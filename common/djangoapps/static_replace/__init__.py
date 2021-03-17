@@ -1,14 +1,12 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 import re
 
-import six
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from opaque_keys.edx.locator import AssetLocator
-from six import text_type
 
 from xmodule.contentstore.content import StaticContent
 
@@ -23,8 +21,7 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return u"""
-        (?x)                      # flags=re.VERBOSE
+    return """(?x)                # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
@@ -39,15 +36,15 @@ def try_staticfiles_lookup(path):
     """
     try:
         url = staticfiles_storage.url(path)
-    except Exception as err:
-        log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        log.warning("staticfiles_storage couldn't find path {}: {}".format(
             path, str(err)))
         # Just return the original path; don't kill everything.
         url = path
     return url
 
 
-def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):
+def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):  # lint-amnesty, pylint: disable=unused-argument
     """
     This will replace a link to another piece of courseware to a 'jump_to'
     URL that will redirect to the right place in the courseware
@@ -81,12 +78,12 @@ def replace_course_urls(text, course_key):
     Replace /course/$stuff urls with /courses/$course_id/$stuff urls
 
     text: The text to replace
-    course_module: A CourseDescriptor
+    course_module: A CourseBlock
 
     returns: text with the links replaced
     """
 
-    course_id = text_type(course_key)
+    course_id = str(course_key)
 
     def replace_course_url(match):
         quote = match.group('quote')
@@ -115,7 +112,7 @@ def process_static_urls(text, replacement_function, data_dir=None):
         # works for actual static assets and for magical course asset URLs....
         full_url = prefix + rest
 
-        starts_with_static_url = full_url.startswith(six.text_type(settings.STATIC_URL))
+        starts_with_static_url = full_url.startswith(str(settings.STATIC_URL))
         starts_with_prefix = full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX)
         contains_prefix = XBLOCK_STATIC_RESOURCE_PREFIX in full_url
         if starts_with_prefix or (starts_with_static_url and contains_prefix):
@@ -124,7 +121,7 @@ def process_static_urls(text, replacement_function, data_dir=None):
         return replacement_function(original, prefix, quote, rest)
 
     return re.sub(
-        _url_replace_regex(u'(?:{static_url}|/static/)(?!{data_dir})'.format(
+        _url_replace_regex('(?:{static_url}|/static/)(?!{data_dir})'.format(
             static_url=settings.STATIC_URL,
             data_dir=data_dir
         )),
@@ -192,8 +189,8 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
             exists_in_staticfiles_storage = False
             try:
                 exists_in_staticfiles_storage = staticfiles_storage.exists(rest)
-            except Exception as err:
-                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+            except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+                log.warning("staticfiles_storage couldn't find path {}: {}".format(
                     rest, str(err)))
 
             if exists_in_staticfiles_storage:
@@ -202,7 +199,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
                 # Import is placed here to avoid model import at project startup.
-                from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
+                from common.djangoapps.static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
                 base_url = AssetBaseUrlConfig.get_base_url()
                 excluded_exts = AssetExcludedExtensionsConfig.get_excluded_extensions()
                 url = StaticContent.get_canonicalized_asset_path(course_id, rest, base_url, excluded_exts)
@@ -220,8 +217,8 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
                 else:
                     url = staticfiles_storage.url(course_path)
             # And if that fails, assume that it's course content, and add manually data directory
-            except Exception as err:
-                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+            except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+                log.warning("staticfiles_storage couldn't find path {}: {}".format(
                     rest, str(err)))
                 url = "".join([prefix, course_path])
 

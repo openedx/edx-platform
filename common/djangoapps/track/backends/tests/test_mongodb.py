@@ -1,15 +1,15 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from django.test import TestCase
 from mock import patch
 
-from track.backends.mongodb import MongoBackend
+from common.djangoapps.track.backends.mongodb import MongoBackend
 
 
-class TestMongoBackend(TestCase):
+class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(TestMongoBackend, self).setUp()
-        self.mongo_patcher = patch('track.backends.mongodb.MongoClient')
+        super(TestMongoBackend, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.mongo_patcher = patch('common.djangoapps.track.backends.mongodb.MongoClient')
         self.mongo_patcher.start()
         self.addCleanup(self.mongo_patcher.stop)
 
@@ -25,7 +25,7 @@ class TestMongoBackend(TestCase):
 
         calls = self.backend.collection.insert.mock_calls
 
-        self.assertEqual(len(calls), 2)
+        assert len(calls) == 2
 
         # Unpack the arguments and check if the events were used
         # as the first argument to collection.insert
@@ -34,5 +34,5 @@ class TestMongoBackend(TestCase):
             _, args, _ = call
             return args[0]
 
-        self.assertEqual(events[0], first_argument(calls[0]))
-        self.assertEqual(events[1], first_argument(calls[1]))
+        assert events[0] == first_argument(calls[0])
+        assert events[1] == first_argument(calls[1])

@@ -3,13 +3,14 @@ Tests for the SignatureValidator class.
 """
 
 
+from unittest.mock import patch
+
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import patch
 
-from lti_provider.models import LtiConsumer
-from lti_provider.signature_validator import SignatureValidator
+from lms.djangoapps.lti_provider.models import LtiConsumer
+from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
 
 
 def get_lti_consumer():
@@ -30,7 +31,7 @@ class ClientKeyValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(ClientKeyValidatorTest, self).setUp()
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_client_key(self):
@@ -38,7 +39,7 @@ class ClientKeyValidatorTest(TestCase):
         Verify that check_client_key succeeds with a valid key
         """
         key = self.lti_consumer.consumer_key
-        self.assertTrue(SignatureValidator(self.lti_consumer).check_client_key(key))
+        assert SignatureValidator(self.lti_consumer).check_client_key(key)
 
     @ddt.data(
         ('0123456789012345678901234567890123456789',),
@@ -50,7 +51,7 @@ class ClientKeyValidatorTest(TestCase):
         """
         Verify that check_client_key fails with a disallowed key
         """
-        self.assertFalse(SignatureValidator(self.lti_consumer).check_client_key(key))
+        assert not SignatureValidator(self.lti_consumer).check_client_key(key)
 
 
 @ddt.ddt
@@ -60,7 +61,7 @@ class NonceValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(NonceValidatorTest, self).setUp()
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_valid_nonce(self):
@@ -68,7 +69,7 @@ class NonceValidatorTest(TestCase):
         Verify that check_nonce succeeds with a key of maximum length
         """
         nonce = '0123456789012345678901234567890123456789012345678901234567890123'
-        self.assertTrue(SignatureValidator(self.lti_consumer).check_nonce(nonce))
+        assert SignatureValidator(self.lti_consumer).check_nonce(nonce)
 
     @ddt.data(
         ('01234567890123456789012345678901234567890123456789012345678901234',),
@@ -80,7 +81,7 @@ class NonceValidatorTest(TestCase):
         """
         Verify that check_nonce fails with badly formatted nonce
         """
-        self.assertFalse(SignatureValidator(self.lti_consumer).check_nonce(nonce))
+        assert not SignatureValidator(self.lti_consumer).check_nonce(nonce)
 
 
 class SignatureValidatorTest(TestCase):
@@ -91,7 +92,7 @@ class SignatureValidatorTest(TestCase):
     """
 
     def setUp(self):
-        super(SignatureValidatorTest, self).setUp()
+        super().setUp()
         self.lti_consumer = get_lti_consumer()
 
     def test_get_existing_client_secret(self):
@@ -101,7 +102,7 @@ class SignatureValidatorTest(TestCase):
         """
         key = self.lti_consumer.consumer_key
         secret = SignatureValidator(self.lti_consumer).get_client_secret(key, None)
-        self.assertEqual(secret, self.lti_consumer.consumer_secret)
+        assert secret == self.lti_consumer.consumer_secret
 
     @patch('oauthlib.oauth1.SignatureOnlyEndpoint.validate_request',
            return_value=(True, None))
@@ -110,7 +111,7 @@ class SignatureValidatorTest(TestCase):
         Verify that the signature validaton library method is called using the
         correct parameters derived from the HttpRequest.
         """
-        body = u'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
+        body = 'oauth_signature_method=HMAC-SHA1&oauth_version=1.0'
         content_type = 'application/x-www-form-urlencoded'
         request = RequestFactory().post('/url', body, content_type=content_type)
         headers = {'Content-Type': content_type}

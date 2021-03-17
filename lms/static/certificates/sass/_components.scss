@@ -21,9 +21,9 @@
 // #HEADINGS
 // ------------------------------
 %hd-subsection {
-  margin-bottom: spacing-vertical(mid-small);
-  border-bottom: rem(2) solid palette(grayscale, x-back);
-  padding-bottom: spacing-vertical(x-small);
+  margin-bottom: map-get($spacing-vertical, mid-small);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, x-small);
 }
 
 // ------------------------------
@@ -31,18 +31,18 @@
 // ------------------------------
 %depth-base-focus {
   background: $white;
-  padding: spacing-vertical(small) spacing-horizontal(base);
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
 }
 
 %depth-well {
-  box-shadow: 0 rem(1) rem(3) 0 palette(grayscale, back) inset;
-  padding: spacing-vertical(small) spacing-horizontal(base);
-  background: palette(grayscale, x-back);
+  box-shadow: 0 rem(1) rem(3) 0 $gray-back inset;
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
+  background: $gray-x-back;
 }
 
 %depth-card {
-  box-shadow: 0 rem(1) rem(2) 0 palette(grayscale, back);
-  padding: spacing-vertical(small) spacing-horizontal(base);
+  box-shadow: 0 rem(1) rem(2) 0 $gray-back;
+  padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, base);
   background: $white;
 }
 
@@ -76,7 +76,7 @@
 .wrapper-header {
   @extend %divider-2;
 
-  border-bottom-color: palette(grayscale, x-back);
+  border-bottom-color: $gray-x-back;
   background: $white;
 }
 
@@ -92,13 +92,14 @@
 // message to user-centric banner
 .wrapper-banner-user {
   box-shadow: inset 0 rem(2) rem(2) 0 $black;
-  background: palette(grayscale, dark);
+  background: $gray-dark;
 }
 
 .banner-user {
   .message-title {
     color: $white;
-    font-weight: font-weight(semi-bold);
+    font-weight: 600;
+    margin-top: 0;
   }
 
   .message-copy {
@@ -106,25 +107,27 @@
   }
 
   .message-actions .action {
+    @include button-outline-variant($gray-x-back, $gray-dark);
 
-    // STATE: hover, active, focus
-    &:hover,
-    &:active,
-    &:focus {
-      // customizations from UXPL
-      color: palette(grayscale, dark);
-    }
+    padding: 0.625rem;
+    font-size: rem(14);
+    transition: color 0.125s ease-in-out 0s, border-color 0.125s ease-in-out 0s, background 0.125s ease-in-out 0s, box-shadow 0.125s ease-in-out 0s;
+    border: 1px solid;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: $font-family-sans;
+    font-weight: 600;
 
     .icon {
-      @include margin-right(spacing-horizontal(x-small));
+      @include margin-right(map-get($spacing-horizontal, x-small));
 
-      font-size: font-size(large);
+      font-size: rem(18);
     }
 
     // CASE: icon display only
     &.icon-only {
       .action-label {
-        @extend %a11y-hide;
+        @include sr-only;
       }
     }
 
@@ -139,9 +142,14 @@
 // #INTRODUCTION
 // ------------------------------
 .introduction {
-  margin-bottom: spacing-vertical(base);
+  margin-bottom: map-get($spacing-vertical, base);
 
   @include text-align(center);
+
+  .introduction-copy {
+    font-weight: 600;
+    margin-top: 0;
+  }
 }
 
 // ------------------------------
@@ -157,7 +165,7 @@
 
 // main accomplishment
 .accomplishment-main {
-  background: palette(grayscale, x-back);
+  background: $gray-x-back;
 }
 
 // brief accomplishment
@@ -194,15 +202,15 @@
 }
 
 %rendering-section {
-  margin-bottom: spacing-vertical(base);
-  border-bottom: rem(2) solid palette(grayscale, x-back);
-  padding-bottom: spacing-vertical(base);
+  margin-bottom: map-get($spacing-vertical, base);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, base);
 }
 
 %rendering-hd-section {
-  margin-bottom: spacing-vertical(mid-small);
-  border-bottom: rem(2) solid palette(grayscale, x-back);
-  padding-bottom: spacing-vertical(x-small);
+  margin-bottom: map-get($spacing-vertical, mid-small);
+  border-bottom: rem(2) solid $gray-x-back;
+  padding-bottom: map-get($spacing-vertical, x-small);
   color: $cert-base-color;
 
   @include text-align(center);
@@ -212,15 +220,15 @@
   @extend %depth-card;
 
   position: relative;
-  top: -(spacing-vertical(base));
+  top: -(map-get($spacing-vertical, base));
   border-top: rem(4) solid $cert-base-color;
 
   // type
   .accomplishment-type {
     @include text-align(center);
 
-    margin-top: -(spacing-vertical(large));
-    margin-bottom: spacing-vertical(base);
+    margin-top: -(map-get($spacing-vertical, large));
+    margin-bottom: map-get($spacing-vertical, base);
   }
 
   .accomplishment-type-label,
@@ -229,16 +237,16 @@
   }
 
   .accomplishment-type-label {
-    @include span(10);
+    @include make-col(10);
 
     margin: 0 auto;
-    font-weight: font-weight(semi-bold);
+    font-weight: 600;
   }
 
   .accomplishment-type-symbol {
     @include size(rem(100));
 
-    margin: 0 auto spacing-vertical(small) auto;
+    margin: 0 auto map-get($spacing-vertical, small) auto;
   }
 
   // statement
@@ -258,12 +266,15 @@
 
   .accomplishment-summary {
     @extend %rendering-accomplishment-line;
+    @extend %copy-lead;
 
-    margin-bottom: spacing-vertical(mid-small);
+    margin-bottom: map-get($spacing-vertical, mid-small);
   }
 
   .accomplishment-course {
     @extend %rendering-accomplishment-line;
+
+    font-weight: 600;
   }
 
   .accomplishment-course-description {
@@ -272,15 +283,12 @@
 
   .accomplishment-statement-detail {
     @extend %rendering-accomplishment-line;
+    @extend %copy-lead;
   }
 
   // organizations
   .accomplishment-orgs {
-    margin-bottom: spacing-vertical(base);
-
-    .list-orgs {
-      @extend %list-unstyled;
-    }
+    margin-bottom: map-get($spacing-vertical, base);
   }
 
   .accomplishment-orgs-title {
@@ -291,13 +299,10 @@
   .accomplishment-signatories {
     @extend %rendering-section;
 
-    .list-signatories {
-      @extend %list-unstyled;
-    }
-
     .signatory-signature {
       display: block;
-      margin: 0 auto spacing-vertical(x-small) auto;
+      margin: 0 auto map-get($spacing-vertical, x-small) auto;
+      box-sizing: border-box;
     }
 
     .signatory-name,
@@ -306,10 +311,16 @@
     }
 
     .signatory-name {
-      margin-bottom: spacing-vertical(xx-small);
+      margin-bottom: map-get($spacing-vertical, xx-small);
+      margin-top: 0;
+      font-weight: 400;
     }
 
     .signatory-credentials {
+      @extend %copy-micro;
+
+      margin-top: 0;
+
       .role,
       .organization {
         white-space: pre-line;
@@ -325,35 +336,36 @@
 
 // metadata
 .accomplishment-metadata {
-  margin-bottom: spacing-vertical(base);
+  margin-bottom: map-get($spacing-vertical, base);
 
   .metadata {
-    @extend %list-unstyled;
-
     .label {
       @extend %copy-meta;
 
-      margin-bottom: spacing-vertical(xx-small);
+      margin-bottom: map-get($spacing-vertical, xx-small);
+      padding: 0 rem(8);
     }
 
     .label-explanation {
       display: block;
-      font-weight: font-weight(normal);
-      margin-top: spacing-vertical(xx-small);
+      font-weight: 400;
+      margin-top: map-get($spacing-vertical, xx-small);
     }
 
     .value {
       @extend %copy-base;
 
-      font-weight: font-weight(semi-bold);
-      color: palette(grayscale, dark);
+      font-weight: 600;
+      color: $gray-dark;
+      margin: 0;
+      padding: 0 rem(8);
     }
   }
 
   .recipient-img,
   .recipient-details {
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
   }
 
   .recipient-img {
@@ -361,7 +373,7 @@
 
     width: rem(100);
 
-    @include margin-right(spacing-horizontal(small));
+    @include margin-right(map-get($spacing-horizontal, small));
 
     .src {
       max-height: 100%;
@@ -372,16 +384,17 @@
   .recipient-details {
     @extend %copy-base;
 
-    font-weight: font-weight(semi-bold);
-    max-width: calc(100% - (#{rem(100)} + #{spacing-horizontal(small)} + 5px));
+    font-weight: 600;
+    max-width: calc(100% - (#{rem(100)} + #{map-get($spacing-horizontal, small)} + 5px));
   }
 
   .recipient-name {
-    margin-bottom: spacing-vertical(xx-small);
+    margin-bottom: map-get($spacing-vertical, xx-small);
   }
 
   .recipient-username {
     margin-bottom: 0;
+    margin-top: rem(28);
   }
 
   .accomplishment-id .value {
@@ -392,7 +405,7 @@
 .accomplishment-metadata-title {
   @extend %hd-subsection;
 
-  border-bottom-color: palette(grayscale, back);
+  border-bottom-color: $gray-back;
 }
 
 // ------------------------------
@@ -451,6 +464,10 @@
       color: $cert-decorative-color;
     }
 
+    .wrapper-statement-and-signatories {
+      width: 100%;
+    }
+
     // statement
     .accomplishment-statement,
     .accomplishment-statement-lead,
@@ -473,7 +490,7 @@
   }
 
   .accomplishment-main {
-    background: palette(grayscale, x-back);
+    background: $gray-x-back;
   }
 
   .accomplishment-rendering {
@@ -492,11 +509,11 @@
 // certificate - distinguished + verified
 .layout-accomplishment.certificate-verified {
   .introduction {
-    margin-bottom: spacing-vertical(base);
+    margin-bottom: map-get($spacing-vertical, base);
   }
 
   .accomplishment-main {
-    background: palette(primary, back);
+    background: $primary-back;
   }
 
   .accomplishment-rendering {
@@ -533,13 +550,13 @@
 // #FOOTER
 // ------------------------------
 .footer-app {
-  border-top: rem(4) solid palette(grayscale, x-back);
-  padding-top: spacing-vertical(base);
+  border-top: rem(4) solid $gray-x-back;
+  padding-top: map-get($spacing-vertical, base);
 }
 
 .footer-app-nav {
   .list {
-    @extend %list-unstyled;
+    padding: 0;
   }
 }
 
@@ -550,8 +567,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: z-index(front);
-  background-color: transparentize(palette(grayscale, base), 0.5); /* dim the background */
+  z-index: 100;
+  background-color: $gray-transparent; /* dim the background */
   width: 100%;
   height: 100%;
   vertical-align: middle;
@@ -561,30 +578,34 @@
 
     box-sizing: content-box;
     position: fixed;
-    top: spacing-vertical(large);
+    top: map-get($spacing-vertical, large);
     right: 0;
     left: 0;
-    z-index: z-index(very-front);
+    z-index: 1000;
     max-width: 50%;
     margin-right: auto;
     margin-left: auto;
-    border-top: rem(10) solid palette(primary, back);
-    background: palette(grayscale, x-back);
-    padding-right: spacing-horizontal(large);
-    padding-left: spacing-horizontal(large);
+    border-top: rem(10) solid $primary-back;
+    background: $gray-x-back;
+    padding-right: map-get($spacing-horizontal, large);
+    padding-left: map-get($spacing-horizontal, large);
     overflow-x: hidden;
-    color: palette(grayscale, dark);
+    color: $gray-dark;
 
     .close {
       position: absolute;
-      right: spacing-horizontal(mid-small);
-      top: spacing-vertical(small);
-      font-weight: font-weight(bold);
+      right: map-get($spacing-horizontal, mid-small);
+      top: map-get($spacing-vertical, small);
+      font-weight: 700;
       cursor: pointer;
     }
 
     .badges-steps {
       display: table;
+
+      a {
+        @extend %link;
+      }
     }
 
     .image-container {
@@ -602,7 +623,7 @@
 
     .backpack-logo {
       @include float(right);
-      @include margin-left(spacing-horizontal(small));
+      @include margin-left(map-get($spacing-horizontal, small));
     }
   }
 }
@@ -610,7 +631,7 @@
 .modal-hr {
   display: block;
   border: none;
-  background-color: palette(grayscale, back);
+  background-color: $gray-back;
   height: rem(2);
   width: 100%;
 }

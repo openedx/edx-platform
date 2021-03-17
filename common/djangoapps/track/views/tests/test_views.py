@@ -1,21 +1,22 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import ddt
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch, sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from track import views
-from track.middleware import TrackMiddleware
-from track.tests import FROZEN_TIME, EventTrackingTestCase
+from common.djangoapps.track import views
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.tests import FROZEN_TIME, EventTrackingTestCase
 
 TEST_USERNAME = 'test-username'
 TEST_USER_ID = 1000
 
 
 @ddt.ddt
-class TestTrackViews(EventTrackingTestCase):
+class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     @classmethod
     def setUpTestData(cls):
@@ -23,11 +24,11 @@ class TestTrackViews(EventTrackingTestCase):
         User.objects.create(pk=TEST_USER_ID, username=TEST_USERNAME)
 
     def setUp(self):
-        super(TestTrackViews, self).setUp()
+        super(TestTrackViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.request_factory = RequestFactory()
 
-        patcher = patch('track.views.tracker', autospec=True)
+        patcher = patch('common.djangoapps.track.views.tracker', autospec=True)
 
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
@@ -141,7 +142,7 @@ class TestTrackViews(EventTrackingTestCase):
         assert_event_matches(expected_event, actual_event)
 
     @override_settings(
-        EVENT_TRACKING_PROCESSORS=[{'ENGINE': 'track.shim.LegacyFieldMappingProcessor'}],
+        EVENT_TRACKING_PROCESSORS=[{'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'}],
     )
     def test_user_track_with_middleware_and_processors(self):
         self.recreate_tracker()

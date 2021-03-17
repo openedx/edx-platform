@@ -6,6 +6,8 @@ defined in edx_user_state_client.
 
 from collections import defaultdict
 
+from django.db import connections
+
 from edx_user_state_client.tests import UserStateClientTestBase
 
 from lms.djangoapps.courseware.tests.factories import UserFactory
@@ -20,9 +22,9 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     __test__ = True
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
-    def _user(self, user_idx):
+    def _user(self, user_idx):  # lint-amnesty, pylint: disable=arguments-differ
         return self.users[user_idx].username
 
     def _block_type(self, block):
@@ -31,6 +33,6 @@ class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
         return 'problem'
 
     def setUp(self):
-        super(TestDjangoUserStateClient, self).setUp()
+        super().setUp()
         self.client = DjangoXBlockUserStateClient()
         self.users = defaultdict(UserFactory.create)

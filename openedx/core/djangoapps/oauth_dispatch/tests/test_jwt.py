@@ -1,26 +1,26 @@
 """ Tests for OAuth Dispatch's jwt module. """
 
 
-import itertools
+import itertools  # lint-amnesty, pylint: disable=unused-import
 from datetime import timedelta
+from unittest.mock import patch
 
 import ddt
 from django.test import TestCase
 from django.utils.timezone import now
-from mock import patch
 
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 from openedx.core.djangoapps.oauth_dispatch.tests.mixins import AccessTokenMixin
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
 class TestCreateJWTs(AccessTokenMixin, TestCase):
     """ Tests for oauth_dispatch's jwt creation functionality. """
     def setUp(self):
-        super(TestCreateJWTs, self).setUp()
+        super().setUp()
         self.user = UserFactory()
         self.default_scopes = ['email', 'profile']
 
@@ -93,8 +93,8 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
             jwt_token, self.user, self.default_scopes, aud=aud, secret=secret,
         )
         self.assertDictContainsSubset(additional_claims, token_payload)
-        self.assertEqual(user_email_verified, token_payload['email_verified'])
-        self.assertEqual(token_payload['roles'], mock_create_roles.return_value)
+        assert user_email_verified == token_payload['email_verified']
+        assert token_payload['roles'] == mock_create_roles.return_value
 
     def test_scopes(self):
         """
@@ -115,6 +115,6 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         jwt_scopes_payload = self.assert_valid_jwt_access_token(
             jwt_scopes, self.user, scopes, aud=aud, secret=secret,
         )
-        self.assertEqual(jwt_payload['scopes'], self.default_scopes)
-        self.assertEqual(jwt_scopes_payload['scopes'], scopes)
-        self.assertEqual(jwt_scopes_payload['user_id'], self.user.id)
+        assert jwt_payload['scopes'] == self.default_scopes
+        assert jwt_scopes_payload['scopes'] == scopes
+        assert jwt_scopes_payload['user_id'] == self.user.id

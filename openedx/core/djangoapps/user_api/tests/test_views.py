@@ -1,40 +1,40 @@
 """Tests for the user API at the HTTP request level. """
 
 
-import json
-from unittest import skipUnless
-
+import json  # lint-amnesty, pylint: disable=unused-import
+from unittest import skipUnless  # lint-amnesty, pylint: disable=unused-import
+import pytest
 import ddt
-import httpretty
-import mock
+import httpretty  # lint-amnesty, pylint: disable=unused-import
+import mock  # lint-amnesty, pylint: disable=unused-import
 import six
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core import mail
-from django.test.client import RequestFactory
-from django.test.testcases import TransactionTestCase
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
+from django.core import mail  # lint-amnesty, pylint: disable=unused-import
+from django.test.client import RequestFactory  # lint-amnesty, pylint: disable=unused-import
+from django.test.testcases import TransactionTestCase  # lint-amnesty, pylint: disable=unused-import
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC, common_timezones_set
+from pytz import UTC, common_timezones_set  # lint-amnesty, pylint: disable=unused-import
 from six import text_type
 from six.moves import range
-from social_django.models import Partial, UserSocialAuth
+from social_django.models import Partial, UserSocialAuth  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common import models
-from openedx.core.djangoapps.site_configuration.helpers import get_value
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
+from openedx.core.djangoapps.site_configuration.helpers import get_value  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from student.tests.factories import UserFactory
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from third_party_auth.tests.utils import (
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.third_party_auth.tests.utils import (  # lint-amnesty, pylint: disable=unused-import
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (  # lint-amnesty, pylint: disable=unused-import
     create_validator_config,
     password_validators_instruction_texts,
     password_validators_restrictions
@@ -42,7 +42,7 @@ from util.password_policy_validators import (
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..accounts import (
+from ..accounts import (  # lint-amnesty, pylint: disable=unused-import
     EMAIL_MAX_LENGTH,
     EMAIL_MIN_LENGTH,
     NAME_MAX_LENGTH,
@@ -50,7 +50,7 @@ from ..accounts import (
     USERNAME_MAX_LENGTH,
     USERNAME_MIN_LENGTH
 )
-from ..accounts.api import get_account_settings
+from ..accounts.api import get_account_settings  # lint-amnesty, pylint: disable=unused-import
 from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
     fake_requested_retirement,
@@ -58,12 +58,12 @@ from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-impo
 )
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
-from ..tests.test_constants import SORTED_COUNTRIES
-from .test_helpers import TestCaseForm
+from ..tests.test_constants import SORTED_COUNTRIES  # lint-amnesty, pylint: disable=unused-import
+from .test_helpers import TestCaseForm  # lint-amnesty, pylint: disable=unused-import
 
-USER_LIST_URI = "/user_api/v1/users/"
-USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
-ROLE_LIST_URI = "/user_api/v1/forum_roles/Moderator/users/"
+USER_LIST_URI = "/api/user/v1/users/"
+USER_PREFERENCE_LIST_URI = "/api/user/v1/user_prefs/"
+ROLE_LIST_URI = "/api/user/v1/forum_roles/Moderator/users/"
 
 
 class UserAPITestCase(ApiTestCase):
@@ -94,7 +94,7 @@ class UserAPITestCase(ApiTestCase):
         six.assertCountEqual(
             self,
             list(user["preferences"].items()),
-            [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]
+            [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]  # lint-amnesty, pylint: disable=no-member
         )
         self.assertSelfReferential(user)
 
@@ -114,10 +114,10 @@ class EmptyUserTestCase(UserAPITestCase):
     """
     def test_get_list_empty(self):
         result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 0)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
-        self.assertEqual(result["results"], [])
+        assert result['count'] == 0
+        assert result['next'] is None
+        assert result['previous'] is None
+        assert result['results'] == []
 
 
 @skip_unless_lms
@@ -129,10 +129,10 @@ class EmptyRoleTestCase(UserAPITestCase):
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
         result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 0)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
-        self.assertEqual(result["results"], [])
+        assert result['count'] == 0
+        assert result['next'] is None
+        assert result['previous'] is None
+        assert result['results'] == []
 
 
 class UserApiTestCase(UserAPITestCase):
@@ -140,7 +140,7 @@ class UserApiTestCase(UserAPITestCase):
     Generalized test case class for specific implementations below
     """
     def setUp(self):
-        super(UserApiTestCase, self).setUp()
+        super(UserApiTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = [
             UserFactory.create(
                 email="test{0}@test.org".format(i),
@@ -164,7 +164,7 @@ class RoleTestCase(UserApiTestCase):
     LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
 
     def setUp(self):
-        super(RoleTestCase, self).setUp()
+        super(RoleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         (role, _) = models.Role.objects.get_or_create(
             name=models.FORUM_ROLE_MODERATOR,
             course_id=self.course_id
@@ -208,10 +208,10 @@ class RoleTestCase(UserApiTestCase):
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
         users = result["results"]
-        self.assertEqual(result["count"], len(self.users))
-        self.assertEqual(len(users), len(self.users))
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
+        assert result['count'] == len(self.users)
+        assert len(users) == len(self.users)
+        assert result['next'] is None
+        assert result['previous'] is None
         for user in users:
             self.assertUserIsValid(user)
 
@@ -224,25 +224,25 @@ class RoleTestCase(UserApiTestCase):
             "page_size": 3,
             "course_id": text_type(self.course_id),
         })
-        self.assertEqual(first_page["count"], 5)
+        assert first_page['count'] == 5
         first_page_next_uri = first_page["next"]
-        self.assertIsNone(first_page["previous"])
+        assert first_page['previous'] is None
         first_page_users = first_page["results"]
-        self.assertEqual(len(first_page_users), 3)
+        assert len(first_page_users) == 3
 
         second_page = self.get_json(first_page_next_uri)
-        self.assertEqual(second_page["count"], 5)
-        self.assertIsNone(second_page["next"])
+        assert second_page['count'] == 5
+        assert second_page['next'] is None
         second_page_prev_uri = second_page["previous"]
         second_page_users = second_page["results"]
-        self.assertEqual(len(second_page_users), 2)
+        assert len(second_page_users) == 2
 
-        self.assertEqual(self.get_json(second_page_prev_uri), first_page)
+        assert self.get_json(second_page_prev_uri) == first_page
 
         for user in first_page_users + second_page_users:
             self.assertUserIsValid(user)
         all_user_uris = [user["url"] for user in first_page_users + second_page_users]
-        self.assertEqual(len(set(all_user_uris)), 5)
+        assert len(set(all_user_uris)) == 5
 
 
 @skip_unless_lms
@@ -253,7 +253,7 @@ class UserViewSetTest(UserApiTestCase):
     LIST_URI = USER_LIST_URI
 
     def setUp(self):
-        super(UserViewSetTest, self).setUp()
+        super(UserViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.detail_uri = self.get_uri_for_user(self.users[0])
 
     # List view tests
@@ -293,35 +293,35 @@ class UserViewSetTest(UserApiTestCase):
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 5)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
+        assert result['count'] == 5
+        assert result['next'] is None
+        assert result['previous'] is None
         users = result["results"]
-        self.assertEqual(len(users), 5)
+        assert len(users) == 5
         for user in users:
             self.assertUserIsValid(user)
 
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={"page_size": 3})
-        self.assertEqual(first_page["count"], 5)
+        assert first_page['count'] == 5
         first_page_next_uri = first_page["next"]
-        self.assertIsNone(first_page["previous"])
+        assert first_page['previous'] is None
         first_page_users = first_page["results"]
-        self.assertEqual(len(first_page_users), 3)
+        assert len(first_page_users) == 3
 
         second_page = self.get_json(first_page_next_uri)
-        self.assertEqual(second_page["count"], 5)
-        self.assertIsNone(second_page["next"])
+        assert second_page['count'] == 5
+        assert second_page['next'] is None
         second_page_prev_uri = second_page["previous"]
         second_page_users = second_page["results"]
-        self.assertEqual(len(second_page_users), 2)
+        assert len(second_page_users) == 2
 
-        self.assertEqual(self.get_json(second_page_prev_uri), first_page)
+        assert self.get_json(second_page_prev_uri) == first_page
 
         for user in first_page_users + second_page_users:
             self.assertUserIsValid(user)
         all_user_uris = [user["url"] for user in first_page_users + second_page_users]
-        self.assertEqual(len(set(all_user_uris)), 5)
+        assert len(set(all_user_uris)) == 5
 
     # Detail view tests
 
@@ -346,21 +346,10 @@ class UserViewSetTest(UserApiTestCase):
     def test_get_detail(self):
         user = self.users[1]
         uri = self.get_uri_for_user(user)
-        self.assertEqual(
-            self.get_json(uri),
-            {
-                "email": user.email,
-                "id": user.id,
-                "name": user.profile.name,
-                "username": user.username,
-                "preferences": dict([
-                    (user_pref.key, user_pref.value)
-                    for user_pref in self.prefs
-                    if user_pref.user == user
-                ]),
-                "url": uri
-            }
-        )
+        assert self.get_json(uri) ==\
+               {'email': user.email, 'id': user.id, 'name': user.profile.name, 'username': user.username,
+                'preferences': {user_pref.key: user_pref.value for user_pref in self.prefs if user_pref.user == user},
+                'url': uri}
 
 
 @skip_unless_lms
@@ -373,7 +362,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UserPreferenceViewSetTest, self).setUp()
+        super(UserPreferenceViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.detail_uri = self.get_uri_for_pref(self.prefs[0])
 
     # List view tests
@@ -400,33 +389,33 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 3)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
+        assert result['count'] == 3
+        assert result['next'] is None
+        assert result['previous'] is None
         prefs = result["results"]
-        self.assertEqual(len(prefs), 3)
+        assert len(prefs) == 3
         for pref in prefs:
             self.assertPrefIsValid(pref)
 
     def test_get_list_filter_key_empty(self):
         result = self.get_json(self.LIST_URI, data={"key": "non-existent"})
-        self.assertEqual(result["count"], 0)
-        self.assertEqual(result["results"], [])
+        assert result['count'] == 0
+        assert result['results'] == []
 
     def test_get_list_filter_key_nonempty(self):
         result = self.get_json(self.LIST_URI, data={"key": "key0"})
-        self.assertEqual(result["count"], 2)
+        assert result['count'] == 2
         prefs = result["results"]
-        self.assertEqual(len(prefs), 2)
+        assert len(prefs) == 2
         for pref in prefs:
             self.assertPrefIsValid(pref)
-            self.assertEqual(pref["key"], "key0")
+            assert pref['key'] == 'key0'
 
     def test_get_list_filter_user_empty(self):
         def test_id(user_id):
             result = self.get_json(self.LIST_URI, data={"user": user_id})
-            self.assertEqual(result["count"], 0)
-            self.assertEqual(result["results"], [])
+            assert result['count'] == 0
+            assert result['results'] == []
         test_id(self.users[2].id)
         # TODO: If the given id does not match a user, then the filter is a no-op
         # test_id(42)
@@ -435,34 +424,34 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     def test_get_list_filter_user_nonempty(self):
         user_id = self.users[0].id
         result = self.get_json(self.LIST_URI, data={"user": user_id})
-        self.assertEqual(result["count"], 2)
+        assert result['count'] == 2
         prefs = result["results"]
-        self.assertEqual(len(prefs), 2)
+        assert len(prefs) == 2
         for pref in prefs:
             self.assertPrefIsValid(pref)
-            self.assertEqual(pref["user"]["id"], user_id)
+            assert pref['user']['id'] == user_id
 
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={"page_size": 2})
-        self.assertEqual(first_page["count"], 3)
+        assert first_page['count'] == 3
         first_page_next_uri = first_page["next"]
-        self.assertIsNone(first_page["previous"])
+        assert first_page['previous'] is None
         first_page_prefs = first_page["results"]
-        self.assertEqual(len(first_page_prefs), 2)
+        assert len(first_page_prefs) == 2
 
         second_page = self.get_json(first_page_next_uri)
-        self.assertEqual(second_page["count"], 3)
-        self.assertIsNone(second_page["next"])
+        assert second_page['count'] == 3
+        assert second_page['next'] is None
         second_page_prev_uri = second_page["previous"]
         second_page_prefs = second_page["results"]
-        self.assertEqual(len(second_page_prefs), 1)
+        assert len(second_page_prefs) == 1
 
-        self.assertEqual(self.get_json(second_page_prev_uri), first_page)
+        assert self.get_json(second_page_prev_uri) == first_page
 
         for pref in first_page_prefs + second_page_prefs:
             self.assertPrefIsValid(pref)
         all_pref_uris = [pref["url"] for pref in first_page_prefs + second_page_prefs]
-        self.assertEqual(len(set(all_pref_uris)), 3)
+        assert len(set(all_pref_uris)) == 3
 
     # Detail view tests
 
@@ -487,26 +476,12 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     def test_get_detail(self):
         pref = self.prefs[1]
         uri = self.get_uri_for_pref(pref)
-        self.assertEqual(
-            self.get_json(uri),
-            {
-                "user": {
-                    "email": pref.user.email,
-                    "id": pref.user.id,
-                    "name": pref.user.profile.name,
-                    "username": pref.user.username,
-                    "preferences": dict([
-                        (user_pref.key, user_pref.value)
-                        for user_pref in self.prefs
-                        if user_pref.user == pref.user
-                    ]),
-                    "url": self.get_uri_for_user(pref.user),
-                },
-                "key": pref.key,
-                "value": pref.value,
-                "url": uri,
-            }
-        )
+        assert self.get_json(uri) ==\
+               {'user': {'email': pref.user.email, 'id': pref.user.id, 'name': pref.user.profile.name,
+                         'username': pref.user.username,
+                         'preferences': {user_pref.key: user_pref.value for user_pref in self.prefs if
+                                         user_pref.user == pref.user}, 'url': self.get_uri_for_user(pref.user)},
+                'key': pref.key, 'value': pref.value, 'url': uri}
 
 
 @skip_unless_lms
@@ -514,7 +489,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for user preferences
     """
-    LIST_URI = "/user_api/v1/preferences/key0/users/"
+    LIST_URI = "/api/user/v1/preferences/key0/users/"
 
     def test_options(self):
         self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
@@ -538,35 +513,35 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
     def test_get_basic(self):
         result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 2)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
+        assert result['count'] == 2
+        assert result['next'] is None
+        assert result['previous'] is None
         users = result["results"]
-        self.assertEqual(len(users), 2)
+        assert len(users) == 2
         for user in users:
             self.assertUserIsValid(user)
 
     def test_get_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={"page_size": 1})
-        self.assertEqual(first_page["count"], 2)
+        assert first_page['count'] == 2
         first_page_next_uri = first_page["next"]
-        self.assertIsNone(first_page["previous"])
+        assert first_page['previous'] is None
         first_page_users = first_page["results"]
-        self.assertEqual(len(first_page_users), 1)
+        assert len(first_page_users) == 1
 
         second_page = self.get_json(first_page_next_uri)
-        self.assertEqual(second_page["count"], 2)
-        self.assertIsNone(second_page["next"])
+        assert second_page['count'] == 2
+        assert second_page['next'] is None
         second_page_prev_uri = second_page["previous"]
         second_page_users = second_page["results"]
-        self.assertEqual(len(second_page_users), 1)
+        assert len(second_page_users) == 1
 
-        self.assertEqual(self.get_json(second_page_prev_uri), first_page)
+        assert self.get_json(second_page_prev_uri) == first_page
 
         for user in first_page_users + second_page_users:
             self.assertUserIsValid(user)
         all_user_uris = [user["url"] for user in first_page_users + second_page_users]
-        self.assertEqual(len(set(all_user_uris)), 2)
+        assert len(set(all_user_uris)) == 2
 
 
 @ddt.ddt
@@ -586,7 +561,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(UpdateEmailOptInTestCase, self).setUp()
+        super(UpdateEmailOptInTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
@@ -610,7 +585,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEqual(preference.value, result)
+        assert preference.value == result
 
     @ddt.data(
         (True, False),
@@ -642,7 +617,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        self.assertEqual(preference.value, u"True")
+        assert preference.value == u'True'
 
     def test_update_email_opt_in_anonymous_user(self):
         """
@@ -654,7 +629,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
             "course_id": six.text_type(self.course.id),
             "email_opt_in": u"True"
         })
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
     def test_update_email_opt_with_invalid_course_key(self):
         """
@@ -666,7 +641,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
             "email_opt_in": u"True"
         })
         self.assertHttpBadRequest(response)
-        with self.assertRaises(UserOrgTag.DoesNotExist):
+        with pytest.raises(UserOrgTag.DoesNotExist):
             UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
 
 
@@ -676,8 +651,8 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for country time zones
     """
-    ALL_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/"
-    COUNTRY_TIME_ZONES_URI = "/user_api/v1/preferences/time_zones/?country_code=cA"
+    ALL_TIME_ZONES_URI = "/api/user/v1/preferences/time_zones/"
+    COUNTRY_TIME_ZONES_URI = "/api/user/v1/preferences/time_zones/?country_code=cA"
 
     @ddt.data(ALL_TIME_ZONES_URI, COUNTRY_TIME_ZONES_URI)
     def test_options(self, country_uri):
@@ -694,16 +669,16 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
     def _assert_time_zone_is_valid(self, time_zone_info):
         """ Asserts that the time zone is a valid pytz time zone """
         time_zone_name = time_zone_info['time_zone']
-        self.assertIn(time_zone_name, common_timezones_set)
-        self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
+        assert time_zone_name in common_timezones_set
+        assert time_zone_info['description'] == get_display_time_zone(time_zone_name)
 
     # The time zones count may need to change each time we upgrade pytz
-    @ddt.data((ALL_TIME_ZONES_URI, 440),
+    @ddt.data((ALL_TIME_ZONES_URI, 439),
               (COUNTRY_TIME_ZONES_URI, 28))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):
         """ Verify that correct time zone info is returned """
         results = self.get_json(country_uri)
-        self.assertEqual(len(results), expected_count)
+        assert len(results) == expected_count
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)

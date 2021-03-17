@@ -1,4 +1,3 @@
-# encoding: utf-8
 """
 The data type and use of it for declaratively creating test courses.
 """
@@ -51,7 +50,7 @@ TOY_BLOCK_INFO_TREE = [
         'Overview', "chapter", {"display_name": "Overview"}, [
             BlockInfo(
                 "Toy_Videos", "videosequence", {
-                    "xml_attributes": {"filename": ["", None]}, "display_name": "Toy Videos", "format": "Lecture Sequence"
+                    "xml_attributes": {"filename": ["", None]}, "display_name": "Toy Videos", "format": "Lecture Sequence"  # lint-amnesty, pylint: disable=line-too-long
                 }, [
                     BlockInfo(
                         "secret:toylab", "html", {
@@ -67,7 +66,7 @@ TOY_BLOCK_INFO_TREE = [
                     ),
                     BlockInfo(
                         "toyjumpto", "html", {
-                            "data": u"<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",
+                            "data": "<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",  # lint-amnesty, pylint: disable=line-too-long
                             "xml_attributes": {"filename": ["html/toyjumpto.xml", "html/toyjumpto.xml"]}
                         }, []),
                     BlockInfo(
@@ -92,7 +91,7 @@ TOY_BLOCK_INFO_TREE = [
                         }, []),
                     BlockInfo(
                         "with_styling", "html", {
-                            "data": "<p style=\"font:italic bold 72px/30px Georgia, serif; color: red; \">Red text here</p>",
+                            "data": "<p style=\"font:italic bold 72px/30px Georgia, serif; color: red; \">Red text here</p>",  # lint-amnesty, pylint: disable=line-too-long
                             "xml_attributes": {"filename": ["html/with_styling.xml", "html/with_styling.xml"]}
                         }, []),
                     BlockInfo(
@@ -109,7 +108,7 @@ TOY_BLOCK_INFO_TREE = [
                 "Welcome", "video", {"data": "", "youtube_id_1_0": "p2Q6BrNhdh8", "display_name": "Welcome"}, []
             ),
             BlockInfo(
-                "video_123456789012", "video", {"data": "", "youtube_id_1_0": "p2Q6BrNhdh8", "display_name": "Test Video"}, []
+                "video_123456789012", "video", {"data": "", "youtube_id_1_0": "p2Q6BrNhdh8", "display_name": "Test Video"}, []  # lint-amnesty, pylint: disable=line-too-long
             ),
             BlockInfo(
                 "video_4f66f493ac8f", "video", {"youtube_id_1_0": "p2Q6BrNhdh8"}, []
@@ -129,7 +128,7 @@ TOY_BLOCK_INFO_TREE = [
         "poll_test", "chapter", {}, [
             BlockInfo(
                 "T1_changemind_poll_foo", "poll_question", {
-                    "question": u"<p>Have you changed your mind? ’</p>",
+                    "question": "<p>Have you changed your mind? ’</p>",
                     "answers": [{"text": "Yes", "id": "yes"}, {"text": "No", "id": "no"}],
                     "xml_attributes": {"reset": "false", "filename": ["", None]},
                     "display_name": "Change your answer"
@@ -177,7 +176,7 @@ TOY_BLOCK_INFO_TREE = [
                         }, []),
                 ]),
                 BlockInfo("unicode", "html", {
-                    "data": u"…", "xml_attributes": {"filename": ["", None]}
+                    "data": "…", "xml_attributes": {"filename": ["", None]}
                 }, [])
             ]),
         ]

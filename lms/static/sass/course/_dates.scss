@@ -9,39 +9,6 @@
     border-bottom: 0;
   }
 
-  .dates-banner {
-    border-radius: 4px;
-    border: solid 1px #9cd2e6;
-    background-color: #eff8fa;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-width: $text-width-readability-max;
-
-    .dates-banner-text {
-      font-size: 16px;
-      line-height: 24px;
-      color: #414141;
-    }
-
-      .banner-has-button {
-          flex: 1 1 20em;
-          max-width: 70%;
-      }
-
-    .upgrade-button {
-      align-self: start;
-      flex: none;
-
-      button {
-        @include white-button-flat-outline;
-      }
-    }
-  }
-
   .timeline-item {
     border-left: solid 1px #2d323e;
     color: #2d323e;
@@ -73,7 +40,7 @@
       background-color: #f5f5f5;
 
       &.past-due {
-        background-color: #d1d2d4;
+        background-color: #475b65;
       }
     }
 
@@ -180,13 +147,12 @@
     padding: 2px 8px;
     border-radius: 5px;
     margin-left: 8px;
-    font-style: italic;
-    font-weight: bold;
+    font-weight: normal;
     vertical-align: top;
 
     &.completed {
-      background-color: #f3f3f4;
-      color: #2d323e;
+      background-color: #f0f2f2;
+      color: #212529;
     }
 
     &.due-next {
@@ -203,7 +169,8 @@
     }
 
     &.past-due {
-      background-color: #d1d2d4;
+      background-color: #475b65;
+      color: #fff;
     }
 
     &.today {

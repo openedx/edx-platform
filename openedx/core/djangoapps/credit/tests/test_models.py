@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for credit course models.
 """
@@ -20,7 +19,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
     setup_retirement_states
 )
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 def add_credit_course(course_key):
@@ -41,16 +40,16 @@ class CreditEligibilityModelTests(TestCase):
     """
 
     def setUp(self):
-        super(CreditEligibilityModelTests, self).setUp()
+        super().setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
 
     @ddt.data(False, True)
     def test_is_credit_course(self, is_credit):
         CreditCourse(course_key=self.course_key, enabled=is_credit).save()
         if is_credit:
-            self.assertTrue(CreditCourse.is_credit_course(self.course_key))
+            assert CreditCourse.is_credit_course(self.course_key)
         else:
-            self.assertFalse(CreditCourse.is_credit_course(self.course_key))
+            assert not CreditCourse.is_credit_course(self.course_key)
 
     def test_get_course_requirements(self):
         credit_course = add_credit_course(self.course_key)
@@ -63,10 +62,10 @@ class CreditEligibilityModelTests(TestCase):
             },
         }
         credit_req, created = CreditRequirement.add_or_update_course_requirement(credit_course, requirement, 0)
-        self.assertEqual(credit_course, credit_req.course)
-        self.assertEqual(created, True)
+        assert credit_course == credit_req.course
+        assert created is True
         requirements = CreditRequirement.get_course_requirements(self.course_key)
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
     def test_add_course_requirement_namespace(self):
         credit_course = add_credit_course(self.course_key)
@@ -79,8 +78,8 @@ class CreditEligibilityModelTests(TestCase):
             },
         }
         credit_req, created = CreditRequirement.add_or_update_course_requirement(credit_course, requirement, 0)
-        self.assertEqual(credit_course, credit_req.course)
-        self.assertEqual(created, True)
+        assert credit_course == credit_req.course
+        assert created is True
 
         requirement = {
             "namespace": "new_grade",
@@ -89,14 +88,14 @@ class CreditEligibilityModelTests(TestCase):
             "criteria": {},
         }
         credit_req, created = CreditRequirement.add_or_update_course_requirement(credit_course, requirement, 1)
-        self.assertEqual(credit_course, credit_req.course)
-        self.assertEqual(created, True)
+        assert credit_course == credit_req.course
+        assert created is True
 
         requirements = CreditRequirement.get_course_requirements(self.course_key)
-        self.assertEqual(len(requirements), 2)
+        assert len(requirements) == 2
 
         requirements = CreditRequirement.get_course_requirements(self.course_key, namespace="grade")
-        self.assertEqual(len(requirements), 1)
+        assert len(requirements) == 1
 
 
 class CreditRequirementStatusTests(RetirementTestCase):
@@ -105,7 +104,7 @@ class CreditRequirementStatusTests(RetirementTestCase):
     """
 
     def setUp(self):
-        super(CreditRequirementStatusTests, self).setUp()
+        super().setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
         self.old_username = "username"
         self.user = UserFactory(username=self.old_username)
@@ -154,21 +153,21 @@ class CreditRequirementStatusTests(RetirementTestCase):
         self.add_course_requirements()
 
         retirement_succeeded = CreditRequirementStatus.retire_user(self.retirement)
-        self.assertTrue(retirement_succeeded)
+        assert retirement_succeeded
 
         old_username_records_exist = CreditRequirementStatus.objects.filter(
             username=self.old_username
         ).exists()
-        self.assertFalse(old_username_records_exist)
+        assert not old_username_records_exist
 
         new_username_records_exist = CreditRequirementStatus.objects.filter(
             username=self.retirement.retired_username
         ).exists()
-        self.assertTrue(new_username_records_exist)
+        assert new_username_records_exist
 
     def test_retire_user_without_data(self):
         retirement_succeeded = CreditRequirementStatus.retire_user(self.retirement)
-        self.assertFalse(retirement_succeeded)
+        assert not retirement_succeeded
 
 
 class CreditRequestTest(RetirementTestCase):
@@ -177,7 +176,7 @@ class CreditRequestTest(RetirementTestCase):
     """
 
     def setUp(self):
-        super(CreditRequestTest, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = CreditCourse.objects.create()
@@ -196,7 +195,7 @@ class CreditRequestTest(RetirementTestCase):
             username=self.user.username
         )[0]
 
-        self.assertEqual(credit_request_before_retire.parameters, test_parameters)
+        assert credit_request_before_retire.parameters == test_parameters
 
         user_was_retired = CreditRequest.retire_user(self.retirement)
         credit_request_before_retire.refresh_from_db()
@@ -204,9 +203,9 @@ class CreditRequestTest(RetirementTestCase):
             username=self.retirement.original_username
         )
 
-        self.assertTrue(user_was_retired)
-        self.assertEqual(credit_request_before_retire.parameters, {})
-        self.assertFalse(credit_requests_after_retire.exists())
+        assert user_was_retired
+        assert credit_request_before_retire.parameters == {}
+        assert not credit_requests_after_retire.exists()
 
     def test_cannot_retire_nonexistent_user(self):
         test_parameters = {'hi': 'there'}
@@ -226,5 +225,5 @@ class CreditRequestTest(RetirementTestCase):
         was_retired = CreditRequest.retire_user(another_retirement)
         credit_request_before_retire.refresh_from_db()
 
-        self.assertFalse(was_retired)
-        self.assertEqual(credit_request_before_retire.parameters, test_parameters)
+        assert not was_retired
+        assert credit_request_before_retire.parameters == test_parameters

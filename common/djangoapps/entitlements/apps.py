@@ -12,11 +12,11 @@ class EntitlementsConfig(AppConfig):
     """
     Application Configuration for Entitlements.
     """
-    name = u'entitlements'
+    name = 'common.djangoapps.entitlements'
 
     def ready(self):
         """
         Connect handlers to signals.
         """
         from . import signals  # pylint: disable=unused-import
-        from .tasks import expire_old_entitlements
+        from .tasks import expire_old_entitlements  # lint-amnesty, pylint: disable=unused-import

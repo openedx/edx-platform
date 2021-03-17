@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
@@ -30,22 +27,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='apiaccessrequest',
             name='company_address',
-            field=models.CharField(default=u'', max_length=255),
+            field=models.CharField(default='', max_length=255),
         ),
         migrations.AddField(
             model_name='apiaccessrequest',
             name='company_name',
-            field=models.CharField(default=u'', max_length=255),
+            field=models.CharField(default='', max_length=255),
         ),
         migrations.AddField(
             model_name='historicalapiaccessrequest',
             name='company_address',
-            field=models.CharField(default=u'', max_length=255),
+            field=models.CharField(default='', max_length=255),
         ),
         migrations.AddField(
             model_name='historicalapiaccessrequest',
             name='company_name',
-            field=models.CharField(default=u'', max_length=255),
+            field=models.CharField(default='', max_length=255),
         ),
         migrations.AlterField(
             model_name='apiaccessrequest',

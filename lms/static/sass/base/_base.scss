@@ -5,20 +5,21 @@
 //   overflow-y: scroll;
 // }
 
-html,
-body {
+html {
   font-family: $font-family-sans-serif;
-  font-size: $font-size-base;
   font-style: normal;
   line-height: 1em;
-}
-
-html {
   background: theme-color("inverse");
+
 }
 
 body {
+  font-family: $font-family-sans-serif;
+  font-style: normal;
+  font-size: $font-size-base;
+  line-height: 1em;
   background: $body-bg;
+
 }
 
 // removing the outline on any element that we make programmatically focusable
@@ -130,8 +131,8 @@ a:visited:not(.btn) {
 }
 
 .content-wrapper {
+  margin: $baseline auto 0 auto;
   max-width: map-get($container-max-widths, xl);
-  margin-top: $baseline;
   padding: 0 0 $baseline/2;
 
   @include media-breakpoint-up(md) {
@@ -304,39 +305,4 @@ mark {
       width: 20%;
     }
   }
-}
-
-.dates-banner {
-    border-radius: 4px;
-    border: solid 1px #9cd2e6;
-    background-color: #eff8fa;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    max-width: $text-width-readability-max;
-
-    .dates-banner-text {
-        font-size: 16px;
-        line-height: 24px;
-        color: #414141;
-
-        a.mobile-dates-link {
-            color: #0075b4;
-        }
-    }
-
-    &.has-button {
-        .dates-banner-text {
-            flex: 1 1 20em;
-            max-width: 70%;
-        }
-    }
-
-    &.on-mobile {
-        margin-left: 20px;
-        margin-right: 20px;
-    }
 }

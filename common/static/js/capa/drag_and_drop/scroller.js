@@ -1,52 +1,33 @@
 (function(requirejs, require, define) {
-    define([], function() {
+    define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         return Scroller;
 
         function Scroller(state) {
             var $parentEl, $moveLeftEl, $showEl, $moveRightEl, showElLeftMargin;
 
-            $parentEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 665px; ' +
-                    'height: 102px; ' +
-                    'margin-left: auto; ' +
-                    'margin-right: auto; ' +
-                '" ' +
-            '></div>'
-        );
+            $parentEl = $(HtmlUtils.HTML(
+                '<div style=" width: 665px; height: 102px; margin-left: auto; margin-right: auto; " ></div>'
+            ).toString());
 
-            $moveLeftEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 40px; ' +
-                    'height: 102px; ' +
-                    'display: inline; ' +
-                    'float: left; ' +
-                '" ' +
-            '>' +
-                '<div ' +
-                    'style=" ' +
-                        'width: 38px; ' +
-                        'height: 100px; ' +
-
-                        'border: 1px solid #CCC; ' +
-                        'background-color: #EEE; ' +
-                        'background-image: -webkit-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -moz-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -ms-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -o-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: linear-gradient(top, #EEE, #DDD); ' +
-                        '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
-                        'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
-
-                        "background-image: url('" + baseUrl + "images/arrow-left.png'); " +
-                        'background-position: center center; ' +
-                        'background-repeat: no-repeat; ' +
-                    '" ' +
-                '></div>' +
-            '</div>'
-        );
+            $moveLeftEl = $(HtmlUtils.joinHtml(
+            HtmlUtils.HTML('<div style=" width: 40px; height: 102px; display: inline; float: left; " >'),
+                HtmlUtils.HTML('<div style=" width: 38px; height: 100px; border: 1px solid #CCC; '),
+                    HtmlUtils.HTML('background-color: #EEE; '),
+                    HtmlUtils.HTML('background-image: -webkit-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -moz-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -ms-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -o-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; '),
+                    HtmlUtils.HTML('box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; '),
+                            // eslint-disable-next-line no-undef
+                    HtmlUtils.HTML("background-image: url('"), baseUrl,
+                    HtmlUtils.HTML("images/arrow-left.png'); "),
+                    HtmlUtils.HTML('background-position: center center; '),
+                    HtmlUtils.HTML('background-repeat: no-repeat; " >'),
+                HtmlUtils.HTML('</div>'),
+            HtmlUtils.HTML('</div>')
+        ).toString());
             $moveLeftEl.appendTo($parentEl);
 
         // The below is necessary to prevent the browser thinking that we want
@@ -77,17 +58,9 @@
                 });
             });
 
-            $showEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 585px; ' +
-                    'height: 102px; ' +
-                    'overflow: hidden; ' +
-                    'display: inline; ' +
-                    'float: left; ' +
-                '" ' +
-            '></div>'
-        );
+            $showEl = $(HtmlUtils.HTML(
+                '<div style=" width: 585px; height: 102px; overflow: hidden; display: inline; float: left; " ></div>'
+            ).toString());
             $showEl.appendTo($parentEl);
 
             showElLeftMargin = 0;
@@ -96,53 +69,36 @@
         // so that any SANE number of draggables will fit in a single row. It
         // will be contained in a parent element whose 'overflow' CSS value
         // will be hidden, preventing the long row from fully being visible.
-            state.sliderEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 20000px; ' +
-                    'height: 100px; ' +
-                    'border-top: 1px solid #CCC; ' +
-                    'border-bottom: 1px solid #CCC; ' +
-                '" ' +
-            '></div>'
-        );
+            // eslint-disable-next-line no-param-reassign
+            state.sliderEl = $(HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<div style=" width: 20000px; height: 100px; border-top: 1px solid #CCC; '),
+                HtmlUtils.HTML('border-bottom: 1px solid #CCC; " ></div>')
+            ).toString());
             state.sliderEl.appendTo($showEl);
 
             state.sliderEl.mousedown(function(event) {
                 event.preventDefault();
             });
 
-            $moveRightEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 40px; ' +
-                    'height: 102px; ' +
-                    'display: inline; ' +
-                    'float: left; ' +
-                '" ' +
-            '>' +
-                '<div ' +
-                    'style=" ' +
-                        'width: 38px; ' +
-                        'height: 100px; ' +
-
-                        'border: 1px solid #CCC; ' +
-                        'background-color: #EEE; ' +
-                        'background-image: -webkit-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -moz-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -ms-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: -o-linear-gradient(top, #EEE, #DDD); ' +
-                        'background-image: linear-gradient(top, #EEE, #DDD); ' +
-                        '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
-                        'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
-
-                        "background-image: url('" + baseUrl + "images/arrow-right.png'); " +
-                        'background-position: center center; ' +
-                        'background-repeat: no-repeat; ' +
-                    '" ' +
-                '></div>' +
-            '</div>'
-        );
+            $moveRightEl = $(HtmlUtils.joinHtml(
+            HtmlUtils.HTML('<div style=" width: 40px; height: 102px; display: inline; float: left; " >'),
+                HtmlUtils.HTML('<div style=" width: 38px; height: 100px; border: 1px solid #CCC; '),
+                    HtmlUtils.HTML('background-color: #EEE; '),
+                    HtmlUtils.HTML('background-image: -webkit-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -moz-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -ms-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: -o-linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('background-image: linear-gradient(top, #EEE, #DDD); '),
+                    HtmlUtils.HTML('-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; '),
+                    HtmlUtils.HTML('box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; '),
+                    // eslint-disable-next-line no-undef
+                    HtmlUtils.HTML("background-image: url('"), baseUrl,
+                    HtmlUtils.HTML("images/arrow-right.png'); "),
+                    HtmlUtils.HTML('background-position: center center; '),
+                    HtmlUtils.HTML('background-repeat: no-repeat; " >'),
+                HtmlUtils.HTML('</div>'),
+            HtmlUtils.HTML('</div>')
+        ).toString());
             $moveRightEl.appendTo($parentEl);
 
         // The below is necessary to prevent the browser thinking that we want

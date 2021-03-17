@@ -7,7 +7,6 @@ Intended to be utilized as an AJAX callback handler, versus a proper view/screen
 import logging
 from functools import wraps
 
-import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -16,14 +15,16 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
-from contentstore.views.item import delete_item
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util import milestones_helpers
+from openedx.core import toggles as core_toggles
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from student.auth import has_course_author_access
-from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .helpers import create_xblock, remove_entrance_exam_graders
+from .item import delete_item
 
 __all__ = ['entrance_exam', ]
 
@@ -41,23 +42,21 @@ def _get_default_entrance_exam_minimum_pct():
     return entrance_exam_minimum_score_pct
 
 
-def check_feature_enabled(feature_name):
+def check_entrance_exams_enabled(view_func):
     """
-    Ensure the specified feature is turned on.  Return an HTTP 400 code if not.
+    Ensure the entrance exams feature is turned on. Return an HTTP 400 code if not.
     """
-    def _check_feature_enabled(view_func):
-        def _decorator(request, *args, **kwargs):
-            # Deny access if the entrance exam feature is disabled
-            if not settings.FEATURES.get(feature_name, False):
-                return HttpResponseBadRequest()
-            return view_func(request, *args, **kwargs)
-        return wraps(view_func)(_decorator)
-    return _check_feature_enabled
+    def _decorator(request, *args, **kwargs):
+        # Deny access if the entrance exam feature is disabled
+        if not core_toggles.ENTRANCE_EXAMS.is_enabled():
+            return HttpResponseBadRequest()
+        return view_func(request, *args, **kwargs)
+    return wraps(view_func)(_decorator)
 
 
 @login_required
 @ensure_csrf_cookie
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def entrance_exam(request, course_key_string):
     """
     The restful handler for entrance exams.
@@ -104,7 +103,7 @@ def entrance_exam(request, course_key_string):
         return HttpResponse(status=405)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct):
     """
     api method to create an entrance exam.
@@ -132,7 +131,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         return HttpResponse(status=400)
 
     # Create the entrance exam item (currently it's just a chapter)
-    parent_locator = six.text_type(course.location)
+    parent_locator = str(course.location)
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,
@@ -147,13 +146,13 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     metadata = {
         'entrance_exam_enabled': True,
         'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct,
-        'entrance_exam_id': six.text_type(created_block.location),
+        'entrance_exam_id': str(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)
 
     # Create the entrance exam section item.
     create_xblock(
-        parent_locator=six.text_type(created_block.location),
+        parent_locator=str(created_block.location),
         user=request.user,
         category='sequential',
         display_name=_('Entrance Exam - Subsection')
@@ -178,14 +177,14 @@ def _get_entrance_exam(request, course_key):
         return HttpResponse(status=404)
     try:
         exam_descriptor = modulestore().get_item(exam_key)
-        return HttpResponse(
-            dump_js_escaped_json({'locator': six.text_type(exam_descriptor.location)}),
+        return HttpResponse(  # lint-amnesty, pylint: disable=http-response-with-content-type-json
+            dump_js_escaped_json({'locator': str(exam_descriptor.location)}),
             status=200, content_type='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def update_entrance_exam(request, course_key, exam_data):
     """
     Operation to update course fields pertaining to entrance exams
@@ -199,7 +198,7 @@ def update_entrance_exam(request, course_key, exam_data):
         CourseMetadata.update_from_dict(metadata, course, request.user)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def delete_entrance_exam(request, course_key):
     """
     api method to delete an entrance exam
@@ -235,7 +234,7 @@ def _delete_entrance_exam(request, course_key):
     return HttpResponse(status=204)
 
 
-def add_entrance_exam_milestone(course_id, x_block):
+def add_entrance_exam_milestone(course_id, x_block):  # lint-amnesty, pylint: disable=missing-function-docstring
     # Add an entrance exam milestone if one does not already exist for given xBlock
     # As this is a standalone method for entrance exam, We should check that given xBlock should be an entrance exam.
     if x_block.is_entrance_exam:
@@ -245,10 +244,10 @@ def add_entrance_exam_milestone(course_id, x_block):
             course_id
         )
         milestones = milestones_helpers.get_milestones(milestone_namespace)
-        if len(milestones):
+        if len(milestones):  # lint-amnesty, pylint: disable=len-as-condition
             milestone = milestones[0]
         else:
-            description = u'Autogenerated during {} entrance exam creation.'.format(six.text_type(course_id))
+            description = 'Autogenerated during {} entrance exam creation.'.format(str(course_id))
             milestone = milestones_helpers.add_milestone({
                 'name': _('Completed Course Entrance Exam'),
                 'namespace': milestone_namespace,
@@ -256,13 +255,13 @@ def add_entrance_exam_milestone(course_id, x_block):
             })
         relationship_types = milestones_helpers.get_milestone_relationship_types()
         milestones_helpers.add_course_milestone(
-            six.text_type(course_id),
+            str(course_id),
             relationship_types['REQUIRES'],
             milestone
         )
         milestones_helpers.add_course_content_milestone(
-            six.text_type(course_id),
-            six.text_type(x_block.location),
+            str(course_id),
+            str(x_block.location),
             relationship_types['FULFILLS'],
             milestone
         )
@@ -279,4 +278,4 @@ def remove_entrance_exam_milestone_reference(request, course_key):
     for course_child in course_children:
         if course_child.is_entrance_exam:
             delete_item(request, course_child.scope_ids.usage_id)
-            milestones_helpers.remove_content_references(six.text_type(course_child.scope_ids.usage_id))
+            milestones_helpers.remove_content_references(str(course_child.scope_ids.usage_id))

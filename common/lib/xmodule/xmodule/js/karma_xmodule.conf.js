@@ -61,25 +61,24 @@ var options = {
     ],
 
     libraryFiles: [
-        {pattern: 'common_static/edx-pattern-library/js/**/*.js'},
         {pattern: 'common_static/edx-ui-toolkit/js/**/*.js'}
     ],
 
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        { pattern: 'src/xmodule.js', included: true, ignoreCoverage: true }, // To prevent getting instrumented twice.
+        {pattern: 'src/xmodule.js', included: true, ignoreCoverage: true}, // To prevent getting instrumented twice.
         // Load these before the xmodules that use them
-        { pattern: 'src/javascript_loader.js', included: true },
-        { pattern: 'src/collapsible.js', included: true },
+        {pattern: 'src/javascript_loader.js', included: true},
+        {pattern: 'src/collapsible.js', included: true},
         // Load everything else
         {pattern: 'src/**/!(video)/!(poll|time).js', included: true}
     ],
 
     specFiles: [
         {pattern: 'spec/helper.js', included: true, ignoreCoverage: true}, // Helper which depends on source files.
-        { pattern: 'spec/**/!(video)/*.js', included: true },
-        { pattern: 'spec/!(time_spec|video_helper).js', included: true }
+        {pattern: 'spec/**/!(video)/*.js', included: true},
+        {pattern: 'spec/!(time_spec|video_helper).js', included: true}
     ],
 
     fixtureFiles: [

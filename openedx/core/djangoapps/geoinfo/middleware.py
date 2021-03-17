@@ -9,14 +9,13 @@ Usage:
 decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 
 """
-
-
 import logging
 import geoip2.database
 
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
-from ipware.ip import get_real_ip
+from ipware.ip import get_client_ip
+from ipware.utils import is_public_ip
 
 log = logging.getLogger(__name__)
 
@@ -31,13 +30,13 @@ class CountryMiddleware(MiddlewareMixin):
 
         Store country code in session.
         """
-        new_ip_address = get_real_ip(request)
+        new_ip_address = get_client_ip(request)[0]
         old_ip_address = request.session.get('ip_address', None)
 
         if not new_ip_address and old_ip_address:
             del request.session['ip_address']
             del request.session['country_code']
-        elif new_ip_address != old_ip_address:
+        elif new_ip_address != old_ip_address and is_public_ip(new_ip_address):
             reader = geoip2.database.Reader(settings.GEOIP_PATH)
             try:
                 response = reader.country(new_ip_address)

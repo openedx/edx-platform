@@ -2,19 +2,19 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from oauth2_provider import models
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 
 
-class DOTAdapter(object):
+class DOTAdapter:
     """
     Standard interface for working with django-oauth-toolkit
     """
 
     backend = object()
-    FILTER_USER_ME = u'user:me'
+    FILTER_USER_ME = 'user:me'
 
     def create_confidential_client(self,
                                    name,
@@ -123,8 +123,8 @@ class DOTAdapter(object):
         filter_set_before_orgs = filter_set.copy()
         filter_set.update([org_relation.to_jwt_filter_claim() for org_relation in application.organizations.all()])
 
-        set_custom_metric('filter_set_before_orgs', list(filter_set_before_orgs))
-        set_custom_metric('filter_set_after_orgs', list(filter_set))
-        set_custom_metric('filter_set_difference', list(filter_set.difference(filter_set_before_orgs)))
+        set_custom_attribute('filter_set_before_orgs', list(filter_set_before_orgs))
+        set_custom_attribute('filter_set_after_orgs', list(filter_set))
+        set_custom_attribute('filter_set_difference', list(filter_set.difference(filter_set_before_orgs)))
 
         return filter_set

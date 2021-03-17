@@ -7,11 +7,10 @@ import logging
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
-
-import dashboard.git_import
-from dashboard.git_import import GitImportError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
+
+from lms.djangoapps.dashboard import git_import
 
 log = logging.getLogger(__name__)
 
@@ -27,8 +26,8 @@ class Command(BaseCommand):
     # to store the courses for use on the Web site.
     help = ('Usage: '
             'git_add_course repository_url [directory to check out into] [repository_branch] '
-            '\n{0}'.format(_('Import the specified git repository and optional branch into the '
-                             'modulestore and optionally specified directory.')))
+            '\n{}'.format(_('Import the specified git repository and optional branch into the '
+                            'modulestore and optionally specified directory.')))
 
     def add_arguments(self, parser):
         # Positional arguments
@@ -50,6 +49,6 @@ class Command(BaseCommand):
             branch = options['repository_branch']
 
         try:
-            dashboard.git_import.add_repo(options['repository_url'], rdir_arg, branch)
-        except GitImportError as ex:
-            raise CommandError(str(ex))
+            git_import.add_repo(options['repository_url'], rdir_arg, branch)
+        except git_import.GitImportError as ex:
+            raise CommandError(str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

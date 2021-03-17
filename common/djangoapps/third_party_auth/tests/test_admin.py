@@ -2,22 +2,20 @@
 Tests third_party_auth admin views
 """
 
-
-import unittest
-
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import models
 from django.urls import reverse
 
-from student.tests.factories import UserFactory
-from third_party_auth.admin import OAuth2ProviderConfigAdmin
-from third_party_auth.models import OAuth2ProviderConfig
-from third_party_auth.tests import testutil
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.admin import OAuth2ProviderConfigAdmin
+from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 class Oauth2ProviderConfigAdminTest(testutil.TestCase):
     """
     Tests for oauth2 provider config admin
@@ -55,8 +53,8 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Get the provider instance with active flag
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), 1)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == 1
+        assert providers[pcount].id == provider1.id
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
@@ -76,14 +74,14 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Post the edit form: expecting redirect
         response = self.client.post(update_url, post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # Editing the existing provider creates a new provider instance
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), pcount + 2)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == (pcount + 2)
+        assert providers[pcount].id == provider1.id
         provider2 = providers[pcount + 1]
 
         # Ensure the icon_image was preserved on the new provider instance
-        self.assertEqual(provider2.icon_image, provider1.icon_image)
-        self.assertEqual(provider2.name, post_data['name'])
+        assert provider2.icon_image == provider1.icon_image
+        assert provider2.name == post_data['name']

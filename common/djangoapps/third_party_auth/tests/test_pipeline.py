@@ -2,19 +2,19 @@
 
 
 import json
-import unittest
 
 import ddt
 import mock
 
-from third_party_auth import pipeline
-from third_party_auth.tests import testutil
-from third_party_auth.tests.specs.base import IntegrationTestMixin
-from third_party_auth.tests.specs.test_testshib import SamlIntegrationTestUtilities
-from third_party_auth.tests.testutil import simulate_running_pipeline
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.specs.base import IntegrationTestMixin
+from common.djangoapps.third_party_auth.tests.specs.test_testshib import SamlIntegrationTestUtilities
+from common.djangoapps.third_party_auth.tests.testutil import simulate_running_pipeline
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
@@ -22,7 +22,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
     def test_get_unlink_form_name(self):
         google_provider = self.configure_google_provider(enabled=True)
         state = pipeline.ProviderUserState(google_provider, object(), None)
-        self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())
+        assert (google_provider.provider_id + '_unlink_form') == state.get_unlink_form_name()
 
     @ddt.data(
         ('saml', 'tpa-saml'),
@@ -49,12 +49,12 @@ class ProviderUserStateTestCase(testutil.TestCase):
                 "idp_name": idp_slug
             }
         }
-        with simulate_running_pipeline("third_party_auth.pipeline", backend_name, **kwargs):
+        with simulate_running_pipeline("common.djangoapps.third_party_auth.pipeline", backend_name, **kwargs):
             logout_url = pipeline.get_idp_logout_url_from_running_pipeline(request)
-            self.assertEqual(idp_config['logout_url'], logout_url)
+            assert idp_config['logout_url'] == logout_url
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
     """
@@ -62,7 +62,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
     """
 
     def setUp(self):
-        super(PipelineOverridesTest, self).setUp()
+        super(PipelineOverridesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.enable_saml()
         self.provider = self.configure_saml_provider(
             enabled=True,
@@ -81,7 +81,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengt9fe2', True),
     )
     @ddt.unpack
-    @mock.patch('third_party_auth.pipeline.user_exists')
+    @mock.patch('common.djangoapps.third_party_auth.pipeline.user_exists')
     def test_get_username_in_pipeline(self, idp_username, expected_username, already_exists, mock_user_exists):
         """
         Test get_username method of running pipeline
@@ -92,9 +92,9 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         }
         mock_user_exists.side_effect = [already_exists, False]
         __, strategy = self.get_request_and_strategy()
-        with mock.patch('third_party_auth.pipeline.uuid4') as mock_uuid:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.uuid4') as mock_uuid:
             uuid4 = mock.Mock()
             type(uuid4).hex = mock.PropertyMock(return_value='9fe2c4e93f654fdbb24c02b15259716c')
             mock_uuid.return_value = uuid4
             final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
-            self.assertEqual(expected_username, final_username['username'])
+            assert expected_username == final_username['username']

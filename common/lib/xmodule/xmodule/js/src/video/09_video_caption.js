@@ -29,22 +29,22 @@
                 return new VideoCaption(state);
             }
 
-            _.bindAll(this, 'toggle', 'onMouseEnter', 'onMouseLeave', 'onMovement',
+            _.bindAll(this, 'toggleTranscript', 'onMouseEnter', 'onMouseLeave', 'onMovement',
                 'onContainerMouseEnter', 'onContainerMouseLeave', 'fetchCaption',
                 'onResize', 'pause', 'play', 'onCaptionUpdate', 'onCaptionHandler', 'destroy',
                 'handleKeypress', 'handleKeypressLink', 'openLanguageMenu', 'closeLanguageMenu',
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop', 'handleTranscriptCookie', 'updateTranscriptCookie'
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
             );
 
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
+            this.setTranscriptVisibility();
             this.listenForDragDrop();
-            this.handleTranscriptCookie();
 
             return $.Deferred().resolve().promise();
         };
@@ -154,7 +154,7 @@
                     keydown: this.handleCaptionToggle
                 });
                 this.transcriptControlEl.on({
-                    click: this.toggle,
+                    click: this.toggleTranscript,
                     keydown: this.handleTranscriptToggle
                 });
                 this.subtitlesMenuEl.on({
@@ -222,7 +222,7 @@
                 case KEY.SPACE:
                 case KEY.ENTER:
                     event.preventDefault();
-                    this.toggle(event);
+                    this.toggleTranscript(event);
                 // no default
                 }
             },
@@ -563,7 +563,7 @@
                             } else {
                                 self.renderCaption(start, captions);
                             }
-                            self.hideCaptions(state.hideCaptions, false);
+                            self.hideCaptions(self.hideCaptionsOnLoad);
                             HtmlUtils.append(
                                 self.state.el.find('.video-wrapper').parent(),
                                 HtmlUtils.HTML(self.subtitlesEl)
@@ -578,6 +578,7 @@
                         self.loaded = true;
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
+                        var canFetchWithYoutubeId;
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
                             '[Video info]: STATUS:', textStatus +
@@ -591,13 +592,16 @@
                         if (_.keys(state.config.transcriptLanguages).length > 1) {
                             self.fetchAvailableTranslations();
                         } else if (!fetchWithYoutubeId && state.videoType === 'html5') {
-                            console.log('[Video info]: Html5 mode fetching caption with youtubeId.');
-                            self.fetchCaption(true);
+                            canFetchWithYoutubeId = self.fetchCaption(true);
+                            if (canFetchWithYoutubeId) {
+                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.');  // eslint-disable-line max-len, no-console
+                            } else {
+                                self.hideCaptions(true);
+                                self.languageChooserEl.hide();
+                            }
                         } else {
-                            self.hideCaptions(true, false);
-                            self.state.el.find('.lang').hide();
-                            self.state.el.find('.transcript-control').hide();
-                            self.subtitlesEl.hide();
+                            self.hideCaptions(true);
+                            self.languageChooserEl.hide();
                         }
                     }
                 });
@@ -632,10 +636,8 @@
                         }
                     },
                     error: function() {
-                        self.hideCaptions(true, false);
-                        self.state.el.find('.lang').hide();
-                        self.state.el.find('.transcript-control').hide();
-                        self.subtitlesEl.hide();
+                        self.hideCaptions(true);
+                        self.languageChooserEl.hide();
                     }
                 });
 
@@ -1136,23 +1138,6 @@
                 );
             },
 
-            /**
-            * @desc Shows/Hides transcript on click `transcript` button
-            *
-            * @param {jquery Event} event
-            *
-            */
-            toggle: function(event) {
-                event.preventDefault();
-                if (this.state.el.hasClass('closed')) {
-                    this.hideCaptions(false, true, true);
-                    this.updateTranscriptCookie(true);
-                } else {
-                    this.hideCaptions(true, true, true);
-                    this.updateTranscriptCookie(false);
-                }
-            },
-
             handleCaptioningCookie: function() {
                 if ($.cookie('show_closed_captions') === 'true') {
                     this.state.showClosedCaptions = true;
@@ -1235,19 +1220,48 @@
                     });
                 }
             },
-            handleTranscriptCookie: function() {
-                if ($.cookie('show_transcript') === null) {
-                    return;
+
+            /**
+            * This runs when the video block is first rendered and sets the initial visibility
+            * of the transcript panel based on the value of the 'show_transcript' cookie and/or
+            * the block's showCaptions setting.
+            */
+            setTranscriptVisibility: function() {
+                var hideCaptionsOnRender = !this.state.config.showCaptions;
+
+                if ($.cookie('show_transcript') === 'true') {
+                    this.hideCaptionsOnLoad = false;
+                    // Keep it going until turned off.
+                    this.updateTranscriptCookie(true);
+                } else if ($.cookie('show_transcript') === 'false') {
+                    hideCaptionsOnRender = true;
+                    this.hideCaptionsOnLoad = true;
+                } else {
+                    this.hideCaptionsOnLoad = !this.state.config.showCaptions;
                 }
-                if ($.cookie('show_transcript') !== 'false') {
-                    this.state.hideCaptions = false;
-                    // keep it going until turned off or in case of null initially change to true
+
+                if (hideCaptionsOnRender) {
+                    this.state.el.addClass('closed');
+                }
+            },
+
+            /**
+            * @desc Shows/Hides transcript on click `transcript` button
+            *
+            * @param {jquery Event} event
+            *
+            */
+            toggleTranscript: function(event) {
+                event.preventDefault();
+                if (this.state.el.hasClass('closed')) {
+                    this.hideCaptions(false, true);
                     this.updateTranscriptCookie(true);
                 } else {
-                    this.state.hideCaptions = true;
+                    this.hideCaptions(true, true);
+                    this.updateTranscriptCookie(false);
                 }
-                this.hideCaptions(this.state.hideCaptions, true, true);
             },
+
             updateTranscriptCookie: function(showTranscript) {
                 if (showTranscript) {
                     $.cookie('show_transcript', 'true', {
@@ -1272,21 +1286,15 @@
             },
 
             /**
-            * @desc Shows/Hides captions and updates the cookie.
+            * @desc Shows/Hides the transcript panel.
             *
-            * @param {boolean} hideCaptions if `true` hides the caption,
+            * @param {boolean} hideCaptions if `true` hides the transcript panel,
             *     otherwise - show.
-            * @param {boolean} updateCookie Flag to update or not the cookie.
-            *
             */
-            hideCaptions: function(hideCaptions, updateCookie, triggerEvent) {
+            hideCaptions: function(hideCaptions, triggerEvent) {
                 var transcriptControlEl = this.transcriptControlEl,
                     state = this.state,
                     text;
-
-                if (typeof updateCookie === 'undefined') {
-                    updateCookie = true;
-                }
 
                 if (hideCaptions) {
                     state.captionsHidden = true;
@@ -1324,12 +1332,6 @@
                 }
 
                 this.setSubtitlesHeight();
-                if (updateCookie) {
-                    $.cookie('hideCaptions', hideCaptions, {
-                        expires: 3650,
-                        path: '/'
-                    });
-                }
             },
 
             /**
@@ -1355,7 +1357,7 @@
                 var height = 0,
                     state = this.state;
                 // on page load captionHidden = undefined
-                if ((state.captionsHidden === undefined && state.hideCaptions) ||
+                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad) ||
                     state.captionsHidden === true
                 ) {
                     // In case of html5 autoshowing subtitles, we adjust height of

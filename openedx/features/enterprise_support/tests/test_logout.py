@@ -3,12 +3,14 @@ Tests for logout for enterprise flow
 """
 
 
-import ddt
-import mock
+from unittest import mock
 
+import ddt
 from django.test.utils import override_settings
 from django.urls import reverse
 
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tests import (
@@ -17,8 +19,6 @@ from openedx.features.enterprise_support.tests import (
     factories
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
 
 
 @ddt.ddt
@@ -28,7 +28,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
     """ Tests for the enterprise logout functionality. """
 
     def setUp(self):
-        super(EnterpriseLogoutTests, self).setUp()
+        super().setUp()
         self.user = UserFactory()
 
         self.enterprise_customer = FAKE_ENTERPRISE_CUSTOMER
@@ -55,7 +55,7 @@ class EnterpriseLogoutTests(EnterpriseServiceMockMixin, CacheIsolationTestCase, 
             logout_path=reverse('logout'),
             redirect_url=redirect_url
         )
-        self.assertTrue(enterprise_enabled())
+        assert enterprise_enabled()
         response = self.client.get(url, HTTP_HOST='testserver')
         expected = {
             'enterprise_target': enterprise_target,

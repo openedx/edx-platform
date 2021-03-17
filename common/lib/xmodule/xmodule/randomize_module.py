@@ -1,24 +1,39 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 import random
 
+from django.utils.functional import cached_property
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.fields import Integer, Scope
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.x_module import STUDENT_VIEW, XModule
+from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.seq_module import SequenceMixin
+from xmodule.xml_module import XmlMixin
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    STUDENT_VIEW,
+    XModuleDescriptorToXBlockMixin,
+    XModuleMixin,
+    XModuleToXBlockMixin,
+)
 
 log = logging.getLogger('edx.' + __name__)
 
 
-class RandomizeFields(object):
-    choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
-
-
-class RandomizeModule(RandomizeFields, XModule):
+class RandomizeBlock(
+    SequenceMixin,
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):
     """
-    Chooses a random child module.  Chooses the same one every time for each student.
+    Chooses a random child xblock. Chooses the same one every time for each student.
 
      Example:
      <randomize>
@@ -38,11 +53,18 @@ class RandomizeModule(RandomizeFields, XModule):
         grading interaction is a tangle between super and subclasses of descriptors and
         modules.
 """
-    def __init__(self, *args, **kwargs):
-        super(RandomizeModule, self).__init__(*args, **kwargs)
+    choice = Integer(help="Which random child was chosen", scope=Scope.user_state)
 
-        # NOTE: calling self.get_children() doesn't work until we've picked a choice
-        num_choices = len(self.descriptor.get_children())
+    resources_dir = None
+
+    filename_extension = "xml"
+
+    show_in_read_only_mode = True
+
+    @cached_property
+    def child(self):
+        """ Return XBlock instance of selected choice """
+        num_choices = len(self.get_children())
 
         if self.choice is not None and self.choice > num_choices:
             # Oops.  Children changed. Reset.
@@ -56,53 +78,39 @@ class RandomizeModule(RandomizeFields, XModule):
                 else:
                     self.choice = random.randrange(0, num_choices)
 
-        if self.choice is not None:
-            # Now get_children() should return a list with one element
-            log.debug("children of randomize module (should be only 1): %s", self.child)
-
-    @property
-    def child_descriptor(self):
-        """ Return descriptor of selected choice """
         if self.choice is None:
             return None
-        return self.descriptor.get_children()[self.choice]
+        child = self.get_children()[self.choice]
 
-    @property
-    def child(self):
-        """ Return module instance of selected choice """
-        child_descriptor = self.child_descriptor
-        if child_descriptor is None:
-            return None
-        return self.system.get_module(child_descriptor)
+        if self.choice is not None:
+            log.debug("children of randomize module (should be only 1): %s", child)
+
+        return child
 
     def get_child_descriptors(self):
         """
         For grading--return just the chosen child.
         """
-        if self.child_descriptor is None:
+        if self.child is None:
             return []
 
-        return [self.child_descriptor]
+        return [self.child]
 
     def student_view(self, context):
+        """
+        The student view.
+        """
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
-            return Fragment(content=u"<div>Nothing to randomize between</div>")
+            return Fragment(content="<div>Nothing to randomize between</div>")
 
         return self.child.render(STUDENT_VIEW, context)
 
+    def get_html(self):
+        return self.studio_view(None).content
+
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
-
-
-class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
-    # the editing interface can be the same as for sequences -- just a container
-    module_class = RandomizeModule
-    resources_dir = None
-
-    filename_extension = "xml"
-
-    show_in_read_only_mode = True
 
     def definition_to_xml(self, resource_fs):
 

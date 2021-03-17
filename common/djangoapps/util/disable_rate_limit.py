@@ -20,7 +20,7 @@ from functools import wraps
 
 from rest_framework.views import APIView
 
-from util.models import RateLimitConfiguration
+from common.djangoapps.util.models import RateLimitConfiguration
 
 LOGGER = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ def can_disable_rate_limit(clz):
     # No-op if the class isn't a Django Rest Framework view.
     if not issubclass(clz, APIView):
         msg = (
-            u"{clz} is not a Django Rest Framework APIView subclass."
+            "{clz} is not a Django Rest Framework APIView subclass."
         ).format(clz=clz)
         LOGGER.warning(msg)
         return clz

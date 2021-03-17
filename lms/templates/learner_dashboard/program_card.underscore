@@ -57,7 +57,7 @@
             <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
             <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
             <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
-            <img class="banner-image" srcset="<%- smallBannerUrl %>" alt="<%= interpolate(gettext('%(programName)s Home Page.'), {programName: title}, true)%>">
+            <img class="banner-image" srcset="<%- smallBannerUrl %>" alt="<%- interpolate(gettext('%(programName)s Home Page.'), {programName: title}, true)%>">
         </picture>
     </div>
 </a>

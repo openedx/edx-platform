@@ -10,7 +10,7 @@ from django.test import TestCase
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
 
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 
 
 @contextmanager
@@ -34,7 +34,7 @@ class TestLTIConsumerHideFieldsFlag(TestCase):
     These are set via Django admin settings.
     """
     def setUp(self):
-        super(TestLTIConsumerHideFieldsFlag, self).setUp()
+        super().setUp()
         self.course_id = CourseLocator(org="edx", course="course", run="run")
 
     @ddt.data(

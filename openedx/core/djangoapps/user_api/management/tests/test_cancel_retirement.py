@@ -5,7 +5,7 @@ Test the cancel_user_retirement_request management command
 
 import pytest
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import CommandError, call_command
 
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
@@ -13,7 +13,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
     setup_retirement_states
 )
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementRequest, UserRetirementStatus
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

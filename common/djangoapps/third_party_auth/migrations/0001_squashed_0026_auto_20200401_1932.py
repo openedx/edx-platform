@@ -3,8 +3,9 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+
 import openedx.core.lib.hash_utils
-import third_party_auth.models
+from common.djangoapps.third_party_auth import models as third_party_auth_models
 
 # These should be no-ops, becuse we don't need to migrate any data on initial creation.
 # third_party_auth.migrations.0019_consolidate_slug
@@ -156,7 +157,7 @@ class Migration(migrations.Migration):
                 ('send_to_registration_first', models.BooleanField(default=False, help_text='If this option is selected, users will be directed to the registration page immediately after authenticating with the third party instead of the login page.')),
                 ('sync_learner_profile_data', models.BooleanField(default=False, help_text='Synchronize user profile data received from the identity provider with the edX user account on each SSO login. The user will be notified if the email address associated with their account is changed as a part of this synchronization.')),
                 ('archived', models.BooleanField(default=False)),
-                ('saml_configuration', models.ForeignKey(blank=True, limit_choices_to=third_party_auth.models.active_saml_configurations_filter, null=True, on_delete=django.db.models.deletion.SET_NULL, to='third_party_auth.SAMLConfiguration')),
+                ('saml_configuration', models.ForeignKey(blank=True, limit_choices_to=third_party_auth_models.active_saml_configurations_filter, null=True, on_delete=django.db.models.deletion.SET_NULL, to='third_party_auth.SAMLConfiguration')),
                 ('send_welcome_email', models.BooleanField(default=False, help_text='If this option is selected, users will be sent a welcome email upon registration.')),
                 ('slug', models.SlugField(default='default', help_text='A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"', max_length=30)),
                 ('enable_sso_id_verification', models.BooleanField(default=False, help_text='Use the presence of a profile from a trusted third party as proof of identity verification.')),

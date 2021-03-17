@@ -8,7 +8,7 @@ from unittest import skip
 from django.test.client import Client
 from wiki.models import URLPath
 
-from course_wiki.views import get_or_create_root
+from lms.djangoapps.course_wiki.views import get_or_create_root
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -20,7 +20,7 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super(TestComprehensiveTheming, self).setUp()
+        super().setUp()
 
         self.wiki = get_or_create_root()
 
@@ -41,6 +41,6 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
         footer when comprehensive theme is enabled.
         """
         response = self.client.get('/courses/edx/math101/2014/wiki/math101/')
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         # This string comes from themes/red-theme/lms/templates/footer.html
         self.assertContains(response, "super-ugly")

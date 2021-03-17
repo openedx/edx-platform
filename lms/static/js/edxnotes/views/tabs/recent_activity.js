@@ -1,8 +1,11 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view'
-    ], function(gettext, TabPanelView, TabView) {
+        'gettext',
+        'js/edxnotes/views/tab_panel',
+        'js/edxnotes/views/tab_view',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(gettext, TabPanelView, TabView, HtmlUtils) {
         var view = 'Recent Activity';
         var RecentActivityView = TabView.extend({
             PanelConstructor: TabPanelView.extend({
@@ -15,7 +18,7 @@
                     ].join(' ');
                 },
                 renderContent: function() {
-                    this.$el.append(this.getNotes(this.collection.toArray()));
+                    this.$el.append(HtmlUtils.HTML(this.getNotes(this.collection.toArray())).toString());
                     return this;
                 }
             }),

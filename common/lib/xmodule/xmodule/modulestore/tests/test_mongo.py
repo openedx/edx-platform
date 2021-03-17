@@ -7,17 +7,15 @@ import logging
 import shutil
 from datetime import datetime
 from tempfile import mkdtemp
+from unittest.mock import patch
 from uuid import uuid4
 
 import pymongo
 import pytest
-import six
 
-# pylint: disable=bad-continuation
 # pylint: disable=protected-access
 from django.test import TestCase
 # pylint: enable=E0611
-from mock import patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import AssetLocator, BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
@@ -51,7 +49,7 @@ DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
-DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
+DEFAULT_CLASS = 'xmodule.hidden_module.HiddenDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 
@@ -80,7 +78,7 @@ class TestMongoModuleStoreBase(TestCase):
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.connection = pymongo.MongoClient(
             host=HOST,
             port=PORT,
@@ -95,7 +93,7 @@ class TestMongoModuleStoreBase(TestCase):
         cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()
@@ -105,10 +103,10 @@ class TestMongoModuleStoreBase(TestCase):
         """
         No asset collection.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
-    def initdb(cls):
+    def initdb(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         # connect to the db
         doc_store_config = {
             'host': HOST,
@@ -173,7 +171,7 @@ class TestMongoModuleStoreBase(TestCase):
         connection.drop_database(DB)
 
     def setUp(self):
-        super(TestMongoModuleStoreBase, self).setUp()
+        super().setUp()
         self.dummy_user = ModuleStoreEnum.UserID.test
 
 
@@ -185,15 +183,15 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         No asset collection - it's not used in the tests below.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def setUpClass(cls):
-        super(TestMongoModuleStore, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(TestMongoModuleStore, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_init(self):
         '''Make sure the db loads'''
@@ -299,7 +297,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         course_key = CourseKey.from_string('course-v1:edX+simple+2012_Fall')
 
-        with self.assertRaises(ItemNotFoundError):
+        with pytest.raises(ItemNotFoundError):
             self.draft_store.get_course(course_key)
 
     def test_has_mongo_course_with_split_course_key(self):
@@ -308,7 +306,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         course_key = CourseKey.from_string('course-v1:edX+simple+2012_Fall')
 
-        self.assertFalse(self.draft_store.has_course(course_key))
+        assert not self.draft_store.has_course(course_key)
 
     def test_has_course_with_library(self):
         """
@@ -370,10 +368,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
     def test_get_courses_has_no_templates(self):
         courses = self.draft_store.get_courses()
         for course in courses:
-            self.assertFalse(
-                course.location.org == 'edx' and course.location.course == 'templates',
-                '{0} is a template course'.format(course)
-            )
+            assert not ((course.location.org == 'edx') and (course.location.course == 'templates')),\
+                f'{course} is a template course'
 
     def test_contentstore_attrs(self):
         """
@@ -496,7 +492,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
                 block_id='p2',
                 runtime=course.runtime
             )
-            self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
+            self.refloc = course.id.make_usage_key('ref_test', 'ref_test')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             self.draft_store.create_item(
                 99,
                 self.refloc.course_key,
@@ -526,7 +522,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             for ref in refele.reference_list:
                 assert isinstance(ref, UsageKey)
             assert len(refele.reference_dict) > 0
-            for ref in six.itervalues(refele.reference_dict):
+            for ref in refele.reference_dict.values():
                 assert isinstance(ref, UsageKey)
 
         def check_mongo_fields():
@@ -535,17 +531,17 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
             def check_children(payload):
                 for child in payload['definition']['children']:
-                    assert isinstance(child, six.string_types)
+                    assert isinstance(child, str)
 
             refele = get_item(self.refloc)
             check_children(refele)
-            assert isinstance(refele['definition']['data']['reference_link'], six.string_types)
+            assert isinstance(refele['definition']['data']['reference_link'], str)
             assert len(refele['definition']['data']['reference_list']) > 0
             for ref in refele['definition']['data']['reference_list']:
-                assert isinstance(ref, six.string_types)
+                assert isinstance(ref, str)
             assert len(refele['metadata']['reference_dict']) > 0
-            for ref in six.itervalues(refele['metadata']['reference_dict']):
-                assert isinstance(ref, six.string_types)
+            for ref in refele['metadata']['reference_dict'].values():
+                assert isinstance(ref, str)
 
         setup_test()
         check_xblock_fields()
@@ -566,9 +562,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, u'test_export')
-        self.assertTrue(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
-        self.assertTrue(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
+        assert path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
+        assert path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
@@ -582,9 +578,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
-        self.assertTrue(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
-        self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        assert path(root_dir / 'test_export/static/just_a_test.jpg').isfile()
+        assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
 
     @patch('xmodule.video_module.video_module.edxval_api', None)
     def test_course_without_image(self):
@@ -595,9 +591,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = self.draft_store.get_course(CourseKey.from_string('edX/simple_with_draft/2012_Fall'))
         root_dir = path(mkdtemp())
         self.addCleanup(shutil.rmtree, root_dir)
-        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, u'test_export')
-        self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
-        self.assertFalse(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
+        export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+        assert not path(root_dir / 'test_export/static/images/course_image.jpg').isfile()
+        assert not path(root_dir / 'test_export/static/images_course_image.jpg').isfile()
 
     def _create_test_tree(self, name, user_id=None):
         """
@@ -613,10 +609,10 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
             user_id = self.dummy_user
 
         org = 'edX'
-        course = 'tree{}'.format(name)
+        course = f'tree{name}'
         run = name
 
-        if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):
+        if not self.draft_store.has_course(CourseKey.from_string('/'.join[org, course, run])):  # lint-amnesty, pylint: disable=unsubscriptable-object
             self.draft_store.create_course(org, course, run, user_id)
 
             locations = {
@@ -678,8 +674,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # Retrieve the block and verify its fields
         component = self.draft_store.get_item(location)
-        self.assertEqual(component.published_on, published_date)
-        self.assertEqual(component.published_by, published_by)
+        assert component.published_on == published_date
+        assert component.published_by == published_by
 
     def test_draft_modulestore_create_child_with_position(self):
         """
@@ -704,8 +700,8 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         # First child should have been moved to second position, and better child takes the lead
         course = self.draft_store.get_course(course.id)
-        self.assertEqual(six.text_type(course.children[1]), six.text_type(first_child.location))
-        self.assertEqual(six.text_type(course.children[0]), six.text_type(second_child.location))
+        assert str(course.children[1]) == str(first_child.location)
+        assert str(course.children[0]) == str(second_child.location)
 
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
@@ -714,11 +710,11 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """Test that we get back the appropriate usage key for the root of a course key."""
         course_key = CourseLocator(org="edX", course="101", run="2015")
         root_block_key = self.draft_store.make_course_usage_key(course_key)
-        self.assertEqual(root_block_key.block_type, "course")
-        self.assertEqual(root_block_key.block_id, "2015")
+        assert root_block_key.block_type == 'course'
+        assert root_block_key.block_id == '2015'
 
 
-class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
+class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):  # lint-amnesty, pylint: disable=test-inherits-tests
     '''
     Tests a situation where no asset_collection is specified.
     '''
@@ -728,26 +724,26 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         """
         No asset collection.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def setUpClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(TestMongoModuleStoreWithNoAssetCollection, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()
         course = courses[0]
         # Confirm that no specified asset collection name means empty asset metadata.
-        self.assertEqual(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
+        assert self.draft_store.get_all_asset_metadata(course.id, 'asset') == []
 
     def test_no_asset_invalid_key(self):
         course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)
         # Confirm that invalid course key raises ItemNotFoundError
-        self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
+        pytest.raises(ItemNotFoundError, (lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1]))
 
 
 class TestMongoKeyValueStore(TestCase):
@@ -756,7 +752,7 @@ class TestMongoKeyValueStore(TestCase):
     """
 
     def setUp(self):
-        super(TestMongoKeyValueStore, self).setUp()
+        super().setUp()
         self.data = {'foo': 'foo_value'}
         self.course_id = CourseKey.from_string('org/course/run')
         self.parent = self.course_id.make_usage_key('parent', 'p')

@@ -141,7 +141,8 @@ class CourseEntitlementView extends Backbone.View {
     this.trackSessionChange(eventPage, eventAction, prevSession);
 
     // With a containing backbone view, we can simply re-render the parent card
-    if (this.$parentEl) {
+    if (this.$parentEl &&
+        this.courseCardModel.get('course_run_key') !== this.currentSessionSelection) {
       this.courseCardModel.updateCourseRun(this.currentSessionSelection);
       return;
     }
@@ -388,6 +389,7 @@ class CourseEntitlementView extends Backbone.View {
     sessionData.forEach((session) => {
       Object.assign(session, {
         enrollment_end: CourseEntitlementView.formatDate(session.enrollment_end, dateFormat),
+        session_id: session.session_id ? session.session_id : session.key,
         session_dates: this.courseCardModel.formatDateString({
           start_date: CourseEntitlementView.formatDate(session.start, dateFormat),
           advertised_start: session.advertised_start,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests the "preview" selector in the LMS that allows changing between Staff, Learner, and Content Groups.
 """
@@ -24,7 +23,7 @@ class StaffViewTest(UniqueCourseTest):
     EMAIL = "johndoe@example.com"
 
     def setUp(self):
-        super(StaffViewTest, self).setUp()
+        super().setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -49,7 +48,7 @@ class StaffViewTest(UniqueCourseTest):
         """
         self.courseware_page.visit()
         staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_view_mode, 'Staff')
+        assert staff_page.staff_view_mode == 'Staff'
         return staff_page
 
 
@@ -60,11 +59,11 @@ class CourseWithContentGroupsTest(StaffViewTest):
     """
 
     def setUp(self):
-        super(CourseWithContentGroupsTest, self).setUp()
+        super().setUp()
         # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
-                u"user_partitions": [
+                "user_partitions": [
                     create_user_partition_json(
                         MINIMUM_STATIC_PARTITION_ID,
                         'Configuration alpha,beta',
@@ -96,10 +95,10 @@ class CourseWithContentGroupsTest(StaffViewTest):
             </problem>
         """)
 
-        self.alpha_text = "VISIBLE TO ALPHA"
-        self.beta_text = "VISIBLE TO BETA"
-        self.audit_text = "VISIBLE TO AUDIT"
-        self.everyone_text = "VISIBLE TO EVERYONE"
+        self.alpha_text = "VISIBLE TO ALPHA"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.beta_text = "VISIBLE TO BETA"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.audit_text = "VISIBLE TO AUDIT"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.everyone_text = "VISIBLE TO EVERYONE"  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(

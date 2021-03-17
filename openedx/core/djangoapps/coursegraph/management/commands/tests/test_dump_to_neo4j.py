@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for the dump_to_neo4j management command.
 """
@@ -6,33 +5,25 @@ Tests for the dump_to_neo4j management command.
 
 from datetime import datetime
 
+from unittest import mock
 import ddt
-import mock
-import six
 from django.core.management import call_command
+from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-
-from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
-    ModuleStoreSerializer
-)
-from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import (
-    MockGraph,
-    MockNodeSelector,
-)
-from openedx.core.djangoapps.coursegraph.tasks import (
-    serialize_item,
-    serialize_course,
-    coerce_types,
-    should_dump_course,
-    strip_branch_and_version,
-)
-from openedx.core.djangoapps.content.block_structure.signals import (
-    update_block_structure_on_course_publish
-)
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
+from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
+from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
+from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeSelector
+from openedx.core.djangoapps.coursegraph.tasks import (
+    coerce_types,
+    serialize_course,
+    serialize_item,
+    should_dump_course,
+    strip_branch_and_version
+)
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
@@ -66,7 +57,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         test for a bug where xblocks with the same block_ids (but different
         locations) pointed to themselves erroneously.
         """
-        super(TestDumpToNeo4jCommandBase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.chapter = ItemFactory.create(parent=cls.course, category='chapter')
         cls.sequential = ItemFactory.create(parent=cls.chapter, category='sequential')
@@ -78,7 +69,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
 
         cls.course2 = CourseFactory.create()
 
-        cls.course_strings = [six.text_type(cls.course.id), six.text_type(cls.course2.id)]
+        cls.course_strings = [str(cls.course.id), str(cls.course2.id)]
 
     @staticmethod
     def setup_mock_graph(mock_selector_class, mock_graph_class, transaction_errors=False):
@@ -112,10 +103,10 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
             number_commits: number of commits we expect against the graph
             number_rollbacks: number of commit rollbacks we expect
         """
-        courses = set([node['course_key'] for node in mock_graph.nodes])
-        self.assertEqual(len(courses), number_of_courses)
-        self.assertEqual(mock_graph.number_commits, number_commits)
-        self.assertEqual(mock_graph.number_rollbacks, number_rollbacks)
+        courses = {node['course_key'] for node in mock_graph.nodes}
+        assert len(courses) == number_of_courses
+        assert mock_graph.number_commits == number_commits
+        assert mock_graph.number_rollbacks == number_rollbacks
 
 
 @ddt.ddt
@@ -229,7 +220,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         )
 
 
-class SomeThing(object):
+class SomeThing:
     """Just to test the stringification of an object."""
     def __str__(self):
         return "<SomeThing>"
@@ -244,7 +235,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     @classmethod
     def setUpClass(cls):
         """Any ModuleStore course/content operations can go here."""
-        super(TestModuleStoreSerializer, cls).setUpClass()
+        super().setUpClass()
         cls.mss = ModuleStoreSerializer.create()
 
     def test_serialize_item(self):
@@ -252,26 +243,26 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Tests the serialize_item method.
         """
         fields, label = serialize_item(self.course)
-        self.assertEqual(label, "course")
-        self.assertIn("edited_on", list(fields.keys()))
-        self.assertIn("display_name", list(fields.keys()))
-        self.assertIn("org", list(fields.keys()))
-        self.assertIn("course", list(fields.keys()))
-        self.assertIn("run", list(fields.keys()))
-        self.assertIn("course_key", list(fields.keys()))
-        self.assertIn("location", list(fields.keys()))
-        self.assertIn("block_type", list(fields.keys()))
-        self.assertIn("detached", list(fields.keys()))
-        self.assertNotIn("checklist", list(fields.keys()))
+        assert label == 'course'
+        assert 'edited_on' in list(fields.keys())
+        assert 'display_name' in list(fields.keys())
+        assert 'org' in list(fields.keys())
+        assert 'course' in list(fields.keys())
+        assert 'run' in list(fields.keys())
+        assert 'course_key' in list(fields.keys())
+        assert 'location' in list(fields.keys())
+        assert 'block_type' in list(fields.keys())
+        assert 'detached' in list(fields.keys())
+        assert 'checklist' not in list(fields.keys())
 
     def test_serialize_course(self):
         """
         Tests the serialize_course method.
         """
         nodes, relationships = serialize_course(self.course.id)
-        self.assertEqual(len(nodes), 9)
+        assert len(nodes) == 9
         # the course has 7 "PARENT_OF" relationships and 3 "PRECEDES"
-        self.assertEqual(len(relationships), 10)
+        assert len(relationships) == 10
 
     def test_strip_version_and_branch(self):
         """
@@ -284,13 +275,13 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             'test_branch'
         ).for_version('test_version')
 
-        self.assertIsNotNone(location.branch)
-        self.assertIsNotNone(location.version_guid)
+        assert location.branch is not None
+        assert location.version_guid is not None
 
         stripped_location = strip_branch_and_version(location)
 
-        self.assertIsNone(stripped_location.branch)
-        self.assertIsNone(stripped_location.version_guid)
+        assert stripped_location.branch is None
+        assert stripped_location.version_guid is None
 
     @staticmethod
     def _extract_relationship_pairs(relationships, relationship_type):
@@ -323,7 +314,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Returns:
             A tuple of the string representations of those XBlocks' locations.
         """
-        return (six.text_type(xblock1.location), six.text_type(xblock2.location))
+        return (str(xblock1.location), str(xblock2.location))
 
     def assertBlockPairIsRelationship(self, xblock1, xblock2, relationships, relationship_type):
         """
@@ -332,7 +323,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
         location_pair = self._extract_location_pair(xblock1, xblock2)
-        self.assertIn(location_pair, relationship_pairs)
+        assert location_pair in relationship_pairs
 
     def assertBlockPairIsNotRelationship(self, xblock1, xblock2, relationships, relationship_type):
         """
@@ -341,7 +332,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         relationship_pairs = self._extract_relationship_pairs(relationships, relationship_type)
         location_pair = self._extract_location_pair(xblock1, xblock2)
-        self.assertNotIn(location_pair, relationship_pairs)
+        assert location_pair not in relationship_pairs
 
     def test_precedes_relationship(self):
         """
@@ -369,18 +360,18 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Test that we add index values on nodes
         """
-        nodes, relationships = serialize_course(self.course.id)
+        nodes, relationships = serialize_course(self.course.id)  # lint-amnesty, pylint: disable=unused-variable
 
         # the html node should have 0 index, and the problem should have 1
         html_nodes = [node for node in nodes if node['block_type'] == 'html']
-        self.assertEqual(len(html_nodes), 1)
+        assert len(html_nodes) == 1
         problem_nodes = [node for node in nodes if node['block_type'] == 'problem']
-        self.assertEqual(len(problem_nodes), 1)
+        assert len(problem_nodes) == 1
         html_node = html_nodes[0]
         problem_node = problem_nodes[0]
 
-        self.assertEqual(html_node['index'], 0)
-        self.assertEqual(problem_node['index'], 1)
+        assert html_node['index'] == 0
+        assert problem_node['index'] == 1
 
     @ddt.data(
         (1, 1),
@@ -402,7 +393,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         Tests the coerce_types helper
         """
         coerced_value = coerce_types(original_value)
-        self.assertEqual(coerced_value, coerced_expected)
+        assert coerced_value == coerced_expected
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -414,9 +405,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
 
         self.assertCourseDump(
             mock_graph,
@@ -428,8 +420,8 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # 9 nodes + 7 relationships from the first course
         # 2 nodes and no relationships from the second
 
-        self.assertEqual(len(mock_graph.nodes), 11)
-        six.assertCountEqual(self, submitted, self.course_strings)
+        assert len(mock_graph.nodes) == 11
+        self.assertCountEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -441,9 +433,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph(transaction_errors=True)
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
 
         self.assertCourseDump(
             mock_graph,
@@ -452,7 +445,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
             number_rollbacks=2,
         )
 
-        six.assertCountEqual(self, submitted, self.course_strings)
+        self.assertCountEqual(submitted, self.course_strings)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -472,19 +465,20 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
         self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
 
         # when run the second time, only dump courses if the cache override
         # is enabled
         submitted, __ = self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
-        self.assertEqual(len(submitted), expected_number_courses)
+        assert len(submitted) == expected_number_courses
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
@@ -496,28 +490,29 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
-        self.assertEqual(len(submitted), len(self.course_strings))
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)  # lint-amnesty, pylint: disable=unused-variable
+        assert len(submitted) == len(self.course_strings)
 
         # simulate one of the courses being published
-        with block_structure_config.waffle().override(block_structure_config.STORAGE_BACKING_FOR_CACHE):
+        with override_waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE, True):
             update_block_structure_on_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
-        submitted, __ = self.mss.dump_courses_to_neo4j(mock_credentials)
-        self.assertEqual(len(submitted), 1)
-        self.assertEqual(submitted[0], six.text_type(self.course.id))
+        submitted, __ = self.mss.dump_courses_to_neo4j(credentials)
+        assert len(submitted) == 1
+        assert submitted[0] == str(self.course.id)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_course_last_published')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.get_command_last_run')
     @ddt.data(
-        (six.text_type(datetime(2016, 3, 30)), six.text_type(datetime(2016, 3, 31)), True),
-        (six.text_type(datetime(2016, 3, 31)), six.text_type(datetime(2016, 3, 30)), False),
-        (six.text_type(datetime(2016, 3, 31)), None, False),
-        (None, six.text_type(datetime(2016, 3, 30)), True),
+        (str(datetime(2016, 3, 30)), str(datetime(2016, 3, 31)), True),
+        (str(datetime(2016, 3, 31)), str(datetime(2016, 3, 30)), False),
+        (str(datetime(2016, 3, 31)), None, False),
+        (None, str(datetime(2016, 3, 30)), True),
         (None, None, True),
     )
     @ddt.unpack
@@ -537,7 +532,4 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_get_course_last_published.return_value = last_course_published
         mock_course_key = mock.Mock()
         mock_graph = mock.Mock()
-        self.assertEqual(
-            should_dump_course(mock_course_key, mock_graph),
-            should_dump,
-        )
+        assert should_dump_course(mock_course_key, mock_graph) == should_dump

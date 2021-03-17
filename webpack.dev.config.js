@@ -20,13 +20,14 @@ module.exports = _.values(Merge.smart(commonConfig, {
                 debug: true
             }),
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': JSON.stringify('development')
+                'process.env.NODE_ENV': JSON.stringify('development'),
+                'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG
             })
         ],
         module: {
             rules: [
                 {
-                    test: /(.scss|.css)$/,
+                    test: /.scss$/,
                     include: [
                         /paragon/,
                         /font-awesome/

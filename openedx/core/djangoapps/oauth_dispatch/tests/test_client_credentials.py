@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 from oauth2_provider.models import Application
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..adapters import DOTAdapter
 from . import mixins
@@ -21,7 +21,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
     """ Tests validating the client credentials grant behavior. """
 
     def setUp(self):
-        super(ClientCredentialsTest, self).setUp()
+        super().setUp()
         self.user = UserFactory()
 
     def test_jwt_access_token(self):
@@ -43,9 +43,9 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
         }
 
         response = self.client.post(reverse('access_token'), data)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         content = json.loads(response.content.decode('utf-8'))
         access_token = content['access_token']
-        self.assertEqual(content['scope'], data['scope'])
+        assert content['scope'] == data['scope']
         self.assert_valid_jwt_access_token(access_token, self.user, scopes)

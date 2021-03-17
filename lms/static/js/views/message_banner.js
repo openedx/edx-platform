@@ -11,7 +11,7 @@
         var MessageBannerView = Backbone.View.extend({
 
             events: {
-                'click #close': 'closeBanner'
+                'click .close-btn': 'closeBanner'
             },
 
             closeBanner: function(event) {
@@ -27,7 +27,8 @@
                     urgency: 'high',
                     type: '',
                     hideCloseBtn: true,
-                    isRecoveryEmailMsg: false
+                    isRecoveryEmailMsg: false,
+                    isLearnerPortalEnabled: false
                 });
             },
 

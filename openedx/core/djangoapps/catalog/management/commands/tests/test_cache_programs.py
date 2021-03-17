@@ -3,7 +3,7 @@ Test cases for cache_programs command.
 """
 
 import json
-
+import pytest
 import httpretty
 from django.core.cache import cache
 from django.core.management import call_command
@@ -14,6 +14,7 @@ from openedx.core.djangoapps.catalog.cache import (
     PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
     PROGRAMS_BY_TYPE_CACHE_KEY_TPL,
+    PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL,
     SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
@@ -22,7 +23,7 @@ from openedx.core.djangoapps.catalog.tests.factories import OrganizationFactory,
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @skip_unless_lms
@@ -34,7 +35,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestCachePrograms, self).setUp()
+        super().setUp()
 
         httpretty.httpretty.reset()
 
@@ -79,7 +80,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
                 'status': ['active', 'retired'],
                 'uuids_only': ['1']
             }
-            self.assertEqual(request.querystring, expected)
+            assert request.querystring == expected
 
             return (200, headers, json.dumps(self.uuids))
 
@@ -98,7 +99,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             expected = {
                 'exclude_utm': ['1'],
             }
-            self.assertEqual(request.querystring, expected)
+            assert request.querystring == expected
 
             return (200, headers, json.dumps(program))
 
@@ -118,7 +119,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
                 'exclude_utm': ['1'],
                 'page': [str(page_number)],
             }
-            self.assertEqual(request.querystring, expected)
+            assert request.querystring == expected
 
             body = {
                 'count': len(pathways),
@@ -164,18 +165,12 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         call_command('cache_programs')
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(
-            set(cached_uuids),
-            set(self.uuids)
-        )
+        assert set(cached_uuids) == set(self.uuids)
 
         program_keys = list(programs.keys())
         cached_programs = cache.get_many(program_keys)
         # Verify that the keys were all cache hits.
-        self.assertEqual(
-            set(cached_programs),
-            set(programs)
-        )
+        assert set(cached_programs) == set(programs)
 
         # We can't use a set comparison here because these values are dictionaries
         # and aren't hashable. We've already verified that all programs came out
@@ -184,7 +179,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         for key, program in cached_programs.items():
             # cached programs have a pathways field added to them, remove before comparing
             del program['pathway_ids']
-            self.assertEqual(program, programs[key])
+            assert program == programs[key]
 
         # the courses in the child program's first curriculum (the active one)
         # should point to both the child program and the first program
@@ -192,23 +187,28 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         for course in self.child_program['curricula'][0]['courses']:
             for course_run in course['course_runs']:
                 course_run_cache_key = COURSE_PROGRAMS_CACHE_KEY_TPL.format(course_run_id=course_run['key'])
-                self.assertIn(self.programs[0]['uuid'], cache.get(course_run_cache_key))
-                self.assertIn(self.child_program['uuid'], cache.get(course_run_cache_key))
+                assert self.programs[0]['uuid'] in cache.get(course_run_cache_key)
+                assert self.child_program['uuid'] in cache.get(course_run_cache_key)
 
         # for each program, assert that the program's UUID is in a cached list of
         # program UUIDS by program type and a cached list of UUIDs by authoring organization
         for program in self.programs:
             program_type = normalize_program_type(program.get('type', 'None'))
+            program_type_slug = program.get('type_attrs', {}).get('slug')
             program_type_cache_key = PROGRAMS_BY_TYPE_CACHE_KEY_TPL.format(
                 site_id=self.site.id, program_type=program_type
             )
-            self.assertIn(program['uuid'], cache.get(program_type_cache_key))
+            program_type_slug_cache_key = PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL.format(
+                site_id=self.site.id, program_slug=program_type_slug
+            )
+            assert program['uuid'] in cache.get(program_type_cache_key)
+            assert program['uuid'] in cache.get(program_type_slug_cache_key)
 
             for organization in program['authoring_organizations']:
                 organization_cache_key = PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL.format(
                     org_key=organization['key']
                 )
-                self.assertIn(program['uuid'], cache.get(organization_cache_key))
+                assert program['uuid'] in cache.get(organization_cache_key)
 
     def test_handle_pathways(self):
         """
@@ -236,16 +236,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         pathway_keys = list(pathways.keys())
-        self.assertEqual(
-            set(cached_pathway_keys),
-            set(pathway_keys)
-        )
+        assert set(cached_pathway_keys) == set(pathway_keys)
 
         cached_pathways = cache.get_many(pathway_keys)
-        self.assertEqual(
-            set(cached_pathways),
-            set(pathways)
-        )
+        assert set(cached_pathways) == set(pathways)
 
         # We can't use a set comparison here because these values are dictionaries
         # and aren't hashable. We've already verified that all pathways came out
@@ -256,7 +250,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             pathways[key]['program_uuids'] = [program['uuid'] for program in pathways[key]['programs']]
             del pathways[key]['programs']
 
-            self.assertEqual(pathway, pathways[key])
+            assert pathway == pathways[key]
 
     def test_pathways_multiple_pages(self):
         """
@@ -290,16 +284,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         pathway_keys = list(pathways_dict.keys())
 
         cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(
-            set(cached_pathway_keys),
-            set(pathway_keys)
-        )
+        assert set(cached_pathway_keys) == set(pathway_keys)
 
         cached_pathways = cache.get_many(pathway_keys)
-        self.assertEqual(
-            set(cached_pathways),
-            set(pathways_dict)
-        )
+        assert set(cached_pathways) == set(pathways_dict)
 
         # We can't use a set comparison here because these values are dictionaries
         # and aren't hashable. We've already verified that all pathways came out
@@ -310,18 +298,18 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             pathways_dict[key]['program_uuids'] = [program['uuid'] for program in pathways_dict[key]['programs']]
             del pathways_dict[key]['programs']
 
-            self.assertEqual(pathway, pathways_dict[key])
+            assert pathway == pathways_dict[key]
 
     def test_handle_missing_service_user(self):
         """
         Verify that the command raises an exception when run without a service
         user, and that program UUIDs are not cached.
         """
-        with self.assertRaises(Exception):
+        with pytest.raises(Exception):
             call_command('cache_programs')
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(cached_uuids, None)
+        assert cached_uuids is None
 
     def test_handle_missing_uuids(self):
         """
@@ -330,12 +318,12 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         """
         UserFactory(username=self.catalog_integration.service_username)
 
-        with self.assertRaises(SystemExit) as context:
+        with pytest.raises(SystemExit) as context:
             call_command('cache_programs')
-        self.assertEqual(context.exception.code, 1)
+        assert context.value.code == 1
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(cached_uuids, [])
+        assert cached_uuids == []
 
     def test_handle_missing_pathways(self):
         """
@@ -353,12 +341,12 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
-        with self.assertRaises(SystemExit) as context:
+        with pytest.raises(SystemExit) as context:
             call_command('cache_programs')
-        self.assertEqual(context.exception.code, 1)
+        assert context.value.code == 1
 
         cached_pathways = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(cached_pathways, [])
+        assert cached_pathways == []
 
     def test_handle_missing_programs(self):
         """
@@ -381,26 +369,20 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             program = partial_programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
             self.mock_detail(uuid, program)
 
-        with self.assertRaises(SystemExit) as context:
+        with pytest.raises(SystemExit) as context:
             call_command('cache_programs')
 
-        self.assertEqual(context.exception.code, 1)
+        assert context.value.code == 1
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
-        self.assertEqual(
-            set(cached_uuids),
-            set(self.uuids)
-        )
+        assert set(cached_uuids) == set(self.uuids)
 
         program_keys = list(all_programs.keys())
         cached_programs = cache.get_many(program_keys)
         # One of the cache keys should result in a cache miss.
-        self.assertEqual(
-            set(cached_programs),
-            set(partial_programs)
-        )
+        assert set(cached_programs) == set(partial_programs)
 
         for key, program in cached_programs.items():
             # cached programs have a pathways field added to them, remove before comparing
             del program['pathway_ids']
-            self.assertEqual(program, partial_programs[key])
+            assert program == partial_programs[key]

@@ -7,7 +7,7 @@ from factory import SubFactory
 from factory.django import DjangoModelFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 
 
 class SAMLConfigurationFactory(DjangoModelFactory):

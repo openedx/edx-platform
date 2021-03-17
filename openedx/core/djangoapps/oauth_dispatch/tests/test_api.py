@@ -8,7 +8,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from oauth2_provider.models import AccessToken
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
 if OAUTH_PROVIDER_ENABLED:
@@ -23,7 +23,7 @@ EXPECTED_DEFAULT_EXPIRES_IN = 36000
 class TestOAuthDispatchAPI(TestCase):
     """ Tests for oauth_dispatch's api.py module. """
     def setUp(self):
-        super(TestOAuthDispatchAPI, self).setUp()
+        super().setUp()
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.client = self.adapter.create_public_client(
@@ -35,19 +35,19 @@ class TestOAuthDispatchAPI(TestCase):
 
     def _assert_stored_token(self, stored_token_value, expected_token_user, expected_client):
         stored_access_token = AccessToken.objects.get(token=stored_token_value)
-        self.assertEqual(stored_access_token.user.id, expected_token_user.id)
-        self.assertEqual(stored_access_token.application.client_id, expected_client.client_id)
-        self.assertEqual(stored_access_token.application.user.id, expected_client.user.id)
+        assert stored_access_token.user.id == expected_token_user.id
+        assert stored_access_token.application.client_id == expected_client.client_id
+        assert stored_access_token.application.user.id == expected_client.user.id
 
     def test_create_token_success(self):
         token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
-        self.assertTrue(token['access_token'])
-        self.assertTrue(token['refresh_token'])
+        assert token['access_token']
+        assert token['refresh_token']
         self.assertDictContainsSubset(
             {
-                u'token_type': u'Bearer',
-                u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'',
+                'token_type': 'Bearer',
+                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+                'scope': '',
             },
             token,
         )
@@ -63,5 +63,5 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(
             HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
         )
-        self.assertDictContainsSubset({u'scope': u'profile'}, token)
-        self.assertDictContainsSubset({u'expires_in': expires_in}, token)
+        self.assertDictContainsSubset({'scope': 'profile'}, token)
+        self.assertDictContainsSubset({'expires_in': expires_in}, token)

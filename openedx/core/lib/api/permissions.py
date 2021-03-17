@@ -5,7 +5,7 @@ API library for Django REST Framework permissions-oriented workflows
 
 from django.conf import settings
 from django.http import Http404
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
@@ -13,7 +13,7 @@ from rest_framework import permissions
 
 from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -37,7 +37,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
             audit_log("ApiKeyHeaderPermission used",
                       path=request.path,
                       ip=request.META.get("REMOTE_ADDR"))
-            set_custom_metric('deprecated_api_key_header', True)
+            set_custom_attribute('deprecated_api_key_header', True)
             return True
 
         return False
@@ -94,7 +94,7 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
             try:
                 course_key = CourseKey.from_string(master_course_id)
             except InvalidKeyError:
-                raise Http404()
+                raise Http404()  # lint-amnesty, pylint: disable=raise-missing-from
             return (hasattr(request, 'user') and
                     (CourseInstructorRole(course_key).has_user(request.user) or
                      CourseStaffRole(course_key).has_user(request.user)))

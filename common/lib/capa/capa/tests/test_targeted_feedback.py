@@ -6,9 +6,6 @@ i.e. those with the <multiplechoiceresponse> element
 
 import textwrap
 import unittest
-
-# Changes formatting of empty elements; import here to avoid test order dependence
-import xmodule.modulestore.xml  # pylint: disable=unused-import
 from capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
 
 
@@ -18,7 +15,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
     '''
 
     def setUp(self):
-        super(CapaTargetedFeedbackTest, self).setUp()
+        super(CapaTargetedFeedbackTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.system = test_capa_system()
 
     def test_no_targeted_feedback(self):
@@ -91,7 +88,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         self.assertRegex(without_new_lines, r"<div>.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*</div>")
         self.assertNotRegex(without_new_lines, r"feedback1|feedback2|feedback3|feedbackC")
-        self.assertEqual(the_html, problem.get_html(), "Should be able to call get_html() twice")
+        assert the_html == problem.get_html(), 'Should be able to call get_html() twice'
 
     def test_targeted_feedback_student_answer1(self):
         problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
@@ -105,7 +102,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegex(without_new_lines, r"feedback1|feedback2|feedbackC")
         # Check that calling it multiple times yields the same thing
         the_html2 = problem.get_html()
-        self.assertEqual(the_html, the_html2)
+        assert the_html == the_html2
 
     def test_targeted_feedback_student_answer2(self):
         problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
@@ -304,7 +301,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertNotRegex(without_new_lines, r"feedback2|feedback3")
         # Check that calling it multiple times yields the same thing
         the_html2 = problem.get_html()
-        self.assertEqual(the_html, the_html2)
+        assert the_html == the_html2
 
     def test_targeted_feedback_no_show_solution_explanation(self):
         xml_str = textwrap.dedent("""

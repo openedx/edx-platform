@@ -22,7 +22,7 @@
                 </div>
             <% } %>
             <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
-            <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
+            <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program" id="program_dashboard_course_upsell_all_button">
                 <%- gettext('Upgrade All Remaining Courses (')%>
                 <% if (discount_data.is_discounted) { %>
                     <span class='list-price'>

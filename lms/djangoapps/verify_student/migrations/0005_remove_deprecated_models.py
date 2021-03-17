@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -21,7 +18,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='skippedreverification',
-            unique_together=set([]),
+            unique_together=set(),
         ),
         migrations.RemoveField(
             model_name='skippedreverification',
@@ -33,7 +30,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='verificationcheckpoint',
-            unique_together=set([]),
+            unique_together=set(),
         ),
         migrations.RemoveField(
             model_name='verificationcheckpoint',

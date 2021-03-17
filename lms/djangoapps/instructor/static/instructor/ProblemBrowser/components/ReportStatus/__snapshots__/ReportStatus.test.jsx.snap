@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReportStatus component render error status 1`] = `
+<div
+  aria-live="polite"
+  className="report-generation-status"
+>
+  <div
+    className="msg error"
+  >
+    Error: 
+    some error status
+  </div>
+</div>
+`;
+
+exports[`ReportStatus component render in progress status 1`] = `
+<div
+  aria-live="polite"
+  className="report-generation-status"
+>
+  <div
+    className="msg progress"
+  >
+    Your report is being generated...
+    <div>
+      <span
+        aria-hidden={true}
+        className="fa fa-refresh fa-spin fa-fw"
+        id="Icon2"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ReportStatus component render success status 1`] = `
+<div
+  aria-live="polite"
+  className="report-generation-status"
+>
+  <div
+    className="msg success"
+  >
+    Your report has been successfully generated.
+    <a
+      href="/some/report/path.csv"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-link"
+          id="Icon2"
+        />
+      </div>
+      View Report
+    </a>
+  </div>
+</div>
+`;

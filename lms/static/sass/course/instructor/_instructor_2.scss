@@ -313,6 +313,30 @@
       }
     }
   }
+    .data-download-nav {
+        @extend .instructor-nav
+    }
+  .report-generation-status {
+    .msg {
+      display: inherit;
+
+      &.error {
+        color: $error-color;
+      }
+
+      > div {
+        display: inline-block;
+      }
+
+      a {
+        margin: 0 1rem;
+
+        & > div {
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
 
 // elements - general
@@ -1484,6 +1508,106 @@
 
 // view - data download
 // --------------------
+
+
+.instructor-dashboard-wrapper-2 section.idash-section#data_download_2 {
+    .data-download-grid-container {
+        display:grid;
+        grid-template-columns:repeat(auto-fit, minmax(20rem, 1fr));
+        grid-auto-rows: minmax(250px, auto);
+        div.card {
+            border-right: 2px solid grey;
+            border-bottom: 2px solid grey;
+            padding: 1em;
+            display: grid;
+            grid-template-rows: 1fr 3fr;
+            p.grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                align-self: self-end;
+            }
+            .problem-browser {
+                display: grid;
+                grid-gap: 1em;
+            }
+        }
+    }
+
+
+    input {
+    margin-bottom: 1em;
+    line-height: 1.3em;
+  }
+
+  .reports-download-container {
+    .data-display-table {
+      .slickgrid {
+        height: 400px;
+      }
+    }
+
+    .report-downloads-table {
+      .slickgrid {
+        height: 300px;
+        padding: ($baseline/4);
+      }
+      // Disable horizontal scroll bar when grid only has 1 column. Remove this CSS class when more columns added.
+      .slick-viewport {
+        overflow-x: hidden !important;
+      }
+    }
+  }
+
+  .block-browser {
+    .header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .title {
+        margin: 0 0.5em;
+      }
+    }
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 0.25em 0;
+
+        .block-name {
+          flex-grow: 1;
+          margin-right: 0.5em;
+          text-align: left;
+        }
+      }
+    }
+  }
+
+  .problem-browser {
+    .block-browser {
+      position: absolute;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+      z-index: 2;
+    }
+
+    input {
+      max-width: 800px;
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+
+}
+
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   input {
     margin-bottom: 1em;
@@ -1507,6 +1631,10 @@
         overflow-x: hidden !important;
       }
     }
+  }
+
+  #react-problem-report {
+    margin: $baseline 0;
   }
 
   .block-browser {
@@ -2459,9 +2587,11 @@ input[name="subject"] {
 }
 
 .special-allowance-container,
+.student-onboarding-status-container,
 .student-proctored-exam-container {
   .allowance-table,
-  .exam-attempts-table {
+  .exam-attempts-table,
+  .onboarding-status-table {
     width: 100%;
 
     tr:nth-child(even) {
@@ -2469,8 +2599,18 @@ input[name="subject"] {
       border-bottom: 1px solid #f3f3f3;
     }
 
+    tbody.even {
+      background-color: $gray-l6;
+      border-bottom: 1px solid #f3f3f3;
+    }
+
+    tbody.accordion-trigger {
+      cursor: pointer;
+    }
+
     .allowance-headings,
-    .exam-attempt-headings {
+    .exam-attempt-headings,
+    .onboarding-status-headings {
       height: 40px;
       border-bottom: 1px solid #bebebe;
 
@@ -2495,10 +2635,12 @@ input[name="subject"] {
 
         &.attempt-type {
           width: 90px;
+          text-align: center;
         }
 
         &.attempt-started-at {
           width: 170px;
+          text-align: center;
         }
 
         &.attempt-completed-at {
@@ -2515,13 +2657,15 @@ input[name="subject"] {
           width: 150px;
         }
 
+        &.more {
+          width: 30px;
+        }
+
         &.username {
           width: 140px;
         }
 
         &.email {
-          @include text-align(center);
-
           width: ($baseline*8);
           word-wrap: break-word;
         }
@@ -2557,7 +2701,7 @@ input[name="subject"] {
         @include padding-left($baseline);
       }
 
-      td:nth-child(2) {
+      td:nth-child(3) {
         line-height: 22px;
 
         @include padding-right(0);
@@ -2565,20 +2709,20 @@ input[name="subject"] {
         word-wrap: break-word;
       }
 
+      td:nth-child(6),
       td:nth-child(5),
-      td:nth-child(4),
-      td:nth-child(6) {
+      td:nth-child(7) {
         @include padding-left(0);
 
         text-align: center;
       }
 
-      td:nth-child(3) {
+      td:nth-child(4) {
         word-wrap: break-word;
         text-align: center;
       }
 
-      td:nth-child(7) {
+      td:nth-child(8) {
         word-wrap: break-word;
         text-align: center;
       }
@@ -2590,7 +2734,8 @@ input[name="subject"] {
   }
 
   .exam-attempts-content,
-  .exam-allowances-content {
+  .exam-allowances-content,
+  .onboarding-status-content {
     padding-left: 0;
     padding-right: 0;
   }
@@ -2599,7 +2744,8 @@ input[name="subject"] {
     margin-top: -30px;
     margin-bottom: 20px;
 
-    .search-attempts {
+    .search-attempts,
+    .search-onboarding {
       border: 1px solid #ccc;
       display: inline-block;
       border-radius: 5px;
@@ -2943,4 +3089,46 @@ div.staff_actions {
   p.success {
     color: theme-color("success");
   }
+}
+
+.action-type-container p {
+    line-height: 2;
+}
+
+.mb-15 {
+    margin-bottom: 20px;
+}
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.download-report {
+    margin-left: 10px;
+}
+
+.selector {
+    width: 315px;
+    height: 34px
+}
+.data-download-container .message {
+    border-radius: 1px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+.font-size-100 {
+    font-size: 100%
+}
+
+.problem-selector{
+    width: 780px;
+    border: 1px solid grey;
+    display: block;
+    padding: 8px;
+    margin-right: 10px;
+    float: left;
+}
+
+.block-browser{
+    margin-top: 34px;
 }

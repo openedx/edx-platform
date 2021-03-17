@@ -6,7 +6,7 @@ Registers the CCX feature for the edX platform.
 from django.conf import settings
 from django.utils.translation import ugettext_noop
 
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.tabs import CourseTab
 
 from .permissions import VIEW_CCX_COACH_DASHBOARD

@@ -86,6 +86,7 @@ def safe_exec(
     python_path=None,
     extra_files=None,
     cache=None,
+    limit_overrides_context=None,
     slug=None,
     unsafely=False,
 ):
@@ -109,11 +110,16 @@ def safe_exec(
     to cache the execution, taking into account the code, the values of the globals,
     and the random seed.
 
+    `limit_overrides_context` is an optional string to be used as a key on
+    the `settings.CODE_JAIL['limit_overrides']` dictionary in order to apply
+    context-specific overrides to the codejail execution limits.
+    If `limit_overrides_context` is omitted or not present in limit_overrides,
+    then use the default limits specified insettings.CODE_JAIL['limits'].
+
     `slug` is an arbitrary string, a description that's meaningful to the
     caller, that will be used in log messages.
 
     If `unsafely` is true, then the code will actually be executed without sandboxing.
-
     """
     # Check the cache for a previous result.
     if cache:
@@ -144,8 +150,12 @@ def safe_exec(
     # Run the code!  Results are side effects in globals_dict.
     try:
         exec_fn(
-            code_prolog + LAZY_IMPORTS + code, globals_dict,
-            python_path=python_path, extra_files=extra_files, slug=slug,
+            code_prolog + LAZY_IMPORTS + code,
+            globals_dict,
+            python_path=python_path,
+            extra_files=extra_files,
+            limit_overrides_context=limit_overrides_context,
+            slug=slug,
         )
     except SafeExecException as e:
         # Saving SafeExecException e in exception to be used later.

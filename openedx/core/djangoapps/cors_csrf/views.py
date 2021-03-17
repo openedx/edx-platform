@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.views.decorators.cache import cache_page
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from .models import XDomainProxyConfiguration
 
@@ -61,9 +61,9 @@ def xdomain_proxy(request):  # pylint: disable=unused-argument
 
     if not allowed_domains:
         log.warning(
-            u"No whitelist configured for cross-domain proxy. "
-            u"You can configure the whitelist in Django Admin "
-            u"using the XDomainProxyConfiguration model."
+            "No whitelist configured for cross-domain proxy. "
+            "You can configure the whitelist in Django Admin "
+            "using the XDomainProxyConfiguration model."
         )
         return HttpResponseNotFound()
 

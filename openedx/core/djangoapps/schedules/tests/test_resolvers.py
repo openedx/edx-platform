@@ -4,27 +4,32 @@ Tests for schedules resolvers
 
 
 import datetime
-from unittest import skipUnless
+from unittest.mock import Mock
 
+import crum
 import ddt
-from django.conf import settings
+import pytz
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import Mock, patch
+from testfixtures import LogCapture
 from waffle.testutils import override_switch
 
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.schedules.config import _EXTERNAL_COURSE_UPDATES_FLAG
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
+    LOG,
     BinnedSchedulesBaseResolver,
-    CourseUpdateResolver,
     CourseNextSectionUpdate,
+    CourseUpdateResolver
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -34,7 +39,7 @@ class SchedulesResolverTestMixin(CacheIsolationMixin):
     Base class for the resolver tests.
     """
     def setUp(self):
-        super(SchedulesResolverTestMixin, self).setUp()
+        super().setUp()
         self.site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory(site=self.site)
         self.schedule_config = ScheduleConfigFactory.create(site=self.site)
@@ -42,14 +47,12 @@ class SchedulesResolverTestMixin(CacheIsolationMixin):
 
 @ddt.ddt
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
-            "Can't test schedules if the app isn't installed")
 class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
     """
     Tests the BinnedSchedulesBaseResolver.
     """
     def setUp(self):
-        super(TestBinnedSchedulesBaseResolver, self).setUp()
+        super().setUp()
 
         self.resolver = BinnedSchedulesBaseResolver(
             async_send_task=Mock(name='async_send_task'),
@@ -67,7 +70,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
-        self.assertEqual(result, mock_query.filter.return_value)
+        assert result == mock_query.filter.return_value
         mock_query.filter.assert_called_once_with(enrollment__course__org=course_org_filter)
 
     @ddt.unpack
@@ -79,14 +82,14 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         self.site_config.save()
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
-        self.assertEqual(result, mock_query.filter.return_value)
+        assert result == mock_query.filter.return_value
         mock_query.filter.assert_called_once_with(enrollment__course__org__in=expected_org_list)
 
     @ddt.unpack
     @ddt.data(
         (None, set([])),
-        ('course1', set([u'course1'])),
-        (['course1', 'course2'], set([u'course1', u'course2']))
+        ('course1', set(['course1'])),
+        (['course1', 'course2'], set(['course1', 'course2']))
     )
     def test_get_course_org_filter_exclude__in(self, course_org_filter, expected_org_list):
         SiteConfigurationFactory.create(
@@ -95,29 +98,57 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         mock_query = Mock()
         result = self.resolver.filter_by_org(mock_query)
         mock_query.exclude.assert_called_once_with(enrollment__course__org__in=expected_org_list)
-        self.assertEqual(result, mock_query.exclude.return_value)
+        assert result == mock_query.exclude.return_value
+
+    @ddt.data(0, 1)
+    def test_external_course_updates(self, bucket):
+        """Confirm that we exclude enrollments in the external course updates experiment"""
+        user = UserFactory()
+        overview1 = CourseOverviewFactory(has_highlights=False)  # set has_highlights just to avoid a modulestore lookup
+        overview2 = CourseOverviewFactory(has_highlights=False)
+
+        # We need to enroll with a request, because our specific experiment code expects it
+        self.addCleanup(crum.set_current_request, None)
+        request = RequestFactory()
+        request.user = user
+        crum.set_current_request(request)
+
+        enrollment1 = CourseEnrollment.enroll(user, overview1.id)
+        with override_experiment_waffle_flag(_EXTERNAL_COURSE_UPDATES_FLAG, bucket=bucket):
+            enrollment2 = CourseEnrollment.enroll(user, overview2.id)
+
+        # OK, at this point, we'd expect course1 to be returned, but course2's enrollment to be excluded by the
+        # experiment. Note that the experiment waffle is currently inactive, but they should still be excluded because
+        # they were bucketed at enrollment time.
+        bin_num = BinnedSchedulesBaseResolver.bin_num_for_user_id(user.id)
+        resolver = BinnedSchedulesBaseResolver(None, self.site, datetime.datetime.now(pytz.UTC), 0, bin_num)
+        resolver.schedule_date_field = 'created'
+        schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        if bucket == 1:
+            assert len(schedules) == 1
+            assert schedules[0].enrollment == enrollment1
+        else:
+            assert len(schedules) == 2
+            assert {s.enrollment for s in schedules} == {enrollment1, enrollment2}
 
 
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
-            "Can't test schedules if the app isn't installed")
 class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     Tests the CourseUpdateResolver.
     """
     def setUp(self):
-        super(TestCourseUpdateResolver, self).setUp()
-        self.course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
+        super().setUp()
+        self.course = CourseFactory.create(highlights_enabled_for_messaging=True)
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=[u'good stuff'])
+            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff'])
 
     def create_resolver(self):
         """
         Creates a CourseUpdateResolver with an enrollment to schedule.
         """
-        with patch('openedx.core.djangoapps.schedules.signals.get_current_site') as mock_get_current_site:
-            mock_get_current_site.return_value = self.site_config.site
-            enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=u'audit')
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
 
         return CourseUpdateResolver(
             async_send_task=Mock(name='async_send_task'),
@@ -128,7 +159,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     def test_schedule_context(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
@@ -141,7 +172,8 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
-            'platform_name': u'\xe9dX',
+            'logo_url': 'https://www.logo.png',
+            'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},
             'template_revision': 'release',
@@ -149,70 +181,76 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'week_highlights': ['good stuff'],
             'week_num': 1,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
         schedules = list(resolver.schedules_for_bin())
-        self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+        assert 'optout' in schedules[0][2]['unsubscribe_url']
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_get_schedules_with_target_date_by_bin_and_orgs_filter_inactive_users(self):
         """Tests that schedules of inactive users are excluded"""
         resolver = self.create_resolver()
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
 
-        self.assertEqual(schedules.count(), 1)
+        assert schedules.count() == 1
         self.user.is_active = False
         self.user.save()
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
-        self.assertEqual(schedules.count(), 0)
+        assert schedules.count() == 0
 
 
 @skip_unless_lms
-@skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
-            "Can't test schedules if the app isn't installed")
 class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     Tests the TestCourseNextSectionUpdateResolver.
     """
     def setUp(self):
-        super(TestCourseNextSectionUpdateResolver, self).setUp()
-        self.course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=True)
-        self.yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        super().setUp()
         self.today = datetime.datetime.utcnow()
-        self.tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        self.yesterday = self.today - datetime.timedelta(days=1)
+        self.course = CourseFactory.create(
+            highlights_enabled_for_messaging=True, self_paced=True,
+            # putting it in the past so the schedule can be later than the start
+            start=self.today - datetime.timedelta(days=30)
+        )
 
         with self.store.bulk_operations(self.course.id):
-            ItemFactory.create(parent=self.course, category='chapter', highlights=[u'good stuff 1'], due=self.yesterday)
-            ItemFactory.create(parent=self.course, category='chapter', highlights=[u'good stuff 2'], due=self.today)
-            ItemFactory.create(parent=self.course, category='chapter', highlights=[u'good stuff 3'], due=self.tomorrow)
+            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 1'])
+            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 2'])
+            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 3'])
+            ItemFactory.create(parent=self.course, category='chapter', highlights=['good stuff 4'])
 
-    def create_resolver(self):
+    def create_resolver(self, user_start_date_offset=8):
         """
         Creates a CourseNextSectionUpdateResolver with an enrollment to schedule.
         """
-        with patch('openedx.core.djangoapps.schedules.signals.get_current_site') as mock_get_current_site:
-            mock_get_current_site.return_value = self.site_config.site
-            CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=u'audit')
+        CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
+
+        # Need to update the user's schedule so the due date for the chapter we want
+        # matches with the user's schedule and the target date. The numbers are based on the
+        # course having the default course duration of 28 days.
+        user_schedule = Schedule.objects.first()
+        user_schedule.start_date = self.today - datetime.timedelta(days=user_start_date_offset)
+        user_schedule.save()
 
         return CourseNextSectionUpdate(
             async_send_task=Mock(name='async_send_task'),
             site=self.site_config.site,
             target_datetime=self.yesterday,
-            course_key=self.course.id,
+            course_id=self.course.id,
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     def test_schedule_context(self):
         resolver = self.create_resolver()
-        # Mock the call to edx-when to just return all schedules
-        with patch('openedx.core.djangoapps.schedules.resolvers.get_schedules_with_due_date') as mock_get_schedules:
-            mock_get_schedules.return_value = Schedule.objects.all()
-            schedules = list(resolver.get_schedules())
+        # using this to make sure the select_related stays intact
+        with self.assertNumQueries(15):
+            sc = resolver.get_schedules()
+            schedules = list(sc)
+
         expected_context = {
             'contact_email': 'info@example.com',
             'contact_mailing_address': '123 Sesame Street',
@@ -222,7 +260,8 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
-            'platform_name': u'\xe9dX',
+            'logo_url': 'https://www.logo.png',
+            'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},
             'template_revision': 'release',
@@ -230,14 +269,25 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'week_highlights': ['good stuff 2'],
             'week_num': 2,
         }
-        self.assertEqual(schedules, [(self.user, None, expected_context, True)])
+        assert schedules == [(self.user, None, expected_context)]
 
-    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     @override_switch('schedules.course_update_show_unsubscribe', True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
-        # Mock the call to edx-when to just return all schedules
-        with patch('openedx.core.djangoapps.schedules.resolvers.get_schedules_with_due_date') as mock_get_schedules:
-            mock_get_schedules.return_value = Schedule.objects.all()
-            schedules = list(resolver.get_schedules())
-        self.assertIn('optout', schedules[0][2]['unsubscribe_url'])
+        schedules = list(resolver.get_schedules())
+        assert 'optout' in schedules[0][2]['unsubscribe_url']
+
+    def test_schedule_context_error(self):
+        resolver = self.create_resolver(user_start_date_offset=29)
+        with LogCapture(LOG.name) as log_capture:
+            list(resolver.get_schedules())
+            log_message = ('Next Section Course Update: Last section was reached. '
+                           'There are no more highlights for {}'.format(self.course.id))
+            log_capture.check_present((LOG.name, 'WARNING', log_message))
+
+    def test_no_updates_if_course_ended(self):
+        self.course.end = self.yesterday
+        self.course = self.update_course(self.course, self.user.id)
+        resolver = self.create_resolver()
+        schedules = list(resolver.get_schedules())
+        self.assertListEqual(schedules, [])

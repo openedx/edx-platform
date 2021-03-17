@@ -3,11 +3,14 @@ Django REST Framework serializers for the User API application
 """
 
 
-from django.contrib.auth.models import User
-from django.utils.timezone import now
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.utils.timezone import now  # lint-amnesty, pylint: disable=unused-import
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import (
+    ManualVerification,
+    SoftwareSecurePhotoVerification
+)
 
 from .models import UserPreference
 
@@ -98,35 +101,32 @@ class CountryTimeZoneSerializer(serializers.Serializer):  # pylint: disable=abst
     description = serializers.CharField()
 
 
-class IDVerificationSerializer(serializers.ModelSerializer):
-    """
-    Serializer that generates a representation of a user's ID verification status.
-    """
-    is_verified = serializers.SerializerMethodField()
+class IDVerificationDetailsSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+    type = serializers.SerializerMethodField()
+    status = serializers.CharField()
+    expiration_datetime = serializers.DateTimeField()
+    message = serializers.SerializerMethodField()
+    updated_at = serializers.DateTimeField()
+    receipt_id = serializers.SerializerMethodField()
 
-    def get_is_verified(self, obj):
-        """
-        Return a boolean indicating if a the user is verified.
-        """
-        return obj.status == 'approved' and obj.expiration_datetime > now()
+    def get_type(self, obj):  # lint-amnesty, pylint: disable=missing-function-docstring
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return 'Software Secure'
+        elif isinstance(obj, ManualVerification):
+            return 'Manual'
+        else:
+            return 'SSO'
 
+    def get_message(self, obj):  # lint-amnesty, pylint: disable=missing-function-docstring
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return obj.error_msg
+        elif isinstance(obj, ManualVerification):
+            return obj.reason
+        else:
+            return ''
 
-class SoftwareSecurePhotoVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = SoftwareSecurePhotoVerification
-
-
-class SSOVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = SSOVerification
-
-
-class ManualVerificationSerializer(IDVerificationSerializer):
-
-    class Meta(object):
-        fields = ('status', 'expiration_datetime', 'is_verified')
-        model = ManualVerification
+    def get_receipt_id(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return obj.receipt_id
+        else:
+            return None

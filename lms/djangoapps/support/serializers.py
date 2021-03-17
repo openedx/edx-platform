@@ -1,15 +1,13 @@
 """
 Serializers for use in the support app.
 """
-from django.urls import reverse
+import json
 
+from django.urls import reverse
 from rest_framework import serializers
 
-from student.models import CourseEnrollment, ManualEnrollmentAudit
-from lms.djangoapps.program_enrollments.models import (
-    ProgramEnrollment,
-    ProgramCourseEnrollment,
-)
+from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from openedx.core.djangoapps.catalog.utils import get_programs_by_uuids
 from openedx.features.course_experience import default_course_url_name
 
@@ -21,7 +19,7 @@ class ManualEnrollmentSerializer(serializers.ModelSerializer):
     """Serializes a manual enrollment audit object."""
     enrolled_by = serializers.SlugRelatedField(slug_field='email', read_only=True, default='')
 
-    class Meta(object):
+    class Meta:
         model = ManualEnrollmentAudit
         fields = ('enrolled_by', 'time_stamp', 'reason')
 
@@ -32,7 +30,7 @@ class CourseEnrollmentSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
     mode = serializers.CharField()
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollment
 
 
@@ -45,7 +43,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     course_enrollment = CourseEnrollmentSerializer()
     course_url = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         model = ProgramCourseEnrollment
 
     def get_course_url(self, obj):
@@ -63,7 +61,7 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     program_course_enrollments = ProgramCourseEnrollmentSerializer(many=True)
     program_name = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         model = ProgramEnrollment
 
     def get_program_name(self, obj):
@@ -86,3 +84,19 @@ def serialize_user_info(user, user_social_auths=None):
                 'uid': user_social_auth.uid,
             })
     return user_info
+
+
+def serialize_sso_records(user_social_auths):
+    """
+    Serialize user social auth model object
+    """
+    sso_records = []
+    for user_social_auth in user_social_auths:
+        sso_records.append({
+            'provider': user_social_auth.provider,
+            'uid': user_social_auth.uid,
+            'created': user_social_auth.created,
+            'modified': user_social_auth.modified,
+            'extraData': json.dumps(user_social_auth.extra_data),
+        })
+    return sso_records

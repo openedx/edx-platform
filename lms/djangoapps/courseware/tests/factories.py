@@ -1,4 +1,4 @@
-# Factories are self documenting
+# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import json
@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseStaffRole,
@@ -25,13 +25,13 @@ from student.roles import (
     OrgStaffRole
 )
 # Imported to re-export
-from student.tests.factories import UserFactory  # Imported to re-export
-from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
+from common.djangoapps.student.tests.factories import UserFactory  # Imported to re-export
+from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name
 course_id = CourseKey.from_string('edX/test_course/test')
-location = partial(course_id.make_usage_key, u'problem')
+location = partial(course_id.make_usage_key, 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
@@ -125,8 +125,8 @@ class GlobalStaffFactory(UserFactory):
 # pylint: enable=unused-argument
 
 
-class StudentModuleFactory(DjangoModelFactory):
-    class Meta(object):
+class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = StudentModule
 
     module_type = "problem"
@@ -138,8 +138,8 @@ class StudentModuleFactory(DjangoModelFactory):
     done = 'na'
 
 
-class UserStateSummaryFactory(DjangoModelFactory):
-    class Meta(object):
+class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
@@ -147,8 +147,8 @@ class UserStateSummaryFactory(DjangoModelFactory):
     usage_id = location('usage_id')
 
 
-class StudentPrefsFactory(DjangoModelFactory):
-    class Meta(object):
+class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = XModuleStudentPrefsField
 
     field_name = 'existing_field'
@@ -157,8 +157,8 @@ class StudentPrefsFactory(DjangoModelFactory):
     module_type = 'mock_problem'
 
 
-class StudentInfoFactory(DjangoModelFactory):
-    class Meta(object):
+class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = XModuleStudentInfoField
 
     field_name = 'existing_field'
@@ -171,6 +171,6 @@ class RequestFactoryNoCsrf(RequestFactory):
     RequestFactory, which disables csrf checks.
     """
     def request(self, **kwargs):
-        request = super(RequestFactoryNoCsrf, self).request(**kwargs)
+        request = super().request(**kwargs)
         setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
         return request

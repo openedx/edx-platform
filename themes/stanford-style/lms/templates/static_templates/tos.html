@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%!
   from django.utils.translation import ugettext as _
 %>
@@ -27,6 +28,7 @@
 <script>
     $(document).ready(function() {
         var print_tos = '<input type="button" value="Print Terms of Service" class="print">';
+        // xss-lint: disable=javascript-jquery-prepend, javascript-jquery-append
         $('#content section.tos').prepend(print_tos).append(print_tos);
         $('#content section.tos input.print').click(function() {
             window.print();

@@ -6,39 +6,39 @@ Unit tests for stub XQueue implementation.
 import ast
 import json
 import unittest
+from unittest import mock
 
-import mock
 import requests
 
 from ..xqueue import StubXQueueService
 
 
-class FakeTimer(object):
+class FakeTimer:
     """
     Fake timer implementation that executes immediately.
     """
-    def __init__(self, delay, func):
+    def __init__(self, delay, func):  # lint-amnesty, pylint: disable=unused-argument
         self.func = func
 
     def start(self):
         self.func()
 
 
-class StubXQueueServiceTest(unittest.TestCase):
+class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(StubXQueueServiceTest, self).setUp()
+        super().setUp()
         self.server = StubXQueueService()
-        self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
+        self.url = f"http://127.0.0.1:{self.server.port}/xqueue/submit"
         self.addCleanup(self.server.shutdown)
 
         # Patch the timer async calls
-        patcher = mock.patch('terrain.stubs.xqueue.post')
+        patcher = mock.patch('common.djangoapps.terrain.stubs.xqueue.post')
         self.post = patcher.start()
         self.addCleanup(patcher.stop)
 
         # Patch POST requests
-        patcher = mock.patch('terrain.stubs.xqueue.Timer')
+        patcher = mock.patch('common.djangoapps.terrain.stubs.xqueue.Timer')
         timer = patcher.start()
         timer.side_effect = FakeTimer
         self.addCleanup(patcher.stop)
@@ -105,7 +105,7 @@ class StubXQueueServiceTest(unittest.TestCase):
         self.server.config['test_1'] = {'response': True}
         self.server.config['test_2'] = {'response': False}
 
-        with mock.patch('terrain.stubs.http.LOGGER') as logger:
+        with mock.patch('common.djangoapps.terrain.stubs.http.LOGGER') as logger:
 
             # Post a submission to the XQueue stub
             callback_url = 'http://127.0.0.1:8000/test_callback'
@@ -116,10 +116,10 @@ class StubXQueueServiceTest(unittest.TestCase):
 
             # Expect that we do NOT receive a response
             # and that an error message is logged
-            self.assertFalse(self.post.called)
-            self.assertTrue(logger.error.called)
+            assert not self.post.called
+            assert logger.error.called
 
-    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):
+    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):  # lint-amnesty, pylint: disable=unused-argument
         """
         Post a submission to the stub XQueue implementation.
         `callback_url` is the URL at which we expect to receive a grade response
@@ -144,7 +144,7 @@ class StubXQueueServiceTest(unittest.TestCase):
         resp = requests.post(self.url, data=grade_request)
 
         # Expect that the response is success
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         # Return back the header, so we can authenticate the response we receive
         return grade_request['xqueue_header']
@@ -167,9 +167,7 @@ class StubXQueueServiceTest(unittest.TestCase):
             'xqueue_body': expected_body,
         }
         # Check that the POST request was made with the correct params
-        self.assertEqual(self.post.call_args[1]['data']['xqueue_body'], expected_callback_dict['xqueue_body'])
-        self.assertEqual(
-            ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']),
-            ast.literal_eval(expected_callback_dict['xqueue_header'])
-        )
-        self.assertEqual(self.post.call_args[0][0], callback_url)
+        assert self.post.call_args[1]['data']['xqueue_body'] == expected_callback_dict['xqueue_body']
+        assert ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']) ==\
+               ast.literal_eval(expected_callback_dict['xqueue_header'])
+        assert self.post.call_args[0][0] == callback_url

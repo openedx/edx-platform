@@ -2,20 +2,21 @@
 
 
 from datetime import datetime, timedelta
+import pytest
 
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
 from six import text_type
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseMode
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility
-from student.models import CourseEnrollment, User
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'student.management.commands.change_eligibility_deadline'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.change_eligibility_deadline'
 command_args = '--username {username} --course {course} --date {date}'
 
 
@@ -24,7 +25,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
 
     def setUp(self):
         """ Initial set up for tests """
-        super(ChangeEligibilityDeadlineTests, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
 
         self.enrolled_user = UserFactory.create(username='amy', email='amy@pond.com', password='password')
@@ -40,33 +41,33 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
 
     def test_invalid_command_arguments(self):
         """ Test command with invalid arguments """
-        course_id_str = text_type(self.course.id)
+        course_id_str = str(self.course.id)
         username = self.enrolled_user.username
 
         # Incorrect username
-        with self.assertRaises(User.DoesNotExist):
+        with pytest.raises(User.DoesNotExist):
             call_command('change_eligibility_deadline',
                          *command_args.format(username='XYZ', course=course_id_str, date='2018-12-30').split(' ')
                          )
         # Incorrect course id
-        with self.assertRaises(InvalidKeyError):
+        with pytest.raises(InvalidKeyError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course='XYZ', date='2018-12-30').split(' ')
                          )
         # Student not enrolled
-        with self.assertRaises(CourseEnrollment.DoesNotExist):
+        with pytest.raises(CourseEnrollment.DoesNotExist):
             unenrolled_user = UserFactory.create()
             call_command('change_eligibility_deadline',
                          *command_args.format(username=unenrolled_user.username, course=course_id_str,
                                               date='2018-12-30').split(' ')
                          )
         # Date format Invalid
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course=course_id_str, date='30-12-2018').split(' ')
                          )
         # Date not provided
-        with self.assertRaises(KeyError):
+        with pytest.raises(KeyError):
             call_command('change_eligibility_deadline',
                          *command_args.format(username=username, course=course_id_str,).split(' '))
 
@@ -78,7 +79,7 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
         default value which is one month from today. It then continues to run the code
         to change eligibility deadline.
         """
-        course_key = text_type(self.course.id)
+        course_key = str(self.course.id)
         username = self.enrolled_user.username
 
         # Test Date set prior to today
@@ -89,12 +90,12 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
             )
             logger.check(
                 (LOGGER_NAME, 'WARNING', 'Invalid date or date not provided. Setting deadline to one month from now'),
-                (LOGGER_NAME, 'INFO', 'Successfully updated credit eligibility deadline for {}'.format(username))
+                (LOGGER_NAME, 'INFO', f'Successfully updated credit eligibility deadline for {username}')
             )
 
     def test_valid_command_arguments(self):
         """ Test command with valid arguments """
-        course_key = text_type(self.course.id)
+        course_key = str(self.course.id)
         username = self.enrolled_user.username
         new_deadline = datetime.utcnow() + timedelta(days=30)
 
@@ -105,4 +106,4 @@ class ChangeEligibilityDeadlineTests(SharedModuleStoreTestCase):
         credit_eligibility = CreditEligibility.objects.get(username=username,
                                                            course__course_key=self.course.id)
         credit_deadline = credit_eligibility.deadline.date()
-        self.assertEqual(credit_deadline, new_deadline.date())
+        assert credit_deadline == new_deadline.date()

@@ -11,17 +11,16 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from web_fragments.views import FragmentView
 
-from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
+from common.djangoapps.edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 
 log = logging.getLogger('plugin_api')
 
 
-class EdxFragmentView(FragmentView):
+class EdxFragmentView(FragmentView):  # lint-amnesty, pylint: disable=abstract-method
     """
     The base class of all Open edX fragment views.
     """
     page_title = None
-    _uses_pattern_library = True
 
     @staticmethod
     def get_css_dependencies(group):
@@ -80,13 +79,12 @@ class EdxFragmentView(FragmentView):
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
-    def create_base_standalone_context(self, request, fragment, **kwargs):
+    def create_base_standalone_context(self, request, fragment, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Creates the base context for rendering a fragment as a standalone page.
         """
         return {
-            'uses_pattern_library': self.uses_pattern_library,
-            'uses_bootstrap': not self.uses_pattern_library,
+            'uses_bootstrap': True,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
@@ -113,7 +111,7 @@ class EdxFragmentView(FragmentView):
             'is_marketing_link_set': is_marketing_link_set,
         })
 
-    def standalone_page_title(self, request, fragment, **kwargs):
+    def standalone_page_title(self, request, fragment, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns the page title for the standalone page, or None if there is no title.
         """
@@ -134,22 +132,10 @@ class EdxFragmentView(FragmentView):
             'fragment': fragment,
             'page_title': self.standalone_page_title(request, fragment, **kwargs),
         })
-        if context.get('uses_pattern_library', False):
-            template = 'fragments/standalone-page-v2.html'
-        elif context.get('uses_bootstrap', False):
-            template = 'fragments/standalone-page-bootstrap.html'
-        else:
-            template = 'fragments/standalone-page-v1.html'
+        template_name = 'fragments/standalone-page-bootstrap.html'
 
         return render(
             request=request,
-            template_name=template,
+            template_name=template_name,
             context=context
         )
-
-    @property
-    def uses_pattern_library(self):
-        """
-        Returns true if this fragment is rendered with edx-pattern-library.
-        """
-        return self._uses_pattern_library

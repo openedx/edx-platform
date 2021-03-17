@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=django-not-configured
 """
 Utility functions related to databases.
 """
@@ -5,11 +6,10 @@ Utility functions related to databases.
 
 import random
 # TransactionManagementError used below actually *does* derive from the standard "Exception" class.
-# pylint: disable=nonstandard-exception
+# lint-amnesty, pylint: disable=bad-option-value, nonstandard-exception
 from contextlib import contextmanager
-from functools import wraps
 
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, Error, transaction
+from django.db import DEFAULT_DB_ALIAS, transaction  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.cache_utils import get_cache
 
@@ -55,7 +55,7 @@ class OuterAtomic(transaction.Atomic):
     def __init__(self, using, savepoint, read_committed=False, name=None):
         self.read_committed = read_committed
         self.name = name
-        super(OuterAtomic, self).__init__(using, savepoint)
+        super().__init__(using, savepoint)
 
     def __enter__(self):
 
@@ -75,7 +75,7 @@ class OuterAtomic(transaction.Atomic):
             # The inner atomic starts a savepoint around the test.
             # So, for tests only, there should be exactly one savepoint_id and two atomic_for_testcase_calls.
             # atomic_for_testcase_calls below is added in a monkey-patch for tests only.
-            if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:
+            if self.ALLOW_NESTED and (self.atomic_for_testcase_calls - len(connection.savepoint_ids)) < 1:  # lint-amnesty, pylint: disable=no-member
                 raise transaction.TransactionManagementError('Cannot be inside an atomic block.')
 
             # Otherwise, this shouldn't be nested in any atomic block.
@@ -88,7 +88,7 @@ class OuterAtomic(transaction.Atomic):
                     cursor = connection.cursor()
                     cursor.execute("SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
 
-        super(OuterAtomic, self).__enter__()
+        super().__enter__()
 
 
 def outer_atomic(using=None, savepoint=True, read_committed=False, name=None):
@@ -151,16 +151,3 @@ def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
         cid = random.randint(minimum, maximum)
 
     return cid
-
-
-class NoOpMigrationModules(object):
-    """
-    Return invalid migrations modules for apps. Used for disabling migrations during tests.
-    See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-    """
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None

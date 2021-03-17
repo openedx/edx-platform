@@ -10,8 +10,8 @@ from django.conf import settings
 from mock import patch
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.signals import _listen_for_course_publish
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.signals import _listen_for_course_publish
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -25,7 +25,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseModeSignalTest, self).setUp()
+        super(CourseModeSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.end = datetime.now(tz=UTC).replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         CourseMode.objects.all().delete()
@@ -59,38 +59,38 @@ class CourseModeSignalTest(ModuleStoreTestCase):
         _listen_for_course_publish('store', self.course.id)
         course_mode.refresh_from_db()
 
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
     @ddt.data(1, 14, 30)
     def test_verified_mode(self, verification_window):
         """ Verify signal updates expiration to configured time period before course end for verified mode. """
         course_mode, __ = self.create_mode('verified', 'verified', 10)
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
-        with patch('course_modes.models.CourseModeExpirationConfig.current') as config:
+        with patch('common.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
             instance.verification_window = timedelta(days=verification_window)
 
             _listen_for_course_publish('store', self.course.id)
             course_mode.refresh_from_db()
 
-            self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+            assert course_mode.expiration_datetime == (self.end - timedelta(days=verification_window))
 
     @ddt.data(1, 14, 30)
     def test_verified_mode_explicitly_set(self, verification_window):
         """ Verify signal does not update expiration for verified mode with explicitly set expiration. """
         course_mode, __ = self.create_mode('verified', 'verified', 10)
         course_mode.expiration_datetime_is_explicit = True
-        self.assertIsNone(course_mode.expiration_datetime)
+        assert course_mode.expiration_datetime is None
 
-        with patch('course_modes.models.CourseModeExpirationConfig.current') as config:
+        with patch('common.djangoapps.course_modes.models.CourseModeExpirationConfig.current') as config:
             instance = config.return_value
             instance.verification_window = timedelta(days=verification_window)
 
             _listen_for_course_publish('store', self.course.id)
             course_mode.refresh_from_db()
 
-            self.assertEqual(course_mode.expiration_datetime, self.end - timedelta(days=verification_window))
+            assert course_mode.expiration_datetime == (self.end - timedelta(days=verification_window))
 
     def test_masters_mode(self):
         # create an xblock with verified group access

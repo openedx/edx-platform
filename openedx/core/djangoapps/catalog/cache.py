@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 # Template used to create cache keys for individual programs.
 PROGRAM_CACHE_KEY_TPL = 'program-{uuid}'
 
@@ -21,6 +22,10 @@ CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL = 'catalog-course-programs-{course_uuid}'
 # because program_type values are likely to be shared between different sites
 # that live in the same environment).
 PROGRAMS_BY_TYPE_CACHE_KEY_TPL = 'programs-by-type-{site_id}-{program_type}'
+
+# Site-aware cache key template used to locate an item containing
+# a list of all program UUIDs with a certain program slug
+PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL = 'programs-by-type-slug-{site_id}-{program_slug}'
 
 # Template used to create cache keys for organization to program uuids.
 PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL = 'organization-programs-{org_key}'

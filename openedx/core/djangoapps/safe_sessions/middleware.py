@@ -85,7 +85,7 @@ class SafeCookieError(Exception):
     An exception class for safe cookie related errors.
     """
     def __init__(self, error_message):
-        super(SafeCookieError, self).__init__(error_message)
+        super(SafeCookieError, self).__init__(error_message)  # lint-amnesty, pylint: disable=super-with-arguments
         log.error(error_message)
 
 
@@ -152,7 +152,7 @@ class SafeCookieData(object):
             raw_cookie_components = six.text_type(safe_cookie_string).split(cls.SEPARATOR)
             safe_cookie_data = SafeCookieData(*raw_cookie_components)
         except TypeError:
-            raise SafeCookieError(
+            raise SafeCookieError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"SafeCookieData BWC parse error: {0!r}.".format(safe_cookie_string)
             )
         else:
@@ -282,7 +282,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             else:
                 request.COOKIES[settings.SESSION_COOKIE_NAME] = safe_cookie_data.session_id  # Step 2
 
-        process_request_response = super(SafeSessionMiddleware, self).process_request(request)  # Step 3
+        process_request_response = super(SafeSessionMiddleware, self).process_request(request)  # Step 3  # lint-amnesty, pylint: disable=assignment-from-no-return, super-with-arguments
         if process_request_response:
             # The process_request pipeline has been short circuited so
             # return the response.
@@ -321,7 +321,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         Step 4. Delete the cookie, if it's marked for deletion.
 
         """
-        response = super(SafeSessionMiddleware, self).process_response(request, response)  # Step 1
+        response = super(SafeSessionMiddleware, self).process_response(request, response)  # Step 1  # lint-amnesty, pylint: disable=super-with-arguments
 
         if not _is_cookie_marked_for_deletion(request) and _is_cookie_present(response):
             try:

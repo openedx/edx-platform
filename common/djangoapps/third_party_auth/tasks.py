@@ -10,15 +10,16 @@ import logging
 import dateutil.parser
 import pytz
 import requests
-from celery.task import task
+from celery import shared_task
 from django.utils.timezone import now
+from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
 from six import text_type
 
 from openedx.core.djangolib.markup import Text
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
 
@@ -27,10 +28,11 @@ SAML_XML_NS = 'urn:oasis:names:tc:SAML:2.0:metadata'  # The SAML Metadata XML na
 
 class MetadataParseError(Exception):
     """ An error occurred while parsing the SAML metadata from an IdP """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-@task(name='third_party_auth.fetch_saml_metadata')
+@shared_task
+@set_code_owner_attribute
 def fetch_saml_metadata():
     """
     Fetch and store/update the metadata of all IdPs
@@ -87,7 +89,7 @@ def fetch_saml_metadata():
             try:
                 parser = etree.XMLParser(remove_comments=True)
                 xml = etree.fromstring(response.content, parser)
-            except etree.XMLSyntaxError:
+            except etree.XMLSyntaxError:  # lint-amnesty, pylint: disable=try-except-raise
                 raise
             # TODO: Can use OneLogin_Saml2_Utils to validate signed XML if anyone is using that
 
@@ -123,7 +125,7 @@ def fetch_saml_metadata():
             log.exception(text_type(error))
             failure_messages.append(
                 u"XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
-                    error_message=str(error.error_log),
+                    error_message=str(error.error_log),  # lint-amnesty, pylint: disable=no-member
                     url=url,
                     entity_ids="\n".join(
                         [u"\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
@@ -181,7 +183,7 @@ def _parse_metadata_xml(xml, entity_id):
         # The only binding supported by python-saml and python-social-auth is HTTP-Redirect:
         sso_url = sso_bindings['urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect']
     except KeyError:
-        raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")
+        raise MetadataParseError("Unable to find SSO URL with HTTP-Redirect binding.")  # lint-amnesty, pylint: disable=raise-missing-from
     return public_key, sso_url, expires_at
 
 

@@ -1,5 +1,7 @@
 (function(requirejs, require, define) {
-    define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggable_logic'], function(draggableEvents, draggableLogic) {
+    define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggable_logic',
+        'edx-ui-toolkit/js/utils/html-utils'],
+    function(draggableEvents, draggableLogic, HtmlUtils) {
         return {
             init: init
         };
@@ -55,17 +57,13 @@
                     draggableObj.iconImgEl.appendTo(draggableObj.iconEl);
 
                     if (draggableObj.originalConfigObj.label.length > 0) {
-                        draggableObj.labelEl = $(
-                        '<div ' +
-                            'style=" ' +
-                                'position: absolute; ' +
-                                'color: black; ' +
-                                'font-size: 0.95em; ' +
-                            '" ' +
-                        'role="label">' +
-                            draggableObj.originalConfigObj.label +
-                        '</div>'
-                    );
+                        draggableObj.labelEl = $(HtmlUtils.joinHtml(
+                            HtmlUtils.HTML(
+                                '<div style="position: absolute; color: black; font-size: 0.95em; " role="label">'
+                            ),
+                            draggableObj.originalConfigObj.label,
+                            HtmlUtils.HTML('</div>')
+                    ).toString());
                         draggableObj.labelEl.css({
                             left: 50 - draggableObj.labelWidth * 0.5,
                             top: 5 + draggableObj.iconHeightSmall + 5
@@ -86,17 +84,11 @@
                 return;
             } else {
                 if (draggableObj.originalConfigObj.label.length > 0) {
-                    draggableObj.iconEl = $(
-                    '<div ' +
-                        'style=" ' +
-                            'position: absolute; ' +
-                            'color: black; ' +
-                            'font-size: 0.95em; ' +
-                        '" ' +
-                    '>' +
-                        draggableObj.originalConfigObj.label +
-                    '</div>'
-                );
+                    draggableObj.iconEl = $(HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<div style=" position: absolute; color: black; font-size: 0.95em; " >'),
+                        draggableObj.originalConfigObj.label,
+                        HtmlUtils.HTML('</div>')
+                ).toString());
                     draggableObj.iconEl.css({
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
                         top: 50 - draggableObj.iconHeightSmall * 0.5
@@ -168,21 +160,11 @@
                 numDraggablesOnMe: 0
             };
 
-            draggableObj.containerEl = $(
-            '<div ' +
-                'style=" ' +
-                    'width: 100px; ' +
-                    'height: 100px; ' +
-                    'display: inline-block; ' +
-                    'overflow: hidden; ' +
-                    'border-left: 1px solid #CCC; ' +
-                    'border-right: 1px solid #CCC; ' +
-                    'text-align: center; ' +
-                    'position: relative; ' +
-                    'cursor: move; ' +
-                '" ' +
-                'role="listitem"></div>'
-        );
+            draggableObj.containerEl = $(HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<div style=" width: 100px; height: 100px; display: inline-block; overflow: hidden; '),
+                HtmlUtils.HTML('border-left: 1px solid #CCC; border-right: 1px solid #CCC; text-align: center; '),
+                HtmlUtils.HTML('position: relative; cursor: move; " role="listitem"></div>')
+        ).toString());
 
             draggableObj.containerEl.appendTo(state.sliderEl);
 
@@ -230,18 +212,13 @@
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
 
                     if (obj.label.length > 0) {
-                        draggableObj.labelEl = $(
-                        '<div ' +
-                            'style=" ' +
-                                'position: absolute; ' +
-                                'color: black; ' +
-                                'font-size: 0.95em; ' +
-                                'cursor: move; ' +
-                            '" ' +
-                        '>' +
-                            obj.label +
-                        '</div>'
-                    );
+                        draggableObj.labelEl = $(HtmlUtils.joinHtml(
+                            HtmlUtils.HTML(
+                                '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " >'
+                            ),
+                            obj.label,
+                            HtmlUtils.HTML('</div>')
+                    ).toString());
 
                         draggableObj.labelEl.appendTo(draggableObj.containerEl);
                         draggableObj.labelWidth = draggableObj.labelEl.width();
@@ -270,19 +247,14 @@
                     draggableObj.iconElBorder = '1px solid black';
                     draggableObj.iconElLeftOffset = 9;
 
-                    draggableObj.iconEl = $(
-                    '<div ' +
-                        'style=" ' +
-                            'position: absolute; ' +
-                            'color: black; ' +
-                            'font-size: 0.95em; ' +
-                            'cursor: move; ' +
-                        '" ' +
-                        'tabindex="0" aria-grabbed="false" role="listitem"' +
-                    '>' +
-                        obj.label +
-                    '</div>'
-                );
+                    draggableObj.iconEl = $(HtmlUtils.joinHtml(
+                        HtmlUtils.HTML(
+                            '<div style=" position: absolute; color: black; font-size: 0.95em; cursor: move; " '
+                        ),
+                        HtmlUtils.HTML('tabindex="0" aria-grabbed="false" role="listitem">'),
+                        obj.label,
+                        HtmlUtils.HTML('</div>')
+                ).toString());
 
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
 

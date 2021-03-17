@@ -39,7 +39,7 @@
   }
 
   %print-rendering-section {
-    margin-bottom: spacing-vertical(small);
+    margin-bottom: map-get($spacing-vertical, small);
     border-bottom: none !important;
     padding-bottom: 0 !important;
 
@@ -74,7 +74,7 @@
 
   body {
     height: auto;
-    margin: spacing-vertical(mid-large) spacing-vertical(mid-small) 0 spacing-vertical(mid-small) !important;
+    margin: map-get($spacing-vertical, mid-large) map-get($spacing-vertical, mid-small) 0 map-get($spacing-vertical, mid-small) !important;
     padding: 0;
   }
 
@@ -124,64 +124,64 @@
 
   // headings
   .hd-1 {
-    font-size: font-size(x-large);
-    line-height: line-height(x-large);
+    font-size: rem(21);
+    line-height: 1.5;
   }
 
   .hd-2 {
-    font-size: font-size(large);
-    line-height: line-height(large);
+    font-size: rem(18);
+    line-height: 1.6;
   }
 
   .hd-3 {
-    font-size: font-size(large);
-    line-height: line-height(large);
+    font-size: rem(18);
+    line-height: 1.6;
   }
 
   .hd-4 {
-    font-size: font-size(base);
-    line-height: line-height(base);
+    font-size: rem(16);
+    line-height: 1.5;
   }
 
   .hd-5 {
-    font-size: font-size(small);
-    line-height: line-height(small);
+    font-size: rem(14);
+    line-height: 1.6;
   }
 
   .hd-6 {
-    font-size: font-size(x-small);
-    line-height: line-height(x-small);
+    font-size: rem(12);
+    line-height: 1.5;
   }
 
   .hd-7 {
-    font-size: font-size(xx-small);
-    line-height: line-height(x-small);
+    font-size: rem(11);
+    line-height: 1.5;
   }
 
   // copy
-  .copy-lead {
-    font-size: font-size(base);
-    line-height: line-height(base);
+  .copy.copy-lead {
+    font-size: rem(16);
+    line-height: 1.5;
   }
 
-  .copy-large {
-    font-size: font-size(base);
-    line-height: line-height(base);
+  .copy.copy-large {
+    font-size: rem(16);
+    line-height: 1.5;
   }
 
-  .copy-base {
-    font-size: font-size(small);
-    line-height: line-height(small);
+  .copy.copy-base {
+    font-size: rem(14);
+    line-height: 1.6;
   }
 
-  .copy-meta {
-    font-size: font-size(x-small);
-    line-height: line-height(small);
+  .copy.copy-meta {
+    font-size: rem(12);
+    line-height: 1.6;
   }
 
-  .copy-micro {
-    font-size: font-size(xx-small);
-    line-height: line-height(x-small);
+  .copy.copy-micro {
+    font-size: rem(11);
+    line-height: 1.5;
   }
 
   // accomplishment
@@ -191,14 +191,17 @@
 
   .accomplishment-rendering {
     top: 0 !important;
-    border: rem(1) solid palette(grayscale, back);
+    border: rem(1) solid $gray-back;
     border-top: rem(2) solid $cert-base-color;
     box-shadow: none;
-    padding: spacing-vertical(small) spacing-horizontal(mid-large);
+    padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, mid-large);
 
+    @include rtl {
+      display: block !important;
+    }
 
     .accomplishment-type {
-      margin-top: -(spacing-vertical(mid-large));
+      margin-top: -(map-get($spacing-vertical, mid-large));
     }
 
     .accomplishment-type-symbol {
@@ -208,20 +211,20 @@
     }
 
     .wrapper-statement-and-signatories {
-      border-bottom: rem(2) solid palette(grayscale, x-back);
+      border-bottom: rem(2) solid $gray-x-back;
     }
 
     .accomplishment-statement {
       @extend %print-rendering-section;
 
-      @include span(8);
+      @include make-col(8);
 
       margin: 0 auto;
     }
 
     .accomplishment-summary,
     .accomplishment-statement-detail {
-      margin-bottom: spacing-vertical(mid-small);
+      margin-bottom: map-get($spacing-vertical, mid-small);
     }
 
     .wrapper-orgs::after {
@@ -235,8 +238,8 @@
 
       .wrapper-organization {
         height: rem(48);
-        margin-top: spacing-vertical(mid-small) !important;
-        margin-bottom: spacing-vertical(mid-small) !important;
+        margin-top: map-get($spacing-vertical, mid-small) !important;
+        margin-bottom: map-get($spacing-vertical, mid-small) !important;
       }
 
       .organization-logo {
@@ -248,7 +251,8 @@
     .accomplishment-signatories {
       @extend %print-rendering-section;
 
-      @include span(12, before);
+      @include make-col(12);
+      @include margin-right(0);
 
       .signatory-credentials {
         font-size: 8pt;
@@ -256,7 +260,7 @@
       }
 
       .signatory-signature {
-        height: spacing-vertical(small);
+        height: map-get($spacing-vertical, small);
         max-width: 100%;
         margin-top: 0;
         padding-top: 0 !important;
@@ -264,7 +268,7 @@
       }
 
       .signatory-name {
-        font-size: font-size(x-small);
+        font-size: rem(12);
       }
 
       .signatory-credentials {
@@ -274,7 +278,7 @@
       // CASE: > 4 signatures
       &.has-many {
         .signatory {
-          @include span(2);
+          @include make-col(2);
         }
       }
     }
@@ -301,12 +305,12 @@
         .value {
           display: inline-block;
           vertical-align: baseline;
-          font-size: font-size(x-small);
-          line-height: line-height(small);
+          font-size: rem(12);
+          line-height: 1.6;
         }
 
         .label {
-          @include margin-right(spacing-horizontal(small));
+          @include margin-right(map-get($spacing-horizontal, small));
         }
       }
     }
@@ -315,6 +319,8 @@
       float: left;
       width: 65% !important;
       margin: 0 !important;
+      flex: none !important;
+      max-width: 65% !important;
 
       @include text-align(left);
     }
@@ -323,6 +329,8 @@
       float: right;
       width: 35% !important;
       margin: 0 !important;
+      flex: none !important;
+      max-width: 35% !important;
 
       @include text-align(right);
     }
@@ -340,4 +348,3 @@
     }
   }
 }
-

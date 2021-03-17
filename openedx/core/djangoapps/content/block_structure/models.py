@@ -8,8 +8,6 @@ from contextlib import contextmanager
 from datetime import datetime
 from logging import getLogger
 
-import six
-from six.moves import map
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile
@@ -30,7 +28,7 @@ def _create_path(directory, filename):
     """
     Returns the full path for the given directory and filename.
     """
-    return '{}/{}'.format(directory, filename)
+    return f'{directory}/{filename}'
 
 
 def _directory_name(data_usage_key):
@@ -38,11 +36,19 @@ def _directory_name(data_usage_key):
     Returns the directory name for the given
     data_usage_key.
     """
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['DIRECTORY_PREFIX']
+    # .. setting_default: ''
+    # .. setting_description: Specifies the path in storage where block structures would be saved,
+    #   for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    directory_prefix = settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', '')
+
     # replace any '/' in the usage key so they aren't interpreted
     # as folder separators.
-    encoded_usage_key = six.text_type(data_usage_key).replace('/', '_')
+    encoded_usage_key = str(data_usage_key).replace('/', '_')
     return '{}{}'.format(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', ''),
+        directory_prefix,
         encoded_usage_key,
     )
 
@@ -63,10 +69,21 @@ def _bs_model_storage():
     """
     Get django Storage object for BlockStructureModel.
     """
-    return get_storage(
-        settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS'),
-        **settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
-    )
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']
+    # .. setting_default: None
+    # .. setting_description: Specifies the storage used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `block_structure.storage_backing_for_cache`.
+    storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
+
+    # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']
+    # .. setting_default: {}
+    # .. setting_description: Specifies the keyword arguments needed to setup the storage, which
+    #   would be used for storage-backed block structure cache.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
+    #   `block_structure.storage_backing_for_cache`.
+    storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
+
+    return get_storage(storage_class, **storage_kwargs)
 
 
 class CustomizableFileField(models.FileField):
@@ -83,10 +100,10 @@ class CustomizableFileField(models.FileField):
             storage=_bs_model_storage(),
             max_length=500,  # allocate enough for base path + prefix + usage_key + timestamp in filepath
         ))
-        super(CustomizableFileField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    def deconstruct(self):
-        name, path, args, kwargs = super(CustomizableFileField, self).deconstruct()
+    def deconstruct(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+        name, path, args, kwargs = super().deconstruct()
         del kwargs['upload_to']
         del kwargs['storage']
         del kwargs['max_length']
@@ -116,14 +133,14 @@ def _storage_error_handling(bs_model, operation, is_read_operation=False):
     try:
         yield
     except Exception as error:  # pylint: disable=broad-except
-        log.exception(u'BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
-        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # pylint: disable=no-member
+        log.exception('BlockStructure: Exception %s on store %s; %s.', error.__class__, operation, bs_model)
+        if isinstance(error, OSError) and error.errno in (errno.EACCES, errno.EPERM):  # lint-amnesty, pylint: disable=no-else-raise, no-member
             raise
         elif is_read_operation and isinstance(error, (IOError, SuspiciousOperation)):
             # May have been caused by one of the possible error
             # situations listed above.  Raise BlockStructureNotFound
             # so the block structure can be regenerated and restored.
-            raise BlockStructureNotFound(bs_model.data_usage_key)
+            raise BlockStructureNotFound(bs_model.data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
         else:
             raise
 
@@ -136,40 +153,40 @@ class BlockStructureModel(TimeStampedModel):
     .. no_pii:
     """
     VERSION_FIELDS = [
-        u'data_version',
-        u'data_edit_timestamp',
-        u'transformers_schema_version',
-        u'block_structure_schema_version',
+        'data_version',
+        'data_edit_timestamp',
+        'transformers_schema_version',
+        'block_structure_schema_version',
     ]
-    UNIQUENESS_FIELDS = [u'data_usage_key'] + VERSION_FIELDS
+    UNIQUENESS_FIELDS = ['data_usage_key'] + VERSION_FIELDS
 
-    class Meta(object):
+    class Meta:
         db_table = 'block_structure'
 
     data_usage_key = UsageKeyWithRunField(
-        u'Identifier of the data being collected.',
+        'Identifier of the data being collected.',
         blank=False,
         max_length=255,
         unique=True,
     )
     data_version = models.CharField(
-        u'Version of the data at the time of collection.',
+        'Version of the data at the time of collection.',
         blank=True,
         null=True,
         max_length=255,
     )
     data_edit_timestamp = models.DateTimeField(
-        u'Edit timestamp of the data at the time of collection.',
+        'Edit timestamp of the data at the time of collection.',
         blank=True,
         null=True,
     )
     transformers_schema_version = models.CharField(
-        u'Representation of the schema version of the transformers used during collection.',
+        'Representation of the schema version of the transformers used during collection.',
         blank=False,
         max_length=255,
     )
     block_structure_schema_version = models.CharField(
-        u'Version of the block structure schema at the time of collection.',
+        'Version of the block structure schema at the time of collection.',
         blank=False,
         max_length=255,
     )
@@ -179,7 +196,7 @@ class BlockStructureModel(TimeStampedModel):
         """
         Returns the collected data for this instance.
         """
-        operation = u'Read'
+        operation = 'Read'
         with _storage_error_handling(self, operation, is_read_operation=True):
             serialized_data = self.data.read()
 
@@ -196,8 +213,8 @@ class BlockStructureModel(TimeStampedModel):
         try:
             return cls.objects.get(data_usage_key=data_usage_key)
         except cls.DoesNotExist:
-            log.info(u'BlockStructure: Not found in table; %s.', data_usage_key)
-            raise BlockStructureNotFound(data_usage_key)
+            log.info('BlockStructure: Not found in table; %s.', data_usage_key)
+            raise BlockStructureNotFound(data_usage_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def update_or_create(cls, serialized_data, data_usage_key, **kwargs):
@@ -210,7 +227,7 @@ class BlockStructureModel(TimeStampedModel):
         # unless the file is successfully persisted.
         with transaction.atomic():
             bs_model, created = cls.objects.update_or_create(defaults=kwargs, data_usage_key=data_usage_key)
-            operation = u'Created' if created else u'Updated'
+            operation = 'Created' if created else 'Updated'
 
             with _storage_error_handling(bs_model, operation):
                 bs_model.data.save('', ContentFile(serialized_data))
@@ -226,8 +243,8 @@ class BlockStructureModel(TimeStampedModel):
         """
         Returns a string representation of this model.
         """
-        return u', '.join(
-            u'{}: {}'.format(field_name, six.text_type(getattr(self, field_name)))
+        return ', '.join(
+            '{}: {}'.format(field_name, str(getattr(self, field_name)))
             for field_name in self.UNIQUENESS_FIELDS
         )
 
@@ -244,10 +261,10 @@ class BlockStructureModel(TimeStampedModel):
 
         try:
             all_files_by_date = sorted(cls._get_all_files(data_usage_key))
-            files_to_delete = all_files_by_date[:-num_to_keep] if num_to_keep > 0 else all_files_by_date
+            files_to_delete = all_files_by_date[:-num_to_keep] if num_to_keep > 0 else all_files_by_date  # lint-amnesty, pylint: disable=invalid-unary-operand-type
             cls._delete_files(files_to_delete)
             log.info(
-                u'BlockStructure: Deleted %d out of total %d files in store; data_usage_key: %s, num_to_keep: %d.',
+                'BlockStructure: Deleted %d out of total %d files in store; data_usage_key: %s, num_to_keep: %d.',
                 len(files_to_delete),
                 len(all_files_by_date),
                 data_usage_key,
@@ -255,7 +272,7 @@ class BlockStructureModel(TimeStampedModel):
             )
 
         except Exception:  # pylint: disable=broad-except
-            log.exception(u'BlockStructure: Exception when deleting old files; data_usage_key: %s.', data_usage_key)
+            log.exception('BlockStructure: Exception when deleting old files; data_usage_key: %s.', data_usage_key)
 
     @classmethod
     def _delete_files(cls, files):
@@ -284,7 +301,7 @@ class BlockStructureModel(TimeStampedModel):
         Writes log information for the given values.
         """
         log.info(
-            u'BlockStructure: %s in store %s at %s%s; %s, size: %d',
+            'BlockStructure: %s in store %s at %s%s; %s, size: %d',
             operation,
             bs_model.data.storage.__class__,
             getattr(bs_model.data.storage, 'bucket_name', ''),

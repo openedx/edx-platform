@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
 """
 Django model specifications for the Program Enrollments API
 """
 
-
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
+from user_util import user_util
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from .constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses, ProgramEnrollmentStatuses
 
@@ -27,7 +27,7 @@ class ProgramEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta(object):
+    class Meta:
         app_label = "program_enrollments"
 
         # A student enrolled in a given (program, curriculum) should always
@@ -70,16 +70,21 @@ class ProgramEnrollment(TimeStampedModel):
             return False
 
         for enrollment in enrollments:
-            enrollment.historical_records.update(external_user_key=None)
+            retired_external_key = user_util.get_retired_external_key(
+                enrollment.external_user_key,
+                settings.RETIRED_USER_SALTS,
+            )
+            enrollment.historical_records.update(external_user_key=retired_external_key)
+            enrollment.external_user_key = retired_external_key
+            enrollment.save()
 
-        enrollments.update(external_user_key=None)
         return True
 
     def __str__(self):
-        return '[ProgramEnrollment id={}]'.format(self.id)
+        return f'[ProgramEnrollment id={self.id}]'
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<ProgramEnrollment"    # pylint: disable=missing-format-attribute
             " id={self.id}"
             " user={self.user!r}"
@@ -100,7 +105,7 @@ class ProgramCourseEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramCourseEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta(object):
+    class Meta:
         app_label = "program_enrollments"
 
         # For each program enrollment, there may be only one
@@ -132,10 +137,10 @@ class ProgramCourseEnrollment(TimeStampedModel):
         return self.status == ProgramCourseEnrollmentStatuses.ACTIVE
 
     def __str__(self):
-        return '[ProgramCourseEnrollment id={}]'.format(self.id)
+        return f'[ProgramCourseEnrollment id={self.id}]'
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<ProgramCourseEnrollment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " program_enrollment={self.program_enrollment!r}"
@@ -152,17 +157,17 @@ class CourseAccessRoleAssignment(TimeStampedModel):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         unique_together = ('role', 'enrollment')
 
     role = models.CharField(max_length=64, choices=ProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
     enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '[CourseAccessRoleAssignment id={}]'.format(self.id)
+        return f'[CourseAccessRoleAssignment id={self.id}]'
 
     def __repr__(self):
-        return (
+        return (  # lint-amnesty, pylint: disable=missing-format-attribute
             "<CourseAccessRoleAssignment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " role={self.role!r}"

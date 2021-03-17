@@ -14,27 +14,29 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_outline_tab_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
-from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
     get_course_goal_options,
     get_goal_api_url,
     has_course_goal_permission
 )
-from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
+from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
-from student.models import CourseEnrollment
-from util.views import ensure_valid_course_key
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 
 from .. import (
@@ -42,13 +44,12 @@ from .. import (
     LATEST_UPDATE_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
 )
-from ..utils import get_course_outline_block_tree, get_resume_block
+from ..utils import get_course_outline_block_tree, get_resume_block, get_start_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
 from .course_outline import CourseOutlineFragmentView
 from .course_sock import CourseSockFragmentView
 from .latest_update import LatestUpdateFragmentView
-from .next_up_banner import NextUpBannerFragmentView
 from .welcome_message import WelcomeMessageFragmentView
 
 EMPTY_HANDOUTS_HTML = u'<ol></ol>'
@@ -62,20 +63,17 @@ class CourseHomeView(CourseTabView):
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
     @method_decorator(add_maintenance_banner)
-    def get(self, request, course_id, **kwargs):
+    def get(self, request, course_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Displays the home page for the specified course.
         """
-        return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)
+        return super(CourseHomeView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap.
-        """
-        return True
-
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         course_id = six.text_type(course.id)
+        if course_home_mfe_outline_tab_is_active(course.id) and not request.user.is_staff:
+            microfrontend_url = get_learning_mfe_home_url(course_key=course_id, view_name="home")
+            raise Redirect(microfrontend_url)
         home_fragment_view = CourseHomeFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -84,17 +82,15 @@ class CourseHomeFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
-    _uses_pattern_library = False
 
     def _get_resume_course_info(self, request, course_id):
         """
         Returns information relevant to resume course functionality.
 
-        Returns a tuple: (has_visited_course, resume_course_url, resume_course_title)
-            has_visited_course: True if the user has ever visited the course, False otherwise.
-            resume_course_url: The URL of the 'resume course' block if the user has visited the course,
-                otherwise the URL of the course root.
-            resume_course_title: The display_name of the resume course block, otherwise the display_name of course root
+        Returns a tuple: (has_visited_course, resume_course_url)
+            has_visited_course: True if the user has ever completed a block, False otherwise.
+            resume_course_url: The URL of the 'resume course' block if the user has completed a block,
+                otherwise the URL of the first block to start the course.
 
         """
         course_outline_root_block = get_course_outline_block_tree(request, course_id, request.user)
@@ -102,12 +98,11 @@ class CourseHomeFragmentView(EdxFragmentView):
         has_visited_course = bool(resume_block)
         if resume_block:
             resume_course_url = resume_block['lms_web_url']
-            resume_course_title = resume_block['display_name']
         else:
-            resume_course_url = course_outline_root_block['lms_web_url'] if course_outline_root_block else None
-            resume_course_title = course_outline_root_block['display_name'] if course_outline_root_block else None
+            start_block = get_start_block(course_outline_root_block) if course_outline_root_block else None
+            resume_course_url = start_block['lms_web_url'] if start_block else None
 
-        return has_visited_course, resume_course_url, resume_course_title
+        return has_visited_course, resume_course_url
 
     def _get_course_handouts(self, request, course):
         """
@@ -118,7 +113,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             return None
         return handouts
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
         """
         Renders the course's home page as a fragment.
         """
@@ -146,7 +141,6 @@ class CourseHomeFragmentView(EdxFragmentView):
         update_message_fragment = None
         course_sock_fragment = None
         offer_banner_fragment = None
-        next_up_banner_fragment = None
         course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
@@ -168,11 +162,8 @@ class CourseHomeFragmentView(EdxFragmentView):
             course_sock_fragment = CourseSockFragmentView().render_to_fragment(
                 request, course=course, **kwargs
             )
-            has_visited_course, resume_course_url, resume_course_title = self._get_resume_course_info(
-                request, course_id
-            )
+            has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
-
             offer_banner_fragment = get_first_purchase_offer_banner_fragment(
                 request.user,
                 course_overview
@@ -181,11 +172,6 @@ class CourseHomeFragmentView(EdxFragmentView):
                 request.user,
                 course_overview
             )
-
-            next_up_banner_fragment = NextUpBannerFragmentView().render_to_fragment(
-                assignment_title=resume_course_title, resume_course_url=resume_course_url, assignment_duration='10 min'
-            )
-
         elif allow_public_outline or allow_public:
             outline_fragment = CourseOutlineFragmentView().render_to_fragment(
                 request, course_id=course_id, user_is_enrolled=False, **kwargs
@@ -246,7 +232,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'course_home_message_fragment': course_home_message_fragment,
             'offer_banner_fragment': offer_banner_fragment,
             'course_expiration_fragment': course_expiration_fragment,
-            'next_up_banner_fragment': next_up_banner_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,
@@ -264,6 +249,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,
             'show_search': show_search,
+            'show_proctoring_info_panel': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_key),
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

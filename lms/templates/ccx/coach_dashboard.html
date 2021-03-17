@@ -129,8 +129,9 @@ from openedx.core.djangolib.js_utils import (
           studentId = $('<input />', {
             type: 'hidden',
             name: 'student-id',
-            value: selectedStudent
+            value: edx.HtmlUtils.ensureHtml(selectedStudent)
           });
+          // xss-lint: disable=javascript-jquery-append
           form.append(action, studentId).submit();
         }
     });
@@ -153,7 +154,7 @@ from openedx.core.djangolib.js_utils import (
       $errorMessage.show();
       return false;
     } else if (hasCcxConnector) {
-      $errorMessage.html('${use_ccx_con_error_message | n, js_escaped_string}');
+      $errorMessage.text('${use_ccx_con_error_message | n, js_escaped_string}');
       $errorMessage.show();
       return false;
     }

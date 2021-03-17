@@ -4,6 +4,7 @@ Course API Serializers.  Representing course catalog data
 
 from rest_framework import serializers
 
+from lms.djangoapps.course_home_api.progress.v1.serializers import CertificateDataSerializer
 from openedx.core.lib.api.fields import AbsoluteURLField
 
 
@@ -13,7 +14,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
@@ -55,17 +56,34 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
         ref_name = 'courseware_api'
 
 
+class CourseProgramSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+    progress = serializers.SerializerMethodField()
+    slug = serializers.CharField()
+    title = serializers.CharField()
+    url = AbsoluteURLField()
+    uuid = serializers.UUIDField()
+
+    def get_progress(self, program):
+        progress = program['progress']
+        return {
+            'completed': progress['completed'],
+            'in_progress': progress['in_progress'],
+            'not_started': progress['not_started']
+        }
+
+
 class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for Course objects providing minimal data about the course.
     Compare this with CourseDetailSerializer.
     """
 
+    access_expiration = serializers.DictField()
     can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
-    course_expired_message = serializers.CharField()
     effort = serializers.CharField()
     end = serializers.DateTimeField()
+    enrollment = serializers.DictField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
     id = serializers.CharField()  # pylint: disable=invalid-name
@@ -73,22 +91,30 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     number = serializers.CharField(source='display_number_with_default')
-    offer_html = serializers.CharField()
+    offer = serializers.DictField()
     org = serializers.CharField(source='display_org_with_default')
+    related_programs = CourseProgramSerializer(many=True)
     short_description = serializers.CharField()
     start = serializers.DateTimeField()
     start_display = serializers.CharField()
     start_type = serializers.CharField()
     pacing = serializers.CharField()
-    enrollment = serializers.DictField()
     tabs = serializers.ListField()
+    user_timezone = serializers.CharField()
     verified_mode = serializers.DictField()
     show_calculator = serializers.BooleanField()
+    original_user_is_staff = serializers.BooleanField()
     is_staff = serializers.BooleanField()
     can_load_courseware = serializers.DictField()
     notes = serializers.DictField()
     marketing_url = serializers.CharField()
     celebrations = serializers.DictField()
+    user_has_passing_grade = serializers.BooleanField()
+    course_exit_page_is_active = serializers.BooleanField()
+    certificate_data = CertificateDataSerializer()
+    verify_identity_url = AbsoluteURLField()
+    verification_status = serializers.CharField()
+    linkedin_add_to_profile_url = serializers.URLField()
 
     def __init__(self, *args, **kwargs):
         """

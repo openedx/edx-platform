@@ -2,24 +2,24 @@
 Tests of CourseDurationLimitConfig.
 """
 
-
 import itertools
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 import ddt
+import pytest
 import pytz
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
-from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 @ddt.ddt
@@ -35,7 +35,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
-        super(TestCourseDurationLimitConfig, self).setUp()
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @ddt.data(
         (True, True),
@@ -64,7 +64,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         )
 
         if already_enrolled:
-            existing_enrollment = CourseEnrollmentFactory.create(
+            existing_enrollment = CourseEnrollmentFactory.create(  # lint-amnesty, pylint: disable=unused-variable
                 user=self.user,
                 course=self.course_overview,
             )
@@ -72,23 +72,23 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             existing_enrollment = None
 
         user = self.user
-        course_key = self.course_overview.id
+        course_key = self.course_overview.id  # lint-amnesty, pylint: disable=unused-variable
 
         query_count = 7
 
         with self.assertNumQueries(query_count):
             enabled = CourseDurationLimitConfig.enabled_for_enrollment(user, self.course_overview)
-            self.assertEqual(not enrolled_before_enabled, enabled)
+            assert (not enrolled_before_enabled) == enabled
 
     def test_enabled_for_enrollment_failure(self):
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(None, None)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
                 Mock(name='user'),
                 None
             )
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             CourseDurationLimitConfig.enabled_for_enrollment(
                 None,
                 Mock(name='course_key')
@@ -114,12 +114,8 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         course_key = self.course_overview.id
 
-        self.assertEqual(
-            not before_enabled,
-            CourseDurationLimitConfig.enabled_for_course(
-                course_key=course_key,
-                target_datetime=target_datetime,
-            )
+        assert (not before_enabled) == CourseDurationLimitConfig.enabled_for_course(
+            course_key=course_key, target_datetime=target_datetime
         )
 
     @ddt.data(
@@ -174,39 +170,39 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         expected_org_setting = self._resolve_settings([global_setting, site_setting, org_setting])
         expected_course_setting = self._resolve_settings([global_setting, site_setting, org_setting, course_setting])
 
-        self.assertEqual(expected_global_setting, CourseDurationLimitConfig.current().enabled)
-        self.assertEqual(expected_site_setting, CourseDurationLimitConfig.current(site=test_site_cfg.site).enabled)
-        self.assertEqual(expected_org_setting, CourseDurationLimitConfig.current(org=test_course.org).enabled)
-        self.assertEqual(expected_course_setting, CourseDurationLimitConfig.current(course_key=test_course.id).enabled)
+        assert expected_global_setting == CourseDurationLimitConfig.current().enabled
+        assert expected_site_setting == CourseDurationLimitConfig.current(site=test_site_cfg.site).enabled
+        assert expected_org_setting == CourseDurationLimitConfig.current(org=test_course.org).enabled
+        assert expected_course_setting == CourseDurationLimitConfig.current(course_key=test_course.id).enabled
 
     def test_all_current_course_configs(self):
         # Set up test objects
         for global_setting in (True, False, None):
-            CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
+            CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
             for site_setting in (True, False, None):
                 test_site_cfg = SiteConfigurationFactory.create(
                     site_values={'course_org_filter': []}
                 )
                 CourseDurationLimitConfig.objects.create(
-                    site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1)
+                    site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC)
                 )
 
                 for org_setting in (True, False, None):
-                    test_org = "{}-{}".format(test_site_cfg.id, org_setting)
+                    test_org = f"{test_site_cfg.id}-{org_setting}"
                     test_site_cfg.site_values['course_org_filter'].append(test_org)
                     test_site_cfg.save()
 
                     CourseDurationLimitConfig.objects.create(
-                        org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1)
+                        org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC)
                     )
 
                     for course_setting in (True, False, None):
                         test_course = CourseOverviewFactory.create(
                             org=test_org,
-                            id=CourseLocator(test_org, 'test_course', 'run-{}'.format(course_setting))
+                            id=CourseLocator(test_org, 'test_course', f'run-{course_setting}')
                         )
                         CourseDurationLimitConfig.objects.create(
-                            course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1)
+                            course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC)  # lint-amnesty, pylint: disable=line-too-long
                         )
 
             with self.assertNumQueries(4):
@@ -215,46 +211,40 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         # Deliberatly using the last all_configs that was checked after the 3rd pass through the global_settings loop
         # We should be creating 3^4 courses (3 global values * 3 site values * 3 org values * 3 course values)
         # Plus 1 for the edX/toy/2012_Fall course
-        self.assertEqual(len(all_configs), 3**4 + 1)
+        assert len(all_configs) == ((3 ** 4) + 1)
 
         # Point-test some of the final configurations
-        self.assertEqual(
-            all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
-            {
-                'enabled': (True, Provenance.org),
-                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
-            }
-        )
-        self.assertEqual(
-            all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
-            {
-                'enabled': (False, Provenance.run),
-                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
-            }
-        )
-        self.assertEqual(
-            all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
-            {
-                'enabled': (True, Provenance.site),
-                'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC), Provenance.run),
-            }
-        )
+        assert all_configs[CourseLocator('7-True', 'test_course', 'run-None')] == {
+            'enabled': (True, Provenance.org),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC),
+                              Provenance.run)
+        }
+        assert all_configs[CourseLocator('7-True', 'test_course', 'run-False')] == {
+            'enabled': (False, Provenance.run),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC),
+                              Provenance.run)
+        }
+        assert all_configs[CourseLocator('7-None', 'test_course', 'run-None')] == {
+            'enabled': (True, Provenance.site),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=pytz.UTC),
+                              Provenance.run)
+        }
 
     def test_caching_global(self):
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the global value is not retrieved from cache after save
         with self.assertNumQueries(1):
-            self.assertTrue(CourseDurationLimitConfig.current().enabled)
+            assert CourseDurationLimitConfig.current().enabled
 
         RequestCache.clear_all_namespaces()
 
         # Check that the global value can be retrieved from cache after read
         with self.assertNumQueries(0):
-            self.assertTrue(CourseDurationLimitConfig.current().enabled)
+            assert CourseDurationLimitConfig.current().enabled
 
         global_config.enabled = False
         global_config.save()
@@ -263,24 +253,24 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Check that the global value in cache was deleted on save
         with self.assertNumQueries(1):
-            self.assertFalse(CourseDurationLimitConfig.current().enabled)
+            assert not CourseDurationLimitConfig.current().enabled
 
     def test_caching_site(self):
         site_cfg = SiteConfigurationFactory()
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the site value is not retrieved from cache after save
         with self.assertNumQueries(1):
-            self.assertTrue(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
+            assert CourseDurationLimitConfig.current(site=site_cfg.site).enabled
 
         RequestCache.clear_all_namespaces()
 
         # Check that the site value can be retrieved from cache after read
         with self.assertNumQueries(0):
-            self.assertTrue(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
+            assert CourseDurationLimitConfig.current(site=site_cfg.site).enabled
 
         site_config.enabled = False
         site_config.save()
@@ -289,36 +279,36 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Check that the site value in cache was deleted on save
         with self.assertNumQueries(1):
-            self.assertFalse(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
+            assert not CourseDurationLimitConfig.current(site=site_cfg.site).enabled
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the site value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(site=site_cfg.site).enabled)
+            assert not CourseDurationLimitConfig.current(site=site_cfg.site).enabled
 
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(
             site_values={'course_org_filter': course.org}
         )
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         org_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
-            self.assertTrue(CourseDurationLimitConfig.current(org=course.org).enabled)
+            assert CourseDurationLimitConfig.current(org=course.org).enabled
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
-            self.assertTrue(CourseDurationLimitConfig.current(org=course.org).enabled)
+            assert CourseDurationLimitConfig.current(org=course.org).enabled
 
         org_config.enabled = False
         org_config.save()
@@ -327,45 +317,45 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
-            self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
+            assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
+            assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(org=course.org).enabled)
+            assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(
             site_values={'course_org_filter': course.org}
         )
-        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         course_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not retrieved from cache after save
         with self.assertNumQueries(2):
-            self.assertTrue(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert CourseDurationLimitConfig.current(course_key=course.id).enabled
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value can be retrieved from cache after read
         with self.assertNumQueries(0):
-            self.assertTrue(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert CourseDurationLimitConfig.current(course_key=course.id).enabled
 
         course_config.enabled = False
         course_config.save()
@@ -374,34 +364,34 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
         # Check that the org value in cache was deleted on save
         with self.assertNumQueries(2):
-            self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        global_config = CourseDurationLimitConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=pytz.UTC))  # lint-amnesty, pylint: disable=line-too-long
         org_config.save()
 
         RequestCache.clear_all_namespaces()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
-            self.assertFalse(CourseDurationLimitConfig.current(course_key=course.id).enabled)
+            assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
     def _resolve_settings(self, settings):
         if all(setting is None for setting in settings):

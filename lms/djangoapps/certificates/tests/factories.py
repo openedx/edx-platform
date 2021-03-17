@@ -1,10 +1,13 @@
-# Factories are self documenting
+"""
+Certificates factories
+"""
 
 
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -12,12 +15,13 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
-from student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):
-
-    class Meta(object):
+    """
+    GeneratedCertificate factory
+    """
+    class Meta:
         model = GeneratedCertificate
 
     course_id = None
@@ -29,8 +33,11 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):
+    """
+    CertificateWhitelist factory
+    """
 
-    class Meta(object):
+    class Meta:
         model = CertificateWhitelist
 
     course_id = None
@@ -39,8 +46,11 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
 
 class CertificateInvalidationFactory(DjangoModelFactory):
+    """
+    CertificateInvalidation factory
+    """
 
-    class Meta(object):
+    class Meta:
         model = CertificateInvalidation
 
     notes = 'Test Notes'
@@ -48,8 +58,11 @@ class CertificateInvalidationFactory(DjangoModelFactory):
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
+    """
+    CertificateHtmlViewConfiguration factory
+    """
 
-    class Meta(object):
+    class Meta:
         model = CertificateHtmlViewConfiguration
 
     enabled = True
@@ -82,10 +95,12 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
 
 
 class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
+    """
+    LinkedInAddToProfileConfiguration factory
+    """
 
-    class Meta(object):
+    class Meta:
         model = LinkedInAddToProfileConfiguration
 
     enabled = True
-    company_identifier = "0_0dPSPyS070e0HsE9HNz_13_d11_"
-    trk_partner_name = 'unittest'
+    company_identifier = "1337"

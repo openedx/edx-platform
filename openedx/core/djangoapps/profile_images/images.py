@@ -94,7 +94,7 @@ def validate_uploaded_image(uploaded_file):
     # adapted from https://github.com/pmitros/ProfileXBlock
     # see also: http://en.wikipedia.org/wiki/Magic_number_%28programming%29
 
-    if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:
+    if uploaded_file.size > settings.PROFILE_IMAGE_MAX_BYTES:  # lint-amnesty, pylint: disable=no-else-raise
         file_upload_too_large = _(
             u'The file must be smaller than {image_max_size} in size.'
         ).format(
@@ -227,7 +227,7 @@ def _get_valid_file_types():
     """
     Return comma separated string of valid file types.
     """
-    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in IMAGE_TYPES.keys()])
+    return ', '.join([', '.join(IMAGE_TYPES[ft].extensions) for ft in IMAGE_TYPES.keys()])  # lint-amnesty, pylint: disable=consider-iterating-dictionary
 
 
 def _user_friendly_size(size):

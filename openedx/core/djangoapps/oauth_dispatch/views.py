@@ -34,7 +34,7 @@ class _DispatchingView(View):
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
         client_id = self._get_client_id(request)
-        monitoring_utils.set_custom_metric('oauth_client_id', client_id)
+        monitoring_utils.set_custom_attribute('oauth_client_id', client_id)
 
         return self.dot_adapter
 
@@ -61,15 +61,15 @@ class _DispatchingView(View):
         Return the appropriate view from the requested backend.
         """
         if backend == self.dot_adapter.backend:
-            return self.dot_view.as_view()
+            return self.dot_view.as_view()  # lint-amnesty, pylint: disable=no-member
         else:
-            raise KeyError('Failed to dispatch view. Invalid backend {}'.format(backend))
+            raise KeyError(f'Failed to dispatch view. Invalid backend {backend}')
 
     def _get_client_id(self, request):
         """
         Return the client_id from the provided request
         """
-        if request.method == u'GET':
+        if request.method == 'GET':
             return request.GET.get('client_id')
         else:
             return request.POST.get('client_id')
@@ -88,12 +88,12 @@ class AccessTokenView(_DispatchingView):
     dot_view = dot_views.TokenView
 
     def dispatch(self, request, *args, **kwargs):
-        response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
 
         token_type = request.POST.get('token_type',
                                       request.META.get('HTTP_X_TOKEN_TYPE', 'no_token_type_supplied')).lower()
-        monitoring_utils.set_custom_metric('oauth_token_type', token_type)
-        monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
+        monitoring_utils.set_custom_attribute('oauth_token_type', token_type)
+        monitoring_utils.set_custom_attribute('oauth_grant_type', request.POST.get('grant_type', ''))
 
         if response.status_code == 200 and token_type == 'jwt':
             response.content = self._build_jwt_response_from_access_token_response(request, response)

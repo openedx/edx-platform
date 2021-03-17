@@ -1,7 +1,5 @@
 """
 gunicorn configuration file: http://docs.gunicorn.org/en/stable/configure.html
-
-This file is created and updated by ansible, edit at your peril
 """
 
 preload_app = False

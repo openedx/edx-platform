@@ -13,7 +13,7 @@ from pytz import UTC
 FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=UTC)
 IN_MEMORY_BACKEND_CONFIG = {
     'mem': {
-        'ENGINE': 'track.tests.InMemoryBackend'
+        'ENGINE': 'common.djangoapps.track.tests.InMemoryBackend'
     }
 }
 
@@ -22,7 +22,7 @@ class InMemoryBackend(object):
     """A backend that simply stores all events in memory"""
 
     def __init__(self):
-        super(InMemoryBackend, self).__init__()
+        super(InMemoryBackend, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
         self.events = []
 
     def send(self, event):
@@ -48,7 +48,7 @@ class EventTrackingTestCase(TestCase):
         freezer.start()
         self.addCleanup(freezer.stop)
 
-        super(EventTrackingTestCase, self).setUp()
+        super(EventTrackingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.recreate_tracker()
 
@@ -72,8 +72,8 @@ class EventTrackingTestCase(TestCase):
 
     def assert_no_events_emitted(self):
         """Ensure no events were emitted at this point in the test."""
-        self.assertEqual(len(self.backend.events), 0)
+        assert len(self.backend.events) == 0
 
     def assert_events_emitted(self):
         """Ensure at least one event has been emitted at this point in the test."""
-        self.assertGreaterEqual(len(self.backend.events), 1)
+        assert len(self.backend.events) >= 1

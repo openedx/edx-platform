@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 
-from course_modes.models import CourseMode, CourseModeExpirationConfig
+from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
 #
@@ -23,7 +23,7 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
-from util.date_utils import get_time_display
+from common.djangoapps.util.date_utils import get_time_display
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
                             for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
@@ -63,7 +63,7 @@ class CourseModeForm(forms.ModelForm):
             args_copy['course'] = CourseKey.from_string(args_copy['course'])
             args = [args_copy]
 
-        super(CourseModeForm, self).__init__(*args, **kwargs)
+        super(CourseModeForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         try:
             if self.data.get('course'):
@@ -122,7 +122,7 @@ class CourseModeForm(forms.ModelForm):
         Clean the form fields.
         This is the place to perform checks that involve multiple form fields.
         """
-        cleaned_data = super(CourseModeForm, self).clean()
+        cleaned_data = super(CourseModeForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
         mode_slug = cleaned_data.get("mode_slug")
         upgrade_deadline = cleaned_data.get("_expiration_datetime")
         verification_deadline = cleaned_data.get("verification_deadline")
@@ -173,7 +173,7 @@ class CourseModeForm(forms.ModelForm):
                     verification_deadline
                 )
 
-        return super(CourseModeForm, self).save(commit=commit)
+        return super(CourseModeForm, self).save(commit=commit)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @admin.register(CourseMode)

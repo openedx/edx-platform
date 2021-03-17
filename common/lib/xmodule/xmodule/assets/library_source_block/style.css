@@ -1,0 +1,58 @@
+.column {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  max-width: 300px;
+  flex-grow: 1;
+}
+.elementList {
+  margin-top: 10px;
+}
+input.search {
+  width: 100% !important;
+  height: auto !important;
+}
+.element > input[type='checkbox'],
+.element > input[type='radio'] {
+  position: absolute;
+  width: 0 !important;
+  height: 0 !important;
+  top: -9999px;
+}
+.element > .elementItem {
+  display: flex;
+  flex-grow: 1;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+.element + .element > label {
+  border-top: 0;
+}
+.element > input[type='checkbox']:focus + label,
+.element > input[type='radio']:focus + label,
+.element > input:hover + label {
+  background: #f6f6f7;
+  cursor: pointer;
+}
+.element > input:checked + label {
+  background: #23419f;
+  color: #fff;
+}
+.element > input[type='checkbox']:checked:focus + label,
+.element > input[type='radio']:checked:focus + label,
+.element > input:checked:hover + label {
+  background: #193787;
+  cursor: pointer;
+}
+.selectedBlocks {
+  padding: 12px 8px 20px;
+}
+button.remove {
+  background: #e00;
+  color: #fff;
+  border: solid rgba(0,0,0,0.25) 1px;
+}
+button.remove:focus,
+button.remove:hover {
+  background: #d00;
+}

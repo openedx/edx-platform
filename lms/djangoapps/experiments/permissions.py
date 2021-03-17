@@ -19,7 +19,7 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
         # Non-staff users can only create data for themselves.
         if view.action == 'create':
             username = request.user.username
-            return super(IsStaffOrOwner, self).has_permission(request, view) or (
+            return super().has_permission(request, view) or (
                 username == request.data.get('user', username))
 
         # The view will handle filtering for the current user
@@ -29,3 +29,13 @@ class IsStaffOrOwner(permissions.IsStaffOrOwner):
 class IsStaffOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_staff or request.method in SAFE_METHODS
+
+
+class IsStaffOrReadOnlyForSelf(BasePermission):
+    """
+    Grants access to staff or to user reading info about their own user
+    """
+    def has_permission(self, request, view):
+        username = request.user.username
+        return request.user.is_staff or (request.method in SAFE_METHODS and (
+            username == request.parser_context['kwargs']['username']))

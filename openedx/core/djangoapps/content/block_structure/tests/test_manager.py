@@ -2,13 +2,13 @@
 Tests for manager.py
 """
 
-
+import pytest
 import ddt
-import six
 from django.test import TestCase
+from edx_toggles.toggles.testutils import override_waffle_switch
 
 from ..block_structure import BlockStructureBlockData
-from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle
+from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE
 from ..exceptions import BlockStructureNotFound, UsageKeyNotInBlockStructure
 from ..manager import BlockStructureManager
 from ..transformers import BlockStructureTransformers
@@ -91,7 +91,7 @@ class TestTransformer1(MockTransformer):
         Returns a unique deterministic value for the given block key
         and data key.
         """
-        return data_key + 't1.val1.' + six.text_type(block_key)
+        return data_key + 't1.val1.' + str(block_key)
 
 
 @ddt.ddt
@@ -101,7 +101,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
     """
 
     def setUp(self):
-        super(TestBlockStructureManager, self).setUp()
+        super().setUp()
 
         TestTransformer1.collect_call_count = 0
         self.registered_transformers = [TestTransformer1()]
@@ -125,7 +125,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         self.assert_block_structure(block_structure, self.children_map)
         TestTransformer1.assert_collected(block_structure)
         if expect_modulestore_called:
-            self.assertGreater(self.modulestore.get_items_call_count, 0)
+            assert self.modulestore.get_items_call_count > 0
         else:
             assert self.modulestore.get_items_call_count == 0
         expected_count = 1 if expect_cache_updated else 0
@@ -169,7 +169,7 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
 
     def test_get_transformed_with_nonexistent_starting_block(self):
         with mock_registered_transformers(self.registered_transformers):
-            with self.assertRaises(UsageKeyNotInBlockStructure):
+            with pytest.raises(UsageKeyNotInBlockStructure):
                 self.bs_manager.get_transformed(self.transformers, starting_block_usage_key=100)
 
     def test_get_collected_cached(self):
@@ -178,14 +178,14 @@ class TestBlockStructureManager(UsageKeyFactoryMixin, ChildrenMapTestMixin, Test
         assert TestTransformer1.collect_call_count == 1
 
     def test_get_collected_error_raised(self):
-        with waffle().override(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
+        with override_waffle_switch(RAISE_ERROR_WHEN_NOT_FOUND, active=True):
             with mock_registered_transformers(self.registered_transformers):
-                with self.assertRaises(BlockStructureNotFound):
+                with pytest.raises(BlockStructureNotFound):
                     self.bs_manager.get_collected()
 
     @ddt.data(True, False)
     def test_update_collected_if_needed(self, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
             with mock_registered_transformers(self.registered_transformers):
                 assert TestTransformer1.collect_call_count == 0
 

@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.views.item import _delete_orphans
+from cms.djangoapps.contentstore.views.item import _delete_orphans
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError("Invalid course key.")
+            raise CommandError("Invalid course key.")  # lint-amnesty, pylint: disable=raise-missing-from
 
         if options['commit']:
             print('Deleting orphans from the course:')

@@ -4,15 +4,15 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 
 
 import logging
+from unittest import mock
 from uuid import uuid4
 
-import mock
 from boto.exception import NoAuthHandlerFound
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
@@ -72,7 +72,7 @@ class TestUserTasks(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
@@ -80,7 +80,7 @@ class TestUserTasks(APITestCase):
         cls.artifact = UserTaskArtifact.objects.create(status=cls.status, text='Lorem ipsum')
 
     def setUp(self):
-        super(TestUserTasks, self).setUp()
+        super().setUp()
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 
@@ -145,14 +145,14 @@ class TestUserTaskStopped(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
             total_steps=5)
 
     def setUp(self):
-        super(TestUserTaskStopped, self).setUp()
+        super().setUp()
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 
@@ -169,7 +169,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         body_fragments = [
-            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
+            f"Your {self.status.name.lower()} task has completed with the status",
             "https://test.edx.org/",
             reverse('usertaskstatus-detail', args=[self.status.uuid])
         ]
@@ -202,7 +202,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         fragments = [
-            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
+            f"Your {self.status.name.lower()} task has completed with the status",
             "Sign in to view the details of your task or download any files created."
         ]
 
@@ -221,17 +221,17 @@ class TestUserTaskStopped(APITestCase):
         with mock.patch('django.core.mail.send_mail') as mock_exception:
             mock_exception.side_effect = NoAuthHandlerFound()
 
-            with mock.patch('cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
+            with mock.patch('cms.djangoapps.cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
                 user_task_stopped.send(sender=UserTaskStatus, status=self.status)
                 self.assertTrue(mock_retry.called)
 
     def test_queue_email_failure(self):
-        logger = logging.getLogger("cms_user_tasks.signals")
+        logger = logging.getLogger("cms.djangoapps.cms_user_tasks.signals")
         hdlr = MockLoggingHandler(level="DEBUG")
         logger.addHandler(hdlr)
 
-        with mock.patch('cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
+        with mock.patch('cms.djangoapps.cms_user_tasks.tasks.send_task_complete_email.delay') as mock_delay:
             mock_delay.side_effect = NoAuthHandlerFound()
             user_task_stopped.send(sender=UserTaskStatus, status=self.status)
             self.assertTrue(mock_delay.called)
-            self.assertEqual(hdlr.messages['error'][0], u'Unable to queue send_task_complete_email')
+            self.assertEqual(hdlr.messages['error'][0], 'Unable to queue send_task_complete_email')

@@ -3,13 +3,13 @@ Support for converting a django user to an XBlock user
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from student.models import anonymous_id_for_user, get_user_by_username_or_email
+from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
@@ -24,7 +24,7 @@ class DjangoXBlockUserService(UserService):
     A user service that converts Django users to XBlockUser
     """
     def __init__(self, django_user, **kwargs):
-        super(DjangoXBlockUserService, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._django_user = django_user
         if self._django_user:
             self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
@@ -66,7 +66,7 @@ class DjangoXBlockUserService(UserService):
             return None
 
         course_id = CourseKey.from_string(course_id)
-        return anonymous_id_for_user(user=user, course_id=course_id, save=False)
+        return anonymous_id_for_user(user=user, course_id=course_id)
 
     def _convert_django_user_to_xblock_user(self, django_user):
         """

@@ -13,7 +13,6 @@ from openedx.core.djangoapps.video_pipeline.forms import (
 from openedx.core.djangoapps.video_pipeline.models import (
     CourseVideoUploadsEnabledByDefault,
     VEMPipelineIntegration,
-    VideoPipelineIntegration,
     VideoUploadsEnabledByDefault
 )
 
@@ -33,8 +32,6 @@ class VEMPipelineIntegrationAdmin(ConfigurationModelAdmin):
     form = VEMPipelineIntegrationAdminForm
 
 
-admin.site.register(VideoPipelineIntegration, ConfigurationModelAdmin)
 admin.site.register(VEMPipelineIntegration, VEMPipelineIntegrationAdmin)
-
 admin.site.register(VideoUploadsEnabledByDefault, ConfigurationModelAdmin)
 admin.site.register(CourseVideoUploadsEnabledByDefault, CourseVideoUploadsEnabledByDefaultAdmin)

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
 import pytest
 from django.core.management import CommandError, call_command
 
 
-def test_without_args(capsys):
+def test_without_args(capsys):  # lint-amnesty, pylint: disable=unused-argument
     with pytest.raises(CommandError, match='Error: the following arguments are required: setting'):
         call_command('print_setting')
 
@@ -13,6 +13,6 @@ def test_without_args(capsys):
 def test_with_setting_args(capsys):
     call_command('print_setting', 'DEBUG')
 
-    out, err = capsys.readouterr()
+    out, err = capsys.readouterr()  # lint-amnesty, pylint: disable=unused-variable
     assert 'False' in out
     assert 'INSTALLED_APPS' not in out

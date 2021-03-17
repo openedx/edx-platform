@@ -3,28 +3,28 @@
 
 import unittest
 from datetime import timedelta
+from unittest.mock import patch
 from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-from mock import patch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import CourseEnrollment
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.models import CourseEntitlement
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.models import CourseEntitlement
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -33,11 +33,11 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
     Series of tests for the helper methods in the CourseEntitlement Model Class.
     """
     def setUp(self):
-        super(TestCourseEntitlementModelHelpers, self).setUp()
+        super().setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    @patch("entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
     def test_check_for_existing_entitlement_and_enroll(self, mock_get_course_uuid):
         course = CourseFactory()
         CourseModeFactory(
@@ -64,7 +64,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
         entitlement.refresh_from_db()
         assert entitlement.enrollment_course_run
 
-    @patch("entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
     def test_check_for_no_entitlement_and_do_not_enroll(self, mock_get_course_uuid):
         course = CourseFactory()
         CourseModeFactory(
@@ -93,7 +93,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
 
         new_course = CourseFactory()
         CourseModeFactory(
-            course_id=new_course.id,
+            course_id=new_course.id,  # lint-amnesty, pylint: disable=no-member
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
             expiration_datetime=now() + timedelta(days=1)
@@ -109,7 +109,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
             )
             assert not CourseEnrollment.is_enrolled(user=self.user, course_key=new_course.id)
         except AttributeError as error:
-            self.fail(error.message)
+            self.fail(error.message)  # lint-amnesty, pylint: disable=no-member
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -117,7 +117,7 @@ class TestModels(TestCase):
     """Test entitlement with policy model functions."""
 
     def setUp(self):
-        super(TestModels, self).setUp()
+        super().setUp()
         self.course = CourseOverviewFactory.create(
             start=now()
         )
@@ -231,7 +231,7 @@ class TestModels(TestCase):
         # or the exact same as the original expiration_period_days if somehow no time has passed
         assert entitlement.get_days_until_expiration() <= entitlement.policy.expiration_period.days
 
-    def test_expired_at_datetime(self):
+    def test_expired_at_datetime(self):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Tests that using the getter method properly updates the expired_at field for an entitlement
         """
@@ -302,8 +302,8 @@ class TestModels(TestCase):
         assert expired_at_datetime
         assert entitlement.expired_at
 
-    @patch("entitlements.models.get_course_uuid_for_course")
-    @patch("entitlements.models.CourseEntitlement.refund")
+    @patch("common.djangoapps.entitlements.models.get_course_uuid_for_course")
+    @patch("common.djangoapps.entitlements.models.CourseEntitlement.refund")
     def test_unenroll_entitlement_with_audit_course_enrollment(self, mock_refund, mock_get_course_uuid):
         """
         Test that entitlement is not refunded if un-enroll is called on audit course un-enroll.

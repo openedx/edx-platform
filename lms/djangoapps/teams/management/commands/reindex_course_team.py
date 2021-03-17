@@ -8,7 +8,6 @@ from textwrap import dedent
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand, CommandError
-from six.moves import map
 
 from lms.djangoapps.teams.models import CourseTeam
 
@@ -38,7 +37,7 @@ class Command(BaseCommand):
         try:
             result = CourseTeam.objects.get(team_id=team_id)
         except ObjectDoesNotExist:
-            raise CommandError('Argument {} is not a course_team team_id'.format(team_id))
+            raise CommandError(f'Argument {team_id} is not a course_team team_id')  # lint-amnesty, pylint: disable=raise-missing-from
 
         return result
 
@@ -67,5 +66,5 @@ class Command(BaseCommand):
             course_teams = list(map(self._get_course_team, options['course_team_ids']))
 
         for course_team in course_teams:
-            print('Indexing {}'.format(course_team.team_id))
+            print(f'Indexing {course_team.team_id}')
             CourseTeamIndexer.index(course_team)

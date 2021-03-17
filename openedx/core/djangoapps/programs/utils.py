@@ -19,19 +19,20 @@ from django.utils.functional import cached_property
 from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
-from requests.exceptions import ConnectionError, Timeout
+from requests.exceptions import ConnectionError, Timeout  # lint-amnesty, pylint: disable=redefined-builtin
 from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
-from course_modes.models import CourseMode
-from entitlements.api import get_active_entitlement_list_for_user
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.api import get_paid_modes_for_course
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.api import get_active_entitlement_list_for_user
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
+from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_programs,
-    get_programs_by_type
 )
 from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -41,8 +42,8 @@ from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.
@@ -626,7 +627,7 @@ class ProgramDataExtender(object):
 
         return courses_without_enrollments
 
-    def _collect_one_click_purchase_eligibility_data(self):
+    def _collect_one_click_purchase_eligibility_data(self):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Extend the program data with data about learner's eligibility for one click purchase,
         discount data of the program and SKUs of seats that should be added to basket.
@@ -640,7 +641,7 @@ class ProgramDataExtender(object):
         skus = []
         bundle_variant = 'full'
 
-        if is_learner_eligible_for_one_click_purchase:
+        if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
             courses = self.data['courses']
             if not self.user.is_anonymous:
                 courses = self._filter_out_courses_with_enrollments(courses)
@@ -790,7 +791,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         user (User): The user whose enrollments to inspect.
     """
     def __init__(self, program_data, user):
-        super(ProgramMarketingDataExtender, self).__init__(program_data, user)
+        super(ProgramMarketingDataExtender, self).__init__(program_data, user)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Aggregate list of instructors for the program keyed by name
         self.instructors = []
@@ -842,7 +843,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
     def extend(self):
         """Execute extension handlers, returning the extended data."""
-        self.data.update(super(ProgramMarketingDataExtender, self).extend())
+        self.data.update(super(ProgramMarketingDataExtender, self).extend())  # lint-amnesty, pylint: disable=super-with-arguments
         return self.data
 
     @classmethod
@@ -864,11 +865,11 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         pages. The certificate URL is not needed when rendering
         the program marketing page.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def _attach_course_run_upgrade_url(self, run_mode):
         if not self.user.is_anonymous:
-            super(ProgramMarketingDataExtender, self)._attach_course_run_upgrade_url(run_mode)
+            super(ProgramMarketingDataExtender, self)._attach_course_run_upgrade_url(run_mode)  # lint-amnesty, pylint: disable=super-with-arguments
         else:
             run_mode['upgrade_url'] = None
 
@@ -901,9 +902,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
                     self.instructors.append(instructor)
 
 
-def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrollments=None, entitlements=None):
+def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None):  # lint-amnesty, pylint: disable=line-too-long
     """
-    This method will Look at the learners Enrollments and Entitlements to determine
+    This method will look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.
 
     NOTE: This method relies on the Program Cache right now. The goal is to move away from this
@@ -911,15 +912,20 @@ def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrol
 
     Arguments:
         user (User): The user we are looking for.
-        program_type (String): The Program type we are looking for.
-        paid_modes (bool): Request if the user is enrolled in a Program in a paid mode, False by default.
+        program_type_slug (str): The slug of the Program type we are looking for.
+        paid_modes_only (bool): Request if the user is enrolled in a Program in a paid mode, False by default.
+        enrollments (List[Dict]): Takes a serialized list of CourseEnrollments linked to the user
+        entitlements (List[CourseEntitlement]): Take a list of CourseEntitlement objects linked to the user
+
+        NOTE: Both enrollments and entitlements will be collected if they are not passed in. They are available
+        as parameters in case they were already collected, to save duplicate queries in high traffic areas.
 
     Returns:
-        bool: True is the user is enrolled in programs of the requested Type
+        bool: True is the user is enrolled in programs of the requested type
     """
     course_runs = set()
     course_uuids = set()
-    programs = get_programs_by_type(Site.objects.get_current(), program_type)
+    programs = get_programs_by_type(Site.objects.get_current(), program_type_slug)
     if not programs:
         return False
 
@@ -939,9 +945,9 @@ def is_user_enrolled_in_program_type(user, program_type, paid_modes=False, enrol
     student_enrollments = enrollments if enrollments is not None else get_enrollments(user.username)
     for enrollment in student_enrollments:
         course_run_id = enrollment['course_details']['course_id']
-        if paid_modes:
+        if paid_modes_only:
             course_run_key = CourseKey.from_string(course_run_id)
-            paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
+            paid_modes = [mode.slug for mode in get_paid_modes_for_course(course_run_key)]
             if enrollment['mode'] in paid_modes and course_run_id in course_runs:
                 return True
         elif course_run_id in course_runs:

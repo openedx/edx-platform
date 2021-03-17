@@ -7,30 +7,29 @@ import json
 import time
 from datetime import datetime
 from unittest import skip
+from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
 import pytest
-import six
 from django.conf import settings
 from lazy.lazy import lazy
-from mock import patch
 from pytz import UTC
 from search.search_engine_base import SearchEngine
-from six.moves import range
-from xblock.core import XBlock
+from xblock.core import XBlock  # lint-amnesty, pylint: disable=unused-import
 
-from contentstore.courseware_index import (
+from cms.djangoapps.contentstore.courseware_index import (
     CourseAboutSearchIndexer,
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
     SearchIndexingError
 )
-from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
+from cms.djangoapps.contentstore.tasks import update_search_index
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
@@ -55,10 +54,6 @@ from xmodule.partitions.partitions import UserPartition
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
-
-class NonIndexableXBlock(XBlock):
-    """XBlock for testing indexibility"""
-
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
     "chapter": "sequential",
@@ -74,7 +69,7 @@ def create_children(store, parent, category, load_factor):
         child_object = ItemFactory.create(
             parent_location=parent.location,
             category=category,
-            display_name=u"{} {} {}".format(category, child_index, time.clock()),
+            display_name=f"{category} {child_index} {time.clock()}",  # lint-amnesty, pylint: disable=no-member
             modulestore=store,
             publish_item=True,
             start=datetime(2015, 3, 1, tzinfo=UTC),
@@ -106,7 +101,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     DATABASE = 'test_mongo_%s' % uuid4().hex[:5]
     COLLECTION = 'modulestore'
     ASSET_COLLECTION = 'assetstore'
-    DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
+    DEFAULT_CLASS = 'xmodule.hidden_module.HiddenDescriptor'
     RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
     modulestore_options = {
         'default_class': DEFAULT_CLASS,
@@ -140,11 +135,10 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     }
 
     INDEX_NAME = None
-    DOCUMENT_TYPE = None
 
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @lazy
     def searcher(self):
@@ -158,7 +152,7 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
     def search(self, field_dictionary=None, query_string=None):
         """ Performs index search according to passed parameters """
         fields = field_dictionary if field_dictionary else self._get_default_search()
-        return self.searcher.search(query_string=query_string, field_dictionary=fields, doc_type=self.DOCUMENT_TYPE)
+        return self.searcher.search(query_string=query_string, field_dictionary=fields)
 
     def _perform_test_using_store(self, store_type, test_to_perform):
         """ Helper method to run a test function that uses a specific store """
@@ -199,7 +193,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def setUp(self):
-        super(TestCoursewareSearchIndexer, self).setUp()
+        super().setUp()
 
         self.course = None
         self.chapter = None
@@ -251,7 +245,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
-    DOCUMENT_TYPE = CoursewareSearchIndexer.DOCUMENT_TYPE
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
@@ -268,7 +261,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
 
     def _get_default_search(self):
-        return {"course": six.text_type(self.course.id)}
+        return {"course": str(self.course.id)}
 
     def _test_indexing_course(self, store):
         """ indexing course tests """
@@ -318,7 +311,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         """
         Test that course will also be delete from search_index after course deletion.
         """
-        self.DOCUMENT_TYPE = 'course_info'  # pylint: disable=invalid-name
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         response = self.search()
         self.assertEqual(response["total"], 0)
 
@@ -353,33 +346,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 3)
 
-    @XBlock.register_temp_plugin(NonIndexableXBlock)
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        # Publish the vertical to start with
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.vertical.location,
-            category="nonindexablexblock",
-            display_name="Some other content",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
-        # even after publishing, we should not find the non-indexable item
-        self.publish_item(store, self.vertical.location)
-        self.reindex_course(store)
-        response = self.search()
-        self.assertEqual(response["total"], 4)
-
     def _test_start_date_propagation(self, store):
         """ make sure that the start date is applied at the right level """
         early_date = self.course.start
@@ -393,10 +359,10 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
         results = response["results"]
         date_map = {
-            six.text_type(self.chapter.location): early_date,
-            six.text_type(self.sequential.location): early_date,
-            six.text_type(self.vertical.location): later_date,
-            six.text_type(self.html_unit.location): later_date,
+            str(self.chapter.location): early_date,
+            str(self.sequential.location): early_date,
+            str(self.vertical.location): later_date,
+            str(self.html_unit.location): later_date,
         }
         for result in results:
             self.assertEqual(result["data"]["start_date"], date_map[result["data"]["id"]])
@@ -452,34 +418,43 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(indexed_count, 7)
 
     def _test_course_about_property_index(self, store):
-        """ Test that informational properties in the course object end up in the course_info index """
+        """
+        Test that informational properties in the course object end up in the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         display_name = "Help, I need somebody!"
         self.course.display_name = display_name
         self.update_item(store, self.course)
         self.reindex_course(store)
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
-            field_dictionary={"course": six.text_type(self.course.id)}
+            field_dictionary={"course": str(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["display_name"], display_name)
 
     def _test_course_about_store_index(self, store):
-        """ Test that informational properties in the about store end up in the course_info index """
+        """
+        Test that informational properties in the about store end up in
+        the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         short_description = "Not just anybody"
         CourseDetails.update_about_item(
             self.course, "short_description", short_description, ModuleStoreEnum.UserID.test, store
         )
         self.reindex_course(store)
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
-            field_dictionary={"course": six.text_type(self.course.id)}
+            field_dictionary={"course": str(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["short_description"], short_description)
 
     def _test_course_about_mode_index(self, store):
-        """ Test that informational properties in the course modes store end up in the course_info index """
+        """
+        Test that informational properties in the course modes store end up in
+        the course_info index.
+        """
+        self.searcher = SearchEngine.get_search_engine(CourseAboutSearchIndexer.INDEX_NAME)
         honour_mode = CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.HONOR,
@@ -496,8 +471,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.reindex_course(store)
 
         response = self.searcher.search(
-            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
-            field_dictionary={"course": six.text_type(self.course.id)}
+            field_dictionary={"course": str(self.course.id)}
         )
         self.assertEqual(response["total"], 1)
         self.assertIn(CourseMode.HONOR, response["results"][0]["data"]["modes"])
@@ -567,10 +541,6 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_deleting_item)
 
     @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
-
-    @ddt.data(*WORKS_WITH_STORES)
     def test_start_date_propagation(self, store_type):
         self._perform_test_using_store(store_type, self._test_start_date_propagation)
 
@@ -620,22 +590,24 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
 
     def _clean_course_id(self):
-        """ Clean all documents from the index that have a specific course provided """
+        """
+        Clean all documents from the index that have a specific course provided.
+        """
         if self.course_id:
 
             response = self.searcher.search(field_dictionary={"course": self.course_id})
             while response["total"] > 0:
                 for item in response["results"]:
-                    self.searcher.remove(CoursewareSearchIndexer.DOCUMENT_TYPE, item["data"]["id"])
+                    self.searcher.remove(item["data"]["id"])
                 response = self.searcher.search(field_dictionary={"course": self.course_id})
         self.course_id = None
 
     def setUp(self):
-        super(TestLargeCourseDeletions, self).setUp()
+        super().setUp()
         self.course_id = None
 
     def tearDown(self):
-        super(TestLargeCourseDeletions, self).tearDown()
+        super().tearDown()
         self._clean_course_id()
 
     def assert_search_count(self, expected_count):
@@ -648,13 +620,13 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
         """ Test that deleting items from a course works even when present within a very large course """
         def id_list(top_parent_object):
             """ private function to get ids from object down the tree """
-            list_of_ids = [six.text_type(top_parent_object.location)]
+            list_of_ids = [str(top_parent_object.location)]
             for child in top_parent_object.get_children():
                 list_of_ids.extend(id_list(child))
             return list_of_ids
 
         course, course_size = create_large_course(store, load_factor)
-        self.course_id = six.text_type(course.id)
+        self.course_id = str(course.id)
 
         # index full course
         CoursewareSearchIndexer.do_course_reindex(store, course.id)
@@ -683,10 +655,10 @@ class TestLargeCourseDeletions(MixedWithOptionsTestCase):
             self._do_test_large_course_deletion(store, load_factor)
         except:  # pylint: disable=bare-except
             # Catch any exception here to see when we fail
-            print(u"Failed with load_factor of {}".format(load_factor))
+            print(f"Failed with load_factor of {load_factor}")
 
-    @skip(("This test is to see how we handle very large courses, to ensure that the delete"
-           "procedure works smoothly - too long to run during the normal course of things"))
+    @skip("This test is to see how we handle very large courses, to ensure that the delete"
+          "procedure works smoothly - too long to run during the normal course of things")
     @ddt.data(*WORKS_WITH_STORES)
     def test_large_course_deletion(self, store_type):
         self._perform_test_using_store(store_type, self._test_large_course_deletion)
@@ -702,7 +674,7 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestTaskExecution, cls).setUpClass()
+        super().setUpClass()
         SignalHandler.course_published.disconnect(listen_for_course_publish)
         SignalHandler.library_updated.disconnect(listen_for_library_update)
         cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
@@ -756,14 +728,16 @@ class TestTaskExecution(SharedModuleStoreTestCase):
     def tearDownClass(cls):
         SignalHandler.course_published.connect(listen_for_course_publish)
         SignalHandler.library_updated.connect(listen_for_library_update)
-        super(TestTaskExecution, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_task_indexing_course(self):
-        """ Making sure that the receiver correctly fires off the task when invoked by signal """
+        """
+        Making sure that the receiver correctly fires off the task when invoked
+        by signal.
+        """
         searcher = SearchEngine.get_search_engine(CoursewareSearchIndexer.INDEX_NAME)
         response = searcher.search(
-            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
-            field_dictionary={"course": six.text_type(self.course.id)}
+            field_dictionary={"course": str(self.course.id)}
         )
         self.assertEqual(response["total"], 0)
 
@@ -771,15 +745,14 @@ class TestTaskExecution(SharedModuleStoreTestCase):
 
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(
-            doc_type=CoursewareSearchIndexer.DOCUMENT_TYPE,
-            field_dictionary={"course": six.text_type(self.course.id)}
+            field_dictionary={"course": str(self.course.id)}
         )
         self.assertEqual(response["total"], 3)
 
     def test_task_library_update(self):
         """ Making sure that the receiver correctly fires off the task when invoked by signal """
         searcher = SearchEngine.get_search_engine(LibrarySearchIndexer.INDEX_NAME)
-        library_search_key = six.text_type(normalize_key_for_search(self.library.location.library_key))
+        library_search_key = str(normalize_key_for_search(self.library.location.library_key))
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 0)
 
@@ -788,6 +761,20 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         # Note that this test will only succeed if celery is working in inline mode
         response = searcher.search(field_dictionary={"library": library_search_key})
         self.assertEqual(response["total"], 2)
+
+    def test_ignore_ccx(self):
+        """Test that we ignore CCX courses (it's too slow now)."""
+        # We're relying on our CCX short circuit to just stop execution as soon
+        # as it encounters a CCX key. If that isn't working properly, it will
+        # fall through to the normal indexing and raise an exception because
+        # there is no data or backing course behind the course key.
+        with patch('cms.djangoapps.contentstore.courseware_index.CoursewareSearchIndexer.index') as mock_index:
+            self.assertIsNone(
+                update_search_index(
+                    "ccx-v1:OpenEdX+FAKECOURSE+FAKERUN+ccx@1", "2020-09-28T16:41:57.150796"
+                )
+            )
+            self.assertFalse(mock_index.called)
 
 
 @ddt.ddt
@@ -798,7 +785,7 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
     WORKS_WITH_STORES = (ModuleStoreEnum.Type.split, )
 
     def setUp(self):
-        super(TestLibrarySearchIndexer, self).setUp()
+        super().setUp()
 
         self.library = None
         self.html_unit1 = None
@@ -827,11 +814,10 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         )
 
     INDEX_NAME = LibrarySearchIndexer.INDEX_NAME
-    DOCUMENT_TYPE = LibrarySearchIndexer.DOCUMENT_TYPE
 
     def _get_default_search(self):
         """ Returns field_dictionary for default search """
-        return {"library": six.text_type(self.library.location.library_key.replace(version_guid=None, branch=None))}
+        return {"library": str(self.library.location.library_key.replace(version_guid=None, branch=None))}
 
     def reindex_library(self, store):
         """ kick off complete reindex of the course """
@@ -903,25 +889,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         response = self.search()
         self.assertEqual(response["total"], 1)
 
-    @XBlock.register_temp_plugin(NonIndexableXBlock)
-    def _test_not_indexable(self, store):
-        """ test not indexable items """
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
-        # Add a non-indexable item
-        ItemFactory.create(
-            parent_location=self.library.location,
-            category="nonindexablexblock",
-            display_name="Assessment",
-            publish_item=False,
-            modulestore=store,
-        )
-        self.reindex_library(store)
-        response = self.search()
-        self.assertEqual(response["total"], 2)
-
     @patch('django.conf.settings.SEARCH_ENGINE', None)
     def _test_search_disabled(self, store):
         """ if search setting has it as off, confirm that nothing is indexed """
@@ -951,10 +918,6 @@ class TestLibrarySearchIndexer(MixedWithOptionsTestCase):
         self._perform_test_using_store(store_type, self._test_deleting_item)
 
     @ddt.data(*WORKS_WITH_STORES)
-    def test_not_indexable(self, store_type):
-        self._perform_test_using_store(store_type, self._test_not_indexable)
-
-    @ddt.data(*WORKS_WITH_STORES)
     def test_search_disabled(self, store_type):
         self._perform_test_using_store(store_type, self._test_search_disabled)
 
@@ -972,7 +935,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
     INDEX_NAME = CoursewareSearchIndexer.INDEX_NAME
 
     def setUp(self):
-        super(GroupConfigurationSearchMongo, self).setUp()
+        super().setUp()
 
         self._setup_course_with_content()
         self._setup_split_test_module()
@@ -1134,26 +1097,26 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         Set up cohort and experiment content groups.
         """
         cohort_groups_list = {
-            u'id': 666,
-            u'name': u'Test name',
-            u'scheme': u'cohort',
-            u'description': u'Test description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 0, u'name': u'Group A', u'version': 1, u'usage': []},
-                {u'id': 1, u'name': u'Group B', u'version': 1, u'usage': []},
+            'id': 666,
+            'name': 'Test name',
+            'scheme': 'cohort',
+            'description': 'Test description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'Group A', 'version': 1, 'usage': []},
+                {'id': 1, 'name': 'Group B', 'version': 1, 'usage': []},
             ],
         }
         experiment_groups_list = {
-            u'id': 0,
-            u'name': u'Experiment aware partition',
-            u'scheme': u'random',
-            u'description': u'Experiment aware description',
-            u'version': UserPartition.VERSION,
-            u'groups': [
-                {u'id': 2, u'name': u'Group A', u'version': 1, u'usage': []},
-                {u'id': 3, u'name': u'Group B', u'version': 1, u'usage': []},
-                {u'id': 4, u'name': u'Group C', u'version': 1, u'usage': []}
+            'id': 0,
+            'name': 'Experiment aware partition',
+            'scheme': 'random',
+            'description': 'Experiment aware description',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 2, 'name': 'Group A', 'version': 1, 'usage': []},
+                {'id': 3, 'name': 'Group B', 'version': 1, 'usage': []},
+                {'id': 4, 'name': 'Group C', 'version': 1, 'usage': []}
             ],
         }
 
@@ -1188,9 +1151,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         return {
             'course_name': self.course.display_name,
-            'id': six.text_type(html_unit.location),
+            'id': str(html_unit.location),
             'content': {'html_content': '', 'display_name': html_unit.display_name},
-            'course': six.text_type(self.course.id),
+            'course': str(self.course.id),
             'location': [
                 self.chapter.display_name,
                 self.sequential.display_name,
@@ -1208,9 +1171,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         return {
             'course_name': self.course.display_name,
-            'id': six.text_type(html_unit.location),
+            'id': str(html_unit.location),
             'content': {'html_content': '', 'display_name': html_unit.display_name},
-            'course': six.text_type(self.course.id),
+            'course': str(self.course.id),
             'location': [
                 self.chapter.display_name,
                 self.sequential2.display_name,
@@ -1229,7 +1192,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         return {
             'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC),
             'content': {'display_name': vertical.display_name},
-            'course': six.text_type(self.course.id),
+            'course': str(self.course.id),
             'location': [
                 self.chapter.display_name,
                 self.sequential2.display_name,
@@ -1237,7 +1200,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             ],
             'content_type': 'Sequence',
             'content_groups': content_groups,
-            'id': six.text_type(vertical.location),
+            'id': str(vertical.location),
             'course_name': self.course.display_name,
             'org': self.course.org
         }
@@ -1248,9 +1211,9 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         return {
             'course_name': self.course.display_name,
-            'id': six.text_type(html_unit.location),
+            'id': str(html_unit.location),
             'content': {'html_content': '', 'display_name': html_unit.display_name},
-            'course': six.text_type(self.course.id),
+            'course': str(self.course.id),
             'location': [
                 self.chapter.display_name,
                 self.sequential.display_name,
@@ -1266,22 +1229,24 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
         """
         Return content values from args tuple in a mocked calls list.
         """
-        kall = mock_index.call_args
-        args, kwargs = kall  # pylint: disable=unused-variable
-        return args[1]
+        call = mock_index.call_args
+        (indexed_content, ), kwargs = call  # pylint: disable=unused-variable
+        return indexed_content
 
     def reindex_course(self, store):
         """ kick off complete reindex of the course """
         return CoursewareSearchIndexer.do_course_reindex(store, self.course.id)
 
     def test_content_group_gets_indexed(self):
-        """ indexing course with content groups added test """
+        """
+        Indexing course with content groups added test.
+        """
 
         # Only published modules should be in the index
         added_to_index = self.reindex_course(self.store)
         self.assertEqual(added_to_index, 16)
-        response = self.searcher.search(field_dictionary={"course": six.text_type(self.course.id)})
-        self.assertEqual(response["total"], 17)
+        response = self.searcher.search(field_dictionary={"course": str(self.course.id)})
+        self.assertEqual(response["total"], 16)
 
         group_access_content = {'group_access': {666: [1]}}
 
@@ -1298,44 +1263,44 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             self.assertTrue(mock_index.called)
             indexed_content = self._get_index_values_from_call_args(mock_index)
             self.assertIn(self._html_group_result(self.html_unit1, [1]), indexed_content)
-            self.assertIn(self._html_experiment_group_result(self.html_unit4, [six.text_type(2)]), indexed_content)
-            self.assertIn(self._html_experiment_group_result(self.html_unit5, [six.text_type(3)]), indexed_content)
-            self.assertIn(self._html_experiment_group_result(self.html_unit6, [six.text_type(4)]), indexed_content)
-            self.assertNotIn(self._html_experiment_group_result(self.html_unit6, [six.text_type(5)]), indexed_content)
+            self.assertIn(self._html_experiment_group_result(self.html_unit4, [str(2)]), indexed_content)
+            self.assertIn(self._html_experiment_group_result(self.html_unit5, [str(3)]), indexed_content)
+            self.assertIn(self._html_experiment_group_result(self.html_unit6, [str(4)]), indexed_content)
+            self.assertNotIn(self._html_experiment_group_result(self.html_unit6, [str(5)]), indexed_content)
             self.assertIn(
-                self._vertical_experiment_group_result(self.condition_0_vertical, [six.text_type(2)]),
+                self._vertical_experiment_group_result(self.condition_0_vertical, [str(2)]),
                 indexed_content
             )
             self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_1_vertical, [six.text_type(2)]),
+                self._vertical_experiment_group_result(self.condition_1_vertical, [str(2)]),
                 indexed_content
             )
             self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_2_vertical, [six.text_type(2)]),
+                self._vertical_experiment_group_result(self.condition_2_vertical, [str(2)]),
                 indexed_content
             )
             self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_0_vertical, [six.text_type(3)]),
-                indexed_content
-            )
-            self.assertIn(
-                self._vertical_experiment_group_result(self.condition_1_vertical, [six.text_type(3)]),
-                indexed_content
-            )
-            self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_2_vertical, [six.text_type(3)]),
-                indexed_content
-            )
-            self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_0_vertical, [six.text_type(4)]),
-                indexed_content
-            )
-            self.assertNotIn(
-                self._vertical_experiment_group_result(self.condition_1_vertical, [six.text_type(4)]),
+                self._vertical_experiment_group_result(self.condition_0_vertical, [str(3)]),
                 indexed_content
             )
             self.assertIn(
-                self._vertical_experiment_group_result(self.condition_2_vertical, [six.text_type(4)]),
+                self._vertical_experiment_group_result(self.condition_1_vertical, [str(3)]),
+                indexed_content
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_2_vertical, [str(3)]),
+                indexed_content
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_0_vertical, [str(4)]),
+                indexed_content
+            )
+            self.assertNotIn(
+                self._vertical_experiment_group_result(self.condition_1_vertical, [str(4)]),
+                indexed_content
+            )
+            self.assertIn(
+                self._vertical_experiment_group_result(self.condition_2_vertical, [str(4)]),
                 indexed_content
             )
             mock_index.reset_mock()
@@ -1460,7 +1425,7 @@ class GroupConfigurationSearchMongo(CourseTestCase, MixedWithOptionsTestCase):
             mock_index.reset_mock()
 
 
-class GroupConfigurationSearchSplit(GroupConfigurationSearchMongo):
+class GroupConfigurationSearchSplit(GroupConfigurationSearchMongo):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
     Tests indexing of content groups on course modules using split modulestore.
     """

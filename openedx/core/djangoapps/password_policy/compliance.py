@@ -9,8 +9,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangolib.markup import HTML
-from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
-from util.password_policy_validators import validate_password
+from common.djangoapps.util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
+from common.djangoapps.util.password_policy_validators import validate_password
 
 
 class NonCompliantPasswordException(Exception):
@@ -18,7 +18,7 @@ class NonCompliantPasswordException(Exception):
     Exception that should be raised when a user who is required to be compliant with password policy requirements
     is found to have a non-compliant password.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class NonCompliantPasswordWarning(Exception):
@@ -26,7 +26,7 @@ class NonCompliantPasswordWarning(Exception):
     Exception that should be raised when a user who will soon be required to be compliant with password policy
     requirements is found to have a non-compliant password.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def should_enforce_compliance_on_login():
@@ -70,10 +70,10 @@ def enforce_compliance_on_login(user, password):
         return
 
     now = datetime.now(pytz.UTC)
-    if now >= deadline:
+    if now >= deadline:  # lint-amnesty, pylint: disable=no-else-raise
         raise NonCompliantPasswordException(
             HTML(_(
-                u'{strong_tag_open}We recently changed our password requirements{strong_tag_close}{break_line_tag}'
+                '{strong_tag_open}We recently changed our password requirements{strong_tag_close}{break_line_tag}'
                 'Your current password does not meet the new security requirements. We just sent a password-reset '
                 'message to the email address associated with this account. Thank you for helping us keep your data '
                 'safe.'
@@ -86,17 +86,17 @@ def enforce_compliance_on_login(user, password):
     else:
         raise NonCompliantPasswordWarning(
             HTML(_(
-                u'{strong_tag_open}Required Action: Please update your password{strong_tag_close}{break_line_tag}'
-                u'As of {deadline}, {platform_name} will require all learners to have complex passwords. Your current '
-                u'password does not meet these requirements. To reset your password, go to to '
-                u'{anchor_tag_open}Account Settings{anchor_tag_close}.'
+                '{strong_tag_open}Required Action: Please update your password{strong_tag_close}{break_line_tag}'
+                'As of {deadline}, {platform_name} will require all learners to have complex passwords. Your current '
+                'password does not meet these requirements. To reset your password, go to to '
+                '{anchor_tag_open}Account Settings{anchor_tag_close}.'
             )).format(
                 strong_tag_open=HTML('<strong>'),
                 strong_tag_close=HTML('</strong>'),
                 break_line_tag=HTML('<br/>'),
                 platform_name=settings.PLATFORM_NAME,
                 deadline=strftime_localized(deadline, DEFAULT_SHORT_DATE_FORMAT),
-                anchor_tag_open=HTML(u'<a href="{account_settings_url}">').format(
+                anchor_tag_open=HTML('<a href="{account_settings_url}">').format(
                     account_settings_url=settings.LMS_ROOT_URL + "/account/settings"
                 ),
                 anchor_tag_close=HTML('</a>')

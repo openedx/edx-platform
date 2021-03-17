@@ -10,15 +10,15 @@ from django.test.client import RequestFactory
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.user_api.accounts.serializers import UserReadOnlySerializer
-from student.models import UserProfile
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = "openedx.core.djangoapps.user_api.accounts.serializers"
 
 
-class UserReadOnlySerializerTest(TestCase):
+class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(UserReadOnlySerializerTest, self).setUp()
+        super(UserReadOnlySerializerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         request_factory = RequestFactory()
         self.request = request_factory.get('/api/user/v1/accounts/')
         self.user = UserFactory.build(username='test_user', email='test_user@test.com')
@@ -36,9 +36,9 @@ class UserReadOnlySerializerTest(TestCase):
         """
         UserProfile.objects.create(user=self.user, name='test name')
         data = UserReadOnlySerializer(self.user, configuration=self.config, context={'request': self.request}).data
-        self.assertEqual(data['username'], self.user.username)
-        self.assertEqual(data['name'], 'test name')
-        self.assertEqual(data['email'], self.user.email)
+        assert data['username'] == self.user.username
+        assert data['name'] == 'test name'
+        assert data['email'] == self.user.email
 
     def test_user_no_profile(self):
         """
@@ -50,5 +50,5 @@ class UserReadOnlySerializerTest(TestCase):
                 (LOGGER_NAME, 'WARNING', 'user profile for the user [test_user] does not exist')
             )
 
-        self.assertEqual(data['username'], self.user.username)
-        self.assertEqual(data['name'], None)
+        assert data['username'] == self.user.username
+        assert data['name'] is None

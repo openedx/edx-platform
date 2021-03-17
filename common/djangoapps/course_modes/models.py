@@ -5,8 +5,6 @@ Add and create new modes for running courses on this particular LMS
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
-
-import inspect
 import logging
 import six
 from config_models.models import ConfigurationModel
@@ -21,7 +19,6 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -133,13 +130,14 @@ class CourseMode(models.Model):
 
     history = HistoricalRecords()
 
-    HONOR = u'honor'
-    PROFESSIONAL = u'professional'
-    VERIFIED = u'verified'
-    AUDIT = u'audit'
-    NO_ID_PROFESSIONAL_MODE = u'no-id-professional'
-    CREDIT_MODE = u'credit'
-    MASTERS = u'masters'
+    HONOR = 'honor'
+    PROFESSIONAL = 'professional'
+    VERIFIED = 'verified'
+    AUDIT = 'audit'
+    NO_ID_PROFESSIONAL_MODE = 'no-id-professional'
+    CREDIT_MODE = 'credit'
+    MASTERS = 'masters'
+    EXECUTIVE_EDUCATION = 'executive-education'
 
     DEFAULT_MODE = Mode(
         settings.COURSE_MODE_DEFAULTS['slug'],
@@ -154,13 +152,22 @@ class CourseMode(models.Model):
     )
     DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS['slug']
 
-    ALL_MODES = [AUDIT, CREDIT_MODE, HONOR, NO_ID_PROFESSIONAL_MODE, PROFESSIONAL, VERIFIED, MASTERS, ]
+    ALL_MODES = [
+        AUDIT,
+        CREDIT_MODE,
+        HONOR,
+        NO_ID_PROFESSIONAL_MODE,
+        PROFESSIONAL,
+        VERIFIED,
+        MASTERS,
+        EXECUTIVE_EDUCATION
+    ]
 
     # Modes utilized for audit/free enrollments
     AUDIT_MODES = [AUDIT, HONOR]
 
     # Modes that allow a student to pursue a verified certificate
-    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS]
+    VERIFIED_MODES = [VERIFIED, PROFESSIONAL, MASTERS, EXECUTIVE_EDUCATION]
 
     # Modes that allow a student to pursue a non-verified certificate
     NON_VERIFIED_MODES = [HONOR, AUDIT, NO_ID_PROFESSIONAL_MODE]
@@ -169,7 +176,7 @@ class CourseMode(models.Model):
     CREDIT_MODES = [CREDIT_MODE]
 
     # Modes that are eligible to purchase credit
-    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE, EXECUTIVE_EDUCATION]
 
     # Modes for which certificates/programs may need to be updated
     CERTIFICATE_RELEVANT_MODES = CREDIT_MODES + CREDIT_ELIGIBLE_MODES + [MASTERS]
@@ -177,21 +184,14 @@ class CourseMode(models.Model):
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
-    # Courses purchased through the shoppingcart
-    # should be "honor". Since we've changed the DEFAULT_MODE_SLUG from
-    # "honor" to "audit", we still need to have the shoppingcart
-    # use "honor"
-    DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
-
     CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
     class Meta(object):
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
 
-    def __init__(self, *args, **kwargs):
-        super(CourseMode, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=useless-super-delegation
+        super(CourseMode, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def clean(self):
         """
@@ -208,21 +208,21 @@ class CourseMode(models.Model):
         if int(self.min_price) < min_price_for_mode:
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
-                _(
-                    u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(
+                _(  # lint-amnesty, pylint: disable=translation-of-non-string
+                    u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(  # lint-amnesty, pylint: disable=line-too-long
                         course_mode=mode_display_name, min_price=min_price_for_mode
                     )
                 )
             )
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, force_insert=False, force_update=False, using=None):  # lint-amnesty, pylint: disable=arguments-differ
         # Ensure currency is always lowercase.
         self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
         if self.id is None:
             # If this model has no primary key at save time, it needs to be force-inserted.
             force_insert = True
-        super(CourseMode, self).save(force_insert, force_update, using)
+        super(CourseMode, self).save(force_insert, force_update, using)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @property
     def slug(self):
@@ -364,7 +364,7 @@ class CourseMode(models.Model):
             raise ValueError("One of course_id or course must not be None.")
 
         if course is not None and not isinstance(course, CourseOverview):
-            # CourseModules don't have the data needed to pull related modes,
+            # CourseBlocks don't have the data needed to pull related modes,
             # so we'll fall back on course_id-based lookup instead
             course_id = course.id
             course = None

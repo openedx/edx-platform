@@ -7,19 +7,19 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseModeFactory
-from student.models import BulkUnenrollConfiguration, CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import BulkUnenrollConfiguration, CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'student.management.commands.bulk_unenroll'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_unenroll'
 
 
 class BulkUnenrollTests(SharedModuleStoreTestCase):
     """Test Bulk un-enroll command works fine for all test cases."""
     def setUp(self):
-        super(BulkUnenrollTests, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -58,7 +58,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
             csv = self._write_test_csv(csv, lines=["amy,test_course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+                call_command("bulk_unenroll", f"--csv_path={csv.name}", "--commit")
                 expected_message = 'Invalid course id {}, skipping un-enrollement.'.\
                     format('test_course')
 
@@ -76,9 +76,25 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=lines)
 
-            call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+            call_command("bulk_unenroll", f"--csv_path={csv.name}", "--commit")
             for enrollment in CourseEnrollment.objects.all():
-                self.assertEqual(enrollment.is_active, False)
+                assert enrollment.is_active is False
+
+    def test_bulk_un_enroll_without_commit(self):
+        """
+        Verify the ability to dry-run the command.
+        """
+        lines = [
+            enrollment.user.username + "," +
+            str(enrollment.course.id) + "\n"
+            for enrollment in self.enrollments
+        ]
+        with NamedTemporaryFile() as csv:
+            csv = self._write_test_csv(csv, lines=lines)
+
+            call_command("bulk_unenroll", f"--csv_path={csv.name}")
+            for enrollment in CourseEnrollment.objects.all():
+                assert enrollment.is_active is True
 
     def test_bulk_unenroll_from_config_model(self):
         """Verify users are unenrolled using the command."""
@@ -90,9 +106,9 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
-        call_command("bulk_unenroll")
+        call_command("bulk_unenroll", "--commit")
         for enrollment in CourseEnrollment.objects.all():
-            self.assertEqual(enrollment.is_active, False)
+            assert enrollment.is_active is False
 
     def test_users_unenroll_successfully_logged(self):
         """Verify users unenrolled are logged """
@@ -101,14 +117,20 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
+        course_id = self.enrollments[0].course.id
         with LogCapture(LOGGER_NAME) as log:
-            call_command("bulk_unenroll")
+            call_command("bulk_unenroll", "--commit")
             log.check(
+                (
+                    LOGGER_NAME,
+                    'INFO',
+                    f'Processing [{course_id}] with [1] enrollments.',
+                ),
                 (
                     LOGGER_NAME,
                     'INFO',
                     'User [{}] have been successfully unenrolled from the course: {}'.format(
                         self.enrollments[0].username, self.enrollments[0].course.id
                     )
-                )
+                ),
             )

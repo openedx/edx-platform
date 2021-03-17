@@ -4,23 +4,22 @@ Tests the transfer student management command
 
 
 import unittest
+from unittest.mock import call, patch
 
 import ddt
 from django.conf import settings
 from django.core.management import call_command
-from mock import call, patch
 from opaque_keys.edx import locator
-from six import text_type
 
-from course_modes.models import CourseMode
-from student.models import (
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
     EVENT_NAME_ENROLLMENT_MODE_CHANGED,
     CourseEnrollment
 )
-from student.signals import UNENROLL_DONE
-from student.tests.factories import UserFactory
+from common.djangoapps.student.signals import UNENROLL_DONE
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -35,14 +34,14 @@ class TestTransferStudents(ModuleStoreTestCase):
     PASSWORD = 'test'
     signal_fired = False
 
-    def setUp(self, **kwargs):
+    def setUp(self, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Connect a stub receiver, and analytics event tracking.
         """
-        super(TestTransferStudents, self).setUp()
+        super().setUp()
 
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
-        patcher = patch('student.models.tracker')
+        patcher = patch('common.djangoapps.student.models.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
         self.addCleanup(UNENROLL_DONE.disconnect, self.assert_unenroll_signal)
@@ -51,8 +50,8 @@ class TestTransferStudents(ModuleStoreTestCase):
         """
         Signal Receiver stub for testing that the unenroll signal was fired.
         """
-        self.assertFalse(self.signal_fired)
-        self.assertTrue(skip_refund)
+        assert not self.signal_fired
+        assert skip_refund
         self.signal_fired = True
 
     def test_transfer_students(self):
@@ -79,9 +78,9 @@ class TestTransferStudents(ModuleStoreTestCase):
         # New Course 2
         course_location_two = locator.CourseLocator('Org2', 'Course2', 'Run2')
         new_course_two = self._create_course(course_location_two)
-        original_key = text_type(course.id)
-        new_key_one = text_type(new_course_one.id)
-        new_key_two = text_type(new_course_two.id)
+        original_key = str(course.id)
+        new_key_one = str(new_course_one.id)
+        new_key_two = str(new_course_two.id)
 
         # Run the actual management command
         call_command(
@@ -89,7 +88,7 @@ class TestTransferStudents(ModuleStoreTestCase):
             '--from', original_key,
             '--to', new_key_one, new_key_two,
         )
-        self.assertTrue(self.signal_fired)
+        assert self.signal_fired
 
         # Confirm the analytics event was emitted.
         self.mock_tracker.emit.assert_has_calls(
@@ -127,9 +126,9 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.mock_tracker.reset_mock()
 
         # Confirm the enrollment mode is verified on the new courses, and enrollment is enabled as appropriate.
-        self.assertEqual((mode, False), CourseEnrollment.enrollment_mode_for_user(student, course.id))
-        self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_one.id))
-        self.assertEqual((mode, True), CourseEnrollment.enrollment_mode_for_user(student, new_course_two.id))
+        assert (mode, False) == CourseEnrollment.enrollment_mode_for_user(student, course.id)
+        assert (mode, True) == CourseEnrollment.enrollment_mode_for_user(student, new_course_one.id)
+        assert (mode, True) == CourseEnrollment.enrollment_mode_for_user(student, new_course_two.id)
 
     def _create_course(self, course_location):
         """
@@ -141,7 +140,7 @@ class TestTransferStudents(ModuleStoreTestCase):
             run=course_location.run
         )
 
-    def _create_and_purchase_verified(self, student, course_id):
+    def _create_and_purchase_verified(self, student, course_id):  # lint-amnesty, pylint: disable=unused-argument
         """
         Creates a verified mode for the course and purchases it for the student.
         """

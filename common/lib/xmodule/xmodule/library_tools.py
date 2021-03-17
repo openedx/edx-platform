@@ -1,12 +1,19 @@
 """
-XBlock runtime services for LibraryContentModule
+XBlock runtime services for LibraryContentBlock
 """
+import hashlib
 
-
-import six
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator, LibraryUsageLocatorV2, BlockUsageLocator
 from search.search_engine_base import SearchEngine
+from xblock.fields import Scope
+
+from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.xblock.api import load_block
+from openedx.core.lib import blockstore_api
+from common.djangoapps.student.auth import has_studio_write_access
 from xmodule.capa_module import ProblemBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
@@ -18,13 +25,14 @@ def normalize_key_for_search(library_key):
     return library_key.replace(version_guid=None, branch=None)
 
 
-class LibraryToolsService(object):
+class LibraryToolsService:
     """
-    Service that allows LibraryContentModule to interact with libraries in the
+    Service that allows LibraryContentBlock to interact with libraries in the
     modulestore.
     """
-    def __init__(self, modulestore):
+    def __init__(self, modulestore, user_id):
         self.store = modulestore
+        self.user_id = user_id
 
     def _get_library(self, library_key):
         """
@@ -72,9 +80,9 @@ class LibraryToolsService(object):
             """ Basic information about the given block """
             orig_key, orig_version = self.store.get_block_original_usage(usage_key)
             return {
-                "usage_key": six.text_type(usage_key),
-                "original_usage_key": six.text_type(orig_key) if orig_key else None,
-                "original_usage_version": six.text_type(orig_version) if orig_version else None,
+                "usage_key": str(usage_key),
+                "original_usage_key": str(orig_key) if orig_key else None,
+                "original_usage_version": str(orig_version) if orig_version else None,
             }
 
         result_json = []
@@ -100,7 +108,7 @@ class LibraryToolsService(object):
         search_engine = SearchEngine.get_search_engine(index="library_index")
         if search_engine:
             filter_clause = {
-                "library": six.text_type(normalize_key_for_search(library.location.library_key)),
+                "library": str(normalize_key_for_search(library.location.library_key)),
                 "content_type": ProblemBlock.INDEX_CONTENT_TYPE,
                 "problem_types": capa_type
             }
@@ -127,9 +135,9 @@ class LibraryToolsService(object):
         """
         return self.store.check_supports(block.location.course_key, 'copy_from_template')
 
-    def update_children(self, dest_block, user_id, user_perms=None, version=None):
+    def update_children(self, dest_block, user_perms=None, version=None):
         """
-        This method is to be used when the library that a LibraryContentModule
+        This method is to be used when the library that a LibraryContentBlock
         references has been updated. It will re-fetch all matching blocks from
         the libraries, and copy them as children of dest_block. The children
         will be given new block_ids, but the definition ID used should be the
@@ -152,7 +160,7 @@ class LibraryToolsService(object):
             library_key = library_key.replace(branch=ModuleStoreEnum.BranchName.library, version_guid=version)
         library = self._get_library(library_key)
         if library is None:
-            raise ValueError("Requested library {0} not found.".format(library_key))
+            raise ValueError(f"Requested library {library_key} not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
@@ -163,11 +171,11 @@ class LibraryToolsService(object):
             source_blocks.extend(library.children)
 
         with self.store.bulk_operations(dest_block.location.course_key):
-            dest_block.source_library_version = six.text_type(library.location.library_key.version_guid)
-            self.store.update_item(dest_block, user_id)
+            dest_block.source_library_version = str(library.location.library_key.version_guid)
+            self.store.update_item(dest_block, self.user_id)
             head_validation = not version
             dest_block.children = self.store.copy_from_template(
-                source_blocks, dest_block.location, user_id, head_validation=head_validation
+                source_blocks, dest_block.location, self.user_id, head_validation=head_validation
             )
             # ^-- copy_from_template updates the children in the DB
             # but we must also set .children here to avoid overwriting the DB again
@@ -181,3 +189,116 @@ class LibraryToolsService(object):
             (lib.location.library_key.replace(version_guid=None, branch=None), lib.display_name)
             for lib in self.store.get_library_summaries()
         ]
+
+    def import_from_blockstore(self, dest_block, blockstore_block_ids):
+        """
+        Imports a block from a blockstore-based learning context (usually a
+        content library) into modulestore, as a new child of dest_block.
+        Any existing children of dest_block are replaced.
+
+        This is only used by LibrarySourcedBlock. It should verify first that
+        the number of block IDs is reasonable.
+        """
+        dest_key = dest_block.scope_ids.usage_id
+        if not isinstance(dest_key, BlockUsageLocator):
+            raise TypeError(f"Destination {dest_key} should be a modulestore course.")
+        if self.user_id is None:
+            raise ValueError("Cannot check user permissions - LibraryTools user_id is None")
+
+        if len(set(blockstore_block_ids)) != len(blockstore_block_ids):
+            # We don't support importing the exact same block twice because it would break the way we generate new IDs
+            # for each block and then overwrite existing copies of blocks when re-importing the same blocks.
+            raise ValueError("One or more library component IDs is a duplicate.")
+
+        dest_course_key = dest_key.context_key
+        user = User.objects.get(id=self.user_id)
+        if not has_studio_write_access(user, dest_course_key):
+            raise PermissionDenied()
+
+        # Read the source block; this will also confirm that user has permission to read it.
+        # (This could be slow and use lots of memory, except for the fact that LibrarySourcedBlock which calls this
+        # should be limiting the number of blocks to a reasonable limit. We load them all now instead of one at a
+        # time in order to raise any errors before we start actually copying blocks over.)
+        orig_blocks = [load_block(UsageKey.from_string(key), user) for key in blockstore_block_ids]
+
+        with self.store.bulk_operations(dest_course_key):
+            child_ids_updated = set()
+
+            for block in orig_blocks:
+                new_block_id = self._import_block(block, dest_key)
+                child_ids_updated.add(new_block_id)
+
+            # Remove any existing children that are no longer used
+            for old_child_id in set(dest_block.children) - child_ids_updated:
+                self.store.delete_item(old_child_id, self.user_id)
+            # If this was called from a handler, it will save dest_block at the end, so we must update
+            # dest_block.children to avoid it saving the old value of children and deleting the new ones.
+            dest_block.children = self.store.get_item(dest_key).children
+
+    def _import_block(self, source_block, dest_parent_key):
+        """
+        Recursively import a blockstore block and its children. See import_from_blockstore above.
+        """
+        def generate_block_key(source_key, dest_parent_key):
+            """
+            Deterministically generate an ID for the new block and return the key
+            """
+            block_id = (
+                dest_parent_key.block_id[:10] +
+                '-' +
+                hashlib.sha1(str(source_key).encode('utf-8')).hexdigest()[:10]
+            )
+            return dest_parent_key.context_key.make_usage_key(source_key.block_type, block_id)
+
+        source_key = source_block.scope_ids.usage_id
+        new_block_key = generate_block_key(source_key, dest_parent_key)
+        try:
+            new_block = self.store.get_item(new_block_key)
+            if new_block.parent != dest_parent_key:
+                raise ValueError(
+                    "Expected existing block {} to be a child of {} but instead it's a child of {}".format(
+                        new_block_key, dest_parent_key, new_block.parent,
+                    )
+                )
+        except ItemNotFoundError:
+            new_block = self.store.create_child(
+                user_id=self.user_id,
+                parent_usage_key=dest_parent_key,
+                block_type=source_key.block_type,
+                block_id=new_block_key.block_id,
+            )
+
+        # Prepare a list of this block's static assets; any assets that are referenced as /static/{path} (the
+        # recommended way for referencing them) will stop working, and so we rewrite the url when importing.
+        # Copying assets not advised because modulestore doesn't namespace assets to each block like blockstore, which
+        # might cause conflicts when the same filename is used across imported blocks.
+        if isinstance(source_key, LibraryUsageLocatorV2):
+            all_assets = library_api.get_library_block_static_asset_files(source_key)
+        else:
+            all_assets = []
+
+        for field_name, field in source_block.fields.items():
+            if field.scope not in (Scope.settings, Scope.content):
+                continue  # Only copy authored field data
+            if field.is_set_on(source_block) or field.is_set_on(new_block):
+                field_value = getattr(source_block, field_name)
+                if isinstance(field_value, str):
+                    # If string field (which may also be JSON/XML data), rewrite /static/... URLs to point to blockstore
+                    for asset in all_assets:
+                        field_value = field_value.replace(f'/static/{asset.path}', asset.url)
+                        # Make sure the URL is one that will work from the user's browser when using the docker devstack
+                        field_value = blockstore_api.force_browser_url(field_value)
+                setattr(new_block, field_name, field_value)
+        new_block.save()
+        self.store.update_item(new_block, self.user_id)
+
+        if new_block.has_children:
+            # Delete existing children in the new block, which can be reimported again if they still exist in the
+            # source library
+            for existing_child_key in new_block.children:
+                self.store.delete_item(existing_child_key, self.user_id)
+            # Now import the children
+            for child in source_block.get_children():
+                self._import_block(child, new_block_key)
+
+        return new_block_key

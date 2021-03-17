@@ -10,7 +10,7 @@ import six
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator, ValidationError, slug_re
 from django.forms import widgets
@@ -18,20 +18,20 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django_countries import countries
 
-import third_party_auth
-from edxmako.shortcuts import marketing_link
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollmentAllowed,
     UserProfile,
     email_exists_or_retired,
 )
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions,
     validate_password,
@@ -108,8 +108,8 @@ class UsernameField(forms.CharField):
 
     default_validators = [validate_username]
 
-    def __init__(self, *args, **kwargs):
-        super(UsernameField, self).__init__(
+    def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+        super(UsernameField, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
             min_length=accounts.USERNAME_MIN_LENGTH,
             max_length=accounts.USERNAME_MAX_LENGTH,
             error_messages={
@@ -127,7 +127,7 @@ class UsernameField(forms.CharField):
         """
 
         value = self.to_python(value).strip()
-        return super(UsernameField, self).clean(value)
+        return super(UsernameField, self).clean(value)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class AccountCreationForm(forms.Form):
@@ -172,7 +172,7 @@ class AccountCreationForm(forms.Form):
         do_third_party_auth=True,
         tos_required=True
     ):
-        super(AccountCreationForm, self).__init__(data)
+        super(AccountCreationForm, self).__init__(data)  # lint-amnesty, pylint: disable=super-with-arguments
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}

@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import string
 from uuid import uuid4
@@ -6,24 +6,24 @@ from uuid import uuid4
 import factory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 
-from course_modes.helpers import CourseMode
-from entitlements.models import CourseEntitlement, CourseEntitlementPolicy
+from common.djangoapps.course_modes.helpers import CourseMode
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.tests.factories import UserFactory
 
 
 class CourseEntitlementPolicyFactory(factory.django.DjangoModelFactory):
     """
     Factory for a a CourseEntitlementPolicy
     """
-    class Meta(object):
+    class Meta:
         model = CourseEntitlementPolicy
 
     site = factory.SubFactory(SiteFactory)
 
 
-class CourseEntitlementFactory(factory.django.DjangoModelFactory):
-    class Meta(object):
+class CourseEntitlementFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = CourseEntitlement
 
     uuid = factory.LazyFunction(uuid4)

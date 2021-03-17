@@ -3,7 +3,7 @@ Provides Python APIs exposed from Bulk Email models.
 """
 
 
-from bulk_email.models import BulkEmailFlag, CourseAuthorization, Optout
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization, Optout
 
 
 def is_user_opted_out_for_course(user, course_id):

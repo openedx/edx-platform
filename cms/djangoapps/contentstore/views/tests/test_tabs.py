@@ -3,9 +3,9 @@
 
 import json
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views import tabs
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views import tabs
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -20,7 +20,7 @@ class TabsPageTests(CourseTestCase):
         """Common setup for tests"""
 
         # call super class to setup course, etc.
-        super(TabsPageTests, self).setUp()
+        super().setUp()
 
         # Set the URL for tests
         self.url = reverse_course_url('tabs_handler', self.course.id)
@@ -178,7 +178,7 @@ class TabsPageTests(CourseTestCase):
         """
         Verify that the static tab renders itself with the correct HTML
         """
-        preview_url = '/xblock/{}/{}'.format(self.test_tab.location, STUDENT_VIEW)
+        preview_url = f'/xblock/{self.test_tab.location}/{STUDENT_VIEW}'
 
         resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
@@ -205,7 +205,7 @@ class PrimitiveTabEdit(ModuleStoreTestCase):
         with self.assertRaises(IndexError):
             tabs.primitive_delete(course, 7)
         tabs.primitive_delete(course, 2)
-        self.assertNotIn({u'type': u'textbooks'}, course.tabs)
+        self.assertNotIn({'type': 'textbooks'}, course.tabs)
         # Check that discussion has shifted up
         self.assertEqual(course.tabs[2], {'type': 'discussion', 'name': 'Discussion'})
 

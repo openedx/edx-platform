@@ -1,24 +1,21 @@
 """
 Tests for course_overviews app.
 """
+from io import BytesIO
+from unittest import mock
 
-
+import pytest
 import datetime
 import itertools
 import math
-from six import BytesIO
-
 import ddt
-import mock
 import pytz
-import six
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
-from six.moves import range  # pylint: disable=ungrouped-imports
 
 from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -26,7 +23,7 @@ from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
-from static_replace.models import AssetBaseUrlConfig
+from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -36,7 +33,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -72,16 +69,16 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     def check_course_overview_against_course(self, course):
         """
         Compares a CourseOverview object against its corresponding
-        CourseDescriptor object.
+        CourseBlock object.
 
         Specifically, given a course, test that data within the following three
         objects match each other:
-         - the CourseDescriptor itself
+         - the CourseBlock itself
          - a CourseOverview that was newly constructed from _create_or_update
          - a CourseOverview that was loaded from the MySQL database
 
         Arguments:
-            course (CourseDescriptor): the course to be checked.
+            course (CourseBlock): the course to be checked.
         """
 
         def get_seconds_since_epoch(date_time):
@@ -135,8 +132,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             course_value = getattr(course, attribute_name)
             cache_miss_value = getattr(course_overview_cache_miss, attribute_name)
             cache_hit_value = getattr(course_overview_cache_hit, attribute_name)
-            self.assertEqual(course_value, cache_miss_value)
-            self.assertEqual(cache_miss_value, cache_hit_value)
+            assert course_value == cache_miss_value
+            assert cache_miss_value == cache_hit_value
 
         # Test if return values for all methods are equal between the three objects
         methods_to_test = [
@@ -150,8 +147,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             course_value = getattr(course, method_name)(*method_args)
             cache_miss_value = getattr(course_overview_cache_miss, method_name)(*method_args)
             cache_hit_value = getattr(course_overview_cache_hit, method_name)(*method_args)
-            self.assertEqual(course_value, cache_miss_value)
-            self.assertEqual(cache_miss_value, cache_hit_value)
+            assert course_value == cache_miss_value
+            assert cache_miss_value == cache_hit_value
 
         # Other values to test
 
@@ -197,14 +194,14 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             course_value = course_accessor(course, attribute_name)
             cache_miss_value = course_overview_accessor(course_overview_cache_miss, attribute_name)
             cache_hit_value = course_overview_accessor(course_overview_cache_hit, attribute_name)
-            self.assertEqual(course_value, cache_miss_value)
-            self.assertEqual(cache_miss_value, cache_hit_value)
+            assert course_value == cache_miss_value
+            assert cache_miss_value == cache_hit_value
 
         # test tabs for both cached miss and cached hit courses
         for course_overview in [course_overview_cache_miss, course_overview_cache_hit]:
             course_overview_tabs = course_overview.tab_set.all()
             course_resp_tabs = {tab.tab_id for tab in course_overview_tabs}
-            self.assertEqual(self.COURSE_OVERVIEW_TABS, course_resp_tabs)
+            assert self.COURSE_OVERVIEW_TABS == course_resp_tabs
 
     @ddt.data(*itertools.product(
         [
@@ -257,7 +254,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     @ddt.unpack
     def test_course_overview_behavior(self, course_kwargs, modulestore_type):
         """
-        Tests if CourseOverviews and CourseDescriptors behave the same
+        Tests if CourseOverviews and CourseBlocks behave the same
         by comparing pairs of them given a variety of scenarios.
 
         Arguments:
@@ -290,9 +287,9 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         course_overview = CourseOverview.get_from_id(course.id)
 
         if catalog_integration_enabled:
-            self.assertNotEqual(course_overview.language, course.language)
+            assert course_overview.language != course.language
         else:
-            self.assertEqual(course_overview.language, course.language)
+            assert course_overview.language == course.language
 
     @ddt.data(
         ('fa', 'fa-ir', 'fa'),
@@ -307,7 +304,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
     def test_closest_released_language(self, released_languages, course_language, expected_language):
         DarkLangConfig(released_languages=released_languages, enabled=True, changed_by=self.user).save()
         course_overview = CourseOverviewFactory.create(language=course_language)
-        self.assertEqual(course_overview.closest_released_language, expected_language)
+        assert course_overview.closest_released_language == expected_language
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_get_non_existent_course(self, modulestore_type):
@@ -320,7 +317,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                 course in.
         """
         store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
-        with self.assertRaises(CourseOverview.DoesNotExist):
+        with pytest.raises(CourseOverview.DoesNotExist):
             CourseOverview.get_from_id(store.make_course_key('Non', 'Existent', 'Course'))
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
@@ -331,8 +328,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         """
         course = CourseFactory.create(default_store=modulestore_type)
         CourseOverview.get_from_id(course.id)  # Ensure course in cached in CourseOverviews
-        self.assertTrue(CourseOverview.objects.filter(id=course.id).exists())
-        self.assertTrue(CourseOverview.course_exists(course.id))
+        assert CourseOverview.objects.filter(id=course.id).exists()
+        assert CourseOverview.course_exists(course.id)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_course_without_overview_exists(self, modulestore_type):
@@ -342,8 +339,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         """
         course = CourseFactory.create(default_store=modulestore_type)
         CourseOverview.objects.filter(id=course.id).delete()
-        self.assertTrue(CourseOverview.course_exists(course.id))
-        self.assertFalse(CourseOverview.objects.filter(id=course.id).exists())
+        assert CourseOverview.course_exists(course.id)
+        assert not CourseOverview.objects.filter(id=course.id).exists()
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
     def test_nonexistent_course_does_not_exists(self, modulestore_type):
@@ -352,19 +349,19 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         """
         store = modulestore()._get_modulestore_by_type(modulestore_type)  # pylint: disable=protected-access
         course_id = store.make_course_key('Non', 'Existent', 'Course')
-        self.assertFalse(CourseOverview.course_exists(course_id))
+        assert not CourseOverview.course_exists(course_id)
 
     def test_get_errored_course(self):
         """
-        Test that getting an ErrorDescriptor back from the module store causes
+        Test that getting an ErrorBlock back from the module store causes
         load_from_module_store to raise an IOError.
         """
-        mock_get_course = mock.Mock(return_value=ErrorDescriptor)
+        mock_get_course = mock.Mock(return_value=ErrorBlock)
         with mock.patch('xmodule.modulestore.mixed.MixedModuleStore.get_course', mock_get_course):
             # This mock makes it so when the module store tries to load course data,
-            # an exception is thrown, which causes get_course to return an ErrorDescriptor,
+            # an exception is thrown, which causes get_course to return an ErrorBlock,
             # which causes get_from_id to raise an IOError.
-            with self.assertRaises(IOError):
+            with pytest.raises(IOError):
                 CourseOverview.load_from_module_store(self.store.make_course_key('Non', 'Existent', 'Course'))
 
     def test_malformed_grading_policy(self):
@@ -377,12 +374,12 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         """
         course = CourseFactory.create()
         course._grading_policy['GRADE_CUTOFFS'] = {}  # pylint: disable=protected-access
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             __ = course.lowest_passing_grade
         course_overview = CourseOverview._create_or_update(course)  # pylint: disable=protected-access
-        self.assertEqual(course_overview.lowest_passing_grade, None)
+        assert course_overview.lowest_passing_grade is None
 
-    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 4))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 4), (ModuleStoreEnum.Type.split, 3, 3))
     @ddt.unpack
     def test_versioning(self, modulestore_type, min_mongo_calls, max_mongo_calls):
         """
@@ -447,7 +444,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
                         # Verify the CourseOverview is loaded successfully both times,
                         # including after an IntegrityError exception the 2nd time.
                         for _ in range(2):
-                            self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
+                            assert isinstance(CourseOverview.get_from_id(course.id), CourseOverview)
 
     def test_course_overview_version_update(self):
         """
@@ -460,7 +457,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         with mock.patch('openedx.core.djangoapps.content.course_overviews.models.CourseOverview.VERSION', new=10):
             # This will create a version 10 CourseOverview
             overview_v10 = CourseOverview.get_from_id(course.id)
-            self.assertEqual(overview_v10.version, 10)
+            assert overview_v10.version == 10
 
             # Now we're going to muck with the values and manually save it as v09
             overview_v10.version = 9
@@ -470,7 +467,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             # that this entry will be deleted() and that we'll get back a new
             # entry with version = 10 again.
             updated_overview = CourseOverview.get_from_id(course.id)
-            self.assertEqual(updated_overview.version, 10)
+            assert updated_overview.version == 10
 
             # Now we're going to muck with this and set it a version higher in
             # the database.
@@ -480,7 +477,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             # Because CourseOverview is encountering a version *higher* than it
             # knows how to write, it's not going to overwrite what's there.
             unmodified_overview = CourseOverview.get_from_id(course.id)
-            self.assertEqual(unmodified_overview.version, 11)
+            assert unmodified_overview.version == 11
 
     def test_update_select_courses(self):
         course_ids = [CourseFactory.create().id for __ in range(3)]
@@ -489,44 +486,35 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
         ) as mock_get_from_id:
             CourseOverview.update_select_courses(select_course_ids)
-            self.assertEqual(mock_get_from_id.call_count, len(select_course_ids))
+            assert mock_get_from_id.call_count == len(select_course_ids)
 
     def test_get_all_courses(self):
         course_ids = [CourseFactory.create(emit_signals=True).id for __ in range(3)]
-        self.assertEqual(
-            {course_overview.id for course_overview in CourseOverview.get_all_courses()},
-            set(course_ids),
-        )
+        assert {course_overview.id for course_overview in CourseOverview.get_all_courses()} == set(course_ids)
 
         with mock.patch(
             'openedx.core.djangoapps.content.course_overviews.models.CourseOverview.get_from_id'
         ) as mock_get_from_id:
             CourseOverview.get_all_courses()
-            self.assertFalse(mock_get_from_id.called)
+            assert not mock_get_from_id.called
 
     def test_get_all_courses_by_org(self):
         org_courses = []  # list of lists of courses
         for index in range(3):
             org_courses.append([
-                CourseFactory.create(org='test_org_' + six.text_type(index), emit_signals=True)
+                CourseFactory.create(org='test_org_' + str(index), emit_signals=True)
                 for __ in range(3)
             ])
 
-        self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses()},
-            {c.id for c in org_courses[0] + org_courses[1] + org_courses[2]},
-        )
+        assert {c.id for c in CourseOverview.get_all_courses()} ==\
+               {c.id for c in org_courses[0] + org_courses[1] + org_courses[2]}
 
-        self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(orgs=['test_org_1', 'test_org_2'])},
-            {c.id for c in org_courses[1] + org_courses[2]},
-        )
+        assert {c.id for c in CourseOverview.get_all_courses(orgs=['test_org_1', 'test_org_2'])} ==\
+               {c.id for c in org_courses[1] + org_courses[2]}
 
         # Test case-insensitivity.
-        self.assertEqual(
-            {c.id for c in CourseOverview.get_all_courses(orgs=['TEST_ORG_1', 'TEST_ORG_2'])},
-            {c.id for c in org_courses[1] + org_courses[2]},
-        )
+        assert {c.id for c in CourseOverview.get_all_courses(orgs=['TEST_ORG_1', 'TEST_ORG_2'])} ==\
+               {c.id for c in org_courses[1] + org_courses[2]}
 
     def test_get_all_courses_by_mobile_available(self):
         mobile_course = CourseFactory.create(emit_signals=True)
@@ -540,16 +528,8 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         )
 
         for filter_, expected_courses in test_cases:
-            self.assertEqual(
-                {
-                    course_overview.id
-                    for course_overview in
-                    CourseOverview.get_all_courses(filter_=filter_)
-                },
-                expected_courses,
-                u"testing CourseOverview.get_all_courses with filter_={}"
-                .format(filter_),
-            )
+            assert {course_overview.id for course_overview in CourseOverview.get_all_courses(filter_=filter_)} ==\
+                   expected_courses, f'testing CourseOverview.get_all_courses with filter_={filter_}'
 
     def test_get_from_ids(self):
         """
@@ -605,7 +585,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
         self.set_config(True)
-        super(CourseOverviewImageSetTestCase, self).setUp()
+        super().setUp()
 
     def _create_course_image(self, course, image_name):
         """
@@ -661,7 +641,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
         # Even though there was no source image to generate, we should still
         # have a CourseOverviewImageSet object associated with this overview.
-        self.assertTrue(hasattr(course_overview, 'image_set'))
+        assert hasattr(course_overview, 'image_set')
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_disabled_no_prior_data(self, modulestore_type):
@@ -680,7 +660,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         course_overview = self._assert_image_urls_all_default(modulestore_type, fake_course_image)
 
         # Because we are disabled, no image set should have been generated.
-        self.assertFalse(hasattr(course_overview, 'image_set'))
+        assert not hasattr(course_overview, 'image_set')
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_disabled_with_prior_data(self, modulestore_type):
@@ -706,7 +686,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             course_overview_before = CourseOverview.get_from_id(course.id)
 
         # This initial seeding should create an entry for the image_set.
-        self.assertTrue(hasattr(course_overview_before, 'image_set'))
+        assert hasattr(course_overview_before, 'image_set')
 
         # Now just throw in some fake data to this image set, something that
         # couldn't possibly work.
@@ -721,22 +701,15 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         course_overview_after = CourseOverview.get_from_id(course.id)
 
         # Assert that the data still exists for debugging purposes
-        self.assertTrue(hasattr(course_overview_after, 'image_set'))
+        assert hasattr(course_overview_after, 'image_set')
         image_set = course_overview_after.image_set
-        self.assertEqual(image_set.small_url, broken_small_url)
-        self.assertEqual(image_set.large_url, broken_large_url)
+        assert image_set.small_url == broken_small_url
+        assert image_set.large_url == broken_large_url
 
         # But because we've disabled it, asking for image_urls should give us
         # the raw source image for all resolutions, and not our broken images.
         expected_url = course_image_url(course)
-        self.assertEqual(
-            course_overview_after.image_urls,
-            {
-                'raw': expected_url,
-                'small': expected_url,
-                'large': expected_url
-            }
-        )
+        assert course_overview_after.image_urls == {'raw': expected_url, 'small': expected_url, 'large': expected_url}
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_cdn(self, modulestore_type):
@@ -755,14 +728,14 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
                 expected_path_start = "/asset-v1:"
 
             for url in overview.image_urls.values():
-                self.assertTrue(url.startswith(expected_path_start))
+                assert url.startswith(expected_path_start)
 
             # Now enable the CDN...
             AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
             expected_cdn_url = "//fakecdn.edx.org" + expected_path_start
 
             for url in overview.image_urls.values():
-                self.assertTrue(url.startswith(expected_cdn_url))
+                assert url.startswith(expected_cdn_url)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_cdn_with_external_image(self, modulestore_type):
@@ -784,10 +757,32 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             }
 
             modified_urls = overview.apply_cdn_to_urls(start_urls)
-            self.assertEqual(modified_urls['raw'], start_urls['raw'])
-            self.assertNotEqual(modified_urls['small'], start_urls['small'])
-            self.assertTrue(modified_urls['small'].startswith(expected_cdn_url))
-            self.assertEqual(modified_urls['large'], start_urls['large'])
+            assert modified_urls['raw'] == start_urls['raw']
+            assert modified_urls['small'] != start_urls['small']
+            assert modified_urls['small'].startswith(expected_cdn_url)
+            assert modified_urls['large'] == start_urls['large']
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_cdn_with_a_single_external_image(self, modulestore_type):
+        """
+        Test CDN is applied for a URL when apply_cdn_to_url called directly.
+
+        Apply CDN/base URL to the given URL if CDN configuration is enabled
+        and the URL is not absolute.
+        """
+        with self.store.default_store(modulestore_type):
+            course = CourseFactory.create(default_store=modulestore_type)
+            overview = CourseOverview.get_from_id(course.id)
+
+            # Now enable the CDN...
+            AssetBaseUrlConfig.objects.create(enabled=True, base_url='fakecdn.edx.org')
+            expected_cdn_url = "//fakecdn.edx.org"
+
+            start_url = "/static/overview.png"
+            modified_url = overview.apply_cdn_to_url(start_url)
+
+            assert start_url != modified_url
+            assert modified_url.startswith(expected_cdn_url)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_error_generating_thumbnails(self, modulestore_type):
@@ -817,9 +812,9 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
         # Now an image set does exist, even though it only has blank values for
         # the small and large urls.
-        self.assertTrue(hasattr(course_overview, 'image_set'))
-        self.assertEqual(course_overview.image_set.small_url, '')
-        self.assertEqual(course_overview.image_set.large_url, '')
+        assert hasattr(course_overview, 'image_set')
+        assert course_overview.image_set.small_url == ''
+        assert course_overview.image_set.large_url == ''
 
         # The next time we create a CourseOverview, the images are explicitly
         # *not* regenerated.
@@ -874,25 +869,25 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             # that, then switch config back over to True and it should lazily
             # create the image_set on the next get_from_id() call.
             if create_after_overview:
-                self.assertFalse(hasattr(course_overview, 'image_set'))
+                assert not hasattr(course_overview, 'image_set')
                 self.set_config(enabled=True)
                 course_overview = CourseOverview.get_from_id(course.id)
 
-            self.assertTrue(hasattr(course_overview, 'image_set'))
+            assert hasattr(course_overview, 'image_set')
             image_urls = course_overview.image_urls
             config = CourseOverviewImageConfig.current()
 
             # Make sure the thumbnail names come out as expected...
-            self.assertTrue(image_urls['raw'].endswith('big_course_image.jpeg'))
-            self.assertTrue(image_urls['small'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.small)))
-            self.assertTrue(image_urls['large'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.large)))
+            assert image_urls['raw'].endswith('big_course_image.jpeg')
+            assert image_urls['small'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.small))
+            assert image_urls['large'].endswith('big_course_image-jpeg-{}x{}.jpg'.format(*config.large))
 
             # Now make sure our thumbnails are of the sizes we expect...
             for image_url, expected_size in [(image_urls['small'], config.small), (image_urls['large'], config.large)]:
                 image_key = StaticContent.get_location_from_path(image_url)
                 image_content = AssetManager.find(image_key)
                 image = Image.open(BytesIO(image_content.data))
-                self.assertEqual(image.size, expected_size)
+                assert image.size == expected_size
 
     @ddt.data(
         (800, 400),  # Larger than both, correct ratio
@@ -946,7 +941,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             image = Image.open(BytesIO(image_content.data))
 
             # Naming convention for thumbnail
-            self.assertTrue(image_url.endswith('src_course_image-png-{}x{}.jpg'.format(*target)))
+            assert image_url.endswith('src_course_image-png-{}x{}.jpg'.format(*target))
 
             # Actual thumbnail data
             src_x, src_y = src_dimensions
@@ -957,12 +952,12 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             # the right thing in terms of handling aspect ratio. We're just
             # going to make sure that small images aren't blown up, and that
             # we never exceed our target sizes
-            self.assertLessEqual(image_x, target_x)
-            self.assertLessEqual(image_y, target_y)
+            assert image_x <= target_x
+            assert image_y <= target_y
 
             if src_x < target_x and src_y < target_y:
-                self.assertEqual(src_x, image_x)
-                self.assertEqual(src_y, image_y)
+                assert src_x == image_x
+                assert src_y == image_y
 
     def test_image_creation_race_condition(self):
         """
@@ -979,7 +974,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
         # First create our CourseOverview
         overview = CourseOverview.get_from_id(course.id)
-        self.assertFalse(hasattr(overview, 'image_set'))
+        assert not hasattr(overview, 'image_set')
 
         # Now create an ImageSet by hand...
         CourseOverviewImageSet.objects.create(course_overview=overview)
@@ -988,7 +983,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         # thrown and suppressed in create()
         self.set_config(True)
         CourseOverviewImageSet.create(overview)
-        self.assertTrue(hasattr(overview, 'image_set'))
+        assert hasattr(overview, 'image_set')
 
         # The following is actually very important for this test because
         # set_config() does a model insert after create_for_course() has caught
@@ -1019,13 +1014,13 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
         # Create course overview with image set.
         overview = CourseOverview.get_from_id(course.id)
-        self.assertTrue(hasattr(overview, 'image_set'))
+        assert hasattr(overview, 'image_set')
 
         # Make sure the thumbnail names come out as expected...
         image_urls = overview.image_urls
-        self.assertTrue(image_urls['raw'].endswith('src_course_image.png'))
-        self.assertTrue(image_urls['small'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.small)))
-        self.assertTrue(image_urls['large'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.large)))
+        assert image_urls['raw'].endswith('src_course_image.png')
+        assert image_urls['small'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.small))
+        assert image_urls['large'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.large))
 
         # Update course image on the course descriptor This fires a
         # course_published signal, this will be caught in signals.py,
@@ -1038,9 +1033,9 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
 
         # Get latest course overview and make sure the thumbnail names are correctly updated..
         image_urls = CourseOverview.objects.get(id=overview.id).image_urls
-        self.assertTrue(image_urls['raw'].endswith('src_course_image1.png'))
-        self.assertTrue(image_urls['small'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.small)))
-        self.assertTrue(image_urls['large'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.large)))
+        assert image_urls['raw'].endswith('src_course_image1.png')
+        assert image_urls['small'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.small))
+        assert image_urls['large'].endswith('src_course_image1-png-{}x{}.jpg'.format(*config.large))
 
     def _assert_image_urls_all_default(self, modulestore_type, raw_course_image_name, expected_url=None):
         """
@@ -1062,14 +1057,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             course_overview = CourseOverview.get_from_id(course.id)
 
             # All the URLs that come back should be for the expected_url
-            self.assertEqual(
-                course_overview.image_urls,
-                {
-                    'raw': expected_url,
-                    'small': expected_url,
-                    'large': expected_url,
-                }
-            )
+            assert course_overview.image_urls == {'raw': expected_url, 'small': expected_url, 'large': expected_url}
             return course_overview
 
 
@@ -1099,12 +1087,12 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
             # Update display name on the course descriptor
             # This fires a course_published signal, which should be caught in signals.py,
             # which should in turn load CourseOverview from modulestore.
-            course.display_name = u'Updated display name'
+            course.display_name = 'Updated display name'
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 self.store.update_item(course, ModuleStoreEnum.UserID.test)
 
             # Asserts that the tabs deletion is properly rolled back to a save point and
             # the course overview is not updated.
             actual_tabs = {tab.tab_id for tab in course_overview.tab_set.all()}
-            self.assertEqual(actual_tabs, expected_tabs)
-            self.assertNotEqual(course_overview.display_name, course.display_name)
+            assert actual_tabs == expected_tabs
+            assert course_overview.display_name != course.display_name

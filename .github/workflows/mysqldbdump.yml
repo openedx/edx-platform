@@ -1,0 +1,23 @@
+name: mysqldbdump
+on:
+  schedule:
+    - cron: '0 8 * * *'
+jobs:
+  mysqldbdump:
+    name: mysqldbdump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Migrate
+        run: docker-compose -f ./.github/workflows/docker-compose.yml.mysqldbdump up -d
+      - name: Wait for migration to complete
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '900s'
+      - name: Dump database
+        run: docker exec -i edx.devstack.mysql57 mysqldump -u'edxapp001' -p'password' --skip-dump-date edxapp > edxapp.sql
+      - name: Commit dump file to repo.
+        run: ./.github/workflows/mysqldbdump_pr.sh
+        env:
+          GH_ACCESS_TOKEN: ${{ secrets.EDX_DEPLOYMENT_GH_TOKEN }}

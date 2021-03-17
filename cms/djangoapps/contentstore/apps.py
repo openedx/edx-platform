@@ -12,7 +12,7 @@ class ContentstoreConfig(AppConfig):
     """
     Application Configuration for Contentstore.
     """
-    name = u'contentstore'
+    name = 'cms.djangoapps.contentstore'
 
     def ready(self):
         """

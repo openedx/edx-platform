@@ -5,14 +5,14 @@ import json
 
 from dateutil import parser
 from ddt import data, ddt, unpack
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
 from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_ENDPOINT, SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase  # lint-amnesty, pylint: disable=line-too-long
 
 
 def expect_failure_with_message(message):
@@ -32,14 +32,14 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
 
     def setUp(self):
-        super(SegmentIOTrackingTestCase, self).setUp()
+        super(SegmentIOTrackingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(sentinel.username))
 
     def test_get_request(self):
         request = self.request_factory.get(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 405)
+        assert response.status_code == 405
         self.assert_no_events_emitted()
 
     @override_settings(
@@ -48,19 +48,19 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     def test_no_secret_config(self):
         request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     def test_no_secret_provided(self):
         request = self.request_factory.post(SEGMENTIO_TEST_ENDPOINT)
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     def test_secret_mismatch(self):
         request = self.create_request(key='y')
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
         self.assert_no_events_emitted()
 
     @data('identify', 'Group', 'Alias', 'Page', 'identify', 'screen')
@@ -68,9 +68,45 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         self.post_segmentio_event(action=action)
         self.assert_no_events_emitted()
 
+    def test_segmentio_ignore_missing_context_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['context']
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_null_context_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['context'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_missing_library_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['context']['library']
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
+    def test_segmentio_ignore_null_library_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['context']['library'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
+        self.assert_no_events_emitted()
+
     def test_segmentio_ignore_unknown_libraries(self):
         self.post_segmentio_event(library_name='foo')
         self.assert_no_events_emitted()
+
+    @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
+    def test_segmentio_ignore_missing_properties_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        del sample_event_raw['properties']
+        self.post_modified_segmentio_event(sample_event_raw)
+
+    @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
+    def test_segmentio_ignore_null_properties_entry(self):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties'] = None
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_USER_NOT_EXIST)
     def test_no_user_for_user_id(self):
@@ -94,7 +130,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         self.assert_no_events_emitted()
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',
@@ -144,47 +180,49 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         segmentio.track_segmentio_event(request)
         self.assert_events_emitted()
 
+    @data(
+        None,
+        'a string',
+        ['a', 'list'],
+    )
+    @expect_failure_with_message(segmentio.ERROR_INVALID_CONTEXT_FIELD_TYPE)
+    def test_invalid_context_field_type(self, invalid_value):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties']['context'] = invalid_value
+        self.post_modified_segmentio_event(sample_event_raw)
+
+    @data(
+        None,
+        'a string',
+        ['a', 'list'],
+    )
+    @expect_failure_with_message(segmentio.ERROR_INVALID_DATA_FIELD_TYPE)
+    def test_invalid_data_field_type(self, invalid_value):
+        sample_event_raw = self.create_segmentio_event()
+        sample_event_raw['properties']['data'] = invalid_value
+        self.post_modified_segmentio_event(sample_event_raw)
+
     @expect_failure_with_message(segmentio.ERROR_MISSING_NAME)
     def test_missing_name(self):
         sample_event_raw = self.create_segmentio_event()
         del sample_event_raw['properties']['name']
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_DATA)
     def test_missing_data(self):
         sample_event_raw = self.create_segmentio_event()
         del sample_event_raw['properties']['data']
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_TIMESTAMP)
     def test_missing_timestamp(self):
         sample_event_raw = self.create_event_without_fields('timestamp')
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     @expect_failure_with_message(segmentio.ERROR_MISSING_RECEIVED_AT)
     def test_missing_received_at(self):
         sample_event_raw = self.create_event_without_fields('receivedAt')
-        request = self.create_request(
-            data=json.dumps(sample_event_raw),
-            content_type='application/json'
-        )
-
-        segmentio.track_segmentio_event(request)
+        self.post_modified_segmentio_event(sample_event_raw)
 
     def create_event_without_fields(self, *fields):
         """Create a fake event and remove some fields from it"""
@@ -214,7 +252,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
             content_type='application/json'
         )
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_events_emitted()
 
     def test_hiding_failure(self):
@@ -225,7 +263,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         )
 
         response = segmentio.segmentio_event(request)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assert_no_events_emitted()
 
     @data(
@@ -272,7 +310,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',
@@ -329,29 +367,29 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         # Verify positive slide case. Verify slide to onSlideSeek. Verify
         # edx.video.seeked emitted from iOS v1.0.02 is changed to
         # edx.video.position.changed.
-        (1, 1, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (1, 1, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify negative slide case. Verify slide to onSlideSeek. Verify
         # edx.video.seeked to edx.video.position.changed.
-        (-2, -2, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (-2, -2, "seek_type", "slide", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify +30 is changed to -30 which is incorrectly emitted in iOS
         # v1.0.02. Verify skip to onSkipSeek
-        (30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify the correct case of -30 is also handled as well. Verify skip
         # to onSkipSeek
-        (-30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),
+        (-30, -30, "seek_type", "skip", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.iOS', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive slide case where onSkipSeek is changed to
         # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
         # changed to edx.video.position.changed.
-        (1, 1, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (1, 1, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive slide case where onSkipSeek is changed to
         # onSlideSkip. Verify edx.video.seeked emitted from Android v1.0.02 is
         # changed to edx.video.position.changed.
-        (-2, -2, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (-2, -2, "type", "onSkipSeek", "onSlideSeek", "edx.video.seeked", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive skip case where onSkipSeek is not changed and does
         # not become negative.
-        (30, 30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),
+        (30, 30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02'),  # lint-amnesty, pylint: disable=line-too-long
         # Verify positive skip case where onSkipSeek is not changed.
-        (-30, -30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02')
+        (-30, -30, "type", "onSkipSeek", "onSkipSeek", "edx.video.position.changed", "edx.video.position.changed", 'edx.mobileapp.android', '1.0.02')  # lint-amnesty, pylint: disable=line-too-long
     )
     @unpack
     def test_previous_builds(self,
@@ -405,7 +443,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
         middleware.process_request(request)
         try:
             response = segmentio.segmentio_event(request)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
             expected_event = {
                 'accept_language': '',

@@ -16,19 +16,26 @@ from collections import defaultdict
 from pkg_resources import resource_string
 
 import django
-import six
 from docopt import docopt
 from path import Path as path
 
+from xmodule.annotatable_module import AnnotatableBlock
 from xmodule.capa_module import ProblemBlock
+from xmodule.conditional_module import ConditionalBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
+from xmodule.library_content_module import LibraryContentBlock
+from xmodule.lti_module import LTIBlock
+from xmodule.poll_module import PollBlock
+from xmodule.seq_module import SequenceBlock
+from xmodule.split_test_module import SplitTestBlock
+from xmodule.template_module import CustomTagBlock
 from xmodule.word_cloud_module import WordCloudBlock
 from xmodule.x_module import XModuleDescriptor, HTMLSnippet
 
 LOG = logging.getLogger(__name__)
 
 
-class VideoBlock(HTMLSnippet):
+class VideoBlock(HTMLSnippet):  # lint-amnesty, pylint: disable=abstract-method
     """
     Static assets for VideoBlock.
     Kept here because importing VideoBlock code requires Django to be setup.
@@ -65,9 +72,17 @@ class VideoBlock(HTMLSnippet):
 # Should only be used for XModules being converted to XBlocks.
 XBLOCK_CLASSES = [
     AboutBlock,
+    AnnotatableBlock,
+    ConditionalBlock,
     CourseInfoBlock,
+    CustomTagBlock,
     HtmlBlock,
+    LibraryContentBlock,
+    LTIBlock,
+    PollBlock,
     ProblemBlock,
+    SequenceBlock,
+    SplitTestBlock,
     StaticTabBlock,
     VideoBlock,
     WordCloudBlock,
@@ -96,20 +111,24 @@ def write_descriptor_js(output_root):
 
 def _list_descriptors():
     """Return a list of all registered XModuleDescriptor classes."""
-    return [
-        desc for desc in [
+    return sorted(
+        [
             desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _list_modules():
     """Return a list of all registered XModule classes."""
-    return [
-        desc.module_class for desc in [
-            desc for (_, desc) in XModuleDescriptor.load_classes()
-        ]
-    ] + XBLOCK_CLASSES
+    return sorted(
+        [
+            desc.module_class for desc in [
+                desc for (_, desc) in XModuleDescriptor.load_classes()
+            ]
+        ] + XBLOCK_CLASSES,
+        key=str
+    )
 
 
 def _ensure_dir(directory):
@@ -138,7 +157,7 @@ def _write_styles(selector, output_root, classes, css_attribute):
             for idx, fragment in enumerate(class_css.get(filetype, [])):
                 css_fragments[idx, filetype, fragment].add(class_.__name__)
     css_imports = defaultdict(set)
-    for (idx, filetype, fragment), classes in sorted(css_fragments.items()):
+    for (idx, filetype, fragment), classes in sorted(css_fragments.items()):  # lint-amnesty, pylint: disable=redefined-argument-from-local
         fragment_name = "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
@@ -154,11 +173,12 @@ def _write_styles(selector, output_root, classes, css_attribute):
         "@import 'bourbon/bourbon';",
         "@import 'lms/theme/variables';",
     ]
-    for class_, fragment_names in css_imports.items():
+    for class_, fragment_names in sorted(css_imports.items()):
+        fragment_names = sorted(fragment_names)
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
             class_=class_, selector=selector
         ))
-        module_styles_lines.extend('  @import "{0}";'.format(name) for name in fragment_names)
+        module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
 
     contents['_module-styles.scss'] = '\n'.join(module_styles_lines)
@@ -215,7 +235,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
         will be ignored
     """
     _ensure_dir(output_root)
-    to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
+    to_delete = {file.basename() for file in output_root.files()} - set(contents.keys())
 
     if generated_suffix_map:
         for output_file in contents.keys():
@@ -226,7 +246,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     for extra_file in to_delete:
         (output_root / extra_file).remove_p()
 
-    for filename, file_content in six.iteritems(contents):
+    for filename, file_content in contents.items():
         output_file = output_root / filename
 
         not_file = not output_file.isfile()
@@ -234,7 +254,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
         # Sometimes content is already unicode and sometimes it's not
         # so we add this conditional here to make sure that below we're
         # always working with streams of bytes.
-        if not isinstance(file_content, six.binary_type):
+        if not isinstance(file_content, bytes):
             file_content = file_content.encode('utf-8')
 
         # not_file is included to short-circuit this check, because
@@ -259,18 +279,24 @@ def write_webpack(output_file, module_files, descriptor_files):
         'entry': {}
     }
     for (owner, files) in list(module_files.items()) + list(descriptor_files.items()):
-        unique_files = sorted(set('./{}'.format(file) for file in files))
+        unique_files = sorted({f'./{file}' for file in files})
         if len(unique_files) == 1:
             unique_files = unique_files[0]
         config['entry'][owner] = unique_files
     # config['entry']['modules/js/all'] = sorted(set('./{}'.format(file) for file in sum(module_files.values(), [])))
-    # config['entry']['descriptors/js/all'] = sorted(set('./{}'.format(file) for file in sum(descriptor_files.values(), [])))
+    # config['entry']['descriptors/js/all'] = sorted(set('./{}'.format(file) for file in sum(descriptor_files.values(), [])))  # lint-amnesty, pylint: disable=line-too-long
 
     with output_file.open('w') as outfile:
         outfile.write(
-            textwrap.dedent(u"""\
+            textwrap.dedent("""\
                 module.exports = {config_json};
-            """).format(config_json=json.dumps(config, indent=4))
+            """).format(
+                config_json=json.dumps(
+                    config,
+                    indent=4,
+                    sort_keys=True,
+                )
+            )
         )
 
 
@@ -289,7 +315,7 @@ def main():
         'openedx.core.djangoapps.video_pipeline',
     )
     try:
-        import edxval
+        import edxval  # lint-amnesty, pylint: disable=unused-import
         installed_apps += ('edxval',)
     except ImportError:
         pass

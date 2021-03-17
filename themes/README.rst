@@ -103,7 +103,7 @@ directory. There are two ways to do this.
             $ sudo /edx/bin/update configuration master
             $ sudo /edx/bin/update edx-platform HEAD
 
-#.  Otherwise, edit the /edx/app/edxapp/lms.env.json file to add the
+#.  Otherwise, edit the /edx/app/edxapp/lms.yml file to add the
     ``COMPREHENSIVE_THEME_DIRS`` value::
 
         "COMPREHENSIVE_THEME_DIRS": ["/full/path/to/my-theme"],
@@ -180,7 +180,7 @@ In addition, there are some other changes you'll need to make:
   config value in your site configuration.
 
 * You can set the google site verification ID in the GOOGLE_SITE_VERIFICATION_ID
-  in your site configuration. Otherwise, edit the /edx/app/edxapp/lms.env.json
+  in your site configuration. Otherwise, edit the /edx/app/edxapp/lms.yml
   file to set the value for GOOGLE_SITE_VERIFICATION_ID. Setting the value for
   GOOGLE_SITE_VERIFICATION_ID will add the meta tag for google site verification
   in the lms/templates/main.html which is the main Mako template that all page

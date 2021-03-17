@@ -44,6 +44,7 @@ define(['js/views/validation',
                 }
             });
 
+                this.codeMirrors = [];
                 var policyValues = listEle$.find('.json');
                 _.each(policyValues, this.attachJSONEditor, this);
                 return this;
@@ -106,12 +107,34 @@ define(['js/views/validation',
                         self.model.set(key, modelVal);
                     }
                 });
+                this.codeMirrors.push(cm);
+            },
+            validateJSON: function() {
+                var jsonValidationErrors = [];
+                _.each(this.codeMirrors, function(mirror) {
+                    var keyDiv = $(mirror.getWrapperElement()).closest('.field-group').children('.key');
+                    var key = keyDiv.attr('id');
+                    var displayName = keyDiv.children('.title').text();
+                    var stringValue = mirror.getValue();
+                    try {
+                        JSON.parse(stringValue);
+                    } catch (e) {
+                        jsonValidationErrors.push({
+                            key: key,
+                            message: 'Incorrectly formatted JSON',
+                            model: {display_name: displayName}
+                        });
+                    }
+                });
+                return jsonValidationErrors;
             },
             saveView: function() {
-        // TODO one last verification scan:
-        //    call validateKey on each to ensure proper format
-        //    check for dupes
                 var self = this;
+                var jsonValidationErrors = self.validateJSON();
+                if (jsonValidationErrors.length) {
+                    self.showErrorModal(jsonValidationErrors);
+                    return;
+                }
                 this.model.save({}, {
                     success: function() {
                         var title = gettext('Your policy changes have been saved.');
@@ -124,23 +147,24 @@ define(['js/views/validation',
                     },
                     silent: true,
                     error: function(model, response, options) {
-                        var json_response, reset_callback, err_modal;
+                        var jsonResponse;
 
                 /* Check that the server came back with a bad request error*/
                         if (response.status === 400) {
-                            json_response = $.parseJSON(response.responseText);
-                            reset_callback = function() {
-                                self.revertView();
-                            };
-
-                    /* initialize and show validation error modal */
-                            err_modal = new ValidationErrorModal();
-                            err_modal.setContent(json_response);
-                            err_modal.setResetCallback(reset_callback);
-                            err_modal.show();
+                            jsonResponse = $.parseJSON(response.responseText);
+                            self.showErrorModal(jsonResponse);
                         }
                     }
                 });
+            },
+            showErrorModal: function(content) {
+                /* initialize and show validation error modal */
+                var self, errModal;
+                self = this;
+                errModal = new ValidationErrorModal();
+                errModal.setContent(content);
+                errModal.setResetCallback(function() { self.revertView(); });
+                errModal.show();
             },
             revertView: function() {
                 var self = this;

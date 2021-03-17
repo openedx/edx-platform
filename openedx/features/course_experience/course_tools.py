@@ -5,7 +5,7 @@ Support for course tool plugins.
 
 from enum import Enum
 
-from openedx.core.lib.plugins import PluginManager
+from edx_django_utils.plugins import PluginManager
 
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'
@@ -41,7 +41,7 @@ class CourseTool(object):
         raise NotImplementedError("Must specify an id to enable course tool eventing.")
 
     @classmethod
-    def is_enabled(cls, request, course_key):
+    def is_enabled(cls, request, course_key):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns true if this tool is enabled for the specified course key.
         """

@@ -8,19 +8,20 @@ import logging
 import re
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from rest_framework import serializers
 from six import text_type
 
+from common.djangoapps.student.models import UserPasswordToggleHistory
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import RetirementState, UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import LanguageProficiency, SocialLink, UserProfile
+from common.djangoapps.student.models import LanguageProficiency, SocialLink, UserProfile
 
 from . import (
     ACCOUNT_VISIBILITY_PREF_KEY,
@@ -38,10 +39,11 @@ PROFILE_IMAGE_KEY_PREFIX = 'image_url'
 LOGGER = logging.getLogger(__name__)
 
 
-class PhoneNumberSerializer(serializers.BaseSerializer):
+class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
     """
     Class to serialize phone number into a digit only representation
     """
+
     def to_internal_value(self, data):
         """Remove all non numeric characters in phone number"""
         return re.sub("[^0-9]", "", data) or None
@@ -89,10 +91,11 @@ class SocialLinkSerializer(serializers.ModelSerializer):
         return platform
 
 
-class UserReadOnlySerializer(serializers.Serializer):
+class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method
     """
     Class that serializes the User model and UserProfile model together.
     """
+
     def __init__(self, *args, **kwargs):
         # Don't pass the 'configuration' arg up to the superclass
         self.configuration = kwargs.pop('configuration', None)
@@ -102,9 +105,9 @@ class UserReadOnlySerializer(serializers.Serializer):
         # Don't pass the 'custom_fields' arg up to the superclass
         self.custom_fields = kwargs.pop('custom_fields', [])
 
-        super(UserReadOnlySerializer, self).__init__(*args, **kwargs)
+        super(UserReadOnlySerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def to_representation(self, user):
+    def to_representation(self, user):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Overwrite to_native to handle custom logic since we are serializing three models as one here
         :param user: User object
@@ -122,18 +125,19 @@ class UserReadOnlySerializer(serializers.Serializer):
             account_recovery = None
 
         accomplishments_shared = badges_enabled()
-
         data = {
             "username": user.username,
             "url": self.context.get('request').build_absolute_uri(
                 reverse('accounts_api', kwargs={'username': user.username})
             ),
             "email": user.email,
+            "id": user.id,
             # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
             # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
             # DRF JSONEncoder will not include it in the serialized value.
             # https://docs.djangoproject.com/en/1.8/ref/databases/#fractional-seconds-support-for-time-and-datetime-fields
             "date_joined": user.date_joined.replace(microsecond=0),
+            "last_login": user.last_login,
             "is_active": user.is_active,
             "bio": None,
             "country": None,
@@ -216,14 +220,30 @@ class UserReadOnlySerializer(serializers.Serializer):
         return visible_serialized_account
 
 
+class UserAccountDisableHistorySerializer(serializers.ModelSerializer):
+    """
+    Class that serializes User account disable history
+    """
+    created_by = serializers.SerializerMethodField()
+
+    class Meta(object):
+        model = UserPasswordToggleHistory
+        fields = ("created", "comment", "disabled", "created_by")
+
+    def get_created_by(self, user_password_toggle_history):
+        return user_password_toggle_history.created_by.username
+
+
 class AccountUserSerializer(serializers.HyperlinkedModelSerializer, ReadOnlyFieldsSerializerMixin):
     """
     Class that serializes the portion of User model needed for account information.
     """
+    password_toggle_history = UserAccountDisableHistorySerializer(many=True, required=False)
+
     class Meta(object):
         model = User
-        fields = ("username", "email", "date_joined", "is_active")
-        read_only_fields = ("username", "email", "date_joined", "is_active")
+        fields = ("username", "email", "date_joined", "is_active", "password_toggle_history")
+        read_only_fields = fields
         explicit_read_only_fields = ()
 
 
@@ -268,7 +288,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce all languages are unique.
         """
-        language_proficiencies = [language for language in value]
+        language_proficiencies = [language for language in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages.")
@@ -278,7 +298,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         """
         Enforce only one entry for a particular social platform.
         """
-        social_links = [social_link for social_link in value]
+        social_links = [social_link for social_link in value]  # lint-amnesty, pylint: disable=unnecessary-comprehension
         unique_social_links = set(social_link["platform"] for social_link in social_links)
         if len(social_links) != len(unique_social_links):
             raise serializers.ValidationError("The social_links field must consist of unique social platforms.")
@@ -420,7 +440,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             ])
 
         # Update the user's social links
-        requested_social_links = self._kwargs['data'].get('social_links')
+        requested_social_links = self._kwargs['data'].get('social_links')  # lint-amnesty, pylint: disable=no-member
         if requested_social_links:
             self._update_social_links(instance, requested_social_links)
 

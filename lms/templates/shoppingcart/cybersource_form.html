@@ -1,9 +1,0 @@
-<%page expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
-    <form action="${action}" method="post">
-        % for pk, pv in params.items():
-            <input type="hidden" name="${pk}" value="${pv}" />
-        % endfor
-
-        <button type="submit">${_('Payment')}<span class="icon fa fa-caret-right" aria-hidden="true"></span></button>
-    </form>

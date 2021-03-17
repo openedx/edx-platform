@@ -79,7 +79,7 @@ from six import text_type
               <%
                 tooltip_str = section['detail']
                 # We are making header labels from the first student record. So for tool tip (title),
-                # I am processing this string ```section['detail']``` from student record and removing
+                # I am processing this string ```section['detail']``` from common.djangoapps.student record and removing
                 # all student related data i.e marks, percentage etc to get only the title of homework.
                 if "=" in section['detail']:
                     tooltip_str = section['detail'][0: section['detail'].rfind('=')]

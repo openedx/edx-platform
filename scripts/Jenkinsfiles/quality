@@ -198,7 +198,7 @@ pipeline {
                     // Publish Quality report
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
                         reportDir: 'reports/metrics/',
-                        reportFiles: 'pylint/*view*/,pep8/*view*/,python_complexity/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
+                        reportFiles: 'pylint/*view*/,pep8/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
                         reportName: 'Quality Report', reportTitles: ''])
                 } finally {
                     if (env.ghprbPullId != null) {

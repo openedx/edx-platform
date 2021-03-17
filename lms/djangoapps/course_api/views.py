@@ -5,10 +5,11 @@ Course API Views
 
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
+from edx_django_utils.monitoring import function_trace
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
-from rest_framework.exceptions import NotFound
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
@@ -137,7 +138,7 @@ class CourseListUserThrottle(UserRateThrottle):
         'staff': '40/minute',
     }
 
-    def check_for_switches(self):
+    def check_for_switches(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if USE_RATE_LIMIT_2_FOR_COURSE_LIST_API.is_enabled():
             self.THROTTLE_RATES = {
                 'user': '2/minute',
@@ -158,7 +159,7 @@ class CourseListUserThrottle(UserRateThrottle):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return super(CourseListUserThrottle, self).allow_request(request, view)
+        return super().allow_request(request, view)
 
 
 class LazyPageNumberPagination(NamespacedPageNumberPagination):
@@ -172,6 +173,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
     """
 
+    @function_trace('get_paginated_response')
     def get_paginated_response(self, data):
         # Clear the cached property values to recalculate the estimated count from the LazySequence
         del self.page.paginator.__dict__['count']
@@ -189,9 +191,53 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
                 page_number=page_number, message=str(exc)
             )
             self.page.number = self.page.paginator.num_pages
-            raise NotFound(msg)
+            raise NotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
-        return super(LazyPageNumberPagination, self).get_paginated_response(data)
+        return super().get_paginated_response(data)
+
+    @function_trace('pagination_paginate_queryset')
+    def paginate_queryset(self, queryset, request, view=None):
+        """
+        Paginate a queryset if required, either returning a
+        page object, or `None` if pagination is not configured for this view.
+
+        This is copied verbatim from upstream with added function traces.
+        https://github.com/encode/django-rest-framework/blob/c6e24521dab27a7af8e8637a32b868ffa03dec2f/rest_framework/pagination.py#L191
+        """
+        with function_trace('pagination_paginate_queryset_get_page_size'):
+            page_size = self.get_page_size(request)
+            if not page_size:
+                return None
+
+        with function_trace('pagination_paginate_queryset_construct_paginator_instance'):
+            paginator = self.django_paginator_class(queryset, page_size)
+
+        with function_trace('pagination_paginate_queryset_get_page_number'):
+            page_number = request.query_params.get(self.page_query_param, 1)
+
+        if page_number in self.last_page_strings:
+            page_number = paginator.num_pages
+
+        with function_trace('pagination_paginate_queryset_get_page'):
+            try:
+                self.page = paginator.page(page_number)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+            except InvalidPage as exc:
+                msg = self.invalid_page_message.format(
+                    page_number=page_number, message=str(exc)
+                )
+                raise NotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
+
+        with function_trace('pagination_paginate_queryset_get_num_pages'):
+            if paginator.num_pages > 1 and self.template is not None:
+                # The browsable API should display pagination controls.
+                self.display_page_controls = True
+
+        self.request = request  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+
+        with function_trace('pagination_paginate_queryset_listify_page'):
+            page_list = list(self.page)
+
+        return page_list
 
 
 @view_auth_classes(is_authenticated=False)
@@ -301,7 +347,7 @@ class CourseIdListUserThrottle(UserRateThrottle):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return super(CourseIdListUserThrottle, self).allow_request(request, view)
+        return super().allow_request(request, view)
 
 
 @view_auth_classes()
@@ -365,6 +411,7 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
     serializer_class = CourseKeySerializer
     throttle_classes = (CourseIdListUserThrottle,)
 
+    @function_trace('get_queryset')
     def get_queryset(self):
         """
         Returns CourseKeys for courses which the user has the provided role.
@@ -378,3 +425,45 @@ class CourseIdListView(DeveloperErrorViewMixin, ListAPIView):
             form.cleaned_data['username'],
             role=form.cleaned_data['role'],
         )
+
+    @function_trace('paginate_queryset')
+    def paginate_queryset(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super().paginate_queryset(*args, **kwargs)
+
+    @function_trace('get_paginated_response')
+    def get_paginated_response(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called only when the response is paginated. Two pages
+        means two GET requests and one function call per request. Otherwise, if
+        the whole response fits in one page, this function never gets called.
+        """
+        return super().get_paginated_response(*args, **kwargs)
+
+    @function_trace('filter_queryset')
+    def filter_queryset(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super().filter_queryset(*args, **kwargs)
+
+    @function_trace('get_serializer')
+    def get_serializer(self, *args, **kwargs):
+        """
+        No-op passthrough function purely for function-tracing (monitoring)
+        purposes.
+
+        This should be called once per GET request.
+        """
+        return super().get_serializer(*args, **kwargs)

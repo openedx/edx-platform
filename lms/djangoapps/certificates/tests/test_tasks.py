@@ -3,18 +3,22 @@ Test module for user certificate generation.
 """
 
 
+from unittest.mock import call, patch
+
 import ddt
 from django.test import TestCase
-from mock import call, patch
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.verify_student.models import IDVerificationAttempt
-from student.tests.factories import UserFactory
 
 
 @ddt.ddt
 class GenerateUserCertificateTest(TestCase):
+    """
+    Tests for course certificates
+    """
 
     @patch('lms.djangoapps.certificates.tasks.generate_user_certificates')
     @patch('lms.djangoapps.certificates.tasks.User.objects.get')

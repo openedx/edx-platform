@@ -5,8 +5,9 @@ Django AppConfig for Content Libraries Implementation
 
 
 from django.apps import AppConfig
+from edx_django_utils.plugins import PluginURLs, PluginSettings
 
-from openedx.core.djangoapps.plugins.constants import ProjectType, PluginURLs, PluginSettings
+from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
 class ContentLibrariesConfig(AppConfig):
@@ -22,7 +23,7 @@ class ContentLibrariesConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.CMS: {
                 # The namespace to provide to django's urls.include.
-                PluginURLs.NAMESPACE: u'content_libraries',
+                PluginURLs.NAMESPACE: 'content_libraries',
             },
         },
         PluginSettings.CONFIG: {

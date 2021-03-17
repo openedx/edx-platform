@@ -12,8 +12,8 @@ from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.enrollments import api
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
-from student.models import get_retired_email_by_email, get_retired_username_by_username
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import get_retired_email_by_email, get_retired_username_by_username
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..views import AccountRetirementView
 
@@ -152,10 +152,10 @@ class RetirementTestCase(TestCase):
         return [create_retirement_status(UserFactory(), state=state) for state in RetirementState.objects.all()]
 
     def _get_non_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]
+        return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def _get_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
+        return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
 
 def fake_requested_retirement(user):

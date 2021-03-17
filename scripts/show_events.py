@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=django-not-configured
 """
 Show Event outputs.
 """
@@ -10,7 +11,7 @@ import traceback
 try:
     import dateutil.parser
 except ImportError:
-    def date_string(ds, fmt=''):
+    def date_string(ds, fmt=''):  # lint-amnesty, pylint: disable=unused-argument
         return ds
 else:
     def date_string(ds, fmt='%Y-%m-%d %H:%M:%S.%f'):
@@ -18,7 +19,7 @@ else:
         return d.strftime(fmt)
 
 
-def display(message):
+def display(message):  # lint-amnesty, pylint: disable=missing-function-docstring
     print('{} - {}'.format(date_string(message['time']), message['event_type']))
     if message.get('event'):
         event = json.loads(message['event'])
@@ -33,6 +34,6 @@ while 1:
     try:
         obj = json.loads(line)
         display(obj)
-    except Exception:
+    except Exception:  # lint-amnesty, pylint: disable=broad-except
         traceback.print_exc()
         continue

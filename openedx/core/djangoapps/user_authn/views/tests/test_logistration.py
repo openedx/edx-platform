@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
+from urllib.parse import urlencode
 
 import ddt
 import mock
@@ -18,20 +19,21 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from pytz import UTC
-from six.moves.urllib.parse import urlencode  # pylint: disable=import-error
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from util.testing import UrlResetMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -47,7 +49,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):  # pylint: disable=arguments-differ
-        super(LoginAndRegistrationTest, self).setUp()
+        super(LoginAndRegistrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Several third party auth providers are created for these tests:
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
@@ -64,6 +66,56 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
         self.hidden_disabled_provider = self.configure_azure_ad_provider()
 
+    FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
+
+    @ddt.data(
+        ("signin_user", "/login"),
+        ("register_user", "/register"),
+        ("password_assistance", "/reset"),
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    def test_logistration_mfe_redirects(self, url_name, path):
+        """
+        Test that if Logistration MFE is enabled, then we redirect to
+        the correct URL.
+        """
+
+        # Test with setting enabled and waffle flag in-active, does not redirect
+        response = self.client.get(reverse(url_name))
+        self.assertContains(response, 'Sign in or Register')
+
+        # Test with setting enabled and waffle flag active, redirects to microfrontend
+        with override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True):
+            response = self.client.get(reverse(url_name))
+            self.assertRedirects(response, settings.AUTHN_MICROFRONTEND_URL + path, fetch_redirect_response=False)
+
+    @ddt.data(
+        (
+            "signin_user",
+            "/login",
+            {"next": "dashboard"},
+        ),
+        (
+            "register_user",
+            "/register",
+            {"course_id": "course-v1:edX+DemoX+Demo_Course", "enrollment_action": "enroll"}
+        )
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
+    def test_logistration_redirect_params(self, url_name, path, query_params):
+        """
+        Test that if request is redirected to logistration MFE,
+        query params are passed to the redirect url.
+        """
+        expected_url = settings.AUTHN_MICROFRONTEND_URL + path + '?' + urlencode(query_params)
+        response = self.client.get(reverse(url_name), query_params)
+
+        self.assertRedirects(response, expected_url, fetch_redirect_response=False)
+
     @ddt.data(
         ("signin_user", "login"),
         ("register_user", "register"),
@@ -79,19 +131,19 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         Test that rate limiting for logistration enpoints works as expected.
         """
         login_url = reverse('signin_user')
-        for i in range(5):
+        for _ in range(5):
             response = self.client.get(login_url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
         # then the rate limiter should kick in and give a HttpForbidden response
         response = self.client.get(login_url)
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 429
 
         # now reset the time to 6 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=361)
         with freeze_time(reset_time):
             response = self.client.get(login_url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
@@ -106,10 +158,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             'honor_code': 'true',
         }
         result = self.client.post(url, data=request_data)
-        self.assertEqual(result.status_code, 200)
+        assert result.status_code == 200
 
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result)
+        assert result
 
         # Verify that we're redirected to the dashboard
         response = self.client.get(reverse(url_name))
@@ -274,6 +326,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         kwargs.setdefault('icon_class', 'fa-university')
         kwargs.setdefault('attr_email', 'dummy-email-attr')
         kwargs.setdefault('max_session_length', None)
+        kwargs.setdefault('skip_registration_form', False)
         self.configure_saml_provider(**kwargs)
 
     @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
@@ -322,7 +375,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         }
         pipeline_target = 'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.pipeline'
         with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
-            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
                 response = login_and_registration_form(request)
 
         expected_error_message = Text(_(
@@ -355,7 +408,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
+        assert response.content.decode('utf-8') not in tpa_hint
 
     @ddt.data(
         ('signin_user', 'login'),
@@ -399,7 +452,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         tpa_hint = self.hidden_disabled_provider.provider_id
         params = [("next", "/courses/something/?tpa_hint={0}".format(tpa_hint))]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertNotIn(response.content.decode('utf-8'), tpa_hint)
+        assert response.content.decode('utf-8') not in tpa_hint
 
     @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
     @ddt.data(
@@ -423,15 +476,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request')
     @ddt.data(
-        ('signin_user', False, None, None),
-        ('register_user', False, None, None),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
-        ('signin_user', True, 'Fake EC', None),
-        ('register_user', True, 'Fake EC', None),
+        ('signin_user', False, None, None, False),
+        ('register_user', False, None, None, False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', False),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', True),
+        ('signin_user', True, 'Fake EC', None, False),
+        ('register_user', True, 'Fake EC', None, False),
     )
     @ddt.unpack
-    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, mock_get_ec):
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, is_proxy, mock_get_ec):
         """
         Verify that when an EnterpriseCustomer is received on the login and register views,
         the appropriate sidebar is rendered.
@@ -444,7 +499,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         else:
             mock_get_ec.return_value = None
 
-        response = self.client.get(reverse(url_name), HTTP_ACCEPT="text/html")
+        params = []
+        if is_proxy:
+            params.append(("proxy_login", "True"))
+
+        response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         enterprise_sidebar_div_id = u'enterprise-content-container'
 
@@ -452,7 +511,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
-            welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            if is_proxy:
+                welcome_message = settings.ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE
+            else:
+                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
             expected_message = Text(welcome_message).format(
                 start_bold=HTML('<b>'),
                 end_bold=HTML('</b>'),
@@ -479,11 +541,11 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME] = 'test-enterprise-customer'
         response = self.client.get(reverse('signin_user'), HTTP_ACCEPT="text/html", cookies=cookies)
 
-        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)
+        assert settings.ENTERPRISE_CUSTOMER_COOKIE_NAME in response.cookies
         enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]
 
-        self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
-        self.assertEqual(enterprise_cookie.value, '')
+        assert enterprise_cookie['domain'] == settings.BASE_COOKIE_DOMAIN
+        assert enterprise_cookie.value == ''
 
     def test_login_registration_xframe_protected(self):
         resp = self.client.get(
@@ -492,7 +554,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             HTTP_REFERER="http://localhost/iframe"
         )
 
-        self.assertEqual(resp['X-Frame-Options'], 'DENY')
+        assert resp['X-Frame-Options'] == 'DENY'
 
         self.configure_lti_provider(name='Test', lti_hostname='localhost', lti_consumer_key='test_key', enabled=True)
 
@@ -501,7 +563,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             HTTP_REFERER="http://localhost/iframe"
         )
 
-        self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
+        assert resp['X-Frame-Options'] == 'ALLOW'
 
     def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers, expected_ec,
                                       add_user_details=False):
@@ -512,6 +574,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             "currentProvider": current_provider,
+            "platformName": settings.PLATFORM_NAME,
             "providers": providers,
             "secondaryProviders": [],
             "finishAuthUrl": finish_auth_url,
@@ -542,6 +605,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
         auth_info = {
             'currentProvider': current_provider,
+            'platformName': settings.PLATFORM_NAME,
             'providers': [],
             'secondaryProviders': [],
             'finishAuthUrl': finish_auth_url,
@@ -579,22 +643,22 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     def test_english_by_default(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html")
 
-        self.assertEqual(response['Content-Language'], 'en')
+        assert response['Content-Language'] == 'en'
 
     def test_unsupported_language(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="ts-zx")
 
-        self.assertEqual(response['Content-Language'], 'en')
+        assert response['Content-Language'] == 'en'
 
     def test_browser_language(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es")
 
-        self.assertEqual(response['Content-Language'], 'es-419')
+        assert response['Content-Language'] == 'es-419'
 
     def test_browser_language_dialent(self):
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
 
-        self.assertEqual(response['Content-Language'], 'es-es')
+        assert response['Content-Language'] == 'es-es'
 
 
 @skip_unless_lms
@@ -606,7 +670,7 @@ class AccountCreationTestCaseWithSiteOverrides(SiteMixin, TestCase):
 
     def setUp(self):
         """Set up the tests"""
-        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()
+        super(AccountCreationTestCaseWithSiteOverrides, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Set the feature flag ALLOW_PUBLIC_ACCOUNT_CREATION to False
         self.site_configuration_values = {

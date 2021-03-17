@@ -5,7 +5,7 @@ Serializers for Badges
 
 from rest_framework import serializers
 
-from badges.models import BadgeAssertion, BadgeClass
+from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass
 
 
 class BadgeClassSerializer(serializers.ModelSerializer):
@@ -14,7 +14,7 @@ class BadgeClassSerializer(serializers.ModelSerializer):
     """
     image_url = serializers.ImageField(source='image')
 
-    class Meta(object):
+    class Meta:
         model = BadgeClass
         fields = ('slug', 'issuing_component', 'display_name', 'course_id', 'description', 'criteria', 'image_url')
 
@@ -25,6 +25,6 @@ class BadgeAssertionSerializer(serializers.ModelSerializer):
     """
     badge_class = BadgeClassSerializer(read_only=True)
 
-    class Meta(object):
+    class Meta:
         model = BadgeAssertion
         fields = ('badge_class', 'image_url', 'assertion_url', 'created')

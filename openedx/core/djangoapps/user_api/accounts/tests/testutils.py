@@ -5,7 +5,7 @@ Utility functions, constants, etc. for testing.
 
 
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 INVALID_NAMES = [
     None,

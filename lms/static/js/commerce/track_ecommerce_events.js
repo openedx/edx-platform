@@ -1,7 +1,8 @@
 /**
  *
  * A library of helper functions to track ecommerce related events.
- *
+ * See here for the full list of upsell links and how to view these events:
+ * https://openedx.atlassian.net/wiki/spaces/RS/pages/1675100377/How+to+find+upsell+link+click+events
  */
 (function(define) {
     'use strict';
@@ -10,7 +11,7 @@
             var eventAttrs = {linkName: linkName};
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
-            if (!window.analytics) {
+            if (!window.analytics || !window.analytics.trackLink) {
                 return;
             }
 
@@ -31,4 +32,6 @@
 
         return TrackECommerceEvents;
     });
-}).call(this, define || RequireJS.define);
+}).call(this,
+    typeof define === 'function' && define.amd ? define : RequireJS.define
+);

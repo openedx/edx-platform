@@ -6,8 +6,8 @@ Django admin dashboard configuration for LMS XBlock infrastructure.
 from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
 from django.contrib import admin
 
-from xblock_config.forms import CourseEditLTIFieldsEnabledAdminForm
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag, StudioConfig
+from cms.djangoapps.xblock_config.forms import CourseEditLTIFieldsEnabledAdminForm
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag, StudioConfig
 
 
 class CourseEditLTIFieldsEnabledFlagAdmin(KeyedConfigurationModelAdmin):

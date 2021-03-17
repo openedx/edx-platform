@@ -3,6 +3,7 @@
 
 import json
 from base64 import b64encode
+from unittest import skip
 
 import httpretty
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
@@ -11,9 +12,9 @@ from social_core.backends.facebook import API_VERSION as FACEBOOK_API_VERSION
 from social_core.backends.facebook import FacebookOAuth2
 from social_django.models import Partial, UserSocialAuth
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
-from .testutil import ThirdPartyAuthTestMixin
+from .testutil import ThirdPartyAuthTestMixin, AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY
 
 
 @httpretty.activate
@@ -32,10 +33,10 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
 
     CREATE_USER = True
 
-    def setUp(self):
-        super(ThirdPartyOAuthTestMixin, self).setUp()
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super(ThirdPartyOAuthTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         if self.CREATE_USER:
-            self.user = UserFactory()
+            self.user = UserFactory.create(password='secret')
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
         self.oauth_client = self._create_client()
         if self.BACKEND == 'google-oauth2':
@@ -44,7 +45,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             self.configure_facebook_provider(enabled=True, visible=True)
 
     def tearDown(self):
-        super(ThirdPartyOAuthTestMixin, self).tearDown()
+        super(ThirdPartyOAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
         Partial.objects.all().delete()
 
     def _create_client(self):
@@ -139,3 +140,12 @@ def prepare_saml_response_from_xml(xml, relay_state='testshib'):
         relay_state=OneLogin_Saml2_Utils.escape_url(relay_state),
         saml_response=OneLogin_Saml2_Utils.escape_url(b64encoded_xml)
     )
+
+
+def skip_unless_thirdpartyauth():
+    """
+    Wraps unittest.skip in consistent logic to skip certain third_party_auth tests in CMS.
+    """
+    if AUTH_FEATURE_ENABLED:
+        return lambda func: func
+    return skip("%s not enabled" % AUTH_FEATURES_KEY)

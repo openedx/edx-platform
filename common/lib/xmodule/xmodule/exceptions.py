@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 class InvalidDefinitionError(Exception):
     pass
 
@@ -11,7 +12,7 @@ class ProcessingError(Exception):
     An error occurred while processing a request to the XModule.
     For example: if an exception occurs while checking a capa problem.
     '''
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class InvalidVersionError(Exception):
@@ -20,7 +21,7 @@ class InvalidVersionError(Exception):
     for a non-leaf node)
     """
     def __init__(self, location):
-        super(InvalidVersionError, self).__init__()
+        super().__init__()
         self.location = location
 
 
@@ -29,7 +30,7 @@ class SerializationError(Exception):
     Thrown when a module cannot be exported to XML
     """
     def __init__(self, location, msg):
-        super(SerializationError, self).__init__(msg)
+        super().__init__(msg)
         self.location = location
 
 
@@ -37,7 +38,7 @@ class UndefinedContext(Exception):
     """
     Tried to access an xmodule field which needs a different context (runtime) to have a value.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class HeartbeatFailure(Exception):
@@ -50,4 +51,4 @@ class HeartbeatFailure(Exception):
         In addition to a msg, provide the name of the service.
         """
         self.service = service
-        super(HeartbeatFailure, self).__init__(msg)
+        super().__init__(msg)

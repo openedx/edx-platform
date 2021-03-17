@@ -40,6 +40,7 @@ def get_course_block_access_transformers(user):
     """
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
+        library_content.ContentLibraryOrderTransformer(),
         start_date.StartDateTransformer(),
         ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),
@@ -60,6 +61,7 @@ def get_course_blocks(
         collected_block_structure=None,
         allow_start_dates_in_future=False,
         include_completion=False,
+        include_has_scheduled_content=False,
 ):
     """
     A higher order function implemented on top of the
@@ -95,7 +97,12 @@ def get_course_blocks(
         transformers = BlockStructureTransformers(get_course_block_access_transformers(user))
     if include_completion:
         transformers += [BlockCompletionTransformer()]
-    transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user, allow_start_dates_in_future)
+    transformers.usage_info = CourseUsageInfo(
+        starting_block_usage_key.course_key,
+        user,
+        allow_start_dates_in_future,
+        include_has_scheduled_content
+    )
 
     return get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
         transformers,

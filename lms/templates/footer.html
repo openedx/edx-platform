@@ -3,7 +3,7 @@
 <%!
   from django.urls import reverse
   from django.utils.translation import ugettext as _
-  from branding.api import get_footer
+  from lms.djangoapps.branding.api import get_footer
   from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 %>
 <% footer = get_footer(is_secure=is_secure) %>
@@ -72,7 +72,7 @@
             <div class="footer-about-openedx">
               <p>
                 <a href="${footer['openedx_link']['url']}">
-                  <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
+                  <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="175" />
                 </a>
               </p>
             </div>
@@ -151,7 +151,7 @@
       <div class="footer-about-openedx">
         <p>
           <a href="${footer['openedx_link']['url']}">
-            <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="140" />
+            <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="175" />
           </a>
         </p>
       </div>

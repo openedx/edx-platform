@@ -12,8 +12,8 @@ from django.urls import reverse
 
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.features.enterprise_support.admin.forms import CSVImportForm
-from student.models import CourseEnrollment, CourseEnrollmentAttribute
-from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -24,7 +24,7 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Test case setup """
-        super(EnrollmentAttributeOverrideViewTest, self).setUp()
+        super().setUp()
 
         self.client = Client()
         user = AdminFactory()
@@ -36,7 +36,7 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
             self.users.append(UserFactory())
 
         self.course = CourseRunFactory()
-        self.course_id = self.course.get('key')
+        self.course_id = self.course.get('key')  # lint-amnesty, pylint: disable=no-member
         self.csv_data = [
             [self.users[0].id, self.course_id, 'OP_4321'],
             [self.users[1].id, self.course_id, 'OP_8765'],

@@ -14,7 +14,7 @@ class CourseOverviewField(forms.ModelChoiceField):
     def to_python(self, value):
         if value in self.empty_values:
             return None
-        return super(CourseOverviewField, self).to_python(CourseKey.from_string(value))
+        return super().to_python(CourseKey.from_string(value))
 
 
 class StackedConfigModelAdminForm(forms.ModelForm):
@@ -31,6 +31,7 @@ class StackedConfigModelAdmin(ConfigurationModelAdmin):
     form = StackedConfigModelAdminForm
 
     raw_id_fields = ('course',)
+    search_fields = ('site__domain', 'org', 'org_course', 'course__id')
 
     def get_fieldsets(self, request, obj=None):
         return (
@@ -65,18 +66,17 @@ class StackedConfigModelAdmin(ConfigurationModelAdmin):
     def stackable_fields(self):
         return list(self.model.STACKABLE_FIELDS)
 
-    @property
-    def config_fields(self):
-        fields = super(StackedConfigModelAdmin, self).get_fields(request, obj)
+    def get_config_fields(self, request, obj=None):
+        fields = super().get_fields(request, obj)
         return [field for field in fields if field not in self.key_fields]
 
     def get_fields(self, request, obj=None):
-        return self.key_fields + self.config_fields
+        return self.key_fields + self.get_config_fields(request, obj)
 
     def get_displayable_field_names(self):
         """
         Return all field names, excluding reverse foreign key relationships.
         """
-        names = super(StackedConfigModelAdmin, self).get_displayable_field_names()
+        names = super().get_displayable_field_names()
         fixed_names = ['id', 'change_date', 'changed_by'] + list(self.model.KEY_FIELDS)
         return fixed_names + [name for name in names if name not in fixed_names]

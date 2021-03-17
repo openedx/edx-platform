@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Contains code related to computing discount percentage
 and discount applicability.
@@ -12,34 +11,33 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 
 from datetime import datetime, timedelta
 
+import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import pytz
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 
-from course_modes.models import CourseMode
-from entitlements.models import CourseEntitlement
-from experiments.models import ExperimentData
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.models import CourseEntitlement
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
-from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.discounts.models import DiscountPercentageConfig, DiscountRestrictionConfig
-from student.models import CourseEnrollment
-from track import segment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track import segment
 
-# .. feature_toggle_name: discounts.enable_discounting
-# .. feature_toggle_type: flag
-# .. feature_toggle_default: False
-# .. feature_toggle_description: Toggle discounts always being disabled
-# .. feature_toggle_category: discounts
-# .. feature_toggle_use_cases: monitored_rollout
-# .. feature_toggle_creation_date: 2019-4-16
-# .. feature_toggle_expiration_date: None
-# .. feature_toggle_warnings: None
-# .. feature_toggle_tickets: REVEM-282
-# .. feature_toggle_status: supported
-DISCOUNT_APPLICABILITY_FLAG = WaffleFlag(
-    waffle_namespace=WaffleFlagNamespace(name=u'discounts'),
-    flag_name=u'enable_discounting',
+# .. toggle_name: discounts.enable_discounting
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Toggle discounts always being disabled
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2019-4-16
+# .. toggle_target_removal_date: None
+# .. toggle_tickets: REVEM-282
+# .. toggle_warnings: This temporary feature toggle does not have a target removal date.
+DISCOUNT_APPLICABILITY_FLAG = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name='discounts'),
+    flag_name='enable_discounting',
+    module_name=__name__,
 )
 
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
@@ -65,7 +63,7 @@ def get_discount_expiration_date(user, course):
 
     time_limit_start = None
     try:
-        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course))
+        saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course.id))
         time_limit_start = parse_datetime(saw_banner.value)
     except ExperimentData.DoesNotExist:
         return None
@@ -151,11 +149,10 @@ def _is_in_holdback_and_bucket(user):
         return False
 
     # Holdback is 10%
-    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 10, user.username)
+    bucket = stable_bucketing_hash_group(DISCOUNT_APPLICABILITY_HOLDBACK, 10, user)
 
     request = get_current_request()
     if hasattr(request, 'session') and DISCOUNT_APPLICABILITY_HOLDBACK not in request.session:
-
         properties = {
             'site': request.site.domain,
             'app_label': 'discounts',

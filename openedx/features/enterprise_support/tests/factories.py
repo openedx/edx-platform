@@ -9,7 +9,11 @@ import factory
 from faker import Factory as FakerFactory
 
 from enterprise.models import (
-    EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerBrandingConfiguration, EnterpriseCustomerUser,
+    EnterpriseCourseEnrollment,
+    EnterpriseCustomer,
+    EnterpriseCustomerBrandingConfiguration,
+    EnterpriseCustomerIdentityProvider,
+    EnterpriseCustomerUser,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
@@ -24,7 +28,7 @@ class EnterpriseCustomerFactory(factory.django.DjangoModelFactory):
     parameters for EnterpriseCustomer constructor.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Meta for EnterpriseCustomerFactory.
         """
@@ -48,7 +52,7 @@ class EnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
     parameters for EnterpriseCustomerUser constructor.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Meta for EnterpriseCustomerFactory.
         """
@@ -66,7 +70,7 @@ class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
     Creates an instance of EnterpriseCourseEnrollment with minimal boilerplate.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Meta for EnterpriseCourseEnrollmentFactory.
         """
@@ -84,13 +88,30 @@ class EnterpriseCustomerBrandingConfigurationFactory(factory.django.DjangoModelF
     Creates an instance of EnterpriseCustomerBrandingConfiguration with minimal boilerplate.
     """
 
-    class Meta(object):
+    class Meta:
         """
         Meta for EnterpriseCustomerBrandingConfigurationFactory.
         """
 
         model = EnterpriseCustomerBrandingConfiguration
 
-    logo = FAKER.image_url()
-    banner_background_color = FAKER.color()
-    banner_border_color = FAKER.color()
+    logo = FAKER.image_url()  # pylint: disable=no-member
+    primary_color = FAKER.color()  # pylint: disable=no-member
+    secondary_color = FAKER.color()  # pylint: disable=no-member
+    tertiary_color = FAKER.color()  # pylint: disable=no-member
+
+
+class EnterpriseCustomerIdentityProviderFactory(factory.django.DjangoModelFactory):
+    """
+    EnterpriseCustomerIdentityProvider factory.
+    """
+
+    class Meta:
+        """
+        Meta for EnterpriseCustomerIdentityProviderFactory.
+        """
+
+        model = EnterpriseCustomerIdentityProvider
+
+    enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
+    provider_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member

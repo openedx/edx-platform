@@ -6,7 +6,7 @@ import logging
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -17,8 +17,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
-from student.models import CourseEnrollment
-from student.roles import GlobalStaff
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -106,7 +106,7 @@ class Role(models.Model):
             self.add_permission(per)
 
     def add_permission(self, permission):
-        self.permissions.add(Permission.objects.get_or_create(name=permission)[0])
+        self.permissions.add(Permission.objects.get_or_create(name=permission)[0])  # lint-amnesty, pylint: disable=no-member
 
     def has_permission(self, permission):
         """
@@ -158,7 +158,7 @@ def permission_blacked_out(course, role_names, permission_name):
     return (
         not course.forum_posts_allowed and
         role_names == {FORUM_ROLE_STUDENT} and
-        any([permission_name.startswith(prefix) for prefix in ['edit', 'update', 'create']])
+        any(permission_name.startswith(prefix) for prefix in ['edit', 'update', 'create'])
     )
 
 

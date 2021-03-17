@@ -2,9 +2,10 @@
 Tests for Paver's Stylelint tasks.
 """
 
+from unittest.mock import MagicMock, patch
 
+import pytest
 import ddt
-from mock import MagicMock, patch
 from paver.easy import call_task
 
 from .utils import PaverTestCase
@@ -30,5 +31,5 @@ class TestPaverStylelint(PaverTestCase):
             if should_pass:
                 call_task('pavelib.quality.run_stylelint', options={"limit": violations_limit})
             else:
-                with self.assertRaises(SystemExit):
+                with pytest.raises(SystemExit):
                     call_task('pavelib.quality.run_stylelint', options={"limit": violations_limit})

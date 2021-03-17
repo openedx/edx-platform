@@ -10,8 +10,9 @@
  *   saved by this view.  Note this may be a parent model.
  */
 define([
-    'js/views/baseview', 'common/js/components/utils/view_utils', 'underscore', 'gettext'
-], function(BaseView, ViewUtils, _, gettext) {
+    'js/views/baseview', 'common/js/components/utils/view_utils', 'underscore', 'gettext',
+    'edx-ui-toolkit/js/utils/html-utils'
+], function(BaseView, ViewUtils, _, gettext, HtmlUtils) {
     'use strict';
 
     var ListItemEditorView = BaseView.extend({
@@ -21,9 +22,11 @@ define([
         },
 
         render: function() {
-            this.$el.html(this.template(_.extend({
+            var template = this.template(_.extend({
                 error: this.model.validationError || this.getSaveableModel().validationError
-            }, this.getTemplateOptions())));
+            }, this.getTemplateOptions())
+            );
+            this.$el.html(HtmlUtils.HTML(template).toString());
         },
 
         setAndClose: function(event) {

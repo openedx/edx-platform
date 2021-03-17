@@ -1,13 +1,13 @@
 """ Tests for commerce views. """
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
-class UserMixin(object):
+class UserMixin:
     """ Mixin for tests involving users. """
 
     def setUp(self):
-        super(UserMixin, self).setUp()
+        super().setUp()
         self.user = UserFactory()
 
     def _login(self):

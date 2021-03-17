@@ -2,16 +2,13 @@
 Tests for third_party_auth decorators.
 """
 
-
-import unittest
-
 import ddt
-from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory
 
-from third_party_auth.decorators import xframe_allow_whitelisted
-from third_party_auth.tests.testutil import TestCase
+from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
+from common.djangoapps.third_party_auth.tests.testutil import TestCase
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
 @xframe_allow_whitelisted
@@ -20,17 +17,13 @@ def mock_view(_request):
     return HttpResponse()
 
 
-# remove this decorator once third_party_auth is enabled in CMS
-@unittest.skipIf(
-    'third_party_auth' not in settings.INSTALLED_APPS,
-    'third_party_auth is not currently installed in CMS'
-)
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class TestXFrameWhitelistDecorator(TestCase):
     """ Test the xframe_allow_whitelisted decorator. """
 
     def setUp(self):
-        super(TestXFrameWhitelistDecorator, self).setUp()
+        super(TestXFrameWhitelistDecorator, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.configure_lti_provider(name='Test', lti_hostname='localhost', lti_consumer_key='test_key', enabled=True)
         self.factory = RequestFactory()
 
@@ -51,11 +44,11 @@ class TestXFrameWhitelistDecorator(TestCase):
 
         response = mock_view(request)
 
-        self.assertEqual(response['X-Frame-Options'], expected_result)
+        assert response['X-Frame-Options'] == expected_result
 
     @ddt.data('http://localhost/login', 'http://not-a-real-domain.com', None)
     def test_feature_flag_off(self, url):
         with self.settings(FEATURES={'ENABLE_THIRD_PARTY_AUTH': False}):
             request = self.construct_request(url)
             response = mock_view(request)
-            self.assertEqual(response['X-Frame-Options'], 'DENY')
+            assert response['X-Frame-Options'] == 'DENY'

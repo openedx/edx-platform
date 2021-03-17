@@ -47,9 +47,9 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            raise CommandError("Unparsable course_id")
+            raise CommandError("Unparsable course_id")  # lint-amnesty, pylint: disable=raise-missing-from
         except IndexError:
-            raise CommandError("Insufficient arguments")
+            raise CommandError("Insufficient arguments")  # lint-amnesty, pylint: disable=raise-missing-from
 
         filename = options['output']
         pipe_results = False
@@ -60,13 +60,19 @@ class Command(BaseCommand):
 
         export_course_to_tarfile(course_key, filename)
 
-        results = self._get_results(filename) if pipe_results else ''
+        results = self._get_results(filename) if pipe_results else b''
 
-        self.stdout.write(results, ending="")
+        # results is of type bytes, so we must write the underlying buffer directly.
+        self.stdout.buffer.write(results)
 
     def _get_results(self, filename):
-        """Load results from file"""
-        with open(filename, 'rb') as f:  # pylint: disable=open-builtin
+        """
+        Load results from file.
+
+        Returns:
+            bytes: bytestring of file contents.
+        """
+        with open(filename, 'rb') as f:
             results = f.read()
             os.remove(filename)
         return results
@@ -92,7 +98,7 @@ def export_course_to_directory(course_key, root_dir):
     # The safest characters are A-Z, a-z, 0-9, <underscore>, <period> and <hyphen>.
     # We represent the first four with \w.
     # TODO: Once we support courses with unicode characters, we will need to revisit this.
-    replacement_char = u'-'
+    replacement_char = '-'
     course_dir = replacement_char.join([course.id.org, course.id.course, course.id.run])
     course_dir = re.sub(r'[^\w\.\-]', replacement_char, course_dir)
 

@@ -4,10 +4,8 @@
 import logging
 import mimetypes
 
-from django.conf import settings
+from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
-
-from edxmako import LOOKUP, add_lookup
 
 log = logging.getLogger(__name__)
 
@@ -21,11 +19,11 @@ class LmsModuleTests(TestCase):
         extensions = ['eot', 'otf', 'ttf', 'woff']
         for extension in extensions:
             mimetype, _ = mimetypes.guess_type('test.' + extension)
-            self.assertIsNotNone(mimetype)
+            assert mimetype is not None
 
     def test_api_docs(self):
         """
         Tests that requests to the `/api-docs/` endpoint do not raise an exception.
         """
         response = self.client.get('/api-docs/')
-        self.assertEqual(200, response.status_code)
+        assert response.status_code == 200

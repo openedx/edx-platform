@@ -2,8 +2,8 @@
     'use strict';
     define([
         'jquery', 'underscore', 'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
-        'js/edxnotes/views/search_box'
-    ], function($, _, gettext, TabPanelView, TabView, SearchBoxView) {
+        'js/edxnotes/views/search_box', 'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils'
+    ], function($, _, gettext, TabPanelView, TabView, SearchBoxView, HtmlUtils, StringUtils) {
         var view = 'Search Results';
         var SearchResultsView = TabView.extend({
             PanelConstructor: TabPanelView.extend({
@@ -16,7 +16,7 @@
                     ].join(' ');
                 },
                 renderContent: function() {
-                    this.$el.append(this.getNotes(this.collection.toArray()));
+                    this.$el.append(HtmlUtils.HTML(this.getNotes(this.collection.toArray())).toString());
                     return this;
                 }
             }),
@@ -31,10 +31,10 @@
                     ].join(' ');
                 },
                 renderContent: function() {
-                    var message = gettext('No results found for "%(query_string)s". Please try searching again.');
+                    var message = gettext('No results found for "{query_string}". Please try searching again.');
 
                     this.$el.append($('<p />', {
-                        text: interpolate(message, {
+                        text: StringUtils.interpolate(message, {
                             query_string: this.options.searchQuery
                         }, true)
                     }));

@@ -7,7 +7,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
-  from contentstore import utils
+  from cms.djangoapps.contentstore import utils
   from openedx.core.djangoapps.certificates.api import can_show_certificate_available_date_field
   from openedx.core.djangolib.js_utils import (
       dump_js_escaped_json, js_escaped_string
@@ -204,7 +204,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <li class="field">
                   <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true" aria-labelledby="course-pace-self-paced-label"/>
                   <label id="course-pace-self-paced-label" class="course-pace-label" for="course-pace-self-paced">${_("Self-Paced")}</label>
-                  <span class="tip">${_("Self-paced courses do not have release dates for course content or due dates for assignments. Learners can complete course material at any time before the course end date.")}</span>
+                  <span class="tip">${_("Self-paced courses offer suggested due dates for assignments or exams based on the learner’s enrollment date and the expected course duration. These courses offer learners flexibility to modify the assignment dates as needed.")}</span>
                 </li>
             </ol>
           </fieldset>

@@ -8,7 +8,7 @@ from textwrap import dedent
 
 from eventtracking import tracker as eventtracker
 
-from track.management.tracked_command import TrackedCommand
+from common.djangoapps.track.management.tracked_command import TrackedCommand
 
 
 class Command(TrackedCommand):

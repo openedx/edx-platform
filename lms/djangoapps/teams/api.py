@@ -10,13 +10,13 @@ from django.db.models import Count, Q
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
-from student.models import CourseEnrollment, anonymous_id_for_user
-from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,17 @@ class OrganizationProtectionStatus(Enum):
 ORGANIZATION_PROTECTED_MODES = (
     CourseMode.MASTERS,
 )
+
+
+def get_team_by_team_id(team_id):
+    """
+    API Function to lookup team object by team_id, which is globally unique.
+    If there is no such team, return None.
+    """
+    try:
+        return CourseTeam.objects.get(team_id=team_id)
+    except CourseTeam.DoesNotExist:
+        return None
 
 
 def get_team_by_discussion(discussion_id):
@@ -174,7 +185,7 @@ def user_organization_protection_status(user, course_key):
         else:
             return OrganizationProtectionStatus.unprotected
     else:
-        raise ValueError(
+        raise ValueError(  # lint-amnesty, pylint: disable=raising-format-tuple
             'Cannot check the org_protection status on a student [%s] not enrolled in course [%s]',
             user.id,
             course_key
@@ -338,7 +349,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
+        raise ValueError("The supplied course id {course_id} is not valid.".format(  # lint-amnesty, pylint: disable=raise-missing-from
             course_id=course_id
         ))
     try:
@@ -381,7 +392,7 @@ def anonymous_user_ids_for_team(user, team):
         ))
 
     return sorted([
-        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=True)
+        anonymous_id_for_user(user=team_member, course_id=team.course_id)
         for team_member in team.users.all()
     ])
 

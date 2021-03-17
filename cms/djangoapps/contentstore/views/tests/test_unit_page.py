@@ -3,10 +3,11 @@ Unit tests for the unit page.
 """
 
 
-from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.x_module import STUDENT_VIEW
+
+from .utils import StudioPageTestCase
 
 
 class UnitPageTestCase(StudioPageTestCase):
@@ -15,7 +16,7 @@ class UnitPageTestCase(StudioPageTestCase):
     """
 
     def setUp(self):
-        super(UnitPageTestCase, self).setUp()
+        super().setUp()
         self.vertical = ItemFactory.create(parent_location=self.sequential.location,
                                            category='vertical', display_name='Unit')
         self.video = ItemFactory.create(parent_location=self.vertical.location,
@@ -26,7 +27,7 @@ class UnitPageTestCase(StudioPageTestCase):
         """
         Verify that a public xblock's preview returns the expected HTML.
         """
-        published_video = self.store.publish(self.video.location, self.user.id)
+        published_video = self.store.publish(self.video.location, self.user.id)  # lint-amnesty, pylint: disable=unused-variable
         self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
 
     def test_draft_component_preview_html(self):

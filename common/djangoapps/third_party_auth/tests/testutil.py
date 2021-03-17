@@ -12,20 +12,20 @@ import django.test
 import mock
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from mako.template import Template
 from oauth2_provider.models import Application
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
 from openedx.core.storage import OverwriteStorage
 
-from third_party_auth.models import (
+from common.djangoapps.third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.models import cache as config_cache
+from common.djangoapps.third_party_auth.models import cache as config_cache
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -64,11 +64,11 @@ class ThirdPartyAuthTestMixin(object):
         patch.start()
         self.addCleanup(patch.stop)
 
-        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)
+        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def tearDown(self):
         config_cache.clear()
-        super(ThirdPartyAuthTestMixin, self).tearDown()
+        super(ThirdPartyAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def enable_saml(self, **kwargs):
         """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
@@ -85,10 +85,8 @@ class ThirdPartyAuthTestMixin(object):
 
     def configure_saml_provider(self, **kwargs):
         """ Update the settings for a SAML-based third party auth provider """
-        self.assertTrue(
-            SAMLConfiguration.is_enabled(Site.objects.get_current(), 'default'),
-            "SAML Provider Configuration only works if SAML is enabled."
-        )
+        assert SAMLConfiguration.is_enabled(Site.objects.get_current(), 'default'), \
+            'SAML Provider Configuration only works if SAML is enabled.'
         obj = SAMLProviderConfig(**kwargs)
         obj.save()
         return obj
@@ -186,7 +184,7 @@ class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCas
     """Base class for auth test cases."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCase, self).setUp()
+        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
         self.hostname = 'example.none'
@@ -215,7 +213,7 @@ class SAMLTestCase(TestCase):
         if 'public_key' not in kwargs:
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
-        super(SAMLTestCase, self).enable_saml(**kwargs)
+        super(SAMLTestCase, self).enable_saml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 @contextmanager
@@ -228,7 +226,7 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     so you will need to provide the "target" module *as it is imported*
     in the software under test.  For example, if `foo/bar.py` does this:
 
-    >>> from third_party_auth import pipeline
+    >>> from common.djangoapps.third_party_auth import pipeline
 
     then you will need to do something like this:
 
@@ -237,7 +235,7 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
 
     If, on the other hand, `foo/bar.py` had done this:
 
-    >>> import third_party_auth
+    >>> from common.djangoapps import third_party_auth
 
     then you would use the target "foo.bar.third_party_auth.pipeline" instead.
 

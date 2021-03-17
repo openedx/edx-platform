@@ -8,4 +8,4 @@ class InvalidAccessPoint(Exception):
         msg = (
             u"Access point '{access_point}' should be either 'enrollment' or 'courseware'"
         ).format(access_point=access_point)
-        super(InvalidAccessPoint, self).__init__(msg, *args, **kwargs)
+        super(InvalidAccessPoint, self).__init__(msg, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments

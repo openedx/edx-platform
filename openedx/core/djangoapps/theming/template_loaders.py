@@ -5,7 +5,7 @@ Theming aware template loaders.
 
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
-from edxmako.makoloader import MakoLoader
+from common.djangoapps.edxmako.makoloader import MakoLoader
 from openedx.core.djangoapps.theming.helpers import get_all_theme_template_dirs, get_current_request, get_current_theme
 
 
@@ -17,7 +17,7 @@ class ThemeTemplateLoader(MakoLoader):
     _accepts_engine_in_init = True
 
     def __init__(self, *args):
-        MakoLoader.__init__(self, ThemeFilesystemLoader(*args))
+        MakoLoader.__init__(self, ThemeFilesystemLoader(*args))  # lint-amnesty, pylint: disable=no-value-for-parameter
 
 
 class ThemeFilesystemLoader(FilesystemLoader):
@@ -33,7 +33,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         theme_dirs = self.get_theme_template_sources()
         if isinstance(theme_dirs, list):
             self.dirs = theme_dirs + self.dirs
-        super(ThemeFilesystemLoader, self).__init__(engine, self.dirs)
+        super(ThemeFilesystemLoader, self).__init__(engine, self.dirs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @staticmethod
     def get_theme_template_sources():

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade.
 """
@@ -7,19 +6,21 @@ Unit tests for masquerade.
 import json
 import pickle
 from datetime import datetime
-
+from unittest.mock import patch
+import pytest
 import ddt
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
-    CourseMasquerade, MasqueradingKeyValueStore, get_masquerading_user_group,
+    CourseMasquerade,
+    MasqueradingKeyValueStore,
+    get_masquerading_user_group
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
@@ -27,10 +28,9 @@ from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubm
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -43,7 +43,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     """
     @classmethod
     def setUpClass(cls):
-        super(MasqueradeTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
         cls.info_page = ItemFactory.create(
             category="course_info", parent_location=cls.course.location,
@@ -81,7 +81,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         )
 
     def setUp(self):
-        super(MasqueradeTestCase, self).setUp()
+        super().setUp()
 
         self.test_user = self.create_user()
         self.login(self.test_user.email, 'test')
@@ -94,7 +94,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.sequential.location.block_id,
             }
@@ -108,7 +108,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'info',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -120,7 +120,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         url = reverse(
             'progress',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
             }
         )
         return self.client.get(url)
@@ -130,8 +130,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         Verifies that the staff debug control visibility is as expected (for staff only).
         """
         content = self.get_courseware_page().content.decode('utf-8')
-        self.assertIn(self.sequential_display_name, content, "Subsection should be visible")
-        self.assertEqual(staff_debug_expected, 'Staff Debug Info' in content)
+        assert self.sequential_display_name in content, 'Subsection should be visible'
+        assert staff_debug_expected == ('Staff Debug Info' in content)
 
     def get_problem(self):
         """
@@ -140,8 +140,8 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
         problem_url = reverse(
             'xblock_handler',
             kwargs={
-                'course_id': six.text_type(self.course.id),
-                'usage_id': six.text_type(self.problem.location),
+                'course_id': str(self.course.id),
+                'usage_id': str(self.problem.location),
                 'handler': 'xmodule_handler',
                 'suffix': 'problem_get'
             }
@@ -150,11 +150,11 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
 
     def verify_show_answer_present(self, show_answer_expected):
         """
-        Verifies that "Show Answer" is only present when expected (for staff only).
+        Verifies that "Show answer" is only present when expected (for staff only).
         """
         problem_html = json.loads(self.get_problem().content.decode('utf-8'))['html']
-        self.assertIn(self.problem_display_name, problem_html)
-        self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
+        assert self.problem_display_name in problem_html
+        assert show_answer_expected == ('Show answer' in problem_html)
 
     def ensure_masquerade_as_group_member(self, partition_id, group_id):
         """
@@ -167,7 +167,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
                configured in the course.
             group_id (int); the integer group id, within the specified partition.
         """
-        self.assertEqual(200, masquerade_as_group_member(self.test_user, self.course, partition_id, group_id))
+        assert 200 == masquerade_as_group_member(self.test_user, self.course, partition_id, group_id)
 
 
 class NormalStudentVisibilityTest(MasqueradeTestCase):
@@ -249,7 +249,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
     Check for staff being able to masquerade as a specific student.
     """
     def setUp(self):
-        super(TestStaffMasqueradeAsSpecificStudent, self).setUp()
+        super().setUp()
         self.student_user = self.create_user()
         self.login_student()
         self.enroll(self.course, True)
@@ -280,7 +280,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         The return value is a string like u'1/2'.
         """
         json_data = json.loads(self.look_at_question(self.problem_display_name).content.decode('utf-8'))
-        progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
+        progress = '{}/{}'.format(str(json_data['current_score']), str(json_data['total_possible']))
         return progress
 
     def assertExpectedLanguageInPreference(self, user, expected_language_code):
@@ -292,14 +292,10 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
             user: User model instance
             expected_language_code: string indicating a language code
         """
-        self.assertEqual(
-            get_user_preference(user, LANGUAGE_KEY), expected_language_code
-        )
-        self.assertEqual(
-            self.client.cookies[settings.LANGUAGE_COOKIE].value, expected_language_code
-        )
+        assert get_user_preference(user, LANGUAGE_KEY) == expected_language_code
+        assert self.client.cookies[settings.LANGUAGE_COOKIE].value == expected_language_code
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):
         """
@@ -322,7 +318,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
     @ddt.data(
         'john',  # Non-unicode username
-        u'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
+        'fôô@bar',  # Unicode username with @, which is what the ENABLE_UNICODE_USERNAME feature allows
     )
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student(self, username):
@@ -338,32 +334,32 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.login(student.email, 'test')
         # Answer correctly as the student, and check progress.
         self.submit_answer('Correct', 'Correct')
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        assert self.get_progress_detail() == '2/2'
 
         # Log in as staff, and check the problem is unanswered.
         self.login_staff()
-        self.assertEqual(self.get_progress_detail(), u'0/2')
+        assert self.get_progress_detail() == '0/2'
 
         # Masquerade as the student, and check we can see the student state.
         self.update_masquerade(role='student', username=student.username)
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        assert self.get_progress_detail() == '2/2'
 
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')
-        self.assertEqual(self.get_progress_detail(), u'1/2')
+        assert self.get_progress_detail() == '1/2'
 
         # Reload the page and check we see the student state again.
         self.get_courseware_page()
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        assert self.get_progress_detail() == '2/2'
 
         # Become the staff user again, and check the problem is still unanswered.
         self.update_masquerade(role='staff')
-        self.assertEqual(self.get_progress_detail(), u'0/2')
+        assert self.get_progress_detail() == '0/2'
 
         # Verify the student state did not change.
         self.logout()
         self.login(student.email, 'test')
-        self.assertEqual(self.get_progress_detail(), u'2/2')
+        assert self.get_progress_detail() == '2/2'
 
     def test_masquerading_with_language_preference(self):
         """
@@ -390,7 +386,7 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.get_courseware_page()
         self.assertExpectedLanguageInPreference(self.test_user, english_language_code)
 
-    @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+    @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=True)
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_student_course_info(self):
         """
@@ -402,12 +398,12 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Log in as staff, and check we can see the info page.
         self.login_staff()
         content = self.get_course_info_page().content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        assert 'OOGIE BLOOGIE' in content
 
         # Masquerade as the student, and check we can see the info page.
         self.update_masquerade(role='student', username=self.student_user.username)
         content = self.get_course_info_page().content.decode('utf-8')
-        self.assertIn("OOGIE BLOOGIE", content)
+        assert 'OOGIE BLOOGIE' in content
 
     def test_masquerade_as_specific_student_progress(self):
         """
@@ -417,21 +413,21 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         self.login_student()
         self.submit_answer('Correct', 'Correct')
         student_progress = self.get_progress_page().content.decode('utf-8')
-        self.assertNotIn("1 of 2 possible points", student_progress)
-        self.assertIn("2 of 2 possible points", student_progress)
+        assert '1 of 2 possible points' not in student_progress
+        assert '2 of 2 possible points' in student_progress
 
         # Staff answers are slightly different
         self.login_staff()
         self.submit_answer('Incorrect', 'Correct')
         staff_progress = self.get_progress_page().content.decode('utf-8')
-        self.assertNotIn("2 of 2 possible points", staff_progress)
-        self.assertIn("1 of 2 possible points", staff_progress)
+        assert '2 of 2 possible points' not in staff_progress
+        assert '1 of 2 possible points' in staff_progress
 
         # Should now see the student's scores
         self.update_masquerade(role='student', username=self.student_user.username)
         masquerade_progress = self.get_progress_page().content.decode('utf-8')
-        self.assertNotIn("1 of 2 possible points", masquerade_progress)
-        self.assertIn("2 of 2 possible points", masquerade_progress)
+        assert '1 of 2 possible points' not in masquerade_progress
+        assert '2 of 2 possible points' in masquerade_progress
 
 
 class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
@@ -439,7 +435,7 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super(TestGetMasqueradingGroupId, self).setUp()
+        super().setUp()
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],
@@ -455,14 +451,14 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         """
         # Verify there is no masquerading group initially
         group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
-        self.assertIsNone(group)
+        assert group is None
 
         # Install a masquerading group
         self.ensure_masquerade_as_group_member(0, 1)
 
         # Verify that the masquerading group is returned
         group = get_masquerading_user_group(self.course.id, self.test_user, self.user_partition)
-        self.assertEqual(group.id, 1)
+        assert group.id == 1
 
 
 class ReadOnlyKeyValueStore(DictKeyValueStore):
@@ -477,7 +473,7 @@ class ReadOnlyKeyValueStore(DictKeyValueStore):
     def delete(self, key):
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
-    def set_many(self, update_dict):  # pylint: disable=unused-argument
+    def set_many(self, update_dict):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         assert False, "ReadOnlyKeyValueStore may not be modified."
 
 
@@ -491,38 +487,38 @@ class MasqueradingKeyValueStoreTest(TestCase):
     Unit tests for the MasqueradingKeyValueStore class.
     """
     def setUp(self):
-        super(MasqueradingKeyValueStoreTest, self).setUp()
+        super().setUp()
         self.ro_kvs = ReadOnlyKeyValueStore({'a': 42, 'b': None, 'c': 'OpenCraft'})
         self.session = FakeSession()
         self.kvs = MasqueradingKeyValueStore(self.ro_kvs, self.session)
 
     def test_all(self):
-        self.assertEqual(self.kvs.get('a'), 42)
-        self.assertEqual(self.kvs.get('b'), None)
-        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
-        with self.assertRaises(KeyError):
+        assert self.kvs.get('a') == 42
+        assert self.kvs.get('b') is None
+        assert self.kvs.get('c') == 'OpenCraft'
+        with pytest.raises(KeyError):
             self.kvs.get('d')
 
-        self.assertTrue(self.kvs.has('a'))
-        self.assertTrue(self.kvs.has('b'))
-        self.assertTrue(self.kvs.has('c'))
-        self.assertFalse(self.kvs.has('d'))
+        assert self.kvs.has('a')
+        assert self.kvs.has('b')
+        assert self.kvs.has('c')
+        assert not self.kvs.has('d')
 
         self.kvs.set_many({'a': 'Norwegian Blue', 'd': 'Giraffe'})
         self.kvs.set('b', 7)
 
-        self.assertEqual(self.kvs.get('a'), 'Norwegian Blue')
-        self.assertEqual(self.kvs.get('b'), 7)
-        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
-        self.assertEqual(self.kvs.get('d'), 'Giraffe')
+        assert self.kvs.get('a') == 'Norwegian Blue'
+        assert self.kvs.get('b') == 7
+        assert self.kvs.get('c') == 'OpenCraft'
+        assert self.kvs.get('d') == 'Giraffe'
 
         for key in 'abd':
-            self.assertTrue(self.kvs.has(key))
+            assert self.kvs.has(key)
             self.kvs.delete(key)
-            with self.assertRaises(KeyError):
+            with pytest.raises(KeyError):
                 self.kvs.get(key)
 
-        self.assertEqual(self.kvs.get('c'), 'OpenCraft')
+        assert self.kvs.get('c') == 'OpenCraft'
 
 
 class CourseMasqueradeTest(TestCase):
@@ -538,4 +534,4 @@ class CourseMasqueradeTest(TestCase):
         del cmasq.user_name
         pickled_cmasq = pickle.dumps(cmasq)
         unpickled_cmasq = pickle.loads(pickled_cmasq)
-        self.assertEqual(unpickled_cmasq.user_name, None)
+        assert unpickled_cmasq.user_name is None

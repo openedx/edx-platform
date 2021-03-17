@@ -12,14 +12,14 @@ from datetime import datetime, timedelta
 from textwrap import dedent
 
 import six.moves.urllib.parse  # pylint: disable=import-error
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from edx_rest_api_client.client import EdxRestApiClient
 from slumber.exceptions import HttpClientError, HttpServerError
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from student.models import UserAttribute
-from util.query import use_read_replica_if_available
+from common.djangoapps.student.models import UserAttribute
+from common.djangoapps.util.query import use_read_replica_if_available
 
 HUBSPOT_API_BASE_URL = 'https://api.hubapi.com'
 
@@ -145,7 +145,7 @@ class Command(BaseCommand):
             return len(contacts)
         except (HttpClientError, HttpServerError) as ex:
             message = u'An error occurred while syncing batch of contacts for site {domain}, {message}'.format(
-                domain=site_conf.site.domain, message=ex.message
+                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member
             )
             self.stderr.write(message)
             return 0
@@ -226,4 +226,4 @@ class Command(BaseCommand):
 
         except Exception as ex:
             traceback.print_exc()
-            raise CommandError(u'Command failed with traceback %s' % str(ex))
+            raise CommandError(u'Command failed with traceback %s' % str(ex))  # lint-amnesty, pylint: disable=raise-missing-from

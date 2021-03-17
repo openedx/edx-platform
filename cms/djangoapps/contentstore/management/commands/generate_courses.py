@@ -6,12 +6,11 @@ Django management command to generate a test course from a course config json
 import json
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
-from six import text_type
 
-from contentstore.management.commands.utils import user_from_str
-from contentstore.views.course import create_new_course_in_store
+from cms.djangoapps.contentstore.management.commands.utils import user_from_str
+from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from openedx.core.djangoapps.credit.models import CreditProvider
 from xmodule.course_module import CourseFields
 from xmodule.fields import Date
@@ -34,9 +33,9 @@ class Command(BaseCommand):
         try:
             courses = json.loads(options["courses_json"])["courses"]
         except ValueError:
-            raise CommandError("Invalid JSON object")
+            raise CommandError("Invalid JSON object")  # lint-amnesty, pylint: disable=raise-missing-from
         except KeyError:
-            raise CommandError("JSON object is missing courses list")
+            raise CommandError("JSON object is missing courses list")  # lint-amnesty, pylint: disable=raise-missing-from
 
         for course_settings in courses:
             # Validate course
@@ -52,7 +51,7 @@ class Command(BaseCommand):
             try:
                 user = user_from_str(user_email)
             except User.DoesNotExist:
-                logger.warning(user_email + " user does not exist")
+                logger.warning(user_email + " user does not exist")  # lint-amnesty, pylint: disable=logging-not-lazy
                 logger.warning("Can't create course, proceeding to next course")
                 continue
             fields = self._process_course_fields(course_settings["fields"])
@@ -60,9 +59,9 @@ class Command(BaseCommand):
             # Create the course
             try:
                 new_course = create_new_course_in_store("split", user, org, num, run, fields)
-                logger.info(u"Created {}".format(text_type(new_course.id)))
+                logger.info("Created {}".format(str(new_course.id)))
             except DuplicateCourseError:
-                logger.warning(u"Course already exists for %s, %s, %s", org, num, run)
+                logger.warning("Course already exists for %s, %s, %s", org, num, run)
 
             # Configure credit provider
             if ("enrollment" in course_settings) and ("credit_provider" in course_settings["enrollment"]):
@@ -102,7 +101,7 @@ class Command(BaseCommand):
             if field not in all_fields:
                 # field does not exist as a CourseField
                 del fields[field]
-                logger.info(field + "is not a valid CourseField")
+                logger.info(field + "is not a valid CourseField")  # lint-amnesty, pylint: disable=logging-not-lazy
             elif fields[field] is None:
                 # field is unset
                 del fields[field]
@@ -113,7 +112,7 @@ class Command(BaseCommand):
                     fields[field] = Date().from_json(date_json)
                     logger.info(field + " has been set to " + date_json)
                 except Exception:  # pylint: disable=broad-except
-                    logger.info("The date string could not be parsed for " + field)
+                    logger.info("The date string could not be parsed for " + field)  # lint-amnesty, pylint: disable=logging-not-lazy
                     del fields[field]
             elif field in course_tab_list_fields:
                 # Generate CourseTabList object from the json value
@@ -122,15 +121,15 @@ class Command(BaseCommand):
                     fields[field] = CourseTabList().from_json(course_tab_list_json)
                     logger.info(field + " has been set to " + course_tab_list_json)
                 except Exception:  # pylint: disable=broad-except
-                    logger.info("The course tab list string could not be parsed for " + field)
+                    logger.info("The course tab list string could not be parsed for " + field)  # lint-amnesty, pylint: disable=logging-not-lazy
                     del fields[field]
             else:
                 # CourseField is valid and has been set
-                logger.info(field + " has been set to " + str(fields[field]))
+                logger.info(field + " has been set to " + str(fields[field]))  # lint-amnesty, pylint: disable=logging-not-lazy
 
         for field in all_fields:
             if field not in fields:
-                logger.info(field + " has not been set")
+                logger.info(field + " has not been set")  # lint-amnesty, pylint: disable=logging-not-lazy
         return fields
 
     def _course_is_valid(self, course):
@@ -147,7 +146,7 @@ class Command(BaseCommand):
         ]
         for setting in required_course_settings:
             if setting not in course:
-                logger.warning("Course json is missing " + setting)
+                logger.warning("Course json is missing " + setting)  # lint-amnesty, pylint: disable=logging-not-lazy
                 is_valid = False
 
         # Check fields settings
@@ -157,7 +156,7 @@ class Command(BaseCommand):
         if "fields" in course:
             for setting in required_field_settings:
                 if setting not in course["fields"]:
-                    logger.warning("Fields json is missing " + setting)
+                    logger.warning("Fields json is missing " + setting)  # lint-amnesty, pylint: disable=logging-not-lazy
                     is_valid = False
 
         return is_valid

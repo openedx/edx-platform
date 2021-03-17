@@ -8,10 +8,8 @@ from `lms.djangoapps.program_enrollments.api`.
 
 import logging
 
-from six import text_type
-
+from common.djangoapps.util.query import read_replica_or_default
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
-from util.query import read_replica_or_default
 
 from .reading import fetch_program_course_enrollments
 
@@ -74,7 +72,7 @@ def _generate_grades(course_key, enrollments):
                 error_string = error_template.format(
                     user.id,
                     course_key,
-                    text_type(exception) if exception else 'Unknown error'
+                    str(exception) if exception else 'Unknown error'
                 )
                 logger.error(error_string)
                 yield ProgramCourseGradeError(enrollment, exception)
@@ -82,7 +80,7 @@ def _generate_grades(course_key, enrollments):
         clear_prefetched_course_grades(course_key)
 
 
-class BaseProgramCourseGrade(object):
+class BaseProgramCourseGrade:
     """
     Base for either a courserun grade or grade-loading failure.
 
@@ -109,7 +107,7 @@ class ProgramCourseGradeOk(BaseProgramCourseGrade):
         Given a ProgramCourseEnrollment and course grade object,
         create a ProgramCourseGradeOk.
         """
-        super(ProgramCourseGradeOk, self).__init__(
+        super().__init__(
             program_course_enrollment
         )
         self.passed = course_grade.passed
@@ -129,7 +127,7 @@ class ProgramCourseGradeError(BaseProgramCourseGrade):
         Given a ProgramCourseEnrollment and an Exception,
         create a ProgramCourseGradeError.
         """
-        super(ProgramCourseGradeError, self).__init__(
+        super().__init__(
             program_course_enrollment
         )
-        self.error = text_type(exception) if exception else "Unknown error"
+        self.error = str(exception) if exception else "Unknown error"

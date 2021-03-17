@@ -13,34 +13,36 @@ signals.)
 
 import logging
 import math
+import shlex
 import sys
 import time
 
 from datetime import datetime, timedelta
 import dateutil.parser
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six.moves import range
 
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
-from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
-from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
+from lms.djangoapps.certificates.models import CertificateStatuses
+from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 
 def certstr(cert):
-    return '{} for user {}'.format(cert.course_id, cert.user.username)
+    return f'{cert.course_id} for user {cert.user.username}'
 
 
 def gradestr(grade):
-    return '{} for user {}'.format(grade.course_id, grade.user_id)
+    return f'{grade.course_id} for user {grade.user_id}'
 
 
 def parsetime(timestr):
@@ -96,8 +98,8 @@ class Command(BaseCommand):
             course-v1:edX+RecordsSelfPaced+1 for user 18
     """
     help = (
-        u"Simulate certificate/grade changes without actually modifying database "
-        u"content. Specifically, trigger the handlers that send data to Credentials."
+        "Simulate certificate/grade changes without actually modifying database "
+        "content. Specifically, trigger the handlers that send data to Credentials."
     )
 
     def add_arguments(self, parser):
@@ -153,6 +155,17 @@ class Command(BaseCommand):
             action='store_true',
             help='Run grade/cert change signal in verbose mode',
         )
+        parser.add_argument(
+            '--notify_programs',
+            action='store_true',
+            help='Send program award notifications with course notification tasks',
+        )
+        parser.add_argument(
+            '--user_ids',
+            default=None,
+            nargs='+',
+            help='Run the command for the given user or list of users',
+        )
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
@@ -160,9 +173,9 @@ class Command(BaseCommand):
         if not config.enabled:
             raise CommandError('NotifyCredentialsConfig is disabled, but --args-from-database was requested.')
 
-        # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
-        argv = config.arguments.split()
-
+        # This split will allow for quotes to wrap datetimes, like "2020-10-20 04:00:00" and other
+        # arguments as if it were the command line
+        argv = shlex.split(config.arguments)
         parser = self.create_parser('manage.py', 'notify_credentials')
         return parser.parse_args(argv).__dict__   # we want a dictionary, not a non-iterable Namespace object
 
@@ -171,56 +184,76 @@ class Command(BaseCommand):
             options = self.get_args_from_database()
 
         if options['auto']:
-            options['end_date'] = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-            options['start_date'] = options['end_date'] - timedelta(days=1)
+            options['end_date'] = datetime.now().replace(minute=0, second=0, microsecond=0)
+            options['start_date'] = options['end_date'] - timedelta(hours=4)
 
         log.info(
-            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            u"from=%s, to=%s, execution=%s",
+            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
+            "from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
             options['page_size'],
             options['start_date'] if options['start_date'] else 'NA',
             options['end_date'] if options['end_date'] else 'NA',
+            options['notify_programs'],
+            options['user_ids'],
             'auto' if options['auto'] else 'manual',
         )
 
         try:
             site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
         except SiteConfiguration.DoesNotExist:
-            log.error(u'No site configuration found for site %s', options['site'])
+            log.error('No site configuration found for site %s', options['site'])
 
         course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date)')
+        if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
+            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
 
-        certs = get_recently_modified_certificates(course_keys, options['start_date'], options['end_date'])
-        grades = get_recently_modified_grades(course_keys, options['start_date'], options['end_date'])
+        certs = get_recently_modified_certificates(
+            course_keys, options['start_date'], options['end_date'], options['user_ids']
+        )
 
+        users = None
+        if options['user_ids']:
+            users = User.objects.filter(id__in=options['user_ids'])
+        grades = get_recently_modified_grades(
+            course_keys, options['start_date'], options['end_date'], users
+        )
+
+        log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
+            certs=certs.count(),
+            grades=grades.count()
+        ))
         if options['dry_run']:
             self.print_dry_run(certs, grades)
         else:
-            self.send_notifications(certs, grades,
-                                    site_config=site_config,
-                                    delay=options['delay'],
-                                    page_size=options['page_size'],
-                                    verbose=options['verbose'])
+            self.send_notifications(
+                certs,
+                grades,
+                site_config=site_config,
+                delay=options['delay'],
+                page_size=options['page_size'],
+                verbose=options['verbose'],
+                notify_programs=options['notify_programs']
+            )
 
         log.info('notify_credentials finished')
 
-    def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False):
+    def send_notifications(
+        self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False, notify_programs=False
+    ):
         """ Run actual handler commands for the provided certs and grades. """
 
         course_cert_info = {}
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):
-                log.info(u"Skipping credential changes %d for certificate %s", i, certstr(cert))
+                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
                 continue
 
             log.info(
-                u"Handling credential changes %d for certificate %s",
+                "Handling credential changes %d for certificate %s",
                 i, certstr(cert),
             )
 
@@ -240,15 +273,17 @@ class Command(BaseCommand):
 
             course_cert_info[(cert.user.id, str(cert.course_id))] = data
             handle_course_cert_changed(**signal_args)
+            if notify_programs and CertificateStatuses.is_passing_status(cert.status):
+                handle_course_cert_awarded(**signal_args)
 
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
             if site_config and not site_config.has_org(grade.course_id.org):
-                log.info(u"Skipping grade changes %d for grade %s", i, gradestr(grade))
+                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
                 continue
 
             log.info(
-                u"Handling grade changes %d for grade %s",
+                "Handling grade changes %d for grade %s",
                 i, gradestr(grade),
             )
 
@@ -285,12 +320,12 @@ class Command(BaseCommand):
             courses = []
         course_keys = []
 
-        log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
+        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:
                 course_keys.append(CourseKey.from_string(course_id))
             except InvalidKeyError:
-                log.fatal(u"%s is not a parseable CourseKey", course_id)
+                log.fatal("%s is not a parseable CourseKey", course_id)
                 sys.exit(1)
 
         return course_keys
@@ -304,10 +339,10 @@ class Command(BaseCommand):
         for cert in certs[:ITEMS_TO_SHOW]:
             print("   ", certstr(cert))
         if certs.count() > ITEMS_TO_SHOW:
-            print(u"    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
+            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
 
         print(grades.count(), "Grades:")
         for grade in grades[:ITEMS_TO_SHOW]:
             print("   ", gradestr(grade))
         if grades.count() > ITEMS_TO_SHOW:
-            print(u"    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
+            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))

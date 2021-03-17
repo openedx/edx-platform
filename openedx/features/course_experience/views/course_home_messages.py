@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.course_goals.api import (
     get_course_goal,
@@ -29,7 +29,7 @@ from lms.djangoapps.courseware.access_utils import check_public_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 
 
@@ -51,7 +51,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         'is_staff': True if the user is a staff member of the course, False otherwise
     }
     """
-    def render_to_fragment(self, request, course_id, user_access, **kwargs):
+    def render_to_fragment(self, request, course_id, user_access, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders a course message fragment for the specified course.
         """
@@ -107,7 +107,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         return Fragment(html)
 
 
-def _register_course_home_messages(request, course, user_access, course_start_data):
+def _register_course_home_messages(request, course, user_access, course_start_data):  # lint-amnesty, pylint: disable=unused-argument
     """
     Register messages to be shown in the course home content page.
     """
@@ -209,7 +209,7 @@ def _register_course_goal_message(request, course):
             ).format(
                 goal_key=goal_key,
                 aria_label_choice=Text(_(u"Set goal to: {goal_text}")).format(
-                    goal_text=Text(_(goal_text))
+                    goal_text=Text(_(goal_text))  # lint-amnesty, pylint: disable=translation-of-non-string
                 )
             ),
             goal_text=goal_text,

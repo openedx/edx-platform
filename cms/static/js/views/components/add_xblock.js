@@ -2,8 +2,10 @@
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu'],
-    function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu) {
+    'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu',
+    'edx-ui-toolkit/js/utils/html-utils'],
+    function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, HtmlUtils) {
+        'use strict';
         var AddXBlockComponent = BaseView.extend({
             events: {
                 'click .new-component .new-component-type .multiple-templates': 'showComponentTemplates',
@@ -19,9 +21,10 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             render: function() {
+                var that;
                 if (!this.$el.html()) {
-                    var that = this;
-                    this.$el.html(this.template({}));
+                    that = this;
+                    this.$el.html(HtmlUtils.HTML(this.template({})).toString());
                     this.collection.each(
                         function(componentModel) {
                             var view, menu;
@@ -47,6 +50,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             closeNewComponent: function(event) {
+                var type;
                 event.preventDefault();
                 event.stopPropagation();
                 type = $(event.currentTarget).data('type');

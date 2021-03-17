@@ -3,16 +3,17 @@ Tests for Course Blocks forms
 """
 
 
+from urllib.parse import urlencode
+
 import ddt
-import six
-from six.moves.urllib.parse import urlencode
+import pytest
 from django.http import Http404, QueryDict
 from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -29,12 +30,12 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestBlockListGetForm, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestBlockListGetForm, self).setUp()
+        super().setUp()
 
         self.student = UserFactory.create()
         self.student2 = UserFactory.create()
@@ -48,7 +49,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         self.form_data = QueryDict(
             urlencode({
                 'username': self.student.username,
-                'usage_key': six.text_type(usage_key),
+                'usage_key': str(usage_key),
             }),
             mutable=True,
         )
@@ -70,14 +71,14 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
         """
         Fail unless permission is denied to the form
         """
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             self.get_form(expected_valid=False)
 
     def assert_raises_not_found(self):
         """
         Fail unless a 404 occurs
         """
-        with self.assertRaises(Http404):
+        with pytest.raises(Http404):
             self.get_form(expected_valid=False)
 
     def assert_equals_cleaned_data(self):

@@ -340,13 +340,26 @@ define([
                 teamsTabView.$('.search-field').val('');
                 teamsTabView.$('.action-search').click();
 
-                verifyTeamsRequest({
-                    order_by: 'last_activity_at'
-                });
+                verifyTeamsRequest({ order_by: 'last_activity_at' });
                 AjaxHelpers.respondWithJson(requests, {});
                 AjaxHelpers.respondWithJson(requests, { count: 0 });
                 expect(teamsTabView.$('.page-title').text()).toBe('Test Topic 1');
                 expect(teamsTabView.$('.page-description').text()).toBe('Test description 1');
+            });
+
+            it('updates the description when search string updates', function() {
+                var newString = 'bar';
+                setUpTopicTab();
+                performSearch();
+                expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
+                expect(teamsTabView.$('.page-description').text()).toBe('Showing results for "foo"');
+                teamsTabView.$('.search-field').val(newString);
+                teamsTabView.$('.action-search').click();
+                AjaxHelpers.respondWithJson(requests, { count: 0 });
+                expect(teamsTabView.$('.page-title').text()).toBe('Team Search');
+                expect(teamsTabView.$('.page-description').text()).toBe(
+                  'Showing results for "' + newString + '"'
+                );
             });
 
             it('can navigate back to all teams from a search', function() {

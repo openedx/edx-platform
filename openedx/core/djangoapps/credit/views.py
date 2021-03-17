@@ -7,7 +7,6 @@ import datetime
 import logging
 
 import pytz
-import six
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -18,7 +17,6 @@ from rest_framework import generics, mixins, permissions, views, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from six import text_type
 
 from openedx.core.djangoapps.credit.api import create_credit_request
 from openedx.core.djangoapps.credit.exceptions import (
@@ -60,7 +58,7 @@ class CreditProviderViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CreditProviderSerializer
 
     def filter_queryset(self, queryset):
-        queryset = super(CreditProviderViewSet, self).filter_queryset(queryset)
+        queryset = super().filter_queryset(queryset)
 
         # Filter by provider ID
         provider_ids = self.request.GET.get('provider_ids', None)
@@ -88,7 +86,7 @@ class CreditProviderRequestCreateView(views.APIView):
         try:
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
-            raise InvalidCourseKey(course_key)
+            raise InvalidCourseKey(course_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         # Validate the username
         username = request.data.get('username')
@@ -103,7 +101,7 @@ class CreditProviderRequestCreateView(views.APIView):
             credit_request = create_credit_request(course_key, provider.provider_id, username)
             return Response(credit_request)
         except CreditApiBadRequest as ex:
-            raise InvalidCreditRequest(text_type(ex))
+            raise InvalidCreditRequest(str(ex))  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 class CreditProviderCallbackView(views.APIView):
@@ -115,7 +113,7 @@ class CreditProviderCallbackView(views.APIView):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(CreditProviderCallbackView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, provider_id):
         """ POST handler. """
@@ -159,12 +157,12 @@ class CreditEligibilityView(generics.ListAPIView):
             raise ValidationError(
                 {'detail': 'Both the course_key and username querystring parameters must be supplied.'})
 
-        course_key = six.text_type(course_key)
+        course_key = str(course_key)
 
         try:
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
-            raise ValidationError({'detail': '[{}] is not a valid course key.'.format(course_key)})
+            raise ValidationError({'detail': f'[{course_key}] is not a valid course key.'})  # lint-amnesty, pylint: disable=raise-missing-from
         return queryset.filter(
             username=username,
             course__course_key=course_key,
@@ -194,7 +192,7 @@ class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.Re
     # SessionAuthentication will enforce CSRF protection.
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(CreditCourseViewSet, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self):
         # Convert the serialized course key into a CourseKey instance
@@ -203,4 +201,4 @@ class CreditCourseViewSet(PutAsCreateMixin, mixins.UpdateModelMixin, viewsets.Re
         if course_key is not None:
             self.kwargs[self.lookup_field] = CourseKey.from_string(course_key)
 
-        return super(CreditCourseViewSet, self).get_object()
+        return super().get_object()

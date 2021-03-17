@@ -6,7 +6,7 @@ Test utilities for OAuth access token exchange
 from django.conf import settings
 from social_django.models import Partial, UserSocialAuth
 
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixin
 
 TPA_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 TPA_FEATURE_ENABLED = TPA_FEATURES_KEY in settings.FEATURES
@@ -20,7 +20,7 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     * _assert_success(data, expected_scopes)
     """
     def setUp(self):
-        super(AccessTokenExchangeTestMixin, self).setUp()
+        super().setUp()
 
         # Initialize to minimal data
         self.data = {
@@ -28,14 +28,14 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
             "client_id": self.client_id,
         }
 
-    def _assert_error(self, _data, _expected_error, _expected_error_description):
+    def _assert_error(self, _data, _expected_error, _expected_error_description, error_code):
         """
         Given request data, execute a test and check that the expected error
         was returned (along with any other appropriate assertions).
         """
         raise NotImplementedError()
 
-    def _assert_success(self, data, expected_scopes):
+    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
         """
         Given request data, execute a test and check that the expected scopes
         were returned (along with any other appropriate assertions).
@@ -61,11 +61,11 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         for field in ["access_token", "client_id"]:
             data = dict(self.data)
             del data[field]
-            self._assert_error(data, "invalid_request", u"{} is required".format(field))
+            self._assert_error(data, "invalid_request", f"{field} is required")  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_invalid_client(self):
         self.data["client_id"] = "nonexistent_client"
-        self._assert_error(
+        self._assert_error(  # lint-amnesty, pylint: disable=no-value-for-parameter
             self.data,
             "invalid_client",
             "nonexistent_client is not a valid client_id"
@@ -74,10 +74,10 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
     def test_confidential_client(self):
         self.data['client_id'] += '_confidential'
         self.oauth_client = self.create_confidential_client(self.user, self.data['client_id'])
-        self._assert_error(
+        self._assert_error(  # lint-amnesty, pylint: disable=no-value-for-parameter
             self.data,
             "invalid_client",
-            "{}_confidential is not a public client".format(self.client_id),
+            f"{self.client_id}_confidential is not a public client",
         )
 
     def test_inactive_user(self):
@@ -88,13 +88,13 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
 
     def test_invalid_acess_token(self):
         self._setup_provider_response(success=False)
-        self._assert_error(self.data, "invalid_grant", "access_token is not valid")
+        self._assert_error(self.data, "invalid_grant", "access_token is not valid")  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_no_linked_user(self):
         UserSocialAuth.objects.all().delete()
         Partial.objects.all().delete()
         self._setup_provider_response(success=True)
-        self._assert_error(self.data, "invalid_grant", "access_token is not valid")
+        self._assert_error(self.data, "invalid_grant", "access_token is not valid")  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_user_automatically_linked_by_email(self):
         UserSocialAuth.objects.all().delete()
@@ -108,4 +108,4 @@ class AccessTokenExchangeTestMixin(ThirdPartyOAuthTestMixin):
         self._setup_provider_response(success=True, email=self.user.email)
         self.user.is_active = False
         self.user.save()
-        self._assert_error(self.data, "invalid_grant", "access_token is not valid")
+        self._assert_error(self.data, "invalid_grant", "access_token is not valid")  # lint-amnesty, pylint: disable=no-value-for-parameter

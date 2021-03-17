@@ -40,8 +40,7 @@ pytest-django             # Django support for pytest
 pytest-json-report        # Output json formatted warnings after running pytest
 pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
 pytest-randomly           # pytest plugin to randomly order tests
-pytest-xdist              # Parallel execution of tests on multiple CPU cores or hosts
-radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
+pytest-xdist[psutil]      # Parallel execution of tests on multiple CPU cores or hosts
 selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
 testfixtures              # Provides a LogCapture utility used by several tests

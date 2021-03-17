@@ -7,6 +7,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import BlockStr
 
 from .block_counts import BlockCountsTransformer
 from .block_depth import BlockDepthTransformer
+from .extra_fields import ExtraFieldsTransformer
 from .navigation import BlockNavigationTransformer
 from .student_view import StudentViewTransformer
 from .video_urls import VideoBlockURLTransformer
@@ -22,6 +23,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer
         BlockDepthTransformer
         BlockNavigationTransformer
+        ExtraFieldsTransformer
 
     Note:
         * BlockDepthTransformer must be executed before BlockNavigationTransformer.
@@ -57,6 +59,7 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockCountsTransformer.collect(block_structure)
         BlockDepthTransformer.collect(block_structure)
         BlockNavigationTransformer.collect(block_structure)
+        ExtraFieldsTransformer.collect(block_structure)
 
         # TODO support olx_data by calling export_to_xml(?)
 
@@ -69,3 +72,4 @@ class BlocksAPITransformer(BlockStructureTransformer):
         BlockDepthTransformer(self.depth).transform(usage_info, block_structure)
         BlockNavigationTransformer(self.nav_depth).transform(usage_info, block_structure)
         VideoBlockURLTransformer().transform(usage_info, block_structure)
+        ExtraFieldsTransformer().transform(usage_info, block_structure)

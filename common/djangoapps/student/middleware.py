@@ -10,7 +10,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import UserStanding
+from common.djangoapps.student.models import UserStanding
 
 
 class UserStandingMiddleware(MiddlewareMixin):
@@ -18,7 +18,7 @@ class UserStandingMiddleware(MiddlewareMixin):
     Checks a user's standing on request. Returns a 403 if the user's
     status is 'disabled'.
     """
-    def process_request(self, request):
+    def process_request(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
         user = request.user
         try:
             user_account = UserStanding.objects.get(user=user.id)
@@ -33,7 +33,7 @@ class UserStandingMiddleware(MiddlewareMixin):
                     'this was done in error, please contact us at '
                     '{support_email}'
                 )).format(
-                    support_email=HTML(u'<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
+                    support_email=HTML('<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
                         address=settings.DEFAULT_FEEDBACK_EMAIL,
                         subject_line=_('Disabled Account'),
                     ),

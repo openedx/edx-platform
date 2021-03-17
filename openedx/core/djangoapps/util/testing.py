@@ -11,7 +11,7 @@ from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.teams_config import TeamsConfig
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
@@ -25,7 +25,7 @@ class ContentGroupTestCase(ModuleStoreTestCase):
     and a non-cohorted user with no special access.
     """
     def setUp(self):
-        super(ContentGroupTestCase, self).setUp()
+        super(ContentGroupTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create(
             org='org', number='number', run='run',
@@ -144,7 +144,7 @@ class TestConditionalContent(ModuleStoreTestCase):
                             -> vertical (Group B)
                                 -> problem
         """
-        super(TestConditionalContent, self).setUp()
+        super(TestConditionalContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Create user partitions
         self.user_partition_group_a = 0

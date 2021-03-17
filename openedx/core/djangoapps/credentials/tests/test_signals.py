@@ -1,20 +1,22 @@
 """Tests covering Credentials signals."""
 
 
+from unittest import mock
+
 import ddt
-import mock
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
+from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled
 from openedx.core.djangoapps.credentials.signals import is_course_run_in_a_program, send_grade_if_interesting
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as XModuleCourseFactory
 
@@ -34,7 +36,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
     """ Tests for send_grade_if_interesting, the main utility function that sends a grade """
 
     def setUp(self):
-        super(TestCredentialsSignalsSendGrade, self).setUp()
+        super().setUp()
         self.user = UserFactory()
         self.key = CourseKey.from_string(CourseRunFactory()['key'])
 
@@ -57,7 +59,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
 
         # Test direct send
         send_grade_if_interesting(self.user, self.key, mode, status, 'A', 1.0)
-        self.assertIs(mock_send_grade_to_credentials.delay.called, called)
+        assert mock_send_grade_to_credentials.delay.called is called
         mock_send_grade_to_credentials.delay.reset_mock()
 
         # Test query
@@ -68,11 +70,11 @@ class TestCredentialsSignalsSendGrade(TestCase):
             mode=mode
         )
         send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0)
-        self.assertIs(mock_send_grade_to_credentials.delay.called, called)
+        assert mock_send_grade_to_credentials.delay.called is called
 
     def test_send_grade_missing_cert(self, _, mock_send_grade_to_credentials, _mock_is_learner_issuance_enabled):
         send_grade_if_interesting(self.user, self.key, None, None, 'A', 1.0)
-        self.assertFalse(mock_send_grade_to_credentials.delay.called)
+        assert not mock_send_grade_to_credentials.delay.called
 
     @ddt.data([True], [False])
     @ddt.unpack
@@ -80,7 +82,7 @@ class TestCredentialsSignalsSendGrade(TestCase):
                                         mock_send_grade_to_credentials, _mock_is_learner_issuance_enabled):
         mock_is_course_run_in_a_program.return_value = in_program
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', 'A', 1.0)
-        self.assertIs(mock_send_grade_to_credentials.delay.called, in_program)
+        assert mock_send_grade_to_credentials.delay.called is in_program
 
     def test_send_grade_queries_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
                                       _mock_is_learner_issuance_enabled):
@@ -88,9 +90,8 @@ class TestCredentialsSignalsSendGrade(TestCase):
 
         with mock_passing_grade('B', 0.81):
             send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        self.assertTrue(mock_send_grade_to_credentials.delay.called)
-        self.assertEqual(mock_send_grade_to_credentials.delay.call_args[0],
-                         (self.user.username, str(self.key), True, 'B', 0.81))
+        assert mock_send_grade_to_credentials.delay.called
+        assert mock_send_grade_to_credentials.delay.call_args[0] == (self.user.username, str(self.key), True, 'B', 0.81)
         mock_send_grade_to_credentials.delay.reset_mock()
 
     @mock.patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
@@ -98,14 +99,14 @@ class TestCredentialsSignalsSendGrade(TestCase):
                                       _mock_is_learner_issuance_enabled):
         mock_is_course_run_in_a_program.return_value = True
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        self.assertFalse(mock_send_grade_to_credentials.delay.called)
+        assert not mock_send_grade_to_credentials.delay.called
 
     def test_send_grade_without_issuance_enabled(self, _mock_is_course_run_in_a_program,
                                                  mock_send_grade_to_credentials, mock_is_learner_issuance_enabled):
         mock_is_learner_issuance_enabled.return_value = False
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        self.assertTrue(mock_is_learner_issuance_enabled.called)
-        self.assertFalse(mock_send_grade_to_credentials.delay.called)
+        assert mock_is_learner_issuance_enabled.called
+        assert not mock_send_grade_to_credentials.delay.called
 
     def test_send_grade_records_enabled(self, _mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
                                         _mock_is_learner_issuance_enabled):
@@ -115,14 +116,24 @@ class TestCredentialsSignalsSendGrade(TestCase):
 
         # Correctly sent
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        self.assertTrue(mock_send_grade_to_credentials.delay.called)
+        assert mock_send_grade_to_credentials.delay.called
         mock_send_grade_to_credentials.delay.reset_mock()
 
         # Correctly not sent
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
-        self.assertFalse(mock_send_grade_to_credentials.delay.called)
+        assert not mock_send_grade_to_credentials.delay.called
+
+    def test_send_grade_records_disabled_globally(
+        self, _mock_is_course_run_in_a_program, mock_send_grade_to_credentials,
+        _mock_is_learner_issuance_enabled
+    ):
+        assert is_learner_records_enabled()
+        with override_settings(FEATURES={"ENABLE_LEARNER_RECORDS": False}):
+            assert not is_learner_records_enabled()
+            send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
+        assert not mock_send_grade_to_credentials.delay.called
 
 
 @skip_unless_lms
@@ -131,7 +142,7 @@ class TestCredentialsSignalsUtils(TestCase):
     """ Tests helper utility functions in our signal handling. """
 
     def setUp(self):
-        super(TestCredentialsSignalsUtils, self).setUp()
+        super().setUp()
         self.site = SiteFactory()
         self.course_run = CourseRunFactory()
         course = CourseFactory(course_runs=[self.course_run])
@@ -139,13 +150,13 @@ class TestCredentialsSignalsUtils(TestCase):
 
     def test_is_course_run_in_a_program_success(self, mock_get_programs):
         mock_get_programs.return_value = self.data
-        self.assertTrue(is_course_run_in_a_program(self.course_run['key']))
-        self.assertEqual(mock_get_programs.call_args[0], (self.site,))
+        assert is_course_run_in_a_program(self.course_run['key'])
+        assert mock_get_programs.call_args[0] == (self.site,)
 
     def test_is_course_run_in_a_program_failure(self, mock_get_programs):
         mock_get_programs.return_value = self.data
         course_run2 = CourseRunFactory()
-        self.assertFalse(is_course_run_in_a_program(course_run2['key']))
+        assert not is_course_run_in_a_program(course_run2['key'])
 
 
 @skip_unless_lms
@@ -156,14 +167,14 @@ class TestCredentialsSignalsEmissions(ModuleStoreTestCase):
     def test_cert_changed(self, mock_send_grade_if_interesting):
         user = UserFactory()
 
-        self.assertFalse(mock_send_grade_if_interesting.called)
+        assert not mock_send_grade_if_interesting.called
         GeneratedCertificateFactory(user=user)
-        self.assertTrue(mock_send_grade_if_interesting.called)
+        assert mock_send_grade_if_interesting.called
 
     def test_grade_changed(self, mock_send_grade_if_interesting):
         user = UserFactory()
         course = XModuleCourseFactory()
 
-        self.assertFalse(mock_send_grade_if_interesting.called)
+        assert not mock_send_grade_if_interesting.called
         CourseGradeFactory().update(user, course=course)
-        self.assertTrue(mock_send_grade_if_interesting.called)
+        assert mock_send_grade_if_interesting.called

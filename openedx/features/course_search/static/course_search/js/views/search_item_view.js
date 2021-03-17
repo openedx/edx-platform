@@ -26,6 +26,25 @@
                 this.template = options.template;
             },
 
+            unitIcon: function() {
+                var icon = null;
+                switch (this.model.attributes.content_type) {
+                case 'Video':
+                    icon = 'film';
+                    break;
+                case 'CAPA':
+                    icon = 'edit';
+                    break;
+                case 'Sequence':
+                    icon = 'compass';
+                    break;
+                default:
+                    icon = 'book';
+                    break;
+                }
+                return icon;
+            },
+
             render: function() {
                 var data = _.clone(this.model.attributes);
 
@@ -35,6 +54,7 @@
                     data.excerpt = '';
                     data.content_type = '';
                 }
+                data.unit_icon = this.unitIcon();
                 data.excerptHtml = HtmlUtils.HTML(data.excerpt);
                 delete data.excerpt;
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.template)(data));

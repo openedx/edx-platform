@@ -1,17 +1,15 @@
 """
 Tests for the migrate_saml_uids management command.
 """
+from unittest.mock import mock_open, patch
 
-
-import six
 from django.core.management import call_command
 from django.test import TestCase
-from mock import mock_open, patch
 from social_django.models import UserSocialAuth
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
 from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
-from student.tests.factories import UserFactory
 
 _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
 
@@ -24,11 +22,11 @@ class TestMigrateSamlUids(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestMigrateSamlUids, cls).setUpClass()
+        super().setUpClass()
         cls.command = migrate_saml_uids.Command()
 
     def _format_email_uid_pair(self, email, uid):
-        return '{{"email":"{email}","student_key":"{new_urn}"}}'.format(email=email, new_urn=uid)
+        return f'{{"email":"{email}","student_key":"{uid}"}}'
 
     def _format_single_email_uid_pair_json(self, email, uid):
         return '[{obj}]'.format(
@@ -50,7 +48,7 @@ class TestMigrateSamlUids(TestCase):
             )
 
     def _format_slug_urn_pair(self, slug, urn):
-        return '{slug}:{urn}'.format(slug=slug, urn=urn)
+        return f'{slug}:{urn}'
 
     def test_single_mapping(self):
         new_urn = '9001'
@@ -111,8 +109,8 @@ class TestMigrateSamlUids(TestCase):
 
         self._call_command(self._format_single_email_uid_pair_json(email, new_urn))
         mock_info.assert_any_call(
-            u'Number of users identified in the mapping file without'
-            u' {slug} UserSocialAuth records: 1'.format(
+            'Number of users identified in the mapping file without'
+            ' {slug} UserSocialAuth records: 1'.format(
                 slug=self.provider_slug
             )
         )
@@ -128,8 +126,8 @@ class TestMigrateSamlUids(TestCase):
 
         self._call_command(self._format_single_email_uid_pair_json('different' + email, new_urn))
         mock_info.assert_any_call(
-            u'Number of users with {slug} UserSocialAuth records '
-            u'for which there was no mapping in the provided file: 1'.format(
+            'Number of users with {slug} UserSocialAuth records '
+            'for which there was no mapping in the provided file: 1'.format(
                 slug=self.provider_slug
             )
         )
@@ -146,7 +144,7 @@ class TestMigrateSamlUids(TestCase):
                 [
                     self._format_email_uid_pair(
                         auth.user.email,
-                        new_urn + six.text_type(ind)
+                        new_urn + str(ind)
                     )
                     for ind, auth
                     in enumerate(auths)
@@ -156,8 +154,8 @@ class TestMigrateSamlUids(TestCase):
 
         for ind, auth in enumerate(auths):
             auth.refresh_from_db()
-            assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn + six.text_type(ind))
-        mock_info.assert_any_call(u'Number of mappings in the mapping file updated: 5')
+            assert auth.uid == self._format_slug_urn_pair(self.provider_slug, new_urn + str(ind))
+        mock_info.assert_any_call('Number of mappings in the mapping file updated: 5')
 
     @patch(_COMMAND_PATH + '.log')
     def test_learner_duplicated_in_mapping(self, mock_log):
@@ -170,5 +168,5 @@ class TestMigrateSamlUids(TestCase):
         self._call_command('[{}]'.format(
             ','.join([self._format_email_uid_pair(email, new_urn) for _ in range(5)])
         ))
-        mock_info.assert_any_call(u'Number of mappings in the mapping file where the '
-                                  u'identified user has already been processed: 4')
+        mock_info.assert_any_call('Number of mappings in the mapping file where the '
+                                  'identified user has already been processed: 4')

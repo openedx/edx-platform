@@ -19,7 +19,7 @@ from openedx.core.djangoapps.user_api.preferences.api import (
     set_user_preference
 )
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from student.roles import GlobalStaff
+from common.djangoapps.student.roles import GlobalStaff
 
 from .helpers import theme_exists
 from .models import SiteTheme
@@ -91,7 +91,7 @@ class ThemingAdministrationFragmentView(EdxFragmentView):
     Fragment view to allow a user to administer theming.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Renders the theming administration view as a fragment.
         """
@@ -105,10 +105,10 @@ class ThemingAdministrationFragmentView(EdxFragmentView):
         """
         if not user_can_preview_themes(request.user):
             raise Http404
-        return super(ThemingAdministrationFragmentView, self).get(request, *args, **kwargs)
+        return super(ThemingAdministrationFragmentView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     @method_decorator(login_required)
-    def post(self, request, **kwargs):
+    def post(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Accept requests to update the theme preview.
         """

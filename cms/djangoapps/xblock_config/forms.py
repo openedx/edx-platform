@@ -7,8 +7,8 @@ import logging
 
 from django import forms
 
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from openedx.core.lib.courses import clean_course_id
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class CourseEditLTIFieldsEnabledAdminForm(forms.ModelForm):
     Form for LTI consumer course-specific configuration to verify the course id.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseEditLTIFieldsEnabledFlag
         fields = '__all__'
 

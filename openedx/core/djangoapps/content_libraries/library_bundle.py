@@ -2,7 +2,8 @@
 Helper code for working with Blockstore bundles that contain OLX
 """
 
-import logging
+import dateutil.parser
+import logging  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.utils.lru_cache import lru_cache
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
@@ -91,7 +92,7 @@ def usage_for_child_include(parent_usage, parent_definition, parsed_include):
     )
 
 
-class LibraryBundle(object):
+class LibraryBundle:
     """
     Wrapper around a Content Library Blockstore bundle that contains OLX.
     """
@@ -148,7 +149,7 @@ class LibraryBundle(object):
             version_arg = {"draft_name": self.draft_name}
         else:
             version_arg = {"bundle_version": get_bundle_version_number(self.bundle_uuid)}
-        olx_path = "{}/{}/definition.xml".format(usage_key.block_type, usage_key.usage_id)
+        olx_path = f"{usage_key.block_type}/{usage_key.usage_id}/definition.xml"
         try:
             get_bundle_file_metadata_with_cache(self.bundle_uuid, olx_path, **version_arg)
             return BundleDefinitionLocator(self.bundle_uuid, usage_key.block_type, olx_path, **version_arg)
@@ -161,16 +162,23 @@ class LibraryBundle(object):
             except KeyError:
                 return None
 
+    def get_all_usages(self):
+        """
+        Get usage keys of all the blocks in this bundle
+        """
+        usage_keys = []
+        for olx_file_path in self.get_olx_files():
+            block_type, usage_id, _unused = olx_file_path.split('/')
+            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
+            usage_keys.append(usage_key)
+
+        return usage_keys
+
     def get_top_level_usages(self):
         """
         Get the set of usage keys in this bundle that have no parent.
         """
-        own_usage_keys = []
-        for olx_file_path in self.get_olx_files():
-            block_type, usage_id, _unused = olx_file_path.split('/')
-            usage_key = LibraryUsageLocatorV2(self.library_key, block_type, usage_id)
-            own_usage_keys.append(usage_key)
-
+        own_usage_keys = self.get_all_usages()
         usage_keys_with_parents = self.get_bundle_includes().keys()
         return [usage_key for usage_key in own_usage_keys if usage_key not in usage_keys_with_parents]
 
@@ -201,7 +209,7 @@ class LibraryBundle(object):
             try:
                 xml_node = xml_for_definition(def_key)
             except:  # pylint:disable=bare-except
-                log.exception("Unable to load definition {}".format(def_key))
+                log.exception(f"Unable to load definition {def_key}")
                 return
 
             for child in xml_node:
@@ -212,7 +220,7 @@ class LibraryBundle(object):
                     child_usage = usage_for_child_include(usage_key, def_key, parsed_include)
                     child_def_key = definition_for_include(parsed_include, def_key)
                 except BundleFormatException:
-                    log.exception("Unable to parse a child of {}".format(def_key))
+                    log.exception(f"Unable to parse a child of {def_key}")
                     continue
                 usages_found[child_usage] = child_def_key
                 add_definitions_children(child_usage, child_def_key)
@@ -306,8 +314,8 @@ class LibraryBundle(object):
             new_links = set(get_bundle_direct_links_with_cache(self.bundle_uuid, draft_name=self.draft_name).items())
             has_unpublished_changes = new_links != old_links
 
-        published_file_paths = set(f.path for f in get_bundle_files_cached(self.bundle_uuid))
-        draft_file_paths = set(f.path for f in draft_files)
+        published_file_paths = {f.path for f in get_bundle_files_cached(self.bundle_uuid)}
+        draft_file_paths = {f.path for f in draft_files}
         for file_path in published_file_paths:
             if file_path not in draft_file_paths:
                 has_unpublished_changes = True
@@ -348,6 +356,23 @@ class LibraryBundle(object):
             for f in get_bundle_files_cached(self.bundle_uuid, draft_name=self.draft_name)
             if f.path.startswith(path_prefix)
         ]
+
+    def get_last_published_time(self):
+        """
+        Return the timestamp when the current library was last published. If the
+        current draft has never been published, return 0.
+        """
+        cache_key = ("last_published_time", )
+        usages_found = self.cache.get(cache_key)
+        if usages_found is not None:
+            return usages_found
+        version = get_bundle_version_number(self.bundle_uuid)
+        if version == 0:
+            return None
+        created_at_str = blockstore_api.get_bundle_version(self.bundle_uuid, version)['snapshot']['created_at']
+        last_published_time = dateutil.parser.parse(created_at_str)
+        self.cache.set(cache_key, last_published_time)
+        return last_published_time
 
     @staticmethod
     def olx_prefix(definition_key):

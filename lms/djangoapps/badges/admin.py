@@ -6,7 +6,7 @@ Admin registration for Badge Models
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from badges.models import BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
+from lms.djangoapps.badges.models import BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
 
 admin.site.register(CourseCompleteImageConfiguration)
 admin.site.register(BadgeClass)

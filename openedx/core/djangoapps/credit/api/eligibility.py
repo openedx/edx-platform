@@ -6,10 +6,9 @@ whether a user has satisfied those requirements.
 
 import logging
 
-import six
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse, InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import (
@@ -19,7 +18,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 # TODO: Cleanup this mess! ECOM-2908
 
@@ -81,7 +80,7 @@ def set_credit_requirements(course_key, requirements):
     try:
         credit_course = CreditCourse.get_credit_course(course_key=course_key)
     except CreditCourse.DoesNotExist:
-        raise InvalidCreditCourse()
+        raise InvalidCreditCourse()  # lint-amnesty, pylint: disable=raise-missing-from
 
     old_requirements = CreditRequirement.get_course_requirements(course_key=course_key)
     requirements_to_disable = _get_requirements_to_disable(old_requirements, requirements)
@@ -180,12 +179,12 @@ def get_eligibilities_for_user(username, course_key=None):
     """
     eligibilities = CreditEligibility.get_user_eligibilities(username)
     if course_key:
-        course_key = CourseKey.from_string(six.text_type(course_key))
+        course_key = CourseKey.from_string(str(course_key))
         eligibilities = eligibilities.filter(course__course_key=course_key)
 
     return [
         {
-            "course_key": six.text_type(eligibility.course.course_key),
+            "course_key": str(eligibility.course.course_key),
             "deadline": eligibility.deadline,
         }
         for eligibility in eligibilities
@@ -221,8 +220,8 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     # Do not allow students who have requested credit to change their eligibility
     if CreditRequest.get_user_request_status(user.username, course_key):
         log.info(
-            u'Refusing to set status of requirement with namespace "%s" and name "%s" because the '
-            u'user "%s" has already requested credit for the course "%s".',
+            'Refusing to set status of requirement with namespace "%s" and name "%s" because the '
+            'user "%s" has already requested credit for the course "%s".',
             req_namespace, req_name, user.username, course_key
         )
         return
@@ -231,8 +230,8 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     eligible_before_update = CreditEligibility.is_user_eligible_for_credit(course_key, user.username)
     if eligible_before_update and status == 'failed':
         log.info(
-            u'Refusing to set status of requirement with namespace "%s" and name "%s" to "failed" because the '
-            u'user "%s" is already eligible for credit in the course "%s".',
+            'Refusing to set status of requirement with namespace "%s" and name "%s" to "failed" because the '
+            'user "%s" is already eligible for credit in the course "%s".',
             req_namespace, req_name, user.username, course_key
         )
         return
@@ -257,12 +256,12 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
     if req_to_update is None:
         log.error(
             (
-                u'Could not update credit requirement in course "%s" '
-                u'with namespace "%s" and name "%s" '
-                u'because the requirement does not exist. '
-                u'The user "%s" should have had his/her status updated to "%s".'
+                'Could not update credit requirement in course "%s" '
+                'with namespace "%s" and name "%s" '
+                'because the requirement does not exist. '
+                'The user "%s" should have had their status updated to "%s".'
             ),
-            six.text_type(course_key), req_namespace, req_name, user.username, status
+            str(course_key), req_namespace, req_name, user.username, status
         )
         return
 
@@ -312,11 +311,11 @@ def remove_credit_requirement_status(username, course_key, req_namespace, req_na
     if not req_to_remove:
         log.error(
             (
-                u'Could not remove credit requirement in course "%s" '
-                u'with namespace "%s" and name "%s" '
-                u'because the requirement does not exist. '
+                'Could not remove credit requirement in course "%s" '
+                'with namespace "%s" and name "%s" '
+                'because the requirement does not exist. '
             ),
-            six.text_type(course_key), req_namespace, req_name
+            str(course_key), req_namespace, req_name
         )
         return
 
@@ -364,7 +363,7 @@ def get_credit_requirement_status(course_key, username, namespace=None, name=Non
     """
     requirements = CreditRequirement.get_course_requirements(course_key, namespace=namespace, name=name)
     requirement_statuses = CreditRequirementStatus.get_statuses(requirements, username)
-    requirement_statuses = dict((o.requirement, o) for o in requirement_statuses)
+    requirement_statuses = {o.requirement: o for o in requirement_statuses}
     statuses = []
     for requirement in requirements:
         requirement_status = requirement_statuses.get(requirement)
@@ -431,7 +430,7 @@ def _validate_requirements(requirements):
 
         if invalid_params:
             invalid_requirements.append(
-                u"{requirement} has missing/invalid parameters: {params}".format(
+                "{requirement} has missing/invalid parameters: {params}".format(
                     requirement=requirement,
                     params=invalid_params,
                 )

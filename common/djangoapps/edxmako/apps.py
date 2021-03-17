@@ -5,6 +5,7 @@ Configuration for the edxmako Django application.
 
 from django.apps import AppConfig
 from django.conf import settings
+
 from . import add_lookup, clear_lookups
 
 
@@ -12,7 +13,7 @@ class EdxMakoConfig(AppConfig):
     """
     Configuration class for the edxmako Django application.
     """
-    name = 'edxmako'
+    name = 'common.djangoapps.edxmako'
     verbose_name = "edX Mako Templating"
 
     def ready(self):

@@ -7,19 +7,18 @@ import datetime
 import json
 import random
 
-import six
 from pytz import UTC
 
-from util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display
 
 
-class FakeInfo(object):
+class FakeInfo:
     """Parent class for faking objects used in tests"""
     FEATURES = []
 
     def __init__(self):
         for feature in self.FEATURES:
-            setattr(self, feature, u'expected')
+            setattr(self, feature, 'expected')
 
     def to_dict(self):
         """ Returns a dict representation of the object """
@@ -34,8 +33,8 @@ class FakeContentTask(FakeInfo):
         'requester',
     ]
 
-    def __init__(self, email_id, num_sent, num_failed, sent_to):
-        super(FakeContentTask, self).__init__()
+    def __init__(self, email_id, num_sent, num_failed, sent_to):  # lint-amnesty, pylint: disable=unused-argument
+        super().__init__()
         self.task_input = {'email_id': email_id}
         self.task_input = json.dumps(self.task_input)
         self.task_output = {'succeeded': num_sent, 'failed': num_failed}
@@ -57,8 +56,8 @@ class FakeEmail(FakeInfo):
     ]
 
     def __init__(self, email_id):
-        super(FakeEmail, self).__init__()
-        self.id = six.text_type(email_id)  # pylint: disable=invalid-name
+        super().__init__()
+        self.id = str(email_id)  # pylint: disable=invalid-name
         # Select a random data for create field
         year = random.randint(1950, 2000)
         month = random.randint(1, 12)
@@ -69,7 +68,7 @@ class FakeEmail(FakeInfo):
         self.targets = FakeTargetGroup()
 
 
-class FakeTarget(object):
+class FakeTarget:
     """ Corresponding fake target for a fake email """
     target_type = "expected"
 
@@ -78,7 +77,7 @@ class FakeTarget(object):
         return self.target_type
 
 
-class FakeTargetGroup(object):
+class FakeTargetGroup:
     """ Mocks out the M2M relationship between FakeEmail and FakeTarget """
     def all(self):
         """ Mocks out a django method """
@@ -88,21 +87,21 @@ class FakeTargetGroup(object):
 class FakeEmailInfo(FakeInfo):
     """ Fake email information object """
     FEATURES = [
-        u'created',
-        u'sent_to',
-        u'email',
-        u'number_sent',
-        u'requester',
+        'created',
+        'sent_to',
+        'email',
+        'number_sent',
+        'requester',
     ]
 
     EMAIL_FEATURES = [
-        u'subject',
-        u'html_message',
-        u'id'
+        'subject',
+        'html_message',
+        'id'
     ]
 
     def __init__(self, fake_email, num_sent, num_failed):
-        super(FakeEmailInfo, self).__init__()
+        super().__init__()
         self.created = get_default_time_display(fake_email.created)
 
         number_sent = str(num_sent) + ' sent'
@@ -112,5 +111,5 @@ class FakeEmailInfo(FakeInfo):
         self.number_sent = number_sent
         fake_email_dict = fake_email.to_dict()
         self.email = {feature: fake_email_dict[feature] for feature in self.EMAIL_FEATURES}
-        self.requester = u'expected'
-        self.sent_to = [u'expected']
+        self.requester = 'expected'
+        self.sent_to = ['expected']

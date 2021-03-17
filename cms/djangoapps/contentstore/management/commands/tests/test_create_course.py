@@ -2,11 +2,9 @@
 Unittests for creating a course in an chosen modulestore
 """
 
-
-from six import StringIO
+from io import StringIO
 
 import ddt
-import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -19,14 +17,11 @@ class TestArgParsing(TestCase):
     """
     Tests for parsing arguments for the `create_course` management command
     """
-    def setUp(self):
-        super(TestArgParsing, self).setUp()
+    def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
+        super().setUp()
 
     def test_no_args(self):
-        if six.PY2:
-            errstring = "Error: too few arguments"
-        else:
-            errstring = "Error: the following arguments are required: modulestore, user, org, number, run"
+        errstring = "Error: the following arguments are required: modulestore, user, org, number, run"
         with self.assertRaisesRegex(CommandError, errstring):
             call_command('create_course')
 
@@ -62,7 +57,7 @@ class TestCreateCourse(ModuleStoreTestCase):
         new_key = modulestore().make_course_key("org", "course", "run")
         self.assertTrue(
             modulestore().has_course(new_key),
-            u"Could not find course in {}".format(store)
+            f"Could not find course in {store}"
         )
         # pylint: disable=protected-access
         self.assertEqual(store, modulestore()._get_modulestore_for_courselike(new_key).get_modulestore_type())
@@ -87,7 +82,7 @@ class TestCreateCourse(ModuleStoreTestCase):
             "org", "course", "run", "dummy-course-name",
             stderr=out
         )
-        expected = u"Course already exists"
+        expected = "Course already exists"
         self.assertIn(out.getvalue().strip(), expected)
 
     @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
@@ -115,7 +110,7 @@ class TestCreateCourse(ModuleStoreTestCase):
                 )
                 course = self.store.get_course(lowercase_course_id)
                 self.assertIsNotNone(course, 'Course not found using lowercase course key.')
-                self.assertEqual(six.text_type(course.id), six.text_type(lowercase_course_id))
+                self.assertEqual(str(course.id), str(lowercase_course_id))
 
                 # Verify store does not return course with different case.
                 uppercase_course_id = self.store.make_course_key(org.upper(), number.upper(), run.upper())

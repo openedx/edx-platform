@@ -7,22 +7,22 @@ import logging
 import time
 from datetime import timedelta
 
-from course_modes.models import CourseMode
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, wrong-import-order
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Q
-from django.urls import reverse
+from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import, wrong-import-order
 from django.utils.timezone import now
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from student.models import CourseEnrollment
-from util.query import use_read_replica_if_available
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
-from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.services import IDVerificationService  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -35,12 +35,12 @@ class Command(BaseCommand):
     """
     This command sends email to learners for which the Software Secure Photo Verification has expired
 
-    The expiry email is sent when the date represented by SoftwareSecurePhotoVerification's field `expiry_date`
+    The expiry email is sent when the date represented by SoftwareSecurePhotoVerification's field `expiration_datetime`
     lies within the date range provided by command arguments. If the email is already sent indicated by field
     `expiry_email_date` then filter if the specified number of days given in settings as
     VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS'] have passed since the last email.
 
-    Since a user can have multiple verification all the previous verifications have expiry_date and expiry_email_date
+    Since a user can have multiple verification all the previous verifications have expiry_email_date
     set to None so that they are not filtered. See lms/djangoapps/verify_student/views.py:1174
 
     The range to filter expired verification is selected based on VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']. This
@@ -91,8 +91,8 @@ class Command(BaseCommand):
         dry_run = options['dry_run']
 
         if default_emails <= 0:
-            raise CommandError(u'DEFAULT_EMAILS must be a positive integer. If you do not wish to send emails '
-                               u'use --dry-run flag instead.')
+            raise CommandError('DEFAULT_EMAILS must be a positive integer. If you do not wish to send emails '
+                               'use --dry-run flag instead.')
 
         end_date = now().replace(hour=0, minute=0, second=0, microsecond=0)
         # If email was sent and user did not re-verify then this date will be used as the criteria for resending email
@@ -101,22 +101,31 @@ class Command(BaseCommand):
         start_date = end_date - timedelta(days=days)
 
         # Adding an order_by() clause will override the class meta ordering as we don't need ordering here
-        query = SoftwareSecurePhotoVerification.objects.filter(Q(status='approved') &
-                                                               Q(expiry_date__isnull=False) &
-                                                               (Q(expiry_date__gte=start_date,
-                                                                  expiry_date__lt=end_date) |
-                                                                Q(expiry_email_date__lte=date_resend_days_ago)
-                                                                )).order_by()
+        query = SoftwareSecurePhotoVerification.objects.filter(
+            Q(status='approved') &
+            (
+                Q(expiration_date__isnull=False) & (
+                    Q(expiration_date__gte=start_date, expiration_date__lt=end_date) |
+                    Q(expiry_email_date__lte=date_resend_days_ago)
+                ) |
+                # Account for old entries still using `expiry_date` rather than`expiration_date`
+                # (this will be deprecated)
+                Q(expiry_date__isnull=False) & (
+                    Q(expiry_date__gte=start_date, expiry_date__lt=end_date) |
+                    Q(expiry_email_date__lte=date_resend_days_ago)
+                )
+            )
+        ).order_by()
 
         sspv = use_read_replica_if_available(query)
 
         total_verification = sspv.count()
         if not total_verification:
-            logger.info(u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
-                        u"date range {} - {}".format(start_date.date(), now().date()))
+            logger.info("No approved expired entries found in SoftwareSecurePhotoVerification for the "
+                        "date range {} - {}".format(start_date.date(), now().date()))
             return
 
-        logger.info(u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
+        logger.info("For the date range {} - {}, total Software Secure Photo verification filtered are {}"
                     .format(start_date.date(), now().date(), total_verification))
 
         batch_verifications = []
@@ -182,8 +191,8 @@ class Command(BaseCommand):
         """
         if email_config['dry_run']:
             logger.info(
-                u"This was a dry run, no email was sent. For the actual run email would have been sent "
-                u"to {} learner(s)".format(len(batch_verifications))
+                "This was a dry run, no email was sent. For the actual run email would have been sent "
+                "to {} learner(s)".format(len(batch_verifications))
             )
             return True
 
@@ -191,7 +200,7 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': IDVerificationService.email_reverify_url(),
+            'lms_verification_link': f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification',
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 
@@ -204,7 +213,7 @@ class Command(BaseCommand):
                 user = users.get(pk=verification.user_id)
                 with emulate_http_request(site=site, user=user):
                     msg = expiry_email.personalize(
-                        recipient=Recipient(user.username, user.email),
+                        recipient=Recipient(user.id, user.email),
                         language=get_user_preference(user, LANGUAGE_KEY),
                         user_context={
                             'full_name': user.profile.name,
@@ -230,7 +239,7 @@ class Command(BaseCommand):
         """
         send_expiry_email_again = True
         email_duration = email_config['resend_days'] * (email_config['default_emails'] - 1)
-        days_since_expiry = (now() - verification.expiry_date).days
+        days_since_expiry = (now() - verification.expiration_datetime).days
 
         if days_since_expiry >= email_duration:
             send_expiry_email_again = False

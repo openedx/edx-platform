@@ -13,7 +13,6 @@ the marketing site and blog).
 
 """
 
-
 import logging
 
 import six
@@ -23,8 +22,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six.moves.urllib.parse import urljoin
 
-from branding.models import BrandingApiConfig
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.models import BrandingApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -90,7 +89,7 @@ def get_footer(is_secure=True, language=settings.LANGUAGE_CODE):
             # ...
         ],
         "openedx_link": {
-            "url": "http://open.edx.org",
+            "url": "https://open.edx.org",
             "title": "Powered by Open edX",
             "image": "http://example.com/openedx.png"
         }
@@ -127,9 +126,9 @@ def _footer_copyright():
     return _(
         # Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
         # Please do not translate any of these trademarks and company names.
-        u"\u00A9 {org_name}.  All rights reserved except where noted.  "
-        u"edX, Open edX and their respective logos are "
-        u"registered trademarks of edX Inc."
+        "\u00A9 {org_name}.  All rights reserved except where noted.  "
+        "edX, Open edX and their respective logos are "
+        "registered trademarks of edX Inc."
     ).format(org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME))
 
 
@@ -166,10 +165,10 @@ def _footer_social_links():
         links.append(
             {
                 "name": social_name,
-                "title": six.text_type(display.get("title", "")),
+                "title": str(display.get("title", "")),
                 "url": settings.SOCIAL_MEDIA_FOOTER_URLS.get(social_name, "#"),
                 "icon-class": display.get("icon", ""),
-                "action": six.text_type(display.get("action", "")).format(platform_name=platform_name),
+                "action": str(display.get("action", "")).format(platform_name=platform_name),
             }
         )
     return links
@@ -216,7 +215,7 @@ def _build_support_form_url(full_path=False):
 
             # Prepend with lms base_url if specified by `full_path`
             if full_path:
-                contact_us_page = '{}{}'.format(settings.LMS_ROOT_URL, contact_us_page)
+                contact_us_page = f'{settings.LMS_ROOT_URL}{contact_us_page}'
 
     return contact_us_page
 
@@ -278,7 +277,7 @@ def _footer_navigation_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             marketing_link("ENTERPRISE"),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
         ("blog", (marketing_link("BLOG"), _("Blog"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
@@ -354,7 +353,7 @@ def _footer_business_links(language=settings.LANGUAGE_CODE):
         ("about", (marketing_link("ABOUT"), _("About"))),
         ("enterprise", (
             _add_enterprise_marketing_footer_query_params(marketing_link("ENTERPRISE")),
-            _(u"{platform_name} for Business").format(platform_name=platform_name)
+            _("{platform_name} for Business").format(platform_name=platform_name)
         )),
     ]
 
@@ -425,7 +424,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "apple",
                 "title": _(
-                    u"Download the {platform_name} mobile app from the Apple App Store"
+                    "Download the {platform_name} mobile app from the Apple App Store"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('apple', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/app_store_badge_135x40.svg'),
@@ -433,7 +432,7 @@ def _footer_mobile_links(is_secure):
             {
                 "name": "google",
                 "title": _(
-                    u"Download the {platform_name} mobile app from Google Play"
+                    "Download the {platform_name} mobile app from Google Play"
                 ).format(platform_name=platform_name),
                 "url": settings.MOBILE_STORE_URLS.get('google', '#'),
                 "image": _absolute_url_staticfile(is_secure, 'images/app/google_play_badge_45.png'),
@@ -443,43 +442,47 @@ def _footer_mobile_links(is_secure):
 
 
 def _footer_logo_img(is_secure):
-    """Return the logo used for footer about link
+    """
+    Return the logo used for footer about link
 
-    Args:
+    Arguments:
         is_secure (bool): Whether the request is using TLS.
 
     Returns:
-        Absolute url to logo
+        URL of the brand logo
     """
-    logo_name = configuration_helpers.get_value('FOOTER_ORGANIZATION_IMAGE', settings.FOOTER_ORGANIZATION_IMAGE)
+    default_local_path = 'images/logo.png'
+    brand_footer_logo_url = settings.LOGO_TRADEMARK_URL
+    footer_url_from_site_config = configuration_helpers.get_value(
+        'FOOTER_ORGANIZATION_IMAGE',
+        settings.FOOTER_ORGANIZATION_IMAGE
+    )
+
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
-    # `lms.env.json`, which is created and managed by Ansible. Because of
+    # `lms.yml`, which is created and managed by Ansible. Because of
     # this runaround, we lose a lot of the flexibility that Django's
     # staticfiles system provides, and we end up having to hardcode the path
     # to the footer logo rather than use the comprehensive theming system.
     # EdX needs the FOOTER_ORGANIZATION_IMAGE value to point to edX's
     # logo by default, so that it can display properly on edx.org -- both
     # within the LMS, and on the Drupal marketing site, which uses this API.
-    try:
-        return _absolute_url_staticfile(is_secure, logo_name)
-    except ValueError:
-        # However, if the edx.org comprehensive theme is not activated,
-        # Django's staticfiles system will be unable to find this footer,
-        # and will throw a ValueError. Since the edx.org comprehensive theme
-        # is not activated by default, we will end up entering this block
-        # of code on new Open edX installations, and on sandbox installations.
-        # We can log when this happens:
-        default_logo = "images/logo.png"
-        log.info(
-            u"Failed to find footer logo at '%s', using '%s' instead",
-            logo_name,
-            default_logo,
-        )
-        # And we'll use the default logo path of "images/logo.png" instead.
-        # There is a core asset that corresponds to this logo, so this should
-        # always succeed.
-        return staticfiles_storage.url(default_logo)
+    if footer_url_from_site_config:
+        return _absolute_url_staticfile(is_secure, footer_url_from_site_config)
+
+    if brand_footer_logo_url:
+        return brand_footer_logo_url
+
+    log.info(
+        "Failed to find footer logo at '%s', using '%s' instead",
+        footer_url_from_site_config,
+        default_local_path,
+    )
+
+    # And we'll use the default logo path of "images/logo.png" instead.
+    # There is a core asset that corresponds to this logo, so this should
+    # always succeed.
+    return staticfiles_storage.url(default_local_path)
 
 
 def _absolute_url(is_secure, url_path):
@@ -564,27 +567,53 @@ def get_base_url(is_secure):
 
 def get_logo_url(is_secure=True):
     """
-    Return the url for the branded logo image to be used
+    Return the url for the branded logo image to be used.
+
+    Preference of the logo should be,
+        Look for site configuration override and return absolute url
+        Absolute url of brand Logo if defined in django settings
+        Relative default local image path
+
     Arguments:
         is_secure (bool): If true, use HTTPS as the protocol.
     """
-
-    # if the configuration has an overide value for the logo_image_url
-    # let's use that
-    image_url = configuration_helpers.get_value('logo_image_url')
-    if image_url:
-        return _absolute_url_staticfile(
-            is_secure=is_secure,
-            name=image_url,
-        )
-
-    # otherwise, use the legacy means to configure this
+    brand_logo_url = settings.LOGO_URL
+    default_local_path = 'images/logo.png'
+    logo_url_from_site_config = configuration_helpers.get_value('logo_image_url')
     university = configuration_helpers.get_value('university')
 
+    if logo_url_from_site_config:
+        return _absolute_url_staticfile(is_secure=is_secure, name=logo_url_from_site_config)
+
     if university:
-        return staticfiles_storage.url('images/{uni}-on-edx-logo.png'.format(uni=university))
-    else:
-        return staticfiles_storage.url('images/logo.png')
+        return staticfiles_storage.url(f'images/{university}-on-edx-logo.png')
+
+    if brand_logo_url:
+        return brand_logo_url
+
+    return staticfiles_storage.url(default_local_path)
+
+
+def get_favicon_url():
+    """
+    Return the url for the branded favicon image to be used.
+
+    Preference of the icon should be,
+        Look for site configuration override
+        Brand favicon url is defined in settings
+        Default local image path
+    """
+    brand_favicon_url = settings.FAVICON_URL
+    default_local_path = getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')
+    favicon_url_from_site_config = configuration_helpers.get_value('favicon_path')
+
+    if favicon_url_from_site_config:
+        return staticfiles_storage.url(favicon_url_from_site_config)
+
+    if brand_favicon_url:
+        return brand_favicon_url
+
+    return staticfiles_storage.url(default_local_path)
 
 
 def get_tos_and_honor_code_url():
@@ -613,3 +642,11 @@ def get_home_url():
     Return Dashboard page url
     """
     return reverse('dashboard')
+
+
+def get_logo_url_for_email():
+    """
+    Returns the url for the branded logo image for embedding in email templates.
+    """
+    default_logo_url = getattr(settings, 'DEFAULT_EMAIL_LOGO_URL', None)
+    return getattr(settings, 'LOGO_URL_PNG', None) or default_logo_url

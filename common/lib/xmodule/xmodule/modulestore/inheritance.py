@@ -20,10 +20,10 @@ _ = lambda text: text
 
 class UserPartitionList(List):
     """Special List class for listing UserPartitions"""
-    def from_json(self, values):
+    def from_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
         return [UserPartition.from_json(v) for v in values]
 
-    def to_json(self, values):
+    def to_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
         return [user_partition.to_json()
                 for user_partition in values]
 
@@ -84,7 +84,8 @@ class InheritanceMixin(XBlockMixin):
             # specific words for the acceptable values.
             'Specify when the Show Answer button appears for each problem. '
             'Valid values are "always", "answered", "attempted", "closed", '
-            '"finished", "past_due", "correct_or_past_due", and "never".'
+            '"finished", "past_due", "correct_or_past_due", "after_all_attempts", '
+            '"after_all_attempts_or_correct", "attempted_no_past_due", and "never".'
         ),
         scope=Scope.settings,
         default="finished",
@@ -123,19 +124,19 @@ class InheritanceMixin(XBlockMixin):
     )
     static_asset_path = String(
         display_name=_("Static Asset Path"),
-        help=_("Enter the path to use for files on the Files & Uploads page. This value overrides the Studio default, c4x://."),
+        help=_("Enter the path to use for files on the Files & Uploads page. This value overrides the Studio default, c4x://."),  # lint-amnesty, pylint: disable=line-too-long
         scope=Scope.settings,
         default='',
     )
     use_latex_compiler = Boolean(
         display_name=_("Enable LaTeX Compiler"),
-        help=_("Enter true or false. If true, you can use the LaTeX templates for HTML components and advanced Problem components."),
+        help=_("Enter true or false. If true, you can use the LaTeX templates for HTML components and advanced Problem components."),  # lint-amnesty, pylint: disable=line-too-long
         default=False,
         scope=Scope.settings
     )
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Enter the maximum number of times a student can try to answer problems. By default, Maximum Attempts is set to null, meaning that students have an unlimited number of attempts for problems. You can override this course-wide setting for individual problems. However, if the course-wide setting is a specific number, you cannot set the Maximum Attempts for individual problems to unlimited."),
+        help=_("Enter the maximum number of times a student can try to answer problems. By default, Maximum Attempts is set to null, meaning that students have an unlimited number of attempts for problems. You can override this course-wide setting for individual problems. However, if the course-wide setting is a specific number, you cannot set the Maximum Attempts for individual problems to unlimited."),  # lint-amnesty, pylint: disable=line-too-long
         values={"min": 0}, scope=Scope.settings
     )
     matlab_api_key = String(
@@ -164,7 +165,7 @@ class InheritanceMixin(XBlockMixin):
     video_auto_advance = Boolean(
         display_name=_("Enable video auto-advance"),
         help=_(
-            "Specify whether to show an auto-advance button in videos. If the student clicks it, when the last video in a unit finishes it will automatically move to the next unit and autoplay the first video."
+            "Specify whether to show an auto-advance button in videos. If the student clicks it, when the last video in a unit finishes it will automatically move to the next unit and autoplay the first video."  # lint-amnesty, pylint: disable=line-too-long
         ),
         scope=Scope.settings,
         default=False
@@ -267,7 +268,7 @@ class InheritanceMixin(XBlockMixin):
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
-    inheritance.  Should be called on a CourseDescriptor after importing a
+    inheritance.  Should be called on a CourseBlock after importing a
     course.
 
     NOTE: This means that there is no such thing as lazy loading at the
@@ -275,7 +276,7 @@ def compute_inherited_metadata(descriptor):
     if descriptor.has_children:
         parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
         # add any of descriptor's explicitly set fields to the inheriting list
-        for field in InheritanceMixin.fields.values():
+        for field in InheritanceMixin.fields.values():  # lint-amnesty, pylint: disable=no-member
             if field.is_set_on(descriptor):
                 # inherited_settings values are json repr
                 parent_metadata[field.name] = field.read_json(descriptor)
@@ -317,7 +318,7 @@ class InheritingFieldData(KvsFieldData):
         parents.
 
         """
-        super(InheritingFieldData, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.inheritable_names = set(inheritable_names)
 
     def has_default_value(self, name):
@@ -348,20 +349,20 @@ class InheritingFieldData(KvsFieldData):
             if ancestor and \
                ancestor.location.block_type == 'library_content' and \
                self.has_default_value(name):
-                return super(InheritingFieldData, self).default(block, name)
+                return super().default(block, name)
 
             while ancestor is not None:
                 if field.is_set_on(ancestor):
                     return field.read_json(ancestor)
                 else:
                     ancestor = ancestor.get_parent()
-        return super(InheritingFieldData, self).default(block, name)
+        return super().default(block, name)
 
 
 def inheriting_field_data(kvs):
     """Create an InheritanceFieldData that inherits the names in InheritanceMixin."""
     return InheritingFieldData(
-        inheritable_names=InheritanceMixin.fields.keys(),
+        inheritable_names=InheritanceMixin.fields.keys(),  # lint-amnesty, pylint: disable=no-member
         kvs=kvs,
     )
 
@@ -374,7 +375,7 @@ class InheritanceKeyValueStore(KeyValueStore):
     Note: inherited_settings is a dict of key to json values (internal xblock field repr)
     """
     def __init__(self, initial_values=None, inherited_settings=None):
-        super(InheritanceKeyValueStore, self).__init__()
+        super().__init__()
         self.inherited_settings = inherited_settings or {}
         self._fields = initial_values or {}
 

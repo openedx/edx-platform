@@ -5,22 +5,24 @@ Tests for student activation and login
 
 
 import datetime
+import hashlib
 import json
 import unicodedata
 
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, reverse
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from freezegun import freeze_time
-from mock import patch
-from six.moves import range
+from mock import Mock, patch
+from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
@@ -28,17 +30,18 @@ from openedx.core.djangoapps.password_policy.compliance import (
 )
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
+from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
 from openedx.core.djangoapps.user_authn.views.login import (
-    AllowedAuthUser,
     ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY,
+    AllowedAuthUser,
     _check_user_auth_flow
 )
-from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.lib.api.test_utils import ApiTestCase
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
+from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -56,7 +59,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def setUp(self):
         """Setup a test user along with its registration and profile"""
-        super(LoginTest, self).setUp()
+        super(LoginTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = self._create_user(self.username, self.user_email)
 
         RegistrationFactory(user=self.user)
@@ -75,38 +78,49 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
 
     def test_login_success(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', self.user_email])
 
-    FEATURES_WITH_LOGIN_MFE_ENABLED = settings.FEATURES.copy()
-    FEATURES_WITH_LOGIN_MFE_ENABLED['ENABLE_LOGIN_MICROFRONTEND'] = True
+    FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
+    FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
+
+    @patch.dict(settings.FEATURES, {
+        "ENABLE_THIRD_PARTY_AUTH": True
+    })
+    @patch(
+        'openedx.core.djangoapps.user_authn.views.login.is_require_third_party_auth_enabled',
+        Mock(return_value=True)
+    )
+    @skip_unless_lms
+    def test_public_login_failure_with_only_third_part_auth_enabled(self):
+        response, _ = self._login_response(
+            self.user_email,
+            self.password,
+        )
+        assert response.status_code == 403
+        assert response.content == b'Third party authentication is required to login.' \
+                                   b' Username and password were received instead.'
 
     @ddt.data(
         # Default redirect is dashboard.
         {
             'next_url': None,
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
         },
-        # A relative path is an acceptable redirect.
+        # Added root url in next .
         {
             'next_url': '/harmless-relative-page',
             'course_id': None,
-            'expected_redirect': '/harmless-relative-page',
-        },
-        # Paths without trailing slashes are also considered relative.
-        {
-            'next_url': 'courses',
-            'course_id': None,
-            'expected_redirect': 'courses',
+            'expected_redirect': settings.LMS_ROOT_URL + '/harmless-relative-page',
         },
         # An absolute URL to a non-whitelisted domain is not an acceptable redirect.
         {
             'next_url': 'https://evil.sketchysite',
             'course_id': None,
-            'expected_redirect': '/dashboard',
+            'expected_redirect': settings.LMS_ROOT_URL + '/dashboard',
         },
         # An absolute URL to a whitelisted domain is acceptable.
         {
@@ -119,7 +133,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': None,
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
             ),
         },
         # If valid course_id AND next_url are provided, redirect to finish_auth with
@@ -128,7 +143,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': 'freshpage',
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=freshpage'
+                settings.LMS_ROOT_URL + '/account/finish_auth?course_id=coursekey&next=freshpage'
             )
         },
         # If course_id is provided with invalid next_url, redirect to finish_auth with
@@ -137,20 +152,24 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'next_url': 'http://scam.scam',
             'course_id': 'coursekey',
             'expected_redirect': (
-                '/account/finish_auth?course_id=coursekey&next=%2Fdashboard'
+                '{root_url}/account/finish_auth?course_id=coursekey&next=%2Fdashboard'.
+                format(root_url=settings.LMS_ROOT_URL)
             ),
         },
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
-    @override_settings(FEATURES=FEATURES_WITH_LOGIN_MFE_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
     @skip_unless_lms
     def test_login_success_with_redirect(self, next_url, course_id, expected_redirect):
         post_params = {}
+
         if next_url:
             post_params['next'] = next_url
         if course_id:
             post_params['course_id'] = course_id
+
         response, _ = self._login_response(
             self.user_email,
             self.password,
@@ -160,10 +179,116 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(response, success=True)
         self._assert_redirect_url(response, expected_redirect)
 
+    @ddt.data(('/dashboard', False), ('/enterprise/select/active/?success_url=/dashboard', True))
+    @ddt.unpack
+    @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
+    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
+    @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
+    @skip_unless_lms
+    def test_login_success_for_multiple_enterprises(
+        self, expected_redirect, user_has_multiple_enterprises, reverse_mock, mock_api_client_class
+    ):
+        """
+        Test that if multiple enterprise feature is enabled, user is redirected
+        to correct page
+        """
+        api_response = {'results': []}
+        enterprise = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+        api_response['results'].append(
+            {
+                "enterprise_customer": {
+                    "uuid": enterprise.uuid,
+                    "name": enterprise.name,
+                    "active": enterprise.active,
+                }
+            }
+        )
+
+        if user_has_multiple_enterprises:
+            enterprise = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+            api_response['results'].append(
+                {
+                    "enterprise_customer": {
+                        "uuid": enterprise.uuid,
+                        "name": enterprise.name,
+                        "active": enterprise.active,
+                    }
+                }
+            )
+
+        mock_client = mock_api_client_class.return_value
+        mock_client.fetch_enterprise_learner_data.return_value = api_response
+        reverse_mock.return_value = '/enterprise/select/active'
+
+        response, _ = self._login_response(
+            self.user.email,
+            self.password,
+            HTTP_ACCEPT='*/*',
+        )
+        self._assert_response(response, success=True)
+        self._assert_redirect_url(response, settings.LMS_ROOT_URL + expected_redirect)
+
+    @ddt.data(('', True), ('/enterprise/select/active/?success_url=', False))
+    @ddt.unpack
+    @patch.dict(settings.FEATURES, {'ENABLE_AUTHN_MICROFRONTEND': True, 'ENABLE_ENTERPRISE_INTEGRATION': True})
+    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
+    @patch('openedx.features.enterprise_support.api.EnterpriseApiClient')
+    @patch('openedx.core.djangoapps.user_authn.views.login.activate_learner_enterprise')
+    @patch('openedx.core.djangoapps.user_authn.views.login.reverse')
+    @skip_unless_lms
+    def test_enterprise_in_url(
+        self, expected_redirect, is_activated, reverse_mock, mock_activate_learner_enterprise, mock_api_client_class
+    ):
+        """
+        If user has multiple enterprises and the enterprise is present in url,
+        activate that url
+        """
+        api_response = {}
+        enterprise_1 = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+        enterprise_2 = EnterpriseCustomerUserFactory(user_id=self.user.id).enterprise_customer
+        api_response['results'] = [
+            {
+                "enterprise_customer": {
+                    "uuid": enterprise_1.uuid,
+                    "name": enterprise_1.name,
+                    "active": enterprise_1.active,
+                }
+            },
+            {
+                "enterprise_customer": {
+                    "uuid": enterprise_2.uuid,
+                    "name": enterprise_2.name,
+                    "active": enterprise_2.active,
+                }
+            }
+        ]
+
+        next_url = '/enterprise/{}/course/{}/enroll/?catalog=catalog_uuid&utm_medium=enterprise'.format(
+            enterprise_1.uuid,
+            'course-v1:testX+test101+2T2020'
+        )
+
+        mock_client = mock_api_client_class.return_value
+        mock_client.fetch_enterprise_learner_data.return_value = api_response
+        mock_activate_learner_enterprise.return_value = is_activated
+        reverse_mock.return_value = '/enterprise/select/active'
+
+        response, _ = self._login_response(
+            self.user.email,
+            self.password,
+            extra_post_params={'next': next_url},
+            HTTP_ACCEPT='*/*',
+        )
+
+        self._assert_response(response, success=True)
+        self._assert_redirect_url(response, settings.LMS_ROOT_URL + expected_redirect + next_url)
+
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_success_no_pii(self):
         response, mock_audit_log = self._login_response(
-            self.user_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            self.user_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success'])
@@ -175,13 +300,15 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self.user.save()
 
         response, mock_audit_log = self._login_response(
-            unicode_email, self.password, patched_audit_log='student.models.AUDIT_LOG'
+            unicode_email, self.password, patched_audit_log='common.djangoapps.student.models.AUDIT_LOG'
         )
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', unicode_email])
 
     def test_login_fail_no_user_exists(self):
         nonexistent_email = u'not_a_user@edx.org'
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             nonexistent_email,
             self.password,
@@ -189,7 +316,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         self._assert_response(
             response, success=False, value=self.LOGIN_FAILED_WARNING, status_code=400
         )
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_no_user_exists_no_pii(self):
@@ -209,16 +336,17 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', self.user_email, u'invalid'])
+                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_fail_wrong_password_no_pii(self):
         response, mock_audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'password for', u'invalid'])
+        self._assert_audit_log(
+            mock_audit_log, 'warning', [u'Login failed', u'password for', str(self.user.id), u'invalid']
+        )
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
 
-    @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_not_activated_no_pii(self):
         # De-activate the user
         self.user.is_active = False
@@ -229,8 +357,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password
         )
-        self._assert_response(response, success=False,
-                              value="In order to sign in, you need to activate your account.")
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
@@ -246,7 +373,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             self.user_email,
             self.password,
         )
-        self._assert_response(response, success=False, value=self.ACTIVATE_ACCOUNT_WARNING)
+        self._assert_response(response, success=False, error_code="inactive-user")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch('openedx.core.djangoapps.user_authn.views.login._log_and_raise_inactive_user_auth_error')
@@ -256,22 +383,26 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         the system does *not* send account activation email notification to the user.
         """
         nonexistent_email = 'incorrect@email.com'
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(nonexistent_email.encode('utf-8')).hexdigest(16)
         self.user.is_active = False
         self.user.save()
         response, mock_audit_log = self._login_response(nonexistent_email, 'incorrect_password')
 
-        self.assertFalse(mock_inactive_user_email_and_error.called)
+        assert not mock_inactive_user_email_and_error.called
         self._assert_response(response, success=False, value=self.LOGIN_FAILED_WARNING)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', nonexistent_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Unknown user email', email_hash])
 
     def test_login_unicode_email(self):
         unicode_email = self.user_email + six.unichr(40960)
+        # pylint: disable=too-many-function-args
+        email_hash = hashlib.shake_128(unicode_email.encode('utf-8')).hexdigest(16)
         response, mock_audit_log = self._login_response(
             unicode_email,
             self.password,
         )
         self._assert_response(response, success=False)
-        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', unicode_email])
+        self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', email_hash])
 
     def test_login_unicode_password(self):
         unicode_password = self.password + six.unichr(1972)
@@ -281,15 +412,15 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         )
         self._assert_response(response, success=False)
         self._assert_audit_log(mock_audit_log, 'warning',
-                               [u'Login failed', u'password for', self.user_email, u'invalid'])
+                               [u'Login failed', u'password for', str(self.user.id), u'invalid'])
 
     def test_logout_logging(self):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
 
     def test_login_user_info_cookie(self):
@@ -300,20 +431,20 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         cookie = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME]
         user_info = json.loads(cookie.value)
 
-        self.assertEqual(user_info["version"], settings.EDXMKTG_USER_INFO_COOKIE_VERSION)
-        self.assertEqual(user_info["username"], self.user.username)
+        assert user_info['version'] == settings.EDXMKTG_USER_INFO_COOKIE_VERSION
+        assert user_info['username'] == self.user.username
 
         # Check that the URLs are absolute
         for url in user_info["header_urls"].values():
-            self.assertIn("http://testserver/", url)
+            assert 'http://testserver/' in url
 
     def test_logout_deletes_mktg_cookies(self):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
         # Check that the marketing site cookies have been set
-        self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
-        self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
+        assert settings.EDXMKTG_LOGGED_IN_COOKIE_NAME in self.client.cookies
+        assert settings.EDXMKTG_USER_INFO_COOKIE_NAME in self.client.cookies
 
         # Log out
         logout_url = reverse('logout')
@@ -323,7 +454,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # (cookies are deleted by setting an expiration date in 1970)
         for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
             cookie = self.client.cookies[cookie_name]
-            self.assertIn("01 Jan 1970", cookie.get('expires').replace('-', ' '))
+            assert '01 Jan 1970' in cookie.get('expires').replace('-', ' ')
 
     @override_settings(
         EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
@@ -347,9 +478,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _ = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
         logout_url = reverse('logout')
-        with patch('student.models.AUDIT_LOG') as mock_audit_log:
+        with patch('common.djangoapps.student.models.AUDIT_LOG') as mock_audit_log:
             response = self.client.post(logout_url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout'])
         self._assert_not_in_audit_log(mock_audit_log, 'info', [u'test'])
 
@@ -365,42 +496,47 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         response, _audit_log = self._login_response(self.user_email, self.password)
         self._assert_response(response, success=True)
 
-    @override_settings(RATELIMIT_ENABLE=False)
-    def test_excessive_login_attempts(self):
-        # try logging in 30 times, the default limit in the number of failed
+    @patch('openedx.core.djangoapps.util.ratelimit.real_ip')
+    def test_excessive_login_attempts_by_email(self, real_ip_mock):
+        # try logging in 6 times, the defalutlimit for the number of failed
         # login attempts in one 5 minute period before the rate gets limited
-        for i in range(30):
-            password = u'test_password{0}'.format(i)
-            self._login_response(self.user_email, password)
-        # check to see if this response indicates that this was ratelimited
-        response, _audit_log = self._login_response(self.user_email, 'wrong_password')
+        # for a specific e-mail address.
+
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(6):
+                password = u'test_password{0}'.format(i)
+                # Provide unique IPs so we don't get ip rate limited.
+                real_ip_mock.return_value = f'192.168.1.{i}'
+                self._login_response(self.user_email, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.user_email, 'wrong_password')
         self._assert_response(response, success=False, value='Too many failed login attempts')
 
-    def test_login_ratelimited(self):
-        """
-        Test that login endpoint is IP ratelimited and only allow 5 requests
-        per 5 minutes per IP.
-        """
-        for i in range(5):
-            password = u'test_password{0}'.format(i)
-            response, _audit_log = self._login_response(self.user_email, password)
-            self._assert_response(response, success=False)
+    def test_excessive_login_attempts_by_ip(self):
+        # try logging in 5 times, the default limit for the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        # from a specific ip address.
 
-        response, _audit_log = self._login_response(self.user_email, self.password)
-        self.assertEqual(response.status_code, 403)
-
-        # now reset the time to 6 min from now in future and verify that it will
-        # allow another request from same IP and user can successfully login
-        reset_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=361)
-        with freeze_time(reset_time):
-            response, _audit_log = self._login_response(self.user_email, self.password)
-            self._assert_response(response, success=True)
+        # We freeze time to deal with the fact that rate limit time boundaries
+        # are not predictable and we don't want the test to be flaky.
+        with freeze_time():
+            for i in range(5):
+                # provide different e-mail addresses so we don't get rate-limited
+                # by e-mail.
+                email = f'test_email{i}@example.com'
+                password = f'test_password{i}'
+                self._login_response(email, password)
+            # check to see if this response indicates that this was ratelimited
+            response, _audit_log = self._login_response(self.user_email, 'wrong_password')
+        self._assert_response(response, success=False, value='Too many failed login attempts')
 
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh(self):
         def _assert_jwt_cookie_present(response):
-            self.assertEqual(response.status_code, 200)
-            self.assertIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
+            assert response.status_code == 200
+            assert jwt_cookies.jwt_cookie_header_payload_name() in self.client.cookies
 
         setup_login_oauth_client()
         response, _ = self._login_response(self.user_email, self.password)
@@ -412,8 +548,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_login_refresh_anonymous_user(self):
         response = self.client.post(reverse('login_refresh'))
-        self.assertEqual(response.status_code, 401)
-        self.assertNotIn(jwt_cookies.jwt_cookie_header_payload_name(), self.client.cookies)
+        assert response.status_code == 401
+        assert jwt_cookies.jwt_cookie_header_payload_name() not in self.client.cookies
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
@@ -427,7 +563,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # Reload the user from the database
         self.user = User.objects.get(pk=self.user.pk)
 
-        self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
+        assert self.user.profile.get_meta()['session_id'] == client1.session.session_key
 
         # second login should log out the first
         response = client2.post(self.url, creds)
@@ -442,7 +578,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             url = reverse('upload_transcripts')
         response = client1.get(url)
         # client1 will be logged out
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session_with_no_user_profile(self):
@@ -456,7 +592,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         user.save()
 
         # Assert that no profile is created.
-        self.assertFalse(hasattr(user, 'profile'))
+        assert not hasattr(user, 'profile')
 
         creds = {'email': 'tester@edx.org', 'password': self.password}
         client1 = Client()
@@ -469,7 +605,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         user = User.objects.get(pk=user.pk)
 
         # Assert that profile is created.
-        self.assertTrue(hasattr(user, 'profile'))
+        assert hasattr(user, 'profile')
 
         # second login should log out the first
         response = client2.post(self.url, creds)
@@ -484,7 +620,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             url = reverse('upload_transcripts')
         response = client1.get(url)
         # client1 will be logged out
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session_with_url_not_having_login_required_decorator(self):
@@ -501,7 +637,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         # Reload the user from the database
         self.user = User.objects.get(pk=self.user.pk)
 
-        self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
+        assert self.user.profile.get_meta()['session_id'] == client1.session.session_key
 
         # second login should log out the first
         response = client2.post(self.url, creds)
@@ -510,7 +646,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         url = reverse('logout')
 
         response = client1.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance(self):
@@ -522,7 +658,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             mock_check_password_policy_compliance.return_value = HttpResponse()
             response, _ = self._login_response(self.user_email, self.password)
             response_content = json.loads(response.content.decode('utf-8'))
-        self.assertTrue(response_content.get('success'))
+        assert response_content.get('success')
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance_exception(self):
@@ -537,9 +673,9 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                 self.password
             )
             response_content = json.loads(response.content.decode('utf-8'))
-        self.assertFalse(response_content.get('success'))
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Password reset', mail.outbox[0].subject)
+        assert not response_content.get('success')
+        assert len(mail.outbox) == 1
+        assert 'Password reset' in mail.outbox[0].subject
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance_warning(self):
@@ -551,8 +687,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordWarning('Test warning')
             response, _ = self._login_response(self.user_email, self.password)
             response_content = json.loads(response.content.decode('utf-8'))
-            self.assertIn('Test warning', self.client.session['_messages'])
-        self.assertTrue(response_content.get('success'))
+            assert 'Test warning' in self.client.session['_messages']
+        assert response_content.get('success')
 
     @ddt.data(
         ('test_password', 'test_password', True),
@@ -588,7 +724,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             result = self.client.post(self.url, post_params, **extra)
         return result, mock_audit_log
 
-    def _assert_response(self, response, success=None, value=None, status_code=None):
+    def _assert_response(self, response, success=None, value=None, status_code=None, error_code=None):
         """
         Assert that the response has the expected status code and returned a valid
         JSON-parseable dict.
@@ -600,7 +736,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         value for 'value' in the JSON dict.
         """
         expected_status_code = status_code or (400 if success is False else 200)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
 
         try:
             response_dict = json.loads(response.content.decode('utf-8'))
@@ -609,12 +745,15 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                       % str(response.content))
 
         if success is not None:
-            self.assertEqual(response_dict['success'], success)
+            assert response_dict['success'] == success
+
+        if error_code is not None:
+            assert response_dict['error_code'] == error_code
 
         if value is not None:
             msg = (u"'%s' did not contain '%s'" %
                    (six.text_type(response_dict['value']), six.text_type(value)))
-            self.assertIn(value, response_dict['value'], msg)
+            assert value in response_dict['value'], msg
 
     def _assert_redirect_url(self, response, expected_redirect_url):
         """
@@ -637,11 +776,11 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEqual(name, level)
-        self.assertEqual(len(args), 1)
+        assert name == level
+        assert len(args) == 1
         format_string = args[0]
         for log_string in log_strings:
-            self.assertIn(log_string, format_string)
+            assert log_string in format_string
 
     def _assert_not_in_audit_log(self, mock_audit_log, level, log_strings):
         """
@@ -649,11 +788,11 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
         """
         method_calls = mock_audit_log.method_calls
         name, args, _kwargs = method_calls[-1]
-        self.assertEqual(name, level)
-        self.assertEqual(len(args), 1)
+        assert name == level
+        assert len(args) == 1
         format_string = args[0]
         for log_string in log_strings:
-            self.assertNotIn(log_string, format_string)
+            assert log_string not in format_string
 
     @ddt.data(
         {
@@ -747,7 +886,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(switch_enabled):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, switch_enabled):
             if not is_third_party_authenticated:
                 site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
@@ -784,7 +923,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
                             response,
                             success=success
                         )
-                        self.assertFalse(mock_check_user_auth_flow.called)
+                        assert not mock_check_user_auth_flow.called
 
     def test_check_user_auth_flow_bad_email(self):
         """Regression Exception was thrown on missing @ char in TPA."""
@@ -800,7 +939,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase):
             'THIRD_PARTY_AUTH_ONLY_HINT': provider_tpa_hint,
         }
 
-        with ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY.override(True):
+        with override_waffle_switch(ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY, True):
             site = self.set_up_site(allowed_domain, default_site_configuration_values)
 
             with self.assertLogs(level='WARN') as log:
@@ -819,7 +958,7 @@ class LoginSessionViewTest(ApiTestCase):
     PASSWORD = "password"
 
     def setUp(self):
-        super(LoginSessionViewTest, self).setUp()
+        super(LoginSessionViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.url = reverse("user_api_login_session")
 
     @ddt.data("get", "post")
@@ -848,43 +987,30 @@ class LoginSessionViewTest(ApiTestCase):
 
         # Verify that the form description matches what we expect
         form_desc = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(form_desc["method"], "post")
-        self.assertEqual(form_desc["submit_url"], reverse("user_api_login_session"))
-        self.assertEqual(form_desc["fields"], [
-            {
-                "name": "email",
-                "defaultValue": "",
-                "type": "email",
-                "required": True,
-                "label": "Email",
-                "placeholder": "",
-                "instructions": "The email address you used to register with {platform_name}".format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
-                "restrictions": {
-                    "min_length": EMAIL_MIN_LENGTH,
-                    "max_length": EMAIL_MAX_LENGTH
-                },
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
-            {
-                "name": "password",
-                "defaultValue": "",
-                "type": "password",
-                "required": True,
-                "label": "Password",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {
-                    "max_length": DEFAULT_MAX_PASSWORD_LENGTH,
-                },
-                "errorMessages": {},
-                "supplementalText": "",
-                "supplementalLink": "",
-            },
-        ])
+        assert form_desc['method'] == 'post'
+        assert form_desc['submit_url'] == reverse('user_api_login_session')
+        assert form_desc['fields'] == [{'name': 'email', 'defaultValue': '', 'type': 'email', 'required': True,
+                                        'label': 'Email', 'placeholder': '',
+                                        'instructions': 'The email address you used to register with {platform_name}'
+                                        .format(platform_name=settings.PLATFORM_NAME),
+                                        'restrictions': {'min_length': EMAIL_MIN_LENGTH,
+                                                         'max_length': EMAIL_MAX_LENGTH},
+                                        'errorMessages': {},
+                                        'supplementalText': '',
+                                        'supplementalLink': '',
+                                        'loginIssueSupportLink': 'https://support.example.com/login-issue-help.html'},
+                                       {'name': 'password',
+                                        'defaultValue': '',
+                                        'type': 'password',
+                                        'required': True,
+                                        'label': 'Password',
+                                        'placeholder': '',
+                                        'instructions': '',
+                                        'restrictions': {'max_length': DEFAULT_MAX_PASSWORD_LENGTH},
+                                        'errorMessages': {},
+                                        'supplementalText': '',
+                                        'supplementalLink': '',
+                                        'loginIssueSupportLink': 'https://support.example.com/login-issue-help.html'}]
 
     @ddt.data(True, False)
     @patch('openedx.core.djangoapps.user_authn.views.login.segment')
@@ -942,7 +1068,7 @@ class LoginSessionViewTest(ApiTestCase):
         # Verify that the session expiration was set correctly
         cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
         expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
-        self.assertIn(expected_expiry.strftime('%d %b %Y'), cookie.get('expires').replace('-', ' '))
+        assert expected_expiry.strftime('%d %b %Y') in cookie.get('expires').replace('-', ' ')
 
     def test_invalid_credentials(self):
         # Create a test user

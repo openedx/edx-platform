@@ -1,16 +1,18 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
+from unittest.mock import patch
+
 import ddt
-import six
 from crum import set_current_request
 from django.conf import settings
-from mock import patch
+from edx_toggles.toggles.testutils import override_waffle_switch
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle
+from ..config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT, waffle_switch
 from ..course_data import CourseData
 from ..course_grade import ZeroCourseGrade
 from ..course_grade_factory import CourseGradeFactory
@@ -31,29 +33,29 @@ class ZeroGradeTest(GradeTestBase):
         """
         Creates a ZeroCourseGrade and ensures it's empty.
         """
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+        with override_waffle_switch(waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=assume_zero_enabled):
             course_data = CourseData(self.request.user, structure=self.course_structure)
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in six.itervalues(section.problem_scores):
-                        self.assertEqual(score.earned, 0)
-                        self.assertEqual(score.first_attempted, None)
-                    self.assertEqual(section.all_total.earned, 0)
+                    for score in section.problem_scores.values():
+                        assert score.earned == 0
+                        assert score.first_attempted is None
+                    assert section.all_total.earned == 0
 
     @ddt.data(True, False)
     def test_zero_null_scores(self, assume_zero_enabled):
         """
         Creates a zero course grade and ensures that null scores aren't included in the section problem scores.
         """
-        with waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=assume_zero_enabled):
+        with override_waffle_switch(waffle_switch(ASSUME_ZERO_GRADE_IF_ABSENT), active=assume_zero_enabled):
             with patch('lms.djangoapps.grades.subsection_grade.get_score', return_value=None):
                 course_data = CourseData(self.request.user, structure=self.course_structure)
                 chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
                 for chapter in chapter_grades:
-                    self.assertNotEqual({}, chapter_grades[chapter]['sections'])
+                    assert {} != chapter_grades[chapter]['sections']
                     for section in chapter_grades[chapter]['sections']:
-                        self.assertEqual({}, section.problem_scores)
+                        assert {} == section.problem_scores
 
 
 class TestScoreForModule(SharedModuleStoreTestCase):
@@ -74,7 +76,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestScoreForModule, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
@@ -105,50 +107,50 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(TestScoreForModule, cls).tearDownClass()
+        super().tearDownClass()
         set_current_request(None)
 
     def test_score_chapter(self):
         earned, possible = self.course_grade.score_for_module(self.a.location)
-        self.assertEqual(earned, 9)
-        self.assertEqual(possible, 24)
+        assert earned == 9
+        assert possible == 24
 
     def test_score_section_many_leaves(self):
         earned, possible = self.course_grade.score_for_module(self.b.location)
-        self.assertEqual(earned, 6)
-        self.assertEqual(possible, 14)
+        assert earned == 6
+        assert possible == 14
 
     def test_score_section_one_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.c.location)
-        self.assertEqual(earned, 3)
-        self.assertEqual(possible, 10)
+        assert earned == 3
+        assert possible == 10
 
     def test_score_vertical_two_leaves(self):
         earned, possible = self.course_grade.score_for_module(self.d.location)
-        self.assertEqual(earned, 5)
-        self.assertEqual(possible, 10)
+        assert earned == 5
+        assert possible == 10
 
     def test_score_vertical_two_leaves_one_unscored(self):
         earned, possible = self.course_grade.score_for_module(self.e.location)
-        self.assertEqual(earned, 1)
-        self.assertEqual(possible, 4)
+        assert earned == 1
+        assert possible == 4
 
     def test_score_vertical_no_score(self):
         earned, possible = self.course_grade.score_for_module(self.f.location)
-        self.assertEqual(earned, 0)
-        self.assertEqual(possible, 0)
+        assert earned == 0
+        assert possible == 0
 
     def test_score_vertical_one_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.g.location)
-        self.assertEqual(earned, 3)
-        self.assertEqual(possible, 10)
+        assert earned == 3
+        assert possible == 10
 
     def test_score_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.h.location)
-        self.assertEqual(earned, 2)
-        self.assertEqual(possible, 5)
+        assert earned == 2
+        assert possible == 5
 
     def test_score_leaf_no_score(self):
         earned, possible = self.course_grade.score_for_module(self.m.location)
-        self.assertEqual(earned, 0)
-        self.assertEqual(possible, 0)
+        assert earned == 0
+        assert possible == 0

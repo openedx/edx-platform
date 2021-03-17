@@ -5,15 +5,14 @@ Unit tests for the announcements feature.
 
 import json
 import unittest
-from mock import patch
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
 
-from student.tests.factories import AdminFactory
-
+from common.djangoapps.student.tests.factories import AdminFactory
 from openedx.features.announcements.models import Announcement
 
 TEST_ANNOUNCEMENTS = [
@@ -33,14 +32,14 @@ class TestGlobalAnnouncements(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(TestGlobalAnnouncements, cls).setUpTestData()
+        super().setUpTestData()
         Announcement.objects.bulk_create([
             Announcement(content=content, active=active)
             for content, active in TEST_ANNOUNCEMENTS
         ])
 
     def setUp(self):
-        super(TestGlobalAnnouncements, self).setUp()
+        super().setUp()
         self.client = Client()
         self.admin = AdminFactory.create(
             email='staff@edx.org',
@@ -65,12 +64,12 @@ class TestGlobalAnnouncements(TestCase):
         url = reverse("announcements:page", kwargs={"page": 1})
         response = self.client.get(url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['num_pages'], 1)
+        assert data['num_pages'] == 1
         ## double the number of announcements to verify the number of pages increases
         self.setUpTestData()
         response = self.client.get(url)
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data['num_pages'], 2)
+        assert data['num_pages'] == 2
 
     def test_active(self):
         """

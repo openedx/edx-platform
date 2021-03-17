@@ -1,11 +1,10 @@
 """
 Tests of management command utility code
 """
-
-
 from unittest import TestCase
 
 import ddt
+import pytest
 from django.core.management import CommandError
 
 from .. import command_utils
@@ -30,7 +29,7 @@ class MutuallyExclusiveRequiredOptionsTestCase(TestCase):
     @ddt.unpack
     def test_successful_exclusive_options(self, exclusions, opts, expected):
         result = command_utils.get_mutually_exclusive_required_option(opts, *exclusions)
-        self.assertEqual(result, expected)
+        assert result == expected
 
     @ddt.data(
         (['opta'], {'opta': 0}),
@@ -45,5 +44,5 @@ class MutuallyExclusiveRequiredOptionsTestCase(TestCase):
     )
     @ddt.unpack
     def test_invalid_exclusive_options(self, exclusions, opts):
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             command_utils.get_mutually_exclusive_required_option(opts, *exclusions)

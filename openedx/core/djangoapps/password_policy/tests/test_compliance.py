@@ -3,11 +3,12 @@ Test password policy utilities
 """
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
+import pytest
 import pytz
 from dateutil.parser import parse as parse_date
 from django.test import TestCase, override_settings
-from mock import patch
 
 from openedx.core.djangoapps.password_policy.compliance import (NonCompliantPasswordException,
                                                                 NonCompliantPasswordWarning,
@@ -15,9 +16,9 @@ from openedx.core.djangoapps.password_policy.compliance import (NonCompliantPass
                                                                 _get_compliance_deadline_for_user,
                                                                 enforce_compliance_on_login,
                                                                 should_enforce_compliance_on_login)
-from student.tests.factories import (CourseAccessRoleFactory,
-                                     UserFactory)
-from util.password_policy_validators import ValidationError
+from common.djangoapps.student.tests.factories import (CourseAccessRoleFactory,
+                                                       UserFactory)
+from common.djangoapps.util.password_policy_validators import ValidationError
 
 
 date1 = parse_date('2018-01-01 00:00:00+00:00')
@@ -36,7 +37,7 @@ class TestCompliance(TestCase):
         Test that if the config is disabled or nonexistent nothing is returned
         """
         # Parameters don't matter for this method as it only tests the config
-        self.assertTrue(should_enforce_compliance_on_login())
+        assert should_enforce_compliance_on_login()
 
     def test_enforce_compliance_on_login(self):
         """
@@ -57,7 +58,7 @@ class TestCompliance(TestCase):
         with patch('openedx.core.djangoapps.password_policy.compliance._check_user_compliance') as \
                 mock_check_user_compliance:
             mock_check_user_compliance.return_value = True
-            self.assertIsNone(enforce_compliance_on_login(user, password))
+            assert enforce_compliance_on_login(user, password) is None
 
         # Test no deadline is set
         with patch('openedx.core.djangoapps.password_policy.compliance._check_user_compliance') as \
@@ -66,7 +67,7 @@ class TestCompliance(TestCase):
             with patch('openedx.core.djangoapps.password_policy.compliance._get_compliance_deadline_for_user') as \
                     mock_get_compliance_deadline_for_user:
                 mock_get_compliance_deadline_for_user.return_value = None
-                self.assertIsNone(enforce_compliance_on_login(user, password))
+                assert enforce_compliance_on_login(user, password) is None
 
         # Test deadline is in the past
         with patch('openedx.core.djangoapps.password_policy.compliance._check_user_compliance') as \
@@ -75,7 +76,7 @@ class TestCompliance(TestCase):
             with patch('openedx.core.djangoapps.password_policy.compliance._get_compliance_deadline_for_user') as \
                     mock_get_compliance_deadline_for_user:
                 mock_get_compliance_deadline_for_user.return_value = datetime.now(pytz.UTC) - timedelta(1)
-                self.assertRaises(NonCompliantPasswordException, enforce_compliance_on_login, user, password)
+                pytest.raises(NonCompliantPasswordException, enforce_compliance_on_login, user, password)
 
         # Test deadline is in the future
         with patch('openedx.core.djangoapps.password_policy.compliance._check_user_compliance') as \
@@ -84,7 +85,7 @@ class TestCompliance(TestCase):
             with patch('openedx.core.djangoapps.password_policy.compliance._get_compliance_deadline_for_user') as \
                     mock_get_compliance_deadline_for_user:
                 mock_get_compliance_deadline_for_user.return_value = datetime.now(pytz.UTC) + timedelta(1)
-                self.assertRaises(NonCompliantPasswordWarning, enforce_compliance_on_login, user, password)
+                assert pytest.raises(NonCompliantPasswordWarning, enforce_compliance_on_login, user, password)
 
     def test_check_user_compliance(self):
         """
@@ -99,7 +100,8 @@ class TestCompliance(TestCase):
             user = UserFactory()
             # Mock validate_password to return True without checking the password
             mock_validate_password.return_value = True
-            self.assertTrue(_check_user_compliance(user, None))  # Don't need a password here
+            assert _check_user_compliance(user, None)
+            # Don't need a password here
 
         # Test that a user that does not pass validate_password returns False
         with patch('openedx.core.djangoapps.password_policy.compliance.validate_password') as \
@@ -107,7 +109,8 @@ class TestCompliance(TestCase):
             user = UserFactory()
             # Mock validate_password to throw a ValidationError without checking the password
             mock_validate_password.side_effect = ValidationError('Some validation error')
-            self.assertFalse(_check_user_compliance(user, None))  # Don't need a password here
+            assert not _check_user_compliance(user, None)
+            # Don't need a password here
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={
         'STAFF_USER_COMPLIANCE_DEADLINE': date1,
@@ -123,15 +126,15 @@ class TestCompliance(TestCase):
         """
         # Staff user returned the STAFF_USER_COMPLIANCE_DEADLINE
         user = UserFactory(is_staff=True)
-        self.assertEqual(date1, _get_compliance_deadline_for_user(user))
+        assert date1 == _get_compliance_deadline_for_user(user)
 
         # User with CourseAccessRole returns the ELEVATED_PRIVILEGE_USER_COMPLIANCE_DEADLINE
         user = UserFactory()
         CourseAccessRoleFactory.create(user=user)
-        self.assertEqual(date2, _get_compliance_deadline_for_user(user))
+        assert date2 == _get_compliance_deadline_for_user(user)
 
         user = UserFactory()
-        self.assertEqual(date3, _get_compliance_deadline_for_user(user))
+        assert date3 == _get_compliance_deadline_for_user(user)
 
     def test_get_compliance_deadline_for_user_fallbacks(self):
         """
@@ -148,43 +151,43 @@ class TestCompliance(TestCase):
             'GENERAL_USER_COMPLIANCE_DEADLINE': date3
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=only_general):
-            self.assertEqual(date3, _get_compliance_deadline_for_user(staff))
-            self.assertEqual(date3, _get_compliance_deadline_for_user(privileged))
-            self.assertEqual(date3, _get_compliance_deadline_for_user(both))
+            assert date3 == _get_compliance_deadline_for_user(staff)
+            assert date3 == _get_compliance_deadline_for_user(privileged)
+            assert date3 == _get_compliance_deadline_for_user(both)
 
         no_staff = {
             'ELEVATED_PRIVILEGE_USER_COMPLIANCE_DEADLINE': date2,
             'GENERAL_USER_COMPLIANCE_DEADLINE': date3
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=no_staff):
-            self.assertEqual(date2, _get_compliance_deadline_for_user(both))
-            self.assertEqual(date2, _get_compliance_deadline_for_user(staff))
+            assert date2 == _get_compliance_deadline_for_user(both)
+            assert date2 == _get_compliance_deadline_for_user(staff)
 
         no_privileged = {
             'STAFF_USER_COMPLIANCE_DEADLINE': date1,
             'GENERAL_USER_COMPLIANCE_DEADLINE': date3
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=no_privileged):
-            self.assertEqual(date1, _get_compliance_deadline_for_user(both))
-            self.assertEqual(date3, _get_compliance_deadline_for_user(privileged))
+            assert date1 == _get_compliance_deadline_for_user(both)
+            assert date3 == _get_compliance_deadline_for_user(privileged)
 
         only_privileged = {
             'ELEVATED_PRIVILEGE_USER_COMPLIANCE_DEADLINE': date2,
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=only_privileged):
-            self.assertEqual(date2, _get_compliance_deadline_for_user(both))
-            self.assertEqual(date2, _get_compliance_deadline_for_user(staff))
-            self.assertIsNone(_get_compliance_deadline_for_user(user))
+            assert date2 == _get_compliance_deadline_for_user(both)
+            assert date2 == _get_compliance_deadline_for_user(staff)
+            assert _get_compliance_deadline_for_user(user) is None
 
         early_elevated = {
             'STAFF_USER_COMPLIANCE_DEADLINE': date2,
             'ELEVATED_PRIVILEGE_USER_COMPLIANCE_DEADLINE': date1,
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=early_elevated):
-            self.assertEqual(date1, _get_compliance_deadline_for_user(both))
-            self.assertEqual(date2, _get_compliance_deadline_for_user(staff))
-            self.assertEqual(date1, _get_compliance_deadline_for_user(privileged))
-            self.assertIsNone(_get_compliance_deadline_for_user(user))
+            assert date1 == _get_compliance_deadline_for_user(both)
+            assert date2 == _get_compliance_deadline_for_user(staff)
+            assert date1 == _get_compliance_deadline_for_user(privileged)
+            assert _get_compliance_deadline_for_user(user) is None
 
         early_general = {
             'STAFF_USER_COMPLIANCE_DEADLINE': date3,
@@ -192,7 +195,7 @@ class TestCompliance(TestCase):
             'GENERAL_USER_COMPLIANCE_DEADLINE': date1,
         }
         with self.settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG=early_general):
-            self.assertEqual(date1, _get_compliance_deadline_for_user(both))
-            self.assertEqual(date1, _get_compliance_deadline_for_user(staff))
-            self.assertEqual(date1, _get_compliance_deadline_for_user(privileged))
-            self.assertEqual(date1, _get_compliance_deadline_for_user(user))
+            assert date1 == _get_compliance_deadline_for_user(both)
+            assert date1 == _get_compliance_deadline_for_user(staff)
+            assert date1 == _get_compliance_deadline_for_user(privileged)
+            assert date1 == _get_compliance_deadline_for_user(user)

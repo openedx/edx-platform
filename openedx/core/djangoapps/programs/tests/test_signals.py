@@ -1,11 +1,13 @@
 """
 This module contains tests for programs-related signals and signal handlers.
 """
-
+import datetime
 
 import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
+
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_awarded,
     handle_course_cert_changed,
@@ -20,7 +22,6 @@ from openedx.core.djangoapps.signals.signals import (
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
 
 TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
@@ -28,7 +29,7 @@ TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.award_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -62,7 +63,7 @@ class CertAwardedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_AWARDED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -70,8 +71,8 @@ class CertAwardedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_awarded(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -82,14 +83,14 @@ class CertAwardedReceiverTest(TestCase):
 
         handle_course_cert_awarded(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME,))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME,)
 
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.award_course_certificate.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -101,7 +102,7 @@ class CertChangedReceiverTest(TestCase):
     """
 
     def setUp(self):
-        super(CertChangedReceiverTest, self).setUp()
+        super(CertChangedReceiverTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.user = UserFactory.create(username=TEST_USERNAME)
 
     @property
@@ -127,7 +128,7 @@ class CertChangedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_CHANGED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 2)
+        assert mock_is_learner_issuance_enabled.call_count == 2
 
     def test_credentials_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -135,8 +136,8 @@ class CertChangedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_credentials_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -147,9 +148,9 @@ class CertChangedReceiverTest(TestCase):
 
         handle_course_cert_changed(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, str(TEST_COURSE_KEY)))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME, str(TEST_COURSE_KEY))
 
     def test_records_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         mock_is_learner_issuance_enabled.return_value = True
@@ -160,19 +161,19 @@ class CertChangedReceiverTest(TestCase):
 
         # Correctly sent
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertTrue(mock_task.called)
+        assert mock_task.called
         mock_task.reset_mock()
 
         # Correctly not sent
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
         site_config.save()
         handle_course_cert_changed(**self.signal_kwargs)
-        self.assertFalse(mock_task.called)
+        assert not mock_task.called
 
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -206,7 +207,7 @@ class CertRevokedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_REVOKED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -214,8 +215,8 @@ class CertRevokedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_revoked(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -226,13 +227,13 @@ class CertRevokedReceiverTest(TestCase):
 
         handle_course_cert_revoked(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, TEST_COURSE_KEY))
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1
+        assert mock_task.call_args[0] == (TEST_USERNAME, TEST_COURSE_KEY)
 
 
 @skip_unless_lms
-@mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.update_certificate_visible_date_on_course_update.delay')
+@mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
     new_callable=mock.PropertyMock,
@@ -251,6 +252,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         return {
             'sender': self.__class__,
             'course_key': TEST_COURSE_KEY,
+            'available_date': datetime.datetime.now()
         }
 
     def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
@@ -263,7 +265,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_DATE_CHANGE.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -271,8 +273,8 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         configuration is not enabled.
         """
         handle_course_cert_date_change(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 0)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -283,5 +285,5 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
 
         handle_course_cert_date_change(**self.signal_kwargs)
 
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
-        self.assertEqual(mock_task.call_count, 1)
+        assert mock_is_learner_issuance_enabled.call_count == 1
+        assert mock_task.call_count == 1

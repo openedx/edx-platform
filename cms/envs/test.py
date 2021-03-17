@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This config file runs the simplest dev environment using sqlite, and db-based
 sessions. Assumes structure:
@@ -14,7 +13,6 @@ sessions. Assumes structure:
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 
-from .common import *
 import os
 from uuid import uuid4
 
@@ -22,15 +20,19 @@ from django.utils.translation import ugettext_lazy
 from path import Path as path
 
 from openedx.core.lib.derived import derive_settings
-from util.db import NoOpMigrationModules
+
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
+
+from .common import *
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (
+from lms.envs.test import (  # pylint: disable=wrong-import-order
     COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
+    LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
     MEDIA_URL,
     PLATFORM_DESCRIPTION,
@@ -44,8 +46,8 @@ from lms.envs.test import (
 
 # Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
-STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_NAME = ugettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
@@ -72,7 +74,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing  # lint-amnesty, pylint: disable=line-too-long
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
@@ -96,11 +98,11 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
-        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'db': f'test_xmodule_{THIS_UUID}',
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
         'collection': 'test_modulestore',
@@ -111,7 +113,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'test_xcontent_{}'.format(THIS_UUID),
+        'db': f'test_xcontent_{THIS_UUID}',
         'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
@@ -132,7 +134,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-LMS_ROOT_URL = "http://{}".format(LMS_BASE)
+LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
@@ -144,7 +146,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'edx_loc_mem_cache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -156,14 +158,14 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'KEY_PREFIX': 'general',
         'VERSION': 4,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
 
     'mongo_metadata_inheritance': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
     },
     'loc_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -183,9 +185,13 @@ BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', '
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
-CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_RESULT_BACKEND = 'django-cache'
 
 CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
+
+# test_status_cancel in cms/cms_user_tasks/test.py is failing without this
+# @override_setting for BROKER_URL is not working in testcase, so updating here
+BROKER_URL = 'memory://localhost/'
 
 ########################### Server Ports ###################################
 
@@ -245,9 +251,20 @@ VIDEO_CDN_URL = {
 # Courseware Search Index
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
+FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 
 FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
+
+####################### ELASTICSEARCH TESTS #######################
+# Enable this when testing elasticsearch-based code which couldn't be tested using the mock engine
+ENABLE_ELASTICSEARCH_FOR_TESTS = os.environ.get(
+    'EDXAPP_ENABLE_ELASTICSEARCH_FOR_TESTS', 'no').lower() in ('true', 'yes', '1')
+
+TEST_ELASTICSEARCH_USE_SSL = os.environ.get(
+    'EDXAPP_TEST_ELASTICSEARCH_USE_SSL', 'no').lower() in ('true', 'yes', '1')
+TEST_ELASTICSEARCH_HOST = os.environ.get('EDXAPP_TEST_ELASTICSEARCH_HOST', 'edx.devstack.elasticsearch')
+TEST_ELASTICSEARCH_PORT = int(os.environ.get('EDXAPP_TEST_ELASTICSEARCH_PORT', '9200'))
 
 ########################## AUTHOR PERMISSION #######################
 FEATURES['ENABLE_CREATOR_GROUP'] = False
@@ -286,9 +303,11 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 ####################### Plugin Settings ##########################
 
-# pylint: disable=wrong-import-position
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
-plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.TEST)
+# pylint: disable=wrong-import-position, wrong-import-order
+from edx_django_utils.plugins import add_plugins
+# pylint: disable=wrong-import-position, wrong-import-order
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
+add_plugins(__name__, ProjectType.CMS, SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
@@ -301,5 +320,18 @@ DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
 
+# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
+# (ref MST-637)
+PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
+LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '6/5m'
+LOGISTRATION_API_RATELIMIT = '5/m'
+
+REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
+RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
+RESET_PASSWORD_API_RATELIMIT = '2/m'
+
+############### Settings for proctoring  ###############
+PROCTORING_USER_OBFUSCATION_KEY = 'test_key'

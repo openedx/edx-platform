@@ -8,16 +8,16 @@ only running cms tests.
 
 
 import importlib
-import os
 import logging
+import os
+
 import contracts
 import pytest
 
 from openedx.core.pytest_hooks import DeferPlugin
 
-
 # Patch the xml libs before anything else.
-from safe_lxml import defuse_xml_libs
+from safe_lxml import defuse_xml_libs  # isort:skip
 defuse_xml_libs()
 
 
@@ -53,7 +53,7 @@ def _django_clear_site_cache():
     clearing mechanism actually works.  So override this fixture to not mess
     with what has been working for us so far.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @pytest.fixture(autouse=True)

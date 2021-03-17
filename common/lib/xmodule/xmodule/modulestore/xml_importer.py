@@ -30,8 +30,8 @@ import os
 import re
 from abc import abstractmethod
 
-import six
 import xblock
+from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -83,7 +83,7 @@ class LocationMixin(XBlockMixin):
         )
 
 
-class StaticContentImporter:
+class StaticContentImporter:  # lint-amnesty, pylint: disable=missing-class-docstring
     def __init__(self, static_content_store, course_data_path, target_id):
         self.static_content_store = static_content_store
         self.target_id = target_id
@@ -91,7 +91,7 @@ class StaticContentImporter:
         try:
             with open(course_data_path / 'policies/assets.json') as f:
                 self.policy = json.load(f)
-        except (IOError, ValueError) as err:
+        except (OSError, ValueError) as err:  # lint-amnesty, pylint: disable=unused-variable
             # xml backed courses won't have this file, only exported courses;
             # so, its absence is not really an exception.
             self.policy = {}
@@ -100,7 +100,7 @@ class StaticContentImporter:
         mimetypes.add_type('application/octet-stream', '.srt')
         self.mimetypes_list = list(mimetypes.types_map.values())
 
-    def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):
+    def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):  # lint-amnesty, pylint: disable=missing-function-docstring
         remap_dict = {}
 
         static_dir = self.course_data_path / content_subdir
@@ -126,12 +126,12 @@ class StaticContentImporter:
 
         return remap_dict
 
-    def import_static_file(self, full_file_path, base_dir):
+    def import_static_file(self, full_file_path, base_dir):  # lint-amnesty, pylint: disable=missing-function-docstring
         filename = os.path.basename(full_file_path)
         try:
             with open(full_file_path, 'rb') as f:
                 data = f.read()
-        except IOError:
+        except OSError:
             # OS X "companion files". See
             # http://www.diigo.com/annotated/0c936fda5da4aa1159c189cea227e174
             if filename.startswith('._'):
@@ -172,15 +172,15 @@ class StaticContentImporter:
         # then commit the content
         try:
             self.static_content_store.save(content)
-        except Exception as err:
-            log.exception(u'Error importing {0}, error={1}'.format(
-                file_subpath, err
-            ))
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+            msg = f"Error importing {file_subpath}, error={err}"
+            log.exception(msg)
+            set_custom_attribute('course_import_failure', f"Static Content Save Failure: {msg}")
 
         return file_subpath, asset_key
 
 
-class ImportManager(object):
+class ImportManager:
     """
     Import xml-based courselikes from data_dir into modulestore.
 
@@ -227,7 +227,7 @@ class ImportManager(object):
 
     def __init__(
             self, store, user_id, data_dir, source_dirs=None,
-            default_class='xmodule.raw_module.RawDescriptor',
+            default_class='xmodule.hidden_module.HiddenDescriptor',
             load_error_modules=True, static_content_store=None,
             target_id=None, verbose=False,
             do_import_static=True, do_import_python_lib=True,
@@ -351,12 +351,12 @@ class ImportManager(object):
                     asset_md = AssetMetadata(asset_key)
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
-        except IOError:
+        except OSError:
             logging.info('No %s file is present with asset metadata.', assets_filename)
             return
         except Exception:  # pylint: disable=W0703
             logging.exception('Error while parsing asset xml.')
-            if self.raise_on_failure:
+            if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
                 raise
             else:
                 return
@@ -377,7 +377,7 @@ class ImportManager(object):
         # first into the store
         course_data_path = path(self.data_dir) / source_courselike.data_dir
 
-        log.debug(u'======> IMPORTING courselike %s', courselike_key)
+        log.debug('======> IMPORTING courselike %s', courselike_key)
 
         if not self.do_import_static:
             # for old-style xblock where this was actually linked to kvs
@@ -405,7 +405,7 @@ class ImportManager(object):
         """
         Updates any special static items, such as PDF coursebooks.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @abstractmethod
     def get_dest_id(self, courselike_key):
@@ -493,7 +493,9 @@ class ImportManager(object):
                     runtime=courselike.runtime,
                 )
             except Exception:
-                log.error('failed to import module location %s', leftover)
+                msg = f'failed to import module location {leftover}'
+                log.error(msg)
+                set_custom_attribute('course_import_failure', f"Module Load failure: {msg}")
                 raise
 
     def run_imports(self):
@@ -598,13 +600,13 @@ class CourseImportManager(ImportManager):
         # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
         # values then remap it so that the wiki does not point to the old wiki.
         if courselike_key != course.id:
-            original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
+            original_unique_wiki_slug = '{}.{}.{}'.format(
                 courselike_key.org,
                 courselike_key.course,
                 courselike_key.run
             )
             if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == courselike_key.course:
-                course.wiki_slug = u'{0}.{1}.{2}'.format(
+                course.wiki_slug = '{}.{}.{}'.format(
                     course.id.org,
                     course.id.course,
                     course.id.run,
@@ -708,7 +710,7 @@ class LibraryImportManager(ImportManager):
         """
         Libraries have no special static items to import.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def import_children(self, source_courselike, courselike, courselike_key, dest_id):
         """
@@ -747,7 +749,7 @@ def _update_and_import_module(
     Update all the module reference fields to the destination course id,
     then import the module into the destination course.
     """
-    logging.debug(u'processing import of module %s...', six.text_type(module.location))
+    logging.debug('processing import of module %s...', str(module.location))
 
     def _update_module_references(module, source_course_id, dest_course_id):
         """
@@ -767,7 +769,7 @@ def _update_and_import_module(
                 return reference
 
         fields = {}
-        for field_name, field in six.iteritems(module.fields):
+        for field_name, field in module.fields.items():
             if field.scope != Scope.parent and field.is_set_on(module):
                 if isinstance(field, Reference):
                     value = field.read_from(module)
@@ -783,7 +785,7 @@ def _update_and_import_module(
                     fields[field_name] = {
                         key: _convert_ref_fields_to_new_namespace(reference)
                         for key, reference
-                        in six.iteritems(reference_dict)
+                        in reference_dict.items()
                     }
                 elif field_name == 'xml_attributes':
                     value = field.read_from(module)
@@ -813,6 +815,10 @@ def _update_and_import_module(
     fields = _update_module_references(module, source_course_id, dest_course_id)
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
+    if module.location.block_type == 'library_content':
+        with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
+            lib_content_block_already_published = store.has_item(module.location)
+
     block = store.import_xblock(
         user_id, dest_course_id, module.location.block_type,
         module.location.block_id, fields, runtime, asides=asides
@@ -822,17 +828,37 @@ def _update_and_import_module(
     # Get to the point where XML import is happening inside the
     # modulestore that is eventually going to store the data.
     # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
+
+    # Special case handling for library content blocks. The fact that this is
+    # in Modulestore code is _bad_ and breaks abstraction barriers, but is too
+    # much work to factor out at this point.
     if block.location.block_type == 'library_content':
-        # if library exists, update source_library_version and children
+        # If library exists, update source_library_version and children
         # according to this existing library and library content block.
         if store.get_library(block.source_library_key):
+            # If the library content block is already in the course, then don't
+            # refresh the children when we re-import it. This lets us address
+            # TNL-7507 (Randomized Content Block Settings Lost in Course Import)
+            # while still avoiding AA-310, where the IDs of the children for an
+            # existing library_content block might be altered, losing student
+            # user state.
+            #
+            # Note that while this method is run on import, it's also run when
+            # adding the library content from Studio for the first time.
+            #
+            # TLDR: When importing, we only copy the default values from content
+            # in a library the first time that library_content block is created.
+            # Future imports ignore what's in the library so as not to disrupt
+            # course state. You _can_ still update to the library via the Studio
+            # UI for updating to the latest version of a library for this block.
+            if lib_content_block_already_published:
+                return block
 
             # Update library content block's children on draft branch
             with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
-                LibraryToolsService(store).update_children(
+                LibraryToolsService(store, user_id).update_children(
                     block,
-                    user_id,
-                    version=block.source_library_version
+                    version=block.source_library_version,
                 )
 
             # Publish it if importing the course for branch setting published_only.
@@ -935,7 +961,7 @@ def _import_course_draft(
                 # Skip any OSX quarantine files, prefixed with a '._'.
                 continue
             module_path = os.path.join(rootdir, filename)
-            with io.open(module_path, 'r') as f:
+            with open(module_path, 'r') as f:
                 try:
                     xml = f.read()
 
@@ -957,7 +983,7 @@ def _import_course_draft(
 
                         index = index_in_children_list(descriptor)
                         parent_url = get_parent_url(descriptor, xml)
-                        draft_url = six.text_type(descriptor.location)
+                        draft_url = str(descriptor.location)
 
                         draft = draft_node_constructor(
                             module=descriptor, url=draft_url, parent_url=parent_url, index=index
@@ -1006,7 +1032,7 @@ def check_module_metadata_editability(module):
         print(
             ": found non-editable metadata on {url}. "
             "These metadata keys are not supported = {keys}".format(
-                url=six.text_type(module.location), keys=illegal_keys
+                url=str(module.location), keys=illegal_keys
             )
         )
 
@@ -1052,7 +1078,7 @@ def create_xml_attributes(module, xml):
     Make up for modules which don't define xml_attributes by creating them here and populating
     """
     xml_attrs = {}
-    for attr, val in six.iteritems(xml.attrib):
+    for attr, val in xml.attrib.items():
         if attr not in module.fields:
             # translate obsolete attr
             if attr == 'parent_sequential_url':
@@ -1063,7 +1089,7 @@ def create_xml_attributes(module, xml):
     module.xml_attributes = xml_attrs
 
 
-def validate_no_non_editable_metadata(module_store, course_id, category):
+def validate_no_non_editable_metadata(module_store, course_id, category):  # lint-amnesty, pylint: disable=missing-function-docstring
     err_cnt = 0
     for module_loc in module_store.modules[course_id]:
         module = module_store.modules[course_id][module_loc]
@@ -1073,13 +1099,13 @@ def validate_no_non_editable_metadata(module_store, course_id, category):
     return err_cnt
 
 
-def validate_category_hierarchy(
+def validate_category_hierarchy(  # lint-amnesty, pylint: disable=missing-function-docstring
         module_store, course_id, parent_category, expected_child_category):
     err_cnt = 0
 
     parents = []
     # get all modules of parent_category
-    for module in six.itervalues(module_store.modules[course_id]):
+    for module in module_store.modules[course_id].values():
         if module.location.block_type == parent_category:
             parents.append(module)
 
@@ -1099,7 +1125,7 @@ def validate_category_hierarchy(
     return err_cnt
 
 
-def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
+def validate_data_source_path_existence(path, is_err=True, extra_msg=None):  # lint-amnesty, pylint: disable=missing-function-docstring, redefined-outer-name
     _cnt = 0
     if not os.path.exists(path):
         print(
@@ -1113,7 +1139,7 @@ def validate_data_source_path_existence(path, is_err=True, extra_msg=None):
     return _cnt
 
 
-def validate_data_source_paths(data_dir, course_dir):
+def validate_data_source_paths(data_dir, course_dir):  # lint-amnesty, pylint: disable=missing-function-docstring
     # check that there is a '/static/' directory
     course_path = data_dir / course_dir
     err_cnt = 0
@@ -1135,16 +1161,16 @@ def validate_course_policy(module_store, course_id):
     """
     # is there a reliable way to get the module location just given the course_id?
     warn_cnt = 0
-    for module in six.itervalues(module_store.modules[course_id]):
+    for module in module_store.modules[course_id].values():
         if module.location.block_type == 'course':
-            if not module._field_data.has(module, 'rerandomize'):
+            if not module._field_data.has(module, 'rerandomize'):  # lint-amnesty, pylint: disable=protected-access
                 warn_cnt += 1
                 print(
                     'WARN: course policy does not specify value for '
                     '"rerandomize" whose default is now "never". '
                     'The behavior of your course may change.'
                 )
-            if not module._field_data.has(module, 'showanswer'):
+            if not module._field_data.has(module, 'showanswer'):  # lint-amnesty, pylint: disable=protected-access
                 warn_cnt += 1
                 print(
                     'WARN: course policy does not specify value for '
@@ -1154,9 +1180,9 @@ def validate_course_policy(module_store, course_id):
     return warn_cnt
 
 
-def perform_xlint(
+def perform_xlint(  # lint-amnesty, pylint: disable=missing-function-docstring
         data_dir, source_dirs,
-        default_class='xmodule.raw_module.RawDescriptor',
+        default_class='xmodule.hidden_module.HiddenDescriptor',
         load_error_modules=True,
         xblock_mixins=(LocationMixin, XModuleMixin)):
     err_cnt = 0
@@ -1177,7 +1203,7 @@ def perform_xlint(
         warn_cnt += _warn_cnt
 
     # first count all errors and warnings as part of the XMLModuleStore import
-    for err_log in six.itervalues(module_store._course_errors):  # pylint: disable=protected-access
+    for err_log in module_store._course_errors.values():  # pylint: disable=protected-access
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             if msg.startswith('ERROR:'):
@@ -1186,7 +1212,7 @@ def perform_xlint(
                 warn_cnt += 1
 
     # then count outright all courses that failed to load at all
-    for err_log in six.itervalues(module_store.errored_courses):
+    for err_log in module_store.errored_courses.values():
         for err_log_entry in err_log.errors:
             msg = err_log_entry[0]
             print(msg)

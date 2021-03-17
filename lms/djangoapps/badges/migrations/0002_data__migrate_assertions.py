@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import json
 import os
 import time
@@ -14,9 +11,8 @@ def forwards(apps, schema_editor):
     """
     Migrate the initial badge classes, assertions, and course image configurations from lms.djangoapps.certificates.
     """
-    from django.core.files.base import ContentFile
     from xmodule.modulestore.django import modulestore
-    from badges.events import course_complete
+    from lms.djangoapps.badges.events import course_complete
     db_alias = schema_editor.connection.alias
     # This will need to be changed if badges/certificates get moved out of the default db for some reason.
     if db_alias != 'default':
@@ -45,7 +41,7 @@ def forwards(apps, schema_editor):
             badge_class.image.name = icon.name
             badge_class.save()
             classes[(badge.course_id, badge.mode)] = badge_class
-        if isinstance(badge.data, six.string_types):
+        if isinstance(badge.data, str):
             data = badge.data
         else:
             data = json.dumps(badge.data)
@@ -83,7 +79,7 @@ def backwards(apps, schema_editor):
         if not badge.badge_class.mode:
             # Can't preserve old badges without modes.
             continue
-        if isinstance(badge.data, six.string_types):
+        if isinstance(badge.data, str):
             data = badge.data
         else:
             data = json.dumps(badge.data)

@@ -4,18 +4,17 @@
 import pytest
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
 
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributions, self).setUp()
+        super().setUp()
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
@@ -29,56 +28,56 @@ class TestAnalyticsDistributions(TestCase):
 
     def test_profile_distribution_bad_feature(self):
         feature = 'robot-not-a-real-feature'
-        self.assertNotIn(feature, AVAILABLE_PROFILE_FEATURES)
+        assert feature not in AVAILABLE_PROFILE_FEATURES
         with pytest.raises(ValueError):
             profile_distribution(self.course_id, feature)
 
     def test_profile_distribution_easy_choice(self):
         feature = 'gender'
-        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        assert feature in AVAILABLE_PROFILE_FEATURES
         distribution = profile_distribution(self.course_id, feature)
-        self.assertEqual(distribution.type, 'EASY_CHOICE')
-        self.assertEqual(distribution.data['no_data'], 0)
-        self.assertEqual(distribution.data['m'], len(self.users) / 3)
-        self.assertEqual(distribution.choices_display_names['m'], 'Male')
+        assert distribution.type == 'EASY_CHOICE'
+        assert distribution.data['no_data'] == 0
+        assert distribution.data['m'] == (len(self.users) / 3)
+        assert distribution.choices_display_names['m'] == 'Male'
 
     def test_profile_distribution_open_choice(self):
         feature = 'year_of_birth'
-        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        assert feature in AVAILABLE_PROFILE_FEATURES
         distribution = profile_distribution(self.course_id, feature)
         print(distribution)
-        self.assertEqual(distribution.type, 'OPEN_CHOICE')
-        self.assertTrue(hasattr(distribution, 'choices_display_names'))
-        self.assertEqual(distribution.choices_display_names, None)
-        self.assertNotIn('no_data', distribution.data)
-        self.assertEqual(distribution.data[1930], 1)
+        assert distribution.type == 'OPEN_CHOICE'
+        assert hasattr(distribution, 'choices_display_names')
+        assert distribution.choices_display_names is None
+        assert 'no_data' not in distribution.data
+        assert distribution.data[1930] == 1
 
     def test_gender_count(self):
         course_enrollments = CourseEnrollment.objects.filter(
             course_id=self.course_id, user__profile__gender='m'
         )
         distribution = profile_distribution(self.course_id, "gender")
-        self.assertEqual(distribution.data['m'], len(course_enrollments))
+        assert distribution.data['m'] == len(course_enrollments)
         course_enrollments[0].deactivate()
         distribution = profile_distribution(self.course_id, "gender")
-        self.assertEqual(distribution.data['m'], len(course_enrollments) - 1)
+        assert distribution.data['m'] == (len(course_enrollments) - 1)
 
     def test_level_of_education_count(self):
         course_enrollments = CourseEnrollment.objects.filter(
             course_id=self.course_id, user__profile__level_of_education='hs'
         )
         distribution = profile_distribution(self.course_id, "level_of_education")
-        self.assertEqual(distribution.data['hs'], len(course_enrollments))
+        assert distribution.data['hs'] == len(course_enrollments)
         course_enrollments[0].deactivate()
         distribution = profile_distribution(self.course_id, "level_of_education")
-        self.assertEqual(distribution.data['hs'], len(course_enrollments) - 1)
+        assert distribution.data['hs'] == (len(course_enrollments) - 1)
 
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
 
     def setUp(self):
-        super(TestAnalyticsDistributionsNoData, self).setUp()
+        super().setUp()
         self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
@@ -97,22 +96,22 @@ class TestAnalyticsDistributionsNoData(TestCase):
 
     def test_profile_distribution_easy_choice_nodata(self):
         feature = 'gender'
-        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        assert feature in AVAILABLE_PROFILE_FEATURES
         distribution = profile_distribution(self.course_id, feature)
         print(distribution)
-        self.assertEqual(distribution.type, 'EASY_CHOICE')
-        self.assertTrue(hasattr(distribution, 'choices_display_names'))
-        self.assertNotEqual(distribution.choices_display_names, None)
-        self.assertIn('no_data', distribution.data)
-        self.assertEqual(distribution.data['no_data'], len(self.nodata_users))
+        assert distribution.type == 'EASY_CHOICE'
+        assert hasattr(distribution, 'choices_display_names')
+        assert distribution.choices_display_names is not None
+        assert 'no_data' in distribution.data
+        assert distribution.data['no_data'] == len(self.nodata_users)
 
     def test_profile_distribution_open_choice_nodata(self):
         feature = 'year_of_birth'
-        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        assert feature in AVAILABLE_PROFILE_FEATURES
         distribution = profile_distribution(self.course_id, feature)
         print(distribution)
-        self.assertEqual(distribution.type, 'OPEN_CHOICE')
-        self.assertTrue(hasattr(distribution, 'choices_display_names'))
-        self.assertEqual(distribution.choices_display_names, None)
-        self.assertIn('no_data', distribution.data)
-        self.assertEqual(distribution.data['no_data'], len(self.nodata_users))
+        assert distribution.type == 'OPEN_CHOICE'
+        assert hasattr(distribution, 'choices_display_names')
+        assert distribution.choices_display_names is None
+        assert 'no_data' in distribution.data
+        assert distribution.data['no_data'] == len(self.nodata_users)

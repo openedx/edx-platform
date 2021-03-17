@@ -8,7 +8,7 @@ import pytz
 
 from openedx.core.djangoapps.schedules import models
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 
 class ScheduleExperienceFactory(factory.DjangoModelFactory):
@@ -18,7 +18,7 @@ class ScheduleExperienceFactory(factory.DjangoModelFactory):
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
-class ScheduleFactory(factory.DjangoModelFactory):
+class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = models.Schedule
 
@@ -28,16 +28,14 @@ class ScheduleFactory(factory.DjangoModelFactory):
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
-class ScheduleConfigFactory(factory.DjangoModelFactory):
+class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
-    create_schedules = True
     enqueue_recurring_nudge = True
     deliver_recurring_nudge = True
     enqueue_upgrade_reminder = True
     deliver_upgrade_reminder = True
     enqueue_course_update = True
     deliver_course_update = True
-    hold_back_ratio = 0

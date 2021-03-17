@@ -2,8 +2,7 @@
 Helper methods for Studio views.
 """
 
-import hashlib
-import six
+import urllib
 from uuid import uuid4
 
 from django.conf import settings
@@ -12,13 +11,13 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
-from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
-from edxmako.shortcuts import render_to_string
-from models.settings.course_grading import CourseGradingModel
-from util.milestones_helpers import is_entrance_exams_enabled
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from common.djangoapps.edxmako.shortcuts import render_to_string
+from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+
+from ..utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
 __all__ = ['event']
 
@@ -108,9 +107,9 @@ def xblock_studio_url(xblock, parent_xblock=None):
     if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)
     elif category in ('chapter', 'sequential'):
-        return u'{url}?show={usage_key}'.format(
+        return '{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=six.moves.urllib.parse.quote(six.text_type(xblock.location))
+            usage_key=urllib.parse.quote(str(xblock.location))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
@@ -143,7 +142,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)
+        return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
     else:
         return default_display_name
 
@@ -213,7 +212,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # Entrance Exams: Chapter module positioning
         child_position = None
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             if category == 'chapter' and is_entrance_exam:
                 fields['is_entrance_exam'] = is_entrance_exam
                 fields['in_entrance_exam'] = True  # Inherited metadata, all children will have it
@@ -221,7 +220,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             data = {'data': data}
 
         created_block = store.create_child(
@@ -237,7 +236,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         )
 
         # Entrance Exams: Grader assignment
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             course_key = usage_key.course_key
             course = store.get_course(course_key)
             if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:
@@ -291,18 +290,3 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
-
-
-def get_course_hash_value(course_key):
-    """
-    Returns a hash value for the given course key.
-
-    If course key is None, function returns an out of bound value which will
-    never satisfy the vem_enabled_courses_percentage condition
-    """
-    out_of_bound_value = 100
-    if course_key:
-        m = hashlib.md5(str(course_key).encode())
-        return int(m.hexdigest(), base=16) % 100
-
-    return out_of_bound_value

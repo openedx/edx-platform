@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import functools
 
@@ -20,7 +20,7 @@ class ScheduleExperienceAdminInline(admin.StackedInline):
     model = models.ScheduleExperience
 
 
-def _set_experience(db_name, human_name, modeladmin, request, queryset):
+def _set_experience(db_name, human_name, modeladmin, request, queryset):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     A django action which will set all selected schedules to the supplied experience.
     The intended usage is with functools.partial to generate the action for each experience type
@@ -83,12 +83,12 @@ class CourseIdFilter(admin.SimpleListFilter):
     parameter_name = "course_id"
 
     def __init__(self, request, params, model, model_admin):
-        super(CourseIdFilter, self).__init__(request, params, model, model_admin)
+        super(CourseIdFilter, self).__init__(request, params, model, model_admin)  # lint-amnesty, pylint: disable=super-with-arguments
         self.unused_parameters = params.copy()
         self.unused_parameters.pop(self.parameter_name, None)
 
     def value(self):
-        value = super(CourseIdFilter, self).value()
+        value = super(CourseIdFilter, self).value()  # lint-amnesty, pylint: disable=super-with-arguments
         if value == "None" or value is None:
             return None
         else:
@@ -121,30 +121,19 @@ class CourseIdFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Schedule)
-class ScheduleAdmin(admin.ModelAdmin):
-    list_display = ('username', 'course_id', 'active', 'start_date', 'upgrade_deadline', 'experience_display')
+class ScheduleAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-class-docstring
+    list_display = ('username', 'course_id', 'start_date', 'upgrade_deadline', 'experience_display')
     list_display_links = ('start_date', 'upgrade_deadline', 'experience_display')
     list_filter = (
         CourseIdFilter,
         'experience__experience_type',
-        'active',
         KnownErrorCases
     )
     raw_id_fields = ('enrollment',)
     readonly_fields = ('modified',)
     search_fields = ('enrollment__user__username',)
     inlines = (ScheduleExperienceAdminInline,)
-    actions = ['deactivate_schedules', 'activate_schedules'] + experience_actions
-
-    def deactivate_schedules(self, request, queryset):
-        rows_updated = queryset.update(active=False)
-        self.message_user(request, u"{} schedule(s) were deactivated".format(rows_updated))
-    deactivate_schedules.short_description = "Deactivate selected schedules"
-
-    def activate_schedules(self, request, queryset):
-        rows_updated = queryset.update(active=True)
-        self.message_user(request, u"{} schedule(s) were activated".format(rows_updated))
-    activate_schedules.short_description = "Activate selected schedules"
+    actions = experience_actions
 
     def experience_display(self, obj):
         return obj.experience.get_experience_type_display()
@@ -171,28 +160,22 @@ class ScheduleAdmin(admin.ModelAdmin):
     course_id.short_description = _('Course ID')
 
     def get_queryset(self, request):
-        qs = super(ScheduleAdmin, self).get_queryset(request)
+        qs = super(ScheduleAdmin, self).get_queryset(request)  # lint-amnesty, pylint: disable=super-with-arguments
         qs = qs.select_related('enrollment', 'enrollment__user')
         return qs
 
 
-class ScheduleConfigAdminForm(forms.ModelForm):
-
-    def clean_hold_back_ratio(self):
-        hold_back_ratio = self.cleaned_data["hold_back_ratio"]
-        if hold_back_ratio < 0 or hold_back_ratio > 1:
-            raise forms.ValidationError("Invalid hold back ratio, the value must be between 0 and 1.")
-        return hold_back_ratio
+class ScheduleConfigAdminForm(forms.ModelForm):  # lint-amnesty, pylint: disable=missing-class-docstring
+    pass
 
 
 @admin.register(models.ScheduleConfig)
-class ScheduleConfigAdmin(admin.ModelAdmin):
+class ScheduleConfigAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-class-docstring
     search_fields = ('site',)
     list_display = (
-        'site', 'create_schedules',
+        'site',
         'enqueue_recurring_nudge', 'deliver_recurring_nudge',
         'enqueue_upgrade_reminder', 'deliver_upgrade_reminder',
         'enqueue_course_update', 'deliver_course_update',
-        'hold_back_ratio',
     )
     form = ScheduleConfigAdminForm

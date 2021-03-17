@@ -5,11 +5,9 @@ Check that view authentication works properly.
 
 import datetime
 
+from unittest.mock import patch
 import pytz
 from django.urls import reverse
-from mock import patch
-from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import (
@@ -22,7 +20,7 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -43,21 +41,21 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
         `names` is a list of URL names that correspond to sections in a course.
 
-        `course` is the instance of CourseDescriptor whose section URLs are to be returned.
+        `course` is the instance of CourseBlock whose section URLs are to be returned.
 
         Returns a list URLs corresponding to section in the passed in course.
 
         """
-        return [reverse(name, kwargs={'course_id': text_type(course.id)})
+        return [reverse(name, kwargs={'course_id': str(course.id)})
                 for name in names]
 
     def _check_non_staff_light(self, course):
         """
         Check that non-staff have access to light urls.
 
-        `course` is an instance of CourseDescriptor.
+        `course` is an instance of CourseBlock.
         """
-        urls = [reverse('about_course', kwargs={'course_id': text_type(course.id)}),
+        urls = [reverse('about_course', kwargs={'course_id': str(course.id)}),
                 reverse('courses')]
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -70,7 +68,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         names = ['courseware', 'progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
-            reverse('book', kwargs={'course_id': text_type(course.id),
+            reverse('book', kwargs={'course_id': str(course.id),
                                     'book_index': index})
             for index, __ in enumerate(course.textbooks)
         ])
@@ -78,7 +76,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             self.assert_request_status_code(302, url)
 
         self.assert_request_status_code(
-            404, reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})
+            404, reverse('instructor_dashboard', kwargs={'course_id': str(course.id)})
         )
 
     def _check_staff(self, course):
@@ -88,7 +86,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         names = ['about_course', 'instructor_dashboard', 'progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
-            reverse('book', kwargs={'course_id': text_type(course.id),
+            reverse('book', kwargs={'course_id': str(course.id),
                                     'book_index': index})
             for index in range(len(course.textbooks))
         ])
@@ -104,7 +102,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         url = reverse(
             'student_progress',
             kwargs={
-                'course_id': text_type(course.id),
+                'course_id': str(course.id),
                 'student_id': self.enrolled_user.id,
             }
         )
@@ -114,11 +112,11 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         url = self._reverse_urls(['courseware'], course)[0]
         self.assert_request_status_code(302, url)
 
-    def login(self, user):
-        return super(TestViewAuth, self).login(user.email, 'test')
+    def login(self, user):  # lint-amnesty, pylint: disable=arguments-differ
+        return super().login(user.email, 'test')
 
     def setUp(self):
-        super(TestViewAuth, self).setUp()
+        super().setUp()
 
         self.course = CourseFactory.create(number='999', display_name='Robot_Super_Course')
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
@@ -175,12 +173,12 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         """
         self.login(self.unenrolled_user)
         response = self.client.get(reverse('courseware',
-                                           kwargs={'course_id': text_type(self.course.id)}))
+                                           kwargs={'course_id': str(self.course.id)}))
         self.assertRedirects(
             response,
             reverse(
                 'about_course',
-                args=[text_type(self.course.id)]
+                args=[str(self.course.id)]
             )
         )
 
@@ -194,7 +192,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         response = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': text_type(self.course.id)}
+                kwargs={'course_id': str(self.course.id)}
             )
         )
 
@@ -202,7 +200,7 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             response,
             reverse(
                 'courseware_section',
-                kwargs={'course_id': text_type(self.course.id),
+                kwargs={'course_id': str(self.course.id),
                         'chapter': self.overview_chapter.url_name,
                         'section': self.welcome_section.url_name}
             )
@@ -217,9 +215,9 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.login(self.enrolled_user)
         url = reverse(
             'courseware',
-            kwargs={'course_id': text_type(self.course.id)}
+            kwargs={'course_id': str(self.course.id)}
         )
-        self.verify_consent_required(self.client, url, status_code=302)
+        self.verify_consent_required(self.client, url, status_code=302)  # lint-amnesty, pylint: disable=no-value-for-parameter
 
     def test_instructor_page_access_nonstaff(self):
         """
@@ -228,8 +226,8 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         """
         self.login(self.enrolled_user)
 
-        urls = [reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)}),
-                reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})]
+        urls = [reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)}),
+                reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})]
 
         # Shouldn't be able to get to the instructor pages
         for url in urls:
@@ -243,10 +241,10 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.login(self.staff_user)
 
         # Now should be able to get to self.course, but not  self.test_course
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_instructor_course_access(self):
@@ -257,10 +255,10 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.login(self.instructor_user)
 
         # Now should be able to get to self.course, but not  self.test_course
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_org_staff_access(self):
@@ -269,13 +267,13 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         and student profile pages for course in their org.
         """
         self.login(self.org_staff_user)
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.other_org_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.other_org_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_org_instructor_access(self):
@@ -284,13 +282,13 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         and student profile pages for course in their org.
         """
         self.login(self.org_instructor_user)
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.other_org_course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.other_org_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_global_staff_access(self):
@@ -300,8 +298,8 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.login(self.global_staff_user)
 
         # and now should be able to load both
-        urls = [reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)}),
-                reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})]
+        urls = [reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)}),
+                reverse('instructor_dashboard', kwargs={'course_id': str(self.test_course.id)})]
 
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -321,8 +319,8 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.course = self.update_course(self.course, self.user.id)
         self.test_course = self.update_course(self.test_course, self.user.id)
 
-        self.assertFalse(self.course.has_started())
-        self.assertFalse(self.test_course.has_started())
+        assert not self.course.has_started()
+        assert not self.test_course.has_started()
 
         # First, try with an enrolled student
         self.login(self.enrolled_user)
@@ -400,18 +398,18 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
 
         # First, try with an enrolled student
         self.login(self.unenrolled_user)
-        self.assertFalse(self.enroll(self.course))
-        self.assertTrue(self.enroll(self.test_course))
+        assert not self.enroll(self.course)
+        assert self.enroll(self.test_course)
 
         # Then, try as an instructor
         self.logout()
         self.login(self.instructor_user)
-        self.assertTrue(self.enroll(self.course))
+        assert self.enroll(self.course)
 
         # Then, try as global staff
         self.logout()
         self.login(self.global_staff_user)
-        self.assertTrue(self.enroll(self.course))
+        assert self.enroll(self.course)
 
 
 class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
@@ -420,7 +418,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
     """
 
     def setUp(self):
-        super(TestBetatesterAccess, self).setUp()
+        super().setUp()
 
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
@@ -429,14 +427,14 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         self.content = ItemFactory(parent=self.course)
 
         self.normal_student = UserFactory()
-        self.beta_tester = BetaTesterFactory(course_key=self.course.id)
+        self.beta_tester = BetaTesterFactory(course_key=self.course.id)  # lint-amnesty, pylint: disable=no-member
 
     @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):
         """
         Check that beta-test access works for courses.
         """
-        self.assertFalse(self.course.has_started())
+        assert not self.course.has_started()  # lint-amnesty, pylint: disable=no-member
         self.assertCannotAccessCourse(self.normal_student, 'load', self.course)
         self.assertCanAccessCourse(self.beta_tester, 'load', self.course)
 
@@ -446,7 +444,7 @@ class TestBetatesterAccess(ModuleStoreTestCase, CourseAccessTestMixin):
         Check that beta-test access works for content.
         """
         # student user shouldn't see it
-        self.assertFalse(has_access(self.normal_student, 'load', self.content, self.course.id))
+        assert not has_access(self.normal_student, 'load', self.content, self.course.id)  # lint-amnesty, pylint: disable=no-member, line-too-long
 
         # now the student should see it
-        self.assertTrue(has_access(self.beta_tester, 'load', self.content, self.course.id))
+        assert has_access(self.beta_tester, 'load', self.content, self.course.id)  # lint-amnesty, pylint: disable=no-member, line-too-long

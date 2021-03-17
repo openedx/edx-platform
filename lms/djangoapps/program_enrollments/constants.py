@@ -2,10 +2,10 @@
 Constants used throughout the program_enrollments app and exposed to other
 in-process apps through api.py.
 """
-from student.roles import CourseStaffRole
+from common.djangoapps.student.roles import CourseStaffRole
 
 
-class ProgramEnrollmentStatuses(object):
+class ProgramEnrollmentStatuses:
     """
     Status that a user may have enrolled in a program.
 
@@ -26,7 +26,7 @@ class ProgramEnrollmentStatuses(object):
     )
 
 
-class ProgramCourseEnrollmentStatuses(object):
+class ProgramCourseEnrollmentStatuses:
     """
     Status that a user may have enrolled in a course.
 
@@ -43,7 +43,7 @@ class ProgramCourseEnrollmentStatuses(object):
     )
 
 
-class _EnrollmentErrorStatuses(object):
+class _EnrollmentErrorStatuses:
     """
     Error statuses common to program and program-course enrollments responses.
     """
@@ -116,7 +116,7 @@ class ProgramCourseOperationStatuses(
     __ALL__ = __OK__ + __ERRORS__
 
 
-class ProgramCourseEnrollmentRoles(object):
+class ProgramCourseEnrollmentRoles:
     """
     Valid roles that can be assigned as part of a ProgramCourseEnrollment
     """

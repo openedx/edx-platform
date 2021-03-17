@@ -1,13 +1,8 @@
 """
 Course Grade Factory Class
 """
-
-
 from collections import namedtuple
 from logging import getLogger
-
-import six
-from six import text_type
 
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_CHANGED,
@@ -24,7 +19,7 @@ from .models_api import prefetch_grade_overrides_and_visible_blocks
 log = getLogger(__name__)
 
 
-class CourseGradeFactory(object):
+class CourseGradeFactory:
     """
     Factory class to create Course Grade objects.
     """
@@ -108,11 +103,11 @@ class CourseGradeFactory(object):
         course_data = CourseData(
             user=None, course=course, collected_block_structure=collected_block_structure, course_key=course_key,
         )
-        stats_tags = [u'action:{}'.format(course_data.course_key)]
+        stats_tags = [f'action:{course_data.course_key}']  # lint-amnesty, pylint: disable=unused-variable
         for user in users:
             yield self._iter_grade_result(user, course_data, force_update)
 
-    def _iter_grade_result(self, user, course_data, force_update):
+    def _iter_grade_result(self, user, course_data, force_update):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             kwargs = {
                 'user': user,
@@ -130,10 +125,10 @@ class CourseGradeFactory(object):
             # Keep marching on even if this student couldn't be graded for
             # some reason, but log it for future reference.
             log.exception(
-                u'Cannot grade student %s in course %s because of exception: %s',
+                'Cannot grade student %s in course %s because of exception: %s',
                 user.id,
                 course_data.course_key,
-                text_type(exc)
+                str(exc)
             )
             return self.GradeResult(user, None, exc)
 
@@ -142,7 +137,7 @@ class CourseGradeFactory(object):
         """
         Returns a ZeroCourseGrade object for the given user and course.
         """
-        log.debug(u'Grades: CreateZero, %s, User: %s', six.text_type(course_data), user.id)
+        log.debug('Grades: CreateZero, %s, User: %s', str(course_data), user.id)
         return ZeroCourseGrade(user, course_data)
 
     @staticmethod
@@ -155,14 +150,14 @@ class CourseGradeFactory(object):
             raise PersistentCourseGrade.DoesNotExist
 
         persistent_grade = PersistentCourseGrade.read(user.id, course_data.course_key)
-        log.debug(u'Grades: Read, %s, User: %s, %s', six.text_type(course_data), user.id, persistent_grade)
+        log.debug('Grades: Read, %s, User: %s, %s', str(course_data), user.id, persistent_grade)
 
         return CourseGrade(
             user,
             course_data,
             persistent_grade.percent_grade,
             persistent_grade.letter_grade,
-            persistent_grade.letter_grade != u''
+            persistent_grade.letter_grade != ''
         )
 
     @staticmethod
@@ -187,7 +182,7 @@ class CourseGradeFactory(object):
 
         should_persist = should_persist and course_grade.attempted
         if should_persist:
-            course_grade._subsection_grade_factory.bulk_create_unsaved()
+            course_grade._subsection_grade_factory.bulk_create_unsaved()  # lint-amnesty, pylint: disable=protected-access
             PersistentCourseGrade.update_or_create(
                 user_id=user.id,
                 course_id=course_data.course_key,
@@ -221,7 +216,7 @@ class CourseGradeFactory(object):
             )
 
         log.info(
-            u'Grades: Update, %s, User: %s, %s, persisted: %s',
+            'Grades: Update, %s, User: %s, %s, persisted: %s',
             course_data.full_string(), user.id, course_grade, should_persist,
         )
 

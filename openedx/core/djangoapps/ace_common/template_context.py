@@ -2,11 +2,11 @@
 Context dictionary for templates that use the ace_common base template.
 """
 
-
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 
-from edxmako.shortcuts import marketing_link
+from lms.djangoapps.branding.api import get_logo_url_for_email
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
 
@@ -37,4 +37,5 @@ def get_base_template_context(site):
             'CONTACT_MAILING_ADDRESS', site=site, site_config_name='contact_mailing_address'),
         'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
         'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_URLS', site=site),
+        'logo_url': get_logo_url_for_email(),
     }

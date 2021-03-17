@@ -5,36 +5,35 @@ Views to show a course outline.
 
 import datetime
 import re
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 
-from completion import waffle as completion_waffle
-from django.contrib.auth.models import User
-from django.db.models import Q
-from django.shortcuts import redirect
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.db.models import Q  # lint-amnesty, pylint: disable=unused-import
+from django.shortcuts import redirect  # lint-amnesty, pylint: disable=unused-import
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import timezone
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils import timezone  # lint-amnesty, pylint: disable=unused-import
+from django.views.decorators.csrf import ensure_csrf_cookie  # lint-amnesty, pylint: disable=unused-import
 import edx_when.api as edx_when_api
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from waffle.models import Switch
 from web_fragments.fragment import Fragment
 
-from course_modes.models import CourseMode
-from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
-from lms.djangoapps.courseware.masquerade import setup_masquerade
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.courseware.masquerade import setup_masquerade  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
-from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule  # lint-amnesty, pylint: disable=unused-import
+from openedx.features.course_experience import RELATIVE_DATES_FLAG  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.course_experience.utils import dates_banner_should_display
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from student.models import CourseEnrollment
-from util.milestones_helpers import get_course_content_milestones
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.milestones_helpers import get_course_content_milestones
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 
@@ -47,14 +46,13 @@ class CourseOutlineFragmentView(EdxFragmentView):
     """
     Course outline fragment to be shown in the unified course view.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, course_id, user_is_enrolled=True, **kwargs):  # pylint: disable=arguments-differ
         """
         Renders the course outline as a fragment.
         """
         from lms.urls import RESET_COURSE_DEADLINES_NAME
-        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME
+        from openedx.features.course_experience.urls import COURSE_HOME_VIEW_NAME  # lint-amnesty, pylint: disable=unused-import
 
         course_key = CourseKey.from_string(course_id)
         course_overview = get_course_overview_with_access(
@@ -79,7 +77,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
 
         reset_deadlines_url = reverse(RESET_COURSE_DEADLINES_NAME)
-        reset_deadlines_redirect_url_base = COURSE_HOME_VIEW_NAME
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -96,8 +93,6 @@ class CourseOutlineFragmentView(EdxFragmentView):
             # managed by edx-when.
             'in_edx_when': edx_when_api.is_enabled_for_course(course_key),
             'reset_deadlines_url': reset_deadlines_url,
-            'reset_deadlines_redirect_url_base': reset_deadlines_redirect_url_base,
-            'reset_deadlines_redirect_url_id_dict': {'course_id': str(course.id)},
             'verified_upgrade_link': verified_upgrade_deadline_link(request.user, course=course),
             'on_course_outline_page': True,
             'missed_deadlines': missed_deadlines,
@@ -171,10 +166,8 @@ class CourseOutlineFragmentView(EdxFragmentView):
         """
         Returns the date that the ENABLE_COMPLETION_TRACKING waffle switch was enabled.
         """
-        # pylint: disable=protected-access
-        switch_name = completion_waffle.waffle()._namespaced_name(completion_waffle.ENABLE_COMPLETION_TRACKING)
         try:
-            return Switch.objects.get(name=switch_name).created
+            return Switch.objects.get(name=ENABLE_COMPLETION_TRACKING_SWITCH.name).created
         except Switch.DoesNotExist:
             return DEFAULT_COMPLETION_TRACKING_START
 

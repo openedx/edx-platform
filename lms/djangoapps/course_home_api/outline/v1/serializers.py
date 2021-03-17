@@ -2,9 +2,69 @@
 Outline Tab Serializers.
 """
 
+from django.utils.translation import ngettext
 from rest_framework import serializers
+
 from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
-from rest_framework.reverse import reverse
+from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin, VerifiedModeSerializerMixin
+
+
+class CourseBlockSerializer(serializers.Serializer):
+    """
+    Serializer for Course Block Objects
+    """
+    blocks = serializers.SerializerMethodField()
+
+    def get_blocks(self, block):
+        block_key = block['id']
+        block_type = block['type']
+        children = block.get('children', []) if block_type != 'sequential' else []  # Don't descend past sequential
+        description = block.get('format')
+        display_name = block['display_name']
+        enable_links = self.context.get('enable_links')
+        graded = block.get('graded')
+        icon = None
+        num_graded_problems = block.get('num_graded_problems', 0)
+        scored = block.get('scored')
+
+        if num_graded_problems and block_type == 'sequential':
+            questions = ngettext('({number} Question)', '({number} Questions)', num_graded_problems)
+            display_name += ' ' + questions.format(number=num_graded_problems)
+
+        if graded and scored:
+            icon = 'fa-pencil-square-o'
+
+        if 'special_exam_info' in block:
+            description = block['special_exam_info'].get('short_description')
+            icon = block['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')
+
+        serialized = {
+            block_key: {
+                'children': [child['id'] for child in children],
+                'complete': block.get('complete', False),
+                'description': description,
+                'display_name': display_name,
+                'due': block.get('due'),
+                'effort_activities': block.get('effort_activities'),
+                'effort_time': block.get('effort_time'),
+                'icon': icon,
+                'id': block_key,
+                'lms_web_url': block['lms_web_url'] if enable_links else None,
+                'resume_block': block.get('resume_block', False),
+                'type': block_type,
+            },
+        }
+        for child in children:
+            serialized.update(self.get_blocks(child))
+        return serialized
+
+
+class CourseGoalsSerializer(serializers.Serializer):
+    """
+    Serializer for Course Goal data
+    """
+    goal_options = serializers.ListField()
+    selected_goal = serializers.DictField()
 
 
 class CourseToolSerializer(serializers.Serializer):
@@ -16,33 +76,10 @@ class CourseToolSerializer(serializers.Serializer):
     url = serializers.SerializerMethodField()
 
     def get_url(self, tool):
-        course_key = self.context.get('course_key')
-        url = tool.url(course_key)
+        course_overview = self.context.get('course_overview')
+        url = tool.url(course_overview.id)
         request = self.context.get('request')
         return request.build_absolute_uri(url)
-
-
-class CourseBlockSerializer(serializers.Serializer):
-    """
-    Serializer for Course Block Objects
-    """
-    blocks = serializers.SerializerMethodField()
-
-    def get_blocks(self, blocks):
-        return {
-            str(block_key): {
-                'id': str(block_key),
-                'type': block_key.category,
-                'display_name': blocks.get_xblock_field(block_key, 'display_name', block_key.category),
-                'lms_web_url': reverse(
-                    'jump_to',
-                    kwargs={'course_id': str(block_key.course_key), 'location': str(block_key)},
-                    request=self.context['request'],
-                ),
-                'children': [str(child_key) for child_key in blocks.get_children(block_key)],
-            }
-            for block_key in blocks
-        }
 
 
 class DatesWidgetSerializer(serializers.Serializer):
@@ -54,12 +91,34 @@ class DatesWidgetSerializer(serializers.Serializer):
     user_timezone = serializers.CharField()
 
 
-class OutlineTabSerializer(serializers.Serializer):
+class EnrollAlertSerializer(serializers.Serializer):
+    """
+    Serializer for enroll alert information
+    """
+    can_enroll = serializers.BooleanField()
+    extra_text = serializers.CharField()
+
+
+class ResumeCourseSerializer(serializers.Serializer):
+    """
+    Serializer for resume course data
+    """
+    has_visited_course = serializers.BooleanField()
+    url = serializers.URLField()
+
+
+class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMixin, serializers.Serializer):
     """
     Serializer for the Outline Tab
     """
+    access_expiration = serializers.DictField()
     course_blocks = CourseBlockSerializer()
+    course_goals = CourseGoalsSerializer()
     course_tools = CourseToolSerializer(many=True)
     dates_widget = DatesWidgetSerializer()
+    enroll_alert = EnrollAlertSerializer()
     handouts_html = serializers.CharField()
+    has_ended = serializers.BooleanField()
+    offer = serializers.DictField()
+    resume_course = ResumeCourseSerializer()
     welcome_message_html = serializers.CharField()

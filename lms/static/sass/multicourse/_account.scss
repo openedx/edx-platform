@@ -611,6 +611,16 @@
         box-shadow: 0 2px 1px 0 $facebook-focus-blue;
       }
 
+      &.button-oa2-apple-id:hover,
+      &.button-oa2-apple-id:focus {
+        background-color: $apple-focus-black;
+        border: 1px solid $apple-focus-black;
+      }
+
+      &.button-oa2-apple-id:hover {
+        box-shadow: 0 2px 1px 0 $apple-focus-black;
+      }
+
       &.button-oa2-linkedin-oauth2:hover,
       &.button-oa2-linkedin-oauth2:focus {
         background-color: $linkedin-blue;

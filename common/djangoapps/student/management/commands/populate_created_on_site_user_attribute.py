@@ -4,11 +4,11 @@ Command to back-populate domain of the site the user account was created on.
 
 
 import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import Registration, UserAttribute
+from common.djangoapps.student.models import Registration, UserAttribute
 
 CREATED_ON_SITE = 'created_on_site'
 
@@ -64,18 +64,18 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(id=user_id)
                 if UserAttribute.get_user_attribute(user, CREATED_ON_SITE):
-                    self.stdout.write("created_on_site attribute already exists for user id: {id}".format(id=user_id))
+                    self.stdout.write(f"created_on_site attribute already exists for user id: {user_id}")
                 else:
                     UserAttribute.set_user_attribute(user, CREATED_ON_SITE, site_domain)
             except User.DoesNotExist:
-                self.stdout.write("This user id [{id}] does not exist in the system.".format(id=user_id))
+                self.stdout.write(f"This user id [{user_id}] does not exist in the system.")
 
         for key in activation_keys:
             try:
                 user = Registration.objects.get(activation_key=key).user
                 if UserAttribute.get_user_attribute(user, CREATED_ON_SITE):
-                    self.stdout.write("created_on_site attribute already exists for user id: {id}".format(id=user.id))
+                    self.stdout.write(f"created_on_site attribute already exists for user id: {user.id}")
                 else:
                     UserAttribute.set_user_attribute(user, CREATED_ON_SITE, site_domain)
             except Registration.DoesNotExist:
-                self.stdout.write("This activation key [{key}] does not exist in the system.".format(key=key))
+                self.stdout.write(f"This activation key [{key}] does not exist in the system.")

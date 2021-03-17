@@ -114,8 +114,12 @@
     }
   }
 
-  &.recovery-email-alert {
-    &#banner-msg {
+  &.recovery-email-alert,
+  &.learner-portal-enabled-alert {
+    &.banner-msg {
+      position: relative;
+      top: -10px;
+      padding: 20px 40px;
       background: $state-info-bg;
       box-shadow: none;
       border-top: 1px solid #579cc5;
@@ -130,6 +134,12 @@
 
     .fa-close:hover {
       cursor: pointer;
+    }
+  }
+
+  &.learner-portal-enabled-alert {
+    &.banner-msg {
+      margin-bottom: 10px;
     }
   }
 

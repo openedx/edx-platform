@@ -6,7 +6,7 @@ import logging
 import re
 import sys
 
-import six
+from bleach.sanitizer import Cleaner
 from lxml import etree
 from pkg_resources import resource_string
 from web_fragments.fragment import Fragment
@@ -17,7 +17,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.editing_module import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawMixin
-from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
@@ -30,13 +29,14 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
-from .capa_base import CapaMixin, ComplexEncoder, _
+from .capa_base import CapaMixin, ComplexEncoder, _  # lint-amnesty, pylint: disable=unused-import
 
 log = logging.getLogger("edx.courseware")
 
 
 @XBlock.wants('user')
 @XBlock.needs('i18n')
+@XBlock.wants('call_to_action')
 class ProblemBlock(
         CapaMixin, RawMixin, XmlMixin, EditingMixin,
         XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
@@ -94,8 +94,8 @@ class ProblemBlock(
         ]
     }
 
-    def bind_for_student(self, *args, **kwargs):
-        super(ProblemBlock, self).bind_for_student(*args, **kwargs)
+    def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+        super().bind_for_student(*args, **kwargs)
 
         # Capa was an XModule. When bind_for_student() was called on it with a new runtime, a new CapaModule object
         # was initialized when XModuleDescriptor._xmodule() was called next. self.lcp was constructed in CapaModule
@@ -110,7 +110,7 @@ class ProblemBlock(
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
         try:
             self.lcp
-        except Exception as err:
+        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
         else:
             html = self.get_html()
@@ -131,7 +131,7 @@ class ProblemBlock(
             return self.student_view(context)
         else:
             # Show a message that this content requires users to login/enroll.
-            return super(ProblemBlock, self).public_view(context)
+            return super().public_view(context)
 
     def author_view(self, context):
         """
@@ -162,7 +162,7 @@ class ProblemBlock(
           <other request-specific values here > }
         """
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp
+        self.lcp  # lint-amnesty, pylint: disable=pointless-statement
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
@@ -188,7 +188,7 @@ class ProblemBlock(
         )
 
         if dispatch not in handlers:
-            return 'Error: {} is not a known capa action'.format(dispatch)
+            return f'Error: {dispatch} is not a known capa action'
 
         before = self.get_progress()
         before_attempts = self.attempts
@@ -196,7 +196,7 @@ class ProblemBlock(
         try:
             result = handlers[dispatch](data)
 
-        except NotFoundError:
+        except NotFoundError as ex:
             log.info(
                 "Unable to find data when dispatching %s to %s for user %s",
                 dispatch,
@@ -204,9 +204,9 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()
-            six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
+            raise ProcessingError(not_found_error_message).with_traceback(traceback_obj) from ex
 
-        except Exception:
+        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
             log.exception(
                 "Unknown error when dispatching %s to %s for user %s",
                 dispatch,
@@ -214,7 +214,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()
-            six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
+            raise ProcessingError(generic_error_message).with_traceback(traceback_obj) from ex
 
         after = self.get_progress()
         after_attempts = self.attempts
@@ -274,7 +274,7 @@ class ProblemBlock(
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(ProblemBlock, self).non_editable_metadata_fields
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             ProblemBlock.due,
             ProblemBlock.graceperiod,
@@ -291,7 +291,7 @@ class ProblemBlock(
         try:
             tree = etree.XML(self.data)
         except etree.XMLSyntaxError:
-            log.error('Error parsing problem types from xml for capa module {}'.format(self.display_name))
+            log.error(f'Error parsing problem types from xml for capa module {self.display_name}')
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
@@ -300,7 +300,11 @@ class ProblemBlock(
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        xblock_body = super(ProblemBlock, self).index_dictionary()
+        xblock_body = super().index_dictionary()
+
+        # Make optioninput's options index friendly by replacing the actual tag with the values
+        capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
+
         # Removing solutions and hints, as well as script and style
         capa_content = re.sub(
             re.compile(
@@ -313,9 +317,14 @@ class ProblemBlock(
                 re.DOTALL |
                 re.VERBOSE),
             "",
-            self.data
+            capa_content
         )
-        capa_content = escape_html_characters(capa_content)
+        capa_content = re.sub(
+            r"(\s|&nbsp;|//)+",
+            " ",
+            Cleaner(tags=[], strip=True).clean(capa_content)
+        )
+
         capa_body = {
             "capa_content": capa_content,
             "display_name": self.display_name,
@@ -374,7 +383,7 @@ class ProblemBlock(
                 minimal_init=True,
             )
         except responsetypes.LoncapaProblemError:
-            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))
+            log.exception("LcpFatalError for block {} while getting max score".format(str(self.location)))
             maximum_score = 0
         else:
             maximum_score = lcp.get_max_score()

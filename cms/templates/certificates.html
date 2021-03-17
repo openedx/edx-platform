@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "certificates" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils
+from cms.djangoapps.contentstore import utils
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.js_utils import (

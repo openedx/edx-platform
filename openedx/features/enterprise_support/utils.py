@@ -7,18 +7,23 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomer
+from edx_toggles.toggles import LegacyWaffleFlag
+from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
+from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
 
-import third_party_auth
+from common.djangoapps import third_party_auth
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
+
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
 
 
 def get_data_consent_share_cache_key(user_id, course_id):
@@ -27,6 +32,13 @@ def get_data_consent_share_cache_key(user_id, course_id):
     """
 
     return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+
+
+def get_is_enterprise_cache_key(user_id):
+    """
+        Returns cache key for the enterprise learner validation method needed against user_id.
+    """
+    return get_cache_key(type='is_enterprise_learner', user_id=user_id)
 
 
 def clear_data_consent_share_cache(user_id, course_id):
@@ -51,7 +63,8 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     """
     sidebar_context = {}
     if enterprise_customer:
-        sidebar_context = get_enterprise_sidebar_context(enterprise_customer)
+        is_proxy_login = request.GET.get('proxy_login')
+        sidebar_context = get_enterprise_sidebar_context(enterprise_customer, is_proxy_login)
 
     if sidebar_context:
         context['data']['registration_form_desc']['fields'] = enterprise_fields_only(
@@ -67,11 +80,15 @@ def update_logistration_context_for_enterprise(request, context, enterprise_cust
     update_third_party_auth_context_for_enterprise(request, context, enterprise_customer)
 
 
-def get_enterprise_sidebar_context(enterprise_customer):
+def get_enterprise_sidebar_context(enterprise_customer, is_proxy_login):
     """
     Get context information for enterprise sidebar for the given enterprise customer.
 
-    Enterprise Sidebar Context has the following key-value pairs.
+    Args:
+        enterprise_customer (dict): customer data from enterprise-customer endpoint, cached
+        is_proxy_login (bool): If True, use proxy login welcome template
+
+    Returns: Enterprise Sidebar Context with the following key-value pairs.
     {
         'enterprise_name': 'Enterprise Name',
         'enterprise_logo_url': 'URL of the enterprise logo image',
@@ -84,10 +101,16 @@ def get_enterprise_sidebar_context(enterprise_customer):
     branding_configuration = enterprise_customer.get('branding_configuration', {})
     logo_url = branding_configuration.get('logo', '') if isinstance(branding_configuration, dict) else ''
 
-    branded_welcome_template = configuration_helpers.get_value(
-        'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
-        settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-    )
+    if is_proxy_login:
+        branded_welcome_template = configuration_helpers.get_value(
+            'ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE',
+            settings.ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE
+        )
+    else:
+        branded_welcome_template = configuration_helpers.get_value(
+            'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
+            settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+        )
 
     branded_welcome_string = Text(branded_welcome_template).format(
         start_bold=HTML('<b>'),
@@ -129,7 +152,7 @@ def enterprise_fields_only(fields):
 
 def update_third_party_auth_context_for_enterprise(request, context, enterprise_customer=None):
     """
-    Return updated context of third party auth with modified for enterprise.
+    Return updated context of third party auth with modified data for the given enterprise customer.
 
     Arguments:
         request (HttpRequest): The request for the logistration page.
@@ -142,10 +165,10 @@ def update_third_party_auth_context_for_enterprise(request, context, enterprise_
     """
     if context['data']['third_party_auth']['errorMessage']:
         context['data']['third_party_auth']['errorMessage'] = Text(_(
-            u'We are sorry, you are not authorized to access {platform_name} via this channel. '
-            u'Please contact your learning administrator or manager in order to access {platform_name}.'
-            u'{line_break}{line_break}'
-            u'Error Details:{line_break}{error_message}')
+            'We are sorry, you are not authorized to access {platform_name} via this channel. '
+            'Please contact your learning administrator or manager in order to access {platform_name}.'
+            '{line_break}{line_break}'
+            'Error Details:{line_break}{error_message}')
         ).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             error_message=context['data']['third_party_auth']['errorMessage'],
@@ -283,39 +306,74 @@ def _get_sync_learner_profile_data(enterprise_customer):
     return False
 
 
-def get_enterprise_learner_portals(request):
+def get_enterprise_learner_portal(request):
     """
-    Gets the formatted portal names and slugs that can be used
-    to generate links for enabled enterprise Learner Portals.
+    Gets the formatted portal name and slug that can be used
+    to generate a link for an enabled enterprise Learner Portal.
 
-    Caches and returns results in/from the user's request session if provided.
+    Caches and returns result in/from the user's request session if provided.
     """
     # Prevent a circular import.
-    from openedx.features.enterprise_support.api import enterprise_enabled
+    from openedx.features.enterprise_support.api import enterprise_enabled, enterprise_customer_uuid_for_request
 
-    if enterprise_enabled():
+    user = request.user
+    # Only cache this if a learner is authenticated (AnonymousUser exists and should not be tracked)
+
+    learner_portal_session_key = 'enterprise_learner_portal'
+
+    if enterprise_enabled() and ENTERPRISE_HEADER_LINKS.is_enabled() and user and user.id:
         # If the key exists return that value
-        if 'enterprise_learner_portals' in request.session:
-            return json.loads(request.session['enterprise_learner_portals'])
+        if learner_portal_session_key in request.session:
+            return json.loads(request.session[learner_portal_session_key])
 
-        user = request.user
-        # Ordering is important, this is consistent with how we decide on which
-        # enterprise_customer is the selected one for an enterprise_customer
-        enterprise_learner_portals = [{
-            'name': enterprise_customer_user.enterprise_customer.name,
-            'slug': enterprise_customer_user.enterprise_customer.slug,
-            'logo': enterprise_customer_user.enterprise_customer.branding_configuration.logo.url,
-        } for enterprise_customer_user in EnterpriseCustomerUser.objects.filter(
-            user_id=user.id, enterprise_customer__enable_learner_portal=True
-        ).prefetch_related(
-            'enterprise_customer', 'enterprise_customer__branding_configuration'
-        ).order_by('-enterprise_customer__active', '-modified')]
+        kwargs = {
+            'user_id': user.id,
+            'enterprise_customer__enable_learner_portal': True,
+        }
+        enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+        if enterprise_customer_uuid:
+            kwargs['enterprise_customer__uuid'] = enterprise_customer_uuid
+
+        queryset = EnterpriseCustomerUser.objects.filter(**kwargs).prefetch_related(
+            'enterprise_customer',
+            'enterprise_customer__branding_configuration',
+        )
+
+        if not enterprise_customer_uuid:
+            # If the request doesn't help us know which Enterprise Customer UUID to select with,
+            # order by the most recently activated/modified customers,
+            # so that when we select the first result of the query as the preferred
+            # customer, it's the most recently active one.
+            queryset = queryset.order_by('-enterprise_customer__active', '-modified')
+
+        preferred_enterprise_customer_user = queryset.first()
+        if not preferred_enterprise_customer_user:
+            return None
+
+        enterprise_customer = preferred_enterprise_customer_user.enterprise_customer
+        learner_portal_data = {
+            'name': enterprise_customer.name,
+            'slug': enterprise_customer.slug,
+            'logo': enterprise_branding_configuration(enterprise_customer).get('logo'),
+        }
 
         # Cache the result in the user's request session
-        request.session['enterprise_learner_portals'] = json.dumps(enterprise_learner_portals)
-
-        return enterprise_learner_portals
+        request.session[learner_portal_session_key] = json.dumps(learner_portal_data)
+        return learner_portal_data
     return None
+
+
+def enterprise_branding_configuration(enterprise_customer_obj):
+    """
+    Given an instance of ``EnterpriseCustomer``, returns a related
+    branding_configuration serialized dictionary if it exists, otherwise
+    the serialized default EnterpriseCustomerBrandingConfiguration object.
+
+    EnterpriseCustomerBrandingConfigurationSerializer will use default values
+    for any empty branding config fields.
+    """
+    branding_config = enterprise_customer_obj.safe_branding_configuration
+    return EnterpriseCustomerBrandingConfigurationSerializer(branding_config).data
 
 
 def get_enterprise_learner_generic_name(request):
@@ -343,7 +401,7 @@ def get_enterprise_learner_generic_name(request):
 
 def is_enterprise_learner(user):
     """
-    Check if the given user belongs to an enterprise.
+    Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
         user (User): Django User object.
@@ -351,7 +409,15 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
+    if cache.get(cached_is_enterprise_key):
+        return True
+
+    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+        # Cache the enterprise user for one hour.
+        cache.set(cached_is_enterprise_key, True, 3600)
+        return True
+    return False
 
 
 def get_enterprise_slug_login_url():

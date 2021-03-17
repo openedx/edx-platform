@@ -13,8 +13,8 @@ from common.test.acceptance.fixtures import COMMENTS_STUB_URL
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
-class ContentFactory(factory.Factory):
-    class Meta(object):
+class ContentFactory(factory.Factory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = dict
 
     id = None
@@ -40,7 +40,7 @@ class ContentFactory(factory.Factory):
         return kwargs
 
 
-class Thread(ContentFactory):
+class Thread(ContentFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     thread_type = "discussion"
     anonymous = False
     anonymous_to_peers = False
@@ -67,8 +67,8 @@ class Response(Comment):
     body = "dummy response body"
 
 
-class SearchResult(factory.Factory):
-    class Meta(object):
+class SearchResult(factory.Factory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = dict
 
     discussion_data = []
@@ -78,14 +78,14 @@ class SearchResult(factory.Factory):
     corrected_text = None
 
 
-class DiscussionContentFixture(object):
+class DiscussionContentFixture:  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def push(self):
         """
         Push the data to the stub comments service.
         """
         return requests.put(
-            '{}/set_config'.format(COMMENTS_STUB_URL),
+            f'{COMMENTS_STUB_URL}/set_config',
             data=self.get_config_data()
         )
 
@@ -96,12 +96,12 @@ class DiscussionContentFixture(object):
         raise NotImplementedError()
 
 
-class SingleThreadViewFixture(DiscussionContentFixture):
+class SingleThreadViewFixture(DiscussionContentFixture):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def __init__(self, thread):
         self.thread = thread
 
-    def addResponse(self, response, comments=[]):
+    def addResponse(self, response, comments=[]):  # lint-amnesty, pylint: disable=dangerous-default-value, missing-function-docstring
         response['children'] = comments
         if self.thread["thread_type"] == "discussion":
             responseListAttr = "children"
@@ -133,7 +133,7 @@ class SingleThreadViewFixture(DiscussionContentFixture):
         }
 
 
-class MultipleThreadFixture(DiscussionContentFixture):
+class MultipleThreadFixture(DiscussionContentFixture):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def __init__(self, threads):
         self.threads = threads
@@ -157,7 +157,7 @@ class MultipleThreadFixture(DiscussionContentFixture):
         thread['comments_count'] += len(comments) + 1
 
 
-class UserProfileViewFixture(DiscussionContentFixture):
+class UserProfileViewFixture(DiscussionContentFixture):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def __init__(self, threads):
         self.threads = threads
@@ -166,7 +166,7 @@ class UserProfileViewFixture(DiscussionContentFixture):
         return {"active_threads": json.dumps(self.threads)}
 
 
-class SearchResultFixture(DiscussionContentFixture):
+class SearchResultFixture(DiscussionContentFixture):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def __init__(self, result):
         self.result = result
@@ -175,7 +175,7 @@ class SearchResultFixture(DiscussionContentFixture):
         return {"search_result": json.dumps(self.result)}
 
 
-class ForumsConfigMixin(object):
+class ForumsConfigMixin:
     """Mixin providing a method used to configure the forums integration."""
     def enable_forums(self, is_enabled=True):
         """Configures whether or not forums are enabled."""

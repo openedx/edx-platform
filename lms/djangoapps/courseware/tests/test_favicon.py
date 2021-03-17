@@ -6,7 +6,7 @@ Tests of the courseware favicon
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 class FaviconTestCase(UrlResetMixin, TestCase):
@@ -16,7 +16,7 @@ class FaviconTestCase(UrlResetMixin, TestCase):
 
     def test_favicon_redirect(self):
         resp = self.client.get("/favicon.ico")
-        self.assertEqual(resp.status_code, 301)
+        assert resp.status_code == 301
         self.assertRedirects(
             resp,
             "/static/images/favicon.ico",
@@ -28,7 +28,7 @@ class FaviconTestCase(UrlResetMixin, TestCase):
         self.reset_urls()
 
         resp = self.client.get("/favicon.ico")
-        self.assertEqual(resp.status_code, 301)
+        assert resp.status_code == 301
         self.assertRedirects(
             resp,
             "/static/images/foo.ico",

@@ -2,14 +2,14 @@
 Enterprise support admin views.
 """
 
-from django.contrib import admin, messages
+from django.contrib import admin, messages  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from enterprise.models import EnterpriseCourseEnrollment
 
 from openedx.features.enterprise_support.admin.forms import CSVImportForm
-from student.models import CourseEnrollment, CourseEnrollmentAttribute
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute
 
 
 class EnrollmentAttributeOverrideView(FormView):
@@ -28,7 +28,7 @@ class EnrollmentAttributeOverrideView(FormView):
         return reverse('admin:enterprise_override_attributes')
 
     def get_context_data(self, **kwargs):
-        context = super(EnrollmentAttributeOverrideView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(self._get_admin_context(self.request))
         return context
 
@@ -68,4 +68,4 @@ class EnrollmentAttributeOverrideView(FormView):
                 ).format(error_line_numbers=', '.join(error_line_numbers))
             )
 
-        return super(EnrollmentAttributeOverrideView, self).form_valid(form)
+        return super().form_valid(form)

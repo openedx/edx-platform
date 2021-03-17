@@ -1,20 +1,19 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import json
 import unittest
+from unittest.mock import Mock, patch
 
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.conditional_module import ConditionalDescriptor
-from xmodule.error_module import NonStaffErrorDescriptor
+from xmodule.conditional_module import ConditionalBlock
+from xmodule.error_module import NonStaffErrorBlock
 from xmodule.modulestore.xml import CourseLocationManager, ImportSystem, XMLModuleStore
 from xmodule.tests import DATA_DIR, get_test_descriptor_system, get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -26,14 +25,14 @@ ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
 
 
-class DummySystem(ImportSystem):
+class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
 
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
-        super(DummySystem, self).__init__(
+        super().__init__(
             xmlstore=xmlstore,
             course_id=CourseKey.from_string('/'.join([ORG, COURSE, 'test_run'])),
             course_dir='test_dir',
@@ -41,18 +40,18 @@ class DummySystem(ImportSystem):
             load_error_modules=load_error_modules,
         )
 
-    def render_template(self, template, context):
+    def render_template(self, template, context):  # lint-amnesty, pylint: disable=method-hidden
         raise Exception("Shouldn't be called")
 
 
-class ConditionalModuleFactory(xml.XmlImportFactory):
+class ConditionalBlockFactory(xml.XmlImportFactory):
     """
-    Factory for generating ConditionalModule for testing purposes
+    Factory for generating ConditionalBlock for testing purposes
     """
     tag = 'conditional'
 
 
-class ConditionalFactory(object):
+class ConditionalFactory:
     """
     A helper class to create a conditional module and associated source and child modules
     to allow for testing.
@@ -63,7 +62,7 @@ class ConditionalFactory(object):
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
 
-        if the source_is_error_module flag is set, create a real ErrorModule for the source.
+        if the source_is_error_module flag is set, create a real ErrorBlock for the source.
         """
         descriptor_system = get_test_descriptor_system()
 
@@ -72,7 +71,7 @@ class ConditionalFactory(object):
                                             "problem", "SampleProblem", deprecated=True)
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml(
+            source_descriptor = NonStaffErrorBlock.from_xml(
                 'some random xml data',
                 system,
                 id_generator=CourseLocationManager(source_location.course_key),
@@ -89,8 +88,8 @@ class ConditionalFactory(object):
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
         child_descriptor.visible_to_staff_only = False
-        child_descriptor._xmodule.student_view.return_value = Fragment(content=u'<p>This is a secret</p>')
-        child_descriptor.student_view = child_descriptor._xmodule.student_view
+        child_descriptor._xmodule.student_view.return_value = Fragment(content='<p>This is a secret</p>')  # lint-amnesty, pylint: disable=protected-access
+        child_descriptor.student_view = child_descriptor._xmodule.student_view  # lint-amnesty, pylint: disable=protected-access
         child_descriptor.displayable_items.return_value = [child_descriptor]
         child_descriptor.runtime = descriptor_system
         child_descriptor.xmodule_runtime = get_test_system()
@@ -125,17 +124,15 @@ class ConditionalFactory(object):
             'children': [child_descriptor.location],
         })
 
-        cond_descriptor = ConditionalDescriptor(
+        cond_descriptor = ConditionalBlock(
             descriptor_system,
             field_data,
             ScopeIds(None, None, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
         system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
-        cond_descriptor.get_required_module_descriptors = Mock(return_value=[source_descriptor])
-        cond_descriptor.required_modules = [
-            system.get_module(descriptor)
-            for descriptor in cond_descriptor.get_required_module_descriptors()
+        cond_descriptor.get_required_blocks = [
+            system.get_module(source_descriptor),
         ]
 
         # return dict:
@@ -144,14 +141,14 @@ class ConditionalFactory(object):
                 'child_module': child_descriptor}
 
 
-class ConditionalModuleBasicTest(unittest.TestCase):
+class ConditionalBlockBasicTest(unittest.TestCase):
     """
     Make sure that conditional module works, using mocks for
     other modules.
     """
 
     def setUp(self):
-        super(ConditionalModuleBasicTest, self).setUp()
+        super().setUp()
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -160,8 +157,8 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         for attempted in ["false", "true"]:
             for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
-                modules['child_module'].get_icon_class = lambda: icon_class
-                self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
+                modules['child_module'].get_icon_class = lambda: icon_class  # lint-amnesty, pylint: disable=cell-var-from-loop
+                assert modules['cond_module'].get_icon_class() == icon_class
 
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -169,11 +166,11 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         # we reverse it here
         html = modules['cond_module'].render(STUDENT_VIEW).content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
-            'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
-            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
-            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
+            'ajax_url': modules['cond_module'].ajax_url,
+            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
+            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
         })
-        self.assertEqual(expected, html)
+        assert expected == html
 
     def test_handle_ajax(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -182,7 +179,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # now change state of the capa problem to make it completed
         modules['source_module'].is_attempted = "true"
@@ -190,18 +187,18 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         modules['cond_module'].save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
+        assert any(('This is a secret' in item['content']) for item in fragments)
 
     def test_error_as_source(self):
         '''
-        Check that handle_ajax works properly if the source is really an ErrorModule,
+        Check that handle_ajax works properly if the source is really an ErrorBlock,
         and that the condition is not satisfied.
         '''
         modules = ConditionalFactory.create(self.test_system, source_is_error_module=True)
         modules['cond_module'].save()
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
     @patch('xmodule.conditional_module.log')
     def test_conditional_with_staff_only_source_module(self, mock_log):
@@ -213,13 +210,13 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         cond_module.save()
         cond_module.is_attempted = "false"
         cond_module.handle_ajax('', '')
-        self.assertFalse(mock_log.warn.called)
-        self.assertIn(None, cond_module.required_modules)
+        assert not mock_log.warn.called
+        assert None in cond_module.get_required_blocks
 
 
-class ConditionalModuleXmlTest(unittest.TestCase):
+class ConditionalBlockXmlTest(unittest.TestCase):
     """
-    Make sure ConditionalModule works, by loading data in from an XML-defined course.
+    Make sure ConditionalBlock works, by loading data in from an XML-defined course.
     """
 
     @staticmethod
@@ -228,20 +225,21 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        super(ConditionalModuleXmlTest, self).setUp()
+        super().setUp()
         self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print("Importing {0}".format(name))
+        print(f"Importing {name}")
 
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
-        self.modulestore = modulestore
-        self.assertEqual(len(courses), 1)
+        self.modulestore = modulestore  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        assert len(courses) == 1
         return courses[0]
 
-    def test_conditional_module(self):
+    @patch('xmodule.x_module.descriptor_global_local_resource_url')
+    def test_conditional_module(self, _):
         """Make sure that conditional module works"""
 
         print("Starting import")
@@ -264,7 +262,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         location = BlockUsageLocator(CourseLocator("HarvardX", "ER22x", "2013_Spring", deprecated=True),
                                      "conditional", "condone", deprecated=True)
 
-        def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
+        def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):  # lint-amnesty, pylint: disable=unused-argument
             return text
         self.test_system.replace_urls = replace_urls
         self.test_system.get_module = inner_get_module
@@ -281,12 +279,12 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': '{}/xmodule_handler'.format(text_type(location)),
-                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
-                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
+                'ajax_url': '{}/xmodule_handler'.format(str(location)),
+                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
+                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
-        self.assertEqual(html, html_expect)
+        assert html == html_expect
 
         gdi = module.get_display_items()
         print("gdi=", gdi)
@@ -295,7 +293,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         module.save()
         print("ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertFalse(any(['This is a secret' in item['content'] for item in fragments]))
+        assert not any(('This is a secret' in item['content']) for item in fragments)
 
         # Now change state of the capa problem to make it completed
         inner_module = inner_get_module(location.replace(category="problem", name='choiceprob'))
@@ -307,11 +305,13 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         module.save()
         print("post-attempt ajax: ", ajax)
         fragments = ajax['fragments']
-        self.assertTrue(any(['This is a secret' in item['content'] for item in fragments]))
+        assert any(('This is a secret' in item['content']) for item in fragments)
+
+    maxDiff = None
 
     def test_conditional_module_with_empty_sources_list(self):
         """
-        If a ConditionalDescriptor is initialized with an empty sources_list, we assert that the sources_list is set
+        If a ConditionalBlock is initialized with an empty sources_list, we assert that the sources_list is set
         via generating UsageKeys from the values in xml_attributes['sources']
         """
         dummy_system = Mock()
@@ -323,17 +323,15 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll'},
             'children': None,
         })
-        conditional = ConditionalDescriptor(
+        conditional = ConditionalBlock(
             dummy_system,
             dummy_field_data,
             dummy_scope_ids,
         )
-        new_run = conditional.location.course_key.run
-        self.assertEqual(
-            conditional.sources_list[0],
-            # Matching what is in ConditionalDescriptor.__init__.
-            BlockUsageLocator.from_string(conditional.xml_attributes['sources']).replace(run=new_run)
-        )
+
+        new_run = conditional.location.course_key.run  # lint-amnesty, pylint: disable=unused-variable
+        assert conditional.sources_list[0] == BlockUsageLocator.from_string(conditional.xml_attributes['sources'])\
+            .replace(run=dummy_location.course_key.run)
 
     def test_conditional_module_parse_sources(self):
         dummy_system = Mock()
@@ -342,23 +340,21 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
-            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},
+            'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},  # lint-amnesty, pylint: disable=line-too-long
             'children': None,
         })
-        conditional = ConditionalDescriptor(
+        conditional = ConditionalBlock(
             dummy_system,
             dummy_field_data,
             dummy_scope_ids,
         )
-        self.assertEqual(
-            conditional.parse_sources(conditional.xml_attributes),
-            ['i4x://HarvardX/ER22x/poll_question/T15_poll', 'i4x://HarvardX/ER22x/poll_question/T16_poll']
-        )
+        assert conditional.parse_sources(conditional.xml_attributes) == ['i4x://HarvardX/ER22x/poll_question/T15_poll',
+                                                                         'i4x://HarvardX/ER22x/poll_question/T16_poll']
 
     def test_conditional_module_parse_attr_values(self):
         root = '<conditional attempted="false"></conditional>'
         xml_object = etree.XML(root)
-        definition = ConditionalDescriptor.definition_from_xml(xml_object, Mock())[0]
+        definition = ConditionalBlock.definition_from_xml(xml_object, Mock())[0]
         expected_definition = {
             'show_tag_list': [],
             'conditional_attr': 'attempted',
@@ -366,7 +362,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'conditional_message': ''
         }
 
-        self.assertEqual(definition, expected_definition)
+        assert definition == expected_definition
 
     def test_presence_attributes_in_xml_attributes(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -380,16 +376,16 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
 
 
-class ConditionalModuleStudioTest(XModuleXmlImportTest):
+class ConditionalBlockStudioTest(XModuleXmlImportTest):
     """
     Unit tests for how conditional test interacts with Studio.
     """
 
     def setUp(self):
-        super(ConditionalModuleStudioTest, self).setUp()
+        super().setUp()
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)
-        conditional = ConditionalModuleFactory(
+        conditional = ConditionalBlockFactory(
             parent=sequence,
             attribs={
                 'group_id_to_child': '{"0": "i4x://edX/xml_test_course/html/conditional_0"}'
@@ -427,22 +423,18 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
 
         context = create_studio_context(self.conditional, False)
         html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
-        self.assertIn('This is a secret HTML', html)
+        assert 'This is a secret HTML' in html
 
         context = create_studio_context(self.sequence, True)
         html = self.module_system.render(self.conditional, AUTHOR_VIEW, context).content
-        self.assertNotIn('This is a secret HTML', html)
+        assert 'This is a secret HTML' not in html
 
     def test_non_editable_settings(self):
         """
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.conditional.non_editable_metadata_fields
-        self.assertIn(ConditionalDescriptor.due, non_editable_metadata_fields)
-        self.assertIn(ConditionalDescriptor.is_practice_exam, non_editable_metadata_fields)
-        self.assertIn(ConditionalDescriptor.is_time_limited, non_editable_metadata_fields)
-        self.assertIn(ConditionalDescriptor.default_time_limit_minutes, non_editable_metadata_fields)
-        self.assertIn(ConditionalDescriptor.show_tag_list, non_editable_metadata_fields)
+        assert ConditionalBlock.due in non_editable_metadata_fields
 
     def test_validation_messages(self):
         """
@@ -450,10 +442,7 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
         """
         self.conditional.sources_list = None
         validation = self.conditional.validate()
-        self.assertEqual(
-            validation.summary.text,
-            u"This component has no source components configured yet."
-        )
-        self.assertEqual(validation.summary.type, StudioValidationMessage.NOT_CONFIGURED)
-        self.assertEqual(validation.summary.action_class, 'edit-button')
-        self.assertEqual(validation.summary.action_label, u"Configure list of sources")
+        assert validation.summary.text == 'This component has no source components configured yet.'
+        assert validation.summary.type == StudioValidationMessage.NOT_CONFIGURED
+        assert validation.summary.action_class == 'edit-button'
+        assert validation.summary.action_label == 'Configure list of sources'

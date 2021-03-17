@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 
 class CourseSearchView(CourseTabView):
@@ -29,38 +29,31 @@ class CourseSearchView(CourseTabView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
-    def get(self, request, course_id, **kwargs):
+    def get(self, request, course_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Displays the home page for the specified course.
         """
-        return super(CourseSearchView, self).get(request, course_id, 'courseware', **kwargs)
+        return super().get(request, course_id, 'courseware', **kwargs)
 
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
-        course_id = six.text_type(course.id)
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+        course_id = str(course.id)
         home_fragment_view = CourseSearchFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
-
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Always render this tab with bootstrap
-        """
-        return True
 
 
 class CourseSearchFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
-    _uses_pattern_library = False
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders the course's home page as a fragment.
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         # Render the course home fragment
         context = {

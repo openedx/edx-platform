@@ -16,7 +16,7 @@ from oauth2_provider.models import get_application_model
 from oauth2_provider.views import ApplicationRegistration
 from slumber.exceptions import HttpNotFoundError
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.api_admin.decorators import require_api_access
 from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, CatalogForm
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, Catalog
@@ -33,19 +33,19 @@ class ApiRequestView(CreateView):
     template_name = 'api_admin/api_access_request_form.html'
     success_url = reverse_lazy('api_admin:api-status')
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         """
         If the requesting user has already requested API access, redirect
         them to the client creation page.
         """
         if ApiAccessRequest.api_access_status(request.user) is not None:
             return redirect(reverse('api_admin:api-status'))
-        return super(ApiRequestView, self).get(request)
+        return super().get(request)
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.site = get_current_site(self.request)
-        return super(ApiRequestView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ApiRequestStatusView(ApplicationRegistration):
@@ -87,7 +87,7 @@ class ApiRequestStatusView(ApplicationRegistration):
         })
 
     def get_form(self, form_class=None):
-        form = super(ApiRequestStatusView, self).get_form(form_class)
+        form = super().get_form(form_class)
         # Copy the data, since it's an immutable QueryDict.
         copied_data = form.data.copy()
         # Now set the fields that were removed earlier. We give them
@@ -105,14 +105,14 @@ class ApiRequestStatusView(ApplicationRegistration):
     def form_valid(self, form):
         # Delete any existing applications if the user has decided to regenerate their credentials
         Application.objects.filter(user=self.request.user).delete()
-        return super(ApiRequestStatusView, self).form_valid(form)
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         return self.get(self.request, form)
 
     @require_api_access
-    def post(self, request):
-        return super(ApiRequestStatusView, self).post(request)
+    def post(self, request):  # lint-amnesty, pylint: disable=arguments-differ
+        return super().post(request)
 
 
 class ApiTosView(TemplateView):
@@ -121,7 +121,7 @@ class ApiTosView(TemplateView):
     template_name = 'api_admin/terms_of_service.html'
 
 
-class CatalogApiMixin(object):
+class CatalogApiMixin:
     def get_catalog_api_client(self, user):
         return create_catalog_api_client(user)
 

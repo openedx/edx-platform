@@ -26,7 +26,7 @@ class GradingPolicySerializer(serializers.Serializer):
         # When the grader dictionary was missing keys, DRF v2 would default to None;
         # DRF v3 unhelpfully raises an exception.
         return dict(
-            super(GradingPolicySerializer, self).to_representation(
+            super().to_representation(
                 defaultdict(lambda: None, instance)
             )
         )
@@ -102,6 +102,8 @@ class SubsectionGradeResponseSerializer(serializers.Serializer):
     """
     Serializer for subsection grade response.
     """
+    success = serializers.BooleanField()
+    error_message = serializers.CharField(required=False)
     subsection_id = serializers.CharField()
     user_id = serializers.IntegerField()
     course_id = serializers.CharField()

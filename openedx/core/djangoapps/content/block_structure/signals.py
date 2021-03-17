@@ -2,8 +2,8 @@
 Signal handlers for invalidating cached data.
 """
 
+import logging
 
-import six
 from django.conf import settings
 from django.dispatch.dispatcher import receiver
 from opaque_keys.edx.locator import LibraryLocator
@@ -12,7 +12,10 @@ from xmodule.modulestore.django import SignalHandler
 
 from . import config
 from .api import clear_course_from_cache
+from .models import BlockStructureNotFound
 from .tasks import update_course_in_cache_v2
+
+log = logging.getLogger(__name__)
 
 
 @receiver(SignalHandler.course_published)
@@ -25,11 +28,17 @@ def update_block_structure_on_course_publish(sender, course_key, **kwargs):  # p
     if isinstance(course_key, LibraryLocator):
         return
 
-    if config.waffle().is_enabled(config.INVALIDATE_CACHE_ON_PUBLISH):
-        clear_course_from_cache(course_key)
+    if config.INVALIDATE_CACHE_ON_PUBLISH.is_enabled():
+        try:
+            clear_course_from_cache(course_key)
+        except BlockStructureNotFound:
+            log.warning(
+                "BlockStructure: %s not found when trying to clear course from cache",
+                course_key,
+            )
 
     update_course_in_cache_v2.apply_async(
-        kwargs=dict(course_id=six.text_type(course_key)),
+        kwargs=dict(course_id=str(course_key)),
         countdown=settings.BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
     )
 

@@ -3,7 +3,6 @@ Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
 
-import six
 from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
 
@@ -18,7 +17,7 @@ class SignatureValidator(RequestValidator):
     """
 
     def __init__(self, lti_consumer):
-        super(SignatureValidator, self).__init__()
+        super().__init__()
         self.endpoint = SignatureOnlyEndpoint(self)
         self.lti_consumer = lti_consumer
 
@@ -31,7 +30,7 @@ class SignatureValidator(RequestValidator):
     # on the platform.
     enforce_ssl = False
 
-    def check_client_key(self, key):
+    def check_client_key(self, key):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Verify that the key supplied by the LTI consumer is valid for an LTI
         launch. This method is only concerned with the structure of the key;
@@ -99,7 +98,7 @@ class SignatureValidator(RequestValidator):
         :return: True if the signature matches, False if it does not.
         """
 
-        method = six.text_type(request.method)
+        method = str(request.method)
         url = request.build_absolute_uri()
         body = request.body
 
@@ -141,13 +140,13 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_access_token(self):
+    def dummy_access_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def dummy_client(self):
+    def dummy_client(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -172,7 +171,7 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_request_token(self):
+    def dummy_request_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """

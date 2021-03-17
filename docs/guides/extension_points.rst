@@ -63,6 +63,9 @@ If you want to provide learners with new content experiences within courses, opt
    * - **External Graders**
      - Hold, Stable
      - An external grader is a service that receives learner responses to a problem, processes those responses, and returns feedback and a problem grade to the edX platform. You build and deploy an external grader separately from the edX platform. An external grader is particularly useful for software programming courses where learners are asked to submit complex code. See the `external grader documentation`_ for details.
+   * - **TinyMCE (Visual Text/HTML Editor) Plugins**
+     - Trial, Limited
+     - TinyMCE's functionality can be extended with so-called Plugins. Custom TinyMCE plugins can be particularly useful for serving certain content in courses that isn't available yet; they can also be used to facilitate the educator's work. `You can follow this guide to install and enable custom TinyMCE plugins`_.
 
 For a more detailed comparison of content integration options, see `Options for Extending the edX Platform`_ in the *Open edX Developer's Guide*.
 
@@ -72,6 +75,7 @@ For a more detailed comparison of content integration options, see `Options for 
 .. _Options for Extending the edX Platform: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/extending.html
 .. _custom JavaScript application: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html
 .. _external grader documentation: https://edx.readthedocs.io/projects/open-edx-ca/en/latest/exercises_tools/external_graders.html
+.. _You can follow this guide to install and enable custom TinyMCE plugins: extensions/tinymce_plugins.rst
 
 
 
@@ -83,11 +87,11 @@ If you wish to customize aspects of the learner or educator experiences, you'll 
 
 Most python plugins are enabled using one of two methods:
 
-1. A Python Entry point: the core Open edX platform provides a standard plugin loading mechanism in |openedx.core.lib.plugins|_ which uses `stevedore`_ to find all installed python packages that declare a specific "entry point" in their setup.py file. See the ``entry_points`` defined in edx-platform's own ``setup.py`` for examples.
+1. A Python Entry point: the core Open edX platform provides a standard plugin loading mechanism in |edx_django_utils.plugins|_ which uses `stevedore`_ to find all installed python packages that declare a specific "entry point" in their setup.py file. See the ``entry_points`` defined in edx-platform's own ``setup.py`` for examples.
 2. A Django setting: Some plugins require modification of Django settings, which is typically done by editing ``/edx/etc/lms.yml`` (in Production) or ``edx-platform/lms/envs/private.py`` (on Devstack).
 
-.. |openedx.core.lib.plugins| replace:: ``openedx.core.lib.plugins``
-.. _openedx.core.lib.plugins: https://github.com/edx/edx-platform/blob/master/openedx/core/lib/plugins.py
+.. |edx_django_utils.plugins| replace:: ``edx_django_utils.plugins``
+.. _edx_django_utils.plugins: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins
 .. _stevedore: https://pypi.org/project/stevedore/
 
 Here are the different integration points that python plugins can use:

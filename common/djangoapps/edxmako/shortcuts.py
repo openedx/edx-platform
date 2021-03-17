@@ -1,4 +1,4 @@
-#   Copyright (c) 2008 Mikeal Rogers
+#   Copyright (c) 2008 Mikeal Rogers  # lint-amnesty, pylint: disable=missing-module-docstring
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,16 +17,15 @@ import logging
 
 import six
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse  # lint-amnesty, pylint: disable=unused-import
 from django.template import engines
 from django.urls import reverse, NoReverseMatch
 from six.moves.urllib.parse import urljoin
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from xmodule.util.xmodule_django import get_current_request_hostname
 
 from . import Engines
@@ -81,13 +80,13 @@ def marketing_link(name):
         # Using urljoin here allows us to enable a marketing site and set
         # a site ROOT, but still specify absolute URLs for other marketing
         # URLs in the MKTG_URLS setting
-        # e.g. urljoin('http://marketing.com', 'http://open-edx.org/about') >>> 'http://open-edx.org/about'
+        # e.g. urljoin('https://marketing.com', 'https://open-edx.org/about') >>> 'https://open-edx.org/about'
         return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
     # only link to the old pages when the marketing site isn't on
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
-            host_name = get_current_request_hostname()
+            host_name = get_current_request_hostname()  # lint-amnesty, pylint: disable=unused-variable
             if link_map[name].startswith('http'):
                 return link_map[name]
             else:
@@ -95,7 +94,7 @@ def marketing_link(name):
                     return reverse(link_map[name])
                 except NoReverseMatch:
                     log.debug(u"Cannot find corresponding link for name: %s", name)
-                    set_custom_metric('unresolved_marketing_link', name)
+                    set_custom_attribute('unresolved_marketing_link', name)
                     return '#'
     else:
         log.debug(u"Cannot find corresponding link for name: %s", name)
@@ -144,7 +143,7 @@ def marketing_link_context_processor(request):
         settings.MKTG_URLS
     )
 
-    return dict(
+    return dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
         [
             ("MKTG_URL_" + k, marketing_link(k))
             for k in (

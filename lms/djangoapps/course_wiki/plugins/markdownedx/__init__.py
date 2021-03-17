@@ -1,4 +1,4 @@
-# Make sure wiki_plugin.py gets run.
+# Make sure wiki_plugin.py gets run.  # lint-amnesty, pylint: disable=missing-module-docstring
 
 
-from course_wiki.plugins.markdownedx.wiki_plugin import ExtendMarkdownPlugin
+from lms.djangoapps.course_wiki.plugins.markdownedx.wiki_plugin import ExtendMarkdownPlugin

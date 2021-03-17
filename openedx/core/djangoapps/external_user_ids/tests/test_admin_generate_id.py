@@ -1,10 +1,10 @@
-# """
-# Test the logic behind the Generate External IDs tools in Admin
-# """
+"""
+Test the logic behind the Generate External IDs tools in Admin
+"""
 import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.external_user_ids.models import (
     ExternalId,
@@ -18,7 +18,7 @@ class TestGenerateExternalIds(TestCase):
     Test generating ExternalIDs for Users.
     """
     def setUp(self):
-        super(TestGenerateExternalIds, self).setUp()
+        super(TestGenerateExternalIds, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.users = UserFactory.create_batch(10)
         self.user_id_list = [user.id for user in self.users]
         self.external_id_admin = ExternalIdAdmin(ExternalId, AdminSite())

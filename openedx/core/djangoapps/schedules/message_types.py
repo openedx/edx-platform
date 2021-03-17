@@ -10,13 +10,13 @@ from openedx.core.djangoapps.schedules.config import DEBUG_MESSAGE_WAFFLE_FLAG
 
 class ScheduleMessageType(BaseMessageType):
     def __init__(self, *args, **kwargs):
-        super(ScheduleMessageType, self).__init__(*args, **kwargs)
+        super(ScheduleMessageType, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.log_level = logging.DEBUG if DEBUG_MESSAGE_WAFFLE_FLAG.is_enabled() else None
 
 
 class RecurringNudge(ScheduleMessageType):
     def __init__(self, day, *args, **kwargs):
-        super(RecurringNudge, self).__init__(*args, **kwargs)
+        super(RecurringNudge, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.name = "recurringnudge_day{}".format(day)
 
 

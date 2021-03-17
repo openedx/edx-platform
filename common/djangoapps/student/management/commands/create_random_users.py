@@ -1,45 +1,26 @@
 """
 A script to create some dummy users
 """
-
-
 import uuid
 
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
-from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
-from student.helpers import do_create_account
-from student.models import CourseEnrollment
+from common.djangoapps.student.management.commands._create_users import create_users
 
 
-def make_random_form():
-    """
-    Generate unique user data for dummy users.
-    """
-    identification = uuid.uuid4().hex[:8]
-    return AccountCreationForm(
-        data={
-            'username': 'user_{id}'.format(id=identification),
-            'email': 'email_{id}@example.com'.format(id=identification),
+def random_user_data_generator(num_users):
+    for _ in range(num_users):
+        identification = uuid.uuid4().hex[:8]
+        yield {
+            'username': f'user_{identification}',
+            'email': f'email_{identification}@example.com',
             'password': '12345',
-            'name': 'User {id}'.format(id=identification),
-        },
-        tos_required=False
-    )
+            'name': f'User {identification}',
+        }
 
 
-def create(num, course_key):
-    """Create num users, enrolling them in course_key if it's not None"""
-    for __ in range(num):
-        (user, _, _) = do_create_account(make_random_form())
-        if course_key is not None:
-            CourseEnrollment.enroll(user, course_key)
-        print('Created user {}'.format(user.username))
-
-
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = """Create N new users, with random parameters.
 
 Usage: create_random_users.py N [course_id_to_enroll_in].
@@ -61,4 +42,4 @@ Examples:
     def handle(self, *args, **options):
         num = options['num_users']
         course_key = CourseKey.from_string(options['course_key']) if options['course_key'] else None
-        create(num, course_key)
+        create_users(course_key, random_user_data_generator(num))

@@ -21,24 +21,46 @@ import hashlib
 import hmac
 import logging
 
-import six
 from django.conf import settings
 
 log = logging.getLogger(__name__)
 
 
+def _encode_secret(secret, provider_id):
+    """
+    Helper function for encoding text_type secrets into ascii.
+    """
+    try:
+        secret.encode('ascii')
+    except UnicodeEncodeError:
+        secret = None
+        log.error('Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+
+    return secret
+
+
 def get_shared_secret_key(provider_id):
     """
-    Retrieve the shared secret key for a particular credit provider.
+    Retrieve the shared secret for a particular credit provider.
+
+    It is possible for the secret to be stored in 2 ways:
+    1 - a key/value pair of provider_id and secret string
+        {'cool_school': '123abc'}
+    2 - a key/value pair of provider_id and secret list
+        {'cool_school': ['987zyx', '123abc']}
     """
+
     secret = getattr(settings, "CREDIT_PROVIDER_SECRET_KEYS", {}).get(provider_id)
 
-    if isinstance(secret, six.text_type):
-        try:
-            secret.encode('ascii')
-        except UnicodeEncodeError:
-            secret = None
-            log.error(u'Shared secret key for credit provider "%s" contains non-ASCII unicode.', provider_id)
+    # When secret is just characters
+    if isinstance(secret, str):
+        secret = _encode_secret(secret, provider_id)
+
+    # When secret is a list containing multiple keys, encode all of them
+    elif isinstance(secret, list):
+        for index, secretvalue in enumerate(secret):
+            if isinstance(secretvalue, str):
+                secret[index] = _encode_secret(secretvalue, provider_id)
 
     return secret
 
@@ -55,10 +77,10 @@ def signature(params, shared_secret):
         str: The 32-character signature.
 
     """
-    encoded_params = u"".join([
-        u"{key}:{value}".format(key=key, value=params[key])
+    encoded_params = "".join([
+        "{key}:{value}".format(key=key, value=params[key])
         for key in sorted(params.keys())
-        if key != u"signature"
+        if key != "signature"
     ])
     hasher = hmac.new(shared_secret.encode('utf-8'), encoded_params.encode('utf-8'), hashlib.sha256)
     return hasher.hexdigest()

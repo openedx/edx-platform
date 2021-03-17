@@ -20,7 +20,7 @@ class AbsoluteURLFieldTests(TestCase):
     """ Tests for the AbsoluteURLField. """
 
     def setUp(self):
-        super(AbsoluteURLFieldTests, self).setUp()
+        super(AbsoluteURLFieldTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.field = AbsoluteURLField()
         self.field._context = {'request': MockRequest()}  # pylint:disable=protected-access
 
@@ -35,8 +35,8 @@ class AbsoluteURLFieldTests(TestCase):
     )
     def test_to_representation_with_absolute_url(self, value):
         """ Verify the method returns the passed value, if the value is an absolute URL. """
-        self.assertEqual(self.field.to_representation(value), value)
+        assert self.field.to_representation(value) == value
 
     def test_to_representation(self):
         """ Verify the method returns an absolute URL. """
-        self.assertEqual(self.field.to_representation('/image.jpg'), MockRequest.ROOT + '/image.jpg')
+        assert self.field.to_representation('/image.jpg') == (MockRequest.ROOT + '/image.jpg')

@@ -6,11 +6,10 @@
 // NOTE: This is the right to left (RTL) configured style compile.
 // It should mirror main-ltr w/ the exception of bi-app references.
 
-
-// Load the RTL version of the edX Pattern Library
-$pattern-library-path: '../../edx-pattern-library' !default;
-
-@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-rtl';
+@import '../sass/vendor/bi-app/bi-app-rtl';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
 
 // Load the shared build
 @import 'build';

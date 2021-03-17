@@ -4,13 +4,12 @@ Receivers of signals sent from django-user-tasks
 
 
 import logging
+from urllib.parse import urljoin
 
-from django.urls import reverse
 from django.dispatch import receiver
+from django.urls import reverse
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped
-
-from six.moves.urllib.parse import urljoin
 
 from .tasks import send_task_complete_email
 

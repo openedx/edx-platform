@@ -1,6 +1,5 @@
 <div class="search-info">
-    <h2 class="search-results-title"><%- gettext("Search Results") %></h2>
-    <div class="search-count"><%- totalCountMsg %></div>
+    <h2 class="search-results-title"><%- totalCountMsg %></h2>
 </div>
 
 <% if (totalCount > 0 ) { %>

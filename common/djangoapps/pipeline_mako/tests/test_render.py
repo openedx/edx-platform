@@ -2,14 +2,13 @@
 
 
 from unittest import skipUnless
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test import TestCase
-from mock import patch
-from six.moves import map
 
-from pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
+from common.djangoapps.pipeline_mako import compressed_css, compressed_js, render_require_js_path_overrides
 
 
 class RequireJSPathOverridesTest(TestCase):
@@ -50,12 +49,12 @@ class PipelineRenderTest(TestCase):
     def mock_staticfiles_lookup(path):
         return '/static/' + path
 
-    @patch('static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
+    @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
     @ddt.data(
         (True,),
         (False,),
     )
-    def test_compressed_css(self, pipeline_enabled, mock_staticfiles_lookup):
+    def test_compressed_css(self, pipeline_enabled, mock_staticfiles_lookup):  # lint-amnesty, pylint: disable=unused-argument
         """
         Verify the behavior of compressed_css, with the pipeline
         both enabled and disabled.
@@ -65,15 +64,15 @@ class PipelineRenderTest(TestCase):
         with self.settings(PIPELINE=pipeline):
             # Verify the default behavior
             css_include = compressed_css('style-main-v1')
-            self.assertIn(u'lms-main-v1.css', css_include)
+            assert 'lms-main-v1.css' in css_include
 
             # Verify that raw keyword causes raw URLs to be emitted
             css_include = compressed_css('style-main-v1', raw=True)
-            self.assertIn(u'lms-main-v1.css?raw', css_include)
+            assert 'lms-main-v1.css?raw' in css_include
 
     @patch('django.contrib.staticfiles.storage.staticfiles_storage.exists', return_value=True)
-    @patch('static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
-    def test_compressed_js(self, mock_staticfiles_lookup, mock_staticfiles_exists):
+    @patch('common.djangoapps.static_replace.try_staticfiles_lookup', side_effect=mock_staticfiles_lookup)
+    def test_compressed_js(self, mock_staticfiles_lookup, mock_staticfiles_exists):  # lint-amnesty, pylint: disable=unused-argument
         """
         Verify the behavior of compressed_css, with the pipeline
         both enabled and disabled.
@@ -83,10 +82,10 @@ class PipelineRenderTest(TestCase):
         pipeline['PIPELINE_ENABLED'] = True
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            self.assertIn(u'lms-base-application.js', js_include)
+            assert 'lms-base-application.js' in js_include
 
         # Verify that multiple JS files are rendered with the pipeline disabled
         pipeline['PIPELINE_ENABLED'] = False
         with self.settings(PIPELINE=pipeline):
             js_include = compressed_js('base_application')
-            self.assertIn(u'/static/js/src/logger.js', js_include)
+            assert '/static/js/src/logger.js' in js_include

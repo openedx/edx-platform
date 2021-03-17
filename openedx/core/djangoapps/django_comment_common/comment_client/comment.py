@@ -30,7 +30,7 @@ class Comment(models.Model):
     type = 'comment'
 
     def __init__(self, *args, **kwargs):
-        super(Comment, self).__init__(*args, **kwargs)
+        super(Comment, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self._cached_thread = None
 
     @property

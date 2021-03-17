@@ -5,8 +5,10 @@ import logging
 
 from django.dispatch import receiver
 from edx_when.api import FIELDS_TO_EXTRACT, set_dates_for_course
-from six import text_type
-from xblock.fields import Scope
+
+from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from openedx.core.lib.graph_traversals import get_children, leaf_filter, traverse_pre_order
+from xblock.fields import Scope  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 
@@ -30,12 +32,50 @@ def _field_values(fields, xblock):
                 result[field.name] = field.read_from(xblock)
             except TypeError as exception:
                 exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
-                    message=text_type(exception),
-                    location=text_type(xblock.location),
+                    message=str(exception),
+                    location=str(xblock.location),
                     field_name=field.name
                 )
-                raise TypeError(exception_message)
+                raise TypeError(exception_message)  # lint-amnesty, pylint: disable=raise-missing-from
     return result
+
+
+def _has_assignment_blocks(item):
+    """
+    Check if a given block contains children that are assignments.
+    Assignments have graded, has_score and nonzero weight attributes.
+    """
+    return any(
+        is_xblock_an_assignment(block)
+        for block in traverse_pre_order(item, get_children, leaf_filter)
+    )
+
+
+def _gather_graded_items(root, due):  # lint-amnesty, pylint: disable=missing-function-docstring
+    items = [root]
+    has_non_ora_scored_content = False
+    collected_items = []
+    while items:
+        next_item = items.pop()
+        if next_item.graded:
+            # Sequentials can be marked as graded, while only containing ungraded problems
+            # To handle this case, we can look at the leaf blocks within a sequential
+            # and check that they are a graded assignment
+            # (if they have graded/has_score attributes and nonzero weight)
+            # TODO: Once studio can manually set relative dates, we would need to manually check for them here
+            collected_items.append((next_item.location, {'due': due if _has_assignment_blocks(next_item) else None}))
+            # TODO: This is pretty gross, and should maybe be configurable in the future,
+            # especially if we find ourselves needing more exceptions.
+            has_non_ora_scored_content = (
+                has_non_ora_scored_content or
+                (next_item.has_score and next_item.category != 'openassessment')
+            )
+
+        items.extend(next_item.get_children())
+
+    if has_non_ora_scored_content:
+        return collected_items
+    return []
 
 
 def extract_dates_from_course(course):
@@ -53,26 +93,13 @@ def extract_dates_from_course(course):
             # Apply the same relative due date to all content inside a section,
             # unless that item already has a relative date set
             for _, section, weeks_to_complete in spaced_out_sections(course):
-                items = [section]
-                has_non_ora_scored_content = False
                 section_date_items = []
-                while items:
-                    next_item = items.pop()
-                    # TODO: This is pretty gross, and should maybe be configurable in the future,
-                    # especially if we find ourselves needing more exceptions.
-                    if next_item.graded:
-                        # TODO: Once studio can manually set relative dates,
-                        # we would need to manually check for them here
-                        section_date_items.append((next_item.location, {'due': weeks_to_complete}))
-                        has_non_ora_scored_content = (
-                            has_non_ora_scored_content or
-                            (next_item.has_score and next_item.category != 'openassessment')
-                        )
+                for subsection in section.get_children():
+                    section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
 
-                    items.extend(next_item.get_children())
-
-                if has_non_ora_scored_content:
-                    date_items.extend(section_date_items)
+                if section_date_items and section.graded:
+                    date_items.append((section.location, weeks_to_complete))
+                date_items.extend(section_date_items)
     else:
         date_items = []
         store = modulestore()

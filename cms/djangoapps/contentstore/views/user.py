@@ -2,7 +2,7 @@
 
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
@@ -11,13 +11,13 @@ from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from course_creators.views import user_requested_access
-from edxmako.shortcuts import render_to_response
-from student import auth
-from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import JsonResponse, expect_json
+from cms.djangoapps.course_creators.views import user_requested_access
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 __all__ = ['request_course_creator', 'course_team_handler']
@@ -117,7 +117,7 @@ def _course_team_user(request, course_key, email):
         user = User.objects.get(email=email)
     except Exception:  # pylint: disable=broad-except
         msg = {
-            "error": _(u"Could not find user by email address '{email}'.").format(email=email),
+            "error": _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -161,7 +161,7 @@ def _course_team_user(request, course_key, email):
     # can't modify an inactive user but can remove it
     if not (user.is_active or new_role is None):
         msg = {
-            "error": _(u'User {email} has registered but has not yet activated his/her account.').format(email=email),
+            "error": _('User {email} has registered but has not yet activated their account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 
@@ -177,7 +177,7 @@ def _course_team_user(request, course_key, email):
                 role_added = True
             else:
                 return permissions_error_response
-        elif role.has_user(user, check_user_activation=False):
+        elif role.has_user(user, check_user_activation=False):  # pylint: disable=no-value-for-parameter
             # Remove the user from this old role:
             old_roles.add(role)
 

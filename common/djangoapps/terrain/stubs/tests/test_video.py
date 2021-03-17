@@ -8,7 +8,7 @@ import unittest
 import requests
 from django.conf import settings
 
-from terrain.stubs.video_source import VideoSourceHttpService
+from common.djangoapps.terrain.stubs.video_source import VideoSourceHttpService
 
 HLS_MANIFEST_TEXT = """
 #EXTM3U
@@ -33,16 +33,16 @@ class StubVideoServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        super(StubVideoServiceTest, self).setUp()
+        super().setUp()
         self.server = VideoSourceHttpService()
-        self.server.config['root_dir'] = '{}/data/video'.format(settings.TEST_ROOT)
+        self.server.config['root_dir'] = f'{settings.TEST_ROOT}/data/video'
         self.addCleanup(self.server.shutdown)
 
     def test_get_hls_manifest(self):
         """
         Verify that correct hls manifest is received.
         """
-        response = requests.get("http://127.0.0.1:{port}/hls/history.m3u8".format(port=self.server.port))
-        self.assertTrue(response.ok)
-        self.assertEqual(response.text, HLS_MANIFEST_TEXT.lstrip())
-        self.assertEqual(response.headers['Access-Control-Allow-Origin'], '*')
+        response = requests.get(f"http://127.0.0.1:{self.server.port}/hls/history.m3u8")
+        assert response.ok
+        assert response.text == HLS_MANIFEST_TEXT.lstrip()
+        assert response.headers['Access-Control-Allow-Origin'] == '*'

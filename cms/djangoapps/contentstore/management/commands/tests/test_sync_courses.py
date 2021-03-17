@@ -1,20 +1,21 @@
 """
 Tests for sync courses management command
 """
-import mock
+from unittest import mock
+
 from django.core.management import call_command
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
 
-from contentstore.views.course import create_new_course_in_store
+from cms.djangoapps.contentstore.views.course import create_new_course_in_store
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-COMMAND_MODULE = 'contentstore.management.commands.sync_courses'
+COMMAND_MODULE = 'cms.djangoapps.contentstore.management.commands.sync_courses'
 
 
 @mock.patch(COMMAND_MODULE + '.get_course_runs')
@@ -22,7 +23,7 @@ class TestSyncCoursesCommand(ModuleStoreTestCase):
     """ Test sync_courses command """
 
     def setUp(self):
-        super(TestSyncCoursesCommand, self).setUp()
+        super().setUp()
 
         self.user = UserFactory(username='test', email='test@example.com')
         self.catalog_course_runs = [
@@ -32,9 +33,9 @@ class TestSyncCoursesCommand(ModuleStoreTestCase):
 
     def _validate_courses(self):
         for run in self.catalog_course_runs:
-            course_key = CourseKey.from_string(run.get('key'))
+            course_key = CourseKey.from_string(run.get('key'))  # lint-amnesty, pylint: disable=no-member
             self.assertTrue(modulestore().has_course(course_key))
-            CourseOverview.objects.get(id=run.get('key'))
+            CourseOverview.objects.get(id=run.get('key'))  # lint-amnesty, pylint: disable=no-member
 
     def test_courses_sync(self, mock_catalog_course_runs):
         mock_catalog_course_runs.return_value = self.catalog_course_runs
@@ -62,7 +63,7 @@ class TestSyncCoursesCommand(ModuleStoreTestCase):
 
         with LogCapture() as capture:
             call_command('sync_courses', self.user.email)
-            expected_message = u"Course already exists for {}, {}, {}. Skipping".format(
+            expected_message = "Course already exists for {}, {}, {}. Skipping".format(
                 course_key.org,
                 course_key.course,
                 course_key.run,

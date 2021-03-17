@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
@@ -10,13 +9,11 @@ import random
 from copy import copy
 from gettext import ngettext
 
-import six
+import bleach
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
-from six import text_type
-from six.moves import zip
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -24,12 +21,21 @@ from xblock.core import XBlock
 from xblock.fields import Integer, List, Scope, String
 
 from capa.responsetypes import registry
-from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.mako_module import MakoTemplateBlockBase
+from xmodule.studio_editable import StudioEditableBlock
+from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.x_module import STUDENT_VIEW, XModule
+from xmodule.xml_module import XmlMixin
+from xmodule.x_module import (
+    HTMLSnippet,
+    ResourceTemplates,
+    shim_xmodule_js,
+    STUDENT_VIEW,
+    XModuleMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+)
 
-from .mako_module import MakoModuleDescriptor
-from .xml_module import XmlDescriptor
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -59,17 +65,57 @@ def _get_capa_types():
     ], key=lambda item: item.get('display_name'))
 
 
-class LibraryContentFields(object):
+@XBlock.wants('library_tools')  # Only needed in studio
+@XBlock.wants('studio_user_permissions')  # Only available in studio
+@XBlock.wants('user')
+class LibraryContentBlock(
+    MakoTemplateBlockBase,
+    XmlMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+    StudioEditableBlock,
+):
     """
-    Fields for the LibraryContentModule.
+    An XBlock whose children are chosen dynamically from a content library.
+    Can be used to create randomized assessments among other things.
 
-    Separated out for now because they need to be added to the module and the
-    descriptor.
+    Note: technically, all matching blocks from the content library are added
+    as children of this block, but only a subset of those children are shown to
+    any particular student.
     """
+    # pylint: disable=abstract-method
+    has_children = True
+    has_author_view = True
+
+    resources_dir = 'assets/library_content'
+
+    preview_view_js = {
+        'js': [],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    preview_view_css = {
+        'scss': [],
+    }
+
+    mako_template = 'widgets/metadata-edit.html'
+    studio_js_module_name = "VerticalDescriptor"
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/vertical/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
+    }
+
+    show_in_read_only_mode = True
+
     completion_mode = XBlockCompletionMode.AGGREGATOR
-    # Please note the display_name of each field below is used in
-    # common/test/acceptance/pages/studio/library.py:StudioLibraryContentXBlockEditModal
-    # to locate input elements - keep synchronized
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -117,7 +163,6 @@ class LibraryContentFields(object):
         default=[],
         scope=Scope.user_state,
     )
-    has_children = True
 
     @property
     def source_library_key(self):
@@ -125,19 +170,6 @@ class LibraryContentFields(object):
         Convenience method to get the library ID as a LibraryLocator and not just a string
         """
         return LibraryLocator.from_string(self.source_library_id)
-
-
-#pylint: disable=abstract-method
-@XBlock.wants('library_tools')  # Only needed in studio
-class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
-    """
-    An XBlock whose children are chosen dynamically from a content library.
-    Can be used to create randomized assessments among other things.
-
-    Note: technically, all matching blocks from the content library are added
-    as children of this block, but only a subset of those children are shown to
-    any particular student.
-    """
 
     @classmethod
     def make_selection(cls, selected, children, max_count, mode):
@@ -160,37 +192,41 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         """
         rand = random.Random()
 
-        selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
+        selected_keys = {tuple(k) for k in selected}  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
-        valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+        valid_block_keys = {(c.block_type, c.block_id) for c in children}
 
         # Remove any selected blocks that are no longer valid:
-        invalid_block_keys = (selected - valid_block_keys)
+        invalid_block_keys = (selected_keys - valid_block_keys)
         if invalid_block_keys:
-            selected -= invalid_block_keys
+            selected_keys -= invalid_block_keys
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        if len(selected) > max_count:
-            num_to_remove = len(selected) - max_count
-            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
-            selected -= overlimit_block_keys
+        if len(selected_keys) > max_count:
+            num_to_remove = len(selected_keys) - max_count
+            overlimit_block_keys = set(rand.sample(selected_keys, num_to_remove))
+            selected_keys -= overlimit_block_keys
 
         # Do we have enough blocks now?
-        num_to_add = max_count - len(selected)
+        num_to_add = max_count - len(selected_keys)
 
         added_block_keys = None
         if num_to_add > 0:
             # We need to select [more] blocks to display to this user:
-            pool = valid_block_keys - selected
+            pool = valid_block_keys - selected_keys
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
                 added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
-            selected |= added_block_keys
+            selected_keys |= added_block_keys
+
+        if any((invalid_block_keys, overlimit_block_keys, added_block_keys)):
+            selected = list(selected_keys)
+            random.shuffle(selected)
 
         return {
             'selected': selected,
@@ -204,13 +240,13 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         Helper method to publish an event for analytics purposes
         """
         event_data = {
-            "location": six.text_type(self.location),
+            "location": str(self.location),
             "result": result,
             "previous_count": getattr(self, "_last_event_result_count", len(self.selected)),
             "max_count": self.max_count,
         }
         event_data.update(kwargs)
-        self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
+        self.runtime.publish(self, f"edx.librarycontentblock.content.{event_name}", event_data)
         self._last_event_result_count = len(result)  # pylint: disable=attribute-defined-outside-init
 
     @classmethod
@@ -270,19 +306,15 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
     def selected_children(self):
         """
-        Returns a set() of block_ids indicating which of the possible children
+        Returns a list() of block_ids indicating which of the possible children
         have been selected to display to the current user.
 
         This reads and updates the "selected" field, which has user_state scope.
 
-        Note: self.selected and the return value contain block_ids. To get
+        Note: the return value (self.selected) contains block_ids. To get
         actual BlockUsageLocators, it is necessary to use self.children,
         because the block_ids alone do not specify the block type.
         """
-        if hasattr(self, "_selected_set"):
-            # Already done:
-            return self._selected_set  # pylint: disable=access-member-before-definition
-
         block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
@@ -294,13 +326,12 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             self._publish_event,
         )
 
-        # Save our selections to the user state, to ensure consistency:
-        selected = block_keys['selected']
-        self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
-        # Cache the results
-        self._selected_set = selected  # pylint: disable=attribute-defined-outside-init
+        if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
+            # Save our selections to the user state, to ensure consistency:
+            selected = block_keys['selected']
+            self.selected = selected  # TODO: this doesn't save from the LMS "Progress" page.
 
-        return selected
+        return self.selected
 
     def _get_selected_child_blocks(self):
         """
@@ -310,17 +341,26 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         for block_type, block_id in self.selected_children():
             yield self.runtime.get_block(self.location.course_key.make_usage_key(block_type, block_id))
 
-    def student_view(self, context):
+    def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         fragment = Fragment()
         contents = []
         child_context = {} if not context else copy(context)
 
         for child in self._get_selected_child_blocks():
+            if child is None:
+                # TODO: Fix the underlying issue in TNL-7424
+                # This shouldn't be happening, but does for an as-of-now
+                # unknown reason. Until we address the underlying issue,
+                # let's at least log the error explicitly, ignore the
+                # exception, and prevent the page from resulting in a
+                # 500-response.
+                logger.error('Skipping display for child block that is None')
+                continue
             for displayable in child.displayable_items():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
                 fragment.add_fragment_resources(rendered_child)
                 contents.append({
-                    'id': text_type(displayable.location),
+                    'id': str(displayable.location),
                     'content': rendered_child.content,
                 })
 
@@ -332,12 +372,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'completion_delay_ms': None,
         }))
         return fragment
-
-    def validate(self):
-        """
-        Validates the state of this Library Content Module Instance.
-        """
-        return self.descriptor.validate()
 
     def author_view(self, context):
         """
@@ -367,37 +401,33 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
+    def studio_view(self, _context):
+        """
+        Return the studio view.
+        """
+        fragment = Fragment(
+            self.system.render_template(self.mako_template, self.get_context())
+        )
+        add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
+        shim_xmodule_js(fragment, self.studio_js_module_name)
+        return fragment
+
     def get_child_descriptors(self):
         """
         Return only the subset of our children relevant to the current student.
         """
         return list(self._get_selected_child_blocks())
 
-
-@XBlock.wants('user')
-@XBlock.wants('library_tools')  # Only needed in studio
-@XBlock.wants('studio_user_permissions')  # Only available in studio
-class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDescriptor, StudioEditableDescriptor):
-    """
-    Descriptor class for LibraryContentModule XBlock.
-    """
-
-    resources_dir = 'assets/library_content'
-
-    module_class = LibraryContentModule
-    mako_template = 'widgets/metadata-edit.html'
-    js = {'js': [resource_string(__name__, 'js/src/vertical/edit.js')]}
-    js_module_name = "VerticalDescriptor"
-
-    show_in_read_only_mode = True
-
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(LibraryContentDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super().non_editable_metadata_fields
         # The only supported mode is currently 'random'.
         # Add the mode field to non_editable_metadata_fields so that it doesn't
         # render in the edit form.
-        non_editable_fields.extend([LibraryContentFields.mode, LibraryContentFields.source_library_version])
+        non_editable_fields.extend([
+            LibraryContentBlock.mode,
+            LibraryContentBlock.source_library_version,
+        ])
         return non_editable_fields
 
     @lazy
@@ -420,7 +450,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         return user_id
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None):
+    def refresh_children(self, request=None, suffix=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -434,10 +464,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         this block is up to date or not.
         """
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        user_id = self.get_user_id()
         if not self.tools:
             return Response("Library Tools unavailable in current runtime.", status=400)
-        self.tools.update_children(self, user_id, user_perms)
+        self.tools.update_children(self, user_perms)
         return Response()
 
     # Copy over any overridden settings the course author may have applied to the blocks.
@@ -445,7 +474,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         Copy any overrides the user has made on blocks in this library.
         """
-        for field in six.itervalues(source.fields):
+        for field in source.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source):
                 setattr(dest, field.name, field.read_from(source))
         if source.has_children:
@@ -469,7 +498,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if not self.tools:
             raise RuntimeError("Library tools unavailable, duplication will not be sane!")
-        self.tools.update_children(self, user_id, user_perms, version=self.source_library_version)
+        self.tools.update_children(self, user_perms, version=self.source_library_version)
 
         self._copy_overrides(store, user_id, source_block, self)
 
@@ -482,16 +511,16 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != six.text_type(latest_version):
+            if version is None or version != str(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
-                        _(u'This component is out of date. The library has new content.'),
+                        _('This component is out of date. The library has new content.'),
                         # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
                         # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
-                        action_label=_(u"{refresh_icon} Update now.").format(refresh_icon=u"↻")
+                        action_label=_("{refresh_icon} Update now.").format(refresh_icon="↻")
                     )
                 )
                 return False
@@ -499,9 +528,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
-                    _(u'Library is invalid, corrupt, or has been deleted.'),
+                    _('Library is invalid, corrupt, or has been deleted.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Library List.")
+                    action_label=_("Edit Library List.")
                 )
             )
             return False
@@ -518,7 +547,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
-        validation = super(LibraryContentDescriptor, self).validate()
+        validation = super().validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
         library_tools = self.runtime.service(self, "library_tools")
@@ -527,8 +556,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 StudioValidationMessage(
                     StudioValidationMessage.ERROR,
                     _(
-                        u"This course does not support content libraries. "
-                        u"Contact your system administrator for more information."
+                        "This course does not support content libraries. "
+                        "Contact your system administrator for more information."
                     )
                 )
             )
@@ -537,9 +566,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"A library has not yet been selected."),
+                    _("A library has not yet been selected."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Library.")
+                    action_label=_("Select a Library.")
                 )
             )
             return validation
@@ -554,9 +583,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'There are no matching problem types in the specified libraries.'),
+                    _('There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Select another problem type.")
+                    action_label=_("Select another problem type.")
                 )
             )
 
@@ -567,18 +596,18 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     (
                         ngettext(
-                            u'The specified library is configured to fetch {count} problem, ',
-                            u'The specified library is configured to fetch {count} problems, ',
+                            'The specified library is configured to fetch {count} problem, ',
+                            'The specified library is configured to fetch {count} problems, ',
                             self.max_count
                         ) +
                         ngettext(
-                            u'but there is only {actual} matching problem.',
-                            u'but there are only {actual} matching problems.',
+                            'but there is only {actual} matching problem.',
+                            'but there are only {actual} matching problems.',
                             matching_children_count
                         )
                     ).format(count=self.max_count, actual=matching_children_count),
                     action_class='edit-button',
-                    action_label=_(u"Edit the library configuration.")
+                    action_label=_("Edit the library configuration.")
                 )
             )
 
@@ -591,17 +620,17 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         lib_tools = self.runtime.service(self, 'library_tools')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
-            (key, name) for key, name in lib_tools.list_available_libraries()
-            if user_perms.can_read(key) or self.source_library_id == six.text_type(key)
+            (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
+            if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
-            all_libraries.append((self.source_library_id, _(u"Invalid Library")))
-        all_libraries = [(u"", _("No Library Selected"))] + all_libraries
-        values = [{"display_name": name, "value": six.text_type(key)} for key, name in all_libraries]
+            all_libraries.append((self.source_library_id, _("Invalid Library")))
+        all_libraries = [("", _("No Library Selected"))] + all_libraries
+        values = [{"display_name": name, "value": str(key)} for key, name in all_libraries]
         return values
 
-    def editor_saved(self, user, old_metadata, old_content):
+    def editor_saved(self, user, old_metadata, old_content):  # lint-amnesty, pylint: disable=unused-argument
         """
         If source_library_id or capa_type has been edited, refresh_children automatically.
         """
@@ -629,7 +658,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         This overwrites the get_content_titles method included in x_module by default.
         """
         titles = []
-        for child in self._xmodule.get_child_descriptors():
+        for child in self.get_child_descriptors():
             titles.extend(child.get_content_titles())
         return titles
 
@@ -651,15 +680,15 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in six.iteritems(self.fields):
+        for field_name, field in self.fields.items():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
-                xml_object.set(field_name, six.text_type(field.read_from(self)))
+                xml_object.set(field_name, str(field.read_from(self)))
         return xml_object
 
 
-class LibrarySummary(object):
+class LibrarySummary:
     """
     A library summary object which contains the fields required for library listing on studio.
     """
@@ -673,7 +702,7 @@ class LibrarySummary(object):
 
         display_name (unicode): display name of the library.
         """
-        self.display_name = display_name if display_name else _(u"Empty")
+        self.display_name = display_name if display_name else _("Empty")
 
         self.id = library_locator  # pylint: disable=invalid-name
         self.location = library_locator.make_usage_key('library', 'library')
@@ -681,7 +710,7 @@ class LibrarySummary(object):
     @property
     def display_org_with_default(self):
         """
-        Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
+        Org display names are not implemented. This just provides API compatibility with CourseBlock.
         Always returns the raw 'org' field from the key.
         """
         return self.location.library_key.org
@@ -689,7 +718,7 @@ class LibrarySummary(object):
     @property
     def display_number_with_default(self):
         """
-        Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
+        Display numbers are not implemented. This just provides API compatibility with CourseBlock.
         Always returns the raw 'library' field from the key.
         """
         return self.location.library_key.library

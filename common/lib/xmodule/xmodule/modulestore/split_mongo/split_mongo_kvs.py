@@ -1,9 +1,8 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import copy
 from collections import namedtuple
 
-import six
 from contracts import contract, new_contract
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlockAside
@@ -37,7 +36,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             (copied from a template block with copy_from_template)
         """
         # deepcopy so that manipulations of fields does not pollute the source
-        super(SplitMongoKVS, self).__init__(copy.deepcopy(initial_values))
+        super().__init__(copy.deepcopy(initial_values))
         self._definition = definition  # either a DefinitionLazyLoader or the db id of the definition.
         # if the db id, then the definition is presumed to be loaded into _fields
 
@@ -52,7 +51,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         self.aside_fields = aside_fields if aside_fields else {}
 
     def get(self, key):
-        if key.block_family == XBlockAside.entry_point:
+        if key.block_family == XBlockAside.entry_point:  # lint-amnesty, pylint: disable=no-else-raise
             if key.scope not in self.VALID_SCOPES:
                 raise InvalidScopeError(key, self.VALID_SCOPES)
 
@@ -75,7 +74,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
             if key.field_name not in self._fields:
                 if key.scope == Scope.parent:
                     return self.parent
-                if key.scope == Scope.children:
+                if key.scope == Scope.children:  # lint-amnesty, pylint: disable=no-else-raise
                     # didn't find children in _fields; so, see if there's a default
                     raise KeyError()
                 elif key.scope == Scope.settings:
@@ -178,7 +177,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         if self._defaults and key.field_name in self._defaults:
             return self._defaults[key.field_name]
         # If not, try inheriting from a parent, then use the XBlock type's normal default value:
-        return super(SplitMongoKVS, self).default(key)
+        return super().default(key)
 
     def _load_definition(self):
         """
@@ -192,7 +191,7 @@ class SplitMongoKVS(InheritanceKeyValueStore):
                 aside_fields_p = persisted_definition.get('aside_fields')
                 if aside_fields_p:
                     aside_fields = self._definition.field_converter(aside_fields_p)
-                    for aside_type, fields in six.iteritems(aside_fields):
+                    for aside_type, fields in aside_fields.items():
                         self.aside_fields.setdefault(aside_type, {}).update(fields)
                 # do we want to cache any of the edit_info?
             self._definition = None  # already loaded

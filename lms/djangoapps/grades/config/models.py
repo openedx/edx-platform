@@ -10,8 +10,6 @@ from django.db.models import BooleanField, IntegerField, TextField
 from django.utils.encoding import python_2_unicode_compatible
 from opaque_keys.edx.django.models import CourseKeyField
 
-from six import text_type
-
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -24,6 +22,20 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     feature to take effect.
 
     .. no_pii:
+
+    .. toggle_name: PersistentGradesEnabledFlag.enabled
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: When enabled, grades are persisted. This means that PersistentCourseGrade objects are
+       created for student grades. In order for this to take effect, CoursePersistentGradesFlag objects must also be
+       created individually for each course. Alternatively, the PersistentGradesEnabledFlag.enabled_for_all_courses
+       waffle flag or the PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS feature flag can be set to True to enable this
+       feature for all courses.
+    .. toggle_use_cases: temporary
+    .. toggle_creation_date: 2016-08-26
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/13329
     """
     # this field overrides course-specific settings to enable the feature for all courses
     enabled_for_all_courses = BooleanField(default=False)
@@ -50,12 +62,12 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
             return effective.enabled if effective is not None else False
         return True
 
-    class Meta(object):
+    class Meta:
         app_label = "grades"
 
     def __str__(self):
         current_model = PersistentGradesEnabledFlag.current()
-        return u"PersistentGradesEnabledFlag: enabled {}".format(
+        return "PersistentGradesEnabledFlag: enabled {}".format(
             current_model.is_enabled()
         )
 
@@ -71,7 +83,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
     """
     KEY_FIELDS = ('course_id',)
 
-    class Meta(object):
+    class Meta:
         app_label = "grades"
 
     # The course that these features are attached to.
@@ -81,18 +93,18 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         not_en = "Not "
         if self.enabled:
             not_en = ""
-        return u"Course '{}': Persistent Grades {}Enabled".format(text_type(self.course_id), not_en)
+        return "Course '{}': Persistent Grades {}Enabled".format(str(self.course_id), not_en)
 
 
 class ComputeGradesSetting(ConfigurationModel):
     """
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         app_label = "grades"
 
     batch_size = IntegerField(default=100)
     course_ids = TextField(
         blank=False,
-        help_text=u"Whitespace-separated list of course keys for which to compute grades."
+        help_text="Whitespace-separated list of course keys for which to compute grades."
     )

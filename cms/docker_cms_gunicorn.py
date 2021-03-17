@@ -1,7 +1,5 @@
 """
 gunicorn configuration file: http://docs.gunicorn.org/en/stable/configure.html
-
-This file is created and updated by ansible, edit at your peril
 """
 
 preload_app = False
@@ -13,7 +11,7 @@ workers = 7
 
 
 def pre_request(worker, req):
-    worker.log.info("%s %s" % (req.method, req.path))
+    worker.log.info(f"{req.method} {req.path}")
 
 
 def close_all_caches():

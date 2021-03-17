@@ -12,9 +12,10 @@
  *   to the DOM.
  */
 define([
-    'js/views/baseview', 'jquery', 'gettext', 'common/js/components/utils/view_utils'
+    'js/views/baseview', 'jquery', 'gettext',
+    'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'
 ], function(
-    BaseView, $, gettext, ViewUtils
+    BaseView, $, gettext, ViewUtils, HtmlUtils
 ) {
     'use strict';
 
@@ -81,7 +82,7 @@ define([
                 this.view = this.createDetailsView();
             }
 
-            this.$el.html(this.view.render().el);
+            this.$el.html(HtmlUtils.HTML(this.view.render().el).toString());
 
             return this;
         }

@@ -2,23 +2,19 @@
 Utility Mixins for unit tests
 """
 
-
 import json
 import sys
+from importlib import reload
+from unittest.mock import patch
 
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.urls import clear_url_caches, resolve
-from mock import patch
 
-from util.db import OuterAtomic
-
-if six.PY3:
-    from importlib import reload
+from common.djangoapps.util.db import OuterAtomic
 
 
-class UrlResetMixin(object):
+class UrlResetMixin:
     """Mixin to reset urls.py before and after a test
 
     Django memoizes the function that reads the urls module (whatever module
@@ -69,18 +65,18 @@ class UrlResetMixin(object):
             URLCONF_MODULES = ['myapp.url', 'another_app.urls']
 
         """
-        super(UrlResetMixin, self).setUp()
+        super().setUp()
 
         self.reset_urls()
         self.addCleanup(self.reset_urls)
 
 
-class EventTestMixin(object):
+class EventTestMixin:
     """
     Generic mixin for verifying that events were emitted during a test.
     """
     def setUp(self, tracker):
-        super(EventTestMixin, self).setUp()
+        super().setUp()
         patcher = patch(tracker)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
@@ -89,7 +85,7 @@ class EventTestMixin(object):
         """
         Ensures no events were emitted since the last event related assertion.
         """
-        self.assertFalse(self.mock_tracker.emit.called)
+        assert not self.mock_tracker.emit.called
 
     def assert_event_emitted(self, event_name, **kwargs):
         """
@@ -109,7 +105,7 @@ class EventTestMixin(object):
         for call_args in self.mock_tracker.emit.call_args_list:
             if call_args[0][0] == event_name:
                 actual_count += 1
-        self.assertEqual(actual_count, expected_count)
+        assert actual_count == expected_count
 
     def reset_tracker(self):
         """
@@ -124,7 +120,7 @@ class EventTestMixin(object):
         return self.mock_tracker.emit.call_args[0]
 
 
-class PatchMediaTypeMixin(object):
+class PatchMediaTypeMixin:
     """
     Generic mixin for verifying unsupported media type in PATCH
     """
@@ -134,7 +130,7 @@ class PatchMediaTypeMixin(object):
             json.dumps({}),
             content_type=self.unsupported_media_type
         )
-        self.assertEqual(response.status_code, 415)
+        assert response.status_code == 415
 
 
 def patch_testcase():

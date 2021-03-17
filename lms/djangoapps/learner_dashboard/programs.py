@@ -8,7 +8,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import get_language_bidi, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -31,7 +31,6 @@ class ProgramsFragmentView(EdxFragmentView):
     """
     A fragment to program listing.
     """
-    _uses_pattern_library = False
 
     def render_to_fragment(self, request, **kwargs):
         """
@@ -66,27 +65,13 @@ class ProgramsFragmentView(EdxFragmentView):
         """
         return _('Programs')
 
-    def css_dependencies(self):
-        """
-        Returns list of CSS files that this view depends on.
-
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return self.get_css_dependencies('style-learner-dashboard-rtl')
-        else:
-            return self.get_css_dependencies('style-learner-dashboard')
-
 
 class ProgramDetailsFragmentView(EdxFragmentView):
     """
     Render the program details fragment.
     """
-    _uses_pattern_library = False
 
-    def render_to_fragment(self, request, program_uuid, **kwargs):
+    def render_to_fragment(self, request, program_uuid, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """View details about a specific program."""
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
         if not programs_config.enabled or not request.user.is_authenticated:
@@ -163,16 +148,3 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         Return page title for the standalone page.
         """
         return _('Program Details')
-
-    def css_dependencies(self):
-        """
-        Returns list of CSS files that this view depends on.
-
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return self.get_css_dependencies('style-learner-dashboard-rtl')
-        else:
-            return self.get_css_dependencies('style-learner-dashboard')

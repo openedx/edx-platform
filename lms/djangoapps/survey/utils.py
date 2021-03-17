@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from survey.models import SurveyAnswer, SurveyForm
+from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 
 
 class SurveyRequiredAccessError(AccessError):
@@ -16,9 +16,9 @@ class SurveyRequiredAccessError(AccessError):
     """
     def __init__(self):
         error_code = "survey_required"
-        developer_message = u"User must complete a survey"
-        user_message = _(u"You must complete a survey")
-        super(SurveyRequiredAccessError, self).__init__(error_code, developer_message, user_message)
+        developer_message = "User must complete a survey"
+        user_message = _("You must complete a survey")
+        super().__init__(error_code, developer_message, user_message)
 
 
 def is_survey_required_for_course(course_descriptor):
@@ -26,7 +26,7 @@ def is_survey_required_for_course(course_descriptor):
     Returns whether a Survey is required for this course
     """
 
-    # Check to see that the survey is required in the CourseDescriptor.
+    # Check to see that the survey is required in the CourseBlock.
     if not getattr(course_descriptor, 'course_survey_required', False):
         return SurveyRequiredAccessError()
 

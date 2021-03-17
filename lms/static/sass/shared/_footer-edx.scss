@@ -6,7 +6,7 @@
 @import 'bootstrap/scss/variables';
 @import 'bootstrap/scss/mixins/breakpoints';
 
-$edx-footer-link-color: $link-color;
+$edx-footer-link-color: $primary;
 $edx-footer-bg-color: rgb(252, 252, 252);
 
 // Aggressively scoped for Drupal
@@ -159,6 +159,10 @@ footer#footer-edx-v3 {
     display: inline-flex;
 
     @include margin-left(5px);
+
+    img {
+      height: $header-logo-height*1.05;
+    }
   }
 
   // To match the Pattern Library

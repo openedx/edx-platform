@@ -9,16 +9,21 @@ from django.conf import settings
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import (  # lint-amnesty, pylint: disable=line-too-long
+    TEST_PASSWORD,
+    CourseEnrollmentFactory,
+    CourseOverviewFactory,
+    UserFactory
+)
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, CourseOverviewFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.utils import is_course_run_entitlement_fulfillable
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 
 
 @skip_unless_lms
@@ -28,12 +33,12 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestCourseRunFulfillableForEntitlement, self).setUp()
+        super().setUp()
 
         self.user = UserFactory(is_staff=True)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    def create_course(
+    def create_course(  # lint-amnesty, pylint: disable=missing-function-docstring
             self,
             start_from_now,
             end_from_now,
@@ -155,14 +160,15 @@ class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_fulfillable_enrollment_ended_upgrade_open(self):
+    def test_course_run_fulfillable_already_enrolled_course_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
-            end_from_now=2,
+            end_from_now=-1,
             enrollment_start_from_now=-2,
             enrollment_end_from_now=-1,
         )
 
         entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        CourseEnrollmentFactory.create(user=entitlement.user, course_id=course_overview.id)
 
         assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)

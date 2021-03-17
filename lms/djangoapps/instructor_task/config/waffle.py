@@ -3,11 +3,13 @@ This module contains various configuration settings via
 waffle switches for the instructor_task app.
 """
 
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace
+
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 WAFFLE_NAMESPACE = 'instructor_task'
-INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=WAFFLE_NAMESPACE)
-WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
+INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE)
+WAFFLE_SWITCHES = LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
 
 # Waffle switches
 OPTIMIZE_GET_LEARNERS_FOR_COURSE = 'optimize_get_learners_for_course'
@@ -25,10 +27,12 @@ def waffle_flags():
         GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY,
+            module_name=__name__,
         ),
         GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY,
+            module_name=__name__,
         ),
     }
 

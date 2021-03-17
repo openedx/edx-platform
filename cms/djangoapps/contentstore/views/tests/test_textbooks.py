@@ -4,16 +4,17 @@
 import json
 from unittest import TestCase
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.course import TextbookValidationError, validate_textbook_json, validate_textbooks_json
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+
+from ..course import TextbookValidationError, validate_textbook_json, validate_textbooks_json
 
 
 class TextbookIndexTestCase(CourseTestCase):
     "Test cases for the textbook index page"
     def setUp(self):
         "Set the URL for tests"
-        super(TextbookIndexTestCase, self).setUp()
+        super().setUp()
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
     def test_view_index(self):
@@ -112,7 +113,7 @@ class TextbookCreateTestCase(CourseTestCase):
 
     def setUp(self):
         "Set up a url and some textbook content for tests"
-        super(TextbookCreateTestCase, self).setUp()
+        super().setUp()
         self.url = reverse_course_url('textbooks_list_handler', self.course.id)
 
         self.textbook = {
@@ -172,7 +173,7 @@ class TextbookDetailTestCase(CourseTestCase):
 
     def setUp(self):
         "Set some useful content and URLs for tests"
-        super(TextbookDetailTestCase, self).setUp()
+        super().setUp()
         self.textbook1 = {
             "tab_title": "Economics",
             "id": 1,
@@ -294,7 +295,7 @@ class TextbookValidationTestCase(TestCase):
 
     def setUp(self):
         "Set some useful content for tests"
-        super(TextbookValidationTestCase, self).setUp()
+        super().setUp()
 
         self.tb1 = {
             "tab_title": "Hi, mom!",

@@ -8,7 +8,7 @@ from bson.errors import BSONError
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from track.backends import BaseBackend
+from common.djangoapps.track.backends import BaseBackend
 
 log = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class MongoBackend(BaseBackend):
 
         """
 
-        super(MongoBackend, self).__init__(**kwargs)
+        super(MongoBackend, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # Extract connection parameters from kwargs
 

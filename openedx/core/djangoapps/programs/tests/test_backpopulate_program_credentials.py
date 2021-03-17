@@ -8,7 +8,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -22,7 +22,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopulate_program_credentials'
 
@@ -42,7 +42,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
     SAME_COURSE = 'same_course'
 
     def setUp(self):
-        super(BackpopulateProgramCredentialsTests, self).setUp()
+        super(BackpopulateProgramCredentialsTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.alice = UserFactory()
         self.bob = UserFactory()
@@ -289,8 +289,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         passing_status = CertificateStatuses.downloadable
         failing_status = CertificateStatuses.notpassing
 
-        self.assertIn(passing_status, CertificateStatuses.PASSED_STATUSES)
-        self.assertNotIn(failing_status, CertificateStatuses.PASSED_STATUSES)
+        assert passing_status in CertificateStatuses.PASSED_STATUSES
+        assert failing_status not in CertificateStatuses.PASSED_STATUSES
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -382,7 +382,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         call_command('backpopulate_program_credentials', commit=True)
 
-        self.assertTrue(mock_log.called)
+        assert mock_log.called
 
         calls = [
             mock.call(self.alice.username),

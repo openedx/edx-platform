@@ -6,9 +6,8 @@ Course Goals Python API
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.reverse import reverse
-from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 from . import models
@@ -25,7 +24,7 @@ def add_course_goal(user, course_id, goal_key):
         goal_key (string): The goal key for the new goal.
 
     """
-    course_key = CourseKey.from_string(text_type(course_id))
+    course_key = CourseKey.from_string(str(course_id))
     current_goal = get_course_goal(user, course_key)
     if current_goal:
         # If a course goal already exists, simply update it.
@@ -85,15 +84,23 @@ def get_course_goal_options():
     Returns the valid options for goal keys, mapped to their translated
     strings, as defined by theCourseGoal model.
     """
-    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}
+    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
 
-def valid_course_goals_ordered():
+def get_course_goal_text(goal_key):
+    """
+    Returns the translated string for the given goal key
+    """
+    goal_options = get_course_goal_options()
+    return goal_options[goal_key]
+
+
+def valid_course_goals_ordered(include_unsure=False):
     """
     Returns a list of the valid options for goal keys ordered by the level of commitment.
     Each option is represented as a tuple, with (goal_key, goal_string).
 
-    This list does not return the unsure option since it does not have a relevant commitment level.
+    This list does not return the unsure option by default since it does not have a relevant commitment level.
     """
     goal_options = get_course_goal_options()
 
@@ -101,5 +108,8 @@ def valid_course_goals_ordered():
     ordered_goal_options.append((models.GOAL_KEY_CHOICES.certify, goal_options[models.GOAL_KEY_CHOICES.certify]))
     ordered_goal_options.append((models.GOAL_KEY_CHOICES.complete, goal_options[models.GOAL_KEY_CHOICES.complete]))
     ordered_goal_options.append((models.GOAL_KEY_CHOICES.explore, goal_options[models.GOAL_KEY_CHOICES.explore]))
+
+    if include_unsure:
+        ordered_goal_options.append((models.GOAL_KEY_CHOICES.unsure, goal_options[models.GOAL_KEY_CHOICES.unsure]))
 
     return ordered_goal_options

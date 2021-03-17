@@ -3,6 +3,8 @@ Define request handlers used by the zendesk_proxy djangoapp
 """
 import logging
 
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -10,6 +12,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 logger = logging.getLogger(__name__)
 REQUESTS_PER_HOUR = 50
@@ -22,7 +25,7 @@ class ZendeskProxyThrottle(UserRateThrottle):
 
     def __init__(self):
         self.rate = '{}/hour'.format(REQUESTS_PER_HOUR)
-        super(ZendeskProxyThrottle, self).__init__()
+        super(ZendeskProxyThrottle, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 class ZendeskPassthroughView(APIView):
@@ -32,6 +35,11 @@ class ZendeskPassthroughView(APIView):
     """
     throttle_classes = (ZendeskProxyThrottle,)
     parser_classes = (JSONParser,)
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
 
     def post(self, request):
         """
@@ -64,6 +72,9 @@ class ZendeskPassthroughView(APIView):
                 custom_fields=request.data['custom_fields'],
                 tags=request.data['tags']
             )
+        except AttributeError as attribute:
+            logger.error('Zendesk Proxy Bad Request AttributeError: %s', attribute)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         except KeyError as key:
             logger.error('Zendesk Proxy Bad Request KeyError: %s', key)
             return Response(status=status.HTTP_400_BAD_REQUEST)

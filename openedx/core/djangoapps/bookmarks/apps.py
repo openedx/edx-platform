@@ -5,8 +5,9 @@ Configuration for bookmarks Django app
 
 from django.apps import AppConfig
 from django.utils.translation import ugettext_lazy as _
+from edx_django_utils.plugins import PluginSettings, PluginURLs
 
-from openedx.core.djangoapps.plugins.constants import PluginSettings, PluginURLs, ProjectType, SettingsType
+from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 
 class BookmarksConfig(AppConfig):
@@ -19,19 +20,19 @@ class BookmarksConfig(AppConfig):
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: u'',
-                PluginURLs.REGEX: u'^api/bookmarks/',
-                PluginURLs.RELATIVE_PATH: u'urls',
+                PluginURLs.NAMESPACE: '',
+                PluginURLs.REGEX: '^api/bookmarks/',
+                PluginURLs.RELATIVE_PATH: 'urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
             }
         }
     }
 
     def ready(self):
         # Register the signals handled by bookmarks.
-        from . import signals
+        from . import signals  # lint-amnesty, pylint: disable=unused-import

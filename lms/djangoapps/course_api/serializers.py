@@ -3,12 +3,14 @@ Course API Serializers.  Representing course catalog data
 """
 
 
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
+import urllib
+
 from django.urls import reverse
+from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
+from openedx.core.djangoapps.content.course_overviews.models import \
+    CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
 
@@ -19,7 +21,7 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     def __init__(self, uri_attribute, *args, **kwargs):
-        super(_MediaSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
@@ -29,6 +31,40 @@ class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         Get the representation for the media resource's URI
         """
         return getattr(course_overview, self.uri_attribute)
+
+
+class _AbsolutMediaSerializer(_MediaSerializer):  # pylint: disable=abstract-method
+    """
+    Nested serializer to represent a media object and its absolute path.
+    """
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        self.context = serializer_field.context
+        return super(self).__call__(serializer_field)  # lint-amnesty, pylint: disable=bad-super-call
+
+    uri_absolute = serializers.SerializerMethodField(source="*")
+
+    def get_uri_absolute(self, course_overview):
+        """
+        Convert the media resource's URI to an absolute URI.
+        """
+        uri = getattr(course_overview, self.uri_attribute)
+
+        if not uri:
+            # Return empty string here, to keep the same
+            # response type in case uri is empty as well.
+            return ""
+
+        cdn_applied_uri = course_overview.apply_cdn_to_url(uri)
+        field = AbsoluteURLField()
+
+        # In order to use the AbsoluteURLField to have the same
+        # behaviour what ImageSerializer provides, we need to set
+        # the request for the field
+        field._context = {"request": self.context.get("request")}  # lint-amnesty, pylint: disable=protected-access
+
+        return field.to_representation(cdn_applied_uri)
 
 
 class ImageSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -47,6 +83,7 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
     """
     Nested serializer to represent a collection of media objects
     """
+    banner_image = _AbsolutMediaSerializer(source='*', uri_attribute='banner_image_url')
     course_image = _MediaSerializer(source='*', uri_attribute='course_image_url')
     course_video = _MediaSerializer(source='*', uri_attribute='course_video_url')
     image = ImageSerializer(source='image_urls')
@@ -94,7 +131,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         """
         base_url = '?'.join([
             reverse('blocks_in_course'),
-            six.moves.urllib.parse.urlencode({'course_id': course_overview.id}),
+            urllib.parse.urlencode({'course_id': course_overview.id}),
         ])
         return self.context['request'].build_absolute_uri(base_url)
 
@@ -127,5 +164,12 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
     """
     Serializer that takes a CourseKey and serializes it to a string course_id.
     """
+
+    @monitoring_utils.function_trace('course_key_serializer_to_representation')
     def to_representation(self, instance):
+        # The function trace should be counting calls to this function, but I
+        # couldn't find it when I looked in any of the NR transaction traces,
+        # so I'm manually counting them using a custom metric:
+        monitoring_utils.increment('course_key_serializer_to_representation_call_count')
+
         return str(instance)

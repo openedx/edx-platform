@@ -1,13 +1,9 @@
 """
 Tests related to XBlock support API.
 """
-
-
-import six
-
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.api import authorable_xblocks, deprecated_xblocks, disabled_xblocks
+from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag  # lint-amnesty, pylint: disable=line-too-long
 
 
 class XBlockSupportTestCase(CacheIsolationTestCase):
@@ -15,7 +11,7 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
     Tests for XBlock Support methods.
     """
     def setUp(self):
-        super(XBlockSupportTestCase, self).setUp()
+        super().setUp()
 
         # Set up XBlockConfigurations for disabled and deprecated states
         block_config = [
@@ -47,23 +43,23 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
         """ Tests the deprecated_xblocks method """
 
         deprecated_xblock_names = [block.name for block in deprecated_xblocks()]
-        six.assertCountEqual(self, ["poll", "survey"], deprecated_xblock_names)
+        self.assertCountEqual(["poll", "survey"], deprecated_xblock_names)
 
         XBlockConfiguration(name="poll", enabled=True, deprecated=False).save()
 
         deprecated_xblock_names = [block.name for block in deprecated_xblocks()]
-        six.assertCountEqual(self, ["survey"], deprecated_xblock_names)
+        self.assertCountEqual(["survey"], deprecated_xblock_names)
 
     def test_disabled_blocks(self):
         """ Tests the disabled_xblocks method """
 
         disabled_xblock_names = [block.name for block in disabled_xblocks()]
-        six.assertCountEqual(self, ["survey"], disabled_xblock_names)
+        self.assertCountEqual(["survey"], disabled_xblock_names)
 
         XBlockConfiguration(name="poll", enabled=False, deprecated=True).save()
 
         disabled_xblock_names = [block.name for block in disabled_xblocks()]
-        six.assertCountEqual(self, ["survey", "poll"], disabled_xblock_names)
+        self.assertCountEqual(["survey", "poll"], disabled_xblock_names)
 
     def test_authorable_blocks_empty_model(self):
         """
@@ -71,17 +67,17 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
         of whether or not XBlockStudioConfigurationFlag is enabled.
         """
         XBlockStudioConfiguration.objects.all().delete()
-        self.assertFalse(XBlockStudioConfigurationFlag.is_enabled())
-        self.assertEqual(0, len(authorable_xblocks(allow_unsupported=True)))
+        assert not XBlockStudioConfigurationFlag.is_enabled()
+        assert 0 == len(authorable_xblocks(allow_unsupported=True))
         XBlockStudioConfigurationFlag(enabled=True).save()
-        self.assertEqual(0, len(authorable_xblocks(allow_unsupported=True)))
+        assert 0 == len(authorable_xblocks(allow_unsupported=True))
 
     def test_authorable_blocks(self):
         """
         Tests authorable_xblocks when name is not specified.
         """
         authorable_xblock_names = [block.name for block in authorable_xblocks()]
-        six.assertCountEqual(self, ["done", "problem", "problem", "html"], authorable_xblock_names)
+        self.assertCountEqual(["done", "problem", "problem", "html"], authorable_xblock_names)
 
         # Note that "survey" is disabled in XBlockConfiguration, but it is still returned by
         # authorable_xblocks because it is marked as enabled and unsupported in XBlockStudioConfiguration.
@@ -89,8 +85,7 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
         # is a whitelist and uses a combination of xblock type and template (and in addition has a global feature flag),
         # it is expected that Studio code will need to filter by both disabled_xblocks and authorable_xblocks.
         authorable_xblock_names = [block.name for block in authorable_xblocks(allow_unsupported=True)]
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             ["survey", "done", "problem", "problem", "problem", "html", "split_module"],
             authorable_xblock_names
         )
@@ -103,21 +98,21 @@ class XBlockSupportTestCase(CacheIsolationTestCase):
             """
             Verifies the returned xblock state.
             """
-            self.assertEqual(name, block.name)
-            self.assertEqual(template, block.template)
-            self.assertEqual(support_level, block.support_level)
+            assert name == block.name
+            assert template == block.template
+            assert support_level == block.support_level
 
         # There are no xblocks with name video.
         authorable_blocks = authorable_xblocks(name="video")
-        self.assertEqual(0, len(authorable_blocks))
+        assert 0 == len(authorable_blocks)
 
         # There is only a single html xblock.
         authorable_blocks = authorable_xblocks(name="html")
-        self.assertEqual(1, len(authorable_blocks))
+        assert 1 == len(authorable_blocks)
         verify_xblock_fields("html", "zoom", XBlockStudioConfiguration.PROVISIONAL_SUPPORT, authorable_blocks[0])
 
         authorable_blocks = authorable_xblocks(name="problem", allow_unsupported=True)
-        self.assertEqual(3, len(authorable_blocks))
+        assert 3 == len(authorable_blocks)
         no_template = None
         circuit = None
         multiple_choice = None

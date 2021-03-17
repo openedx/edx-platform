@@ -2,44 +2,82 @@
 
 exports[`ProblemBrowser Main component render with basic parameters 1`] = `
 <div
-  className="problem-browser"
+  className="problem-browser-container"
 >
-  <button
-    className="btn"
-    onBlur={[Function]}
-    onClick={[Function]}
-    onKeyDown={[Function]}
-    type="button"
+  <div
+    className="problem-browser"
   >
-    Select a section or problem
-  </button>
-  <input
-    disabled={true}
-    name="problem-location"
-    type="text"
-    value={null}
-  />
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Select a section or problem
+    </button>
+    <input
+      disabled={true}
+      hidden={false}
+      name="problem-location"
+      type="text"
+      value={null}
+    />
+    <button
+      className="btn"
+      name="list-problem-responses-csv"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Create a report of problem responses
+    </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
+  </div>
 </div>
 `;
 
 exports[`ProblemBrowser Main component render with selected block 1`] = `
 <div
-  className="problem-browser"
+  className="problem-browser-container"
 >
-  <button
-    className="btn"
-    onBlur={[Function]}
-    onClick={[Function]}
-    onKeyDown={[Function]}
-    type="button"
+  <div
+    className="problem-browser"
   >
-    Select a section or problem
-  </button>
-  <input
-    disabled={true}
-    name="problem-location"
-    type="text"
-    value="some-selected-block"
-  />
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Select a section or problem
+    </button>
+    <input
+      disabled={true}
+      hidden={false}
+      name="problem-location"
+      type="text"
+      value="some-selected-block"
+    />
+    <button
+      className="btn"
+      name="list-problem-responses-csv"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Create a report of problem responses
+    </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
+  </div>
 </div>
 `;

@@ -6,8 +6,9 @@ Tests for pavelib/i18n.py.
 import os
 import textwrap
 import unittest
+from unittest.mock import mock_open, patch
 
-from mock import mock_open, patch
+import pytest
 from paver.easy import call_task, task
 
 import pavelib.i18n
@@ -66,7 +67,7 @@ def do_nothing():
     """
     Don't do anything, for replacing prerequisite tasks we want to skip.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class FindReleaseResourcesTest(unittest.TestCase):
@@ -93,10 +94,8 @@ class FindReleaseResourcesTest(unittest.TestCase):
 
     @mocked_i18n_open(TX_CONFIG_RELEASE)
     def test_good_resources(self):
-        self.assertEqual(
-            pavelib.i18n.find_release_resources(),
-            ['edx-platform.release-zebrawood', 'edx-platform.release-zebrawood-js'],
-        )
+        assert pavelib.i18n.find_release_resources() ==\
+               ['edx-platform.release-zebrawood', 'edx-platform.release-zebrawood-js']
 
 
 class ReleasePushPullTest(PaverTestCase):
@@ -106,17 +105,17 @@ class ReleasePushPullTest(PaverTestCase):
     @mocked_i18n_open(TX_CONFIG_SIMPLE)
     @patch.object(pavelib.i18n, 'i18n_generate', new=do_nothing)
     def test_cant_push_nothing(self):
-        with self.assertRaises(SystemExit) as sysex:
+        with pytest.raises(SystemExit) as sysex:
             pavelib.i18n.i18n_release_push()
         # Check that we exited with a failure status code.
-        self.assertEqual(sysex.exception.args, (1,))
+        assert sysex.value.args == (1,)
 
     @mocked_i18n_open(TX_CONFIG_SIMPLE)
     def test_cant_pull_nothing(self):
-        with self.assertRaises(SystemExit) as sysex:
+        with pytest.raises(SystemExit) as sysex:
             pavelib.i18n.i18n_release_pull()
         # Check that we exited with a failure status code.
-        self.assertEqual(sysex.exception.args, (1,))
+        assert sysex.value.args == (1,)
 
     @mocked_i18n_open(TX_CONFIG_RELEASE)
     @patch.object(pavelib.i18n, 'i18n_generate', new=do_nothing)
@@ -157,14 +156,7 @@ class TestI18nDummy(PaverTestCase):
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
         call_task('pavelib.i18n.i18n_dummy')
-        self.assertEqual(
-            self.task_messages,
-            [
-                'i18n_tool extract',
-                'i18n_tool dummy',
-                'i18n_tool generate',
-            ]
-        )
+        assert self.task_messages == ['i18n_tool extract', 'i18n_tool dummy', 'i18n_tool generate']
 
 
 class TestI18nCompileJS(PaverTestCase):
@@ -190,10 +182,5 @@ class TestI18nCompileJS(PaverTestCase):
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
         call_task('pavelib.i18n.i18n_compilejs', options={"settings": Env.TEST_SETTINGS})
-        self.assertEqual(
-            self.task_messages,
-            [
-                'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
-                'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
-            ]
-        )
+        assert self.task_messages == [f'python manage.py lms --settings={Env.TEST_SETTINGS} compilejsi18n',
+                                      f'python manage.py cms --settings={Env.TEST_SETTINGS} compilejsi18n']

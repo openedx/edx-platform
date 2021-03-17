@@ -428,15 +428,6 @@
                     'js/verify_student/views/step_view'
                 ]
             },
-            'js/verify_student/views/payment_confirmation_step_view': {
-                exports: 'edx.verify_student.PaymentConfirmationStepView',
-                deps: [
-                    'jquery',
-                    'underscore',
-                    'gettext',
-                    'js/verify_student/views/step_view'
-                ]
-            },
             'js/verify_student/views/face_photo_step_view': {
                 exports: 'edx.verify_student.FacePhotoStepView',
                 deps: [
@@ -491,7 +482,6 @@
                     'js/verify_student/models/verification_model',
                     'js/verify_student/views/intro_step_view',
                     'js/verify_student/views/make_payment_step_view',
-                    'js/verify_student/views/payment_confirmation_step_view',
                     'js/verify_student/views/face_photo_step_view',
                     'js/verify_student/views/id_photo_step_view',
                     'js/verify_student/views/review_photos_step_view',
@@ -757,6 +747,7 @@
         'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'js/spec/groups/views/cohorts_spec.js',
         'js/spec/groups/views/discussions_spec.js',
+        'js/spec/instructor_dashboard/data_download_spec.js',
         'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
@@ -784,6 +775,7 @@
         'js/spec/student_account/password_reset_spec.js',
         'js/spec/student_account/register_spec.js',
         'js/spec/student_account/shoppingcart_spec.js',
+        'js/spec/student_account/utils_spec.js',
         'js/spec/verify_student/image_input_spec.js',
         'js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
         'js/spec/verify_student/make_payment_step_view_spec.js',

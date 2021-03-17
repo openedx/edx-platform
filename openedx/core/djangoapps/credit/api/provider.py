@@ -8,7 +8,6 @@ import logging
 import uuid
 
 import pytz
-import six
 from django.db import transaction
 from edx_proctoring.api import get_last_exam_completion_date
 
@@ -26,9 +25,9 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus
 )
 from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
-from student.models import CourseEnrollment, User
-from util.date_utils import to_timestamp
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.date_utils import to_timestamp
+from common.djangoapps.util.json_request import JsonResponse
 
 # TODO: Cleanup this mess! ECOM-2908
 
@@ -112,6 +111,28 @@ def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-ar
     return JsonResponse(credit_provider_data)
 
 
+def check_keys_exist(shared_secret_key, provider_id):
+    """
+    Verify that a key is available for single or multiple key support scenarios.
+
+    Raise CreditProviderNotConfigured if no key available.
+    """
+    # Accounts for old way of storing provider key
+    if shared_secret_key is None:  # lint-amnesty, pylint: disable=no-else-raise
+        msg = 'Credit provider with ID "{provider_id}" does not have a secret key configured.'.format(
+            provider_id=provider_id
+        )
+        log.error(msg)
+        raise CreditProviderNotConfigured(msg)
+
+    # Accounts for new way of storing provider key
+    elif isinstance(shared_secret_key, list) and not any(shared_secret_key):
+        msg = 'Could not retrieve secret key for credit provider [{}]. ' \
+              'Unable to validate requests from provider.'.format(provider_id)
+        log.error(msg)
+        raise CreditProviderNotConfigured(msg)
+
+
 @transaction.atomic
 def create_credit_request(course_key, provider_id, username):
     """
@@ -186,14 +207,14 @@ def create_credit_request(course_key, provider_id, username):
         credit_provider = CreditProvider.objects.get(provider_id=provider_id)
     except CreditEligibility.DoesNotExist:
         log.warning(
-            u'User "%s" tried to initiate a request for credit in course "%s", '
-            u'but the user is not eligible for credit',
+            'User "%s" tried to initiate a request for credit in course "%s", '
+            'but the user is not eligible for credit',
             username, course_key
         )
-        raise UserIsNotEligible
+        raise UserIsNotEligible  # lint-amnesty, pylint: disable=raise-missing-from
     except CreditProvider.DoesNotExist:
-        log.error(u'Credit provider with ID "%s" has not been configured.', provider_id)
-        raise CreditProviderNotConfigured
+        log.error('Credit provider with ID "%s" has not been configured.', provider_id)
+        raise CreditProviderNotConfigured  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Check if we've enabled automatic integration with the credit
     # provider.  If not, we'll show the user a link to a URL
@@ -212,12 +233,12 @@ def create_credit_request(course_key, provider_id, username):
         # That way, if there's a misconfiguration, we won't have requests
         # in our system that we know weren't sent to the provider.
         shared_secret_key = get_shared_secret_key(credit_provider.provider_id)
-        if shared_secret_key is None:
-            msg = u'Credit provider with ID "{provider_id}" does not have a secret key configured.'.format(
-                provider_id=credit_provider.provider_id
-            )
-            log.error(msg)
-            raise CreditProviderNotConfigured(msg)
+        check_keys_exist(shared_secret_key, credit_provider.provider_id)
+
+        if isinstance(shared_secret_key, list):
+            # if keys exist, and keys are stored as a list
+            # then we know at least 1 is available for [0]
+            shared_secret_key = [key for key in shared_secret_key if key][0]
 
     # Initiate a new request if one has not already been created
     credit_request, created = CreditRequest.objects.get_or_create(
@@ -232,8 +253,8 @@ def create_credit_request(course_key, provider_id, username):
     if not created and credit_request.status != "pending":
         log.warning(
             (
-                u'Cannot initiate credit request because the request with UUID "%s" '
-                u'exists with status "%s"'
+                'Cannot initiate credit request because the request with UUID "%s" '
+                'exists with status "%s"'
             ), credit_request.uuid, credit_request.status
         )
         raise RequestAlreadyCompleted
@@ -255,16 +276,16 @@ def create_credit_request(course_key, provider_id, username):
         ).reason["final_grade"]
 
         # NOTE (CCB): Limiting the grade to seven characters is a hack for ASU.
-        if len(six.text_type(final_grade)) > 7:
-            final_grade = u'{:.5f}'.format(final_grade)
+        if len(str(final_grade)) > 7:
+            final_grade = f'{final_grade:.5f}'
         else:
-            final_grade = six.text_type(final_grade)
+            final_grade = str(final_grade)
 
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
-        msg = u'Could not retrieve final grade from the credit eligibility table for ' \
-              u'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
+        msg = 'Could not retrieve final grade from the credit eligibility table for ' \
+              'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
         log.exception(msg)
-        raise UserIsNotEligible(msg)
+        raise UserIsNotEligible(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     # Getting the students's enrollment date
     course_enrollment = CourseEnrollment.get_enrollment(user, course_key)
@@ -297,10 +318,10 @@ def create_credit_request(course_key, provider_id, username):
     credit_request.save()
 
     if created:
-        log.info(u'Created new request for credit with UUID "%s"', credit_request.uuid)
+        log.info('Created new request for credit with UUID "%s"', credit_request.uuid)
     else:
         log.info(
-            u'Updated request for credit with UUID "%s" so the user can re-issue the request',
+            'Updated request for credit with UUID "%s" so the user can re-issue the request',
             credit_request.uuid
         )
 
@@ -350,17 +371,17 @@ def update_credit_request_status(request_uuid, provider_id, status):
         request.save()
 
         log.info(
-            u'Updated request with UUID "%s" from status "%s" to "%s" for provider with ID "%s".',
+            'Updated request with UUID "%s" from status "%s" to "%s" for provider with ID "%s".',
             request_uuid, old_status, status, provider_id
         )
     except CreditRequest.DoesNotExist:
         msg = (
-            u'Credit provider with ID "{provider_id}" attempted to '
-            u'update request with UUID "{request_uuid}", but no request '
-            u'with this UUID is associated with the provider.'
+            'Credit provider with ID "{provider_id}" attempted to '
+            'update request with UUID "{request_uuid}", but no request '
+            'with this UUID is associated with the provider.'
         ).format(provider_id=provider_id, request_uuid=request_uuid)
         log.warning(msg)
-        raise CreditRequestNotFound(msg)
+        raise CreditRequestNotFound(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def get_credit_requests_for_user(username):

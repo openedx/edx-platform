@@ -3,12 +3,13 @@ Tests for the fake software secure response.
 """
 
 
-from django.test import TestCase
-from mock import patch
+from unittest.mock import patch
 
+from django.test import TestCase
+
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
 
 
 class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
@@ -16,12 +17,12 @@ class SoftwareSecureFakeViewTest(UrlResetMixin, TestCase):
     Base class to test the fake software secure view.
     """
 
-    URLCONF_MODULES = ['verify_student.urls']
+    URLCONF_MODULES = ['lms.djangoapps.verify_student.urls']
 
     def setUp(self, **kwargs):
         enable_software_secure_fake = kwargs.get('enable_software_secure_fake', False)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SOFTWARE_SECURE_FAKE': enable_software_secure_fake}):
-            super(SoftwareSecureFakeViewTest, self).setUp()
+            super().setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -34,8 +35,8 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
     'ENABLE_SOFTWARE_SECURE_FAKE' is not enabled.
     """
 
-    def setUp(self):
-        super(SoftwareSecureFakeViewDisabledTest, self).setUp(enable_software_secure_fake=False)
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super().setUp(enable_software_secure_fake=False)
 
     def test_get_method_without_enable_feature_flag(self):
         """
@@ -46,7 +47,7 @@ class SoftwareSecureFakeViewDisabledTest(SoftwareSecureFakeViewTest):
             '/verify_student/software-secure-fake-response'
         )
 
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
@@ -55,8 +56,8 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
     'ENABLE_SOFTWARE_SECURE_FAKE' is enabled.
     """
 
-    def setUp(self):
-        super(SoftwareSecureFakeViewEnabledTest, self).setUp(enable_software_secure_fake=True)
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super().setUp(enable_software_secure_fake=True)
 
     def test_get_method_without_logged_in_user(self):
         """
@@ -66,7 +67,7 @@ class SoftwareSecureFakeViewEnabledTest(SoftwareSecureFakeViewTest):
         response = self.client.get(
             '/verify_student/software-secure-fake-response'
         )
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
     def test_get_method(self):
         """

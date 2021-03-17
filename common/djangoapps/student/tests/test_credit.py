@@ -5,18 +5,18 @@ Tests for credit courses on the student dashboard.
 
 import datetime
 import unittest
+from unittest.mock import patch
 
 import ddt
 import pytz
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from mock import patch
 
+from common.djangoapps.student.models import CourseEnrollmentAttribute
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider
-from student.models import CourseEnrollmentAttribute
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -43,12 +43,12 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a course and an enrollment. """
-        super(CreditCourseDashboardTest, self).setUp()
+        super().setUp()
 
         # Create a user and log in
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
         # Create a course and configure it as a credit course
         self.course = CourseFactory()
@@ -213,14 +213,14 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
 
     @ddt.data(
         (
-            [u'Arizona State University'],
+            ['Arizona State University'],
             'You are now eligible for credit from Arizona State University'),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft'],
             'You are now eligible for credit from Arizona State University and Hogwarts School of Witchcraft'
         ),
         (
-            [u'Arizona State University', u'Hogwarts School of Witchcraft and Wizardry', u'Charter Oak'],
+            ['Arizona State University', 'Hogwarts School of Witchcraft and Wizardry', 'Charter Oak'],
             'You are now eligible for credit from Arizona State University, Hogwarts School'
             ' of Witchcraft and Wizardry, and Charter Oak'
         ),
@@ -235,7 +235,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
 
         # The user should have the option to purchase credit
-        with patch('student.views.dashboard.get_credit_provider_attribute_values') as mock_method:
+        with patch('common.djangoapps.student.views.dashboard.get_credit_provider_attribute_values') as mock_method:
             mock_method.return_value = providers_list
             response = self._load_dashboard()
 

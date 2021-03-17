@@ -24,28 +24,28 @@ class UserPartitionError(Exception):
     """
     Base Exception for when an error was found regarding user partitions.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class NoSuchUserPartitionError(UserPartitionError):
     """
     Exception to be raised when looking up a UserPartition by its ID fails.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class NoSuchUserPartitionGroupError(UserPartitionError):
     """
     Exception to be raised when looking up a UserPartition Group by its ID fails.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class ReadOnlyUserPartitionError(UserPartitionError):
     """
     Exception to be raised when attempting to modify a read only partition.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class Group(namedtuple("Group", "id name")):
@@ -58,7 +58,7 @@ class Group(namedtuple("Group", "id name")):
     VERSION = 1
 
     def __new__(cls, id, name):
-        return super(Group, cls).__new__(cls, int(id), name)
+        return super().__new__(cls, int(id), name)
 
     def to_json(self):
         """
@@ -88,11 +88,11 @@ class Group(namedtuple("Group", "id name")):
 
         for key in ("id", "name", "version"):
             if key not in value:
-                raise TypeError("Group dict {0} missing value key '{1}'".format(
+                raise TypeError("Group dict {} missing value key '{}'".format(
                     value, key))
 
         if value["version"] != Group.VERSION:
-            raise TypeError("Group dict {0} has unexpected version".format(
+            raise TypeError("Group dict {} has unexpected version".format(
                 value))
 
         return Group(value["id"], value["name"])
@@ -133,7 +133,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if parameters is None:
             parameters = {}
 
-        return super(UserPartition, cls).__new__(cls, int(id), name, description, groups, scheme, parameters, active)
+        return super().__new__(cls, int(id), name, description, groups, scheme, parameters, active)
 
     @staticmethod
     def get_scheme(name):
@@ -145,9 +145,9 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         if not UserPartition.scheme_extensions:
             UserPartition.scheme_extensions = ExtensionManager(namespace=USER_PARTITION_SCHEME_NAMESPACE)
         try:
-            scheme = UserPartition.scheme_extensions[name].plugin
+            scheme = UserPartition.scheme_extensions[name].plugin  # lint-amnesty, pylint: disable=unsubscriptable-object
         except KeyError:
-            raise UserPartitionError("Unrecognized scheme '{0}'".format(name))
+            raise UserPartitionError(f"Unrecognized scheme '{name}'")  # lint-amnesty, pylint: disable=raise-missing-from
         scheme.name = name
         return scheme
 
@@ -184,7 +184,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
 
         for key in ("id", "name", "description", "version", "groups"):
             if key not in value:
-                raise TypeError("UserPartition dict {0} missing value key '{1}'".format(value, key))
+                raise TypeError(f"UserPartition dict {value} missing value key '{key}'")
 
         if value["version"] == 1:
             # If no scheme was provided, set it to the default ('random')
@@ -195,21 +195,21 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         # version, we should try to read it rather than raising an exception.
         elif value["version"] >= 2:
             if "scheme" not in value:
-                raise TypeError("UserPartition dict {0} missing value key 'scheme'".format(value))
+                raise TypeError(f"UserPartition dict {value} missing value key 'scheme'")
 
             scheme_id = value["scheme"]
         else:
-            raise TypeError("UserPartition dict {0} has unexpected version".format(value))
+            raise TypeError(f"UserPartition dict {value} has unexpected version")
 
         parameters = value.get("parameters", {})
         active = value.get("active", True)
         groups = [Group.from_json(g) for g in value["groups"]]
         scheme = UserPartition.get_scheme(scheme_id)
         if not scheme:
-            raise TypeError("UserPartition dict {0} has unrecognized scheme {1}".format(value, scheme_id))
+            raise TypeError(f"UserPartition dict {value} has unrecognized scheme {scheme_id}")
 
         if getattr(scheme, 'read_only', False):
-            raise ReadOnlyUserPartitionError("UserPartition dict {0} uses scheme {1} which is read only".format(value, scheme_id))
+            raise ReadOnlyUserPartitionError(f"UserPartition dict {value} uses scheme {scheme_id} which is read only")  # lint-amnesty, pylint: disable=line-too-long
 
         if hasattr(scheme, "create_user_partition"):
             return scheme.create_user_partition(
@@ -252,7 +252,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             )
         )
 
-    def access_denied_message(self, block_key, user, user_group, allowed_groups):
+    def access_denied_message(self, block_key, user, user_group, allowed_groups):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return a message that should be displayed to the user when they are not allowed to access
         content managed by this partition, or None if there is no applicable message.
@@ -267,7 +267,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         """
         return None
 
-    def access_denied_fragment(self, block, user, user_group, allowed_groups):
+    def access_denied_fragment(self, block, user, user_group, allowed_groups):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return an html fragment that should be displayed to the user when they are not allowed to access
         content managed by this partition, or None if there is no applicable message.

@@ -5,19 +5,19 @@ Asynchronous tasks for the LTI provider app.
 
 import logging
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from opaque_keys.edx.keys import CourseKey
 
-import lti_provider.outcomes as outcomes
+import lms.djangoapps.lti_provider.outcomes as outcomes
 from lms import CELERY_APP
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lti_provider.models import GradedAssignment
+from lms.djangoapps.lti_provider.models import GradedAssignment
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-@CELERY_APP.task(name='lti_provider.tasks.send_composite_outcome')
+@CELERY_APP.task(name='lms.djangoapps.lti_provider.tasks.send_composite_outcome')
 def send_composite_outcome(user_id, course_id, assignment_id, version):
     """
     Calculate and transmit the score for a composite module (such as a
@@ -46,7 +46,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     assignment = GradedAssignment.objects.get(id=assignment_id)
     if version != assignment.version_number:
         log.info(
-            u"Score passback for GradedAssignment %s skipped. More recent score available.",
+            "Score passback for GradedAssignment %s skipped. More recent score available.",
             assignment.id
         )
         return

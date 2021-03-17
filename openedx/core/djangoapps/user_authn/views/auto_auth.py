@@ -6,7 +6,7 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.core.validators import ValidationError
 from django.http import HttpResponseForbidden
@@ -21,13 +21,13 @@ from openedx.core.djangoapps.django_comment_common.models import assign_role
 from openedx.core.djangoapps.user_authn.utils import generate_password
 from openedx.core.djangoapps.user_authn.views.registration_form import AccountCreationForm
 from openedx.features.course_experience import course_home_url_name
-from student.helpers import (
+from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
     create_or_set_user_attribute_created_on_site,
     do_create_account
 )
-from student.models import (
+from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     Registration,
@@ -35,7 +35,7 @@ from student.models import (
     anonymous_id_for_user,
     create_comments_service_user
 )
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 def auto_auth(request):  # pylint: disable=too-many-statements

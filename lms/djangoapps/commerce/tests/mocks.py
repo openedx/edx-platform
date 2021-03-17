@@ -10,7 +10,7 @@ from django.conf import settings
 from . import factories
 
 
-class mock_ecommerce_api_endpoint(object):
+class mock_ecommerce_api_endpoint:
     """
     Base class for contextmanagers used to mock calls to api endpoints.
 
@@ -33,7 +33,8 @@ class mock_ecommerce_api_endpoint(object):
             response: a JSON-serializable Python type representing the desired response body.
             status: desired HTTP status for the response.
             expect_called: a boolean indicating whether an API request was expected; set
-                to False if we should ensure that no request arrived.
+                to False if we should ensure that no request arrived, or None to skip checking
+                if the request arrived
             exception: raise this exception instead of returning an HTTP response when called.
             reset_on_exit (bool): Indicates if `httpretty` should be reset after the decorator exits.
         """
@@ -75,7 +76,10 @@ class mock_ecommerce_api_endpoint(object):
         )
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        called_if_expected = self.expect_called == (httpretty.last_request().headers != {})
+        if self.expect_called is None:
+            called_if_expected = True
+        else:
+            called_if_expected = self.expect_called == (httpretty.last_request().headers != {})
         httpretty.disable()
 
         if self.reset_on_exit:
@@ -91,11 +95,11 @@ class mock_basket_order(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, basket_id, **kwargs):
-        super(mock_basket_order, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.basket_id = basket_id
 
     def get_path(self):
-        return '/baskets/{}/order/'.format(self.basket_id)
+        return f'/baskets/{self.basket_id}/order/'
 
 
 class mock_create_refund(mock_ecommerce_api_endpoint):
@@ -108,6 +112,18 @@ class mock_create_refund(mock_ecommerce_api_endpoint):
         return '/refunds/'
 
 
+class mock_payment_processors(mock_ecommerce_api_endpoint):
+    """
+    Mocks calls to E-Commerce API payment processors method.
+    """
+
+    default_response = ['foo', 'bar']
+    method = httpretty.GET
+
+    def get_path(self):
+        return "/payment/processors/"
+
+
 class mock_process_refund(mock_ecommerce_api_endpoint):
     """ Mocks calls to E-Commerce API client refund process method. """
 
@@ -115,11 +131,11 @@ class mock_process_refund(mock_ecommerce_api_endpoint):
     method = httpretty.PUT
 
     def __init__(self, refund_id, **kwargs):
-        super(mock_process_refund, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.refund_id = refund_id
 
     def get_path(self):
-        return '/refunds/{}/process/'.format(self.refund_id)
+        return f'/refunds/{self.refund_id}/process/'
 
 
 class mock_order_endpoint(mock_ecommerce_api_endpoint):
@@ -129,11 +145,11 @@ class mock_order_endpoint(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, order_number, **kwargs):
-        super(mock_order_endpoint, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.order_number = order_number
 
     def get_path(self):
-        return '/orders/{}/'.format(self.order_number)
+        return f'/orders/{self.order_number}/'
 
 
 class mock_get_orders(mock_ecommerce_api_endpoint):

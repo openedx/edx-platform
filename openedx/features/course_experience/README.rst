@@ -56,14 +56,7 @@ The course experience consists of a number of views:
    The course updates page shows the user all of the course team's updates
    in a scrolling list. The updates page is also provided as a course tool.
 
-7. **Course Reviews**
-
-   This page shows the user reviews of the course from an external provider.
-   The default provider is `CourseTalk`_. The reviews page is also provided
-   as a course tool.
-
 A number of the features in the course experience are controlled via Waffle
 flags. For documentation, see `Waffle flag definitions`_.
 
-.. _CourseTalk: https://www.coursetalk.com/
 .. _Waffle flag definitions: https://github.com/edx/edx-platform/blob/master/openedx/features/course_experience/__init__.py

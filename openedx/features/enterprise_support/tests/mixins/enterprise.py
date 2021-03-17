@@ -1,11 +1,11 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Mixins for the EnterpriseApiClient.
 """
 
 
 import json
 
-import mock
+from unittest import mock
 
 import httpretty
 from django.conf import settings
@@ -15,7 +15,7 @@ from django.urls import reverse
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 
 
-class EnterpriseServiceMockMixin(object):
+class EnterpriseServiceMockMixin:
     """
     Mocks for the Enterprise service responses.
     """
@@ -23,13 +23,13 @@ class EnterpriseServiceMockMixin(object):
     consent_url = '{}{}'.format(settings.ENTERPRISE_CONSENT_API_URL, 'data_sharing_consent')
 
     def setUp(self):
-        super(EnterpriseServiceMockMixin, self).setUp()
+        super().setUp()
         cache.clear()
 
     @staticmethod
     def get_enterprise_url(path):
         """Return a URL to the configured Enterprise API. """
-        return '{}{}/'.format(settings.ENTERPRISE_API_URL, path)
+        return f'{settings.ENTERPRISE_API_URL}{path}/'
 
     def mock_get_enterprise_customer(self, uuid, response, status):
         """
@@ -78,7 +78,7 @@ class EnterpriseServiceMockMixin(object):
             status=500
         )
 
-    def mock_consent_response(
+    def mock_consent_response(  # lint-amnesty, pylint: disable=missing-function-docstring
             self,
             username,
             course_id,
@@ -142,6 +142,66 @@ class EnterpriseServiceMockMixin(object):
             required=False,
         )
 
+    def get_mock_enterprise_learner_results(
+            self,
+            entitlement_id=1,
+            learner_id=1,
+            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
+            enable_audit_enrollment=False,
+    ):
+        """
+        Helper function to format enterprise learner API response.
+        """
+        mock_results = [
+            {
+                'id': learner_id,
+                'enterprise_customer': {
+                    'uuid': enterprise_customer_uuid,
+                    'name': 'TestShib',
+                    'active': True,
+                    'site': {
+                        'domain': 'example.com',
+                        'name': 'example.com'
+                    },
+                    'enable_data_sharing_consent': True,
+                    'enforce_data_sharing_consent': 'at_login',
+                    'enable_audit_enrollment': enable_audit_enrollment,
+                    'branding_configuration': {
+                        'enterprise_customer': enterprise_customer_uuid,
+                        'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
+                    },
+                    'enterprise_customer_entitlements': [
+                        {
+                            'enterprise_customer': enterprise_customer_uuid,
+                            'entitlement_id': entitlement_id
+                        }
+                    ],
+                    'replace_sensitive_sso_username': True,
+                },
+                'user_id': 5,
+                'user': {
+                    'username': 'verified',
+                    'first_name': '',
+                    'last_name': '',
+                    'email': 'verified@example.com',
+                    'is_staff': True,
+                    'is_active': True,
+                    'date_joined': '2016-09-01T19:18:26.026495Z'
+                },
+                'data_sharing_consent': [
+                    {
+                        "username": "verified",
+                        "enterprise_customer_uuid": enterprise_customer_uuid,
+                        "exists": True,
+                        "course_id": "course-v1:edX DemoX Demo_Course",
+                        "consent_provided": True,
+                        "consent_required": False
+                    }
+                ]
+            }
+        ]
+        return mock_results
+
     def mock_enterprise_learner_api(
             self,
             entitlement_id=1,
@@ -152,58 +212,14 @@ class EnterpriseServiceMockMixin(object):
         """
         Helper function to register enterprise learner API endpoint.
         """
+        results = self.get_mock_enterprise_learner_results(
+            entitlement_id, learner_id, enterprise_customer_uuid, enable_audit_enrollment
+        )
         enterprise_learner_api_response = {
             'count': 1,
             'num_pages': 1,
             'current_page': 1,
-            'results': [
-                {
-                    'id': learner_id,
-                    'enterprise_customer': {
-                        'uuid': enterprise_customer_uuid,
-                        'name': 'TestShib',
-                        'active': True,
-                        'site': {
-                            'domain': 'example.com',
-                            'name': 'example.com'
-                        },
-                        'enable_data_sharing_consent': True,
-                        'enforce_data_sharing_consent': 'at_login',
-                        'enable_audit_enrollment': enable_audit_enrollment,
-                        'branding_configuration': {
-                            'enterprise_customer': enterprise_customer_uuid,
-                            'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
-                        },
-                        'enterprise_customer_entitlements': [
-                            {
-                                'enterprise_customer': enterprise_customer_uuid,
-                                'entitlement_id': entitlement_id
-                            }
-                        ],
-                        'replace_sensitive_sso_username': True,
-                    },
-                    'user_id': 5,
-                    'user': {
-                        'username': 'verified',
-                        'first_name': '',
-                        'last_name': '',
-                        'email': 'verified@example.com',
-                        'is_staff': True,
-                        'is_active': True,
-                        'date_joined': '2016-09-01T19:18:26.026495Z'
-                    },
-                    'data_sharing_consent': [
-                        {
-                            "username": "verified",
-                            "enterprise_customer_uuid": enterprise_customer_uuid,
-                            "exists": True,
-                            "course_id": "course-v1:edX DemoX Demo_Course",
-                            "consent_provided": True,
-                            "consent_required": False
-                        }
-                    ]
-                }
-            ],
+            'results': results,
             'next': None,
             'start': 0,
             'previous': None
@@ -263,15 +279,15 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
         response = client.get(url)
         while(response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
             response = client.get(response.url)
-        self.assertEqual(response.status_code, 302)
-        self.assertIn('grant_data_sharing_permissions', response.url)
+        assert response.status_code == 302
+        assert 'grant_data_sharing_permissions' in response.url
 
         # Ensure that when consent is not necessary, the user continues through to the requested page.
         mock_consent_necessary.return_value = False
         response = client.get(url)
-        self.assertEqual(response.status_code, status_code)
+        assert response.status_code == status_code
 
         # If we were expecting a redirect, ensure it's not to the data sharing permission page
         if status_code == 302:
-            self.assertNotIn('grant_data_sharing_permissions', response.url)
+            assert 'grant_data_sharing_permissions' not in response.url
         return response

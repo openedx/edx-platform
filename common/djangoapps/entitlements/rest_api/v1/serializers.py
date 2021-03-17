@@ -6,7 +6,7 @@ Serializers for all Course Entitlement related return objects.
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from openedx.core.lib.api.serializers import CourseKeyField
 
 

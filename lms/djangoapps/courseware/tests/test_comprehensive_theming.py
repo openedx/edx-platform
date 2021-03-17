@@ -6,7 +6,7 @@ from django.contrib import staticfiles
 from django.test import TestCase
 from path import Path
 
-import edxmako
+from common.djangoapps import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_clean
 
@@ -15,7 +15,7 @@ class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
 
     def setUp(self):
-        super(TestComprehensiveTheming, self).setUp()
+        super().setUp()
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
@@ -28,7 +28,7 @@ class TestComprehensiveTheming(TestCase):
         asserts presence of the content from header.html and footer.html
         """
         resp = self.client.get('/')
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
 
@@ -54,7 +54,7 @@ class TestComprehensiveTheming(TestCase):
         def do_the_test(self):
             """A function to do the work so we can use the decorator."""
             resp = self.client.get('/')
-            self.assertEqual(resp.status_code, 200)
+            assert resp.status_code == 200
             self.assertContains(resp, "TEMPORARY THEME")
 
         do_the_test(self)
@@ -63,19 +63,19 @@ class TestComprehensiveTheming(TestCase):
 
     def test_default_logo_image(self):
         result = staticfiles.finders.find('images/logo.png')
-        self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
+        assert result == (settings.REPO_ROOT / 'lms/static/images/logo.png')
 
     @with_comprehensive_theme('red-theme')
     def test_overridden_logo_image(self):
         result = staticfiles.finders.find('red-theme/images/logo.png')
-        self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/logo.png')
+        assert result == (settings.REPO_ROOT / 'themes/red-theme/lms/static/images/logo.png')
 
     def test_default_favicon(self):
         """
         Test default favicon is served if no theme is applied
         """
         result = staticfiles.finders.find('images/favicon.ico')
-        self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/favicon.ico')
+        assert result == (settings.REPO_ROOT / 'lms/static/images/favicon.ico')
 
     @with_comprehensive_theme('red-theme')
     def test_overridden_favicon(self):
@@ -83,4 +83,4 @@ class TestComprehensiveTheming(TestCase):
         Test comprehensive theme override on favicon image.
         """
         result = staticfiles.finders.find('red-theme/images/favicon.ico')
-        self.assertEqual(result, settings.REPO_ROOT / 'themes/red-theme/lms/static/images/favicon.ico')
+        assert result == (settings.REPO_ROOT / 'themes/red-theme/lms/static/images/favicon.ico')

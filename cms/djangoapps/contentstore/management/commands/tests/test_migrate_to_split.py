@@ -3,8 +3,6 @@ Unittests for migrating a course to split mongo
 """
 
 
-import six
-
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 
@@ -19,17 +17,14 @@ class TestArgParsing(TestCase):
     """
     Tests for parsing arguments for the `migrate_to_split` management command
     """
-    def setUp(self):
-        super(TestArgParsing, self).setUp()
+    def setUp(self):  # lint-amnesty, pylint: disable=useless-super-delegation
+        super().setUp()
 
     def test_no_args(self):
         """
         Test the arg length error
         """
-        if six.PY2:
-            errstring = "Error: too few arguments"
-        else:
-            errstring = "Error: the following arguments are required: course_key, email"
+        errstring = "Error: the following arguments are required: course_key, email"
         with self.assertRaisesRegex(CommandError, errstring):
             call_command("migrate_to_split")
 
@@ -65,7 +60,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestMigrateToSplit, self).setUp()
+        super().setUp()
         self.course = CourseFactory(default_store=ModuleStoreEnum.Type.mongo)
 
     def test_user_email(self):
@@ -74,11 +69,11 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         """
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            str(self.course.id),  # lint-amnesty, pylint: disable=no-member
             str(self.user.email),
         )
         split_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
-        new_key = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        new_key = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)  # lint-amnesty, pylint: disable=no-member
         self.assertTrue(
             split_store.has_course(new_key),
             "Could not find course"
@@ -91,7 +86,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         # lack of error implies success
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            str(self.course.id),  # lint-amnesty, pylint: disable=no-member
             str(self.user.id),
         )
 
@@ -101,7 +96,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         """
         call_command(
             "migrate_to_split",
-            str(self.course.id),
+            str(self.course.id),  # lint-amnesty, pylint: disable=no-member
             str(self.user.id),
             org="org.dept",
             course="name",
@@ -114,11 +109,11 @@ class TestMigrateToSplit(ModuleStoreTestCase):
 
         # Getting the original course with mongo course_id
         mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        mongo_locator = mongo_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        mongo_locator = mongo_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)  # lint-amnesty, pylint: disable=no-member
         course_from_mongo = mongo_store.get_course(mongo_locator)
         self.assertIsNotNone(course_from_mongo)
 
         # Throws ItemNotFoundError when try to access original course with split course_id
-        split_locator = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)
+        split_locator = split_store.make_course_key(self.course.id.org, self.course.id.course, self.course.id.run)  # lint-amnesty, pylint: disable=no-member
         with self.assertRaises(ItemNotFoundError):
             mongo_store.get_course(split_locator)

@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 ###
 ### Script for editing the course's tabs
 ###
@@ -11,7 +12,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.views import tabs
+from cms.djangoapps.contentstore.views import tabs
 from lms.djangoapps.courseware.courses import get_course_by_id
 
 from .prompt import query_yes_no
@@ -37,7 +38,7 @@ def print_course(course):
 # {u'type': u'progress', u'name': u'Progress'}]
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = """See and edit a course's tabs list. Only supports insertion
 and deletion. Move and rename etc. can be done with a delete
 followed by an insert. The tabs are numbered starting with 1.
@@ -85,7 +86,7 @@ command again, adding --insert or --delete to edit the list.
                 if num < 3:
                     raise CommandError("Tabs 1 and 2 cannot be changed.")
 
-                if query_yes_no(u'Deleting tab {0} Confirm?'.format(num), default='no'):
+                if query_yes_no(f'Deleting tab {num} Confirm?', default='no'):
                     tabs.primitive_delete(course, num - 1)  # -1 for 0-based indexing
             elif options['insert']:
                 num, tab_type, name = options['insert']
@@ -93,8 +94,8 @@ command again, adding --insert or --delete to edit the list.
                 if num < 3:
                     raise CommandError("Tabs 1 and 2 cannot be changed.")
 
-                if query_yes_no(u'Inserting tab {0} "{1}" "{2}" Confirm?'.format(num, tab_type, name), default='no'):
+                if query_yes_no(f'Inserting tab {num} "{tab_type}" "{name}" Confirm?', default='no'):
                     tabs.primitive_insert(course, num - 1, tab_type, name)  # -1 as above
         except ValueError as e:
             # Cute: translate to CommandError so the CLI error prints nicely.
-            raise CommandError(e)
+            raise CommandError(e)  # lint-amnesty, pylint: disable=raise-missing-from

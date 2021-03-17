@@ -1,7 +1,7 @@
 """ Utility mixin; forces models to validate *before* saving to db """
 
 
-class ValidateOnSaveMixin(object):
+class ValidateOnSaveMixin:
     """
     Forces models to call their full_clean method prior to saving
     """
@@ -11,4 +11,4 @@ class ValidateOnSaveMixin(object):
         """
         if not (force_insert or force_update):
             self.full_clean()
-        super(ValidateOnSaveMixin, self).save(force_insert, force_update, **kwargs)
+        super().save(force_insert, force_update, **kwargs)

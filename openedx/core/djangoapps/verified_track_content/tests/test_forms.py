@@ -27,21 +27,15 @@ class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):
             'course_key': six.text_type(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
         }
         form = VerifiedTrackCourseForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_form_validation_failure(self):
         form_data = {'course_key': self.FAKE_COURSE, 'verified_cohort_name': 'Verified Learners', 'enabled': True}
         form = VerifiedTrackCourseForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['course_key'],
-            ['COURSE NOT FOUND.  Please check that the course ID is valid.']
-        )
+        assert not form.is_valid()
+        assert form.errors['course_key'] == ['COURSE NOT FOUND.  Please check that the course ID is valid.']
 
         form_data = {'course_key': self.BAD_COURSE_KEY, 'verified_cohort_name': 'Verified Learners', 'enabled': True}
         form = VerifiedTrackCourseForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(
-            form.errors['course_key'],
-            ['COURSE NOT FOUND.  Please check that the course ID is valid.']
-        )
+        assert not form.is_valid()
+        assert form.errors['course_key'] == ['COURSE NOT FOUND.  Please check that the course ID is valid.']

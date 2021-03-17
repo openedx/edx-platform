@@ -8,7 +8,7 @@ import logging
 from django import forms
 from django.core.exceptions import ValidationError
 
-from bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
+from lms.djangoapps.bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
 from openedx.core.lib.courses import clean_course_id
 
 log = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
 
     name = forms.CharField(required=False)
 
-    class Meta(object):
+    class Meta:
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -27,11 +27,11 @@ class CourseEmailTemplateForm(forms.ModelForm):
         """Check the template for required tags."""
         index = template.find(COURSE_EMAIL_MESSAGE_BODY_TAG)
         if index < 0:
-            msg = u'Missing tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
+            msg = f'Missing tag: "{COURSE_EMAIL_MESSAGE_BODY_TAG}"'
             log.warning(msg)
             raise ValidationError(msg)
         if template.find(COURSE_EMAIL_MESSAGE_BODY_TAG, index + 1) >= 0:
-            msg = u'Multiple instances of tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
+            msg = f'Multiple instances of tag: "{COURSE_EMAIL_MESSAGE_BODY_TAG}"'
             log.warning(msg)
             raise ValidationError(msg)
         # TODO: add more validation here, including the set of known tags
@@ -63,7 +63,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
             try:
                 CourseEmailTemplate.get_template(name)
                 # already exists, this is no good
-                raise ValidationError(u'Name of "{}" already exists, this must be unique.'.format(name))
+                raise ValidationError(f'Name of "{name}" already exists, this must be unique.')
             except CourseEmailTemplate.DoesNotExist:
                 # this is actually the successful validation
                 pass
@@ -73,7 +73,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
 class CourseAuthorizationAdminForm(forms.ModelForm):
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta(object):
+    class Meta:
         model = CourseAuthorization
         fields = '__all__'
 

@@ -8,7 +8,6 @@ import unittest
 from tempfile import mkdtemp
 
 import ddt
-import six
 from django.core.management import CommandError, call_command
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -25,10 +24,7 @@ class TestArgParsingCourseExport(unittest.TestCase):
         """
         Test export command with no arguments
         """
-        if six.PY2:
-            errstring = "Error: too few arguments"
-        else:
-            errstring = "Error: the following arguments are required: course_id, output_path"
+        errstring = "Error: the following arguments are required: course_id, output_path"
         with self.assertRaisesRegex(CommandError, errstring):
             call_command('export')
 
@@ -39,7 +35,7 @@ class TestCourseExport(ModuleStoreTestCase):
     Test exporting a course
     """
     def setUp(self):
-        super(TestCourseExport, self).setUp()
+        super().setUp()
 
         # Temp directories (temp_dir_1: relative path, temp_dir_2: absolute path)
         self.temp_dir_1 = mkdtemp()
@@ -55,10 +51,10 @@ class TestCourseExport(ModuleStoreTestCase):
         Create a new course try exporting in a path specified
         """
         course = CourseFactory.create(default_store=store)
-        course_id = six.text_type(course.id)
+        course_id = str(course.id)
         self.assertTrue(
             modulestore().has_course(course.id),
-            u"Could not find course in {}".format(store)
+            f"Could not find course in {store}"
         )
         # Test `export` management command with invalid course_id
         errstring = "Invalid course_key: 'InvalidCourseID'."

@@ -10,13 +10,13 @@ from factory import lazy_attribute
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
 # Factories are self documenting
-class CourseModeFactory(DjangoModelFactory):
+class CourseModeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta(object):
         model = CourseMode
 

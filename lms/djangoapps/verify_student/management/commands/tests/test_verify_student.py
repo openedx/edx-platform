@@ -4,11 +4,14 @@ Tests for django admin commands in the verify_student module
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
 
+from unittest.mock import patch
+
 from django.conf import settings
 from django.core.management import call_command
-from mock import patch
 from testfixtures import LogCapture
 
+from common.djangoapps.student.tests.factories import \
+    UserFactory  # lint-amnesty, pylint: disable=import-error, unused-import, useless-suppression
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 from lms.djangoapps.verify_student.tests import TestVerificationBase
@@ -17,7 +20,6 @@ from lms.djangoapps.verify_student.tests.test_models import (
     mock_software_secure_post,
     mock_software_secure_post_error
 )
-from student.tests.factories import UserFactory  # pylint: disable=import-error, useless-suppression
 
 LOGGER_NAME = 'retry_photo_verification'
 
@@ -42,8 +44,8 @@ class TestVerifyStudentCommand(MockS3BotoMixin, TestVerificationBase):
             self.create_upload_and_submit_attempt_for_user()
 
         # check to make sure we had two successes and two failures; otherwise we've got problems elsewhere
-        self.assertEqual(SoftwareSecurePhotoVerification.objects.filter(status="submitted").count(), 1)
-        self.assertEqual(SoftwareSecurePhotoVerification.objects.filter(status='must_retry').count(), 2)
+        assert SoftwareSecurePhotoVerification.objects.filter(status='submitted').count() == 1
+        assert SoftwareSecurePhotoVerification.objects.filter(status='must_retry').count() == 2
 
         with self.immediate_on_commit():
             call_command('retry_failed_photo_verifications')
@@ -77,7 +79,7 @@ class TestVerifyStudentCommand(MockS3BotoMixin, TestVerificationBase):
                     log.check_present(
                         (
                             LOGGER_NAME, 'INFO',
-                            'Attempting to retry {0} failed PhotoVerification submissions'.format(1)
+                            'Attempting to retry {} failed PhotoVerification submissions'.format(1)
                         ),
                     )
 

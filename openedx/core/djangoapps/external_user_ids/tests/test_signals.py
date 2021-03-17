@@ -6,20 +6,20 @@ from opaque_keys.edx.keys import CourseKey
 from django.core.cache import cache
 from edx_django_utils.cache import RequestCache
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     ProgramFactory,
 )
-from student.tests.factories import TEST_PASSWORD, UserFactory, CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory, CourseEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import (
     CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL,
     COURSE_PROGRAMS_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
 )
 from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
-from student.models import CourseEnrollment
-from course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.course_modes.models import CourseMode
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -47,7 +47,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         )
 
     def setUp(self):
-        super(MicrobachelorsExternalIDTest, self).setUp()
+        super(MicrobachelorsExternalIDTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         RequestCache.clear_all_namespaces()
         self.program = self._create_cached_program()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)

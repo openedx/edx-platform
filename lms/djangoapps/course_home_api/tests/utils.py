@@ -3,19 +3,20 @@ Base classes or util functions for use in Course Home API tests
 """
 
 import unittest
-
 from datetime import datetime
+
 from django.conf import settings
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import UserFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=unused-import
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -45,7 +46,9 @@ class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
         CourseModeFactory(
             course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=datetime(2028, 1, 1)
+            expiration_datetime=datetime(2028, 1, 1),
+            min_price=149,
+            sku='ABCD1234',
         )
         VerificationDeadline.objects.create(course_key=self.course.id, deadline=datetime(2028, 1, 1))
 

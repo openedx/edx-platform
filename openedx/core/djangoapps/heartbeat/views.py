@@ -4,9 +4,8 @@ Views for verifying the health (heartbeat) of the app.
 
 
 import logging
-import six
 
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 from .runchecks import runchecks
 
@@ -28,11 +27,11 @@ def heartbeat(request):
         for check in check_results:
             if not check_results[check]['status']:
                 status_code = 503  # 503 on any failure
-    except Exception as e:
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
         status_code = 503
-        check_results = {'error': six.text_type(e)}
+        check_results = {'error': str(e)}
 
     if status_code == 503:
-        log.error(u'Heartbeat check failed (%s): %s', status_code, check_results)
+        log.error('Heartbeat check failed (%s): %s', status_code, check_results)
 
     return JsonResponse(check_results, status=status_code)

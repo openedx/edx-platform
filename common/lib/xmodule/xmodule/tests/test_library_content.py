@@ -1,20 +1,18 @@
-# -*- coding: utf-8 -*-
 """
-Basic unit tests for LibraryContentModule
+Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
+from unittest.mock import Mock, patch
 
-
-import six
 from bson.objectid import ObjectId
-from mock import Mock, patch
+from fs.memoryfs import MemoryFS
+from lxml import etree
 from search.search_engine_base import SearchEngine
-from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
-from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
+from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
@@ -23,20 +21,22 @@ from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 
+from .test_course_module import DummySystem as TestImportSystem
+
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
 class LibraryContentTest(MixedSplitTestCase):
     """
-    Base class for tests of LibraryContentModule (library_content_module.py)
+    Base class for tests of LibraryContentBlock (library_content_block.py)
     """
     def setUp(self):
-        super(LibraryContentTest, self).setUp()
+        super().setUp()
 
-        self.tools = LibraryToolsService(self.store)
+        self.tools = LibraryToolsService(self.store, self.user_id)
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
-            self.make_block("html", self.library, data="Hello world from block {}".format(i))
+            self.make_block("html", self.library, data=f"Hello world from block {i}")
             for i in range(1, 5)
         ]
         self.course = CourseFactory.create(modulestore=self.store)
@@ -47,7 +47,7 @@ class LibraryContentTest(MixedSplitTestCase):
             "library_content",
             self.vertical,
             max_count=1,
-            source_library_id=six.text_type(self.library.location.library_key)
+            source_library_id=str(self.library.location.library_key)
         )
 
     def _bind_course_module(self, module):
@@ -70,9 +70,73 @@ class LibraryContentTest(MixedSplitTestCase):
         module.xmodule_runtime = module_system
 
 
-class LibraryContentModuleTestMixin(object):
+class TestLibraryContentExportImport(LibraryContentTest):
     """
-    Basic unit tests for LibraryContentModule
+    Export and import tests for LibraryContentBlock
+    """
+
+    maxDiff = None
+
+    def test_xml_export_import_cycle(self):
+        """
+        Test the export-import cycle.
+        """
+        # Children will only set after calling this.
+        self.lc_block.refresh_children()
+        lc_block = self.store.get_item(self.lc_block.location)
+
+        expected_olx = (
+            '<library_content display_name="{block.display_name}" max_count="{block.max_count}"'
+            ' source_library_id="{block.source_library_id}" source_library_version="{block.source_library_version}">\n'
+            '  <html url_name="{block.children[0].block_id}"/>\n'
+            '  <html url_name="{block.children[1].block_id}"/>\n'
+            '  <html url_name="{block.children[2].block_id}"/>\n'
+            '  <html url_name="{block.children[3].block_id}"/>\n'
+            '</library_content>\n'
+        ).format(
+            block=lc_block,
+        )
+
+        export_fs = MemoryFS()
+        # Set the virtual FS to export the olx to.
+        lc_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
+
+        # Export the olx.
+        node = etree.Element("unknown_root")
+        lc_block.add_xml_to_node(node)
+
+        # Read it back
+        with export_fs.open('{dir}/{file_name}.xml'.format(
+            dir=lc_block.scope_ids.usage_id.block_type,
+            file_name=lc_block.scope_ids.usage_id.block_id
+        )) as f:
+            exported_olx = f.read()
+
+        # And compare.
+        assert exported_olx == expected_olx
+
+        runtime = TestImportSystem(load_error_modules=True, course_id=lc_block.location.course_key)
+        runtime.resources_fs = export_fs
+
+        # Now import it.
+        olx_element = etree.fromstring(exported_olx)
+        id_generator = Mock()
+        imported_lc_block = LibraryContentBlock.parse_xml(olx_element, runtime, None, id_generator)
+
+        # Check the new XBlock has the same properties as the old one.
+        assert imported_lc_block.display_name == lc_block.display_name
+        assert imported_lc_block.source_library_id == lc_block.source_library_id
+        assert imported_lc_block.source_library_version == lc_block.source_library_version
+        assert imported_lc_block.mode == lc_block.mode
+        assert imported_lc_block.max_count == lc_block.max_count
+        assert imported_lc_block.capa_type == lc_block.capa_type
+        assert len(imported_lc_block.children) == 4
+        assert imported_lc_block.children == lc_block.children
+
+
+class LibraryContentBlockTestMixin:
+    """
+    Basic unit tests for LibraryContentBlock
     """
     problem_types = [
         ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
@@ -107,12 +171,12 @@ class LibraryContentModuleTestMixin(object):
         # Check that the LibraryContent block has no children initially
         # Normally the children get added when the "source_libraries" setting
         # is updated, but the way we do it through a factory doesn't do that.
-        self.assertEqual(len(self.lc_block.children), 0)
+        assert len(self.lc_block.children) == 0
         # Update the LibraryContent module:
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        assert len(self.lc_block.children) == len(self.lib_blocks)
 
     def test_children_seen_by_a_user(self):
         """
@@ -122,14 +186,14 @@ class LibraryContentModuleTestMixin(object):
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_module(self.lc_block)
         # Make sure the runtime knows that the block's children vary per-user:
-        self.assertTrue(self.lc_block.has_dynamic_children())
+        assert self.lc_block.has_dynamic_children()
 
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        assert len(self.lc_block.children) == len(self.lib_blocks)
 
         # Check how many children each user will see:
-        self.assertEqual(len(self.lc_block.get_child_descriptors()), 1)
+        assert len(self.lc_block.get_child_descriptors()) == 1
         # Check that get_content_titles() doesn't return titles for hidden/unused children
-        self.assertEqual(len(self.lc_block.get_content_titles()), 1)
+        assert len(self.lc_block.get_content_titles()) == 1
 
     def test_validation_of_course_libraries(self):
         """
@@ -139,29 +203,32 @@ class LibraryContentModuleTestMixin(object):
         # When source_library_id is blank, the validation summary should say this block needs to be configured:
         self.lc_block.source_library_id = ""
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.NOT_CONFIGURED, result.summary.type)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.NOT_CONFIGURED == result.summary.type
 
         # When source_library_id references a non-existent library, we should get an error:
         self.lc_block.source_library_id = "library-v1:BAD+WOLF"
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.ERROR, result.summary.type)
-        self.assertIn("invalid", result.summary.text)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.ERROR == result.summary.type
+        assert 'invalid' in result.summary.text
 
         # When source_library_id is set but the block needs to be updated, the summary should say so:
-        self.lc_block.source_library_id = six.text_type(self.library.location.library_key)
+        self.lc_block.source_library_id = str(self.library.location.library_key)
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
-        self.assertIn("out of date", result.summary.text)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'out of date' in result.summary.text
 
         # Now if we update the block, all validation should pass:
         self.lc_block.refresh_children()
-        self.assertTrue(self.lc_block.validate())
+        assert self.lc_block.validate()
 
     def test_validation_of_matching_blocks(self):
         """
@@ -173,76 +240,80 @@ class LibraryContentModuleTestMixin(object):
         # In the normal studio editing process, editor_saved() calls refresh_children at this point
         self.lc_block.refresh_children()
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
-        self.assertIn("only 4 matching problems", result.summary.text)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'only 4 matching problems' in result.summary.text
 
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
         self.lc_block.refresh_children()
-        self.assertTrue(self.lc_block.validate())
+        assert self.lc_block.validate()
 
         # Existing problem type should pass validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.lc_block.refresh_children()
-        self.assertTrue(self.lc_block.validate())
+        assert self.lc_block.validate()
 
         # ... unless requested more blocks than exists in library
         self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.lc_block.refresh_children()
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
-        self.assertIn("only 1 matching problem", result.summary.text)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'only 1 matching problem' in result.summary.text
 
         # Missing problem type should always fail validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'customresponse'
         self.lc_block.refresh_children()
         result = self.lc_block.validate()
-        self.assertFalse(result)  # Validation fails due to at least one warning/message
-        self.assertTrue(result.summary)
-        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
-        self.assertIn("no matching problem types", result.summary.text)
+        assert not result
+        # Validation fails due to at least one warning/message
+        assert result.summary
+        assert StudioValidationMessage.WARNING == result.summary.type
+        assert 'no matching problem types' in result.summary.text
 
     def test_capa_type_filtering(self):
         """
         Test that the capa type filter is actually filtering children
         """
         self._create_capa_problems()
-        self.assertEqual(len(self.lc_block.children), 0)  # precondition check
+        assert len(self.lc_block.children) == 0
+        # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
         self.lc_block.refresh_children()
-        self.assertEqual(len(self.lc_block.children), 1)
+        assert len(self.lc_block.children) == 1
 
         self.lc_block.capa_type = "optionresponse"
         self.lc_block.refresh_children()
-        self.assertEqual(len(self.lc_block.children), 3)
+        assert len(self.lc_block.children) == 3
 
         self.lc_block.capa_type = "coderesponse"
         self.lc_block.refresh_children()
-        self.assertEqual(len(self.lc_block.children), 2)
+        assert len(self.lc_block.children) == 2
 
         self.lc_block.capa_type = "customresponse"
         self.lc_block.refresh_children()
-        self.assertEqual(len(self.lc_block.children), 0)
+        assert len(self.lc_block.children) == 0
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.lc_block.refresh_children()
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 4)
+        assert len(self.lc_block.children) == (len(self.lib_blocks) + 4)
 
     def test_non_editable_settings(self):
         """
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
-        self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
-        self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
+        assert LibraryContentBlock.mode in non_editable_metadata_fields
+        assert LibraryContentBlock.display_name not in non_editable_metadata_fields
 
     def test_overlimit_blocks_chosen_randomly(self):
         """
@@ -272,29 +343,26 @@ class LibraryContentModuleTestMixin(object):
         Helper method that changes the max_count of self.lc_block, refreshes
         children, and asserts that the number of selected children equals the count provided.
         """
-        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
-        if hasattr(self.lc_block._xmodule, '_selected_set'):
-            del self.lc_block._xmodule._selected_set
         self.lc_block.max_count = count
         selected = self.lc_block.get_child_descriptors()
-        self.assertEqual(len(selected), count)
+        assert len(selected) == count
         return selected
 
 
 @patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
-class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
+class TestLibraryContentBlockNoSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
     """
     Tests for library container when no search index is available.
     Tests fallback low-level CAPA problem introspection
     """
-    pass
+    pass  # pylint:disable=unnecessary-pass
 
 
 search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
 @patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=search_index_mock, autospec=True))
-class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
+class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
     """
     Tests for library container with mocked search engine response.
     """
@@ -313,7 +381,7 @@ class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, Lib
 
     def setUp(self):
         """ Sets up search engine mock """
-        super(TestLibraryContentModuleWithSearchIndex, self).setUp()
+        super().setUp()
         search_index_mock.search = Mock(side_effect=self._get_search_response)
 
 
@@ -324,36 +392,38 @@ class TestLibraryContentModuleWithSearchIndex(LibraryContentModuleTestMixin, Lib
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(LibraryContentTest):
     """
-    Rendering unit tests for LibraryContentModule
+    Rendering unit tests for LibraryContentBlock
     """
 
     def test_preview_view(self):
         """ Test preview view rendering """
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        assert len(self.lc_block.children) == len(self.lib_blocks)
         self._bind_course_module(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {'root_xblock': self.lc_block})
-        self.assertIn("Hello world from block 1", rendered.content)
+        assert 'Hello world from block 1' in rendered.content
 
     def test_author_view(self):
         """ Test author view rendering """
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        assert len(self.lc_block.children) == len(self.lib_blocks)
         self._bind_course_module(self.lc_block)
         rendered = self.lc_block.render(AUTHOR_VIEW, {})
-        self.assertEqual("", rendered.content)  # content should be empty
-        self.assertEqual("LibraryContentAuthorView", rendered.js_init_fn)  # but some js initialization should happen
+        assert '' == rendered.content
+        # content should be empty
+        assert 'LibraryContentAuthorView' == rendered.js_init_fn
+        # but some js initialization should happen
 
 
 class TestLibraryContentAnalytics(LibraryContentTest):
     """
-    Test analytics features of LibraryContentModule
+    Test analytics features of LibraryContentBlock
     """
 
     def setUp(self):
-        super(TestLibraryContentAnalytics, self).setUp()
+        super().setUp()
         self.publisher = Mock()
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
@@ -362,13 +432,13 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
     def _assert_event_was_published(self, event_type):
         """
-        Check that a LibraryContentModule analytics event was published by self.lc_block.
+        Check that a LibraryContentBlock analytics event was published by self.lc_block.
         """
-        self.assertTrue(self.publisher.called)
-        self.assertTrue(len(self.publisher.call_args[0]), 3)
-        _, event_name, event_data = self.publisher.call_args[0]
-        self.assertEqual(event_name, "edx.librarycontentblock.content.{}".format(event_type))
-        self.assertEqual(event_data["location"], six.text_type(self.lc_block.location))
+        assert self.publisher.called
+        assert len(self.publisher.call_args[0]) == 3  # pylint:disable=unsubscriptable-object
+        _, event_name, event_data = self.publisher.call_args[0]  # pylint:disable=unsubscriptable-object
+        assert event_name == f'edx.librarycontentblock.content.{event_type}'
+        assert event_data['location'] == str(self.lc_block.location)
         return event_data
 
     def test_assigned_event(self):
@@ -378,35 +448,31 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # In the beginning was the lc_block and it assigned one child to the student:
         child = self.lc_block.get_child_descriptors()[0]
         child_lib_location, child_lib_version = self.store.get_block_original_usage(child.location)
-        self.assertIsInstance(child_lib_version, ObjectId)
+        assert isinstance(child_lib_version, ObjectId)
         event_data = self._assert_event_was_published("assigned")
         block_info = {
-            "usage_key": six.text_type(child.location),
-            "original_usage_key": six.text_type(child_lib_location),
-            "original_usage_version": six.text_type(child_lib_version),
+            "usage_key": str(child.location),
+            "original_usage_key": str(child_lib_location),
+            "original_usage_version": str(child_lib_version),
             "descendants": [],
         }
-        self.assertEqual(event_data, {
-            "location": six.text_type(self.lc_block.location),
-            "added": [block_info],
-            "result": [block_info],
-            "previous_count": 0,
-            "max_count": 1,
-        })
+        assert event_data ==\
+               {'location': str(self.lc_block.location),
+                'added': [block_info],
+                'result': [block_info],
+                'previous_count': 0, 'max_count': 1}
         self.publisher.reset_mock()
 
         # Now increase max_count so that one more child will be added:
         self.lc_block.max_count = 2
-        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
-        del self.lc_block._xmodule._selected_set
         children = self.lc_block.get_child_descriptors()
-        self.assertEqual(len(children), 2)
+        assert len(children) == 2
         child, new_child = children if children[0].location == child.location else reversed(children)
         event_data = self._assert_event_was_published("assigned")
-        self.assertEqual(event_data["added"][0]["usage_key"], six.text_type(new_child.location))
-        self.assertEqual(len(event_data["result"]), 2)
-        self.assertEqual(event_data["previous_count"], 1)
-        self.assertEqual(event_data["max_count"], 2)
+        assert event_data['added'][0]['usage_key'] == str(new_child.location)
+        assert len(event_data['result']) == 2
+        assert event_data['previous_count'] == 1
+        assert event_data['max_count'] == 2
 
     def test_assigned_event_published(self):
         """
@@ -449,8 +515,9 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         event_data = self._assert_event_was_published("assigned")
 
         for block_list in (event_data["added"], event_data["result"]):
-            self.assertEqual(len(block_list), 1)  # main_vertical is the only root block added, and is the only result.
-            self.assertEqual(block_list[0]["usage_key"], six.text_type(course_usage_main_vertical))
+            assert len(block_list) == 1
+            # main_vertical is the only root block added, and is the only result.
+            assert block_list[0]['usage_key'] == str(course_usage_main_vertical)
 
             # Check that "descendants" is a flat, unordered list of all of main_vertical's descendants:
             descendants_expected = (
@@ -460,14 +527,14 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             )
             descendant_data_expected = {}
             for lib_key, course_usage_key in descendants_expected:
-                descendant_data_expected[six.text_type(course_usage_key)] = {
-                    "usage_key": six.text_type(course_usage_key),
-                    "original_usage_key": six.text_type(lib_key),
-                    "original_usage_version": six.text_type(self.store.get_block_original_usage(course_usage_key)[1]),
+                descendant_data_expected[str(course_usage_key)] = {
+                    "usage_key": str(course_usage_key),
+                    "original_usage_key": str(lib_key),
+                    "original_usage_version": str(self.store.get_block_original_usage(course_usage_key)[1]),
                 }
-            self.assertEqual(len(block_list[0]["descendants"]), len(descendant_data_expected))
+            assert len(block_list[0]['descendants']) == len(descendant_data_expected)
             for descendant in block_list[0]["descendants"]:
-                self.assertEqual(descendant, descendant_data_expected.get(descendant["usage_key"]))
+                assert descendant == descendant_data_expected.get(descendant['usage_key'])
 
     def test_removed_overlimit(self):
         """
@@ -478,16 +545,14 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
         self.lc_block.max_count = 0
-        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
-        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving no blocks left:
         children = self.lc_block.get_child_descriptors()
-        self.assertEqual(len(children), 0)
+        assert len(children) == 0
         event_data = self._assert_event_was_published("removed")
-        self.assertEqual(len(event_data["removed"]), 1)
-        self.assertEqual(event_data["result"], [])
-        self.assertEqual(event_data["reason"], "overlimit")
+        assert len(event_data['removed']) == 1
+        assert event_data['result'] == []
+        assert event_data['reason'] == 'overlimit'
 
     def test_removed_invalid(self):
         """
@@ -497,39 +562,31 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # Start by assigning two blocks to the student:
         self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.lc_block.max_count = 2
-        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
-        del self.lc_block._xmodule._selected_set
         initial_blocks_assigned = self.lc_block.get_child_descriptors()
-        self.assertEqual(len(initial_blocks_assigned), 2)
+        assert len(initial_blocks_assigned) == 2
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
         # Now make sure that one of the assigned blocks will have to be un-assigned.
         # To cause an "invalid" event, we delete all blocks from the content library
         # except for one of the two already assigned to the student:
         keep_block_key = initial_blocks_assigned[0].location
         keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
-        self.assertIsNotNone(keep_block_lib_usage_key)
+        assert keep_block_lib_usage_key is not None
         deleted_block_key = initial_blocks_assigned[1].location
         self.library.children = [keep_block_lib_usage_key]
         self.store.update_item(self.library, self.user_id)
         self.lc_block.refresh_children()
-        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
-        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving one block left:
         children = self.lc_block.get_child_descriptors()
-        self.assertEqual(len(children), 1)
+        assert len(children) == 1
         event_data = self._assert_event_was_published("removed")
-        self.assertEqual(event_data["removed"], [{
-            "usage_key": six.text_type(deleted_block_key),
-            "original_usage_key": None,  # Note: original_usage_key info is sadly unavailable because the block has been
-                                         # deleted so that info can no longer be retrieved
-            "original_usage_version": None,
-            "descendants": [],
-        }])
-        self.assertEqual(event_data["result"], [{
-            "usage_key": six.text_type(keep_block_key),
-            "original_usage_key": six.text_type(keep_block_lib_usage_key),
-            "original_usage_version": six.text_type(keep_block_lib_version),
-            "descendants": [],
-        }])
-        self.assertEqual(event_data["reason"], "invalid")
+        assert event_data['removed'] ==\
+               [{'usage_key': str(deleted_block_key),
+                 'original_usage_key': None,
+                 'original_usage_version': None,
+                 'descendants': []}]
+        assert event_data['result'] ==\
+               [{'usage_key': str(keep_block_key),
+                 'original_usage_key': str(keep_block_lib_usage_key),
+                 'original_usage_version': str(keep_block_lib_version), 'descendants': []}]
+        assert event_data['reason'] == 'invalid'

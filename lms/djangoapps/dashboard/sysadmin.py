@@ -2,21 +2,20 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
-
-
 import json
 import logging
 import os
 import subprocess
+import warnings
+from io import StringIO
 
 import mongoengine
-import unicodecsv as csv
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -26,18 +25,17 @@ from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
-from six import StringIO, text_type
-
-import dashboard.git_import as git_import
-import track.views
-from dashboard.git_import import GitImportError
-from dashboard.models import CourseImportLog
-from edxmako.shortcuts import render_to_response
-from lms.djangoapps.courseware.courses import get_course_by_id
-from openedx.core.djangolib.markup import HTML
-from student.models import CourseEnrollment, Registration, UserProfile
-from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
+
+import lms.djangoapps.dashboard.git_import as git_import
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.models import CourseEnrollment, Registration, UserProfile
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.track import views as track_views
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.dashboard.git_import import GitImportError
+from lms.djangoapps.dashboard.models import CourseImportLog
+from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +50,13 @@ class SysadminDashboardView(TemplateView):
         Initialize base sysadmin dashboard class with modulestore,
         modulestore_type and return msg
         """
+        # Deprecation log for Sysadmin Dashboard
+        warnings.warn("Sysadmin Dashboard is deprecated. See DEPR-118.", DeprecationWarning)
 
         self.def_ms = modulestore()
-        self.msg = u''
+        self.msg = ''
         self.datatable = []
-        super(SysadminDashboardView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
@@ -64,44 +64,12 @@ class SysadminDashboardView(TemplateView):
                                     must_revalidate=True))
     @method_decorator(condition(etag_func=None))
     def dispatch(self, *args, **kwargs):
-        return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_courses(self):
         """ Get an iterable list of courses."""
 
         return self.def_ms.get_courses()
-
-    def return_csv(self, filename, header, data):
-        """
-        Convenient function for handling the http response of a csv.
-        data should be iterable and is used to stream object over http
-        """
-
-        csv_file = StringIO()
-        writer = csv.writer(csv_file, dialect='excel', quotechar='"',
-                            quoting=csv.QUOTE_ALL)
-
-        writer.writerow(header)
-
-        # Setup streaming of the data
-        def read_and_flush():
-            """Read and clear buffer for optimization"""
-            csv_file.seek(0)
-            csv_data = csv_file.read()
-            csv_file.seek(0)
-            csv_file.truncate()
-            return csv_data
-
-        def csv_data():
-            """Generator for handling potentially large CSVs"""
-            for row in data:
-                writer.writerow(row)
-            csv_data = read_and_flush()
-            yield csv_data
-        response = HttpResponse(csv_data(), content_type='text/csv')
-        response['Content-Disposition'] = u'attachment; filename={0}'.format(
-            filename)
-        return response
 
 
 class Users(SysadminDashboardView):
@@ -118,7 +86,7 @@ class Users(SysadminDashboardView):
         if not name:
             return _('Must provide full name')
 
-        msg = u''
+        msg = ''
         if not password:
             return _('Password must be supplied')
 
@@ -134,7 +102,7 @@ class Users(SysadminDashboardView):
         try:
             user.save()
         except IntegrityError:
-            msg += _(u'Oops, failed to create user {user}, {error}').format(
+            msg += _('Oops, failed to create user {user}, {error}').format(
                 user=user,
                 error="IntegrityError"
             )
@@ -147,7 +115,7 @@ class Users(SysadminDashboardView):
         profile.name = name
         profile.save()
 
-        msg += _(u'User {user} created successfully!').format(user=user)
+        msg += _('User {user} created successfully!').format(user=user)
         return msg
 
     def delete_user(self, uname):
@@ -159,19 +127,19 @@ class Users(SysadminDashboardView):
             try:
                 user = User.objects.get(email=uname)
             except User.DoesNotExist as err:
-                msg = _(u'Cannot find user with email address {email_addr}').format(email_addr=uname)
+                msg = _('Cannot find user with email address {email_addr}').format(email_addr=uname)
                 return msg
         else:
             try:
                 user = User.objects.get(username=uname)
             except User.DoesNotExist as err:
-                msg = _(u'Cannot find user with username {username} - {error}').format(
+                msg = _('Cannot find user with username {username} - {error}').format(
                     username=uname,
                     error=str(err)
                 )
                 return msg
         user.delete()
-        return _(u'Deleted user {username}').format(username=uname)
+        return _('Deleted user {username}').format(username=uname)
 
     def make_datatable(self):
         """
@@ -192,7 +160,7 @@ class Users(SysadminDashboardView):
         }
         return datatable
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         if not request.user.is_staff:
             raise Http404
         context = {
@@ -209,24 +177,18 @@ class Users(SysadminDashboardView):
         if not request.user.is_staff:
             raise Http404
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {}, page='user_sysdashboard')
+        track_views.server_track(request, action, {}, page='user_sysdashboard')
 
-        if action == 'download_users':
-            header = [_('username'), _('email'), ]
-            data = ([u.username, u.email] for u in
-                    (User.objects.all().iterator()))
-            return self.return_csv('users_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
-        elif action == 'create_user':
+        if action == 'create_user':
             uname = request.POST.get('student_uname', '').strip()
             name = request.POST.get('student_fullname', '').strip()
             password = request.POST.get('student_password', '').strip()
-            self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
+            self.msg = HTML('<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Create User Results'),
                 self.create_user(uname, name, password), self.msg)
         elif action == 'del_user':
             uname = request.POST.get('student_uname', '').strip()
-            self.msg = HTML(u'<h4>{0}</h4><p>{1}</p><hr />{2}').format(
+            self.msg = HTML('<h4>{0}</h4><p>{1}</p><hr />{2}').format(
                 _('Delete User Results'), self.delete_user(uname), self.msg)
         context = {
             'datatable': self.make_datatable(),
@@ -258,14 +220,14 @@ class Courses(SysadminDashboardView):
                 return info
 
         cmd = ['git', 'log', '-1',
-               u'--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
+               '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
         try:
             output_json = json.loads(subprocess.check_output(cmd, cwd=gdir).decode('utf-8'))
             info = [output_json['commit'],
                     output_json['date'],
                     output_json['author'], ]
         except OSError as error:
-            log.warning(text_type(u"Error fetching git data: %s - %s"), text_type(cdir), text_type(error))
+            log.warning("Error fetching git data: %s - %s", str(cdir), str(error))
         except (ValueError, subprocess.CalledProcessError):
             pass
 
@@ -287,9 +249,9 @@ class Courses(SysadminDashboardView):
         at debug level for display in template
         """
 
-        msg = u''
+        msg = ''
 
-        log.debug(u'Adding course using git repo %s', gitloc)
+        log.debug('Adding course using git repo %s', gitloc)
 
         # Grab logging output for debugging imports
         output = StringIO()
@@ -297,7 +259,7 @@ class Courses(SysadminDashboardView):
         import_log_handler.setLevel(logging.DEBUG)
 
         logger_names = ['xmodule.modulestore.xml_importer',
-                        'dashboard.git_import',
+                        'lms.djangoapps.dashboard.git_import',
                         'xmodule.modulestore.xml',
                         'xmodule.seq_module', ]
         loggers = []
@@ -327,8 +289,8 @@ class Courses(SysadminDashboardView):
             msg_header = _('Added Course')
             color = 'blue'
 
-        msg = HTML(u"<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
-        msg += HTML(u"<pre>{0}</pre>").format(escape(ret))
+        msg = HTML("<h4 style='color:{0}'>{1}</h4>").format(color, msg_header)
+        msg += HTML("<pre>{0}</pre>").format(escape(ret))
         return msg
 
     def make_datatable(self, courses=None):
@@ -338,7 +300,7 @@ class Courses(SysadminDashboardView):
         courses = courses or self.get_courses()
         for course in courses:
             gdir = course.id.course
-            data.append([course.display_name, text_type(course.id)]
+            data.append([course.display_name, str(course.id)]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'),
@@ -350,7 +312,7 @@ class Courses(SysadminDashboardView):
                     title=_('Information about all courses'),
                     data=data)
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         """Displays forms and course information"""
 
         if not request.user.is_staff:
@@ -371,7 +333,7 @@ class Courses(SysadminDashboardView):
             raise Http404
 
         action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
+        track_views.server_track(request, action, {},
                                  page='courses_sysdashboard')
 
         courses = {course.id: course for course in self.get_courses()}
@@ -392,8 +354,8 @@ class Courses(SysadminDashboardView):
                     course = get_course_by_id(course_key)
                     course_found = True
                 except Exception as err:   # pylint: disable=broad-except
-                    self.msg += _(
-                        HTML(u'Error - cannot get course with ID {0}<br/><pre>{1}</pre>')
+                    self.msg += _(  # lint-amnesty, pylint: disable=translation-of-non-string
+                        HTML('Error - cannot get course with ID {0}<br/><pre>{1}</pre>')
                     ).format(
                         course_key,
                         escape(str(err))
@@ -404,8 +366,8 @@ class Courses(SysadminDashboardView):
                 self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
                 self.msg += \
-                    HTML(u"<font color='red'>{0} {1} = {2} ({3})</font>").format(
-                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
+                    HTML("<font color='red'>{0} {1} = {2} ({3})</font>").format(
+                        _('Deleted'), str(course.location), str(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(list(courses.values())),
@@ -419,10 +381,10 @@ class Courses(SysadminDashboardView):
 class Staffing(SysadminDashboardView):
     """
     The status view provides a view of staffing and enrollment in
-    courses that include an option to download the data as a csv.
+    courses.
     """
 
-    def get(self, request):
+    def get(self, request):  # lint-amnesty, pylint: disable=arguments-differ
         """Displays course Enrollment and staffing course statistics"""
 
         if not request.user.is_staff:
@@ -450,31 +412,6 @@ class Staffing(SysadminDashboardView):
             'modeflag': {'staffing': 'active-section'},
         }
         return render_to_response(self.template_name, context)
-
-    def post(self, request):
-        """Handle all actions from staffing and enrollment view"""
-
-        action = request.POST.get('action', '')
-        track.views.server_track(request, action, {},
-                                 page='staffing_sysdashboard')
-
-        if action == 'get_staff_csv':
-            data = []
-            roles = [CourseInstructorRole, CourseStaffRole, ]
-
-            for course in self.get_courses():
-                for role in roles:
-                    for user in role(course.id).users_with_role():
-                        datum = [course.id, role, user.username, user.email,
-                                 user.profile.name.encode('utf-8')]
-                        data.append(datum)
-            header = [_('course_id'),
-                      _('role'), _('username'),
-                      _('email'), _('full_name'), ]
-            return self.return_csv('staff_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
-
-        return self.get(request)
 
 
 class GitLogs(TemplateView):
@@ -519,7 +456,7 @@ class GitLogs(TemplateView):
                 mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
-        except mongoengine.connection.ConnectionError:
+        except mongoengine.connection.ConnectionError:  # lint-amnesty, pylint: disable=no-member
             log.exception('Unable to connect to mongodb to save log, '
                           'please check MONGODB_LOG settings.')
 
@@ -538,7 +475,7 @@ class GitLogs(TemplateView):
             cilset = CourseImportLog.objects.filter(
                 course_id=course_id
             ).order_by('-created')
-            log.debug(u'cilset length=%s', len(cilset))
+            log.debug('cilset length=%s', len(cilset))
 
         # Paginate the query set
         paginator = Paginator(cilset, page_size)
@@ -555,7 +492,7 @@ class GitLogs(TemplateView):
         mdb.close()
         context = {
             'logs': logs,
-            'course_id': text_type(course_id) if course_id else None,
+            'course_id': str(course_id) if course_id else None,
             'error_msg': error_msg,
             'page_size': page_size
         }

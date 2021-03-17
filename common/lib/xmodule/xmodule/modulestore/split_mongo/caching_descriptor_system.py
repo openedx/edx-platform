@@ -1,9 +1,8 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import logging
 import sys
 
-import six
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
@@ -12,7 +11,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KeyValueStore, KvsFieldData
 
-from xmodule.error_module import ErrorDescriptor
+from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
@@ -37,7 +36,7 @@ new_contract('CourseEnvelope', CourseEnvelope)
 new_contract('XBlock', XBlock)
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
+class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
     A system that has a cache of a course version's json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data.
@@ -45,7 +44,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     Computes the settings (nee 'metadata') inheritance upon creation.
     """
     @contract(course_entry=CourseEnvelope)
-    def __init__(self, modulestore, course_entry, default_class, module_data, lazy, **kwargs):
+    def __init__(self, modulestore, course_entry, default_class, module_data, lazy, **kwargs):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Computes the settings inheritance and sets up the cache.
 
@@ -61,7 +60,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         # needed by capa_problem (as runtime.filestore via this.resources_fs)
         if course_entry.course_key.course:
-            root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run
+            root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run  # lint-amnesty, pylint: disable=line-too-long
         else:
             root = modulestore.fs_root / str(course_entry.structure['_id'])
         root.makedirs_p()  # create directory if it doesn't exist
@@ -70,7 +69,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         kwargs.setdefault('id_reader', id_manager)
         kwargs.setdefault('id_generator', id_manager)
 
-        super(CachingDescriptorSystem, self).__init__(
+        super().__init__(
             field_data=None,
             load_item=self._load_item,
             resources_fs=OSFS(root),
@@ -85,13 +84,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.module_data = module_data
         self.default_class = default_class
         self.local_modules = {}
-        self._services['library_tools'] = LibraryToolsService(modulestore)
+        self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
 
     @lazy
     @contract(returns="dict(BlockKey: BlockKey)")
-    def _parent_map(self):
+    def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         parent_map = {}
-        for block_key, block in six.iteritems(self.course_entry.structure['blocks']):
+        for block_key, block in self.course_entry.structure['blocks'].items():
             for child in block.fields.get('children', []):
                 parent_map[child] = block_key
         return parent_map
@@ -114,7 +113,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 try:
                     return self.local_modules[usage_key]
                 except KeyError:
-                    raise ItemNotFoundError
+                    raise ItemNotFoundError  # lint-amnesty, pylint: disable=raise-missing-from
             else:
                 block_key = BlockKey.from_usage_key(usage_key)
                 version_guid = self.course_entry.course_key.version_guid
@@ -258,7 +257,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             )
         except Exception:  # pylint: disable=broad-except
             log.warning("Failed to load descriptor", exc_info=True)
-            return ErrorDescriptor.from_json(
+            return ErrorBlock.from_json(
                 block_data,
                 self,
                 course_entry_override.course_key.make_usage_key(
@@ -292,13 +291,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         See :meth: cms.lib.xblock.runtime.EditInfoRuntimeMixin.get_edited_by
         """
-        return xblock._edited_by
+        return xblock._edited_by  # lint-amnesty, pylint: disable=protected-access
 
     def get_edited_on(self, xblock):
         """
         See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
         """
-        return xblock._edited_on
+        return xblock._edited_on  # lint-amnesty, pylint: disable=protected-access
 
     @contract(xblock='XBlock')
     def get_subtree_edited_by(self, xblock):
@@ -382,10 +381,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 if aside.scope_ids.block_type == aside_type:
                     return aside
 
-        new_aside = super(CachingDescriptorSystem, self).get_aside_of_type(block, aside_type)
+        new_aside = super().get_aside_of_type(block, aside_type)
         new_aside._field_data = block._field_data  # pylint: disable=protected-access
 
-        for key, _ in six.iteritems(new_aside.fields):
+        for key, _ in new_aside.fields.items():
             if isinstance(key, KeyValueStore.Key) and block._field_data.has(new_aside, key):  # pylint: disable=protected-access
                 try:
                     value = block._field_data.get(new_aside, key)  # pylint: disable=protected-access

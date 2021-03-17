@@ -15,27 +15,27 @@ urlpatterns = [
         name='course_grades'
     ),
     url(
-        r'^courses/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN),
+        fr'^courses/{settings.COURSE_ID_PATTERN}/$',
         views.CourseGradesView.as_view(),
         name='course_grades'
     ),
     url(
-        r'^policy/courses/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN),
+        fr'^policy/courses/{settings.COURSE_ID_PATTERN}/$',
         views.CourseGradingPolicy.as_view(),
         name='course_grading_policy'
     ),
     url(
-        r'^gradebook/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN),
+        fr'^gradebook/{settings.COURSE_ID_PATTERN}/$',
         gradebook_views.GradebookView.as_view(),
         name='course_gradebook'
     ),
     url(
-        r'^gradebook/{course_id}/bulk-update$'.format(course_id=settings.COURSE_ID_PATTERN),
+        fr'^gradebook/{settings.COURSE_ID_PATTERN}/bulk-update$',
         gradebook_views.GradebookBulkUpdateView.as_view(),
         name='course_gradebook_bulk_update'
     ),
     url(
-        r'^gradebook/{course_id}/grading-info$'.format(course_id=settings.COURSE_ID_PATTERN),
+        fr'^gradebook/{settings.COURSE_ID_PATTERN}/grading-info$',
         gradebook_views.CourseGradingView.as_view(),
         name='course_gradebook_grading_info'
     ),

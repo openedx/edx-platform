@@ -5,18 +5,18 @@ Factories for use in tests of XBlocks.
 
 import datetime
 import functools
+import logging
 import threading
 import traceback
 from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
+from unittest.mock import patch
 
 import pymongo.message
 import pytz
-import six
 from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
-from mock import patch
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
@@ -25,10 +25,12 @@ from xmodule.course_module import Textbook
 from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
 from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
 
 
-class Dummy(object):
+LOG = logging.getLogger(__name__)
+
+
+class Dummy:
     pass
 
 
@@ -42,7 +44,7 @@ class XModuleFactoryLock(threading.local):
     will be called.
     """
     def __init__(self):
-        super(XModuleFactoryLock, self).__init__()
+        super().__init__()
         self._enabled = False
 
     def enable(self):
@@ -78,11 +80,11 @@ class XModuleFactory(Factory):
     # We have to give a model for Factory.
     # However, the class that we create is actually determined by the category
     # specified in the factory
-    class Meta(object):
+    class Meta:
         model = Dummy
 
     @lazy_attribute
-    def modulestore(self):
+    def modulestore(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         msg = "XMODULE_FACTORY_LOCK not enabled. Please use ModuleStoreTestCase as your test baseclass."
         assert XMODULE_FACTORY_LOCK.is_enabled(), msg
 
@@ -103,7 +105,7 @@ class CourseFactory(XModuleFactory):
 
     # pylint: disable=unused-argument
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create and return a new course. For performance reasons, we do not emit
         signals during this process, but if you need signals to run, you can
@@ -152,7 +154,7 @@ class SampleCourseFactory(CourseFactory):
         user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-            course = super(SampleCourseFactory, cls)._create(target_class, **kwargs)
+            course = super()._create(target_class, **kwargs)
 
             def create_sub_tree(parent_loc, block_info):
                 """Recursively creates a sub_tree on this parent_loc with this block."""
@@ -213,7 +215,7 @@ class ToyCourseFactory(SampleCourseFactory):
         }
         fields.update(kwargs)
 
-        toy_course = super(ToyCourseFactory, cls)._create(
+        toy_course = super()._create(
             target_class,
             **fields
         )
@@ -256,7 +258,7 @@ class LibraryFactory(XModuleFactory):
 
     # pylint: disable=unused-argument
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create a library with a unique name and key.
         All class attributes (from this class and base classes) are automagically
@@ -287,18 +289,18 @@ class ItemFactory(XModuleFactory):
     descriptive_tag = None
 
     @lazy_attribute_sequence
-    def display_name(self, n):
+    def display_name(self, n):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.descriptive_tag:
-            return "{} {} - {}".format(self.category, n, self.descriptive_tag)
+            return f"{self.category} {n} - {self.descriptive_tag}"
         else:
-            return "{} {}".format(self.category, n)
+            return f"{self.category} {n}"
 
     @lazy_attribute
-    def location(self):
+    def location(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         if self.display_name is None:
             dest_name = uuid4().hex
         else:
-            dest_name = self.display_name.replace(" ", "_")
+            dest_name = self.display_name.replace(" ", "_")  # lint-amnesty, pylint: disable=no-member
 
         new_location = self.parent_location.course_key.make_usage_key(
             self.category,
@@ -307,7 +309,7 @@ class ItemFactory(XModuleFactory):
         return new_location
 
     @lazy_attribute
-    def parent_location(self):
+    def parent_location(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         default_location = getattr(last_course, 'loc', None)
         try:
             parent = self.parent
@@ -322,7 +324,7 @@ class ItemFactory(XModuleFactory):
         return parent.location
 
     @classmethod
-    def _create(cls, target_class, **kwargs):
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Uses ``**kwargs``:
 
@@ -359,6 +361,9 @@ class ItemFactory(XModuleFactory):
         location = kwargs.pop('location')
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
+        has_score = kwargs.pop('has_score', None)
+        submission_start = kwargs.pop('submission_start', None)
+        submission_end = kwargs.pop('submission_end', None)
 
         # Remove the descriptive_tag, it's just for generating display_name,
         # and doesn't need to be passed into the object constructor
@@ -383,7 +388,7 @@ class ItemFactory(XModuleFactory):
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
-                if not isinstance(data, six.string_types):
+                if not isinstance(data, str):
                     data.update(template.get('data'))
 
             # replace the display name with an optional parameter passed in from the caller
@@ -401,6 +406,13 @@ class ItemFactory(XModuleFactory):
                 fields=kwargs,
             )
 
+            if has_score:
+                module.has_score = has_score
+            if submission_start:
+                module.submission_start = submission_start
+            if submission_end:
+                module.submission_end = submission_end
+
             # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
@@ -412,7 +424,7 @@ class ItemFactory(XModuleFactory):
                 store.update_item(course, user_id)
 
             # parent and publish the item, so it can be accessed
-            if 'detached' not in module._class_tags:
+            if 'detached' not in module._class_tags:  # lint-amnesty, pylint: disable=protected-access
                 parent.children.append(location)
                 store.update_item(parent, user_id)
                 if publish_item:
@@ -428,24 +440,30 @@ class ItemFactory(XModuleFactory):
 
 
 @contextmanager
-def check_exact_number_of_calls(object_with_method, method_name, num_calls):
+def check_exact_number_of_calls(object_with_method, method_name, num_calls, stack_depth=2):
     """
     Instruments the given method on the given object to verify the number of calls to the
     method is exactly equal to 'num_calls'.
     """
-    with check_number_of_calls(object_with_method, method_name, num_calls, num_calls):
+    with check_number_of_calls(object_with_method, method_name, num_calls, num_calls, stack_depth=stack_depth + 1):
         yield
 
 
-def check_number_of_calls(object_with_method, method_name, maximum_calls, minimum_calls=1):
+def check_number_of_calls(object_with_method, method_name, maximum_calls, minimum_calls=1, stack_depth=2):
     """
     Instruments the given method on the given object to verify the number of calls to the method is
     less than or equal to the expected maximum_calls and greater than or equal to the expected minimum_calls.
     """
-    return check_sum_of_calls(object_with_method, [method_name], maximum_calls, minimum_calls)
+    return check_sum_of_calls(
+        object_with_method,
+        [method_name],
+        maximum_calls,
+        minimum_calls,
+        stack_depth=stack_depth + 1
+    )
 
 
-class StackTraceCounter(object):
+class StackTraceCounter:
     """
     A class that counts unique stack traces underneath a particular stack frame.
     """
@@ -457,7 +475,7 @@ class StackTraceCounter(object):
                 when capturing a stack trace.
         """
         self.include_arguments = include_arguments
-        self._top_of_stack = traceback.extract_stack(limit=stack_depth)[0]
+        self._top_of_stack = tuple(traceback.extract_stack(limit=stack_depth + 1)[0])
 
         if self.include_arguments:
             self._stacks = defaultdict(lambda: defaultdict(int))
@@ -486,13 +504,13 @@ class StackTraceCounter(object):
                 try:
                     safe_args.append(repr(arg))
                 except Exception as exc:
-                    safe_args.append('<un-repr-able value: {}'.format(exc))
+                    safe_args.append(f'<un-repr-able value: {exc}')
             safe_kwargs = {}
             for key, kwarg in kwargs.items():
                 try:
                     safe_kwargs[key] = repr(kwarg)
                 except Exception as exc:
-                    safe_kwargs[key] = '<un-repr-able value: {}'.format(exc)
+                    safe_kwargs[key] = f'<un-repr-able value: {exc}'
 
             self._stacks[tuple(stack)][tuple(safe_args), tuple(safe_kwargs.items())] += 1
         else:
@@ -540,7 +558,7 @@ class StackTraceCounter(object):
                 to the captured function).
 
         """
-        stacks = StackTraceCounter(stack_depth, include_arguments)
+        stacks = StackTraceCounter(stack_depth + 1, include_arguments)
 
         @functools.wraps(func)
         def capture(*args, **kwargs):
@@ -553,7 +571,7 @@ class StackTraceCounter(object):
 
 
 @contextmanager
-def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include_arguments=True):
+def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include_arguments=True, stack_depth=1):
     """
     Instruments the given methods on the given object to verify that the total sum of calls made to the
     methods falls between minumum_calls and maximum_calls.
@@ -562,7 +580,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
     mocks = {
         method: StackTraceCounter.capture_call(
             getattr(object_, method),
-            stack_depth=7,
+            stack_depth=stack_depth + 3,  # dictcomp + check_sum_of_calls + contextmanager
             include_arguments=include_arguments
         )
         for method in methods
@@ -573,6 +591,7 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
 
     call_count = sum(capture_fn.stack_counter.total_calls for capture_fn in mocks.values())
 
+    messages = []
     # Assertion errors don't handle multi-line values, so pretty-print to std-out instead
     if not minimum_calls <= call_count <= maximum_calls:
         messages = ["Expected between {} and {} calls, {} were made.\n\n".format(
@@ -592,17 +611,12 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
                 messages.append("\n\n")
                 if include_arguments:
                     for (args, kwargs), count in stack_counter[stack].items():
-                        messages.append("      called {} times with:\n".format(count))
-                        messages.append("      args: {}\n".format(args))
+                        messages.append(f"      called {count} times with:\n")
+                        messages.append(f"      args: {args}\n")
                         messages.append("      kwargs: {}\n\n".format(dict(kwargs)))
 
-        print("".join(messages))
-
-    # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-    assert call_count >= minimum_calls, call_count
-
-    # now verify the number of actual calls is less than (or equal to) the expected maximum
-    assert call_count <= maximum_calls, call_count
+    # verify that we called the methods within the desired range
+    assert minimum_calls <= call_count <= maximum_calls, "".join(messages)
 
 
 def mongo_uses_error_check(store):
@@ -610,12 +624,12 @@ def mongo_uses_error_check(store):
     Does mongo use the error check as a separate message?
     """
     if hasattr(store, 'modulestores'):
-        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+        return any(mongo_uses_error_check(substore) for substore in store.modulestores)
     return False
 
 
 @contextmanager
-def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None):
+def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None, stack_depth=2):
     """
     Instruments the given store to count the number of calls to find (incl find_one and count_documents) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
@@ -631,6 +645,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
         ['find', 'count_documents'],
         max_finds,
         min_finds,
+        stack_depth=stack_depth + 2
     ):
         if max_sends is not None or min_sends is not None:
             with check_sum_of_calls(
@@ -639,6 +654,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
                 ['insert_one', 'replace_one', 'update_one', 'bulk_write', '_delete'],
                 max_sends if max_sends is not None else float("inf"),
                 min_sends if min_sends is not None else 0,
+                stack_depth=stack_depth + 2  # check_mongo_calls_range + context_manager
             ):
                 yield
         else:
@@ -646,7 +662,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
 
 
 @contextmanager
-def check_mongo_calls(num_finds=0, num_sends=None):
+def check_mongo_calls(num_finds=0, num_sends=None, stack_depth=2):
     """
     Instruments the given store to count the number of calls to find (incl find_one) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
@@ -656,7 +672,13 @@ def check_mongo_calls(num_finds=0, num_sends=None):
     :param num_sends: If none, don't instrument the send calls. If non-none, count and compare to
         the given int value.
     """
-    with check_mongo_calls_range(num_finds, num_finds, num_sends, num_sends):
+    with check_mongo_calls_range(
+        num_finds,
+        num_finds,
+        num_sends,
+        num_sends,
+        stack_depth=stack_depth + 2  # check_mongo_calls + contextmanager
+    ):
         yield
 
 # This dict represents the attribute keys for a course's 'about' info.
@@ -676,7 +698,7 @@ class CourseAboutFactory(XModuleFactory):
     """
 
     @classmethod
-    def _create(cls, target_class, **kwargs):  # pylint: disable=unused-argument
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Uses **kwargs:
 

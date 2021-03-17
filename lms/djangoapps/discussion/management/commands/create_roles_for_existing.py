@@ -8,11 +8,11 @@ Enrollments.
 
 from django.core.management.base import BaseCommand
 
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role_on_enrollment
-from student.models import CourseEnrollment
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
     help = 'Seed default permisssions and roles.'
 
     def handle(self, *args, **options):
@@ -20,5 +20,5 @@ class Command(BaseCommand):
         for i, enrollment in enumerate(CourseEnrollment.objects.filter(is_active=1), start=1):
             assign_default_role_on_enrollment(None, enrollment)
             if i % 1000 == 0:
-                print('{0}...'.format(i), end=' ')
+                print(f'{i}...', end=' ')
         print()

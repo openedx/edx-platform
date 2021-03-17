@@ -1,8 +1,8 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-from contentstore.views.helpers import xblock_studio_url
-from contentstore.utils import is_visible_to_specific_partition_groups
+from cms.djangoapps.contentstore.views.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.utils import is_visible_to_specific_partition_groups
 from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string

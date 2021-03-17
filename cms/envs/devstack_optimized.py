@@ -19,7 +19,7 @@ invoked each time that changes have been made.
 """
 
 
-import os
+import os  # lint-amnesty, pylint: disable=unused-import
 
 ########################## Devstack settings ###################################
 

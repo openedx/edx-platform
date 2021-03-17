@@ -11,9 +11,14 @@ from django.contrib import admin
 from django.core.mail import send_mail
 from django.dispatch import receiver
 
-from course_creators.models import CourseCreator, send_admin_notification, send_user_notification, update_creator_state
-from course_creators.views import update_course_creator_group
-from edxmako.shortcuts import render_to_string
+from cms.djangoapps.course_creators.models import (
+    CourseCreator,
+    send_admin_notification,
+    send_user_notification,
+    update_creator_state
+)
+from cms.djangoapps.course_creators.views import update_course_creator_group
+from common.djangoapps.edxmako.shortcuts import render_to_string
 
 log = logging.getLogger("studio.coursecreatoradmin")
 
@@ -75,7 +80,7 @@ admin.site.register(CourseCreator, CourseCreatorAdmin)
 
 
 @receiver(update_creator_state, sender=CourseCreator)
-def update_creator_group_callback(sender, **kwargs):
+def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Callback for when the model's creator status has changed.
     """
@@ -85,7 +90,7 @@ def update_creator_group_callback(sender, **kwargs):
 
 
 @receiver(send_user_notification, sender=CourseCreator)
-def send_user_notification_callback(sender, **kwargs):
+def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Callback for notifying user about course creator status change.
     """
@@ -108,12 +113,12 @@ def send_user_notification_callback(sender, **kwargs):
 
     try:
         user.email_user(subject, message, studio_request_email)
-    except:
-        log.warning(u"Unable to send course creator status e-mail to %s", user.email)
+    except:  # lint-amnesty, pylint: disable=bare-except
+        log.warning("Unable to send course creator status e-mail to %s", user.email)
 
 
 @receiver(send_admin_notification, sender=CourseCreator)
-def send_admin_notification_callback(sender, **kwargs):
+def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Callback for notifying admin of a user in the 'pending' state.
     """
@@ -135,4 +140,4 @@ def send_admin_notification_callback(sender, **kwargs):
             fail_silently=False
         )
     except SMTPException:
-        log.warning(u"Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
+        log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)

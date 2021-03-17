@@ -71,9 +71,6 @@ else
             # Run quality task. Pass in the 'fail-under' percentage to diff-quality
             paver run_quality -p 100 || EXIT=1
 
-            echo "Running code complexity report (python)."
-            paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
-
             exit $EXIT
             ;;
 
