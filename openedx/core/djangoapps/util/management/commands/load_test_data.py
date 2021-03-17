@@ -11,7 +11,7 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 
 class Command(BaseCommand):
     """
-    Created to help test how factoryboy works to add data to database
+    Use to populate your database with some essential basic data
     """
 
     def add_arguments(self, parser):
@@ -24,13 +24,19 @@ class Command(BaseCommand):
         if 'users' in data_spec:
             self.create_users(data_spec['users'])
         if 'enrollments' in data_spec:
-            self.create_enrollment(data_spec['enrollments'])
+            self.create_enrollments(data_spec['enrollments'])
 
     def create_users(self, users):
+        """
+        Use to create users in your database.
+        """
         for user in data_spec['users']:
             UserFactory.create(**user)
 
-    def create_enrollment(self, enrollments):
+    def create_enrollments(self, enrollments):
+        """
+        Use to create enrollments in your database.
+        """
         User = get_user_model()
         for enrollment_spec in enrollments:
             try:
