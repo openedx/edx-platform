@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.conf.urls import url
 from django.conf import settings
 from django.template.response import TemplateResponse
+from django.utils.html import format_html
 from hijack_admin.admin import HijackUserAdminMixin
 from ratelimitbackend import admin
 from student.admin import UserAdmin
 
-from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from organizations.models import UserOrganizationMapping
 
@@ -24,7 +24,7 @@ from openedx.core.djangoapps.appsembler.sites.utils import (
 class TahoeUserAdmin(UserAdmin, HijackUserAdminMixin):
     list_display = UserAdmin.list_display + (
         'hijack_field',
-        'make_amc_admin_action',
+        'amc_actions',
     )
 
     def get_urls(self):
@@ -36,12 +36,11 @@ class TahoeUserAdmin(UserAdmin, HijackUserAdminMixin):
             ),
         ] + super(UserAdmin, self).get_urls()
 
-    def make_amc_admin_action(self, obj):
-        return HTML('<a class="button" href="{href}">AMC Admin Form</a> ').format(
-            href=Text(reverse('admin:make-amc-admin', args=[obj.id])),
+    def amc_actions(self, obj):
+        return format_html(
+            '<a class="button" href="{href}">AMC Admin Form</a> ',
+            href=reverse('admin:make-amc-admin', args=[obj.id])
         )
-    make_amc_admin_action.short_description = 'AMC Actions'
-    make_amc_admin_action.allow_tags = True
 
     def process_make_amc_admin(self, request, user_id, *args, **kwargs):
         user = self.get_object(request, user_id)

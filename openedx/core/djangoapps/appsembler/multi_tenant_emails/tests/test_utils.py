@@ -48,12 +48,12 @@ def with_organization_context(site_color, configs=None):
             yield org
 
 
-def create_org_user(organization, **kwargs):
+def create_org_user(organization, is_amc_admin=False, **kwargs):
     """
     Create one user and save it to the database.
     """
     user = UserFactory.create(**kwargs)
-    UserOrganizationMapping.objects.create(user=user, organization=organization)
+    UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=is_amc_admin)
     return user
 
 

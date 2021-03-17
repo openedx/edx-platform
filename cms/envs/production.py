@@ -531,6 +531,17 @@ RETIREMENT_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
 ############### Settings for edx-rbac  ###############
 SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_WIDE_ROLE_CLASSES
 
+
+### Appsembler customization - Studio local login ###
+if FEATURES.get('STUDIO_LOCAL_LOGIN'):
+    CMS_ROOT_URL = '//localhost:18010'
+    LOGIN_URL = reverse_lazy('login')
+    FRONTEND_LOGIN_URL = lambda settings: settings.CMS_ROOT_URL + '/login'
+    derived('FRONTEND_LOGIN_URL')
+    FRONTEND_LOGOUT_URL = lambda settings: settings.CMS_ROOT_URL + '/logout/'
+    derived('FRONTEND_LOGOUT_URL')
+    LOGOUT_REDIRECT_URL = reverse_lazy('home')
+
 ####################### Plugin Settings ##########################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded

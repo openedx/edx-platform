@@ -8,6 +8,8 @@ import ddt
 import mock
 import six
 
+from django.conf import settings
+
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -367,9 +369,10 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
         ('credit', True),
         ('masters', True),
         ('audit', False),
-        ('honor', False),
+        ('honor', True),  # TAHOE_AUTO_GENERATE_HONOR_CERTS feature: allows for honor
     )
     @ddt.unpack
+    @mock.patch.dict(settings.FEATURES, {'TAHOE_AUTO_GENERATE_HONOR_CERTS': True})
     def test_fire_ungenerated_certificate_task_allowed_modes(self, enrollment_mode, should_create):
         """
         Test that certificate generation task is fired for only modes that are

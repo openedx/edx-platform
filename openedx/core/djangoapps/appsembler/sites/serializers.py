@@ -1,3 +1,4 @@
+import beeline
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import transaction
@@ -34,7 +35,9 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
         model = SiteConfiguration
         fields = ('id', 'values', 'sassVariables', 'pageElements')
 
+    @beeline.traced(name="SiteConfigurationSerializer.update")
     def update(self, instance, validated_data):
+        beeline.add_context_field("validated_data", validated_data)
         object = super(SiteConfigurationSerializer, self).update(instance, validated_data)
         return object
 
@@ -51,13 +54,17 @@ class AlternativeDomainSerializer(serializers.ModelSerializer):
         model = AlternativeDomain
         fields = ('id', 'site', 'domain')
 
+    @beeline.traced(name="AlternativeDomainSerializer.create")
     def create(self, validated_data):
         """
         Allow only one alternative domain per Site model.
         """
+        beeline.add_context_field("validated_data", validated_data)
         domain, created = AlternativeDomain.objects.get_or_create(
             site=validated_data.get('site', None),
             defaults={'domain': validated_data.get('domain', None)})
+        beeline.add_context_field("domain", domain)
+        beeline.add_context_field("created", created)
         if not created:
             domain.domain = validated_data.get('domain', None)
             domain.save()
@@ -73,11 +80,14 @@ class SiteSerializer(serializers.ModelSerializer):
         model = Site
         fields = ('id', 'name', 'domain', 'configuration', 'alternativeDomain', 'customDomainStatus')
 
+    @beeline.traced(name="SiteSerializer.create")
     def create(self, validated_data):
+        beeline.add_context_field("validated_data", validated_data)
         site = super(SiteSerializer, self).create(validated_data)
-        organization, site, user = bootstrap_site(site)
+        _organization, site, _user = bootstrap_site(site)
         return site
 
+    @beeline.traced(name="SiteSerializer.custom_domain_status")
     def custom_domain_status(self, obj):
         if not hasattr(obj, 'alternative_domain'):
             return 'inactive'
@@ -89,7 +99,9 @@ class OrganizationSerializer(serializers.ModelSerializer):
         model = Organization
         fields = ('id', 'name', 'short_name', 'edx_uuid')
 
+    @beeline.traced(name="OrganizationSerializer.create")
     def create(self, validated_data):
+        beeline.add_context_field("validated_data", validated_data)
         return organizations_api.add_organization(**validated_data)
 
 
@@ -101,7 +113,9 @@ class RegistrationSerializer(serializers.Serializer):
     password = serializers.CharField(required=False)
     initial_values = serializers.DictField(required=False)
 
+    @beeline.traced(name="RegistrationSerializer.create")
     def create(self, validated_data):
+        beeline.add_context_field('validated_data', validated_data)
         site_data = validated_data.pop('site')
         site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
@@ -143,6 +157,8 @@ class RegistrationSerializer(serializers.Serializer):
 
         # clone course
         if settings.FEATURES.get("APPSEMBLER_IMPORT_DEFAULT_COURSE_ON_SITE_CREATION", False):
+            beeline.add_context_field("default_course_on_site_creation_flag", True)
+
             def import_task_on_commit():
                 """
                 Run the import task after the commit to avoid Organization.DoesNotExist error on the Celery.

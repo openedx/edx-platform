@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from openedx.core.djangoapps.appsembler.sites.permissions import AMCAdminPermission
 
 from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
+    BearerAuthenticationAllowInactiveUser,
 )
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from openedx.core.djangoapps.appsembler.tpa_admin.serializers import (
@@ -25,7 +25,7 @@ class SAMLConfigurationViewSet(viewsets.ModelViewSet):
     model = SAMLConfiguration
     queryset = SAMLConfiguration.objects.current_set().order_by('id')
     serializer_class = SAMLConfigurationSerializer
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
     filterset_class = SAMLConfigurationFilter
 
@@ -50,7 +50,7 @@ class SAMLConfigurationSiteDetail(generics.RetrieveAPIView):
 class SAMLProviderConfigViewSet(viewsets.ModelViewSet):
     queryset = SAMLProviderConfig.objects.current_set().order_by('id')
     serializer_class = SAMLProviderConfigSerializer
-    authentication_classes = (OAuth2AuthenticationAllowInactiveUser,)
+    authentication_classes = (BearerAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated, AMCAdminPermission)
     filterset_class = SAMLProviderConfigFilter
 

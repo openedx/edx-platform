@@ -16,7 +16,7 @@ from testfixtures import LogCapture
 
 from student.tests.factories import UserFactory
 
-if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:
+if not settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS:  # TODO: Refactor or fix in RED-1674
     # TODO: Fix broken imports See https://openedx.atlassian.net/browse/DEPR-47
     from edx_oauth2_provider.models import TrustedClient
     from edx_oauth2_provider.tests.factories import (
@@ -176,7 +176,7 @@ class TestLoginHelper(TestCase):
 
 
 @unittest.skipIf(
-    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,
+    settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Refactor or fix in RED-1674
     'edX removed TrustedClient See https://openedx.atlassian.net/browse/DEPR-47'
 )
 class TestDestroyOAuthTokensHelper(TestCase):
