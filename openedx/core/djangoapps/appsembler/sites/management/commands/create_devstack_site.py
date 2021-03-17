@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             'name',
-            help='A slug for the username and used as a site name prefix e.g. something.localhost:18000',
+            help='A slug for the username and used as a site name prefix e.g. something.devstack.tahoe:18000',
             nargs=1,
             type=str,
         )
@@ -69,7 +69,7 @@ class Command(BaseCommand):
         if User.objects.filter(username=name).exists():
             raise CommandError('User exists with the username: "{}". Please choose another name.'.format(name))
 
-        domain = '{}.localhost'.format(name)
+        domain = '{}.devstack.tahoe'.format(name)
         site_name = '{}:18000'.format(domain)
 
         user = User.objects.create_user(
