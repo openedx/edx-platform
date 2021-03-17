@@ -18,6 +18,8 @@ from opaque_keys.edx.locator import UsageKey
 from six import text_type
 from six.moves import range, zip
 
+from django.test.utils import override_settings
+
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.factories import InstructorFactory
@@ -284,3 +286,36 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(len(proctored_exam_attempts), 3)
         for proctored_exam_attempt in proctored_exam_attempts:
             self.assertEqual(set(proctored_exam_attempt.keys()), set(query_features))
+
+    ################ EOL ###############################################
+    @override_settings(UCHILEEDXLOGIN_TASK_RUN_ENABLE=True)
+    def test_enrolled_students_features_keys_with_run(self):
+        try:
+            from unittest.case import SkipTest
+            from uchileedxlogin.models import EdxLoginUser
+        except ImportError:
+            self.skipTest("import error uchileedxlogin")
+        runs = ('run',)
+        query_features = ('run', 'username', 'name', 'email', 'city', 'country',)
+        for user in self.users:
+            EdxLoginUser.objects.create(user=user, run='000000000{}'.format(user.id))
+            user.profile.city = "Mos Eisley {}".format(user.id)
+            user.profile.country = "Tatooine {}".format(user.id)
+            user.profile.save()
+        for feature in query_features:
+            self.assertIn(feature, AVAILABLE_FEATURES + runs)
+        with self.assertNumQueries(2):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        self.assertEqual(len(userreports), len(self.users))
+
+        userreports = sorted(userreports, key=lambda u: u["username"])
+        users = sorted(self.users, key=lambda u: u.username)
+        for userreport, user in zip(userreports, users):
+            aux = EdxLoginUser.objects.get(user=user)
+            self.assertEqual(set(userreport.keys()), set(query_features))
+            self.assertEqual(userreport['username'], user.username)
+            self.assertEqual(userreport['email'], user.email)
+            self.assertEqual(userreport['name'], user.profile.name)
+            self.assertEqual(userreport['city'], user.profile.city)
+            self.assertEqual(userreport['country'], user.profile.country)
+            self.assertEqual(userreport['run'], aux.run)        

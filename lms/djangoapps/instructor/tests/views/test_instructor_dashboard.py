@@ -170,6 +170,28 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
                 self.assertContains(response, download_section)
             else:
                 self.assertNotContains(response, download_section)
+            
+    #### EOL ####
+    def test_data_download_eol(self):
+        """
+        Verify that the xblockcompletion report is visible
+        """
+        from lms.djangoapps.instructor.views.instructor_dashboard import _section_data_download
+        user = UserFactory.create(is_staff=True)
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='staff',
+            org=self.course.id.org
+        )
+        self.client.login(username=user.username, password="test")
+        response = _section_data_download(self.course, {})
+        try:
+            from xblockcompletion import views
+            self.assertTrue(response['has_xblockcompletion'])
+        except ImportError:
+            self.assertFalse(response['has_xblockcompletion'])
+    #### EOL ####
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
