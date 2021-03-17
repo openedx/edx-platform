@@ -383,6 +383,9 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
         filename = arguments_dict['archive_name']
         return f'Import of {key} from {filename}'
 
+    def add_artifect(self, message):
+        return UserTaskArtifact.objects.create(status=self.status, name='Error', text=message)
+
 
 @shared_task(base=CourseImportTask, bind=True)
 # Note: The decorator @set_code_owner_attribute could not be used because  # lint-amnesty, pylint: disable=too-many-statements
@@ -439,6 +442,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             LOGGER.info('Course import %s: Uploaded file %s not found', courselike_key, archive_path)
             with translation_language(language):
                 self.status.fail(_('Tar file not found'))
+                self.add_artifect('Tar file not found')
+
             return
         with course_import_export_storage.open(archive_path, 'rb') as source:
             with open(temp_filepath, 'wb') as destination:

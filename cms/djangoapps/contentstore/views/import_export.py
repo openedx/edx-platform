@@ -70,14 +70,7 @@ def import_handler(request, course_key_string):
     """
     courselike_key = CourseKey.from_string(course_key_string)
     library = isinstance(courselike_key, LibraryLocator)
-    if library:
-        successful_url = reverse_library_url('library_handler', courselike_key)
-        context_name = 'context_library'
-        courselike_module = modulestore().get_library(courselike_key)
-    else:
-        successful_url = reverse_course_url('course_handler', courselike_key)
-        context_name = 'context_course'
-        courselike_module = modulestore().get_course(courselike_key)
+
     if not has_course_author_access(request.user, courselike_key):
         raise PermissionDenied()
 
@@ -87,6 +80,16 @@ def import_handler(request, course_key_string):
         else:
             return _write_chunk(request, courselike_key)
     elif request.method == 'GET':  # assume html
+        is_library = isinstance(courselike_key, LibraryLocator)
+        if is_library:
+            successful_url = reverse_library_url('library_handler', courselike_key)
+            context_name = 'context_library'
+            courselike_module = modulestore().get_library(courselike_key)
+        else:
+            successful_url = reverse_course_url('course_handler', courselike_key)
+            context_name = 'context_course'
+            courselike_module = modulestore().get_course(courselike_key)
+
         status_url = reverse_course_url(
             "import_status_handler", courselike_key, kwargs={'filename': "fillerName"}
         )
@@ -120,7 +123,9 @@ def _write_chunk(request, courselike_key):
     data_root = path(settings.GITHUB_REPO_ROOT)
     subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
     course_dir = data_root / subdir
-    filename = request.FILES['course-data'].name
+    import_file = request.FILES['course-data']
+    filename = import_file.name
+    temp_filepath = course_dir / filename
 
     courselike_string = str(courselike_key) + filename
     # Do everything in a try-except block to make sure everything is properly cleaned up.
@@ -138,7 +143,6 @@ def _write_chunk(request, courselike_key):
                 status=415
             )
 
-        temp_filepath = course_dir / filename
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
@@ -181,7 +185,7 @@ def _write_chunk(request, courselike_key):
                 return JsonResponse({'ImportStatus': 1})
 
         with open(temp_filepath, mode) as temp_file:
-            for chunk in request.FILES['course-data'].chunks():
+            for chunk in import_file.chunks():
                 temp_file.write(chunk)
 
         size = os.path.getsize(temp_filepath)
@@ -244,6 +248,8 @@ def import_status_handler(request, course_key_string, filename=None):
         4 : Import successful
 
     """
+    status = 0
+    message = ''
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
@@ -261,15 +267,16 @@ def import_status_handler(request, course_key_string, filename=None):
             session_status = request.session["import_status"]
             status = session_status[course_key_string + filename]
         except KeyError:
-            status = 0
+            pass
     elif task_status.state == UserTaskStatus.SUCCEEDED:
         status = 4
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
+        message = list(task_status.artifacts.all().values_list('text', flat=True))
         status = max(-(task_status.completed_steps + 1), -3)
     else:
         status = min(task_status.completed_steps + 1, 3)
 
-    return JsonResponse({"ImportStatus": status})
+    return JsonResponse({"ImportStatus": status, "message": message})
 
 
 def send_tarball(tarball, size):

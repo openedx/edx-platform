@@ -25,7 +25,7 @@ define(
             ERROR: 4
         };
 
-        var current = {stage: 0, state: STATE.READY};
+        var current = {stage: STAGE.UPLOADING, state: STATE.READY, message: ''};
         var deferred = null;
         var file = {name: null, url: null};
         var timeout = {id: null, delay: 1000};
@@ -250,7 +250,7 @@ define(
                 if (current.stage === STAGE.SUCCESS) {
                     success();
                 } else if (current.stage < STAGE.UPLOADING) { // Failed
-                    error(gettext('Error importing course'));
+                    error(gettext(current.message || 'Error importing course'));
                 } else { // In progress
                     updateFeedbackList();
 
@@ -295,7 +295,7 @@ define(
                         this.pollStatus(current.stage);
                     } else {
                         // An import in the upload stage cannot be resumed
-                        error(gettext('There was an error with the upload'));
+                        error(gettext(current.message || 'There was an error with the upload'));
                     }
                 }.bind(this));
 
