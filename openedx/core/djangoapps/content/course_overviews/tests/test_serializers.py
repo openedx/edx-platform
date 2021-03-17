@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 CourseOverviewSerializer tests
 """
@@ -16,7 +15,7 @@ class TestCourseOverviewSerializer(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseOverviewSerializer, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         CourseOverviewFactory.create()
 
     def test_get_course_overview_serializer(self):

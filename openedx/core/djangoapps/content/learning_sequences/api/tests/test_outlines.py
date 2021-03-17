@@ -4,6 +4,7 @@ models for this app.
 """
 from datetime import datetime, timezone
 from unittest import TestCase
+from unittest.mock import patch
 
 import pytest
 import attr
@@ -1171,7 +1172,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(SequentialVisibilityTestCase, cls).setUpTestData()
+        super().setUpTestData()
 
         cls.global_staff = User.objects.create_user('global_staff', email='gstaff@example.com', is_staff=True)
         cls.student = User.objects.create_user('student', email='student@example.com', is_staff=False)
@@ -1242,7 +1243,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert all(((not is_accessible) for is_accessible in is_sequence_accessible)),\
+                    assert all((not is_accessible) for is_accessible in is_sequence_accessible),\
                         "Sequences shouldn't be accessible to anonymous or " \
                         "non-enrolled students for a public_outline course"
                 else:
