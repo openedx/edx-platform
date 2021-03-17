@@ -167,7 +167,7 @@ class LibraryRootView(APIView):
             ensure_organization(org_name)
         except InvalidOrganizationException:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                detail={"org": "No such organization '{}' found.".format(org_name)}
+                detail={"org": f"No such organization '{org_name}' found."}
             )
         org = Organization.objects.get(short_name=org_name)
         try:

@@ -1,11 +1,11 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
-from collections import defaultdict, OrderedDict  # lint-amnesty, pylint: disable=unused-import
+from collections import defaultdict  # lint-amnesty, pylint: disable=unused-import
 from datetime import datetime, timedelta
 
 from django.contrib.auth import get_user_model
 from edx_when.api import get_dates_for_course
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 

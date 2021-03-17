@@ -23,7 +23,7 @@ class ContentLibrariesConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.CMS: {
                 # The namespace to provide to django's urls.include.
-                PluginURLs.NAMESPACE: u'content_libraries',
+                PluginURLs.NAMESPACE: 'content_libraries',
             },
         },
         PluginSettings.CONFIG: {

@@ -6,17 +6,16 @@ Tests for StaticContentServer
 import copy
 
 import datetime
-import ddt
-import logging  # lint-amnesty, pylint: disable=wrong-import-order
-import six
-import unittest  # lint-amnesty, pylint: disable=wrong-import-order
-from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
+import logging
+import unittest
+from unittest.mock import patch
+from uuid import uuid4
 
+import ddt
 from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
-from mock import patch
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
@@ -62,7 +61,7 @@ def get_old_style_versioned_asset_url(asset_path):
     try:
         locator = StaticContent.get_location_from_path(asset_path)
         content = AssetManager.find(locator, as_stream=True)
-        return u'{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, content.content_digest, asset_path)
+        return f'{VERSIONED_ASSETS_PREFIX}/{content.content_digest}{asset_path}'
     except (InvalidKeyError, ItemNotFoundError):
         pass
 
@@ -78,7 +77,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(ContentStoreToyCourseTest, cls).setUpClass()
+        super().setUpClass()
 
         cls.contentstore = contentstore()
         cls.modulestore = modulestore()
@@ -92,14 +91,14 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = six.text_type(cls.locked_asset)
+        cls.url_locked = str(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = six.text_type(cls.unlocked_asset)
+        cls.url_unlocked = str(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
@@ -108,7 +107,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         Create user and login.
         """
-        super(ContentStoreToyCourseTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.staff_usr = AdminFactory.create()
         self.non_staff_usr = UserFactory.create()
 
@@ -220,8 +219,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         assert resp.status_code == 206
         # HTTP_206_PARTIAL_CONTENT
         assert resp['Content-Range'] ==\
-               u'bytes {first}-{last}/{length}'.format(first=0, last=(self.length_unlocked - 1),
-                                                       length=self.length_unlocked)
+               'bytes {first}-{last}/{length}'.format(first=0, last=(self.length_unlocked - 1),
+                                                      length=self.length_unlocked)
         assert resp['Content-Length'] == str(self.length_unlocked)
 
     def test_range_request_partial_file(self):
@@ -237,10 +236,10 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         assert resp.status_code == 206
         # HTTP_206_PARTIAL_CONTENT
-        assert resp['Content-Range'] == u'bytes {first}-{last}/{length}'.format(first=first_byte,
-                                                                                last=last_byte,
-                                                                                length=self.length_unlocked)
-        assert resp['Content-Length'] == str(((last_byte - first_byte) + 1))
+        assert resp['Content-Range'] == 'bytes {first}-{last}/{length}'.format(first=first_byte,
+                                                                               last=last_byte,
+                                                                               length=self.length_unlocked)
+        assert resp['Content-Length'] == str((last_byte - first_byte) + 1)
 
     def test_range_request_multiple_ranges(self):
         """
@@ -413,7 +412,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(ParseRangeHeaderTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.content_length = 10000
 
     def test_bytes_unit(self):

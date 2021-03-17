@@ -1,11 +1,10 @@
 """
 Tests for transformers.py
 """
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 import pytest
-from unittest import TestCase
-
-from mock import MagicMock, patch
 
 from ..block_structure import BlockStructureModulestoreData
 from ..exceptions import TransformerDataIncompatible, TransformerException
@@ -25,7 +24,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     def setUp(self):
-        super(TestBlockStructureTransformers, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.transformers = BlockStructureTransformers(usage_info=MagicMock())
         self.registered_transformers = [MockTransformer(), MockFilteringTransformer()]
 

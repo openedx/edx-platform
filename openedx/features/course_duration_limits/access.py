@@ -41,8 +41,8 @@ class AuditExpiredError(AccessError):
                                                 ' for expired on {expiration_date}').format(
                 expiration_date=expiration_date
             )
-        super().__init__(error_code, developer_message, user_message,
-                                                additional_context_user_message)
+        # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(error_code, developer_message, user_message, additional_context_user_message)
 
 
 def get_user_course_duration(user, course):

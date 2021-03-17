@@ -1,7 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
-import mock
-import six
+from unittest import mock
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -12,7 +11,7 @@ from ..tasks import enqueue_async_course_overview_update_tasks
 
 class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(BatchedAsyncCourseOverviewUpdateTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.course_2 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.course_3 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
@@ -33,7 +32,7 @@ class BatchedAsyncCourseOverviewUpdateTests(ModuleStoreTestCase):  # lint-amnest
     @mock.patch('openedx.core.djangoapps.content.course_overviews.models.CourseOverview.update_select_courses')
     def test_enqueue_specific_courses_in_two_batches(self, mock_update_courses):
         enqueue_async_course_overview_update_tasks(
-            course_ids=[six.text_type(self.course_1.id), six.text_type(self.course_2.id)],
+            course_ids=[str(self.course_1.id), str(self.course_2.id)],
             force_update=True,
             chunk_size=1,
             all_courses=False

@@ -7,15 +7,13 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import Optional, List  # lint-amnesty, pylint: disable=unused-import
-
-import attr  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db import transaction
-from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.locator import LibraryLocator
+from edx_django_utils.cache import TieredCache  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 
 from ..data import (
@@ -28,6 +26,7 @@ from ..data import (
     UserCourseOutlineData,
     UserCourseOutlineDetailsData,
     VisibilityData,
+
 )
 from ..models import (
     ContentError,
@@ -205,7 +204,7 @@ def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
     except LearningContext.DoesNotExist:
         # Could happen if it hasn't been published.
         raise CourseOutlineData.DoesNotExist(  # lint-amnesty, pylint: disable=raise-missing-from
-            "No CourseOutlineData for {}".format(course_key)
+            f"No CourseOutlineData for {course_key}"
         )
     return course_context
 
@@ -314,7 +313,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         processor.load_data()
         if not user_can_see_all_content:
             # function_trace lets us see how expensive each processor is being.
-            with function_trace('learning_sequences.api.outline_processors.{}'.format(name)):
+            with function_trace(f'learning_sequences.api.outline_processors.{name}'):
                 processor_usage_keys_removed = processor.usage_keys_to_remove(full_course_outline)
                 processor_inaccessible_sequences = processor.inaccessible_sequences(full_course_outline)
                 usage_keys_to_remove |= processor_usage_keys_removed

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Block for testing variously scoped XBlock fields.
 """

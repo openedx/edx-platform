@@ -2,20 +2,17 @@
 Unit tests for Block Structure models.
 """
 # pylint: disable=protected-access
-
-import pytest
 import errno
 from itertools import product
 from uuid import uuid4
+from unittest.mock import Mock, patch
 
 import ddt
-import six
-from six.moves import range
+import pytest
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
-from mock import Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from ..exceptions import BlockStructureNotFound
@@ -28,22 +25,22 @@ class BlockStructureModelTestCase(TestCase):
     Tests for BlockStructureModel.
     """
     def setUp(self):
-        super(BlockStructureModelTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
+        super().setUp()
+        self.course_key = CourseLocator('org', 'course', str(uuid4()))
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
 
         self.params = self._create_bsm_params()
 
     def tearDown(self):
         BlockStructureModel._prune_files(self.usage_key, num_to_keep=0)
-        super(BlockStructureModelTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def _assert_bsm_fields(self, bsm, expected_serialized_data):
         """
         Verifies that the field values and serialized data
         on the given bsm are as expected.
         """
-        for field_name, field_value in six.iteritems(self.params):
+        for field_name, field_value in self.params.items():
             assert field_value == getattr(bsm, field_name)
 
         assert bsm.get_serialized_data().decode('utf-8') == expected_serialized_data
@@ -65,7 +62,7 @@ class BlockStructureModelTestCase(TestCase):
             data_version='DV',
             data_edit_timestamp=now(),
             transformers_schema_version='TV',
-            block_structure_schema_version=six.text_type(1),
+            block_structure_schema_version=str(1),
         )
 
     def _verify_update_or_create_call(self, serialized_data, mock_log=None, expect_created=None):
@@ -139,7 +136,7 @@ class BlockStructureModelTestCase(TestCase):
             return_value=prune_keep_count,
         ):
             for x in range(num_prior_edits):
-                self._verify_update_or_create_call('data_{}'.format(x))
+                self._verify_update_or_create_call(f'data_{x}')
 
             if num_prior_edits:
                 self._assert_file_count_equal(min(num_prior_edits, prune_keep_count))
@@ -148,12 +145,12 @@ class BlockStructureModelTestCase(TestCase):
             self._assert_file_count_equal(min(num_prior_edits + 1, prune_keep_count))
 
     @ddt.data(
-        (IOError, errno.ENOENT, u'No such file or directory', BlockStructureNotFound, True),
-        (IOError, errno.ENOENT, u'No such file or directory', IOError, False),
+        (IOError, errno.ENOENT, 'No such file or directory', BlockStructureNotFound, True),
+        (IOError, errno.ENOENT, 'No such file or directory', IOError, False),
         (SuspiciousOperation, None, None, BlockStructureNotFound, True),
         (SuspiciousOperation, None, None, SuspiciousOperation, False),
-        (OSError, errno.EACCES, u'Permission denied', OSError, True),
-        (OSError, errno.EACCES, u'Permission denied', OSError, False),
+        (OSError, errno.EACCES, 'Permission denied', OSError, True),
+        (OSError, errno.EACCES, 'Permission denied', OSError, False),
     )
     @ddt.unpack
     def test_error_handling(self, error_raised_in_operation, errno_raised, message_raised,
@@ -168,7 +165,7 @@ class BlockStructureModelTestCase(TestCase):
 
     @patch('openedx.core.djangoapps.content.block_structure.models.log')
     def test_old_mongo_keys(self, mock_log):
-        self.course_key = CourseLocator('org2', 'course2', six.text_type(uuid4()), deprecated=True)
+        self.course_key = CourseLocator('org2', 'course2', str(uuid4()), deprecated=True)
         self.usage_key = BlockUsageLocator(course_key=self.course_key, block_type='course', block_id='course')
         serialized_data = 'test data for old course'
         self.params['data_usage_key'] = self.usage_key

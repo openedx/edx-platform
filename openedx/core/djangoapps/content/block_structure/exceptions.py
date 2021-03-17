@@ -37,6 +37,6 @@ class BlockStructureNotFound(BlockStructureException):
     Exception for when a Block Structure is not found.
     """
     def __init__(self, root_block_usage_key):
-        super(BlockStructureNotFound, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
-            u'Block structure not found; data_usage_key: {}'.format(root_block_usage_key)
+        super().__init__(
+            f'Block structure not found; data_usage_key: {root_block_usage_key}'
         )

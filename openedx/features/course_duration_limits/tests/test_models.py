@@ -4,6 +4,7 @@ Tests of CourseDurationLimitConfig.
 
 import itertools
 from datetime import datetime, timedelta
+from unittest.mock import Mock
 
 import ddt
 import pytest
@@ -35,7 +36,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='audit')
         CourseModeFactory.create(course_id=self.course_overview.id, mode_slug='verified')
         self.user = UserFactory.create()
-        super().setUp()
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
     @ddt.data(
         (True, True),
