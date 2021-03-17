@@ -714,7 +714,17 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1325
     'ENABLE_OPENBADGES': False,
 
-    # Enable LTI Provider feature.
+    # .. toggle_name: FEATURES['ENABLE_LTI_PROVIDER']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: When set to True, Open edX site can be used as an LTI Provider to other systems
+    #    and applications.
+    # .. toggle_warnings: After enabling this feature flag there are multiple steps invloved to configure edX
+    #    as LTI provider. Full guide is available here:
+    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-04-24
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7689
     'ENABLE_LTI_PROVIDER': False,
 
     # .. toggle_name: FEATURES['SHOW_HEADER_LANGUAGE_SELECTOR']
