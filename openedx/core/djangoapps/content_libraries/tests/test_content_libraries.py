@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 """
 Tests for Blockstore-based Content Libraries
 """
 from uuid import UUID
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.test.utils import override_settings
-from mock import patch
 from organizations.models import Organization
 
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer

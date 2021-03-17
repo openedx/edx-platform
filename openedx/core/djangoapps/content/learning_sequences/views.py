@@ -3,7 +3,6 @@ The views.py for this app is intentionally thin, and only exists to translate
 user input/output to and from the business logic in the `api` package.
 """
 from datetime import datetime, timezone
-import json  # lint-amnesty, pylint: disable=unused-import
 import logging
 
 from django.conf import settings
@@ -16,7 +15,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import attr  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.lib.api.permissions import IsStaff
 from .api import get_user_course_outline_details
@@ -180,7 +178,7 @@ class CourseOutlineView(APIView):
             course_key = CourseKey.from_string(course_key_str)
         except InvalidKeyError:
             raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "{} is not a valid CourseKey".format(course_key_str)
+                f"{course_key_str} is not a valid CourseKey"
             )
         if course_key.deprecated:
             raise serializers.ValidationError(

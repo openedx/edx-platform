@@ -14,8 +14,6 @@ from copy import deepcopy
 from functools import partial
 from logging import getLogger
 
-import six
-
 from openedx.core.lib.graph_traversals import traverse_post_order, traverse_topologically
 
 from .exceptions import TransformerException
@@ -27,7 +25,7 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 TRANSFORMER_VERSION_KEY = '_version'
 
 
-class _BlockRelations(object):
+class _BlockRelations:
     """
     Data structure to encapsulate relationships for a single block,
     including its children and parents.
@@ -43,7 +41,7 @@ class _BlockRelations(object):
         self.children = []
 
 
-class BlockStructure(object):
+class BlockStructure:
     """
     Base class for a block structure.  BlockStructures are constructed
     using the BlockStructureFactory and then used as the currency across
@@ -148,7 +146,7 @@ class BlockStructure(object):
             iterator(UsageKey) - An iterator of the usage
             keys of all the blocks in the block structure.
         """
-        return six.iterkeys(self._block_relations)
+        return iter(self._block_relations.keys())
 
     #--- Block structure traversal methods ---#
 
@@ -280,7 +278,7 @@ class BlockStructure(object):
             block_relations[usage_key] = _BlockRelations()
 
 
-class FieldData(object):
+class FieldData:
     """
     Data structure to encapsulate collected fields.
     """
@@ -299,21 +297,21 @@ class FieldData(object):
 
     def __getattr__(self, field_name):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__getattr__(field_name)  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+            return super().__getattr__(field_name)  # lint-amnesty, pylint: disable=no-member
         try:
             return self.fields[field_name]
         except KeyError:
-            raise AttributeError(u"Field {0} does not exist".format(field_name))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise AttributeError(f"Field {field_name} does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
 
     def __setattr__(self, field_name, field_value):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__setattr__(field_name, field_value)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().__setattr__(field_name, field_value)
         else:
             self.fields[field_name] = field_value
 
     def __delattr__(self, field_name):
         if self._is_own_field(field_name):
-            return super(FieldData, self).__delattr__(field_name)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().__delattr__(field_name)
         else:
             del self.fields[field_name]
 
@@ -383,10 +381,10 @@ class BlockData(FieldData):
     Data structure to encapsulate collected data for a single block.
     """
     def class_field_names(self):
-        return super(BlockData, self).class_field_names() + ['location', 'transformer_data']  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().class_field_names() + ['location', 'transformer_data']
 
     def __init__(self, usage_key):
-        super(BlockData, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
 
         # Location (or usage key) of the block.
         self.location = usage_key
@@ -407,7 +405,7 @@ class BlockStructureBlockData(BlockStructure):
     VERSION = 2
 
     def __init__(self, root_block_usage_key):
-        super(BlockStructureBlockData, self).__init__(root_block_usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(root_block_usage_key)
 
         # Map of a block's usage key to its collected data, including
         # its xBlock fields and block-specific transformer data.
@@ -435,14 +433,14 @@ class BlockStructureBlockData(BlockStructure):
         Returns iterator of (UsageKey, BlockData) pairs for all
         blocks in the BlockStructure.
         """
-        return six.iteritems(self._block_data_map)
+        return iter(self._block_data_map.items())
 
     def itervalues(self):
         """
         Returns iterator of BlockData for all blocks in the
         BlockStructure.
         """
-        return six.itervalues(self._block_data_map)
+        return iter(self._block_data_map.values())
 
     def __getitem__(self, usage_key):
         """
@@ -750,7 +748,7 @@ class BlockStructureBlockData(BlockStructure):
         its current version number.
         """
         if transformer.WRITE_VERSION == 0:
-            raise TransformerException(u'Version attributes are not set on transformer {0}.', transformer.name())  # lint-amnesty, pylint: disable=raising-format-tuple
+            raise TransformerException('Version attributes are not set on transformer {0}.', transformer.name())  # lint-amnesty, pylint: disable=raising-format-tuple
         self.set_transformer_data(transformer, TRANSFORMER_VERSION_KEY, transformer.WRITE_VERSION)
 
     def _get_or_create_block(self, usage_key):
@@ -778,7 +776,7 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
     interface and implementation of an xBlock.
     """
     def __init__(self, root_block_usage_key):
-        super(BlockStructureModulestoreData, self).__init__(root_block_usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(root_block_usage_key)
 
         # Map of a block's usage key to its instantiated xBlock.
         # dict {UsageKey: XBlock}
@@ -838,7 +836,7 @@ class BlockStructureModulestoreData(BlockStructureBlockData):
         Iterates through all instantiated xBlocks that were added and
         collects all xBlock fields that were requested.
         """
-        for xblock_usage_key, xblock in six.iteritems(self._xblock_map):
+        for xblock_usage_key, xblock in self._xblock_map.items():
             block_data = self._get_or_create_block(xblock_usage_key)
             for field_name in self._requested_xblock_fields:
                 self._set_xblock_field(block_data, xblock, field_name)

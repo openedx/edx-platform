@@ -2,14 +2,12 @@
 Tests for generate_course_blocks management command.
 """
 
+from unittest.mock import patch
 
 import itertools
 import pytest
 import ddt
 from django.core.management.base import CommandError
-from mock import patch
-import six
-from six.moves import range
 
 from openedx.core.djangoapps.content.block_structure.tests.helpers import (
     is_course_in_block_structure_cache,
@@ -32,7 +30,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
         """
         Create courses in modulestore.
         """
-        super(TestGenerateCourseBlocks, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.courses = [CourseFactory.create() for _ in range(self.num_courses)]
         self.course_keys = [course.id for course in self.courses]
         self.command = generate_course_blocks.Command()
@@ -88,13 +86,13 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
 
     def test_one_course(self):
         self._assert_courses_not_in_block_cache(*self.course_keys)
-        self.command.handle(courses=[six.text_type(self.course_keys[0])])
+        self.command.handle(courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_not_in_block_cache(*self.course_keys[1:])
         self._assert_courses_not_in_block_storage(*self.course_keys)
 
     def test_with_storage(self):
-        self.command.handle(with_storage=True, courses=[six.text_type(self.course_keys[0])])
+        self.command.handle(with_storage=True, courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
         self._assert_courses_in_block_storage(self.course_keys[0])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])
@@ -170,7 +168,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_dependent_options_error(self, dependent_option, depending_on_option):
-        expected_error_message = 'Option --{} requires option --{}.'.format(dependent_option, depending_on_option)
+        expected_error_message = f'Option --{dependent_option} requires option --{depending_on_option}.'
         options = {dependent_option: 1, depending_on_option: False, 'courses': ['some/course/key']}
         with self.assertRaisesMessage(CommandError, expected_error_message):
             self.command.handle(**options)

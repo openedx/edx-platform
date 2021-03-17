@@ -23,7 +23,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestBlockStructureStore, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.children_map = self.SIMPLE_CHILDREN_MAP
         self.block_structure = self.create_block_structure(self.children_map)
@@ -43,7 +43,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 self.block_key_factory(0),
                 transformer,
                 key='test',
-                value=u'{} val'.format(transformer.name()),
+                value=f'{transformer.name()} val',
             )
 
     @ddt.data(True, False)

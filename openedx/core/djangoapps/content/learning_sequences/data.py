@@ -24,7 +24,7 @@ Note: we're using old-style syntax for attrs because we need to support Python
 TODO: Validate all datetimes to be UTC.
 """
 import logging
-from datetime import datetime, timezone  # lint-amnesty, pylint: disable=unused-import
+from datetime import datetime  # lint-amnesty, pylint: disable=unused-import
 from enum import Enum
 from typing import Dict, List, Optional, Set
 

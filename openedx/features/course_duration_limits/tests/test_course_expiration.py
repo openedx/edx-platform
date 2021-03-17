@@ -3,15 +3,18 @@ Contains tests to verify correctness of course expiration functionality
 """
 
 from datetime import timedelta
+from unittest import mock
 
 import ddt
-import mock
 import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
+from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     GlobalStaffFactory,
@@ -35,9 +38,6 @@ from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITIO
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
-from common.djangoapps.student.roles import CourseInstructorRole
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
@@ -48,7 +48,7 @@ from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
-        super(CourseExpirationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.course = CourseFactory(
             start=now() - timedelta(weeks=10),
         )
@@ -61,7 +61,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
     def tearDown(self):
         CourseEnrollment.unenroll(self.user, self.course.id)
-        super(CourseExpirationTestCase, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def test_enrollment_mode(self):
         """Tests that verified enrollments do not have an expiration"""
@@ -236,10 +236,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         self.update_masquerade(**masquerade_config)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         assert response.status_code == 200
-        six.assertCountEqual(self, response.redirect_chain, [])
+        self.assertCountEqual(response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
             self.assertContains(response, banner_text)
@@ -273,10 +273,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         assert response.status_code == 200
-        six.assertCountEqual(self, response.redirect_chain, [])
+        self.assertCountEqual(response.redirect_chain, [])
         banner_text = 'You lose all access to this course, including your progress,'
         self.assertNotContains(response, banner_text)
 
@@ -309,10 +309,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         self.update_masquerade(username='audit')
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         assert response.status_code == 200
-        six.assertCountEqual(self, response.redirect_chain, [])
+        self.assertCountEqual(response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertContains(response, banner_text)
 
@@ -360,10 +360,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         assert response.status_code == 200
-        six.assertCountEqual(self, response.redirect_chain, [])
+        self.assertCountEqual(response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotContains(response, banner_text)
 
@@ -409,9 +409,9 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
         self.update_masquerade(username=expired_staff.username)
 
-        course_home_url = reverse('openedx.course_experience.course_home', args=[six.text_type(self.course.id)])
+        course_home_url = reverse('openedx.course_experience.course_home', args=[str(self.course.id)])
         response = self.client.get(course_home_url, follow=True)
         assert response.status_code == 200
-        six.assertCountEqual(self, response.redirect_chain, [])
+        self.assertCountEqual(response.redirect_chain, [])
         banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertNotContains(response, banner_text)

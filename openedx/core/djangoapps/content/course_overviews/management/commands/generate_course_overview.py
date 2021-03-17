@@ -5,7 +5,6 @@ Command to load course overviews.
 
 import logging
 
-import six
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 
@@ -37,25 +36,25 @@ class Command(BaseCommand):
             dest='all_courses',
             action='store_true',
             default=DEFAULT_ALL_COURSES,
-            help=u'Generate course overview for all courses.',
+            help='Generate course overview for all courses.',
         )
         parser.add_argument(
             '--force-update', '--force_update',
             action='store_true',
             default=DEFAULT_FORCE_UPDATE,
-            help=u'Force update course overviews for the requested courses.',
+            help='Force update course overviews for the requested courses.',
         )
         parser.add_argument(
             '--chunk-size',
             action='store',
             type=int,
             default=DEFAULT_CHUNK_SIZE,
-            help=u'The maximum number of courses each task will generate a course overview for.'
+            help='The maximum number of courses each task will generate a course overview for.'
         )
         parser.add_argument(
             '--routing-key',
             dest='routing_key',
-            help=u'The celery routing key to use.'
+            help='The celery routing key to use.'
         )
 
     def handle(self, *args, **options):
@@ -73,4 +72,4 @@ class Command(BaseCommand):
                 **kwargs
             )
         except InvalidKeyError as exc:
-            raise CommandError(u'Invalid Course Key: ' + six.text_type(exc))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError('Invalid Course Key: ' + str(exc))  # lint-amnesty, pylint: disable=raise-missing-from

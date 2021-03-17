@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
@@ -29,13 +28,13 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.unit_block import UnitBlock
 
 
-class ContentLibraryContentTestMixin(object):
+class ContentLibraryContentTestMixin:
     """
     Mixin for content library tests that creates two students and a library.
     """
     @classmethod
     def setUpClass(cls):
-        super(ContentLibraryContentTestMixin, cls).setUpClass()
+        super().setUpClass()
         # Create a couple students that the tests can use
         cls.student_a = UserFactory.create(username="Alice", email="alice@example.com", password="edx")
         cls.student_b = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
@@ -398,7 +397,7 @@ class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase
         client = APIClient()
         client.login(username=self.student_a.username, password='edx')
         student_view_result = client.get(URL_BLOCK_RENDER_VIEW.format(block_key=block_id, view_name='student_view'))
-        problem_key = "input_{}_2_1".format(block_id)
+        problem_key = f"input_{block_id}_2_1"
         assert problem_key in student_view_result.data['content']
 
         # And submit a wrong answer:
@@ -488,7 +487,7 @@ class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, Complet
     """
 
     def setUp(self):
-        super(ContentLibraryXBlockCompletionTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Enable the completion waffle flag for these tests
         self.override_waffle_switch(True)
 

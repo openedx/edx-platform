@@ -4,6 +4,7 @@ models for this app.
 """
 from datetime import datetime, timezone
 from unittest import TestCase
+from unittest.mock import patch
 
 import pytest
 import attr
@@ -14,7 +15,6 @@ from edx_when.api import set_dates_for_course
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -30,6 +30,7 @@ from ...data import (
     CourseVisibility,
     ExamData,
     VisibilityData,
+
 )
 from ..outlines import (
     get_content_errors,
@@ -1171,7 +1172,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(SequentialVisibilityTestCase, cls).setUpTestData()
+        super().setUpTestData()
 
         cls.global_staff = User.objects.create_user('global_staff', email='gstaff@example.com', is_staff=True)
         cls.student = User.objects.create_user('student', email='student@example.com', is_staff=False)
@@ -1242,7 +1243,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert all(((not is_accessible) for is_accessible in is_sequence_accessible)),\
+                    assert all((not is_accessible) for is_accessible in is_sequence_accessible),\
                         "Sequences shouldn't be accessible to anonymous or " \
                         "non-enrolled students for a public_outline course"
                 else:

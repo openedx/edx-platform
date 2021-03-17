@@ -11,7 +11,7 @@ from openedx.core.lib.graph_traversals import get_children, leaf_filter, travers
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 
-class ContentTypeGatingService(object):
+class ContentTypeGatingService:
     """
     Content Type Gating uses Block Transformers to gate sections of the course outline
     and field overrides to gate course content.

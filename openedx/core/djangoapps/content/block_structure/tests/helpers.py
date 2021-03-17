@@ -5,9 +5,8 @@ Common utilities for tests in block_structure module
 
 from contextlib import contextmanager
 from uuid import uuid4
+from unittest.mock import patch
 
-import six
-from mock import patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -45,7 +44,7 @@ def is_course_in_block_structure_storage(course_key, store):
         return False
 
 
-class MockXBlock(object):
+class MockXBlock:
     """
     A mock XBlock to be used in unit tests, thereby decoupling the
     implementation of the block cache framework from the xBlock
@@ -72,7 +71,7 @@ class MockXBlock(object):
         return [self.modulestore.get_item(child) for child in self.children]
 
 
-class MockModulestore(object):
+class MockModulestore:
     """
     A mock Modulestore to be used in unit tests, providing only the
     minimum methods needed by the block cache framework.
@@ -112,7 +111,7 @@ class MockModulestore(object):
         yield
 
 
-class MockCache(object):
+class MockCache:
     """
     A mock Cache object, providing only the minimum features needed
     by the block cache framework.
@@ -145,7 +144,7 @@ class MockCache(object):
         del self.map[key]
 
 
-class MockModulestoreFactory(object):
+class MockModulestoreFactory:
     """
     A factory for creating MockModulestore objects.
     """
@@ -228,7 +227,7 @@ def mock_registered_transformers(transformers):
         yield
 
 
-class ChildrenMapTestMixin(object):
+class ChildrenMapTestMixin:
     """
     A Test Mixin with utility methods for testing with block structures
     created and manipulated using children_map and parents_map.
@@ -305,34 +304,34 @@ class ChildrenMapTestMixin(object):
         for block_key, children in enumerate(children_map):
             # Verify presence
             assert (self.block_key_factory(block_key) in block_structure) == (block_key not in missing_blocks),\
-                u'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'\
-                .format(six.text_type(block_key))
+                'Expected presence in block_structure for block_key {} to match absence in missing_blocks.'\
+                .format(str(block_key))
 
             # Verify children
             if block_key not in missing_blocks:
                 assert set(block_structure.get_children(self.block_key_factory(block_key))) ==\
-                       set((self.block_key_factory(child) for child in children))
+                       {self.block_key_factory(child) for child in children}
 
         # Verify parents
         parents_map = self.get_parents_map(children_map)
         for block_key, parents in enumerate(parents_map):
             if block_key not in missing_blocks:
                 assert set(block_structure.get_parents(self.block_key_factory(block_key))) ==\
-                       set((self.block_key_factory(parent) for parent in parents))
+                       {self.block_key_factory(parent) for parent in parents}
 
 
-class UsageKeyFactoryMixin(object):
+class UsageKeyFactoryMixin:
     """
     Test Mixin that provides a block_key_factory to create OpaqueKey objects
     for block_ids rather than simple integers. By default, the children maps in
     ChildrenMapTestMixin use integers for block_ids.
     """
     def setUp(self):
-        super(UsageKeyFactoryMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.course_key = CourseLocator('org', 'course', six.text_type(uuid4()))
+        super().setUp()
+        self.course_key = CourseLocator('org', 'course', str(uuid4()))
 
     def block_key_factory(self, block_id):
         """
         Returns a block key object for the given block_id.
         """
-        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=six.text_type(block_id))
+        return BlockUsageLocator(course_key=self.course_key, block_type='course', block_id=str(block_id))
