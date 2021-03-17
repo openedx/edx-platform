@@ -1079,7 +1079,7 @@ class VideoBlock(
 
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
-            video_profile_names = context.get("profiles", ["mobile_low"])
+            video_profile_names = context.get("profiles", ["mobile_low", 'desktop_mp4', 'desktop_webm', 'mobile_high'])
             if HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key) and 'hls' not in video_profile_names:
                 video_profile_names.append('hls')
 
