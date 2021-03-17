@@ -15,7 +15,7 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('--data-file-path', type=str, help="Path to file where your data is specified.")
+        parser.add_argument('--data-file-path', type=str, required=True, help="Path to file where your data is specified.")
 
 
     def handle(self, *args, **options):
