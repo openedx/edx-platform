@@ -3,8 +3,8 @@
 
 <p>${_("Hola {full_name},").format(full_name=full_name)}</p>
 
-${_("Congratulations! Your ID verification process was successful.")}
-${_("Your verification is effective for one year. It will expire on {expiration_datetime}").format(expiration_date=expiration_datetime)}
+<p>${_("¡Felicitaciones! Tu verificación de identidad fue exitosa.")}<br>
+${_("Tu verificación es válida durante un año. Esta expirará el {expiration_datetime}.").format(expiration_datetime=expiration_datetime)}</p>
 
 <p>${_("Thank you,")}</p>
 <p>${_("The {platform_name} team").format(platform_name=platform_name)}</p>
