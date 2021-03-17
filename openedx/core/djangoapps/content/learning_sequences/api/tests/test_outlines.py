@@ -14,7 +14,6 @@ from edx_when.api import set_dates_for_course
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -30,6 +29,7 @@ from ...data import (
     CourseVisibility,
     ExamData,
     VisibilityData,
+
 )
 from ..outlines import (
     get_content_errors,

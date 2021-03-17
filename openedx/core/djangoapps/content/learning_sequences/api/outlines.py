@@ -7,15 +7,13 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import Optional, List  # lint-amnesty, pylint: disable=unused-import
-
-import attr  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db import transaction
-from edx_django_utils.cache import TieredCache, get_cache_key  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.locator import LibraryLocator
+from edx_django_utils.cache import TieredCache  # lint-amnesty, pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 
 from ..data import (
@@ -28,6 +26,7 @@ from ..data import (
     UserCourseOutlineData,
     UserCourseOutlineDetailsData,
     VisibilityData,
+
 )
 from ..models import (
     ContentError,

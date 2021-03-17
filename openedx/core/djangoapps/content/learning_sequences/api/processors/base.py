@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=unused-import
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
 
 User = get_user_model()
 log = logging.getLogger(__name__)
