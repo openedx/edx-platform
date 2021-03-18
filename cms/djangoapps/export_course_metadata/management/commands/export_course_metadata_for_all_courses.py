@@ -27,7 +27,6 @@ def export_course_metadata_for_all_courses():
     """
     Export course metadata for all courses
     """
-    module_store = modulestore()
-    courses = module_store.get_courses()
+    courses = modulestore().get_course_summaries()
     for course in courses:
         export_course_metadata_task.delay(str(course.id))
