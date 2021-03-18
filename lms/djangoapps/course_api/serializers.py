@@ -178,7 +178,7 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
         return str(instance)
 
 
-class CourseEnrollmentSerializer(serializers.ModelSerializer):
+class CourseEnrollmentSerializer(serializers.ModelSerializer):  # pylint: disable=abstract-method
     """
     Serializer that takes CourseEnrollment and serializes mode field.
     """
@@ -187,7 +187,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         fields = ['mode']
 
 
-class CourseAccessRoleSerializer(serializers.ModelSerializer):
+class CourseAccessRoleSerializer(serializers.ModelSerializer):  # pylint: disable=abstract-method
     """
     Serializer that takes CourseAccessRole and serializes role field.
     """
@@ -196,7 +196,7 @@ class CourseAccessRoleSerializer(serializers.ModelSerializer):
         fields = ['role']
 
 
-class CourseMemberSerializer(serializers.ModelSerializer):
+class CourseMemberSerializer(serializers.ModelSerializer):  # pylint: disable=abstract-method
     """
     Serializer that takes User instance and serializes profile,
     enrollments and course accessroles associated with that User.

@@ -8,7 +8,7 @@ from unittest import TestCase
 
 import ddt
 from opaque_keys.edx.locator import CourseLocator
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
@@ -18,7 +18,6 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
 
 from ..serializers import (
     CourseDetailSerializer,
@@ -222,10 +221,10 @@ class TestCourseMemberSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         """
         user = self.create_user('test_user', is_staff=False)
         course = self.create_course()
-        course_access_role = self.create_courseaccessrole(role='instructor', user=user, course_id=course.id)
-        course_enrollment = self.create_enrollment(mode='audit', user=user, course_id=course.id)
+        self.create_courseaccessrole(role='instructor', user=user, course_id=course.id)
+        self.create_enrollment(mode='audit', user=user, course_id=course.id)
 
-        user_obj = User.objects.filter(username='test_user').prefetch_related(
+        user_obj = get_user_model().objects.filter(username='test_user').prefetch_related(
             'profile', 'courseaccessrole_set', 'courseenrollment_set'
         ).get()
 
