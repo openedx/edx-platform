@@ -51,7 +51,7 @@ class SAMLConfigurationTests(APITestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        super(SAMLConfigurationTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.user = User.objects.create_user(username='testuser', password=TEST_PASSWORD)
         cls.site, _ = Site.objects.get_or_create(domain='example.com')
         for config in SAML_CONFIGURATIONS:
@@ -74,7 +74,7 @@ class SAMLConfigurationTests(APITestCase):
             )
 
     def setUp(self):
-        super(SAMLConfigurationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def test_get_saml_configurations_successful(self):

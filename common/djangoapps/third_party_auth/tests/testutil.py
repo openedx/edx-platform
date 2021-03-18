@@ -7,17 +7,15 @@ Used by Django and non-Django tests; must not have Django deps.
 
 import os.path
 from contextlib import contextmanager
+from unittest import mock
 
 import django.test
-import mock
 import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from mako.template import Template
 from oauth2_provider.models import Application
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin
-from openedx.core.storage import OverwriteStorage
 
 from common.djangoapps.third_party_auth.models import (
     LTIProviderConfig,
@@ -26,6 +24,8 @@ from common.djangoapps.third_party_auth.models import (
     SAMLProviderConfig
 )
 from common.djangoapps.third_party_auth.models import cache as config_cache
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
+from openedx.core.storage import OverwriteStorage
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -43,16 +43,16 @@ def patch_mako_templates():
     return mock.patch.multiple(Template, render_unicode=wrapped_render, render=wrapped_render)
 
 
-class FakeDjangoSettings(object):
+class FakeDjangoSettings:
     """A fake for Django settings."""
 
     def __init__(self, mappings):
         """Initializes the fake from mappings dict."""
-        for key, value in six.iteritems(mappings):
+        for key, value in mappings.items():
             setattr(self, key, value)
 
 
-class ThirdPartyAuthTestMixin(object):
+class ThirdPartyAuthTestMixin:
     """ Helper methods useful for testing third party auth functionality """
 
     def setUp(self, *args, **kwargs):
@@ -64,11 +64,11 @@ class ThirdPartyAuthTestMixin(object):
         patch.start()
         self.addCleanup(patch.stop)
 
-        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp(*args, **kwargs)
 
     def tearDown(self):
         config_cache.clear()
-        super(ThirdPartyAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def enable_saml(self, **kwargs):
         """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
@@ -184,12 +184,12 @@ class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCas
     """Base class for auth test cases."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
         self.hostname = 'example.none'
         self.client.defaults['SERVER_NAME'] = self.hostname
-        self.url_prefix = 'http://{}'.format(self.hostname)
+        self.url_prefix = f'http://{self.hostname}'
 
 
 class SAMLTestCase(TestCase):
@@ -199,12 +199,12 @@ class SAMLTestCase(TestCase):
     @classmethod
     def _get_public_key(cls, key_name='saml_key'):
         """ Get a public key for use in the test. """
-        return cls.read_data_file('{}.pub'.format(key_name))
+        return cls.read_data_file(f'{key_name}.pub')
 
     @classmethod
     def _get_private_key(cls, key_name='saml_key'):
         """ Get a private key for use in the test. """
-        return cls.read_data_file('{}.key'.format(key_name))
+        return cls.read_data_file(f'{key_name}.key')
 
     def enable_saml(self, **kwargs):
         """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
@@ -213,7 +213,7 @@ class SAMLTestCase(TestCase):
         if 'public_key' not in kwargs:
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
-        super(SAMLTestCase, self).enable_saml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().enable_saml(**kwargs)
 
 
 @contextmanager
@@ -282,8 +282,8 @@ def simulate_running_pipeline(pipeline_target, backend, email=None, fullname=Non
     if username is not None:
         pipeline_data["kwargs"]["username"] = username
 
-    pipeline_get = mock.patch("{pipeline}.get".format(pipeline=pipeline_target), spec=True)
-    pipeline_running = mock.patch("{pipeline}.running".format(pipeline=pipeline_target), spec=True)
+    pipeline_get = mock.patch(f"{pipeline_target}.get", spec=True)
+    pipeline_running = mock.patch(f"{pipeline_target}.running", spec=True)
 
     mock_get = pipeline_get.start()
     mock_running = pipeline_running.start()

@@ -2,9 +2,9 @@
 
 
 import json
+from unittest import mock
 
 import ddt
-import mock
 
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests import testutil
@@ -36,7 +36,7 @@ class ProviderUserStateTestCase(testutil.TestCase):
         self.enable_saml()
         idp_slug = "test"
         idp_config = {"logout_url": "http://example.com/logout"}
-        getattr(self, 'configure_{idp_type}_provider'.format(idp_type=idp_type))(
+        getattr(self, f'configure_{idp_type}_provider')(
             enabled=True,
             name="Test Provider",
             slug=idp_slug,
@@ -62,7 +62,7 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
     """
 
     def setUp(self):
-        super(PipelineOverridesTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.enable_saml()
         self.provider = self.configure_saml_provider(
             enabled=True,

@@ -3,7 +3,7 @@ Separate integration test for Twitter which is an OAuth1 provider.
 """
 
 
-from mock import patch
+from unittest.mock import patch
 from common.djangoapps.third_party_auth.tests.specs import base
 
 
@@ -11,7 +11,7 @@ class TwitterIntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, pylin
     """Integration tests for Twitter backend."""
 
     def setUp(self):
-        super(TwitterIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider = self.configure_twitter_provider(
             enabled=True,
             visible=True,

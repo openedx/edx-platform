@@ -23,7 +23,7 @@ class TestXFrameWhitelistDecorator(TestCase):
     """ Test the xframe_allow_whitelisted decorator. """
 
     def setUp(self):
-        super(TestXFrameWhitelistDecorator, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configure_lti_provider(name='Test', lti_hostname='localhost', lti_consumer_key='test_key', enabled=True)
         self.factory = RequestFactory()
 
