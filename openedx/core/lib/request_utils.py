@@ -273,13 +273,13 @@ class ExpectedErrorMiddleware:
 #     This setting is configured of a list of dicts. See setting and toggle annotations for
 #     ``EXPECTED_ERRORS[N]['XXX']`` for details of each item in the dict.
 #     If this setting is a non-empty list, all uncaught errors processed will get a ``checked_error_expected_from``
-#     attribute, whether they are expected or not. This can be used to ensure that all uncaught errors are actually
-#     processed. Those errors that are processed and match a 'MODULE_AND_CLASS' (documented elsewhere), will get an
-#     ``error_expected`` custom attribute. The value of the custom attribute will include the error module and class.
-#     Another custom attribute ``error_expected_message`` will contain the message of the error.
-#     and message. Unexpected errors would be errors with ``error_expected IS NULL``.
-# .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. It is still
-#     possible that some errors could slip by these mechanisms.
+#     attribute, whether they are expected or not. Those errors that are processed and match a 'MODULE_AND_CLASS'
+#     (documented elsewhere), will get an ``error_expected`` custom attribute. Unexpected errors would be errors with
+#     ``error_expected IS NULL``. For additional diagnostic information for ignored errors, see the
+#     EXPECTED_ERRORS[N]['IS_IGNORED'] annotation.
+# .. setting_warning: We use Django Middleware and a DRF custom error handler to find uncaught errors. Some errors may
+#     slip through the cracks, like ValidationError. Any error where ``checked_error_expected_from IS NULL`` is
+#     an error that was not processed.
 
 # .. setting_name: EXPECTED_ERRORS[N]['MODULE_AND_CLASS']
 # .. setting_default: None
@@ -289,16 +289,19 @@ class ExpectedErrorMiddleware:
 # .. toggle_name: EXPECTED_ERRORS[N]['IS_IGNORED']
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: True
-# .. toggle_description: If True, adds a custom attribute ``error_ignored`` if the error is configured to be ignored
-#      from monitoring. For example, for ignoring errors in New Relic, see:
+# .. toggle_description: Set this to False if the errors are not ignored by monitoring, but only expected, like
+#      for temporary problems that may take some time to fix. If True, adds the custom attributes
+#      ``error_ignored_class`` and ``error_ignored_message`` to help diagnose issues with ignored errors, since
+#      this data is not otherwise available. For example of ignoring errors in New Relic, see:
 #      https://docs.newrelic.com/docs/agents/manage-apm-agents/agent-data/manage-errors-apm-collect-ignore-or-mark-expected/#ignore  pylint: disable=line-too-long,useless-suppression
-#      Ignored errors would be errors where ``error_ignored IS NOT NULL``.
+#      To query for ignored errors, you would use ``error_ignored_class IS NOT NULL``.
 #      Note: This is defaulted to True because it will be easier for us to detect if True is not the correct value, by
 #      seeing that these errors aren't actually ignored.
 # .. toggle_warning: At this time, this toggle does not actually configure the error to be ignored. It is meant to match
 #     the ignored error configuration found elsewhere. When monitoring, no errors should ever have the attribute
-#     ``error_ignored``. If it is found, it means we are stating an error should be ignored when it is not actually
-#     configured as such, or the configuration is not working.
+#     ``error_ignored_class``. Only Transactions should have this custom attribute. If found for an error, it means we
+#     are stating an error should be ignored when it is not actually configured as such, or the configuration is not
+#     working.
 # .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2021-03-11
 
@@ -470,12 +473,14 @@ def _log_and_monitor_expected_errors(request, exception, caller):
         return
 
     exception_message = str(exception)
-    set_custom_attribute('error_expected', module_and_class)
-    set_custom_attribute('error_expected_message', exception_message)
+    set_custom_attribute('error_expected', True)
 
     expected_error_settings = expected_error_settings_dict[module_and_class]
     if expected_error_settings['is_ignored']:
-        set_custom_attribute('error_ignored', True)
+        # Additional error details are needed for ignored errors, because they are otherwise
+        # not available by our monitoring system, because they have been ignored.
+        set_custom_attribute('error_ignored_class', module_and_class)
+        set_custom_attribute('error_ignored_message', exception_message)
 
     if expected_error_settings['log_error']:
         exc_info = exception if expected_error_settings['log_stack_trace'] else None

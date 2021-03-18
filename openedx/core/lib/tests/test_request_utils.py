@@ -399,9 +399,9 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'middleware'),
-                call('error_expected', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
-                call('error_expected_message', 'Test failure'),
-                call('error_ignored', True)
+                call('error_expected', True),
+                call('error_ignored_class', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+                call('error_ignored_message', 'Test failure'),
             ],
             any_order=True
         )
@@ -427,9 +427,9 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
 
         expected_calls = [
             call('checked_error_expected_from', 'middleware'),
-            call('error_expected', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
-            call('error_expected_message', 'Test failure'),
-            call('error_ignored', True),
+            call('error_expected', True),
+            call('error_ignored_class', 'openedx.core.lib.tests.test_request_utils.CustomError1'),
+            call('error_ignored_message', 'Test failure'),
             call('checked_error_expected_from', 'middleware'),
         ]
         if use_same_exception:
@@ -451,8 +451,9 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         ExpectedErrorMiddleware('mock-response').process_exception(self.mock_request, mock_exception)
 
         mock_set_custom_attribute.assert_has_calls([
-            call('error_expected', "Exception"),
-            call('error_expected_message', 'Oops'),
+            call('error_expected', True),
+            call('error_ignored_class', 'Exception'),
+            call('error_ignored_message', 'Oops'),
         ])
 
     @patch('openedx.core.lib.request_utils.set_custom_attribute')
@@ -488,8 +489,7 @@ class TestExpectedErrorMiddleware(unittest.TestCase):
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'middleware'),
-                call('error_expected', expected_class),
-                call('error_expected_message', expected_message),
+                call('error_expected', True),
             ],
             any_order=True
         )
@@ -540,9 +540,9 @@ class TestExpectedErrorExceptionHandler(unittest.TestCase):
         mock_set_custom_attribute.assert_has_calls(
             [
                 call('checked_error_expected_from', 'drf'),
-                call('error_expected', expected_class),
-                call('error_expected_message', expected_message),
-                call('error_ignored', True)
+                call('error_expected', True),
+                call('error_ignored_class', expected_class),
+                call('error_ignored_message', expected_message),
             ],
             any_order=True
         )

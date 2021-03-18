@@ -18,13 +18,15 @@ Monitoring expected errors
 
 At a minimum, it is recommended that you add monitoring for any expected errors, including ignored errors. You do this by using the ``EXPECTED_ERRORS`` setting. For details on configuring, see the documentation for `EXPECTED_ERRORS settings and toggles on Readthedocs`_.
 
-By default, this will provide an ``error_expected`` custom attribute for every expected error. This custom attribute can be used in the following ways:
+This will provide an ``error_expected`` custom attribute for every expected error. This custom attribute can be used in the following ways.
 
-* Alert conditions can exclude or include expected errors as necessary.
-* The value of the custom attribute includes the error module and class name.
-* The message of the expected error can be found in the ``error_expected_message`` custom attribute, which may also help in diagnosing an unexpected scenario.
+* Use ``WHERE error_expected IS NULL`` to filter out expected errors from most alert conditions.
+* Set up special alerts for an overabundance of expected errors using ``WHERE error_expected IS NOT NULL``.
 
-Additionally, a subset of these errors will also have an ``error_ignored`` custom attribute if the error is configured as ignored.
+Additionally, a subset of expected errors that are configured as ignored will also get ``error_ignored_class`` and ``error_ignored_message`` custom attributes.
+
+* Using New Relic terminology, this extra error class and message data will live on the Transaction and not the TransactionError, because ignored errors won't have a TransactionError.
+* Use these additional custom attributes to help diagnose unexpected issues with ignored errors.
 
 .. _EXPECTED_ERRORS settings and toggles on Readthedocs: https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/search.html?q=EXPECTED_ERRORS&check_keywords=yes&area=default
 
