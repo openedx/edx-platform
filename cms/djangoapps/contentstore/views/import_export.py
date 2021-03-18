@@ -212,9 +212,7 @@ def _write_chunk(request, courselike_key):
             shutil.rmtree(course_dir)
             log.info("Course import %s: Temp data cleared", courselike_key)
 
-        log.exception(
-            "error importing course"
-        )
+        log.exception(f'Course import {courselike_key}: error importing course.')
         return JsonResponse(
             {
                 'ErrMsg': str(exception),
