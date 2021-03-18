@@ -26,11 +26,11 @@ class Comment(models.Model):
 
     metrics_tag_fields = ['course_id', 'endorsed', 'closed']
 
-    base_url = "{prefix}/comments".format(prefix=settings.PREFIX)
+    base_url = f"{settings.PREFIX}/comments"
     type = 'comment'
 
     def __init__(self, *args, **kwargs):
-        super(Comment, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         self._cached_thread = None
 
     @property
@@ -58,7 +58,7 @@ class Comment(models.Model):
         if action in ['post']:
             return cls.url_for_comments(params)
         else:
-            return super(Comment, cls).url(action, params)
+            return super().url(action, params)
 
     def flagAbuse(self, user, voteable):
         if voteable.type == 'thread':
@@ -100,16 +100,16 @@ class Comment(models.Model):
 
 
 def _url_for_thread_comments(thread_id):
-    return "{prefix}/threads/{thread_id}/comments".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return f"{settings.PREFIX}/threads/{thread_id}/comments"
 
 
 def _url_for_comment(comment_id):
-    return "{prefix}/comments/{comment_id}".format(prefix=settings.PREFIX, comment_id=comment_id)
+    return f"{settings.PREFIX}/comments/{comment_id}"
 
 
 def _url_for_flag_abuse_comment(comment_id):
-    return "{prefix}/comments/{comment_id}/abuse_flag".format(prefix=settings.PREFIX, comment_id=comment_id)
+    return f"{settings.PREFIX}/comments/{comment_id}/abuse_flag"
 
 
 def _url_for_unflag_abuse_comment(comment_id):
-    return "{prefix}/comments/{comment_id}/abuse_unflag".format(prefix=settings.PREFIX, comment_id=comment_id)
+    return f"{settings.PREFIX}/comments/{comment_id}/abuse_unflag"

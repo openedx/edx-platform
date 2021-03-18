@@ -1,12 +1,10 @@
 # pylint: disable=missing-docstring
 
 
-import six
 import pytest
 from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -20,7 +18,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-new_contract('basestring', six.string_types[0])
+new_contract('basestring', str)
 
 
 class RoleAssignmentTest(TestCase):
@@ -30,7 +28,7 @@ class RoleAssignmentTest(TestCase):
     """
 
     def setUp(self):
-        super(RoleAssignmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Check a staff account because those used to get the Moderator role
         self.staff_user = User.objects.create_user(
             "patty",
@@ -78,7 +76,7 @@ class RoleAssignmentTest(TestCase):
 class CourseDiscussionSettingsTest(ModuleStoreTestCase):
 
     def setUp(self):
-        super(CourseDiscussionSettingsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
     def test_get_course_discussion_settings(self):
@@ -128,7 +126,7 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
     def test_invalid_data_types(self):
         exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
         fields = [
-            {'name': 'division_scheme', 'type': six.string_types[0]},
+            {'name': 'division_scheme', 'type': (str,)[0]},
             {'name': 'always_divide_inline_discussions', 'type': bool},
             {'name': 'divided_discussions', 'type': list}
         ]
@@ -138,4 +136,4 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
             with pytest.raises(ValueError) as value_error:
                 set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
 
-            assert text_type(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)
+            assert str(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)
