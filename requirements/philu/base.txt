@@ -12,3 +12,4 @@ img2pdf==0.2.4
 -e git+https://github.com/philanthropy-u/edx-notifications.git@c1d538a757f03ea048301f7035713510cc5a1b0d#egg=edx-notifications
 git+https://github.com/philanthropy-u/openedx-scorm-xblock.git@master#egg=openedx-scorm-xblock
 django-multiselectfield==0.1.12
+pytest-mock==2.0.0
