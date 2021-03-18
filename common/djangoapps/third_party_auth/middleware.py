@@ -20,7 +20,7 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
 
     def get_redirect_uri(self, request, exception):
         # Fall back to django settings's SOCIAL_AUTH_LOGIN_ERROR_URL.
-        redirect_uri = super(ExceptionMiddleware, self).get_redirect_uri(request, exception)  # lint-amnesty, pylint: disable=super-with-arguments
+        redirect_uri = super().get_redirect_uri(request, exception)
 
         # Safe because it's already been validated by
         # pipeline.parse_query_params. If that pipeline step ever moves later
@@ -48,4 +48,4 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
                 redirect_url = get_next_url_for_login_page(request)
                 return redirect('/login?next=' + redirect_url)
 
-        return super(ExceptionMiddleware, self).process_exception(request, exception)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().process_exception(request, exception)

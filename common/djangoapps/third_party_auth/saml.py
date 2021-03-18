@@ -19,8 +19,8 @@ from social_core.exceptions import AuthForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 
-STANDARD_SAML_PROVIDER_KEY = u'standard_saml_provider'
-SAP_SUCCESSFACTORS_SAML_KEY = u'sap_success_factors'
+STANDARD_SAML_PROVIDER_KEY = 'standard_saml_provider'
+SAP_SUCCESSFACTORS_SAML_KEY = 'sap_success_factors'
 log = logging.getLogger(__name__)
 
 
@@ -83,18 +83,18 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             config["sp"].update(self.get_idp_setting(idp, "SP_EXTRA", {}))
             return config
         else:
-            return super(SAMLAuthBackend, self).generate_saml_config()  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().generate_saml_config()
 
     def get_user_id(self, details, response):
         """
         Calling the parent function and handling the exception properly.
         """
         try:
-            return super(SAMLAuthBackend, self).get_user_id(details, response)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().get_user_id(details, response)
         except KeyError as ex:
             log.warning(
-                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
-                u'Provider: {idp_name}, Message: {message}'.format(
+                '[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
+                'Provider: {idp_name}, Message: {message}'.format(
                     message=ex.message,  # lint-amnesty, pylint: disable=no-member
                     idp_name=response.get('idp_name')
                 )
@@ -127,7 +127,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             log.error('[THIRD_PARTY_AUTH] SAML authentication is not enabled')
             raise Http404
 
-        return super(SAMLAuthBackend, self).auth_url()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().auth_url()
 
     def disconnect(self, *args, **kwargs):
         """
@@ -136,7 +136,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
         user = kwargs.get('user', None)
         unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
-        return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().disconnect(*args, **kwargs)
 
     def _check_entitlements(self, idp, attributes):
         """
@@ -150,8 +150,8 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             for expected in idp.conf['requiredEntitlements']:
                 if expected not in entitlements:
                     log.warning(
-                        u'[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '
-                        u'Provider: {provider}, Entitlement: {entitlement}'.format(
+                        '[THIRD_PARTY_AUTH] SAML user rejected due to missing eduPersonEntitlement. '
+                        'Provider: {provider}, Entitlement: {entitlement}'.format(
                             provider=idp.name,
                             entitlement=expected)
                     )
@@ -165,7 +165,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         # We only override this method so that we can add extra debugging when debug_mode is True
         # Note that auth_inst is instantiated just for the current HTTP request, then is destroyed
-        auth_inst = super(SAMLAuthBackend, self)._create_saml_auth(idp)  # lint-amnesty, pylint: disable=super-with-arguments
+        auth_inst = super()._create_saml_auth(idp)
         from .models import SAMLProviderConfig
         if SAMLProviderConfig.current(idp.name).debug_mode:
 
@@ -177,7 +177,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
                     """ Wrapped login or process_response method """
                     result = method(*args, **kwargs)
                     log.info(
-                        u"SAML login %s for IdP %s. Data: %s. Next url %s. XML is:\n%s",
+                        "SAML login %s for IdP %s. Data: %s. Next url %s. XML is:\n%s",
                         action_description, idp.name, request_data, next_url, xml_getter()
                     )
                     return result
@@ -207,7 +207,7 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         Overrides `get_user_details` from the base class; retrieves those details,
         then updates the dict with values from whatever additional fields are desired.
         """
-        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
+        details = super().get_user_details(attributes)
         extra_field_definitions = self.conf.get('extra_field_definitions', [])
         details.update({
             field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
@@ -227,8 +227,8 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
             try:
                 return attributes[key][0]
             except IndexError:
-                log.warning(u'[THIRD_PARTY_AUTH] SAML attribute value not found. '
-                            u'SamlAttribute: {attribute}'.format(attribute=key))
+                log.warning('[THIRD_PARTY_AUTH] SAML attribute value not found. '
+                            'SamlAttribute: {attribute}'.format(attribute=key))
         return self.conf['attr_defaults'].get(conf_key) or None
 
     @property
@@ -375,8 +375,8 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not all(var in self.conf for var in self.required_variables):
             missing = [var for var in self.required_variables if var not in self.conf]
             log.warning(
-                u'[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '
-                u'the following keys in other_settings are required, but were missing. MissingKeys: {keys}'.format(
+                '[THIRD_PARTY_AUTH] To retrieve rich user data for a SAP SuccessFactors identity provider, '
+                'the following keys in other_settings are required, but were missing. MissingKeys: {keys}'.format(
                     keys=missing
                 )
             )
@@ -394,21 +394,21 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         token_data = transaction_data.get('token_data')
         token_data = token_data if token_data else 'Not available'
         log_msg_template = (
-            u'SAPSuccessFactors exception received for {operation_name} request.  ' +
-            u'URL: {url}  ' +
-            u'Company ID: {company_id}.  ' +
-            u'User ID: {user_id}.  ' +
-            u'Error message: {err_msg}.  ' +
-            u'System message: {sys_msg}.  ' +
-            u'Headers: {headers}.  ' +
-            u'Token Data: {token_data}.'
+            'SAPSuccessFactors exception received for {operation_name} request.  ' +
+            'URL: {url}  ' +
+            'Company ID: {company_id}.  ' +
+            'User ID: {user_id}.  ' +
+            'Error message: {err_msg}.  ' +
+            'System message: {sys_msg}.  ' +
+            'Headers: {headers}.  ' +
+            'Token Data: {token_data}.'
         )
         log_msg = log_msg_template.format(
             operation_name=transaction_data['operation_name'],
             url=transaction_data['endpoint_url'],
             company_id=transaction_data['company_id'],
             user_id=transaction_data['user_id'],
-            err_msg=text_type(err),
+            err_msg=str(err),
             sys_msg=sys_msg,
             headers=headers,
             token_data=token_data,
@@ -482,7 +482,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         if not access_token_data:
             return None
         token_string = access_token_data['access_token']
-        session.headers.update({'Authorization': u'Bearer {}'.format(token_string), 'Accept': 'application/json'})
+        session.headers.update({'Authorization': f'Bearer {token_string}', 'Accept': 'application/json'})
         session.token_data = access_token_data
         return session
 
@@ -492,7 +492,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         of the info we need to do that, or if the request triggers an exception, then fail nicely by
         returning the basic user details we're able to extract from just the SAML response.
         """
-        basic_details = super(SapSuccessFactorsIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
+        basic_details = super().get_user_details(attributes)
         if self.invalid_configuration():
             return basic_details
         user_id = basic_details['username']
@@ -526,7 +526,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
             self.log_bizx_api_exception(transaction_data, err)
             return basic_details
 
-        log.info(u'[THIRD_PARTY_AUTH] BizX Odata response for user [%s] %s', user_id, response)
+        log.info('[THIRD_PARTY_AUTH] BizX Odata response for user [%s] %s', user_id, response)
         return self.get_registration_fields(response)
 
 
@@ -552,7 +552,7 @@ def get_saml_idp_class(idp_identifier_string):
     }
     if idp_identifier_string not in choices:
         log.error(
-            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
-            u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider=idp_identifier_string)
+            '[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
+            'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider=idp_identifier_string)
         )
     return choices.get(idp_identifier_string, EdXSAMLIdentityProvider)
