@@ -27,7 +27,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         super(TPAContextViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse('third_party_auth_context')
-        self.query_params = {'redirect_to': '/dashboard'}
+        self.query_params = {'next': '/dashboard'}
 
         # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
@@ -87,15 +87,6 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {}
         }
 
-    def test_missing_arguments(self):
-        """
-        Test that if required arguments are missing, proper status code and message
-        is returned.
-        """
-        response = self.client.get(self.url)
-        assert response.status_code == 400
-        assert response.data == {'message': 'Request missing required parameter: redirect_to'}
-
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
     def test_no_third_party_auth_providers(self):
         """
@@ -112,7 +103,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         response = self.client.get(self.url, self.query_params)
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
 
         assert response.status_code == 200
@@ -131,7 +122,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         email = 'test@test.com' if add_user_details else None
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
 
         # Simulate a running pipeline
@@ -148,7 +139,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         even if it is not visible on the login page
         """
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
         tpa_hint = self.hidden_enabled_provider.provider_id
         self.query_params.update({'tpa_hint': tpa_hint})
