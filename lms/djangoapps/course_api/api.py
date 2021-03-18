@@ -337,7 +337,7 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
                 ]
             }
     """
-    queryset = User.objects.order_by('id')
+    queryset = User.objects.filter(is_active=True).order_by('id')
 
     # if access_roles not given, assign all registered access roles
     if access_roles is None:
