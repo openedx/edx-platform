@@ -39,7 +39,6 @@ from lms.djangoapps.commerce.utils import EcommerceService, is_account_activatio
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -951,9 +950,10 @@ class SubmitPhotosView(View):
                 "Name must be at least {min_length} character long."
             ).format(min_length=NAME_MIN_LENGTH)
             log.error(
-                ("User {user_id} provided an account name less than {min_length} characters").format(
-                    user_id=request.user.id,
-                    min_length=NAME_MIN_LENGTH
+                (
+                    "User {user_id} suffered ID verification error while submitting a full_name change"
+                ).format(
+                    user_id=request.user.id
                 )
             )
             return HttpResponseBadRequest(msg)
@@ -1073,14 +1073,6 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
         "Date": request.META.get("HTTP_DATE", "")
     }
-
-    has_valid_signature(
-        "POST",
-        headers,
-        body_dict,
-        settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_ACCESS_KEY"],
-        settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_SECRET_KEY"]
-    )
 
     _response, access_key_and_sig = headers["Authorization"].split(" ")
     access_key = access_key_and_sig.split(":")[0]
