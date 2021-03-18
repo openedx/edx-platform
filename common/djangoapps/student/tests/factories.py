@@ -167,7 +167,8 @@ class CourseEnrollmentFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
         if cls._meta.django_get_or_create:
             if all(x in kwargs for x in cls._meta.django_get_or_create):
                 key_fields = {key:kwargs[key] for key in cls._meta.django_get_or_create}
-                return manager.get_or_create(*args, **key_fields)
+                # get_or_create returns a tuple (CourseEnrollment, bool(if_created)), _create method is expected to just return CourseEnrollment
+                return manager.get_or_create(*args, **key_fields)[0]
         return manager.create(*args, **kwargs)
 
 
