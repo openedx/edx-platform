@@ -8,17 +8,22 @@ Replace this with more appropriate tests for your application.
 
 import itertools
 from datetime import timedelta
+from unittest.mock import patch
 
 import ddt
+import six
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
-from unittest.mock import patch
 from opaque_keys.edx.locator import CourseLocator
-import six
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
-from common.djangoapps.course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.course_modes.models import (  # lint-amnesty, pylint: disable=line-too-long
+    CourseMode,
+    Mode,
+    get_cosmetic_display_price,
+    invalidate_course_mode_cache
+)
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
