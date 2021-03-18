@@ -6,7 +6,7 @@ import re
 from django.contrib.sites.models import Site
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.test.utils import CaptureQueriesContext
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from common.djangoapps.third_party_auth import provider

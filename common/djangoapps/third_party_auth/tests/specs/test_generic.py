@@ -20,7 +20,7 @@ class GenericIntegrationTest(IntegrationTestMixin, testutil.TestCase):
     USER_USERNAME = "Galactica1"
 
     def setUp(self):
-        super(GenericIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configure_dummy_provider(enabled=True, visible=True)
 
     def do_provider_login(self, provider_redirect_url):

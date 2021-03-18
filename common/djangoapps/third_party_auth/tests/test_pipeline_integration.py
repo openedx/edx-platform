@@ -5,7 +5,7 @@ import datetime
 import pytest
 
 import ddt
-import mock
+from unittest import mock
 import pytz
 from django import test
 from django.contrib.auth import models
@@ -27,7 +27,7 @@ class TestCase(testutil.TestCase, test.TestCase):
     """Base test case."""
 
     def setUp(self):
-        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
@@ -35,7 +35,7 @@ class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
     def setUp(self):
-        super(GetAuthenticatedUserTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def get_by_username(self, username):
@@ -75,7 +75,7 @@ class GetProviderUserStatesTestCase(TestCase):
     """Tests generation of ProviderUserStates."""
 
     def setUp(self):
-        super(GetProviderUserStatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configure_google_provider(enabled=False)
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
@@ -214,7 +214,7 @@ class TestPipelineUtilityFunctions(TestCase):
     Test some of the isolated utility functions in the pipeline
     """
     def setUp(self):
-        super(TestPipelineUtilityFunctions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
         self.social_auth = social_models.UserSocialAuth.objects.create(
             user=self.user,
@@ -302,7 +302,7 @@ class EnsureUserInformationTestCase(TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(
             username='username',
             password='password',
@@ -382,15 +382,15 @@ class UserDetailsForceSyncTestCase(TestCase):
     """Tests to ensure learner profile data is properly synced if the provider requires it."""
 
     def setUp(self):
-        super(UserDetailsForceSyncTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.old_email = self.user.email
         self.old_username = self.user.username
         self.old_fullname = self.user.profile.name
         self.details = {
-            'email': u'new+{}'.format(self.user.email),
-            'username': u'new_{}'.format(self.user.username),
-            'fullname': u'Grown Up {}'.format(self.user.profile.name),
+            'email': f'new+{self.user.email}',
+            'username': f'new_{self.user.username}',
+            'fullname': f'Grown Up {self.user.profile.name}',
             'country': 'PK',
             'non_existing_field': 'value',
         }
@@ -418,8 +418,8 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # User now has updated information in the DB.
         user = User.objects.get()
-        assert user.email == 'new+{}'.format(self.old_email)
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.email == f'new+{self.old_email}'
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -432,7 +432,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         The user details were attempted to be synced but the incoming email already exists for another account.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(email='new+{}'.format(self.old_email))
+        UserFactory.create(email=f'new+{self.old_email}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -445,7 +445,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         # The email is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
         assert user.email == self.old_email
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -461,7 +461,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         An email should still be sent in this case.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(username='new_{}'.format(self.old_username))
+        UserFactory.create(username=f'new_{self.old_username}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -473,9 +473,9 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # The username is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
-        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.email == f'new+{self.old_email}'
         assert user.username == self.old_username
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # An email should still be sent because the email changed.
@@ -486,7 +486,7 @@ class SetIDVerificationStatusTestCase(TestCase):
     """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
 
     def setUp(self):
-        super(SetIDVerificationStatusTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.provider_class_name = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
         self.provider_slug = 'default'
