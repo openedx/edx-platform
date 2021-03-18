@@ -124,6 +124,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
@@ -137,6 +138,7 @@ class TestCourseUpdateResolver(SchedulesResolverTestMixin, ModuleStoreTestCase):
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
+            'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},
@@ -211,12 +213,14 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         )
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
         with self.assertNumQueries(17):
-            schedules = list(resolver.get_schedules())
+            sc = resolver.get_schedules()
+            schedules = list(sc)
 
         expected_context = {
             'contact_email': 'info@example.com',
@@ -227,6 +231,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'dashboard_url': '/dashboard',
             'homepage_url': '/',
             'mobile_store_urls': {},
+            'logo_url': 'https://www.logo.png',
             'platform_name': '\xe9dX',
             'show_upsell': False,
             'social_media_urls': {},

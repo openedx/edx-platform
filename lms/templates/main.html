@@ -82,8 +82,10 @@ from common.djangoapps.pipeline_mako import render_require_js_path_overrides
   % endif
   <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
   <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
+  <% favicon_url = branding_api.get_favicon_url() %>
+  <link rel="icon" type="image/x-icon" href="${favicon_url}"/>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
+
 
   <%static:css group='style-vendor'/>
   % if '/' in self.attr.main_css:
