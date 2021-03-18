@@ -5,7 +5,7 @@ Common mixins for Course API Tests
 
 from datetime import datetime
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory, CourseAccessRoleFactory
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 TEST_PASSWORD = 'edx'
@@ -41,3 +41,17 @@ class CourseApiFactoryMixin:
             password=TEST_PASSWORD,
             is_staff=is_staff
         )
+
+    @staticmethod
+    def create_enrollment(**kwargs):
+        """
+        Create a CourseEnrollment to use in tests.
+        """
+        return CourseEnrollmentFactory(**kwargs)
+
+    @staticmethod
+    def create_courseaccessrole(**kwargs):
+        """
+        Create a CourseAccessRole to use in tests.
+        """
+        return CourseAccessRoleFactory(**kwargs)

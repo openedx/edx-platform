@@ -271,39 +271,73 @@ def get_course_run_url(request, course_id):
     return request.build_absolute_uri(course_run_url)
 
 
-def get_course_members(course_key, page=1, limit=20, include_students=True, access_roles=None):
+def get_course_members(course_key, include_students=True, access_roles=None, page=1, limit=20):
     """
-    Returns a User queryset that filters all users related to a course. For example - Students, Teachers, Staffs etc.
+    Returns a dict containing User information that filters all users related to a course.
+    For example - Students, Teachers, Staffs etc.
+
+    User information includes -
+        - User info - id, email, username
+        - Profile info - name, picture etc
+        - CourseEnrollment - mode, only the course enrollments associated with the given course
+        - CourseAccessRole - role, only the course access roles associated with the given course
 
     Examples:
         - Get all members:
-            get_course_member_queryset(course_key)
+            get_course_members(course_key)
         - Get only students excluding staffs:
-            get_course_member_queryset(course_key, include_students=True, access_roles=[])
+            get_course_members(course_key, include_students=True, access_roles=[])
         - Get only staffs excluding students:
-            get_course_member_queryset(course_key, include_students=False, access_roles=None)
+            get_course_members(course_key, include_students=False, access_roles=None)
         - Get only instructors:
-            get_course_member_queryset(course_key, include_students=False, access_roles=['instructor'])
+            get_course_members(course_key, include_students=False, access_roles=['instructor'])
         - Get instructors & students:
-            get_course_member_queryset(course_key, include_students=True, access_roles=['instructor'])
-        - Get all members and prefetch course related roles:
-            get_course_member_queryset(course_key, prefetch_user_course_roles=True)
+            get_course_members(course_key, include_students=True, access_roles=['instructor'])
+        - Paginating
+            get_course_members(course_key, page=2)
+        - Paginating with custom limit
+            get_course_members(course_key, limit=50)
 
     Arguments:
         course_key (CourseKey): the CourseKey for the course
-        include_students: Wether or not to include students,
+        include_students: wether or not to include students,
         access_roles:
             accepts an array of string course access roles.
             If None provided, it includes all roles.
-        prefetch_user_course_roles:
-            prefetches CourseAccessRole & CourseEnrollment instances attached with user.
-            This only includes CourseAccessRole & CourseEnrollment instances related to
-            the provided CourseKey.
+        page (int): the page number for pagination
+        limit (int): how many results to include per page
 
     Returns:
-        (QuerySet): User queryset
+        dict: A dictionary with paginated result with following format -
+            {
+                'count': total number of user instances matching specified filter,
+                'num_pages': total number of pages,
+                'current_page': current page number,
+                'result': [
+                    {
+                        'id': user id,
+                        'email': user's email,
+                        'username': user's username,
+                        'profile': {
+                            'name': user's name,
+                            'profile_image': user's profile image,
+                            .... other profile information
+                        },
+                        'enrollments': [
+                            {
+                                'mode': enrollment mode
+                            }
+                        ],
+                        'course_access_roles': [
+                            {
+                                'role': user's role in course
+                            }
+                        ]
+                    }
+                ]
+            }
     """
-    queryset = User.objects.filter()
+    queryset = User.objects.order_by('id')
 
     # if access_roles not given, assign all registered access roles
     if access_roles is None:

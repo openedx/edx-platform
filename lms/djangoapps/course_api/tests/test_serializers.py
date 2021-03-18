@@ -8,6 +8,7 @@ from unittest import TestCase
 
 import ddt
 from opaque_keys.edx.locator import CourseLocator
+from django.contrib.auth.models import User
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
@@ -17,8 +18,16 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
+from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
 
-from ..serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+from ..serializers import (
+    CourseDetailSerializer,
+    CourseKeySerializer,
+    CourseSerializer,
+    CourseEnrollmentSerializer,
+    CourseAccessRoleSerializer,
+    CourseMemberSerializer,
+)
 from .mixins import CourseApiFactoryMixin
 
 
@@ -172,3 +181,69 @@ class TestCourseKeySerializer(TestCase):  # lint-amnesty, pylint: disable=missin
         course_key = CourseLocator(org='org', course='course', run='2020_Q3')
         serializer = CourseKeySerializer(course_key)
         assert serializer.data == str(course_key)
+
+
+class TestCourseEnrollmentSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
+    """
+    Test CourseEnrollmentSerializer.
+    """
+
+    def test_courseenrollment_serializer(self):
+        """
+        Tests if serializer serializes as expected.
+        """
+        course_enrollment = self.create_enrollment(mode='audit')
+        serializer = CourseEnrollmentSerializer(course_enrollment)
+        assert serializer.data == {'mode': 'audit'}
+
+
+class TestCourseAccessRoleSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
+    """
+    Test CourseAccessRoleSerializer.
+    """
+
+    def test_courseaccessrole_serializer(self):
+        """
+        Tests if serializer serializes as expected.
+        """
+        course_access_role = self.create_courseaccessrole(role='instructor')
+        serializer = CourseAccessRoleSerializer(course_access_role)
+        assert serializer.data == {'role': 'instructor'}
+
+
+class TestCourseMemberSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
+    """
+    Test CourseMemberSerializer.
+    """
+
+    def test_course_member_serializer(self):
+        """
+        Tests if serializer serializes as expected.
+        """
+        user = self.create_user('test_user', is_staff=False)
+        course = self.create_course()
+        course_access_role = self.create_courseaccessrole(role='instructor', user=user, course_id=course.id)
+        course_enrollment = self.create_enrollment(mode='audit', user=user, course_id=course.id)
+
+        user_obj = User.objects.filter(username='test_user').prefetch_related(
+            'profile', 'courseaccessrole_set', 'courseenrollment_set'
+        ).get()
+
+        serialized_data = CourseMemberSerializer(user_obj).data
+
+        # Test User model fields
+        assert serialized_data['id'] == user.id
+        assert serialized_data['username'] == user.username
+        assert serialized_data['email'] == user.email
+
+        # Test user profile
+        assert 'profile' in serialized_data
+        assert 'name' in serialized_data['profile']
+
+        # Test CourseEnrollment
+        assert 'enrollments' in serialized_data
+        assert serialized_data['enrollments'][0]['mode'] == 'audit'
+
+        # Test CourseAccessRole
+        assert 'course_access_roles' in serialized_data
+        assert serialized_data['course_access_roles'][0]['role'] == 'instructor'

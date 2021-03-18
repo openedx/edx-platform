@@ -8,6 +8,7 @@ from unittest import mock
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import InvalidPage
 from django.http import Http404
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
@@ -15,12 +16,11 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, CourseAccessRoleFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 
-from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_member_queryset
+from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members
 from .mixins import CourseApiFactoryMixin
 
 
@@ -310,7 +310,7 @@ class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
 class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
     """
-    Test get_course_member_queryset function
+    Test get_course_members function
     """
 
     @classmethod
@@ -323,74 +323,99 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
         cls.instructor = cls.create_user('instructor', is_staff=True)
 
         # attach users with cls.course
-        CourseEnrollmentFactory.create(user=cls.honor, course_id=cls.course.id)
-        CourseAccessRoleFactory.create(user=cls.staff, course_id=cls.course.id, role='staff')
-        CourseAccessRoleFactory.create(user=cls.instructor, course_id=cls.course.id, role='instructor')
+        cls.create_enrollment(user=cls.honor, course_id=cls.course.id)
+        cls.create_courseaccessrole(user=cls.staff, course_id=cls.course.id, role='staff')
+        cls.create_courseaccessrole(user=cls.instructor, course_id=cls.course.id, role='instructor')
 
         # attach users with cls.course2
-        CourseEnrollmentFactory.create(user=cls.honor, course_id=cls.course2.id)
-        CourseAccessRoleFactory.create(user=cls.staff, course_id=cls.course2.id, role='staff')
-        CourseAccessRoleFactory.create(user=cls.instructor, course_id=cls.course2.id, role='instructor')
+        cls.create_enrollment(user=cls.honor, course_id=cls.course2.id)
+        cls.create_courseaccessrole(user=cls.staff, course_id=cls.course2.id, role='staff')
+        cls.create_courseaccessrole(user=cls.instructor, course_id=cls.course2.id, role='instructor')
 
-    def test_get_course_member_queryset(self):
+    def test_get_course_members(self):
         """
         Test all different possible filtering
         """
         # by default it should return all type of users
-        queryset = get_course_member_queryset(self.course.id)
-        assert queryset.count() == 3
+        members = get_course_members(self.course.id)
+        assert members['count'] == 3
+        assert members['num_pages'] == 1
+        assert members['current_page'] == 1
 
         # exclude students
-        queryset = get_course_member_queryset(self.course.id, include_students=False)
-        assert queryset.count() == 2
+        members = get_course_members(self.course.id, include_students=False)
+        assert members['count'] == 2
 
         # get only staff
-        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['staff'])
-        assert queryset.count() == 1
-        assert queryset[0].username == 'staff'
+        members = get_course_members(self.course.id, include_students=False, access_roles=['staff'])
+        assert members['count'] == 1
+        assert members['result'][0]['username'] == 'staff'
 
         # get only instructor
-        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['instructor'])
-        assert queryset.count() == 1
-        assert queryset[0].username == 'instructor'
+        members = get_course_members(self.course.id, include_students=False, access_roles=['instructor'])
+        assert members['count'] == 1
+        assert members['result'][0]['username'] == 'instructor'
 
         # get only students
-        queryset = get_course_member_queryset(self.course.id, include_students=True, access_roles=[])
-        assert queryset.count() == 1
-        assert queryset[0].username == 'honor'
+        members = get_course_members(self.course.id, include_students=True, access_roles=[])
+        assert members['count'] == 1
+        assert members['result'][0]['username'] == 'honor'
 
-    def test_prefetch_enrollments(self):
+    def test_enrollments(self):
         """
-        Test prefetching CourseEnrollment instances.
+        Test CourseEnrollment data.
         """
-        # It should get all enrollments if prefetch_enrollments is False
-        queryset = get_course_member_queryset(self.course.id, include_students=True, access_roles=[])
-        assert queryset[0].courseenrollment_set.count() == 2
-
-        # It should only get enrollment related to the course if prefetch_enrollments is True
-        queryset = get_course_member_queryset(
+        members = get_course_members(
             self.course.id,
             include_students=True,
-            access_roles=[],
-            prefetch_user_course_roles=True
+            access_roles=[]
         )
-        assert queryset[0].courseenrollment_set.count() == 1
-        assert queryset[0].courseenrollment_set.all()[0].course_id == self.course.id
+        assert len(members['result'][0]['enrollments']) == 1
+        assert members['result'][0]['enrollments'][0]['mode'] == 'audit'
 
-    def test_prefetch_accessroles(self):
+    def test_accessroles(self):
         """
-        Test prefetching CourseAccessRole instances.
+        Test CourseAccessRole data.
         """
-        # It should get all access roles if prefetch_accessroles is False
-        queryset = get_course_member_queryset(self.course.id, include_students=False, access_roles=['staff'])
-        assert queryset[0].courseaccessrole_set.count() == 2
-
-        # It should only get access roles related to the course if prefetch_accessroles is True
-        queryset = get_course_member_queryset(
+        members = get_course_members(
             self.course.id,
             include_students=False,
             access_roles=['staff'],
-            prefetch_user_course_roles=True
         )
-        assert queryset[0].courseaccessrole_set.count() == 1
-        assert queryset[0].courseaccessrole_set.all()[0].course_id == self.course.id
+        assert len(members['result'][0]['course_access_roles']) == 1
+
+    def test_user_and_profile_information(self):
+        """
+        Test if user and profile related information present in output
+        """
+        members = get_course_members(
+            self.course.id,
+            include_students=False,
+            access_roles=['staff'],
+        )
+        assert 'id' in members['result'][0]
+        assert 'username' in members['result'][0]
+        assert 'email' in members['result'][0]
+        assert 'profile' in members['result'][0]
+        assert 'name' in members['result'][0]['profile']
+        assert 'profile_image' in members['result'][0]['profile']
+
+    def test_pagination(self):
+        """
+        Test get_course_members pagination
+        """
+        # there are 3 users in self.course
+        members = get_course_members(self.course.id, limit=1)
+        assert members['num_pages'] == 3
+        assert members['count'] == 3
+        assert members['current_page'] == 1
+
+        # check next page
+        members = get_course_members(self.course.id, page=2, limit=1)
+        assert members['num_pages'] == 3
+        assert members['count'] == 3
+        assert members['current_page'] == 2
+
+        # check if exceptions throws as expected
+        with self.assertRaises(InvalidPage):
+            get_course_members(self.course.id, page=4, limit=1)

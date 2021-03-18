@@ -179,23 +179,33 @@ class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstrac
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer that takes CourseEnrollment and serializes mode field.
+    """
     class Meta:
         model = CourseEnrollment
         fields = ['mode']
 
 
 class CourseAccessRoleSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer that takes CourseAccessRole and serializes role field.
+    """
     class Meta:
         model = CourseAccessRole
         fields = ['role']
 
 
 class CourseMemberSerializer(serializers.ModelSerializer):
+    """
+    Serializer that takes User instance and serializes profile,
+    enrollments and course accessroles associated with that User.
+    """
 
     profile = AccountLegacyProfileSerializer()
     enrollments = CourseEnrollmentSerializer(source='courseenrollment_set', many=True)
     course_access_roles = CourseAccessRoleSerializer(source='courseaccessrole_set', many=True)
+
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'profile', 'enrollments', 'course_access_roles']
+        fields = ['id', 'username', 'email', 'profile', 'enrollments', 'course_access_roles']
