@@ -40,7 +40,7 @@ class ProviderBaseThrottle(throttling.UserRateThrottle):
         Only throttle unprivileged requests.
         """
         if view.is_unprivileged_query(request, view.get_identifier_for_requested_user(request)):
-            return super(ProviderBaseThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().allow_request(request, view)
         return True
 
 
@@ -123,7 +123,7 @@ class BaseUserView(APIView):
         if identifier.kind not in self.identifier_kinds:
             # This is already checked before we get here, so raise a 500 error
             # if the check fails.
-            raise ValueError(u"Identifier kind {} not in {}".format(identifier.kind, self.identifier_kinds))
+            raise ValueError(f"Identifier kind {identifier.kind} not in {self.identifier_kinds}")
 
         self_request = False
         if identifier == self.identifier('username', request.user.username):
@@ -195,11 +195,11 @@ class UserView(BaseUserView):
         """
         Return an identifier namedtuple for the requested user.
         """
-        if u'@' in self.kwargs[u'username']:
-            id_kind = u'email'
+        if '@' in self.kwargs['username']:
+            id_kind = 'email'
         else:
-            id_kind = u'username'
-        return self.identifier(id_kind, self.kwargs[u'username'])
+            id_kind = 'username'
+        return self.identifier(id_kind, self.kwargs['username'])
 
 
 # TODO: When removing deprecated UserView, rename this view to UserView.
@@ -260,7 +260,7 @@ class UserViewV2(BaseUserView):
                 identifier = self.identifier(id_kind, request.GET[id_kind])
                 break
         if identifier is None:
-            raise exceptions.ValidationError(u"Must provide one of {}".format(self.identifier_kinds))
+            raise exceptions.ValidationError(f"Must provide one of {self.identifier_kinds}")
         return identifier
 
 
@@ -378,7 +378,7 @@ class UserMappingView(ListAPIView):
         Extra context provided to the serializer class with current provider. We need the provider to
         remove idp_slug from the remote_id if there is any
         """
-        context = super(UserMappingView, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        context = super().get_serializer_context()
         context['provider'] = self.provider
 
         return context
