@@ -13,10 +13,9 @@ import ddt
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now
-from mock import patch
+from unittest.mock import patch
 from opaque_keys.edx.locator import CourseLocator
 import six
-from six.moves import zip
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
 from common.djangoapps.course_modes.models import CourseMode, Mode, get_cosmetic_display_price, invalidate_course_mode_cache  # lint-amnesty, pylint: disable=line-too-long
@@ -38,12 +37,12 @@ class CourseModeModelTest(TestCase):
     }
 
     def setUp(self):
-        super(CourseModeModelTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course_key = CourseLocator('Test', 'TestCourse', 'TestCourseRun')
         CourseMode.objects.all().delete()
 
     def tearDown(self):
-        super(CourseModeModelTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         invalidate_course_mode_cache(sender=None)
 
     def create_mode(
@@ -92,7 +91,7 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate', 10)
         modes = CourseMode.modes_for_course(self.course_key)
-        mode = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
         assert [mode] == modes
 
         modes_dict = CourseMode.modes_for_course_dict(self.course_key)
@@ -103,16 +102,16 @@ class CourseModeModelTest(TestCase):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 10, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 10, '', 'usd', None, None, None, None)
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
 
         modes = CourseMode.modes_for_course(self.course_key)
         assert modes == set_modes
-        assert mode1 == CourseMode.mode_for_course(self.course_key, u'honor')
-        assert mode2 == CourseMode.mode_for_course(self.course_key, u'verified')
+        assert mode1 == CourseMode.mode_for_course(self.course_key, 'honor')
+        assert mode2 == CourseMode.mode_for_course(self.course_key, 'verified')
         assert CourseMode.mode_for_course(self.course_key, 'DNE') is None
 
     def test_min_course_price_for_currency(self):
@@ -123,9 +122,9 @@ class CourseModeModelTest(TestCase):
         assert 0 == CourseMode.min_course_price_for_currency(self.course_key, 'usd')
 
         # create some modes
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None, None, None, None)
-        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 10, '', 'usd', None, None, None, None)
+        mode2 = Mode('verified', 'Verified Certificate', 20, '', 'usd', None, None, None, None)
+        mode3 = Mode('honor', 'Honor Code Certificate', 80, '', 'cny', None, None, None, None)
         set_modes = [mode1, mode2, mode3]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
@@ -140,7 +139,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         assert [CourseMode.DEFAULT_MODE] == modes
 
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
+        mode1 = Mode('honor', 'Honor Code Certificate', 0, '', 'usd', None, None, None, None)
         self.create_mode(mode1.slug, mode1.name, mode1.min_price, mode1.suggested_prices)
         modes = CourseMode.modes_for_course(self.course_key)
         assert [mode1] == modes
@@ -149,8 +148,8 @@ class CourseModeModelTest(TestCase):
         expired_mode.expiration_datetime = expiration_datetime
         expired_mode.save()
         expired_mode_value = Mode(
-            u'verified',
-            u'Verified Certificate',
+            'verified',
+            'Verified Certificate',
             10,
             '',
             'usd',
@@ -335,7 +334,7 @@ class CourseModeModelTest(TestCase):
             assert not is_error_expected, 'Expected a ValidationError to be thrown.'
         except ValidationError as exc:
             assert is_error_expected, 'Did not expect a ValidationError to be thrown.'
-            assert exc.messages == [u'Professional education modes are not allowed to have expiration_datetime set.']
+            assert exc.messages == ['Professional education modes are not allowed to have expiration_datetime set.']
 
     @ddt.data(
         ("verified", "verify_need_to_verify"),
@@ -385,11 +384,11 @@ class CourseModeModelTest(TestCase):
 
         # Check the selectable modes, which should exclude credit
         selectable_modes = CourseMode.modes_for_course_dict(self.course_key)
-        six.assertCountEqual(self, list(selectable_modes.keys()), expected_selectable_modes)
+        self.assertCountEqual(list(selectable_modes.keys()), expected_selectable_modes)
 
         # When we get all unexpired modes, we should see credit as well
         all_modes = CourseMode.modes_for_course_dict(self.course_key, only_selectable=False)
-        six.assertCountEqual(self, list(all_modes.keys()), available_modes)
+        self.assertCountEqual(list(all_modes.keys()), available_modes)
 
     def _enrollment_display_modes_dicts(self, dict_type):
         """

@@ -66,7 +66,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         cls.other_mode.delete()
 
     def setUp(self):
-        super(CourseModesViewTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # overwrite self.student to be a staff member, since only staff
         # should be able to access the course_modes API endpoints.
         # This is needed to make a handful of tests inherited from AuthAndScopesTestMixin pass.
@@ -89,7 +89,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         jwt_token = self._create_jwt_token(self.student, auth_type, include_me_filter=True)
         # include_me_filter=True means a JWT filter will require the username
         # of the requesting user to be in the requested URL
-        url = self.get_url(self.student) + '?username={}'.format(self.student.username)
+        url = self.get_url(self.student) + f'?username={self.student.username}'
 
         resp = self.get_response(AuthType.jwt, token=jwt_token, url=url)
         assert status.HTTP_200_OK == resp.status_code
@@ -108,7 +108,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         Required method to implement AuthAndScopesTestMixin.
         """
         kwargs = {
-            'course_id': text_type(course_id or self.course_key)
+            'course_id': str(course_id or self.course_key)
         }
         return reverse(self.view_name, kwargs=kwargs)
 
@@ -130,7 +130,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         actual_results = self._sorted_results(response)
         expected_results = [
             {
-                'course_id': text_type(self.course_key),
+                'course_id': str(self.course_key),
                 'mode_slug': 'audit',
                 'mode_display_name': 'Audit',
                 'min_price': 0,
@@ -142,7 +142,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
                 'bulk_sku': None,
             },
             {
-                'course_id': text_type(self.course_key),
+                'course_id': str(self.course_key),
                 'mode_slug': 'verified',
                 'mode_display_name': 'Verified',
                 'min_price': 25,
@@ -165,7 +165,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         other_actual_results = self._sorted_results(other_response)
         other_expected_results = [
             {
-                'course_id': text_type(self.other_course_key),
+                'course_id': str(self.other_course_key),
                 'mode_slug': 'other-audit',
                 'mode_display_name': 'Other Audit',
                 'min_price': 0,
@@ -199,7 +199,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         url = self.get_url(course_id=self.course_key)
 
         request_payload = {
-            'course_id': text_type(self.course_key),
+            'course_id': str(self.course_key),
             'mode_slug': 'masters',
             'mode_display_name': 'Masters',
             'currency': 'usd',
@@ -220,7 +220,7 @@ class TestCourseModesListViews(CourseModesViewTestBase, ModuleStoreTestCase, API
         url = self.get_url(course_id=self.course_key)
 
         request_payload = {
-            'course_id': text_type(self.course_key),
+            'course_id': str(self.course_key),
             'mode_slug': 'phd',
         }
 
@@ -252,7 +252,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
         Required method to implement AuthAndScopesTestMixin.
         """
         kwargs = {
-            'course_id': text_type(course_id or self.course_key),
+            'course_id': str(course_id or self.course_key),
             'mode_slug': mode_slug or 'audit',
         }
         return reverse(self.view_name, kwargs=kwargs)
@@ -282,7 +282,7 @@ class TestCourseModesDetailViews(CourseModesViewTestBase, APITestCase):
         assert status.HTTP_200_OK == response.status_code
         actual_data = dict(response.data)
         expected_data = {
-            'course_id': text_type(self.course_key),
+            'course_id': str(self.course_key),
             'mode_slug': 'audit',
             'mode_display_name': 'Audit',
             'min_price': 0,

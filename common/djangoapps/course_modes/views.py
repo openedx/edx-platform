@@ -64,7 +64,7 @@ class ChooseModeView(View):
         atomic() block is active, since that would break atomicity.
 
         """
-        return super(ChooseModeView, self).dispatch(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().dispatch(*args, **kwargs)
 
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
@@ -136,13 +136,13 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(six.text_type(course_key), None)
+        chosen_price = donation_for_course.get(str(course_key), None)
 
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
             params = six.moves.urllib.parse.urlencode({'course_closed': enrollment_end_date})
-            return redirect('{0}?{1}'.format(reverse('dashboard'), params))
+            return redirect('{}?{}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
@@ -156,7 +156,7 @@ class ChooseModeView(View):
             CourseMode.is_credit_mode(mode) for mode
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
-        course_id = text_type(course_key)
+        course_id = str(course_key)
 
         context = {
             "course_modes_choose_url": reverse(
@@ -307,7 +307,7 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[six.text_type(course_key)] = amount_value
+            donation_for_course[str(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             verify_url = IDVerificationService.get_verify_location(course_id=course_key)
@@ -358,16 +358,16 @@ def create_mode(request, course_id):
         Response
     """
     PARAMETERS = {
-        'mode_slug': u'honor',
-        'mode_display_name': u'Honor Code Certificate',
+        'mode_slug': 'honor',
+        'mode_display_name': 'Honor Code Certificate',
         'min_price': 0,
-        'suggested_prices': u'',
-        'currency': u'usd',
+        'suggested_prices': '',
+        'currency': 'usd',
         'sku': None,
     }
 
     # Try pulling querystring parameters out of the request
-    for parameter, default in six.iteritems(PARAMETERS):
+    for parameter, default in PARAMETERS.items():
         PARAMETERS[parameter] = request.GET.get(parameter, default)
 
     # Attempt to create the new mode for the given course

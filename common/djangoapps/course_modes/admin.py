@@ -26,7 +26,7 @@ from openedx.core.lib.courses import clean_course_id
 from common.djangoapps.util.date_utils import get_time_display
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
-                            for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
+                            for key, enrollment_mode in settings.COURSE_ENROLLMENT_MODES.items()]
 
 
 class CourseModeForm(forms.ModelForm):
@@ -34,7 +34,7 @@ class CourseModeForm(forms.ModelForm):
     Admin form for adding a course mode.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseMode
         fields = '__all__'
 
@@ -63,7 +63,7 @@ class CourseModeForm(forms.ModelForm):
             args_copy['course'] = CourseKey.from_string(args_copy['course'])
             args = [args_copy]
 
-        super(CourseModeForm, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
         try:
             if self.data.get('course'):
@@ -122,7 +122,7 @@ class CourseModeForm(forms.ModelForm):
         Clean the form fields.
         This is the place to perform checks that involve multiple form fields.
         """
-        cleaned_data = super(CourseModeForm, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        cleaned_data = super().clean()
         mode_slug = cleaned_data.get("mode_slug")
         upgrade_deadline = cleaned_data.get("_expiration_datetime")
         verification_deadline = cleaned_data.get("verification_deadline")
@@ -173,7 +173,7 @@ class CourseModeForm(forms.ModelForm):
                     verification_deadline
                 )
 
-        return super(CourseModeForm, self).save(commit=commit)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().save(commit=commit)
 
 
 @admin.register(CourseMode)
