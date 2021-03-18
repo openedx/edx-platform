@@ -30,7 +30,7 @@ class Command(BaseCommand):
         """
         Use to create users in your database.
         """
-        for user in data_spec['users']:
+        for user in users:
             UserFactory.create(**user)
 
     def create_enrollments(self, enrollments):
@@ -46,6 +46,6 @@ class Command(BaseCommand):
             if enrollment_spec['mode'] in CourseMode.VERIFIED_MODES:
                 verfication = SoftwareSecurePhotoVerificationFactory(user=user)
             enrollment = CourseEnrollmentFactory(user=user, course_id=enrollment_spec['course_id'])
-            if enrollment[0].mode != enrollment_spec['mode']:
-                enrollment[0].mode = enrollment_spec['mode']
-                enrollment[0].save()
+            if enrollment.mode != enrollment_spec['mode']:
+                enrollment.mode = enrollment_spec['mode']
+                enrollment.save()
