@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
-from mock import patch
+from unittest.mock import patch
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -25,7 +25,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CourseModeSignalTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.end = datetime.now(tz=UTC).replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         CourseMode.objects.all().delete()

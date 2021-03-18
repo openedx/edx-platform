@@ -58,10 +58,10 @@ def enrollment_mode_display(mode, verification_status, course_id):
         enrollment_value = _("Professional Ed")
 
     return {
-        'enrollment_title': six.text_type(enrollment_title),
-        'enrollment_value': six.text_type(enrollment_value),
+        'enrollment_title': str(enrollment_title),
+        'enrollment_value': str(enrollment_value),
         'show_image': show_image,
-        'image_alt': six.text_type(image_alt),
+        'image_alt': str(image_alt),
         'display_mode': _enrollment_mode_display(mode, verification_status, course_id)
     }
 
