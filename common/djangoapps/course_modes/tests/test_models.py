@@ -11,7 +11,6 @@ from datetime import timedelta
 from unittest.mock import patch
 
 import ddt
-import six
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 from django.utils.timezone import now

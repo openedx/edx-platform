@@ -6,6 +6,7 @@ Tests for course_modes views.
 import decimal
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import ddt
 import freezegun
@@ -14,20 +15,19 @@ import pytz
 import six
 from django.conf import settings
 from django.urls import reverse
-from unittest.mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode, Mode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
-from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

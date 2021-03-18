@@ -4,10 +4,10 @@ Unit tests for the course_mode signals
 
 
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
-from unittest.mock import patch
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
