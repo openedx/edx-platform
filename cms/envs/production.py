@@ -533,7 +533,7 @@ SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_
 
 
 ### Appsembler customization - Studio local login ###
-if FEATURES.get('STUDIO_LOCAL_LOGIN'):
+if FEATURES.get('TAHOE_STUDIO_LOCAL_LOGIN'):
     CMS_ROOT_URL = '//localhost:18010'
     LOGIN_URL = reverse_lazy('login')
     FRONTEND_LOGIN_URL = lambda settings: settings.CMS_ROOT_URL + '/login'
