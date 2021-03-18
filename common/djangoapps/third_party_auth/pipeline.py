@@ -186,7 +186,7 @@ class AuthEntryError(AuthException):
     """
 
 
-class ProviderUserState(object):
+class ProviderUserState:
     """Object representing the provider state (attached or not) for a user.
 
     This is intended only for use when rendering templates. See for example
@@ -243,7 +243,7 @@ def get_idp_logout_url_from_running_pipeline(request):
                 try:
                     return tpa_provider.get_setting('logout_url')
                 except KeyError:
-                    logger.info(u'[THIRD_PARTY_AUTH] idP [%s] logout_url setting not defined', tpa_provider.name)
+                    logger.info('[THIRD_PARTY_AUTH] idP [%s] logout_url setting not defined', tpa_provider.name)
 
 
 def get_real_social_auth_object(request):
@@ -315,7 +315,7 @@ def _get_enabled_provider(provider_id):
     enabled_provider = provider.Registry.get(provider_id)
 
     if not enabled_provider:
-        raise ValueError(u'Provider %s not enabled' % provider_id)
+        raise ValueError('Provider %s not enabled' % provider_id)
 
     return enabled_provider
 
@@ -337,7 +337,7 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None,
     if extra_params:
         query_params.update(extra_params)
 
-    return u"{url}?{params}".format(
+    return "{url}?{params}".format(
         url=url,
         params=six.moves.urllib.parse.urlencode(query_params)
     )
@@ -357,7 +357,7 @@ def get_complete_url(backend_name):
         ValueError: if no provider is enabled with the given backend_name.
     """
     if not any(provider.Registry.get_enabled_by_backend_name(backend_name)):
-        raise ValueError(u'Provider with backend %s not enabled' % backend_name)
+        raise ValueError('Provider with backend %s not enabled' % backend_name)
 
     return _get_url('social:complete', backend_name)
 
@@ -533,7 +533,7 @@ def redirect_to_custom_form(request, auth_entry, details, kwargs):
     provider_id = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs}).provider_id
     form_info = AUTH_ENTRY_CUSTOM[auth_entry]
     secret_key = form_info['secret_key']
-    if isinstance(secret_key, six.text_type):
+    if isinstance(secret_key, str):
         secret_key = secret_key.encode('utf-8')
     custom_form_url = form_info['url']
     data_bytes = json.dumps({
@@ -652,8 +652,8 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # register anew via SSO. See SOL-1324 in JIRA.
             # However, we will log a warning for this case:
             logger.warning(
-                u'[THIRD_PARTY_AUTH] User is using third_party_auth to login but has not yet activated their account. '
-                u'Username: {username}'.format(username=user.username)
+                '[THIRD_PARTY_AUTH] User is using third_party_auth to login but has not yet activated their account. '
+                'Username: {username}'.format(username=user.username)
             )
 
 
@@ -777,9 +777,9 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         try:
             enterprise_customer_user = is_enterprise_customer_user(current_provider.provider_id, current_user)
             logger.info(
-                u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
-                u'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
-                u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                '[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
+                'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                ' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                     email=current_user.email,
                     user_id=current_user.id,
                     provider_id=current_provider.provider_id,
@@ -808,9 +808,9 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                     not association_response['user'].is_active
                 ):
                     logger.info(
-                        u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
-                        u' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
-                        u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                        '[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
+                        ' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                        ' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                             email=current_user.email,
                             user_id=current_user.id,
                             provider_id=current_provider.provider_id,
@@ -880,9 +880,9 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
             current_value = getattr(model, field)
             if provider_value is not None and current_value != provider_value:
                 if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
-                    logger.warning(u'[THIRD_PARTY_AUTH] Profile data synchronization conflict. '
-                                   u'UserId: {user_id}, Provider: {provider}, ConflictField: {conflict_field}, '
-                                   u'ConflictValue: {conflict_value}'.format(
+                    logger.warning('[THIRD_PARTY_AUTH] Profile data synchronization conflict. '
+                                   'UserId: {user_id}, Provider: {provider}, ConflictField: {conflict_field}, '
+                                   'ConflictValue: {conflict_value}'.format(
                                        user_id=user.id,
                                        provider=current_provider.name,
                                        conflict_field=field,
@@ -893,8 +893,8 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
 
         if changed:
             logger.info(
-                u'[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '
-                u'Username: {username}, Provider: {provider}, UpdatedKeys: {updated_keys}'.format(
+                '[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '
+                'Username: {username}, Provider: {provider}, UpdatedKeys: {updated_keys}'.format(
                     username=user.username,
                     provider=current_provider.name,
                     updated_keys=list(changed.keys())
@@ -924,7 +924,7 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                     email.send()
                 except SMTPException:
                     logger.exception('[THIRD_PARTY_AUTH] Error sending IdP learner data sync-initiated email change '
-                                     u'notification email. Username: {username}'.format(username=user.username))
+                                     'notification email. Username: {username}'.format(username=user.username))
 
 
 def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
@@ -1012,7 +1012,7 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
             username = short_username + uuid4().hex[:uuid_length]
             final_username = slug_func(clean_func(username[:max_length]))
-            logger.info(u'[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
+            logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
                 username=final_username))
     else:
         final_username = storage.user.get_username(user)

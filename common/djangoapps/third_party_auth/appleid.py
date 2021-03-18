@@ -108,7 +108,7 @@ class AppleIdAuth(BaseOAuth2):
         Apple requires to set `response_mode` to `form_post` if `scope`
         parameter is passed.
         """
-        params = super(AppleIdAuth, self).auth_params(*args, **kwargs)
+        params = super().auth_params(*args, **kwargs)
         if self.RESPONSE_MODE:
             params['response_mode'] = self.RESPONSE_MODE
         elif self.get_scope():
@@ -213,7 +213,7 @@ class AppleIdAuth(BaseOAuth2):
             raise AuthFailed(self, 'Missing id_token parameter')
 
         decoded_data = self.decode_id_token(jwt_string)
-        return super(AppleIdAuth, self).do_auth(
+        return super().do_auth(
             access_token,
             response=decoded_data,
             *args,
