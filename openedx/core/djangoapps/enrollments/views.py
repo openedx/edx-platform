@@ -7,8 +7,6 @@ consist primarily of authentication, request validation, and serialization.
 
 import logging
 
-from six import text_type
-
 from common.djangoapps.course_modes.models import CourseMode
 from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
@@ -62,7 +60,7 @@ class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, S
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class ApiKeyPermissionMixIn(object):
+class ApiKeyPermissionMixIn:
     """
     This mixin is used to provide a convenience function for doing individual permission checks
     for the presence of API keys.
@@ -99,7 +97,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
+        return self.has_api_key_permissions(request) or super().allow_request(request, view)
 
 
 @can_disable_rate_limit
@@ -210,8 +208,8 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"An error occurred while retrieving enrollments for user "
-                        u"'{username}' in course '{course_id}'"
+                        "An error occurred while retrieving enrollments for user "
+                        "'{username}' in course '{course_id}'"
                     ).format(username=username, course_id=course_id)
                 }
             )
@@ -258,13 +256,13 @@ class EnrollmentUserRolesView(APIView):
             course_id = request.GET.get('course_id')
             roles_data = api.get_user_roles(request.user.username)
             if course_id:
-                roles_data = [role for role in roles_data if text_type(role.course_id) == course_id]
+                roles_data = [role for role in roles_data if str(role.course_id) == course_id]
         except Exception:  # pylint: disable=broad-except
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"An error occurred while retrieving roles for user '{username}"
+                        "An error occurred while retrieving roles for user '{username}"
                     ).format(username=request.user.username)
                 }
             )
@@ -272,7 +270,7 @@ class EnrollmentUserRolesView(APIView):
             'roles': [
                 {
                     "org": role.org,
-                    "course_id": text_type(role.course_id),
+                    "course_id": str(role.course_id),
                     "role": role.role
                 }
                 for role in roles_data],
@@ -370,7 +368,7 @@ class EnrollmentCourseDetailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"No course found for course ID '{course_id}'"
+                        "No course found for course ID '{course_id}'"
                     ).format(course_id=course_id)
                 }
             )
@@ -429,11 +427,11 @@ class UnenrollmentView(APIView):
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(api.unenroll_user_from_all_courses(username))
         except KeyError:
-            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
+            return Response('Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except UserRetirementStatus.DoesNotExist:
-            return Response(u'No retirement request status for username.', status=status.HTTP_404_NOT_FOUND)
+            return Response('No retirement request status for username.', status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @can_disable_rate_limit
@@ -647,7 +645,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"An error occurred while retrieving enrollments for user '{username}'"
+                        "An error occurred while retrieving enrollments for user '{username}'"
                     ).format(username=username)
                 }
             )
@@ -676,7 +674,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         if not course_id:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"message": u"Course ID must be specified to create a new enrollment."}
+                data={"message": "Course ID must be specified to create a new enrollment."}
             )
 
         try:
@@ -685,7 +683,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
+                    "message": f"No course '{course_id}' found for enrollment"
                 }
             )
 
@@ -707,7 +705,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
-                    "message": u"User does not have permission to create enrollment with mode [{mode}].".format(
+                    "message": "User does not have permission to create enrollment with mode [{mode}].".format(
                         mode=mode
                     )
                 }
@@ -720,7 +718,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(
                 status=status.HTTP_406_NOT_ACCEPTABLE,
                 data={
-                    'message': u'The user {} does not exist.'.format(username)
+                    'message': f'The user {username} does not exist.'
                 }
             )
 
@@ -736,7 +734,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 return Response(
                     status=status.HTTP_400_BAD_REQUEST,
                     data={
-                        'message': (u"'{value}' is an invalid enrollment activation status.").format(value=is_active)
+                        'message': ("'{value}' is an invalid enrollment activation status.").format(value=is_active)
                     }
                 )
 
@@ -745,26 +743,26 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 enterprise_api_client = EnterpriseApiServiceClient()
                 consent_client = ConsentApiServiceClient()
                 try:
-                    enterprise_api_client.post_enterprise_course_enrollment(username, text_type(course_id), None)
+                    enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
                 except EnterpriseApiException as error:
-                    log.exception(u"An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                                  u"for user [%s] in course run [%s]", username, course_id)
-                    raise CourseEnrollmentError(text_type(error))  # lint-amnesty, pylint: disable=raise-missing-from
+                    log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                  "for user [%s] in course run [%s]", username, course_id)
+                    raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
                 kwargs = {
                     'username': username,
-                    'course_id': text_type(course_id),
+                    'course_id': str(course_id),
                     'enterprise_customer_uuid': explicit_linked_enterprise,
                 }
                 consent_client.provide_consent(**kwargs)
 
             enrollment_attributes = request.data.get('enrollment_attributes')
-            enrollment = api.get_enrollment(username, text_type(course_id))
+            enrollment = api.get_enrollment(username, str(course_id))
             mode_changed = enrollment and mode is not None and enrollment['mode'] != mode
             active_changed = enrollment and is_active is not None and enrollment['is_active'] != is_active
             missing_attrs = []
             if enrollment_attributes:
                 actual_attrs = [
-                    u"{namespace}:{name}".format(**attr)
+                    "{namespace}:{name}".format(**attr)
                     for attr in enrollment_attributes
                 ]
                 missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
@@ -773,14 +771,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     # if the requester wanted to deactivate but specified the wrong mode, fail
                     # the request (on the assumption that the requester had outdated information
                     # about the currently active enrollment).
-                    msg = u"Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
+                    msg = "Enrollment mode mismatch: active mode={}, requested mode={}. Won't deactivate.".format(
                         enrollment["mode"], mode
                     )
                     log.warning(msg)
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
 
                 if missing_attrs:
-                    msg = u"Missing enrollment attributes: requested mode={} required attributes={}".format(
+                    msg = "Missing enrollment attributes: requested mode={} required attributes={}".format(
                         mode, REQUIRED_ATTRIBUTES.get(mode)
                     )
                     log.warning(msg)
@@ -788,7 +786,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
                 response = api.update_enrollment(
                     username,
-                    text_type(course_id),
+                    str(course_id),
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes,
@@ -799,7 +797,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 # Will reactivate inactive enrollments.
                 response = api.add_enrollment(
                     username,
-                    text_type(course_id),
+                    str(course_id),
                     mode=mode,
                     is_active=is_active,
                     enrollment_attributes=enrollment_attributes
@@ -818,14 +816,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
 
-            log.info(u'The user [%s] has already been enrolled in course run [%s].', username, course_id)
+            log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"The [{mode}] course mode is expired or otherwise unavailable for course run [{course_id}]."
+                        "The [{mode}] course mode is expired or otherwise unavailable for course run [{course_id}]."
                     ).format(mode=mode, course_id=course_id),
                     "course_details": error.data
                 })
@@ -833,38 +831,38 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
+                    "message": f"No course '{course_id}' found for enrollment"
                 }
             )
         except CourseEnrollmentExistsError as error:
-            log.warning(u'An enrollment already exists for user [%s] in course run [%s].', username, course_id)
+            log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
-            log.exception(u"An error occurred while creating the new course enrollment for user "
-                          u"[%s] in course run [%s]", username, course_id)
+            log.exception("An error occurred while creating the new course enrollment for user "
+                          "[%s] in course run [%s]", username, course_id)
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"An error occurred while creating the new course enrollment for user "
-                        u"'{username}' in course '{course_id}'"
+                        "An error occurred while creating the new course enrollment for user "
+                        "'{username}' in course '{course_id}'"
                     ).format(username=username, course_id=course_id)
                 }
             )
         except CourseUserGroup.DoesNotExist:
-            log.exception(u'Missing cohort [%s] in course run [%s]', cohort_name, course_id)
+            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
-                    "message": u"An error occured while adding to cohort [%s]" % cohort_name
+                    "message": "An error occured while adding to cohort [%s]" % cohort_name
                 })
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
             if has_api_key_permissions:
-                current_enrollment = api.get_enrollment(username, text_type(course_id))
+                current_enrollment = api.get_enrollment(username, str(course_id))
                 audit_log(
                     'enrollment_change_requested',
-                    course_id=text_type(course_id),
+                    course_id=str(course_id),
                     requested_mode=mode,
                     actual_mode=current_enrollment['mode'] if current_enrollment else None,
                     requested_activation=is_active,

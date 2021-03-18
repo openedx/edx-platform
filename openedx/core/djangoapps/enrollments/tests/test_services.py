@@ -36,8 +36,8 @@ class EnrollmentsServiceTests(ModuleStoreTestCase):
 
             CourseModeFactory.create(mode_slug=course_mode, course_id=course_id)
             user = UserFactory(
-                username='user{}'.format(index),
-                email='LEARNER{}@example.com'.format(index)
+                username=f'user{index}',
+                email=f'LEARNER{index}@example.com'
             )
             CourseEnrollment.enroll(user, course_id, mode=course_mode)
 
@@ -186,7 +186,7 @@ class EnrollmentsServicePerformanceTests(ModuleStoreTestCase):
     def create_and_enroll_users(self, num_users):
         num_course_modes = len(self.course_modes)
         for index in range(num_users):
-            user = UserFactory(username='user{}'.format(index))
+            user = UserFactory(username=f'user{index}')
             CourseEnrollment.enroll(user, self.course.id, mode=self.course_modes[index % num_course_modes])
 
     @ddt.data(10, 25, 50)
