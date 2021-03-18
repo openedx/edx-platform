@@ -150,7 +150,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                 'task_id': async_result.task_id
             })
         except Exception as e:
-            log.exception(str(e))
+            log.exception(f'Course import {course_key: Unknown error in import}')
             raise self.api_error(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 developer_message=str(e),

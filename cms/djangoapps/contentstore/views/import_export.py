@@ -142,7 +142,7 @@ def _write_chunk(request, courselike_key):
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        logging.debug(f'importing course to {temp_filepath}')
+        logging.info(f'Course import {courselike_key}: importing course to {temp_filepath}')
 
         # Get upload chunks byte ranges
         try:
@@ -150,6 +150,7 @@ def _write_chunk(request, courselike_key):
             content_range = matches.groupdict()
         except KeyError:  # Single chunk
             # no Content-Range header, so make one that will work
+            logging.info(f'Course import {courselike_key}: single chunk found')
             content_range = {'start': 0, 'stop': 1, 'end': 2}
 
         # stream out the uploaded files in chunks to disk
@@ -163,10 +164,8 @@ def _write_chunk(request, courselike_key):
             # the same session, but it's always better to catch errors earlier.
             if size < int(content_range['start']):
                 _save_request_status(request, courselike_string, -1)
-                log.warning(
-                    "Reported range %s does not match size downloaded so far %s",
-                    content_range['start'],
-                    size
+                log.error(
+                    f'Course import {courselike_key}: A chunk has been missed'
                 )
                 return JsonResponse(
                     {
@@ -199,7 +198,7 @@ def _write_chunk(request, courselike_key):
                 }]
             })
 
-        log.info("Course import %s: Upload complete", courselike_key)
+        log.info(f'Course import {courselike_key}: Upload complete')
         with open(temp_filepath, 'rb') as local_file:
             django_file = File(local_file)
             storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
@@ -213,9 +212,7 @@ def _write_chunk(request, courselike_key):
             shutil.rmtree(course_dir)
             log.info("Course import %s: Temp data cleared", courselike_key)
 
-        log.exception(
-            "error importing course"
-        )
+        log.exception(f'Course import {courselike_key}: error importing course.')
         return JsonResponse(
             {
                 'ErrMsg': str(exception),
