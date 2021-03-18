@@ -3,13 +3,13 @@ Tests for EmbargoMiddleware
 """
 
 from contextlib import contextmanager
+from unittest import mock
+from unittest.mock import patch, MagicMock
 
 import geoip2.database
 import maxminddb
 import ddt
 import pytest
-import mock
-from mock import patch, MagicMock
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -49,7 +49,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super(EmbargoCheckAccessApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
@@ -162,7 +162,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # exception when the embargo middleware treated the value as a string.
         # In order to simulate this behavior, we can't simply set `profile.country = None`.
         # (because when we save it, it will set the database field to an empty string instead of NULL)
-        query = u"UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
 
         # Verify that we can check the user's access without error
@@ -270,7 +270,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(EmbargoMessageUrlApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
     @ddt.data(
