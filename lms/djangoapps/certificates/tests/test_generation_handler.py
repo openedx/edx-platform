@@ -132,20 +132,20 @@ class AllowlistTests(ModuleStoreTestCase):
         u = UserFactory()
         cr = CourseFactory()
         key = cr.id  # pylint: disable=no-member
-        cert = GeneratedCertificateFactory(
+        GeneratedCertificateFactory(
             user=u,
             course_id=key,
             mode=GeneratedCertificate.MODES.verified,
             status=status,
         )
 
-        assert _can_generate_allowlist_certificate_for_status(cert) == expected_response
+        assert _can_generate_allowlist_certificate_for_status(u, key) == expected_response
 
     def test_generation_status_for_none(self):
         """
         Test handling of certificate statuses for a non-existent cert
         """
-        assert _can_generate_allowlist_certificate_for_status(None) is True
+        assert _can_generate_allowlist_certificate_for_status(None, None)
 
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
     def test_handle_invalid(self):

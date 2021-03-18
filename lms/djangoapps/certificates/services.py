@@ -37,11 +37,6 @@ class CertificateService:
                 course_id=course_key
             )
             generated_certificate.invalidate()
-            log.info(
-                'Certificate invalidated for user %d in course %s',
-                user_id,
-                course_key
-            )
         except ObjectDoesNotExist:
             log.warning(
                 'Invalidation failed because a certificate for user %d in course %s does not exist.',
