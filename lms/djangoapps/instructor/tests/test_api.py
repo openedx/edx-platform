@@ -23,7 +23,6 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
-from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC

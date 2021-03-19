@@ -2,7 +2,6 @@
 
 
 import jwt
-import six
 from django.test.client import Client
 from django.urls import reverse
 
