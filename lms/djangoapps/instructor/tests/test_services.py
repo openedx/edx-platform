@@ -175,9 +175,16 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         expected_body = body.format(**args)
         mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, expected_body, tags)
 
-    def test_get_proctoring_escalation_email(self):
+    def test_get_proctoring_escalation_email_from_course_key(self):
         """
-        Test that it returns the correct proctoring escalation email
+        Test that it returns the correct proctoring escalation email from a course key object
+        """
+        email = self.service.get_proctoring_escalation_email(self.course.id)
+        assert email == self.email
+
+    def test_get_proctoring_escalation_email_from_course_id(self):
+        """
+        Test that it returns the correct proctoring escalation email from a course id string
         """
         email = self.service.get_proctoring_escalation_email(str(self.course.id))
         assert email == self.email
