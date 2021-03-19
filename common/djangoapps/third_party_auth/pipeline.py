@@ -592,7 +592,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
     if not user:
         # Use only email for user existence check in case of saml provider
-        saml_provider, _ = is_saml_provider(current_partial.backend, kwargs)
+        saml_provider, _ = is_saml_provider(backend, kwargs)
 
         if saml_provider:
             user_details = {'email': details.get('email')} if details else None

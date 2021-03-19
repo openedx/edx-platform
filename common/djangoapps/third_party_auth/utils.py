@@ -80,8 +80,10 @@ def validate_uuid4_string(uuid_string):
 
 def is_saml_provider(backend, kwargs):
     """ Verify that the third party provider uses SAML """
-    current_provider = provider.Registry.get_from_pipeline({'backend': backend, 'kwargs': kwargs})
-    saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
+    current_provider = None
+    if backend:
+        current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+        saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
     return (current_provider and
             current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list]), current_provider
 
