@@ -82,6 +82,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     QueueConnectionError,
     generate_already_running_error_message
 )
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
@@ -2616,6 +2617,26 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         res_json = json.loads(response.content.decode('utf-8'))
 
         assert ('team' in res_json['feature_names']) == has_teams
+
+    def test_get_students_features_external_user_key(self):
+        external_key_dict = {}
+        for i in range(len(self.students)):
+            student = self.students[i]
+            external_key = "{}_{}".format(student.username, i)
+            ProgramEnrollmentFactory.create(user=student, external_user_key=external_key)
+            external_key_dict[student.username] = external_key
+        url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+
+        response = self.client.post(url, {})
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert 'external_user_key' in res_json['feature_names']
+        for student in self.students:
+            student_json = [
+                x for x in res_json['students']
+                if x['username'] == student.username
+            ][0]
+            assert student_json['username'] == student.username
+            assert student_json['external_user_key'] == external_key_dict[student.username]
 
     def test_get_students_who_may_enroll(self):
         """

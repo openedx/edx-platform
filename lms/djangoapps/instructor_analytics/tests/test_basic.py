@@ -16,6 +16,7 @@ from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint: disable=unused-import
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
+    PROGRAM_ENROLLMENT_FEATURES,
     STUDENT_FEATURES,
     StudentModule,
     enrolled_students_features,
@@ -24,6 +25,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
     list_may_enroll,
     list_problem_responses
 )
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import UserFactory
@@ -224,9 +226,32 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             else:
                 assert report['cohort'] == '[unassigned]'
 
+    def test_enrolled_student_features_external_user_keys(self):
+        query_features = ('username', 'name', 'email', 'city', 'country', 'external_user_key')
+        username_with_external_user_key_dict = {}
+        for i in range(len(self.users)):
+            # Setup some users with ProgramEnrollments
+            if i % 2 == 0:
+                user = self.users[i]
+                external_user_key = '{}_{}'.format(user.username, i)
+                ProgramEnrollmentFactory.create(user=user, external_user_key=external_user_key)
+                username_with_external_user_key_dict[user.username] = external_user_key
+
+        with self.assertNumQueries(2):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        assert len(userreports) == 30
+        for report in userreports:
+            username = report['username']
+            external_key = username_with_external_user_key_dict.get(username)
+            if external_key:
+                assert external_key == report['external_user_key']
+            else:
+                assert '' == report['external_user_key']
+
+
     def test_available_features(self):
-        assert len(AVAILABLE_FEATURES) == len((STUDENT_FEATURES + PROFILE_FEATURES))
-        assert set(AVAILABLE_FEATURES) == set((STUDENT_FEATURES + PROFILE_FEATURES))
+        assert len(AVAILABLE_FEATURES) == len((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))
+        assert set(AVAILABLE_FEATURES) == set((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])

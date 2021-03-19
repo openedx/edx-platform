@@ -23,6 +23,7 @@ from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentA
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import context as grades_context
+from lms.djangoapps.program_enrollments.api import fetch_program_enrollments_by_students
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -35,6 +36,7 @@ STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'em
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals', 'meta',
                     'city', 'country')
+PROGRAM_ENROLLMENT_FEATURES = ('external_user_key', )
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -46,7 +48,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
                        'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
                        'bill_to_country', 'order_type', 'created')
 
-AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
+AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 CERTIFICATE_FEATURES = ('course_id', 'mode', 'status', 'grade', 'created_date', 'is_active', 'error_reason')
@@ -96,6 +98,8 @@ def enrolled_students_features(course_key, features):
     include_team_column = 'team' in features
     include_enrollment_mode = 'enrollment_mode' in features
     include_verification_status = 'verification_status' in features
+    include_program_enrollments = 'external_user_key' in features
+    external_user_key_dict = {}
 
     students = User.objects.filter(
         courseenrollment__course_id=course_key,
@@ -107,6 +111,11 @@ def enrolled_students_features(course_key, features):
 
     if include_team_column:
         students = students.prefetch_related('teams')
+
+    if include_program_enrollments and len(students) > 0:
+        program_enrollments = fetch_program_enrollments_by_students(users=students, realized_only=True)
+        for program_enrollment in program_enrollments:
+            external_user_key_dict[program_enrollment.user_id] = program_enrollment.external_user_key
 
     def extract_attr(student, feature):
         """Evaluate a student attribute that is ready for JSON serialization"""
@@ -166,6 +175,10 @@ def enrolled_students_features(course_key, features):
                 )
             if include_enrollment_mode:
                 student_dict['enrollment_mode'] = enrollment_mode
+
+        if include_program_enrollments:
+            # extra external_user_key
+            student_dict['external_user_key'] = external_user_key_dict.get(student.id, '')
 
         return student_dict
 

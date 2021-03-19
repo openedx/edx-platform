@@ -271,6 +271,47 @@ def fetch_program_enrollments_by_student(
     return ProgramEnrollment.objects.filter(**_remove_none_values(filters))
 
 
+def fetch_program_enrollments_by_students(
+    users=None,
+    external_user_keys=None,
+    program_enrollment_statuses=None,
+    realized_only=False,
+    waiting_only=False,
+):
+    """
+    Fetch program enrollments for a specific list of students.
+
+    Required arguments (at least one must be provided):
+        * users (iterable[User])
+        * external_user_keys (iterable[str])
+
+    Optional arguments:
+        * program_enrollment_statuses (iterable[str])
+        * realized_only (bool)
+        * waiting_only (bool)
+
+    Optional arguments are used as filtersets if they are not None.
+    
+    Returns: queryset[ProgramEnrollment]
+    """
+    if not (users or external_user_keys):
+        raise ValueError(_STUDENT_LIST_ARG_ERROR_MESSAGE)
+    if realized_only and waiting_only:
+        raise ValueError(
+            _REALIZED_FILTER_ERROR_TEMPLATE.format("realized_only", "waiting_only")
+        )
+    filters = {
+        "user__in": users,
+        "external_user_key__in": external_user_keys,
+        "program_enrollment__status__in": program_enrollment_statuses,
+    }
+    if realized_only:
+        filters["user__isnull"] = False
+    if waiting_only:
+        filters["user__isnull"] = True
+    return ProgramEnrollment.objects.filter(**_remove_none_values(filters))
+
+
 def fetch_program_course_enrollments_by_students(
         users=None,
         external_user_keys=None,
