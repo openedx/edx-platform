@@ -13,9 +13,8 @@ from ..models import DiscussionsConfiguration
 from ..models import ProviderFilter
 
 SUPPORTED_PROVIDERS = [
-    'cs_comments_service',
-    'lti',
-    'test',
+    'legacy',
+    'piazza',
 ]
 
 
@@ -137,7 +136,7 @@ class DiscussionsConfigurationModelTest(TestCase):
         self.configuration_with_values = DiscussionsConfiguration(
             context_key=self.course_key_with_values,
             enabled=False,
-            provider_type='cs_comments_service',
+            provider_type='legacy',
             plugin_configuration={
                 'url': 'http://localhost',
             },
@@ -186,14 +185,14 @@ class DiscussionsConfigurationModelTest(TestCase):
         configuration.plugin_configuration = {
             'url': 'http://localhost',
         }
-        configuration.provider_type = 'cs_comments_service'
+        configuration.provider_type = 'legacy'
         configuration.save()
         configuration = DiscussionsConfiguration.objects.get(context_key=self.course_key_with_defaults)
         assert configuration is not None
         assert not configuration.enabled
         assert configuration.lti_configuration is None
         assert configuration.plugin_configuration['url'] == 'http://localhost'
-        assert configuration.provider_type == 'cs_comments_service'
+        assert configuration.provider_type == 'legacy'
 
     def test_is_enabled_nonexistent(self):
         """
@@ -247,4 +246,4 @@ class DiscussionsConfigurationModelTest(TestCase):
         assert not configuration.enabled
         assert not configuration.lti_configuration
         assert configuration.plugin_configuration
-        assert configuration.provider_type == 'cs_comments_service'
+        assert configuration.provider_type == 'legacy'
