@@ -267,7 +267,7 @@ class ImportManager:
         # If we're going to remap the ID, then we can only do that with
         # a single target
         if self.target_id:
-            assert len(self.xml_module_store.modules) == 1
+            assert len(self.xml_module_store.modules) == 1, 'Store unable to load course correctly.'
 
     def import_static(self, data_path, dest_id):
         """
