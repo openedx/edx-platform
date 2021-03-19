@@ -58,8 +58,8 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
-        update_url = reverse('admin:{}_{}_add'.format(admin.model._meta.app_label, admin.model._meta.model_name))
-        update_url += "?source={}".format(provider1.pk)
+        update_url = reverse(f'admin:{admin.model._meta.app_label}_{admin.model._meta.model_name}_add')
+        update_url += f"?source={provider1.pk}"
 
         # Remove the icon_image from the POST data, to simulate unchanged icon_image
         post_data = models.model_to_dict(provider1)
