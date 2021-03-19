@@ -419,3 +419,16 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
         # check if exceptions throws as expected
         with self.assertRaises(InvalidPage):
             get_course_members(self.course.id, page=4, limit=1)
+
+    def test_number_of_queries(self):
+        """
+        Tests if number of queries matches expectation.
+        """
+        # a total of 5 queries should be executed
+        # - select users matching all the filters
+        # - select user profiles
+        # - select course access
+        # - select course enrollments
+        # - count of matching user rows
+        with self.assertNumQueries(5):
+            get_course_members(self.course.id)

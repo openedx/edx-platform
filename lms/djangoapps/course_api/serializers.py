@@ -196,13 +196,24 @@ class CourseAccessRoleSerializer(serializers.ModelSerializer):  # pylint: disabl
         fields = ['role']
 
 
+class UserProfileSerializer(AccountLegacyProfileSerializer):
+    """
+    Serializes user profile.
+    """
+    class Meta(AccountLegacyProfileSerializer.Meta):
+        fields = (
+            "name", "gender", "year_of_birth", "level_of_education", "country", "state",
+            "mailing_address", "bio", "profile_image", "phone_number"
+        )
+
+
 class CourseMemberSerializer(serializers.ModelSerializer):  # pylint: disable=abstract-method
     """
     Serializer that takes User instance and serializes profile,
     enrollments and course accessroles associated with that User.
     """
 
-    profile = AccountLegacyProfileSerializer()
+    profile = UserProfileSerializer()
     enrollments = CourseEnrollmentSerializer(source='courseenrollment_set', many=True)
     course_access_roles = CourseAccessRoleSerializer(source='courseaccessrole_set', many=True)
 
