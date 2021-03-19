@@ -301,7 +301,7 @@ urlpatterns += (
     url(r'^hijack/', include('hijack.urls')),
 )
 
-if settings.FEATURES.get('STUDIO_LOCAL_LOGIN'):
+if settings.FEATURES.get('TAHOE_STUDIO_LOCAL_LOGIN'):
     urlpatterns += [
         url(r'', include('cms.djangoapps.appsembler.urls'))
     ]
