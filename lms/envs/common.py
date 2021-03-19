@@ -949,7 +949,7 @@ FEATURES = {
     # .. toggle_warnings: None.
     'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': False,
 
-    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']
+    # .. toggle_name: FEATURES['ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION']  # lint-amnesty, pylint: disable=annotation-invalid-choice
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
