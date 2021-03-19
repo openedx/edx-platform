@@ -4,9 +4,9 @@ Test the views served by third_party_auth.
 
 
 import unittest
-import pytest
 
 import ddt
+import pytest
 from django.conf import settings
 from django.urls import reverse
 from lxml import etree

@@ -7,7 +7,7 @@ existing data accordingly.
 import os
 import unittest
 
-import mock
+from unittest import mock
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -34,7 +34,7 @@ def mock_get(status_code=200):
         """
         url = url.split("/")[-1] if url else "testshib-providers.xml"
 
-        file_path = os.path.dirname(os.path.realpath(__file__)) + "/test_data/{}".format(url)
+        file_path = os.path.dirname(os.path.realpath(__file__)) + f"/test_data/{url}"
         with open(file_path) as providers:
             xml = providers.read()
 
@@ -56,7 +56,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Setup operations for saml configurations. these operations contain
         creation of SAMLConfiguration and SAMLProviderConfig records in database.
         """
-        super(TestSAMLCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.stdout = StringIO()
 
