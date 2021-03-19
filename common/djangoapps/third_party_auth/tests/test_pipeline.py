@@ -2,9 +2,9 @@
 
 
 import json
+from unittest import mock
 
 import ddt
-from unittest import mock
 
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests import testutil

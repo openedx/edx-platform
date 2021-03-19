@@ -5,10 +5,10 @@ import base64
 import hashlib
 import hmac
 import json
+from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
-from unittest.mock import patch
 from social_core.exceptions import AuthException
 
 from common.djangoapps.student.tests.factories import UserFactory

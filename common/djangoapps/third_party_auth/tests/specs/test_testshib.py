@@ -8,26 +8,27 @@ import json
 import logging
 import os
 from unittest import skip
+from unittest.mock import MagicMock, patch
 
 import ddt
 import httpretty
 from django.conf import settings
 from django.contrib import auth
+from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
 from freezegun import freeze_time
-from unittest.mock import MagicMock, patch
 from social_core import actions
 from social_django import views as social_views
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
-from enterprise.models import EnterpriseCustomerIdentityProvider, EnterpriseCustomerUser
-from openedx.core.djangoapps.user_authn.views.login import login_user
-from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
-from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
 from common.djangoapps.third_party_auth import pipeline
-from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
+from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider
+from common.djangoapps.third_party_auth.saml import log as saml_log
 from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
 from common.djangoapps.third_party_auth.tests import testutil, utils
+from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
+from openedx.core.djangoapps.user_authn.views.login import login_user
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
 
 from .base import IntegrationTestMixin
 
