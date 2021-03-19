@@ -11,7 +11,6 @@ from datetime import timedelta  # lint-amnesty, pylint: disable=unused-import
 from unittest.mock import patch
 
 import ddt
-import six
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.test import TestCase

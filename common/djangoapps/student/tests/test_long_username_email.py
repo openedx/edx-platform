@@ -1,3 +1,4 @@
+""" Test case for longer user emails."""
 import json
 
 from django.test import TestCase

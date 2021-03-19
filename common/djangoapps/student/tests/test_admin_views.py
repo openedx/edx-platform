@@ -8,7 +8,6 @@ from unittest.mock import Mock
 
 import ddt
 import pytest
-import six
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import ValidationError
