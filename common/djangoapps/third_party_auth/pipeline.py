@@ -586,20 +586,15 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return (current_provider and
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
-    def is_provider_saml():
-        """ Verify that the third party provider uses SAML """
-        current_provider = provider.Registry.get_from_pipeline({'backend': current_partial.backend, 'kwargs': kwargs})
-        saml_providers_list = list(provider.Registry.get_enabled_by_backend_name('tpa-saml'))
-        return (current_provider and
-                current_provider.slug in [saml_provider.slug for saml_provider in saml_providers_list])
-
     if current_partial:
         strategy.session_set('partial_pipeline_token_', current_partial.token)
         strategy.storage.partial.store(current_partial)
 
     if not user:
         # Use only email for user existence check in case of saml provider
-        if is_provider_saml():
+        saml_provider, _ = is_saml_provider(current_partial.backend, kwargs)
+
+        if saml_provider:
             user_details = {'email': details.get('email')} if details else None
         else:
             user_details = details
