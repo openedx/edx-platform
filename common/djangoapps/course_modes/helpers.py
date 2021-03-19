@@ -2,7 +2,6 @@
 
 
 import logging
-import six
 from django.utils.translation import ugettext_lazy as _
 
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin

@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, User

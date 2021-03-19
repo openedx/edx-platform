@@ -7,7 +7,6 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-import six
 from django.conf import settings
 from django.urls import reverse
 from pytz import UTC, timezone

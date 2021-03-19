@@ -23,7 +23,6 @@ Modulestore virtual   |          XML physical (draft, published)
 
 
 import json
-import io
 import logging
 import mimetypes
 import os

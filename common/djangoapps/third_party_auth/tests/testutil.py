@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from unittest import mock
 
 import django.test
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site

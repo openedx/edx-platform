@@ -12,7 +12,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
-from six import text_type
 
 from common.djangoapps.course_modes.rest_api.v1.views import CourseModesView
 from common.djangoapps.course_modes.models import CourseMode

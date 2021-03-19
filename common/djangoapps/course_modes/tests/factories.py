@@ -4,7 +4,6 @@ Factories for course mode models.
 
 
 import random
-import six
 
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory

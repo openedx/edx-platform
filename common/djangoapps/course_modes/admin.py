@@ -1,7 +1,6 @@
 """Django admin for course_modes"""
 
 
-import six
 from django import forms
 from django.conf import settings
 from django.contrib import admin

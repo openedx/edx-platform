@@ -19,7 +19,6 @@ from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import iteritems, text_type
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout

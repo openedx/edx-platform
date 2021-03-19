@@ -2,7 +2,6 @@
 
 import glob
 import hashlib
-import io
 import itertools
 import json
 import logging

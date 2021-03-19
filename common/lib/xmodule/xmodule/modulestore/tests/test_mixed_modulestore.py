@@ -22,7 +22,7 @@ import pytest
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator  # pylint: disable=unused-import
 from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
