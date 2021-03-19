@@ -730,3 +730,4 @@ class TestUserPostSaveCallback(SharedModuleStoreTestCase):
                 course_enrollment.save()
 
         return user
+
