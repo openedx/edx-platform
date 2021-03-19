@@ -5,7 +5,6 @@ from datetime import datetime
 from uuid import uuid4
 
 import factory
-import six
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from factory.django import DjangoModelFactory

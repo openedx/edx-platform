@@ -7,7 +7,6 @@ by reversing group name formats.
 import unittest
 
 from unittest import mock
-import six
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
