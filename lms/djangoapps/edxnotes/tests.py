@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 import ddt
 import jwt
 import pytest
-import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured

@@ -3,7 +3,6 @@ Provide django models to back the discussions app
 """
 from __future__ import annotations
 import logging
-from typing import List
 
 from django.core.exceptions import ValidationError
 from django.db import models

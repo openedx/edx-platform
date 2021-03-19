@@ -3,7 +3,6 @@ Views to show a course's bookmarks.
 """
 
 
-import six
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.template.context_processors import csrf

@@ -2,7 +2,6 @@
 Views for the verification flow
 """
 
-import datetime
 import decimal
 import json
 import logging
