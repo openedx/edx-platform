@@ -1249,7 +1249,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
             CourseMode.VERIFIED,
             False,
             'error',
-            'A system error has occurred with your proctored exam',
+            'A technical error has occurred with your proctored exam',
             False
         ),
     )
