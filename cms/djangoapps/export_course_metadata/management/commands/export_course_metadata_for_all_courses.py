@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.django import modulestore
 
-from cms.djangoapps.export_course_metadata.signals import export_course_metadata
+from cms.djangoapps.export_course_metadata.signals import export_course_metadata  # pylint: disable=unused-import
 from cms.djangoapps.export_course_metadata.tasks import export_course_metadata_task
 
 

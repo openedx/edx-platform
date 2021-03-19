@@ -6,7 +6,6 @@ Python tests for the Survey views
 import json
 from collections import OrderedDict
 
-import six
 from django.test.client import Client
 from django.urls import reverse
 

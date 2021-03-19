@@ -7,7 +7,6 @@ from collections import OrderedDict
 
 import ddt
 import pytest
-import six
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.test import TestCase

@@ -3,12 +3,10 @@ Test audit user's access to various content based on content-gating features.
 """
 
 
-import json
 import os
 from datetime import datetime, timedelta
 
 import ddt
-import six
 from django.conf import settings
 from django.test.client import RequestFactory, Client
 from django.test.utils import override_settings

@@ -6,7 +6,6 @@ from datetime import timedelta
 from unittest import mock
 
 import ddt
-import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
