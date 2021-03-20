@@ -11,7 +11,6 @@ import logging
 
 import crum
 import pytz
-import six
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment

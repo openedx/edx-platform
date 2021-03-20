@@ -1,4 +1,3 @@
-
 """
 Enrollments Application Configuration
 

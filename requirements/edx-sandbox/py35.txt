@@ -27,7 +27,7 @@ pyparsing==2.2.0          # via -r requirements/edx-sandbox/py35.in, chem, matpl
 python-dateutil==2.4.0    # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
 pytz==2021.1              # via matplotlib
 random2==1.0.1            # via -r requirements/edx-sandbox/py35.in
-regex==2020.11.13         # via -r requirements/edx-sandbox/shared.txt, nltk
+regex==2021.3.17          # via -r requirements/edx-sandbox/shared.txt, nltk
 scipy==1.2.1              # via -r requirements/edx-sandbox/py35.in, chem, openedx-calc
 six==1.15.0               # via -r requirements/edx-sandbox/shared.txt, chem, cryptography, cycler, matplotlib, openedx-calc, python-dateutil
 sympy==1.6.2              # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/py35.in, symmath

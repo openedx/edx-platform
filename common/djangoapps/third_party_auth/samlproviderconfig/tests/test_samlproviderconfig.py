@@ -48,7 +48,7 @@ class SAMLProviderConfigTests(APITestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        super(SAMLProviderConfigTests, cls).setUpTestData()
+        super().setUpTestData()
         cls.user = User.objects.create_user(username='testuser', password='testpwd')
         cls.site, _ = Site.objects.get_or_create(domain='example.com')
         cls.enterprise_customer = EnterpriseCustomer.objects.create(

@@ -185,10 +185,10 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     def test_different_user_at_step_2_error(self):
         self.request.safe_cookie_verified_user_id = "different_user"
 
-        with self.assert_logged_for_request_user_mismatch("different_user", self.user.id, 'warning'):
+        with self.assert_logged_for_request_user_mismatch("different_user", self.user.id, 'warning', self.request.path):
             self.assert_response(set_request_user=True, set_session_cookie=True)
 
-        with self.assert_logged_for_session_user_mismatch("different_user", self.user.id):
+        with self.assert_logged_for_session_user_mismatch("different_user", self.user.id, self.request.path):
             self.assert_response(set_request_user=True, set_session_cookie=True)
 
     def test_anonymous_user(self):
@@ -196,7 +196,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.request.user = AnonymousUser()
         self.request.session[SESSION_KEY] = self.user.id
         with self.assert_no_error_logged():
-            with self.assert_logged_for_request_user_mismatch(self.user.id, None, 'debug'):
+            with self.assert_logged_for_request_user_mismatch(self.user.id, None, 'debug', self.request.path):
                 self.assert_response(set_request_user=False, set_session_cookie=True)
 
     def test_update_cookie_data_at_step_3(self):

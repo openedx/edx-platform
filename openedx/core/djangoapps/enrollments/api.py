@@ -257,7 +257,7 @@ def update_enrollment(
         }
 
     """
-    log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
+    log.info('Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
         user=username,
         course=course_id,
         mode=mode,
@@ -272,7 +272,7 @@ def update_enrollment(
     else:
         if enrollment_attributes is not None:
             set_enrollment_attributes(username, course_id, enrollment_attributes)
-    log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
+    log.info('Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
         user=username,
         course=course_id,
         mode=mode
@@ -320,16 +320,13 @@ def get_course_enrollment_details(course_id, include_expired=False):
         }
 
     """
-    cache_key = u'enrollment.course.details.{course_id}.{include_expired}'.format(
-        course_id=course_id,
-        include_expired=include_expired
-    )
+    cache_key = f'enrollment.course.details.{course_id}.{include_expired}'
     cached_enrollment_data = None
     try:
         cached_enrollment_data = cache.get(cache_key)
     except Exception:  # pylint: disable=broad-except
         # The cache backend could raise an exception (for example, memcache keys that contain spaces)
-        log.exception(u"Error occurred while retrieving course enrollment details from the cache")
+        log.exception("Error occurred while retrieving course enrollment details from the cache")
 
     if cached_enrollment_data:
         return cached_enrollment_data
@@ -449,8 +446,8 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
     available_modes = [m['slug'] for m in course_modes]
     if mode not in available_modes:
         msg = (
-            u"Specified course mode '{mode}' unavailable for course {course_id}.  "
-            u"Available modes were: {available}"
+            "Specified course mode '{mode}' unavailable for course {course_id}.  "
+            "Available modes were: {available}"
         ).format(
             mode=mode,
             course_id=course_id,

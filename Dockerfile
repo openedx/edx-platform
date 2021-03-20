@@ -60,12 +60,10 @@ ENV PATH /edx/app/edxapp/edx-platform/bin:${PATH}
 ENV SETTINGS production
 RUN mkdir -p /edx/etc/
 
-<<<<<<< HEAD
 # TODO: Install requirements before copying in code.
 RUN pip install setuptools==39.0.1 pip==21.0.1
 RUN pip install -r requirements/edx/base.txt
-=======
->>>>>>> aba07f59a578cd11e7c9fce4747ae38a72d5e768
+
 ENV VIRTUAL_ENV=/edx/app/edxapp/venvs/edxapp
 RUN python3.8 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -106,7 +104,7 @@ CMD gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name l
 FROM lms as lms-newrelic
 RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
-<<<<<<< HEAD
+
 
 FROM lms as lms-devstack
 # TODO: This compiles static assets.
@@ -117,8 +115,6 @@ ENV DJANGO_SETTINGS_MODULE ""
 RUN NO_PREREQ_INSTALL=1 paver update_assets lms --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
-=======
-
 FROM lms as lms-devstack
 # TODO: This compiles static assets.
 # However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
@@ -128,7 +124,6 @@ ENV DJANGO_SETTINGS_MODULE ""
 RUN NO_PREREQ_INSTALL=1 paver update_assets lms --settings devstack_decentralized
 ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
->>>>>>> aba07f59a578cd11e7c9fce4747ae38a72d5e768
 FROM base as studio
 ENV SERVICE_VARIANT cms
 ENV DJANGO_SETTINGS_MODULE cms.envs.production

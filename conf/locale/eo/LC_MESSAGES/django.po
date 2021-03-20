@@ -21713,6 +21713,19 @@ msgstr ""
 "Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+"Çlïçk tö généräté ä ZÌP fïlé thät çöntäïns äll süßmïssïön téxts änd "
+"ättäçhménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
+msgstr ""
+"Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid "Reports Available for Download"
 msgstr "Répörts Àväïläßlé för Döwnlöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -22053,7 +22066,6 @@ msgid "Generate Submission Files Archive"
 msgstr ""
 "Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-
 msgid "Enrollment Code"
 msgstr "Énröllmént Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -22416,6 +22428,26 @@ msgid "Change the status of an enrollment code."
 msgstr ""
 "Çhängé thé stätüs öf än énröllmént çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Course Price"
+msgstr "Çöürsé Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Currency"
+msgstr "Çürrénçý Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
+msgstr "Sét Prïçé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Proctortrack Escalation Email:"
+msgstr "Pröçtörträçk Ésçälätïön Émäïl: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Allowance Section"
+msgstr "Àllöwänçé Séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 msgid "Enrollment Code"
@@ -22867,6 +22899,143 @@ msgid "Show the status for the tasks that you submitted for this problem."
 msgstr ""
 "Shöw thé stätüs för thé täsks thät ýöü süßmïttéd för thïs prößlém. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Note"
+msgstr "Nöté Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
+msgid ""
+"Select a problem to generate a CSV         file that lists all student "
+"answers to the problem. You also select a section or chapter to include"
+"         results of all problems in that section or chapter."
+msgstr ""
+"Séléçt ä prößlém tö généräté ä ÇSV         fïlé thät lïsts äll stüdént "
+"änswérs tö thé prößlém. Ýöü älsö séléçt ä séçtïön ör çhäptér tö ïnçlüdé"
+"         résülts öf äll prößléms ïn thät séçtïön ör çhäptér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to display the grading configuration for the                 course. "
+"The grading configuration is the breakdown of graded subsections of the "
+"course                 (such as exams and problem sets), and can be changed "
+"on the 'Grading'                 page (under 'Settings') in Studio."
+msgstr ""
+"Çlïçk tö dïspläý thé grädïng çönfïgürätïön för thé                 çöürsé. "
+"Thé grädïng çönfïgürätïön ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé "
+"çöürsé                 (süçh äs éxäms änd prößlém séts), änd çän ßé çhängéd "
+"ön thé 'Grädïng'                 pägé (ündér 'Séttïngs') ïn Stüdïö. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ η#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid "Click to download a CSV of                 anonymized student IDs:"
+msgstr ""
+"Çlïçk tö döwnlöäd ä ÇSV öf                 änönýmïzéd stüdént ÌDs: Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For large courses, generating some reports can take                 several "
+"hours. When report generation is complete, a                 link that "
+"includes the date and time of generation appears in the table below. These "
+"reports are                 generated in the background, meaning it is OK to"
+" navigate away from this page while your report is                 "
+"generating."
+msgstr ""
+"För lärgé çöürsés, générätïng sömé répörts çän täké                 sévéräl "
+"höürs. Whén répört générätïön ïs çömplété, ä                 lïnk thät "
+"ïnçlüdés thé däté änd tïmé öf générätïön äppéärs ïn thé täßlé ßélöw. Thésé "
+"répörts äré                 générätéd ïn thé ßäçkgröünd, méänïng ït ïs ÖK tö"
+" nävïgäté äwäý fröm thïs pägé whïlé ýöür répört ïs                 "
+"générätïng.#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Please be patient and do not click these buttons                 multiple "
+"times. Clicking these buttons multiple times will significantly slow the "
+"generation                 process."
+msgstr ""
+"Pléäsé ßé pätïént änd dö nöt çlïçk thésé ßüttöns                 mültïplé "
+"tïmés. Çlïçkïng thésé ßüttöns mültïplé tïmés wïll sïgnïfïçäntlý slöw thé "
+"générätïön                 pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
+"мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
+"łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"For smaller courses, click to list                 profile information for "
+"enrolled students directly on this page:"
+msgstr ""
+"För smällér çöürsés, çlïçk tö lïst                 pröfïlé ïnförmätïön för "
+"énrölléd stüdénts dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 all students enrolled in "
+"this course, along with profile information such as email address and"
+"                 username:"
+msgstr ""
+"Çlïçk tö généräté ä ÇSV fïlé öf                 äll stüdénts énrölléd ïn "
+"thïs çöürsé, älöng wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd"
+"                 üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 that lists learners who can "
+"enroll in the course but have not yet done so."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV fïlé                 thät lïsts léärnérs whö çän "
+"énröll ïn thé çöürsé ßüt hävé nöt ýét döné sö. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file                 of all proctored exam results "
+"in this course."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV fïlé                 öf äll pröçtöréd éxäm résülts "
+"ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV file of                 survey results for this "
+"course."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV fïlé öf                 sürvéý résülts för thïs "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 ORA grade report for all currently "
+"enrolled students."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV                 ÖRÀ grädé répört för äll çürréntlý "
+"énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
+msgid ""
+"Click to generate a CSV                 problem grade report for all "
+"currently enrolled students."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV                 prößlém grädé répört för äll "
+"çürréntlý énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html

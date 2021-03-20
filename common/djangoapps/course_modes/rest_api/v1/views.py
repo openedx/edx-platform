@@ -22,7 +22,7 @@ from openedx.core.lib.api.parsers import MergePatchParser
 log = logging.getLogger(__name__)
 
 
-class CourseModesMixin(object):
+class CourseModesMixin:
     """
     A base class for course modes views that specifies authentication, permissions,
     serialization, pagination, and the base queryset.

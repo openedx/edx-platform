@@ -122,6 +122,12 @@ def _write_chunk(request, courselike_key):
     course_dir = data_root / subdir
     filename = request.FILES['course-data'].name
 
+    def error_response(message, status):
+        """
+        Returns Json error response
+        """
+        return JsonResponse({'ErrMsg': message, 'Stage': -1}, status=status)
+
     courselike_string = str(courselike_key) + filename
     # Do everything in a try-except block to make sure everything is properly cleaned up.
     try:
@@ -130,19 +136,14 @@ def _write_chunk(request, courselike_key):
 
         if not filename.endswith('.tar.gz'):
             _save_request_status(request, courselike_string, -1)
-            return JsonResponse(
-                {
-                    'ErrMsg': _('We only support uploading a .tar.gz file.'),
-                    'Stage': -1
-                },
-                status=415
-            )
+            return error_response(_('We only support uploading a .tar.gz file.'), 415)
 
         temp_filepath = course_dir / filename
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
         logging.debug(f'importing course to {temp_filepath}')
+        logging.info(f'Course import {courselike_key}: importing course to {temp_filepath}')
 
         # Get upload chunks byte ranges
         try:
@@ -150,6 +151,7 @@ def _write_chunk(request, courselike_key):
             content_range = matches.groupdict()
         except KeyError:  # Single chunk
             # no Content-Range header, so make one that will work
+            logging.info(f'Course import {courselike_key}: single chunk found')
             content_range = {'start': 0, 'stop': 1, 'end': 2}
 
         # stream out the uploaded files in chunks to disk
@@ -157,24 +159,33 @@ def _write_chunk(request, courselike_key):
             mode = "wb+"
         else:
             mode = "ab+"
+            if not temp_filepath.exists():
+                _save_request_status(request, courselike_string, -1)
+                log.error(f'Course Import: {courselike_key} Chunks missed during upload.')
+                return error_response(_('Some chunks missed during file upload. Please try again'), 409)
+
             size = os.path.getsize(temp_filepath)
             # Check to make sure we haven't missed a chunk
             # This shouldn't happen, even if different instances are handling
             # the same session, but it's always better to catch errors earlier.
             if size < int(content_range['start']):
                 _save_request_status(request, courselike_string, -1)
-                log.warning(
-                    "Reported range %s does not match size downloaded so far %s",
-                    content_range['start'],
-                    size
+                # log.warning(
+                #     "Reported range %s does not match size downloaded so far %s",
+                #     content_range['start'],
+                #     size
+                # )
+                # return JsonResponse(
+                #     {
+                #         'ErrMsg': _('File upload corrupted. Please try again'),
+                #         'Stage': -1
+                #     },
+                #     status=409
+                log.error(
+                    f'Course import {courselike_key}: A chunk has been missed'
                 )
-                return JsonResponse(
-                    {
-                        'ErrMsg': _('File upload corrupted. Please try again'),
-                        'Stage': -1
-                    },
-                    status=409
-                )
+                return error_response(_('File upload corrupted. Please try again'), 409)
+
             # The last request sometimes comes twice. This happens because
             # nginx sends a 499 error code when the response takes too long.
             elif size > int(content_range['stop']) and size == int(content_range['end']):
@@ -200,6 +211,7 @@ def _write_chunk(request, courselike_key):
             })
 
         log.info("Course import %s: Upload complete", courselike_key)
+        log.info(f'Course import {courselike_key}: Upload complete')
         with open(temp_filepath, 'rb') as local_file:
             django_file = File(local_file)
             storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
@@ -213,16 +225,8 @@ def _write_chunk(request, courselike_key):
             shutil.rmtree(course_dir)
             log.info("Course import %s: Temp data cleared", courselike_key)
 
-        log.exception(
-            "error importing course"
-        )
-        return JsonResponse(
-            {
-                'ErrMsg': str(exception),
-                'Stage': -1
-            },
-            status=400
-        )
+        log.exception(f'Course import {courselike_key}: error importing course.')
+        return error_response(str(exception), 400)
 
     return JsonResponse({'ImportStatus': 1})
 

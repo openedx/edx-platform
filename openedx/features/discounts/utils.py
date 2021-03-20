@@ -5,7 +5,6 @@ Utility functions for working with discounts and discounted pricing.
 from datetime import datetime
 
 import pytz
-import six
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache

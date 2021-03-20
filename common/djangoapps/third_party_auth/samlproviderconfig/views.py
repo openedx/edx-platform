@@ -18,7 +18,7 @@ from .serializers import SAMLProviderConfigSerializer
 from ..utils import convert_saml_slug_provider_id
 
 
-class SAMLProviderMixin(object):
+class SAMLProviderMixin:
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderConfigSerializer

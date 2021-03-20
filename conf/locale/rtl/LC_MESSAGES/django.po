@@ -6959,7 +6959,6 @@ msgstr ""
 "فاث رعوزثق خب سثذخريس فخ يثمشغ/فهوثخعف صشهف فخ لثف ذخخنهث دشمعثس بقخو "
 "سشهمفاقع."
 
-<<<<<<< HEAD
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #, python-brace-format
 msgid "{platform_name} Staff"
@@ -7004,7 +7003,7 @@ msgstr "يشفش هرفثلقهفغ ثققخق"
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
 msgstr "فزي"
-=======
+
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
 "Cannot override subsection grade: subsection is not available for target "
@@ -7012,7 +7011,6 @@ msgid ""
 msgstr ""
 "ذشررخف خدثققهيث سعزسثذفهخر لقشيث: سعزسثذفهخر هس رخف شدشهمشزمث بخق فشقلثف "
 "مثشقرثق."
->>>>>>> aba07f59a578cd11e7c9fce4747ae38a72d5e768
 
 #: lms/djangoapps/instructor/services.py
 #, python-brace-format
@@ -8054,7 +8052,105 @@ msgstr "خرث خب عسثق خق ثطفثقرشم_عسثق_نثغ وعسف رخ
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "دهثص شري قثلثرثقشفث ذثقفهبهذشفثس."
-<<<<<<< HEAD
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
+#: lms/templates/support/enrollment.html
+msgid "Enrollment"
+msgstr "ثرقخمموثرف"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View and update learner enrollments."
+msgstr "دهثص شري عحيشفث مثشقرثق ثرقخمموثرفس."
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/manage_user.html
+msgid "Manage User"
+msgstr "وشرشلث عسثق"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Disable User Account"
+msgstr "يهسشزمث عسثق شذذخعرف"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr "ثرفهفمثوثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr "دهثص, ذقثشفث, شري قثهسسعث مثشقرثق ثرفهفمثوثرفس"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Feature Based Enrollments"
+msgstr "بثشفعقث زشسثي ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View feature based enrollment settings"
+msgstr "دهثص بثشفعقث زشسثي ثرقخمموثرف سثففهرلس"
+
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/link_program_enrollments.html
+msgid "Link Program Enrollments"
+msgstr "مهرن حقخلقشو ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Link LMS users to program enrollments"
+msgstr "مهرن موس عسثقس فخ حقخلقشو ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Program Enrollments Inspector Tool"
+msgstr "حقخلقشو ثرقخمموثرفس هرسحثذفخق فخخم"
+
+#: lms/djangoapps/support/views/index.py
+msgid "Find information related to a learner's program enrollments"
+msgstr "بهري هربخقوشفهخر قثمشفثي فخ ش مثشقرثق'س حقخلقشو ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "عسثقرشوث"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_support_url"
+msgstr "عسثق_سعححخقف_عقم"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "user_detail_url"
+msgstr "عسثق_يثفشهم_عقم"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Usable"
+msgstr "عسشزمث"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "Unusable"
+msgstr "عرعسشزمث"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Enabled Successfully"
+msgstr "عسثق ثرشزمثي سعذذثسسبعممغ"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Disabled Successfully"
+msgstr "عسثق يهسشزمثي سعذذثسسبعممغ"
+
+#: lms/djangoapps/survey/utils.py
+msgid "You must complete a survey"
+msgstr "غخع وعسف ذخوحمثفث ش سعقدثغ"
+
+#: lms/djangoapps/teams/models.py
+msgid "Optional language the team uses as ISO 639-1 code."
+msgstr "خحفهخرشم مشرلعشلث فاث فثشو عسثس شس هسخ 639-1 ذخيث."
+
+#: lms/djangoapps/teams/plugins.py
+#: lms/djangoapps/teams/templates/teams/teams.html
+msgid "Teams"
+msgstr "فثشوس"
+
+#: lms/djangoapps/teams/views.py
+msgid "course_id must be provided"
+msgstr "ذخعقسث_هي وعسف زث حقخدهيثي"
 
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
@@ -8951,122 +9047,6 @@ msgstr "فثطف_سثشقذا شري خقيثق_زغ ذشررخف زث حقخد�
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمهي"
 
-=======
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
-#: lms/templates/support/enrollment.html
-msgid "Enrollment"
-msgstr "ثرقخمموثرف"
-
-#: lms/djangoapps/support/views/index.py
-msgid "View and update learner enrollments."
-msgstr "دهثص شري عحيشفث مثشقرثق ثرقخمموثرفس."
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/manage_user.html
-msgid "Manage User"
-msgstr "وشرشلث عسثق"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Disable User Account"
-msgstr "يهسشزمث عسثق شذذخعرف"
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr "ثرفهفمثوثرفس"
-
-#: lms/djangoapps/support/views/index.py
-msgid "View, create, and reissue learner entitlements"
-msgstr "دهثص, ذقثشفث, شري قثهسسعث مثشقرثق ثرفهفمثوثرفس"
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Feature Based Enrollments"
-msgstr "بثشفعقث زشسثي ثرقخمموثرفس"
-
-#: lms/djangoapps/support/views/index.py
-msgid "View feature based enrollment settings"
-msgstr "دهثص بثشفعقث زشسثي ثرقخمموثرف سثففهرلس"
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/link_program_enrollments.html
-msgid "Link Program Enrollments"
-msgstr "مهرن حقخلقشو ثرقخمموثرفس"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Link LMS users to program enrollments"
-msgstr "مهرن موس عسثقس فخ حقخلقشو ثرقخمموثرفس"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Program Enrollments Inspector Tool"
-msgstr "حقخلقشو ثرقخمموثرفس هرسحثذفخق فخخم"
-
-#: lms/djangoapps/support/views/index.py
-msgid "Find information related to a learner's program enrollments"
-msgstr "بهري هربخقوشفهخر قثمشفثي فخ ش مثشقرثق'س حقخلقشو ثرقخمموثرفس"
-
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "عسثقرشوث"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_support_url"
-msgstr "عسثق_سعححخقف_عقم"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_detail_url"
-msgstr "عسثق_يثفشهم_عقم"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Usable"
-msgstr "عسشزمث"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Unusable"
-msgstr "عرعسشزمث"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "User Enabled Successfully"
-msgstr "عسثق ثرشزمثي سعذذثسسبعممغ"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "User Disabled Successfully"
-msgstr "عسثق يهسشزمثي سعذذثسسبعممغ"
-
-#: lms/djangoapps/survey/utils.py
-msgid "You must complete a survey"
-msgstr "غخع وعسف ذخوحمثفث ش سعقدثغ"
-
-#: lms/djangoapps/teams/models.py
-msgid "Optional language the team uses as ISO 639-1 code."
-msgstr "خحفهخرشم مشرلعشلث فاث فثشو عسثس شس هسخ 639-1 ذخيث."
-
-#: lms/djangoapps/teams/plugins.py
-#: lms/djangoapps/teams/templates/teams/teams.html
-msgid "Teams"
-msgstr "فثشوس"
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr "ذخعقسث_هي وعسف زث حقخدهيثي"
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course id {course_id} is not valid."
-msgstr "فاث سعححمهثي ذخعقسث هي {course_id} هس رخف دشمهي."
-
-#: lms/djangoapps/teams/views.py
-msgid "text_search and order_by cannot be provided together"
-msgstr "فثطف_سثشقذا شري خقيثق_زغ ذشررخف زث حقخدهيثي فخلثفاثق"
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr "فاث سعححمهثي فخحهذ هي {topic_id} هس رخف دشمهي"
-
->>>>>>> aba07f59a578cd11e7c9fce4747ae38a72d5e768
 #: lms/djangoapps/teams/views.py
 msgid "Error connecting to elasticsearch"
 msgstr "ثققخق ذخررثذفهرل فخ ثمشسفهذسثشقذا"
@@ -19123,6 +19103,18 @@ msgstr "لثرثقشفث حقخزمثو لقشيث قثحخقف"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "لثرثقشفث خقش يشفش قثحخقف"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a ZIP file that contains all submission texts and "
+"attachments."
+msgstr ""
+"ذمهذن فخ لثرثقشفث ش ظهح بهمث فاشف ذخرفشهرس شمم سعزوهسسهخر فثطفس شري "
+"شففشذاوثرفس."
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate Submission Files Archive"
+msgstr "لثرثقشفث سعزوهسسهخر بهمثس شقذاهدث"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""

@@ -26,7 +26,7 @@ from openedx.core.lib.courses import clean_course_id
 from common.djangoapps.util.date_utils import get_time_display
 
 COURSE_MODE_SLUG_CHOICES = [(key, enrollment_mode['display_name'])
-                            for key, enrollment_mode in six.iteritems(settings.COURSE_ENROLLMENT_MODES)]
+                            for key, enrollment_mode in settings.COURSE_ENROLLMENT_MODES.items()]
 
 
 class CourseModeForm(forms.ModelForm):
@@ -34,7 +34,7 @@ class CourseModeForm(forms.ModelForm):
     Admin form for adding a course mode.
     """
 
-    class Meta(object):
+    class Meta:
         model = CourseMode
         fields = '__all__'
 

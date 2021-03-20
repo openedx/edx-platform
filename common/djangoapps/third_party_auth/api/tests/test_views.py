@@ -4,6 +4,7 @@ Tests for the Third Party Auth REST API
 
 
 import unittest
+from unittest.mock import patch
 
 import ddt
 import six
@@ -12,9 +13,7 @@ from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-from mock import patch
 from rest_framework.test import APITestCase
-from six.moves import range
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -67,7 +66,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             make_staff = (username == STAFF_USERNAME) or make_superuser
             user = UserFactory.create(
                 username=username,
-                email='{}@example.com'.format(username),
+                email=f'{username}@example.com',
                 password=PASSWORD,
                 is_staff=make_staff,
                 is_superuser=make_superuser,
@@ -75,19 +74,19 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             UserSocialAuth.objects.create(
                 user=user,
                 provider=google.backend_name,
-                uid='{}@gmail.com'.format(username),
+                uid=f'{username}@gmail.com',
             )
             UserSocialAuth.objects.create(
                 user=user,
                 provider=testshib.backend_name,
-                uid='{}:remote_{}'.format(testshib.slug, username),
+                uid=f'{testshib.slug}:remote_{username}',
             )
         # Create another user not linked to any providers:
-        UserFactory.create(username=CARL_USERNAME, email='{}@example.com'.format(CARL_USERNAME), password=PASSWORD)
+        UserFactory.create(username=CARL_USERNAME, email=f'{CARL_USERNAME}@example.com', password=PASSWORD)
 
 
 @ddt.ddt
-class UserViewsMixin(object):
+class UserViewsMixin:
     """
     Generic TestCase to exercise the v1 and v2 UserViews.
     """
@@ -100,7 +99,7 @@ class UserViewsMixin(object):
             {
                 "provider_id": "oa2-google-oauth2",
                 "name": "Google",
-                "remote_id": "{}@gmail.com".format(username),
+                "remote_id": f"{username}@gmail.com",
             },
             {
                 "provider_id": PROVIDER_ID_TESTSHIB,
@@ -172,7 +171,7 @@ class UserViewsMixin(object):
 
     def test_allow_query_by_email(self):
         self.client.login(username=ALICE_USERNAME, password=PASSWORD)
-        url = self.make_url({'email': '{}@example.com'.format(ALICE_USERNAME)})
+        url = self.make_url({'email': f'{ALICE_USERNAME}@example.com'})
         response = self.client.get(url)
         assert response.status_code == 200
         assert len(response.data['active']) > 0
@@ -247,7 +246,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
         token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
-        return "JWT {}".format(token)
+        return f"JWT {token}"
 
     @ddt.data(
         (True, 200, get_mapping_data_by_usernames(LINKED_USERS)),
@@ -311,7 +310,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         for attr in ['username', 'remote_id']:
             if attr in query_params:
                 params.setlist(attr, query_params[attr])
-        url = "{}?{}".format(base_url, params.urlencode())
+        url = f"{base_url}?{params.urlencode()}"
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self._verify_response(response, expect_code, expect_data)
 
@@ -327,7 +326,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         UserSocialAuth.objects.create(
             user=user,
             provider=testshib2.backend_name,
-            uid='{}:{}'.format(testshib2.slug, username),
+            uid=f'{testshib2.slug}:{username}',
         )
 
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})

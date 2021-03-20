@@ -4,12 +4,12 @@ Tests for student enrollment.
 
 
 import unittest
+from unittest.mock import Mock, patch
 
 import ddt
 import pytest
 from django.conf import settings
 from django.test.utils import override_settings
-from mock import Mock, patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import api

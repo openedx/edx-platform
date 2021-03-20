@@ -45,7 +45,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'enrollment.Course'
 
@@ -82,7 +82,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         """Retrieves the username from the associated model."""
         return model.username
 
-    class Meta(object):
+    class Meta:
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'

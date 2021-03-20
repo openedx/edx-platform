@@ -5,13 +5,17 @@ import datetime
 import pytest
 
 import ddt
-import mock
+import pytest
 import pytz
 from django import test
 from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from lms.djangoapps.verify_student.models import SSOVerification
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline, provider
@@ -388,9 +392,9 @@ class UserDetailsForceSyncTestCase(TestCase):
         self.old_username = self.user.username
         self.old_fullname = self.user.profile.name
         self.details = {
-            'email': u'new+{}'.format(self.user.email),
-            'username': u'new_{}'.format(self.user.username),
-            'fullname': u'Grown Up {}'.format(self.user.profile.name),
+            'email': f'new+{self.user.email}',
+            'username': f'new_{self.user.username}',
+            'fullname': f'Grown Up {self.user.profile.name}',
             'country': 'PK',
             'non_existing_field': 'value',
         }
@@ -418,8 +422,8 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # User now has updated information in the DB.
         user = User.objects.get()
-        assert user.email == 'new+{}'.format(self.old_email)
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.email == f'new+{self.old_email}'
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -432,7 +436,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         The user details were attempted to be synced but the incoming email already exists for another account.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(email='new+{}'.format(self.old_email))
+        UserFactory.create(email=f'new+{self.old_email}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -445,7 +449,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         # The email is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
         assert user.email == self.old_email
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -461,7 +465,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         An email should still be sent in this case.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(username='new_{}'.format(self.old_username))
+        UserFactory.create(username=f'new_{self.old_username}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -473,9 +477,9 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # The username is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
-        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.email == f'new+{self.old_email}'
         assert user.username == self.old_username
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # An email should still be sent because the email changed.

@@ -17,7 +17,7 @@ from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
 
 
-class SAMLProviderDataMixin(object):
+class SAMLProviderDataMixin:
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderDataSerializer

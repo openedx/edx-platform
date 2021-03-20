@@ -427,6 +427,13 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
 
     is_shib_course = uses_shib(course)
 
+    # Collect mailing address and platform name to pass as context
+    contact_mailing_address = configuration_helpers.get_value(
+        'contact_mailing_address',
+        settings.CONTACT_MAILING_ADDRESS
+    )
+    platform_name = configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
+
     # Composition of email
     email_params = {
         'site_name': stripped_site_name,
@@ -437,6 +444,9 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
         'course_url': course_url,
         'course_about_url': course_about_url,
         'is_shib_course': is_shib_course,
+        'contact_mailing_address': contact_mailing_address,
+        'platform_name': platform_name,
+        'site_configuration_values': configuration_helpers.get_current_site_configuration_values(),
     }
     return email_params
 

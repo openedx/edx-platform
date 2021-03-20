@@ -46,7 +46,7 @@ def show_reference_template(request, template):
             PageLevelMessages.register_error_message(request, request.GET.get('error'))
 
         # Add some messages to the course skeleton pages
-        if u'course-skeleton.html' in request.path:
+        if 'course-skeleton.html' in request.path:
             PageLevelMessages.register_info_message(request, _('This is a test message'))
             PageLevelMessages.register_success_message(request, _('This is a success message'))
             PageLevelMessages.register_warning_message(request, _('This is a test warning'))
@@ -54,4 +54,4 @@ def show_reference_template(request, template):
 
         return render_to_response(template, context)
     except TemplateDoesNotExist:
-        return HttpResponseNotFound(u'Missing template {template}'.format(template=bleach.clean(template, strip=True)))
+        return HttpResponseNotFound('Missing template {template}'.format(template=bleach.clean(template, strip=True)))

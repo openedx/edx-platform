@@ -40,7 +40,7 @@ class CourseEnrollmentsApiListForm(Form):
             usernames = usernames_csv_string.split(',')
             if len(usernames) > self.MAX_USERNAME_COUNT:
                 raise ValidationError(
-                    u"Too many usernames in a single request - {}. A maximum of {} is allowed".format(
+                    "Too many usernames in a single request - {}. A maximum of {} is allowed".format(
                         len(usernames),
                         self.MAX_USERNAME_COUNT,
                     )

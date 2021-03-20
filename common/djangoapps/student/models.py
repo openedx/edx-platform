@@ -24,7 +24,6 @@ from importlib import import_module
 from urllib.parse import urlencode
 import warnings
 
-import six
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings

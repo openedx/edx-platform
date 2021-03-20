@@ -436,7 +436,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         returns a CourseBlock for the course
         """
-        log.debug('========> Starting courselike import from %s', course_dir)
+        log.info(f'Course import {target_course_id}: Starting courselike import from {course_dir}')
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
@@ -531,7 +531,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
             self.content_importers(system, course_descriptor, course_dir, url_name)
 
-            log.debug('========> Done with courselike import from %s', course_dir)
+            log.info(f'Course import {target_course_id}: Done with courselike import from {course_dir}')
             return course_descriptor
 
     def content_importers(self, system, course_descriptor, course_dir, url_name):

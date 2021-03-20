@@ -2,7 +2,6 @@
 Views for the verification flow
 """
 
-import datetime
 import decimal
 import json
 import logging
@@ -39,7 +38,6 @@ from lms.djangoapps.commerce.utils import EcommerceService, is_account_activatio
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
 from lms.djangoapps.verify_student.utils import can_verify_now
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -1073,14 +1071,6 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
         "Date": request.META.get("HTTP_DATE", "")
     }
-
-    has_valid_signature(
-        "POST",
-        headers,
-        body_dict,
-        settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_ACCESS_KEY"],
-        settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_SECRET_KEY"]
-    )
 
     _response, access_key_and_sig = headers["Authorization"].split(" ")
     access_key = access_key_and_sig.split(":")[0]
