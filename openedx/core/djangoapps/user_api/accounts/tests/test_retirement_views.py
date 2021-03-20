@@ -1570,10 +1570,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(response.status_code, expected_status)
         return response
 
-    @unittest.skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
-        'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
-    )
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skipping until Lilac OSPR edx#27002 of BOM-2453')
     def test_retire_user(self):
         # check that rows that will not exist after retirement exist now
         self.assertTrue(CreditRequest.objects.filter(username=self.test_user.username).exists())
@@ -1610,10 +1607,7 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.company_name, '')
         self.assertEqual(retired_api_access_request.reason, '')
 
-    @unittest.skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage IntegrityError in RED-1877
-        'IntegrityError in wiki_articleplugin needs devstack/staging to test before marking as perm. failure.'
-    )
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Skipping until Lilac OSPR edx#27002 of BOM-2453')
     def test_retire_user_twice_idempotent(self):
         # check that a second call to the retire_misc endpoint will work
         data = {'username': self.original_username}
