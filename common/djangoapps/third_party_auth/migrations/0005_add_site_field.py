@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 from django.db import migrations, models
 
@@ -28,7 +25,7 @@ class Migration(migrations.Migration):
             name='provider_slug',
             field=models.SlugField(
                 default='temp',
-                help_text=u'A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"',
+                help_text='A short string uniquely identifying this provider. Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"',
                 max_length=30
             ),
             preserve_default=False,

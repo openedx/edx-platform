@@ -32,7 +32,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestRemoveSocialAuthUsersCommand, cls).setUpClass()
+        super().setUpClass()
         cls.command = remove_social_auth_users.Command()
 
     def setUp(self):
@@ -58,7 +58,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         external_id = uuid4()
         UserSocialAuth.objects.create(
             user=user,
-            uid='{0}:{1}'.format(provider.slug, external_id),
+            uid=f'{provider.slug}:{external_id}',
             provider=provider.slug,
         )
 
@@ -87,7 +87,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
     def test_invalid_idp(self):
         invalid_slug = 'jedi-academy'
-        err_string = u'No SAML provider found for slug {}'.format(invalid_slug)
+        err_string = f'No SAML provider found for slug {invalid_slug}'
         with self.assertRaisesRegex(CommandError, err_string):
             call_command(self.command, invalid_slug)
 

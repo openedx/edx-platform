@@ -38,7 +38,7 @@ class CourseModeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=mi
             course_overview = None
             course_kwargs.setdefault('id', course_id)
             if course_id is not None:
-                if isinstance(course_id, six.string_types):
+                if isinstance(course_id, str):
                     course_id = CourseKey.from_string(course_id)
                     course_kwargs['id'] = course_id
                 try:
@@ -63,4 +63,4 @@ class CourseModeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=mi
 
     @lazy_attribute
     def mode_display_name(self):
-        return '{0} course'.format(self.mode_slug)
+        return f'{self.mode_slug} course'

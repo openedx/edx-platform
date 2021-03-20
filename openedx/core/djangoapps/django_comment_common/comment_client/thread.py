@@ -39,7 +39,7 @@ class Thread(models.Model):
     # initializable_fields are sent in POST requests
     initializable_fields = updatable_fields + ['thread_type', 'context']
 
-    base_url = "{prefix}/threads".format(prefix=settings.PREFIX)
+    base_url = f"{settings.PREFIX}/threads"
     default_retrieve_params = {'recursive': False}
     type = 'thread'
 
@@ -69,7 +69,7 @@ class Thread(models.Model):
             'get',
             url,
             params,
-            metric_tags=[u'course_id:{}'.format(query_params['course_id'])],
+            metric_tags=['course_id:{}'.format(query_params['course_id'])],
             metric_action='thread.search',
             paged_results=True
         )
@@ -93,8 +93,8 @@ class Thread(models.Model):
                 }
             )
             log.info(
-                u'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} '
-                u'group_id={group_id} page={requested_page} total_results={total_results}'.format(
+                'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} '
+                'group_id={group_id} page={requested_page} total_results={total_results}'.format(
                     search_query=search_query,
                     corrected_text=corrected_text,
                     course_id=course_id,
@@ -115,16 +115,16 @@ class Thread(models.Model):
     @classmethod
     def url_for_threads(cls, params=None):
         if params and params.get('commentable_id'):
-            return u"{prefix}/{commentable_id}/threads".format(
+            return "{prefix}/{commentable_id}/threads".format(
                 prefix=settings.PREFIX,
                 commentable_id=params['commentable_id'],
             )
         else:
-            return u"{prefix}/threads".format(prefix=settings.PREFIX)
+            return f"{settings.PREFIX}/threads"
 
     @classmethod
     def url_for_search_threads(cls):
-        return "{prefix}/search/threads".format(prefix=settings.PREFIX)
+        return f"{settings.PREFIX}/search/threads"
 
     @classmethod
     def url(cls, action, params=None):
@@ -135,7 +135,7 @@ class Thread(models.Model):
         elif action == 'search':
             return cls.url_for_search_threads()
         else:
-            return super(Thread, cls).url(action, params)
+            return super().url(action, params)
 
     # TODO: This is currently overriding Model._retrieve only to add parameters
     # for the request. Model._retrieve should be modified to handle this such
@@ -221,16 +221,16 @@ class Thread(models.Model):
 
 
 def _url_for_flag_abuse_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/abuse_flag".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return f"{settings.PREFIX}/threads/{thread_id}/abuse_flag"
 
 
 def _url_for_unflag_abuse_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/abuse_unflag".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return f"{settings.PREFIX}/threads/{thread_id}/abuse_unflag"
 
 
 def _url_for_pin_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/pin".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return f"{settings.PREFIX}/threads/{thread_id}/pin"
 
 
 def _url_for_un_pin_thread(thread_id):
-    return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)
+    return f"{settings.PREFIX}/threads/{thread_id}/unpin"

@@ -397,10 +397,12 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         with translation_language(language):
+            LOGGER.error(f'Course import {courselike_key}: Unknown User ID: {user_id}')
             self.status.fail(_('Unknown User ID: {0}').format(user_id))
         return
     if not has_course_author_access(user, courselike_key):
         with translation_language(language):
+            LOGGER.error(f'Course import {courselike_key}: Permission denied User ID: {user_id}')
             self.status.fail(_('Permission denied'))
         return
 
@@ -422,9 +424,10 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     course_dir = data_root / subdir
     try:
         self.status.set_state('Unpacking')
-
+        LOGGER.info(f'Course import {courselike_key}: unpacking step started')
         if not archive_name.endswith('.tar.gz'):
             with translation_language(language):
+                LOGGER.error(f'Course import {courselike_key}: Only .tar.gz file is supported')
                 self.status.fail(_('We only support uploading a .tar.gz file.'))
                 return
 
@@ -432,11 +435,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        LOGGER.debug(f'importing course to {temp_filepath}')
+        LOGGER.info(f'Course import: {courselike_key}: importing course to {temp_filepath}')
 
         # Copy the OLX archive from where it was uploaded to (S3, Swift, file system, etc.)
         if not course_import_export_storage.exists(archive_path):
-            LOGGER.info('Course import %s: Uploaded file %s not found', courselike_key, archive_path)
+            LOGGER.error(f'Course import {courselike_key}: Uploaded file {archive_path} not found')
             with translation_language(language):
                 self.status.fail(_('Tar file not found'))
             return
@@ -449,7 +452,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                     return source.read(FILE_READ_CHUNK)
                 for chunk in iter(read_chunk, b''):
                     destination.write(chunk)
-        LOGGER.info('Course import %s: Download from storage complete', courselike_key)
+        LOGGER.info(f'Course import {courselike_key}: Download from storage complete')
         # Delete from source location
         course_import_export_storage.delete(archive_path)
 
@@ -463,16 +466,15 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
-                    'entrance exam milestone content reference for course %s has been removed',
-                    courselike_module.id
+                    f'Course import {courselike_key}: entrance exam milestone content reference has been removed'
                 )
     # Send errors to client with stage at which error occurred.
     except Exception as exception:  # pylint: disable=broad-except
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info('Course import %s: Temp data cleared', courselike_key)
+            LOGGER.info(f'Course import {courselike_key}: Temp data cleared')
 
-        LOGGER.exception('Error importing course %s', courselike_key, exc_info=True)
+        LOGGER.exception(f'Course import {courselike_key}: Unknown error while unpacking', exc_info=True)
         self.status.fail(str(exception))
         return
 
@@ -482,14 +484,14 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         try:
             safetar_extractall(tar_file, (course_dir + '/'))
         except SuspiciousOperation as exc:
-            LOGGER.info('Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
+            LOGGER.error(f'Course import {courselike_key}: Unsafe tar file')
             with translation_language(language):
                 self.status.fail(_('Unsafe tar file. Aborting import.'))
             return
         finally:
             tar_file.close()
 
-        LOGGER.info('Course import %s: Uploaded file extracted', courselike_key)
+        LOGGER.info(f'Course import {courselike_key}: Uploaded file extracted. Verification step started')
         self.status.set_state('Verifying')
         self.status.increment_completed_steps()
 
@@ -517,13 +519,13 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         dirpath = get_dir_for_filename(course_dir, root_name)
         if not dirpath:
             with translation_language(language):
+                LOGGER.error(f'Course import {courselike_key}: Could not find the {root_name} file in the package.')
                 self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
                 return
 
         dirpath = os.path.relpath(dirpath, data_root)
-        LOGGER.debug('found %s at %s', root_name, dirpath)
 
-        LOGGER.info('Course import %s: Extracted file verified', courselike_key)
+        LOGGER.info(f'Course import {courselike_key}: Extracted file verified. Updating course started')
         self.status.set_state('Updating')
         self.status.increment_completed_steps()
 
@@ -532,20 +534,21 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             settings.GITHUB_REPO_ROOT, [dirpath],
             load_error_modules=False,
             static_content_store=contentstore(),
-            target_id=courselike_key
+            target_id=courselike_key,
+            verbose=True
         )
 
         new_location = courselike_items[0].location
         LOGGER.debug('new course at %s', new_location)
 
-        LOGGER.info('Course import %s: Course import successful', courselike_key)
+        LOGGER.info(f'Course import {courselike_key}: Course import successful')
     except Exception as exception:   # pylint: disable=broad-except
-        LOGGER.exception('error importing course', exc_info=True)
+        LOGGER.exception(f'Course import {courselike_key}: Unknown error while updating course')
         self.status.fail(str(exception))
     finally:
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info('Course import %s: Temp data cleared', courselike_key)
+            LOGGER.info(f'Course import {courselike_key}: Temp data cleared')
 
         if self.status.state == 'Updating' and is_course:
             # Reload the course so we have the latest state

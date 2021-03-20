@@ -32,6 +32,7 @@ def generate_activation_email_context(user, registration):
             'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
         ) or settings.SUPPORT_SITE_LINK,
         'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+        'site_configuration_values': configuration_helpers.get_current_site_configuration_values(),
     })
     return context
 

@@ -21,7 +21,6 @@ from django.db import IntegrityError, transaction, ProgrammingError
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
-from six import iteritems, text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode

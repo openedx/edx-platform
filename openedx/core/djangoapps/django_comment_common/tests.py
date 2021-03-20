@@ -6,7 +6,6 @@ import pytest
 from contracts import new_contract
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
-from six import text_type
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
@@ -20,7 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-new_contract('basestring', six.string_types[0])
+new_contract('basestring', str)
 
 
 class RoleAssignmentTest(TestCase):
@@ -128,7 +127,7 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
     def test_invalid_data_types(self):
         exception_msg_template = "Incorrect field type for `{}`. Type must be `{}`"
         fields = [
-            {'name': 'division_scheme', 'type': six.string_types[0]},
+            {'name': 'division_scheme', 'type': (str,)[0]},
             {'name': 'always_divide_inline_discussions', 'type': bool},
             {'name': 'divided_discussions', 'type': list}
         ]

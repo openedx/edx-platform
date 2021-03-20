@@ -87,7 +87,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
         )
 
 
-class ThirdPartyOAuthTestMixinFacebook(object):
+class ThirdPartyOAuthTestMixinFacebook:
     """Tests oauth with the Facebook backend"""
     BACKEND = "facebook"
     USER_URL = FacebookOAuth2.USER_DATA_URL.format(version=FACEBOOK_API_VERSION)
@@ -95,7 +95,7 @@ class ThirdPartyOAuthTestMixinFacebook(object):
     UID_FIELD = "id"
 
 
-class ThirdPartyOAuthTestMixinGoogle(object):
+class ThirdPartyOAuthTestMixinGoogle:
     """Tests oauth with the Google backend"""
     BACKEND = "google-oauth2"
     USER_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
@@ -115,7 +115,7 @@ def read_and_pre_process_xml(file_name):
     Returns:
          (str): Pre Processed contents of the file.
     """
-    with open(file_name, 'r') as xml_file:
+    with open(file_name) as xml_file:
         return xml_file.read().replace('\n', '')
 
 

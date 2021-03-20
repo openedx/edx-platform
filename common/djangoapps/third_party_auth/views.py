@@ -82,7 +82,7 @@ def saml_metadata_view(request):
 
 
 @csrf_exempt
-@psa('{0}:complete'.format(URL_NAMESPACE))
+@psa(f'{URL_NAMESPACE}:complete')
 def lti_login_and_complete_view(request, backend, *args, **kwargs):
     """This is a combination login/complete due to LTI being a one step login"""
 

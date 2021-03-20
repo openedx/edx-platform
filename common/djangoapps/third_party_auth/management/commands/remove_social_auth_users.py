@@ -10,7 +10,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from six.moves import input
 
 from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
@@ -51,7 +50,7 @@ class Command(BaseCommand):
         user_count = len(users)
         count, models = users.delete()
         log.info(
-            u'\n%s users and their related models will be deleted:\n%s\n',
+            '\n%s users and their related models will be deleted:\n%s\n',
             user_count,
             models,
         )
@@ -61,4 +60,4 @@ class Command(BaseCommand):
             if confirmation != 'confirm':
                 raise CommandError('User confirmation required.  No records have been modified')
 
-        log.info(u'Deleting %s records...', count)
+        log.info('Deleting %s records...', count)

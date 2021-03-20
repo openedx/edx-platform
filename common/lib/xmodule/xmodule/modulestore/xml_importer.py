@@ -267,14 +267,16 @@ class ImportManager:
         # If we're going to remap the ID, then we can only do that with
         # a single target
         if self.target_id:
-            assert len(self.xml_module_store.modules) == 1
+            assert len(self.xml_module_store.modules) == 1, 'Store unable to load course correctly.'
 
     def import_static(self, data_path, dest_id):
         """
         Import all static items into the content store.
         """
         if self.static_content_store is None:
-            log.warning("Static content store is None. Skipping static content import...")
+            log.error(
+                f'Course import {self.target_id}: Static content store is None. Skipping static content import.'
+            )
             return
 
         static_content_importer = StaticContentImporter(
@@ -284,14 +286,16 @@ class ImportManager:
         )
         if self.do_import_static:
             if self.verbose:
-                log.debug("Importing static content and python library")
+                log.info(f'Course import {self.target_id}: Importing static content and python library')
             # first pass to find everything in the static content directory
             static_content_importer.import_static_content_directory(
                 content_subdir=self.static_content_subdir, verbose=self.verbose
             )
         elif self.do_import_python_lib and self.python_lib_filename:
             if self.verbose:
-                log.debug("Skipping static content import, still importing python library")
+                log.info(
+                    f'Course import {self.target_id}: Skipping static content import, still importing python library'
+                )
             python_lib_dir_path = data_path / self.static_content_subdir
             python_lib_full_path = python_lib_dir_path / self.python_lib_filename
             if os.path.isfile(python_lib_full_path):
@@ -300,7 +304,7 @@ class ImportManager:
                 )
         else:
             if self.verbose:
-                log.debug("Skipping import of static content and python library")
+                log.info(f'Course import {self.target_id}: Skipping import of static content and python library')
 
         # No matter what do_import_static is, import "static_import" directory.
         # This is needed because the "about" pages (eg "overview") are
@@ -314,7 +318,7 @@ class ImportManager:
         simport = 'static_import'
         if os.path.exists(data_path / simport):
             if self.verbose:
-                log.debug("Importing %s directory", simport)
+                log.info(f'Course import {self.target_id}: Importing {simport} directory')
             static_content_importer.import_static_content_directory(
                 content_subdir=simport, verbose=self.verbose
             )
@@ -471,7 +475,9 @@ class ImportManager:
                             runtime=courselike.runtime,
                         )
                     except Exception:
-                        log.error('failed to import module location %s', child.location)
+                        log.exception(
+                            f'Course import {self.target_id}: failed to import module location {child.location}'
+                        )
                         raise
 
                     depth_first(child)

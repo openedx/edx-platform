@@ -6,7 +6,6 @@ import pytest
 
 from django.core.management import call_command
 from opaque_keys import InvalidKeyError
-from six import text_type
 from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.tests.factories import CourseMode

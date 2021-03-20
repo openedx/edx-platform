@@ -27,7 +27,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollManagementCommandTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(org='fooX', number='007')
 
     def setUp(self):

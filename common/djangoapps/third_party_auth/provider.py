@@ -18,7 +18,7 @@ from common.djangoapps.third_party_auth.models import (
 )
 
 
-class Registry(object):
+class Registry:
     """
     API for querying third-party auth ProviderConfig objects.
 

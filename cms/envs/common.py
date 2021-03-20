@@ -157,6 +157,9 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 ############################ FEATURE CONFIGURATION #############################
 
 PLATFORM_NAME = _('Your Platform Name Here')
+
+CONTACT_MAILING_ADDRESS = _('Your Contact Mailing Address Here')
+
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"

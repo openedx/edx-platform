@@ -8,7 +8,7 @@ import unittest
 from contextlib import contextmanager
 import pytest
 
-import mock
+import pytest
 from django import test
 from django.conf import settings
 from django.contrib import auth
@@ -40,7 +40,7 @@ def create_account(request):
     return RegistrationView().post(request)
 
 
-class HelperMixin(object):
+class HelperMixin:
     """
     Contains helper methods for IntegrationTestMixin and IntegrationTest classes below.
     """
@@ -73,11 +73,11 @@ class HelperMixin(object):
         # Check that the correct provider was selected.
         self.assertContains(
             response,
-            u'"errorMessage": null'
+            '"errorMessage": null'
         )
         self.assertContains(
             response,
-            u'"currentProvider": "{}"'.format(self.provider.name),
+            f'"currentProvider": "{self.provider.name}"',
         )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
@@ -796,11 +796,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_first_party_auth_trumps_third_party_auth_and_fails_when_credentials_bad(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password=u'password', success=False)
+            email='user@example.com', password='password', success=False)
 
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password=u'password', success=True)
+            email='user@example.com', password='password', success=True)
 
     def test_pipeline_redirects_to_requested_url(self):
         requested_redirect_url = 'foo'  # something different from '/dashboard'

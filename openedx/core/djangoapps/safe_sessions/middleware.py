@@ -54,6 +54,10 @@ to the browser that the cookie should be sent only over an
 SSL-protected channel.  Otherwise, a session hijacker could copy
 the entire cookie and use it to impersonate the victim.
 
+Custom Attributes:
+    safe_sessions.user_mismatch: 'request-response-mismatch' | 'request-session-mismatch'
+        This attribute can be one of the above two values which correspond to the kind of comparison
+        that failed when processing the response. See SafeSessionMiddleware._verify_user
 """
 
 
@@ -72,6 +76,7 @@ from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import python_2_unicode_compatible
+from edx_django_utils.monitoring import set_custom_attribute
 
 from six import text_type  # pylint: disable=ungrouped-imports
 
@@ -372,18 +377,24 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 # conditionally set the log level.
                 log_func = log.debug if request.user.id is None else log.warning
                 log_func(
-                    u"SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(
-                        request.safe_cookie_verified_user_id,
-                        request.user.id,
+                    (
+                        "SafeCookieData user at request '{0}' does not match user at response: '{1}' "
+                        "for request path '{2}'"
+                    ).format(
+                        request.safe_cookie_verified_user_id, request.user.id, request.path,
                     ),
                 )
+                set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
             if request.safe_cookie_verified_user_id != userid_in_session:
                 log.warning(
-                    u"SafeCookieData user at request '{0}' does not match user in session: '{1}'".format(  # pylint: disable=logging-format-interpolation
-                        request.safe_cookie_verified_user_id,
-                        userid_in_session,
+                    (
+                        "SafeCookieData user at request '{0}' does not match user in session: '{1}' "
+                        "for request path '{2}'"
+                    ).format(  # pylint: disable=logging-format-interpolation
+                        request.safe_cookie_verified_user_id, userid_in_session, request.path,
                     ),
                 )
+                set_custom_attribute("safe_sessions.user_mismatch", "request-session-mismatch")
 
     @staticmethod
     def get_user_id_from_session(request):

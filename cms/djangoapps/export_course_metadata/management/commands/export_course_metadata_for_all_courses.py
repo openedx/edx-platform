@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.django import modulestore
 
-from cms.djangoapps.export_course_metadata.signals import export_course_metadata
+from cms.djangoapps.export_course_metadata.signals import export_course_metadata  # pylint: disable=unused-import
 from cms.djangoapps.export_course_metadata.tasks import export_course_metadata_task
 
 
@@ -27,7 +27,6 @@ def export_course_metadata_for_all_courses():
     """
     Export course metadata for all courses
     """
-    module_store = modulestore()
-    courses = module_store.get_courses()
+    courses = modulestore().get_course_summaries()
     for course in courses:
         export_course_metadata_task.delay(str(course.id))

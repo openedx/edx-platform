@@ -161,7 +161,7 @@ class LTIAuthBackend(BaseAuth):
             parameters_string = normalize_parameters(parameters)
             base_string = construct_base_string(request.http_method, base_uri, parameters_string)
 
-            computed_signature = sign_hmac_sha1(base_string, six.text_type(lti_consumer_secret), '')
+            computed_signature = sign_hmac_sha1(base_string, str(lti_consumer_secret), '')
             submitted_signature = request.oauth_signature
 
             data = {parameter_value_pair[0]: parameter_value_pair[1] for parameter_value_pair in parameters}
@@ -189,7 +189,7 @@ class LTIAuthBackend(BaseAuth):
             if valid:
                 return data
         except AttributeError as error:
-            log.error(u"'{}' not found.".format(text_type(error)))
+            log.error("'{}' not found.".format(str(error)))
         return None
 
     @classmethod
