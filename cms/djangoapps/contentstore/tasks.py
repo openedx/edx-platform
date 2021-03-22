@@ -2,7 +2,6 @@
 This file contains celery tasks for contentstore views
 """
 
-
 import base64
 import json
 import os
@@ -22,7 +21,13 @@ from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
+from edx_django_utils.monitoring import (
+    set_code_owner_attribute,
+    set_code_owner_attribute_from_module,
+    set_custom_attribute,
+    set_custom_attributes_for_course_key,
+)
+from common.djangoapps.util.monitoring import monitor_import_failure
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.api import add_organization_course, ensure_organization
@@ -391,19 +396,70 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     """
     Import a course or library from a provided OLX .tar.gz archive.
     """
-    set_code_owner_attribute_from_module(__name__)
+    current_step = 'Unpacking'
     courselike_key = CourseKey.from_string(course_key_string)
-    try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        with translation_language(language):
-            LOGGER.error(f'Course import {courselike_key}: Unknown User ID: {user_id}')
-            self.status.fail(_('Unknown User ID: {0}').format(user_id))
+    set_code_owner_attribute_from_module(__name__)
+    set_custom_attributes_for_course_key(courselike_key)
+    log_prefix = f'Course import {courselike_key}'
+    self.status.set_state(current_step)
+
+    data_root = path(settings.GITHUB_REPO_ROOT)
+    subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
+    course_dir = data_root / subdir
+
+    def validate_user():
+        """Validate if the user exists otherwise log error. """
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist as exc:
+            with translation_language(language):
+                self.status.fail(_('Unknown User ID: {0}').format(user_id))
+            LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
+            monitor_import_failure(courselike_key, current_step, exception=exc)
+            return
+
+    def user_has_access(user):
+        """Return True if user has studio write access to the given course."""
+        has_access = has_course_author_access(user, courselike_key)
+        if not has_access:
+            message = f'User permission denied: {user.username}'
+            with translation_language(language):
+                self.status.fail(_('Permission denied'))
+            LOGGER.error(f'{log_prefix}: {message}')
+            monitor_import_failure(courselike_key, current_step, message=message)
+        return has_access
+
+    def file_is_supported():
+        """Check if it is a supported file."""
+        file_is_valid = archive_name.endswith('.tar.gz')
+
+        if not file_is_valid:
+            message = f'Unsupported file {archive_name}'
+            with translation_language(language):
+                self.status.fail(_('We only support uploading a .tar.gz file.'))
+            LOGGER.error(f'{log_prefix}: {message}')
+            monitor_import_failure(courselike_key, current_step, message=message)
+        return file_is_valid
+
+    def file_exists_in_storage():
+        archive_path_exists = course_import_export_storage.exists(archive_path)
+
+        if not archive_path_exists:
+            message = f'Uploaded file {archive_path} not found'
+            with translation_language(language):
+                self.status.fail(_('Tar file not found'))
+            LOGGER.error(f'{log_prefix}: {message}')
+            monitor_import_failure(courselike_key, current_step, message=message)
+        return archive_path_exists
+
+    user = validate_user()
+    if not user:
         return
-    if not has_course_author_access(user, courselike_key):
-        with translation_language(language):
-            LOGGER.error(f'Course import {courselike_key}: Permission denied User ID: {user_id}')
-            self.status.fail(_('Permission denied'))
+
+    if not user_has_access(user):
+        return
+
+    if not file_is_supported():
         return
 
     is_library = isinstance(courselike_key, LibraryLocator)
@@ -419,30 +475,19 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     # Locate the uploaded OLX archive (and download it from S3 if necessary)
     # Do everything in a try-except block to make sure everything is properly cleaned up.
-    data_root = path(settings.GITHUB_REPO_ROOT)
-    subdir = base64.urlsafe_b64encode(repr(courselike_key).encode('utf-8')).decode('utf-8')
-    course_dir = data_root / subdir
     try:
-        self.status.set_state('Unpacking')
-        LOGGER.info(f'Course import {courselike_key}: unpacking step started')
-        if not archive_name.endswith('.tar.gz'):
-            with translation_language(language):
-                LOGGER.error(f'Course import {courselike_key}: Only .tar.gz file is supported')
-                self.status.fail(_('We only support uploading a .tar.gz file.'))
-                return
+        LOGGER.info(f'{log_prefix}: unpacking step started')
 
         temp_filepath = course_dir / get_valid_filename(archive_name)
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        LOGGER.info(f'Course import: {courselike_key}: importing course to {temp_filepath}')
+        LOGGER.info(f'{log_prefix}: importing course to {temp_filepath}')
 
         # Copy the OLX archive from where it was uploaded to (S3, Swift, file system, etc.)
-        if not course_import_export_storage.exists(archive_path):
-            LOGGER.error(f'Course import {courselike_key}: Uploaded file {archive_path} not found')
-            with translation_language(language):
-                self.status.fail(_('Tar file not found'))
+        if not file_exists_in_storage():
             return
+
         with course_import_export_storage.open(archive_path, 'rb') as source:
             with open(temp_filepath, 'wb') as destination:
                 def read_chunk():
@@ -450,9 +495,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                     Read and return a sequence of bytes from the source file.
                     """
                     return source.read(FILE_READ_CHUNK)
+
                 for chunk in iter(read_chunk, b''):
                     destination.write(chunk)
-        LOGGER.info(f'Course import {courselike_key}: Download from storage complete')
+
+        LOGGER.info(f'{log_prefix}: Download from storage complete')
         # Delete from source location
         course_import_export_storage.delete(archive_path)
 
@@ -465,17 +512,16 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 from .views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
-                LOGGER.info(
-                    f'Course import {courselike_key}: entrance exam milestone content reference has been removed'
-                )
+                LOGGER.info(f'{log_prefix}: entrance exam milestone content reference has been removed')
     # Send errors to client with stage at which error occurred.
     except Exception as exception:  # pylint: disable=broad-except
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info(f'Course import {courselike_key}: Temp data cleared')
+            LOGGER.info(f'{log_prefix}: Temp data cleared')
 
-        LOGGER.exception(f'Course import {courselike_key}: Unknown error while unpacking', exc_info=True)
         self.status.fail(str(exception))
+        LOGGER.exception(f'{log_prefix}: Unknown error while unpacking', exc_info=True)
+        monitor_import_failure(courselike_key, current_step, exception=exception)
         return
 
     # try-finally block for proper clean up after receiving file.
@@ -484,16 +530,18 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         try:
             safetar_extractall(tar_file, (course_dir + '/'))
         except SuspiciousOperation as exc:
-            LOGGER.error(f'Course import {courselike_key}: Unsafe tar file')
             with translation_language(language):
                 self.status.fail(_('Unsafe tar file. Aborting import.'))
+            LOGGER.error(f'{log_prefix}: Unsafe tar file')
+            monitor_import_failure(courselike_key, current_step, exception=exc)
             return
         finally:
             tar_file.close()
 
-        LOGGER.info(f'Course import {courselike_key}: Uploaded file extracted. Verification step started')
-        self.status.set_state('Verifying')
+        current_step = 'Verifying'
+        self.status.set_state(current_step)
         self.status.increment_completed_steps()
+        LOGGER.info(f'{log_prefix}: Uploaded file extracted. Verification step started')
 
         # find the 'course.xml' file
         def get_all_files(directory):
@@ -518,16 +566,19 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         dirpath = get_dir_for_filename(course_dir, root_name)
         if not dirpath:
+            message = f'Could not find the {root_name} file in the package.'
             with translation_language(language):
-                LOGGER.error(f'Course import {courselike_key}: Could not find the {root_name} file in the package.')
                 self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
-                return
+            LOGGER.error(f'{log_prefix}: {message}')
+            monitor_import_failure(courselike_key, current_step, message=message)
+            return
 
         dirpath = os.path.relpath(dirpath, data_root)
 
-        LOGGER.info(f'Course import {courselike_key}: Extracted file verified. Updating course started')
-        self.status.set_state('Updating')
+        current_step = 'Updating'
+        self.status.set_state(current_step)
         self.status.increment_completed_steps()
+        LOGGER.info(f'{log_prefix}: Extracted file verified. Updating course started')
 
         courselike_items = import_func(
             modulestore(), user.id,
@@ -541,14 +592,17 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         new_location = courselike_items[0].location
         LOGGER.debug('new course at %s', new_location)
 
-        LOGGER.info(f'Course import {courselike_key}: Course import successful')
-    except Exception as exception:   # pylint: disable=broad-except
-        LOGGER.exception(f'Course import {courselike_key}: Unknown error while updating course')
-        self.status.fail(str(exception))
+        LOGGER.info(f'{log_prefix}: Course import successful')
+        set_custom_attribute('course_import_completed', True)
+    except Exception as exception:  # pylint: disable=broad-except
+        msg = str(exception)
+        LOGGER.exception(f'{log_prefix}: Unknown error while updating course {msg}')
+        self.status.fail(msg)
+        monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():
             shutil.rmtree(course_dir)
-            LOGGER.info(f'Course import {courselike_key}: Temp data cleared')
+            LOGGER.info(f'{log_prefix}: Temp data cleared')
 
         if self.status.state == 'Updating' and is_course:
             # Reload the course so we have the latest state
@@ -564,7 +618,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 CourseMetadata.update_from_dict(metadata, course, user)
                 from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
-                LOGGER.info('Course %s Entrance exam imported', course.id)
+                LOGGER.info(f'Course import {course.id}: Entrance exam imported')
 
 
 @shared_task

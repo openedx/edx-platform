@@ -31,7 +31,6 @@ import re
 from abc import abstractmethod
 
 import xblock
-from edx_django_utils.monitoring import set_custom_attribute
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -40,6 +39,7 @@ from xblock.core import XBlockMixin
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
@@ -173,9 +173,9 @@ class StaticContentImporter:  # lint-amnesty, pylint: disable=missing-class-docs
         try:
             self.static_content_store.save(content)
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-            msg = f"Course import {self.target_id}: Error importing {file_subpath}, error={err}"
-            log.exception(msg)
-            set_custom_attribute('course_import_failure', f"Static Content Save Failure: {msg}")
+            msg = f'Error importing {file_subpath}, error={err}'
+            log.exception(f'Course import {self.target_id}: {msg}')
+            monitor_import_failure(self.target_id, 'Updating', exception=err)
 
         return file_subpath, asset_key
 
@@ -355,13 +355,14 @@ class ImportManager:
                     asset_md = AssetMetadata(asset_key)
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
-        except OSError:
-            logging.error(
-                f'Course import {self.target_id}: No {assets_filename} file is present with asset metadata.'
-            )
+        except OSError as os_exc:
+            msg = f'No {assets_filename} file is present with asset metadata.'
+            logging.error(f'Course import {course_id}: {msg}')
+            monitor_import_failure(course_id, 'Updating', msg, os_exc)
             return
-        except Exception:  # pylint: disable=W0703
-            logging.exception(f'Course import {self.target_id}: Error while parsing asset xml.')
+        except Exception as exc:  # pylint: disable=W0703
+            monitor_import_failure(course_id, 'Updating', exception=exc)
+            logging.exception(f'Course import {course_id}: Error while parsing asset xml.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
                 raise
             else:
@@ -478,7 +479,7 @@ class ImportManager:
                         )
                     except Exception:
                         log.exception(
-                            f'Course import {self.target_id}: failed to import module location {child.location}'
+                            f'Course import {dest_id}: failed to import module location {child.location}'
                         )
                         raise
 
@@ -501,9 +502,8 @@ class ImportManager:
                     runtime=courselike.runtime,
                 )
             except Exception:
-                msg = f'Course import {self.target_id}: failed to import module location {leftover}'
+                msg = f'Course import {dest_id}: failed to import module location {leftover}'
                 log.error(msg)
-                set_custom_attribute('course_import_failure', f"Module Load failure: {msg}")
                 raise
 
     def run_imports(self):
@@ -1008,7 +1008,7 @@ def _import_course_draft(
         try:
             _import_module(draft.module)
         except Exception:  # pylint: disable=broad-except
-            logging.exception('while importing draft descriptor %s', draft.module)
+            logging.exception(f'Course import {source_course_id}: while importing draft descriptor {draft.module}')
 
 
 def allowed_metadata_by_category(category):
