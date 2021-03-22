@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 
 
@@ -7,8 +6,8 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
+from urllib.parse import urljoin, urlparse, urlunparse
 
-import six
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -20,7 +19,6 @@ from edx_rest_api_client.exceptions import SlumberBaseException
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import ConnectionError, Timeout  # lint-amnesty, pylint: disable=redefined-builtin
-from six.moves.urllib.parse import urljoin, urlparse, urlunparse  # pylint: disable=import-error
 
 from common.djangoapps.course_modes.api import get_paid_modes_for_course
 from common.djangoapps.course_modes.models import CourseMode
@@ -77,7 +75,7 @@ def attach_program_detail_url(programs, mobile_only=False):
         if mobile_only:
             detail_fragment_url = reverse('program_details_fragment_view', kwargs={'program_uuid': program['uuid']})
             path_id = detail_fragment_url.replace('/dashboard/', '')
-            detail_url = 'edxapp://enrolled_program_info?path_id={path_id}'.format(path_id=path_id)
+            detail_url = f'edxapp://enrolled_program_info?path_id={path_id}'
         else:
             detail_url = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
@@ -86,7 +84,7 @@ def attach_program_detail_url(programs, mobile_only=False):
     return programs
 
 
-class ProgramProgressMeter(object):
+class ProgramProgressMeter:
     """Utility for gauging a user's progress towards program completion.
 
     Arguments:
@@ -110,7 +108,7 @@ class ProgramProgressMeter(object):
         self.course_run_ids = []
         for enrollment in self.enrollments:
             # enrollment.course_id is really a CourseKey (╯ಠ_ಠ）╯︵ ┻━┻
-            enrollment_id = six.text_type(enrollment.course_id)
+            enrollment_id = str(enrollment.course_id)
             mode = enrollment.mode
             if mode == CourseMode.NO_ID_PROFESSIONAL_MODE:
                 mode = CourseMode.PROFESSIONAL
@@ -153,7 +151,7 @@ class ProgramProgressMeter(object):
                             program_list.append(program)
 
         # Sort programs by title for consistent presentation.
-        for program_list in six.itervalues(inverted_programs):
+        for program_list in inverted_programs.values():
             program_list.sort(key=lambda p: p['title'])
 
         return inverted_programs
@@ -436,7 +434,7 @@ class ProgramProgressMeter(object):
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
             course_data = {
-                'course_run_id': six.text_type(certificate['course_key']),
+                'course_run_id': str(certificate['course_key']),
                 'type': self._certificate_mode_translation(certificate['type']),
             }
 
@@ -463,7 +461,7 @@ class ProgramProgressMeter(object):
 
 
 # pylint: disable=missing-docstring
-class ProgramDataExtender(object):
+class ProgramDataExtender:
     """
     Utility for extending program data meant for the program detail page with
     user-specific (e.g., CourseEnrollment) data.
@@ -509,7 +507,7 @@ class ProgramDataExtender(object):
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
-                    log.warning(u'Failed to get course overview for course run key: %s', course_run.get('key'))
+                    log.warning('Failed to get course overview for course run key: %s', course_run.get('key'))
                 else:
                     self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
 
@@ -592,7 +590,7 @@ class ProgramDataExtender(object):
         Returns:
             A subset of the given list of course dicts
         """
-        course_uuids = set(course['uuid'] for course in courses)
+        course_uuids = {course['uuid'] for course in courses}
         # Filter the entitlements' modes with a case-insensitive match against applicable seat_types
         entitlements = self.user.courseentitlement_set.filter(
             mode__in=self.data['applicable_seat_types'],
@@ -601,7 +599,7 @@ class ProgramDataExtender(object):
         # Here we check the entitlements' expired_at_datetime property rather than filter by the expired_at attribute
         # to ensure that the expiration status is as up to date as possible
         entitlements = [e for e in entitlements if not e.expired_at_datetime]
-        courses_with_entitlements = set(six.text_type(entitlement.course_uuid) for entitlement in entitlements)
+        courses_with_entitlements = {str(entitlement.course_uuid) for entitlement in entitlements}
         return [course for course in courses if course['uuid'] not in courses_with_entitlements]
 
     def _filter_out_courses_with_enrollments(self, courses):
@@ -619,10 +617,10 @@ class ProgramDataExtender(object):
             is_active=True,
             mode__in=self.data['applicable_seat_types']
         )
-        course_runs_with_enrollments = set(six.text_type(enrollment.course_id) for enrollment in enrollments)
+        course_runs_with_enrollments = {str(enrollment.course_id) for enrollment in enrollments}
         courses_without_enrollments = []
         for course in courses:
-            if all(six.text_type(run['key']) not in course_runs_with_enrollments for run in course['course_runs']):
+            if all(str(run['key']) not in course_runs_with_enrollments for run in course['course_runs']):
                 courses_without_enrollments.append(course)
 
         return courses_without_enrollments
@@ -634,7 +632,7 @@ class ProgramDataExtender(object):
         """
         if 'professional' in self.data['applicable_seat_types']:
             self.data['applicable_seat_types'].append('no-id-professional')
-        applicable_seat_types = set(seat for seat in self.data['applicable_seat_types'] if seat != 'credit')
+        applicable_seat_types = {seat for seat in self.data['applicable_seat_types'] if seat != 'credit'}
 
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
         bundle_uuid = self.data.get('uuid')
@@ -712,7 +710,7 @@ class ProgramDataExtender(object):
                     'variant': bundle_variant
                 })
             except (ConnectionError, SlumberBaseException, Timeout):
-                log.exception(u'Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
+                log.exception('Failed to get discount price for following product SKUs: %s ', ', '.join(skus))
                 self.data.update({
                     'discount_data': {'is_discounted': False}
                 })
@@ -791,7 +789,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         user (User): The user whose enrollments to inspect.
     """
     def __init__(self, program_data, user):
-        super(ProgramMarketingDataExtender, self).__init__(program_data, user)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(program_data, user)
 
         # Aggregate list of instructors for the program keyed by name
         self.instructors = []
@@ -843,7 +841,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
     def extend(self):
         """Execute extension handlers, returning the extended data."""
-        self.data.update(super(ProgramMarketingDataExtender, self).extend())  # lint-amnesty, pylint: disable=super-with-arguments
+        self.data.update(super().extend())
         return self.data
 
     @classmethod
@@ -869,7 +867,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
     def _attach_course_run_upgrade_url(self, run_mode):
         if not self.user.is_anonymous:
-            super(ProgramMarketingDataExtender, self)._attach_course_run_upgrade_url(run_mode)  # lint-amnesty, pylint: disable=super-with-arguments
+            super()._attach_course_run_upgrade_url(run_mode)
         else:
             run_mode['upgrade_url'] = None
 

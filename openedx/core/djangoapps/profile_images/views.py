@@ -16,7 +16,6 @@ from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import text_type
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.errors import UserNotFound
@@ -30,8 +29,8 @@ from .images import IMAGE_TYPES, create_profile_images, remove_profile_images, v
 
 log = logging.getLogger(__name__)
 
-LOG_MESSAGE_CREATE = u'Generated and uploaded images %(image_names)s for user %(user_id)s'
-LOG_MESSAGE_DELETE = u'Deleted images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_CREATE = 'Generated and uploaded images %(image_names)s for user %(user_id)s'
+LOG_MESSAGE_DELETE = 'Deleted images %(image_names)s for user %(user_id)s'
 
 
 def _make_upload_dt():
@@ -133,8 +132,8 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
         if 'file' not in request.FILES:
             return Response(
                 {
-                    "developer_message": u"No file provided for profile image",
-                    "user_message": _(u"No file provided for profile image"),
+                    "developer_message": "No file provided for profile image",
+                    "user_message": _("No file provided for profile image"),
 
                 },
                 status=status.HTTP_400_BAD_REQUEST
@@ -151,7 +150,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
                 validate_uploaded_image(uploaded_file)
             except ImageValidationError as error:
                 return Response(
-                    {"developer_message": text_type(error), "user_message": error.user_message},
+                    {"developer_message": str(error), "user_message": error.user_message},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 

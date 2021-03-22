@@ -51,7 +51,7 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.debug(
-        u'handling COURSE_CERT_AWARDED: username=%s, course_key=%s, mode=%s, status=%s',
+        'handling COURSE_CERT_AWARDED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,
         mode,
@@ -89,13 +89,13 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
     verbose = kwargs.get('verbose', False)
     if verbose:
-        msg = u"Starting handle_course_cert_changed with params: "\
-            u"sender [{sender}], "\
-            u"user [{username}], "\
-            u"course_key [{course_key}], "\
-            u"mode [{mode}], "\
-            u"status [{status}], "\
-            u"kwargs [{kw}]"\
+        msg = "Starting handle_course_cert_changed with params: "\
+            "sender [{sender}], "\
+            "user [{username}], "\
+            "course_key [{course_key}], "\
+            "mode [{mode}], "\
+            "status [{status}], "\
+            "kwargs [{kw}]"\
             .format(
                 sender=sender,
                 username=getattr(user, 'username', None),
@@ -118,7 +118,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     if not is_learner_records_enabled_for_org(course_key.org):
         if verbose:
             LOGGER.info(
-                u"Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
+                "Skipping send cert: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
                     org=course_key.org
                 )
             )
@@ -126,7 +126,7 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.debug(
-        u'handling COURSE_CERT_CHANGED: username=%s, course_key=%s, mode=%s, status=%s',
+        'handling COURSE_CERT_CHANGED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,
         mode,
@@ -169,7 +169,7 @@ def handle_course_cert_revoked(sender, user, course_key, mode, status, **kwargs)
 
     # schedule background task to process
     LOGGER.info(
-        u'handling COURSE_CERT_REVOKED: username=%s, course_key=%s, mode=%s, status=%s',
+        'handling COURSE_CERT_REVOKED: username=%s, course_key=%s, mode=%s, status=%s',
         user,
         course_key,
         mode,
