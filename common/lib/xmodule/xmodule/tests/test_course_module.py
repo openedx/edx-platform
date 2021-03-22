@@ -148,6 +148,21 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
         self.assertFalse(self.future_noshow_certs.may_certify())
 
 
+def test_tahoe_customized_certificate_behaviour_setting():
+    """
+    Test for the `TAHOE_CERTIFICATE_DISPLAY_BEHAVIOUR` setting to customize certificates_display_behavior.
+    """
+    course_xml = """
+         <course org="{org}" course="{course}" url_name="test">
+            <chapter url="hi" url_name="ch" display_name="CH"></chapter>
+         </course>
+    """.format(org=ORG, course=COURSE)
+
+    system = DummySystem(load_error_modules=True)
+    course = system.process_xml(course_xml)
+    assert course.certificates_display_behavior == 'early_with_info'
+
+
 class CourseSummaryHasEnded(unittest.TestCase):
     """ Test for has_ended method when end date is missing timezone information. """
 
