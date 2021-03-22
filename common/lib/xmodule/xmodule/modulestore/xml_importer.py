@@ -355,10 +355,8 @@ class ImportManager:
                     asset_md = AssetMetadata(asset_key)
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
-        except OSError as os_exc:
-            msg = f'No {assets_filename} file is present with asset metadata.'
-            logging.error(f'Course import {course_id}: {msg}')
-            monitor_import_failure(course_id, 'Updating', msg, os_exc)
+        except OSError:
+            logging.error(f'Course import {course_id}: No {assets_filename} file present.')
             return
         except Exception as exc:  # pylint: disable=W0703
             monitor_import_failure(course_id, 'Updating', exception=exc)
