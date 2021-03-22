@@ -14,7 +14,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
     """
-    Factory for SoftwareSecurePhotoVerification
+    Factory for SoftwareSecurePhotoVerification.
     """
     class Meta:
         model = SoftwareSecurePhotoVerification
