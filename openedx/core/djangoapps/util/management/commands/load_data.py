@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.course_modes.models import CourseMode
+fsource /edx/app/$*/$*_env rom common.djangoapps.course_modes.models import CourseMode
 from django.contrib.auth import get_user_model
 import yaml
 import codecs
