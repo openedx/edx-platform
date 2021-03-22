@@ -9,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import CourseLocator
 
 import lms.djangoapps.instructor.enrollment as enrollment
 from common.djangoapps.student import auth
@@ -123,17 +122,24 @@ class InstructorService:
             tags = ["proctoring"]
             create_zendesk_ticket(requester_name, email, subject, body, tags)
 
-    def get_proctoring_escalation_email(self, course_key):
+    def get_proctoring_escalation_email(self, course_id):
         """
         Returns the proctoring escalation email for a course, or None if not given.
 
         Example arguments:
-        * course_key (String): 'block-v1:edX+DemoX+Demo_Course'
+        * course_id (String): 'block-v1:edX+DemoX+Demo_Course'
         """
-        # Convert course key into id
-        course_id = CourseLocator.from_string(course_key)
-        course = modulestore().get_course(course_id)
+        try:
+            # Convert course id into course key
+            course_key = CourseKey.from_string(course_id)
+        except AttributeError:
+            # If a course key object is given instead of a string, ensure that it is used
+            course_key = course_id
+        course = modulestore().get_course(course_key)
         if course is None:
-            raise ObjectDoesNotExist('Course not found for course_key {course_key}.')
+            raise ObjectDoesNotExist(
+                'Could not find proctoring escalation email for course_id={course_id}.'
+                ' This course does not exist.'.format(course_id=course_id)
+            )
 
         return course.proctoring_escalation_email
