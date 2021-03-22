@@ -63,7 +63,12 @@ class ToggleStateView(views.APIView):
         Expose toggle state report dict as a view.
         """
         report = CourseOverrideToggleStateReport().as_dict()
-        _add_waffle_flag_course_override_state(report["waffle_flags"])
+        flags_list = report["waffle_flags"]
+        flags_dict = {flag['name']:flag for flag in flags_list}
+        _add_waffle_flag_course_override_state(flags_dict)
+        # sorted_values_by_name should be exposed from edx_toggles.toggles.state
+        from edx_toggles.toggles.state.internal.report import sorted_values_by_name
+        report["waffle_flags"] = sorted_values_by_name(flags_dict)
         return Response(report)
 
 
