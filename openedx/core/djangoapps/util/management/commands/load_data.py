@@ -21,31 +21,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(options["data_file_path"], 'r') as f:
             data_spec = yaml.safe_load(f)
-        if 'users' in data_spec:
-            self.create_users(data_spec['users'])
-        if 'enrollments' in data_spec:
-            self.create_enrollments(data_spec['enrollments'])
+        for user_spec in data_spec.get('users', []):
+            self.create_user(user_spec)
+        for enrollment_spec in data_spec.get('enrollments', []):
+            self.create_enrollment(enrollment_spec)
 
-    def create_users(self, users):
+    def create_user(self, user):
         """
         Use to create users in your database.
         """
-        for user in users:
-            UserFactory.create(**user)
+        return UserFactory.create(**user)
 
-    def create_enrollments(self, enrollments):
+    def create_enrollment(self, enrollment_spec):
         """
         Use to create enrollments in your database.
         """
         User = get_user_model()
-        for enrollment_spec in enrollments:
-            try:
-                user = User.objects.get(username=enrollment_spec['username'])
-            except User.DoesNotExist:
-                raise exception(f"User:{enrollment_spec['username']} not created before trying to create enrollment")
-            if enrollment_spec['mode'] in CourseMode.VERIFIED_MODES:
-                verfication = SoftwareSecurePhotoVerificationFactory(user=user)
-            enrollment = CourseEnrollmentFactory(user=user, course_id=enrollment_spec['course_id'])
-            if enrollment.mode != enrollment_spec['mode']:
-                enrollment.mode = enrollment_spec['mode']
-                enrollment.save()
+        try:
+            user = User.objects.get(username=enrollment_spec['username'])
+        except User.DoesNotExist:
+            raise exception(f"User:{enrollment_spec['username']} not created before trying to create enrollment")
+        if enrollment_spec['mode'] in CourseMode.VERIFIED_MODES:
+            verfication = SoftwareSecurePhotoVerificationFactory(user=user)
+        enrollment = CourseEnrollmentFactory(user=user, course_id=enrollment_spec['course_id'])
+        if enrollment.mode != enrollment_spec['mode']:
+            enrollment.mode = enrollment_spec['mode']
+            enrollment.save()
+        return enrollment
