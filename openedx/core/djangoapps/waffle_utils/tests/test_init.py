@@ -1,6 +1,7 @@
 """
 Tests for waffle utils features.
 """
+# pylint: disable=toggle-missing-annotation
 
 import crum
 import ddt

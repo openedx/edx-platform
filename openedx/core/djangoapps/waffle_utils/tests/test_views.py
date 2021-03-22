@@ -1,12 +1,11 @@
 """
 Tests for waffle utils views.
 """
+# pylint: disable=toggle-missing-annotation
 from django.test import TestCase
 from edx_toggles.toggles import (
     LegacyWaffleFlag,
-    LegacyWaffleFlagNamespace,
-    SettingDictToggle,
-    SettingToggle
+    LegacyWaffleFlagNamespace
 )
 from rest_framework.test import APIRequestFactory
 
