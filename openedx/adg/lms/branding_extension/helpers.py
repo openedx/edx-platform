@@ -2,6 +2,7 @@
 Helpers for branding_extension app
 """
 from datetime import datetime
+from urllib import parse
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -45,3 +46,20 @@ def get_copyright():
         year=datetime.today().year,
         org_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
     )
+
+
+def is_referred_by_login_or_register(request):
+    """
+    Returns True if user is redirected to root from login or register, otherwise False
+
+    Arguments:
+        request: HTTP request
+
+    Returns:
+        Boolean: True if path in HTTP_REFERER contains login or register, otherwise False
+    """
+    if 'HTTP_REFERER' in request.META:
+        path = parse.urlsplit(request.META['HTTP_REFERER']).path
+        return path in ['/login', '/register']
+
+    return False

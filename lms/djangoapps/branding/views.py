@@ -18,12 +18,13 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 import lms.djangoapps.branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
-from common.djangoapps.student import views as student_views
 from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
-from openedx.core.djangoapps.lang_pref.api import released_languages
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from common.djangoapps.student import views as student_views
 from common.djangoapps.util.cache import cache_if_anonymous
 from common.djangoapps.util.json_request import JsonResponse
+from openedx.adg.lms.branding_extension.helpers import is_referred_by_login_or_register
+from openedx.core.djangoapps.lang_pref.api import released_languages
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -33,9 +34,9 @@ log = logging.getLogger(__name__)
 @cache_if_anonymous()
 def index(request):
     """
-    Redirects to main page -- info page if user authenticated, or marketing if not
+    Redirects to main page -- info page if user authenticated and redirected from login or register, or marketing if not
     """
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and is_referred_by_login_or_register(request):
         # Only redirect to dashboard if user has
         # courses in their dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog

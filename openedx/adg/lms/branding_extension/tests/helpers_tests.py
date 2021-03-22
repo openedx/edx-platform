@@ -1,9 +1,16 @@
 """
 Tests for helpers of branding_extension app
 """
+import pytest
+from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 
-from openedx.adg.lms.branding_extension.helpers import get_copyright, get_footer_navigation_links
+from openedx.adg.lms.branding_extension.helpers import (
+    get_copyright,
+    get_footer_navigation_links,
+    is_referred_by_login_or_register
+)
 
 
 def test_get_footer_navigation_links(mocker):
@@ -49,3 +56,23 @@ def test_get_copyright(mocker):
     )
 
     assert get_copyright() == '\u00A9 {} {}'.format(2021, test_platform_name)
+
+
+def test_is_referred_by_login_or_register_with_no_referred_value():
+    request = RequestFactory().get(reverse('root'))
+    flag = is_referred_by_login_or_register(request)
+    assert flag is False
+
+
+@pytest.mark.parametrize(
+    'path, expected_value',
+    [('login', True), ('register', True), ('dashboard', False)],
+    ids=['redirect_from_login', 'redirect_from_register', 'redirect_from_dashboard']
+)
+def test_is_referred_by_login_or_register(path, expected_value):
+    request = RequestFactory().get(reverse('root'))
+
+    request.META['HTTP_REFERER'] = f'http://localhost:18000/{path}'
+    flag = is_referred_by_login_or_register(request)
+
+    assert flag is expected_value
