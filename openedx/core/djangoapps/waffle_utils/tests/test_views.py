@@ -3,19 +3,12 @@ Tests for waffle utils views.
 """
 # pylint: disable=toggle-missing-annotation
 from django.test import TestCase
-from edx_toggles.toggles import (
-    LegacyWaffleFlag,
-    LegacyWaffleFlagNamespace
-)
 from rest_framework.test import APIRequestFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 
 from .. import models
 from .. import views as toggle_state_views
-
-TEST_WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace("test")
-TEST_WAFFLE_FLAG = LegacyWaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag", __name__)
 
 
 class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
