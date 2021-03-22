@@ -64,10 +64,11 @@
 
         .details {
           @include clearfix();
+          @include padding-right($baseline);
 
           .wrapper-course-image {
             @include float(left);
-            @include margin-right(flex-gutter());
+            @include margin-right($baseline);
 
             width: flex-grid(3);
             max-height: 150px;
@@ -128,7 +129,7 @@
 
           .wrapper-course-details {
             display: flex;
-            flex-flow: row wrap;
+            flex-flow: column wrap;
             padding: 0;
             margin-bottom: $baseline/2;
             justify-content: space-between;
@@ -156,6 +157,10 @@
             }
 
             .course-info {
+              flex-grow: 1;
+              flex-shrink: 0;
+              min-width: 15em;
+
               [class*="info-"] {
                 font: -apple-system-short-subheadline !important;
                 color: $gray-d1;
@@ -196,20 +201,36 @@
               }
             }
 
-            .wrapper-course-actions {
-              @include margin-right($baseline);
+            .wrapper-course-info-actions {
+              display: flex;
 
-              margin-top: $baseline;
-              align-self: flex-end;
+              .wrapper-course-info-row {
+                width: 100%;
+                display: inline-flex;
+                flex-wrap: wrap;
+
+                .course-info {
+                  flex-shrink: 0;
+                  min-width: 10em;
+                }
+
+                .wrapper-course-actions {
+                  margin-top: $baseline;
+
+                  flex-grow: 1;
+                  flex-shrink: 0;
+                }
+              }
+
+              .continue-button {
+                flex-shrink: 0;
+                flex-grow: 1;
+                align-self: flex-end;
+              }
             }
-
 
             // Responsive behavior
             @include media-breakpoint-down(sm) {
-              width: 100%;
-              display: flex;
-              flex-direction: column;
-
               .course-info,
               .wrapper-course-actions {
                 flex-grow: 1;
@@ -220,6 +241,30 @@
 
                 .wrapper-action-more {
                   padding-top: 3px;
+                }
+              }
+            }
+
+            @include media-breakpoint-down(xs) {
+              margin-bottom: $baseline;
+              @include padding-left($baseline/2);
+
+              .wrapper-course-info-actions {
+                flex-wrap: wrap;
+                flex-flow: row wrap;
+
+                .wrapper-course-info-row {
+                  .wrapper-course-actions {
+                    margin-top: 0px;
+                  }
+                }
+              }
+
+              .continue-button {
+                .enter-course {
+                  flex: 2 100%;
+                  width: 100%;
+                  margin-top: $baseline;
                 }
               }
             }
@@ -414,6 +459,7 @@
             @extend %btn-pl-white-base;
 
             @include float(right);
+            margin-top: $baseline;
 
             &.archived {
               @extend %btn-pl-default-base;
