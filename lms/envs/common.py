@@ -871,7 +871,14 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/18298
     'ENABLE_ACCOUNT_DELETION': True,
 
-    # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
+    # .. toggle_name: FEATURES['ENABLE_ENROLLMENT_RESET']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Enable feature to remove enrollments and users. Used to reset state of master's
+    #   integration environments
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2019-08-07
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21280
     'ENABLE_ENROLLMENT_RESET': False,
     'DISABLE_MOBILE_COURSE_AVAILABLE': False,
 
