@@ -14,6 +14,7 @@ from uuid import uuid4
 import ddt
 import six
 from completion.test_utils import CompletionWaffleTestMixin
+import six
 from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -629,7 +630,7 @@ class ViewsTestCase(BaseViewsTestCase):
 
         url = reverse('submission_history', kwargs={
             'course_id': six.text_type(self.course_key),
-            'student_username_or_email': 'dummy',
+            'learner_identifier': 'dummy',
             'location': six.text_type(self.problem.location),
         })
         response = self.client.get(url)
@@ -645,7 +646,7 @@ class ViewsTestCase(BaseViewsTestCase):
         # try it with an existing user and a malicious location
         url = reverse('submission_history', kwargs={
             'course_id': six.text_type(self.course_key),
-            'student_username_or_email': 'dummy',
+            'learner_identifier': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
         response = self.client.get(url)
@@ -654,7 +655,7 @@ class ViewsTestCase(BaseViewsTestCase):
         # try it with a malicious user and a non-existent location
         url = reverse('submission_history', kwargs={
             'course_id': six.text_type(self.course_key),
-            'student_username_or_email': '<script>alert("hello");</script>',
+            'learner_identifier': '<script>alert("hello");</script>',
             'location': 'dummy'
         })
         response = self.client.get(url)
@@ -687,7 +688,7 @@ class ViewsTestCase(BaseViewsTestCase):
 
         url = reverse('submission_history', kwargs={
             'course_id': six.text_type(self.course_key),
-            'student_username_or_email': admin.email,
+            'learner_identifier': admin.email,
             'location': six.text_type(usage_key),
         })
         response = self.client.get(url)
@@ -728,7 +729,7 @@ class ViewsTestCase(BaseViewsTestCase):
                 )
                 url = reverse('submission_history', kwargs={
                     'course_id': six.text_type(course_key),
-                    'student_username_or_email': admin.username,
+                    'learner_identifier': admin.username,
                     'location': six.text_type(usage_key),
                 })
                 response = client.get(url)

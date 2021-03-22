@@ -1338,22 +1338,14 @@ def _course_home_redirect_enabled():
 
 @login_required
 @ensure_valid_course_key
-def submission_history(request, course_id, student_username_or_email, location):
+def submission_history(request, course_id, learner_identifier, location):
     """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
-    user = None
     found_user_name = None
-    if '@' in student_username_or_email:
-        user = User.objects.filter(email=student_username_or_email).first()
-    if not user:
-        user = User.objects.filter(username=student_username_or_email).first()
-
-    if user:
-        found_user_name = user.username
-
+    found_user_name = get_learner_username(learner_identifier)
     if not found_user_name:
         return HttpResponse(escape(_(u'User does not exist.')))
 
@@ -1940,3 +1932,10 @@ def get_financial_aid_courses(user):
             )
 
     return financial_aid_courses
+
+
+def get_learner_username(learner_identifier):
+    """ Return the username """
+    learner = User.objects.filter(Q(username=learner_identifier) | Q(email=learner_identifier)).first()
+    if learner:
+        return learner.username
