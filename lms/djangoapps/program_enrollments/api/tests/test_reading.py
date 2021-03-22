@@ -372,7 +372,6 @@ class ProgramEnrollmentReadingTests(TestCase):
         actual_enrollment_ids = {enrollment.id for enrollment in actual_enrollments}
         assert actual_enrollment_ids == expected_enrollment_ids
 
-
     @ddt.data(
 
         # User with no enrollments
