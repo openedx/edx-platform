@@ -368,6 +368,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
         given userid_in_session.
         """
         if hasattr(request, 'safe_cookie_verified_user_id'):
+            if hasattr(request.user, 'real_user'):  # User is a masqueraded user.
+                request.user = request.user.real_user
             if request.safe_cookie_verified_user_id != request.user.id:
                 # The user at response time is expected to be None when the user
                 # is logging out. To prevent extra noise in the logs,
