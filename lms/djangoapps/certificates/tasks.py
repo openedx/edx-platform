@@ -10,7 +10,11 @@ from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.certificates.generation import generate_allowlist_certificate, generate_user_certificates
+from lms.djangoapps.certificates.generation import (
+    generate_allowlist_certificate,
+    generate_course_certificate,
+    generate_user_certificates
+)
 from lms.djangoapps.verify_student.services import IDVerificationService
 
 log = getLogger(__name__)
@@ -49,8 +53,7 @@ def generate_certificate(self, **kwargs):
         return
 
     if v2_certificate:
-        # TODO: will be implemented in MICROBA-923
-        log.warning(f'Ignoring v2 certificate task request for {student.id}: {course_key}')
+        generate_course_certificate(user=student, course_key=course_key)
         return
 
     if expected_verification_status:

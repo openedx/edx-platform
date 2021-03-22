@@ -46,6 +46,14 @@ def generate_allowlist_certificate(user, course_key):
     return cert
 
 
+def generate_course_certificate(user, course_key):
+    """
+    Generate a regular certificate for this user, in this course run. This method should be called from a task.
+    """
+    # TODO: Implementation will be added in MICROBA-1039
+    log.warning(f'Ignoring course certificate generation for {user.id}: {course_key}')
+
+
 def _generate_certificate(user, course_id):
     """
     Generate a certificate for this user, in this course run.
