@@ -7,6 +7,7 @@ import mandrill
 from django.conf import settings
 
 from .email_data import EmailData
+from .helpers import add_user_preferred_language_to_template_slug
 
 log = logging.getLogger(__name__)
 
@@ -14,6 +15,10 @@ log = logging.getLogger(__name__)
 class MandrillClient(object):
     """
     Mandrill class to send ADG emails
+
+    Note: While adding here, language is trimmed from the template slug
+    For example on mandrill if we have 'adg-password-reset' for English and 'adg-password-reset-ar' for Arabic
+    here it would be defined as 'adg-password-reset'
     """
     CHANGE_USER_EMAIL_ALERT = 'adg-confirm-email-address-change'
     COURSE_ENROLLMENT_INVITATION = 'adg-invitation-course'
@@ -66,5 +71,6 @@ class MandrillClient(object):
         """
         log.info(f'Sending email using template: {template}, account: {email} and context: {context} using mandrill')
 
+        template = add_user_preferred_language_to_template_slug(template, email)
         email_data = EmailData(template, email, context)
         self._send_mail(email_data)
