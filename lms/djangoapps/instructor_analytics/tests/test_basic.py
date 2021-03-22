@@ -248,7 +248,6 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             else:
                 assert '' == report['external_user_key']
 
-
     def test_available_features(self):
         assert len(AVAILABLE_FEATURES) == len((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))
         assert set(AVAILABLE_FEATURES) == set((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))

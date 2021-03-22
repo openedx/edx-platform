@@ -2618,13 +2618,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         assert ('team' in res_json['feature_names']) == has_teams
 
-    def test_get_students_features_external_user_key(self):
+    @ddt.data(True, False)
+    def test_get_students_features_external_user_key(self, has_program_enrollments):
         external_key_dict = {}
-        for i in range(len(self.students)):
-            student = self.students[i]
-            external_key = "{}_{}".format(student.username, i)
-            ProgramEnrollmentFactory.create(user=student, external_user_key=external_key)
-            external_key_dict[student.username] = external_key
+        if has_program_enrollments:
+            for i in range(len(self.students)):
+                student = self.students[i]
+                external_key = "{}_{}".format(student.username, i)
+                ProgramEnrollmentFactory.create(user=student, external_user_key=external_key)
+                external_key_dict[student.username] = external_key
+
         url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
 
         response = self.client.post(url, {})
@@ -2636,7 +2639,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 if x['username'] == student.username
             ][0]
             assert student_json['username'] == student.username
-            assert student_json['external_user_key'] == external_key_dict[student.username]
+            if has_program_enrollments:
+                assert student_json['external_user_key'] == external_key_dict[student.username]
+            else:
+                assert student_json['external_user_key'] == ''
 
     def test_get_students_who_may_enroll(self):
         """

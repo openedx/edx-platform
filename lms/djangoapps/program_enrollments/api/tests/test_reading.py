@@ -42,6 +42,7 @@ from ..reading import (
     fetch_program_course_enrollments_by_students,
     fetch_program_enrollments,
     fetch_program_enrollments_by_student,
+    fetch_program_enrollments_by_students,
     get_external_key_by_user_and_course,
     get_program_course_enrollment,
     get_program_enrollment,
@@ -368,6 +369,52 @@ class ProgramEnrollmentReadingTests(TestCase):
     def test_fetch_program_enrollments_by_student(self, kwargs, expected_enrollment_ids):
         kwargs = self._username_to_user(kwargs)
         actual_enrollments = fetch_program_enrollments_by_student(**kwargs)
+        actual_enrollment_ids = {enrollment.id for enrollment in actual_enrollments}
+        assert actual_enrollment_ids == expected_enrollment_ids
+
+
+    @ddt.data(
+
+        # User with no enrollments
+        (
+            {'usernames': [username_0]},
+            set(),
+        ),
+
+        # Filters
+        (
+            {
+                'usernames': [username_3],
+            },
+            {3, 7},
+        ),
+
+        # More filters
+        (
+            {
+                'usernames': [username_3],
+                'external_user_keys': [ext_3],
+                'program_enrollment_statuses': {PEStatuses.SUSPENDED, PEStatuses.CANCELED},
+            },
+            {7},
+        ),
+
+        # Realized-only filter
+        (
+            {'usernames': [username_4], 'realized_only': True},
+            {4},
+        ),
+
+        # Waiting-only filter
+        (
+            {'external_user_keys': [ext_4], 'waiting_only': True},
+            {8},
+        ),
+    )
+    @ddt.unpack
+    def test_fetch_program_enrollments_by_students(self, kwargs, expected_enrollment_ids):
+        kwargs = self._usernames_to_users(kwargs)
+        actual_enrollments = fetch_program_enrollments_by_students(**kwargs)
         actual_enrollment_ids = {enrollment.id for enrollment in actual_enrollments}
         assert actual_enrollment_ids == expected_enrollment_ids
 

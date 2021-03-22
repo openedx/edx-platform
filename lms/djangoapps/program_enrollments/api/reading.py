@@ -291,7 +291,7 @@ def fetch_program_enrollments_by_students(
         * waiting_only (bool)
 
     Optional arguments are used as filtersets if they are not None.
-    
+
     Returns: queryset[ProgramEnrollment]
     """
     if not (users or external_user_keys):
@@ -303,7 +303,7 @@ def fetch_program_enrollments_by_students(
     filters = {
         "user__in": users,
         "external_user_key__in": external_user_keys,
-        "program_enrollment__status__in": program_enrollment_statuses,
+        "status__in": program_enrollment_statuses,
     }
     if realized_only:
         filters["user__isnull"] = False
