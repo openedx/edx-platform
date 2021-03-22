@@ -27,8 +27,7 @@ class CourseWaffleFlag(LegacyWaffleFlag):
 
     Usage:
 
-       WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='my_namespace')
-       SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature', __name__)
+       SOME_COURSE_FLAG = CourseWaffleFlag('my_namespace', 'some_course_feature', __name__)
 
     And then we can check this flag in code with::
 
