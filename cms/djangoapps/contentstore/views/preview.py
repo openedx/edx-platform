@@ -294,10 +294,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': context.get('can_edit', True),
-            'can_edit_visibility': context.get('can_edit_visibility', xblock.course_id.is_course),
+            'can_edit_visibility': context.get('can_edit_visibility', True),
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
-            'can_move': context.get('can_move', xblock.course_id.is_course),
+            'can_move': context.get('can_move', True),
             'language': getattr(course, 'language', None)
         }
 
