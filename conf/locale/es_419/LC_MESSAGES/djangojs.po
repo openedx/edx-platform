@@ -8995,11 +8995,11 @@ msgstr "Ocurrió un error. Por favor recargue la página."
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help signing in?"
-msgstr ""
+msgstr "¿Necesitas ayuda para iniciar sesión?"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot my password"
-msgstr ""
+msgstr "Olvidé mi contraseña"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Other sign-in issues"
