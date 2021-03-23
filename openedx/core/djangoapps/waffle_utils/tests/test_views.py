@@ -37,6 +37,16 @@ class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-c
             "class": "SettingDictToggle",
         } in response.data["django_settings"]
 
+    def test_response_with_course_override(self):
+        models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
+        response = get_toggle_state_response()
+        assert response.data["waffle_flags"]
+        assert "my.flag" == response.data["waffle_flags"][0]["name"]
+        assert response.data["waffle_flags"][0]["course_overrides"]
+        assert "None" == response.data["waffle_flags"][0]["course_overrides"][0]["course_id"]
+        assert "on" == response.data["waffle_flags"][0]["course_overrides"][0]["force"]
+        assert "both" == response.data["waffle_flags"][0]["computed_status"]
+
     def test_course_overrides(self):
         models.WaffleFlagCourseOverrideModel.objects.create(waffle_flag="my.flag", enabled=True)
         course_overrides = {}

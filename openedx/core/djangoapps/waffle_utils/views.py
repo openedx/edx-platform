@@ -63,7 +63,6 @@ class ToggleStateView(views.APIView):
         Expose toggle state report dict as a view.
         """
         report = CourseOverrideToggleStateReport().as_dict()
-        _add_waffle_flag_course_override_state(report["waffle_flags"])
         return Response(report)
 
 
