@@ -587,7 +587,7 @@ def get_sibling_urls(subsection):
             ))
         else:
             try:
-                next_section = sections[sections.index(next(s for s in sections if s.location == section.location)) - 1]
+                next_section = sections[sections.index(next(s for s in sections if s.location == section.location)) + 1]
                 next_loc = next_section.get_children()[0].get_children()[0].location
             except IndexError:
                 pass
