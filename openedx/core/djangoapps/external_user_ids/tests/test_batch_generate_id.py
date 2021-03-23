@@ -31,7 +31,7 @@ class TestBatchGenerateExternalIds(TransactionTestCase):
         with self.assertNumQueries(self.EXPECTED_NUM_OF_QUERIES):
             result = ExternalId.batch_get_or_create_user_ids(users, id_type)
 
-        assert len(result) == len(result)
+        assert len(result) == len(users)
 
         for user in users:
             assert result[user.id].external_id_type.name == 'test'

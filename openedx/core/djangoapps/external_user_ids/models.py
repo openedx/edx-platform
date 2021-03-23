@@ -117,7 +117,7 @@ class ExternalId(TimeStampedModel):
             users: List of User to create the IDs for
             type_name (str): Name of the type of ExternalId
         Returns:
-            dict: Returns ExternalIds mapped by User.id
+            dict: None if fails, otherwise ExternalIds mapped by User.id
                 {
                     user_id: ExternalId
                 }
@@ -126,7 +126,7 @@ class ExternalId(TimeStampedModel):
             type_obj = ExternalIdType.objects.get(name=type_name)
         except ExternalIdType.DoesNotExist:
             LOGGER.info(
-                'Batch ID Creation failed, no external id type of {type}'.format(
+                'Batch ID Creation failed, no external id type of {type!r}'.format(
                     type=type_name
                 )
             )
