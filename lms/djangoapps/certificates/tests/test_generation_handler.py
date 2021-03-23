@@ -41,6 +41,7 @@ BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler._is_beta_te
 CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_course'
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._has_passing_grade'
+WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
 AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
 AUTO_GENERATION_SWITCH_NAME = f'{AUTO_GENERATION_NAMESPACE}.{AUTO_GENERATION_NAME}'
@@ -50,6 +51,7 @@ AUTO_GENERATION_SWITCH = LegacyWaffleSwitch(AUTO_GENERATION_NAMESPACE, AUTO_GENE
 @override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
 @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
+@mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
 @ddt.ddt
 class AllowlistTests(ModuleStoreTestCase):
     """
@@ -259,12 +261,20 @@ class AllowlistTests(ModuleStoreTestCase):
 
         assert not _can_generate_allowlist_certificate(u, key)
 
+    def test_can_generate_web_cert_disabled(self):
+        """
+        Test handling when web certs are not enabled
+        """
+        with mock.patch(WEB_CERTS_METHOD, return_value=False):
+            assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
+
 
 @override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
 @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(CCX_COURSE_METHOD, mock.Mock(return_value=False))
 @mock.patch(PASSING_GRADE_METHOD, mock.Mock(return_value=True))
+@mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
 @ddt.ddt
 class CertificateTests(ModuleStoreTestCase):
     """
@@ -441,3 +451,10 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         assert not _can_generate_v2_certificate(u, key)
+
+    def test_can_generate_web_cert_disabled(self):
+        """
+        Test handling when web certs are not enabled
+        """
+        with mock.patch(WEB_CERTS_METHOD, return_value=False):
+            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
