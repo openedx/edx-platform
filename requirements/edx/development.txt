@@ -170,7 +170,7 @@ jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requi
 jsonschema==3.2.0         # via sphinxcontrib-openapi
 kombu==4.6.11             # via -r requirements/edx/testing.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/testing.txt
-lazy-object-proxy==1.5.2  # via -r requirements/edx/testing.txt, astroid
+lazy-object-proxy==1.6.0  # via -r requirements/edx/testing.txt, astroid
 lazy==1.4                 # via -r requirements/edx/testing.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/testing.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/testing.txt, ora2
