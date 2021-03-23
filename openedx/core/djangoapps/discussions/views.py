@@ -14,10 +14,9 @@ from .models import DiscussionsConfiguration
 
 
 PROVIDER_FEATURE_MAP = {
-    'cs_comments_service': [
+    'legacy': [
         'discussion-page',
         'embedded-course-sections',
-        'lti',
         'wcag-2.1',
     ],
     'piazza': [
@@ -66,7 +65,7 @@ class DiscussionsConfigurationView(APIView):
                 },
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
-                    'active': instance.provider_type or '',
+                    'active': instance.provider_type or None,
                     'available': {
                         provider: {
                             'features': PROVIDER_FEATURE_MAP.get(provider) or [],

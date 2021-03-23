@@ -29,9 +29,8 @@ def get_supported_providers() -> list[str]:
     TODO: Load this from entry points?
     """
     providers = [
-        'cs_comments_service',
-        'lti',
-        'test',
+        'legacy',
+        'piazza',
     ]
     return providers
 
