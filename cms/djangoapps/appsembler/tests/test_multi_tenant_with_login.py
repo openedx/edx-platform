@@ -1,22 +1,50 @@
 """
 Tests for APPSEMBLER_MULTI_TENANT_EMAILS in Studio login.
+
+Special note:
+
+This test module needs to patch `cms.urls.urlpatterns` to include urlpatterns
+from `cms.djangoapps.appsembler.urls`. This works by overriding the
+`doango.conf.settings.ROOT_URLCONF` with `django.test.utils.override_settings`
+at the TestCase class level with the `urlpatterns` list declared in the module
+containing the TestCase class.
+
+For this test module, we've added a `urlpatterns` module level variable and
+assigned it the value of `cms.urls.urlpatterns` then appended the conditionally
+included urlpatterns we need to run the tests.
+
+Then we add `@override_settings(ROOT_URLCONF=__name__)` to the TestClass
+
+There are other ways to do this. However, this is simple and does not require
+our code to explicitly hack  `sys.modules` reloading
 """
 
 import ddt
 import pytest
 from django.core.exceptions import MultipleObjectsReturned
+from django.conf.urls import include, url
+from django.urls import reverse
 from bs4 import BeautifulSoup as soup
 from mock import patch
 from django.test import TestCase
+from django.test.utils import override_settings
 from rest_framework import status
 
 from student.roles import CourseAccessRole, CourseCreatorRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 
+import cms.urls
 from cms.djangoapps.appsembler.views import LoginView
 
 
+# Set the urlpatterns we want to use for our tests in this module only
+urlpatterns = cms.urls.urlpatterns + [
+    url(r'', include('cms.djangoapps.appsembler.urls'))
+]
+
+
 @ddt.ddt
+@override_settings(ROOT_URLCONF=__name__)  # the module that contains `urlpatterns`
 @patch.dict('django.conf.settings.FEATURES', {'APPSEMBLER_MULTI_TENANT_EMAILS': True})
 @patch.dict('django.conf.settings.FEATURES', {'TAHOE_STUDIO_LOCAL_LOGIN': True})
 class MultiTenantStudioLoginTestCase(TestCase):
@@ -34,9 +62,7 @@ class MultiTenantStudioLoginTestCase(TestCase):
 
     def setUp(self):
         super(MultiTenantStudioLoginTestCase, self).setUp()
-        # using `reverse('login')` fails with `NoReverseMatch` unless
-        # we set `TAHOE_STUDIO_LOCAL_LOGIN = True` before loading `cms/urls.py`
-        self.url = '/login/'  # CMS login endpoint
+        self.url = reverse('login')
         self.customer = UserFactory.create(email=self.EMAIL, password=self.PASSWORD)
 
     def get_error_message_text(self, response):
