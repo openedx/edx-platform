@@ -40,7 +40,8 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=enrollment_spec['username'])
         except User.DoesNotExist:
-            raise exception(f"User:{enrollment_spec['username']} not created before trying to create enrollment")
+            # if a user does not exist, creaete one that matches given params
+            user = create_user({'username': enrollment_spec['username']})
         if enrollment_spec['mode'] in CourseMode.VERIFIED_MODES:
             verfication = SoftwareSecurePhotoVerificationFactory(user=user)
         enrollment = CourseEnrollmentFactory(user=user, course_id=enrollment_spec['course_id'])
