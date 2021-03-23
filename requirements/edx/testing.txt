@@ -164,7 +164,7 @@ jsondiff==1.2.0           # via -r requirements/edx/base.txt, edx-enterprise
 jsonfield2==3.0.3         # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-celeryutils, edx-enterprise, edx-event-routing-backends, edx-proctoring, edx-submissions, lti-consumer-xblock, ora2
 kombu==4.6.11             # via -r requirements/edx/base.txt, celery
 laboratory==1.0.2         # via -r requirements/edx/base.txt
-lazy-object-proxy==1.5.2  # via astroid
+lazy-object-proxy==1.6.0  # via astroid
 lazy==1.4                 # via -r requirements/edx/base.txt, acid-xblock, bok-choy, lti-consumer-xblock, ora2
 libsass==0.10.0           # via -r requirements/edx/base.txt, ora2
 loremipsum==1.0.5         # via -r requirements/edx/base.txt, ora2
