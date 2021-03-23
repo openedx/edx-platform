@@ -1,17 +1,14 @@
 """
 Tests for waffle utils views.
 """
+# pylint: disable=toggle-missing-annotation
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 
-from .. import WaffleFlag, WaffleFlagNamespace
 from .. import models
 from .. import views as toggle_state_views
-
-TEST_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace("test")
-TEST_WAFFLE_FLAG = WaffleFlag(TEST_WAFFLE_FLAG_NAMESPACE, "flag", __name__)
 
 
 class ToggleStateViewTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring

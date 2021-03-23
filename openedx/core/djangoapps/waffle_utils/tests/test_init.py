@@ -1,6 +1,7 @@
 """
 Tests for waffle utils features.
 """
+# pylint: disable=toggle-missing-annotation
 
 import crum
 import ddt
@@ -11,10 +12,7 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
-from .. import (
-    CourseWaffleFlag,
-    WaffleSwitchNamespace,
-)
+from .. import CourseWaffleFlag
 from ..models import WaffleFlagCourseOverrideModel
 
 
@@ -125,14 +123,3 @@ class TestCourseWaffleFlag(TestCase):
         )
         with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
             assert test_course_flag.is_enabled(self.TEST_COURSE_KEY) is True
-
-
-class DeprecatedWaffleFlagTests(TestCase):
-    """
-    Tests for the deprecated waffle methods, including override and import paths.
-    """
-
-    def test_waffle_switch_namespace_override(self):
-        namespace = WaffleSwitchNamespace("namespace")
-        with namespace.override("waffle_switch1", True):
-            assert namespace.is_enabled('waffle_switch1')
