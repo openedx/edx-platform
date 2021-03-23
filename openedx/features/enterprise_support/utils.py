@@ -279,13 +279,14 @@ def _user_has_social_auth_record(user, enterprise_customer):
     Return True if a `UserSocialAuth` record exists for `user` False otherwise.
     """
     provider_backend_names = []
-    if enterprise_customer:
-        for idp in enterprise_customer.identity_providers:
+    if enterprise_customer and enterprise_customer['identity_providers']:
+        for idp in enterprise_customer['identity_providers']:
             identity_provider = third_party_auth.provider.Registry.get(
-                provider_id=idp.provider_id,
+                provider_id=idp['provider_id']
             )
             provider_backend_names.append(identity_provider.backend_name)
-        return UserSocialAuth.objects.filter(provider__in=provider_backend_names, user=user).exists()
+        return UserSocialAuth.objects.select_related('user').\
+            filter(provider__in=provider_backend_names, user=user).exists()
     return False
 
 

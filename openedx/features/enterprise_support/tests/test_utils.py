@@ -254,7 +254,7 @@ class TestEnterpriseUtils(TestCase):
     @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_get_enterprise_readonly_account_fields_no_sync_learner_profile_data(
-            self, mock_customer_for_request, mock_get_current_request
+            self, mock_customer_for_request, mock_get_current_request,
     ):
         mock_get_current_request.return_value = mock.Mock(
             GET={'enterprise_customer': 'some-uuid'},
@@ -262,6 +262,7 @@ class TestEnterpriseUtils(TestCase):
         mock_customer_for_request.return_value = {
             'uuid': 'some-uuid',
             'identity_provider': None,
+            'identity_providers': [],
         }
         user = mock.Mock()
 
@@ -283,6 +284,11 @@ class TestEnterpriseUtils(TestCase):
         mock_customer_for_request.return_value = {
             'uuid': 'some-uuid',
             'identity_provider': 'mock-idp',
+            'identity_providers': [
+                {
+                    "provider_id": "mock-idp",
+                },
+            ]
         }
         mock_idp = mock.MagicMock(
             backend_name='mock-backend',
@@ -299,11 +305,10 @@ class TestEnterpriseUtils(TestCase):
         mock_get_current_request.assert_called_once_with()
 
         mock_tpa.provider.Registry.get.assert_called_with(provider_id='mock-idp')
-
         mock_select_related = mock_user_social_auth.objects.select_related
         mock_select_related.assert_called_once_with('user')
         mock_select_related.return_value.filter.assert_called_once_with(
-            provider=mock_idp.backend_name,
+            provider__in=[mock_idp.backend_name],
             user=user
         )
 

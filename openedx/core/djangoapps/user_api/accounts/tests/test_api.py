@@ -274,7 +274,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             mock_customer.return_value.update({
                 'uuid': 'real-ent-uuid',
                 'name': 'Dummy Enterprise',
-                'identity_provider': 'saml-ubc'
+                'identity_provider': 'saml-ubc',
+                'identity_providers': [
+                    {
+                        "provider_id": "saml-ubc",
+                    }
+                ],
             })
         mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
         mock_auth_provider.return_value.backend_name = idp_backend_name
