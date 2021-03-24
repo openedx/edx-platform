@@ -7,7 +7,6 @@ import calendar
 import logging
 import time
 
-import six
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from oauthlib.common import Request
 from oauthlib.oauth1.rfc5849.signature import (
@@ -17,7 +16,6 @@ from oauthlib.oauth1.rfc5849.signature import (
     normalize_parameters,
     sign_hmac_sha1
 )
-from six import text_type
 from social_core.backends.base import BaseAuth
 from social_core.exceptions import AuthFailed
 from social_core.utils import sanitize_redirect

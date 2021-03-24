@@ -17,7 +17,7 @@ from django.utils.timezone import now
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.course_modes.helpers import enrollment_mode_display
-from common.djangoapps.course_modes.models import (  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.course_modes.models import (
     CourseMode,
     Mode,
     get_cosmetic_display_price,

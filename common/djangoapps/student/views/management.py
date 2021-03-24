@@ -8,7 +8,6 @@ import logging
 import uuid
 from collections import namedtuple
 
-import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -34,7 +33,6 @@ from ipware.ip import get_client_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import text_type
 
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout

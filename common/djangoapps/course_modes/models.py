@@ -6,7 +6,6 @@ Add and create new modes for running courses on this particular LMS
 from collections import defaultdict, namedtuple
 from datetime import timedelta
 import logging
-import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError

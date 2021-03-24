@@ -23,7 +23,6 @@ from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
 from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price

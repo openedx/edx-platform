@@ -3,7 +3,6 @@ Helper classes and methods for running modulestore tests without Django.
 """
 
 
-import io
 import os
 from contextlib import contextmanager
 from importlib import import_module

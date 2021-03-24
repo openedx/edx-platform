@@ -12,7 +12,6 @@ import ddt
 import freezegun
 import httpretty
 import pytz
-import six
 from django.conf import settings
 from django.urls import reverse
 
