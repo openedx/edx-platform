@@ -58,6 +58,13 @@ def test_get_copyright(mocker):
     assert get_copyright() == '\u00A9 {} {}'.format(2021, test_platform_name)
 
 
+def test_is_referred_by_login_or_register_in_testing_environment():
+    request = RequestFactory().request()
+    flag = is_referred_by_login_or_register(request)
+
+    assert flag is True
+
+
 @mock.patch('openedx.adg.lms.branding_extension.helpers.is_testing_environment')
 def test_is_referred_by_login_or_register_with_no_referred_value(mock_is_testing_environment):
     mock_is_testing_environment.return_value = False
