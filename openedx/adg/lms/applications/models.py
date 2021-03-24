@@ -235,7 +235,7 @@ class UserApplication(TimeStampedModel):
     @property
     def is_work_experience_completed(self):
         """
-        Check if user add any work experience or mark user application as work experience not applicable
+        Check if user added any work experience or marked user application as work experience not applicable
         """
         return self.is_work_experience_not_applicable or self.has_work_experience
 
