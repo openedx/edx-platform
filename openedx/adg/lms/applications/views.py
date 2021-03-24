@@ -314,7 +314,7 @@ class EducationAndExperienceView(RedirectToLoginOrRelevantPageMixin, TemplateVie
             'year_choices': year_choices(),
             'user_application_id': user_application.id,
             'is_work_experience_not_applicable': user_application.is_work_experience_not_applicable,
-            'is_education_experience_completed': user_application.is_education_experience_completed
+            'is_education_experience_completed': user_application.is_education_experience_completed,
         })
 
         return context

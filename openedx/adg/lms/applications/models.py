@@ -213,7 +213,7 @@ class UserApplication(TimeStampedModel):
         """
         Check if any work experience is associated with the user application
         """
-        return WorkExperience.objects.filter(user_application=self).exists()
+        return self.applications_workexperiences.exists()
 
     @property
     def has_no_work_experience(self):
@@ -230,12 +230,12 @@ class UserApplication(TimeStampedModel):
         """
         Check if any education is associated with the user application.
         """
-        return Education.objects.filter(user_application=self).exists()
+        return self.applications_educations.exists()
 
     @property
     def is_work_experience_completed(self):
         """
-        Check if any work experience is associated with the user application.
+        Check if user add any work experience or mark user application as work experience not applicable
         """
         return self.is_work_experience_not_applicable or self.has_work_experience
 
