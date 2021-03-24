@@ -58,8 +58,6 @@ def is_referred_by_login_or_register(request):
     Returns:
         Boolean: True if path in HTTP_REFERER contains login or register, otherwise False
     """
-    if 'HTTP_REFERER' in request.META:
-        path = parse.urlsplit(request.META['HTTP_REFERER']).path
-        return path in ['/login', '/register']
-
-    return False
+    referer = request.META.get('HTTP_REFERER', '')
+    path = parse.urlsplit(referer).path
+    return path in ['/login', '/register']
