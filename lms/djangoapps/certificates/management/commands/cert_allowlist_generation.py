@@ -22,7 +22,7 @@ class Command(BaseCommand):
     Management command to generate allowlist certificates for one or more users in a given course run.
 
     Example usage:
-    ./manage.py lms cert_allowlist_generation -u 123 verified -c course-v1:edX+DemoX+Demo_Course
+    ./manage.py lms cert_allowlist_generation -u 123 456 -c course-v1:edX+DemoX+Demo_Course
     """
 
     help = """
