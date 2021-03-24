@@ -20,7 +20,9 @@
                 {{ comment_body }}
             </div>
 
-            {% trans "View discussion" as course_cta_text %}{{course_cta_text|force_escape}}
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}View discussion{% endblocktrans %}
+            {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=post_link%}
 
             {% block google_analytics_pixel %}
