@@ -9,6 +9,7 @@ import os
 
 from django.conf import settings
 from django.core.files import File
+from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from path import Path as path
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
@@ -112,6 +113,8 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         Kicks off an asynchronous course import and returns an ID to be used to check
         the task's status
         """
+        set_custom_attribute('course_import_init', True)
+        set_custom_attributes_for_course_key(course_key)
         try:
             if 'course_data' not in request.FILES:
                 raise self.api_error(
@@ -150,7 +153,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                 'task_id': async_result.task_id
             })
         except Exception as e:
-            log.exception(f'Course import {course_key: Unknown error in import}')
+            log.exception(f'Course import {course_key}: Unknown error in import')
             raise self.api_error(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 developer_message=str(e),

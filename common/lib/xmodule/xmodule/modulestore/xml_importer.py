@@ -274,7 +274,7 @@ class ImportManager:
         Import all static items into the content store.
         """
         if self.static_content_store is None:
-            log.error(
+            log.warning(
                 f'Course import {self.target_id}: Static content store is None. Skipping static content import.'
             )
             return
@@ -356,7 +356,8 @@ class ImportManager:
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
         except OSError:
-            logging.error(f'Course import {course_id}: No {assets_filename} file present.')
+            # file does not exist.
+            logging.info(f'Course import {course_id}: No {assets_filename} file present.')
             return
         except Exception as exc:  # pylint: disable=W0703
             monitor_import_failure(course_id, 'Updating', exception=exc)
