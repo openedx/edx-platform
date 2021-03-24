@@ -279,7 +279,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
 
-
     # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
