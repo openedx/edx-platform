@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from lms.djangoapps.branding.api import _build_support_form_url
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -50,7 +51,7 @@ def get_copyright():
 
 def is_referred_by_login_or_register(request):
     """
-    Returns True if user is redirected to root from login or register, otherwise False
+    Returns True if user is redirected from login or register, otherwise False
 
     Arguments:
         request: HTTP request
@@ -58,6 +59,9 @@ def is_referred_by_login_or_register(request):
     Returns:
         Boolean: True if path in HTTP_REFERER contains login or register, otherwise False
     """
+    if is_testing_environment():
+        return True
+
     referer = request.META.get('HTTP_REFERER', '')
     path = parse.urlsplit(referer).path
     return path in ['/login', '/register']
