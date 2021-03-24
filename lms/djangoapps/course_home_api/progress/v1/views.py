@@ -68,6 +68,7 @@ class ProgressTabView(RetrieveAPIView):
         enrollment_mode: (str) a str representing the enrollment the user has ('audit', 'verified', ...)
         grading_policy:
             assignment_policies: List of serialized assignment grading policy objects, each has the following fields:
+                num_droppable: (int) the number of assignments able to be dropped
                 type: (str) the assignment type
                 weight: (float) the percent weight the given assigment type has on the overall grade
             grade_range: an object containing the grade range cutoffs. The exact keys in the object can vary, but they
