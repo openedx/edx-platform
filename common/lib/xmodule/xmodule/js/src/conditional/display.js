@@ -78,8 +78,8 @@
         return this.addXBlockFragmentResources(resources).done(function () {
           // We give XBlock fragments free-reign to add javascript and CSS to
           // to the page, so XSS escaping doesn't matter much in this context
-          // xss-lint: disable=javascript-jquery-append
           console.log("Fragment resources loaded, appending HTML");
+          // xss-lint: disable=javascript-jquery-append
           element.append(html);
         });
       } catch (e) {
