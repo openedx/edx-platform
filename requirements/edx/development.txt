@@ -130,7 +130,7 @@ edx-toggles==4.1.0        # via -r requirements/edx/testing.txt, edx-ace, edx-co
 edx-user-state-client==1.3.0  # via -r requirements/edx/testing.txt
 edx-when==2.0.0           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==2.0.1             # via -r requirements/edx/testing.txt
-elasticsearch==7.11.0     # via -r requirements/edx/testing.txt, edx-search
+elasticsearch==7.12.0     # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==2.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
