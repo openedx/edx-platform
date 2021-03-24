@@ -53,6 +53,7 @@ class GradingPolicySerializer(serializers.Serializer):
 
     def get_assignment_policies(self, grading_policy):
         return [{
+            'num_droppable': assignment_policy['drop_count'],
             'type': assignment_policy['type'],
             'weight': assignment_policy['weight'],
         } for assignment_policy in grading_policy['GRADER']]
