@@ -82,7 +82,7 @@ class ExtendedUserProfileForm(forms.Form):
         saudi_national = self.cleaned_data.get('saudi_national')
         if not saudi_national:
             raise forms.ValidationError(
-                'Sorry, only a saudi national can enter this program'
+                'Sorry, only a Saudi national can enter this program'
             )
         return saudi_national
 

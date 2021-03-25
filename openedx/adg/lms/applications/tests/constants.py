@@ -1,6 +1,9 @@
 """
 Constants for all the tests.
 """
+from datetime import date
+
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 
 ADMIN_TYPE_SUPER_ADMIN = 'super_admin'
@@ -35,3 +38,5 @@ COVER_LETTER_REDIRECT_URL = '{register}?next={next}'.format(
 MOCK_FILE_PATH = 'dummy_file.pdf'
 
 TEST_MESSAGE_FOR_APPLICANT = 'Test message for the applicant'
+
+VALID_USER_BIRTH_DATE_FOR_APPLICATION = date.today() - relativedelta(years=30)

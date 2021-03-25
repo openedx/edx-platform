@@ -18,7 +18,7 @@ from openedx.adg.lms.applications.forms import (
 )
 from openedx.adg.lms.registration_extension.tests.factories import ExtendedUserProfileFactory
 
-from .constants import MOCK_FILE_PATH
+from .constants import MOCK_FILE_PATH, VALID_USER_BIRTH_DATE_FOR_APPLICATION
 from .factories import BusinessLineFactory
 
 
@@ -30,14 +30,22 @@ def user_extended_profile_fixture():
     return ExtendedUserProfileFactory()
 
 
-def birth_date_dictionary(birth_date):
+def get_extended_profile_form_data(birth_date=VALID_USER_BIRTH_DATE_FOR_APPLICATION, saudi_national=True):
     """
-    Initialize the data dictionary for birth_date of extended profile form
+    Initialize the data dictionary for the extended profile form
+
+    Arguments:
+        birth_date (date): Date for the extended profile form
+        saudi_national (Boolean): Saudi national or not
+
+    Returns:
+        dict: A dict containing the form data
     """
     return {
         'birth_day': birth_date.day,
         'birth_month': birth_date.month,
-        'birth_year': birth_date.year
+        'birth_year': birth_date.year,
+        'saudi_national': saudi_national
     }
 
 
@@ -46,20 +54,7 @@ def test_extended_user_profile_form_with_future_birth_date():
     Validate that future dates are not allowed in birth_date field
     """
     tomorrow = date.today() + timedelta(days=1)
-    form = ExtendedUserProfileForm(data=birth_date_dictionary(tomorrow))
-    assert not form.is_valid()
-
-
-def test_extended_user_profile_form_with_invalid_date():
-    """
-    Validate that future dates are not allowed in birth_date field
-    """
-    data = {
-        'birth_day': 30,
-        'birth_month': 2,
-        'birth_year': 2000
-    }
-    form = ExtendedUserProfileForm(data=data)
+    form = ExtendedUserProfileForm(data=get_extended_profile_form_data(birth_date=tomorrow))
     assert not form.is_valid()
 
 
@@ -68,8 +63,8 @@ def test_extended_user_profile_form_with_birth_date(age_year, expected):
     """
     Validate that birth_date with at least 21 year difference is allowed
     """
-    age = date.today() - relativedelta(years=age_year)
-    form = ExtendedUserProfileForm(data=birth_date_dictionary(age))
+    birth_date = date.today() - relativedelta(years=age_year)
+    form = ExtendedUserProfileForm(data=get_extended_profile_form_data(birth_date=birth_date))
     assert form.is_valid() == expected
 
 
@@ -79,14 +74,13 @@ def test_extended_user_profile_form_valid_data(user_extended_profile):
     Validate that valid data is stored in database successfully
     """
     user = user_extended_profile.user
-    birth_date = date.today() - relativedelta(years=30)
-    form = ExtendedUserProfileForm(data=birth_date_dictionary(birth_date))
+    form = ExtendedUserProfileForm(data=get_extended_profile_form_data())
     mocked_request = MagicMock()
     mocked_request.user = user
     if form.is_valid():
         form.save(request=mocked_request)
     user_extended_profile.refresh_from_db()
-    assert birth_date == user_extended_profile.birth_date
+    assert VALID_USER_BIRTH_DATE_FOR_APPLICATION == user_extended_profile.birth_date
 
 
 @pytest.mark.parametrize('size , expected', [(FILE_MAX_SIZE, True), (FILE_MAX_SIZE + 1, False)])
@@ -128,6 +122,16 @@ def test_user_application_admin_form(
     else:
         assert not admin_form.is_valid()
         assert admin_form.errors['__all__'] == [APPLICATION_REVIEW_ERROR_MSG]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('is_saudi_national, expected_result', [(True, True), (False, False)])
+def test_user_application_nationality_validation(is_saudi_national, expected_result):
+    """
+    Test if the user application validation for saudi_national is working correctly or not
+    """
+    form = ExtendedUserProfileForm(data=get_extended_profile_form_data(saudi_national=is_saudi_national))
+    assert form.is_valid() is expected_result
 
 
 # ------- Application Cover Letter Form tests below -------
