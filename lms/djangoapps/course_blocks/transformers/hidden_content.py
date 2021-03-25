@@ -10,7 +10,7 @@ from pytz import utc
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from xmodule.seq_module import SequenceBlock
 
-from .utils import collect_merged_boolean_field, collect_merged_date_field
+from .utils import collect_merged_boolean_field
 
 MAXIMUM_DATE = utc.localize(datetime.max)
 
@@ -33,7 +33,6 @@ class HiddenContentTransformer(BlockStructureTransformer):
     """
     WRITE_VERSION = 3
     READ_VERSION = 3
-    MERGED_DUE_DATE = 'merged_due_date'
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
 
     @classmethod
@@ -66,16 +65,6 @@ class HiddenContentTransformer(BlockStructureTransformer):
             transformer=cls,
             xblock_field_name='hide_after_due',
             merged_field_name=cls.MERGED_HIDE_AFTER_DUE,
-        )
-
-        collect_merged_date_field(
-            block_structure,
-            transformer=cls,
-            xblock_field_name='due',
-            merged_field_name=cls.MERGED_DUE_DATE,
-            default_date=MAXIMUM_DATE,
-            func_merge_parents=max,
-            func_merge_ancestors=min,
         )
 
         block_structure.request_xblock_fields('self_paced', 'end', 'due')
