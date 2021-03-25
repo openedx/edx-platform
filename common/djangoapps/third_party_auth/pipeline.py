@@ -90,7 +90,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import is_multiple_sso_accounts_association_to_saml_user_enabled
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from common.djangoapps.third_party_auth.utils import (
     get_user_from_email,
     is_enterprise_customer_user,
@@ -135,9 +134,6 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # URL specified with this setting, rather than to the built-in
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
-
-# If authn MFE is enabled, the redirect should be to MFE instead of FE
-BASE_URL = settings.AUTHN_MICROFRONTEND_URL if should_redirect_to_authn_microfrontend() else ''
 
 
 def is_api(auth_entry):
@@ -574,11 +570,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # invariants have been violated and future misbehavior is likely.
     def dispatch_to_login():
         """Redirects to the login page."""
-        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """
