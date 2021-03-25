@@ -5,6 +5,7 @@ Unit tests for SafeSessionMiddleware
 from unittest.mock import patch
 
 import ddt
+
 from crum import set_current_request
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -16,7 +17,7 @@ from django.test.utils import override_settings
 from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..middleware import SafeCookieData, SafeSessionMiddleware
+from ..middleware import SafeCookieData, SafeSessionMiddleware, log_request_user_changes
 from .test_utils import TestSafeSessionsLogMixin
 
 
@@ -70,7 +71,10 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         """
         assert SafeSessionMiddleware.get_user_id_from_session(self.request) == self.user.id
 
-    def test_success(self):
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES_FLAG")
+    def test_success(self, mock_log_request_user_changes_flag, mock_log_request_user_changes):
+        mock_log_request_user_changes_flag.is_enabled.return_value = False
         self.client.login(username=self.user.username, password='test')
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
@@ -91,6 +95,20 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
 
         # verify steps 4, 5: user_id stored for later verification
         assert self.request.safe_cookie_verified_user_id == self.user.id
+
+        # verify extra request_user_logging not called.
+        assert not mock_log_request_user_changes.called
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES_FLAG")
+    def test_log_request_user_flag_on(self, mock_log_request_user_changes_flag, mock_log_request_user_changes):
+        mock_log_request_user_changes_flag.is_enabled.return_value = True
+        self.client.login(username=self.user.username, password='test')
+        session_id = self.client.session.session_key
+        safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
+
+        self.assert_response(safe_cookie_data)
+        assert mock_log_request_user_changes.called
 
     def test_success_no_cookies(self):
         self.assert_response()
@@ -306,3 +324,62 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def test_error_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
         self.verify_error(401)
+
+
+@ddt.ddt
+class TestLogRequestUserChanges(TestCase):
+    """
+    Test the function that instruments a request object.
+
+    Ensure that we are logging changes to the 'user' attribute and
+    that the correct messages are written.
+    """
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.log.info")
+    def test_initial_user_setting_logging(self, mock_log):
+        request = get_mock_request()
+        del request.user
+        log_request_user_changes(request)
+        request.user = UserFactory.create()
+
+        assert mock_log.called
+        assert "Setting for the first time" in mock_log.call_args[0][0]
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.log.info")
+    def test_user_change_logging(self, mock_log):
+        request = get_mock_request()
+        original_user = UserFactory.create()
+        new_user = UserFactory.create()
+
+        request.user = original_user
+        log_request_user_changes(request)
+
+        # Verify that we don't log if set to same as current value.
+        request.user = original_user
+        assert not mock_log.called
+
+        # Verify logging on change.
+        request.user = new_user
+        assert mock_log.called
+        assert f"Changing request user. Originally {original_user.id!r}" in mock_log.call_args[0][0]
+        assert f"will become {new_user.id!r}" in mock_log.call_args[0][0]
+
+        # Verify change back logged.
+        request.user = original_user
+        assert mock_log.call_count == 2
+        expected_msg = f"Originally {original_user.id!r}, now {new_user.id!r} and will become {original_user.id!r}"
+        assert expected_msg in mock_log.call_args[0][0]
+
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.log.info")
+    def test_user_change_with_no_ids(self, mock_log):
+        request = get_mock_request()
+        del request.user
+
+        log_request_user_changes(request)
+        request.user = object()
+        assert mock_log.called
+        assert "Setting for the first time, but user has no id" in mock_log.call_args[0][0]
+
+        request.user = object()
+        assert mock_log.call_count == 2
+        assert "Changing request user but user has no id." in mock_log.call_args[0][0]

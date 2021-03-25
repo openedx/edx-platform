@@ -60,7 +60,7 @@ Custom Attributes:
         that failed when processing the response. See SafeSessionMiddleware._verify_user
 """
 
-
+import inspect
 from base64 import b64encode
 from contextlib import contextmanager
 from hashlib import sha256
@@ -76,8 +76,21 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import WaffleFlag
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+
+# .. toggle_name: safe_session.log_request_user_changes
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Turn this toggle on to log anytime the `user` attribute of the request object gets
+#   changed.  This will also log the location where the change is coming from to quickly find issues.
+# .. toggle_warnings: This logging will be very verbose and so should probably not be left on all the time.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-03-25
+# .. toggle_target_removal_date: 2021-05-01
+# .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
+LOG_REQUEST_USER_CHANGES_FLAG = WaffleFlag('safe_session.log_request_user_changes', __name__)
 
 log = getLogger(__name__)
 
@@ -295,6 +308,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             user_id = self.get_user_id_from_session(request)
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
+                if LOG_REQUEST_USER_CHANGES_FLAG.is_enabled():
+                    log_request_user_changes(request)
             else:
                 return self._on_user_authentication_failed(request)
 
@@ -499,6 +514,61 @@ def _delete_cookie(request, response):
             "SafeCookieData deleted session cookie for session %s",
             request.session.session_key
         )
+
+
+def log_request_user_changes(request):
+    """
+    Instrument the request object so that we log changes to the `user` attribute. This is done by
+    changing the `__class__` attribute of the request object to point to a new class we created
+    on the fly which is exactly the same as the underlying request class but with an override for
+    the `__setattr__` function to catch the attribute chages.
+    """
+    original_user = getattr(request, 'user', None)
+
+    class SafeSessionRequestWrapper(request.__class__):
+        """
+        A wrapper class for the request object.
+        """
+
+        def __setattr__(self, name, value):
+            nonlocal original_user
+            if name == 'user':
+                stack = inspect.stack()
+                # Written this way in case you need more of the stack for debugging.
+                location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[1:2])
+
+                if not hasattr(request, name):
+                    original_user = value
+                    if hasattr(value, 'id'):
+                        log.info(
+                            f"SafeCookieData: Setting for the first time: {value.id!r}\n"
+                            f"{location}"
+                        )
+                    else:
+                        log.info(
+                            f"SafeCookieData: Setting for the first time, but user has no id: {value!r}\n"
+                            f"{location}"
+                        )
+                elif value != getattr(request, name):
+                    current_user = getattr(request, name)
+                    if hasattr(value, 'id'):
+                        log.info(
+                            f"SafeCookieData: Changing request user. "
+                            f"Originally {original_user.id!r}, now {current_user.id!r} and will become {value.id!r}\n"
+                            f"{location}"
+                        )
+                    else:
+                        log.info(
+                            f"SafeCookieData: Changing request user but user has no id. "
+                            f"Originally {original_user!r}, now {current_user!r} and will become {value!r}\n"
+                            f"{location}"
+                        )
+
+                else:
+                    # Value being set but not actually changing.
+                    pass
+            return super().__setattr__(name, value)
+    request.__class__ = SafeSessionRequestWrapper
 
 
 def _is_from_logout(request):
