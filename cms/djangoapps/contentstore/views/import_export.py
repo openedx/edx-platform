@@ -126,9 +126,9 @@ def _write_chunk(request, courselike_key):
     set_custom_attributes_for_course_key(courselike_key)
     current_step = 'Uploading'
 
-    def error_response(message, status):
+    def error_response(message, status, stage):
         """Returns Json error response"""
-        return JsonResponse({'ErrMsg': message, 'Stage': -1}, status=status)
+        return JsonResponse({'ErrMsg': message, 'Stage': stage}, status=status)
 
     courselike_string = str(courselike_key) + filename
     # Do everything in a try-except block to make sure everything is properly cleaned up.
@@ -140,7 +140,7 @@ def _write_chunk(request, courselike_key):
             error_message = _('We only support uploading a .tar.gz file.')
             _save_request_status(request, courselike_string, -1)
             monitor_import_failure(courselike_key, current_step, message=error_message)
-            return error_response(error_message, 415)
+            return error_response(error_message, 415, 0)
 
         temp_filepath = course_dir / filename
         if not course_dir.isdir():
@@ -170,7 +170,7 @@ def _write_chunk(request, courselike_key):
                 _save_request_status(request, courselike_string, -1)
                 log.error(f'Course Import {courselike_key}: {error_message}')
                 monitor_import_failure(courselike_key, current_step, message=error_message)
-                return error_response(error_message, status=409)
+                return error_response(error_message, 409, 0)
 
             size = os.path.getsize(temp_filepath)
             # Check to make sure we haven't missed a chunk
@@ -181,7 +181,7 @@ def _write_chunk(request, courselike_key):
                 _save_request_status(request, courselike_string, -1)
                 log.error(f'Course import {courselike_key}: A chunk has been missed')
                 monitor_import_failure(courselike_key, current_step, message=error_message)
-                return error_response(error_message, status=409)
+                return error_response(error_message, 409, 0)
 
             # The last request sometimes comes twice. This happens because
             # nginx sends a 499 error code when the response takes too long.
@@ -223,7 +223,7 @@ def _write_chunk(request, courselike_key):
 
         monitor_import_failure(courselike_key, current_step, exception=exception)
         log.exception(f'Course import {courselike_key}: error importing course.')
-        return error_response(str(exception), 400)
+        return error_response(str(exception), 400, -1)
 
     return JsonResponse({'ImportStatus': 1})
 
