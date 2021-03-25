@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.adg.lms.applications.models import BusinessLine
-from openedx.adg.lms.registration_extension.constants import CITIES
+from openedx.adg.lms.registration_extension.constants import CITIES, REQUIRED_FIELD_CITY_MSG, REQUIRED_FIELD_COMPANY_MSG
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn.views.registration_form import \
@@ -56,7 +56,6 @@ class RegistrationFormFactory(CoreRegistrationFormFactory):
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the city in which they live.
         city_label = _(u'City')
-        error_msg = accounts.REQUIRED_FIELD_CITY_MSG
 
         form_desc.add_field(
             'city',
@@ -66,7 +65,7 @@ class RegistrationFormFactory(CoreRegistrationFormFactory):
             include_default_option=True,
             required=required,
             error_messages={
-                'required': error_msg
+                'required': REQUIRED_FIELD_CITY_MSG
             }
         )
 
@@ -143,13 +142,13 @@ class ExtendedProfileForm(ModelForm):
     company = ModelChoiceField(
         queryset=BusinessLine.objects.all(),
         to_field_name='title',
-        empty_label='Select company',
-        required=False
+        label=_(u'Al-Dabbagh Group Company'),
+        required=False,
+        error_messages={
+            'required': REQUIRED_FIELD_COMPANY_MSG
+        }
     )
 
     class Meta(object):
         model = ExtendedUserProfile
         fields = ('company',)
-        labels = {
-            'company': _('Al-Dabbagh Group Company'),
-        }

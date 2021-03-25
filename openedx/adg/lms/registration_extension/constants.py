@@ -67,3 +67,6 @@ CITIES = {
         ('Unaizah', _('Unaizah'))
     ]
 }
+
+REQUIRED_FIELD_CITY_MSG = _(u'Please select your City.')
+REQUIRED_FIELD_COMPANY_MSG = _(u'Please select your Company.')

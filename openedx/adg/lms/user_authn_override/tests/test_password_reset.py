@@ -24,7 +24,7 @@ class PasswordResetFormTest(TestCase):
             form_desc['fields'], [
                 {
                     'required': True,
-                    'placeholder': 'Email Address',
+                    'placeholder': 'Email',
                     'restrictions': {'max_length': EMAIL_MAX_LENGTH, 'min_length': EMAIL_MIN_LENGTH},
                     'errorMessages': {},
                     'label': 'Email',
