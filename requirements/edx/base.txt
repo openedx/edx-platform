@@ -208,7 +208,7 @@ ruamel.yaml==0.16.13      # via drf-yasg
 rules==2.2                # via -r requirements/edx/base.in, edx-enterprise, edx-proctoring
 s3transfer==0.1.13        # via boto3
 sailthru-client==2.2.3    # via -r requirements/edx/base.in, edx-ace
-scipy==1.6.1              # via chem, openedx-calc
+scipy==1.6.2              # via chem, openedx-calc
 semantic-version==2.8.5   # via edx-drf-extensions
 shapely==1.7.1            # via -r requirements/edx/base.in
 simplejson==3.17.2        # via -r requirements/edx/base.in, sailthru-client, super-csv, xblock-utils
