@@ -255,10 +255,10 @@ class Command(BaseCommand):
             user = User.objects.get(id=grade.user_id)
 
             # Grab mode/status from cert call
-            if course_cert_info:
-                key = (user.id, str(grade.course_id))
-                mode = course_cert_info[key].get('mode', None)
-                status = course_cert_info[key].get('status', None)
+            key = (user.id, str(grade.course_id))
+            cert_info = course_cert_info.get(key, {})
+            mode = cert_info.get('mode', None)
+            status = cert_info.get('status', None)
 
             send_grade_if_interesting(
                 user,

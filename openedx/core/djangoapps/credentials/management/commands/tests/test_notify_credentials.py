@@ -120,12 +120,11 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--dry-run', '--start-date', '2017-02-01')
         self.assertFalse(mock_send.called)
 
-    @mock.patch(COMMAND_MODULE + '.handle_cert_change')
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
     @mock.patch(COMMAND_MODULE + '.handle_course_cert_changed')
-    def test_hand_off(self, mock_grade_cert_change, mock_grade_interesting, mock_program_changed):
+    def test_hand_off(self, mock_grade_interesting, mock_program_changed):
+        # pylint: disable=unused-argument
         call_command(Command(), '--start-date', '2017-02-01')
-        self.assertEqual(mock_grade_cert_change.call_count, 2)
         self.assertEqual(mock_grade_interesting.call_count, 2)
 
     @mock.patch(COMMAND_MODULE + '.time')
