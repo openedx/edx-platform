@@ -184,9 +184,16 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError) as ex:
             log.exception(u"Unknown tpa_hint provider: %s", ex)
 
+    # Redirect to authn MFE if it is enabled or user is not an enterprise user or not coming from a SAML IDP.
+    saml_provider = False
+    running_pipeline = pipeline.get(request)
     enterprise_customer = enterprise_customer_for_request(request)
-    # Redirect to authn MFE if it is enabled
-    if should_redirect_to_authn_microfrontend() and not enterprise_customer:
+    if running_pipeline:
+        saml_provider, __ = third_party_auth.utils.is_saml_provider(
+            running_pipeline.get('backend'), running_pipeline.get('kwargs')
+        )
+
+    if should_redirect_to_authn_microfrontend() and not enterprise_customer and not saml_provider:
 
         # This is to handle a case where a logged-in cookie is not present but the user is authenticated.
         # Note: If we don't handle this learner is redirected to authn MFE and then back to dashboard
