@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from completion.models import BlockCompletion
+from openedx.features.pakx.lms.overrides.models import CourseProgressEmailModel
 
 
 class BlockCompletionAdmin(admin.ModelAdmin):
@@ -18,3 +19,14 @@ class BlockCompletionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(BlockCompletion, BlockCompletionAdmin)
+
+
+@admin.register(CourseProgressEmailModel)
+class CourseProgressEmailModelAdmin(admin.ModelAdmin):
+    """
+    Admin interface for CourseProgressEmailModel object
+    """
+
+    list_display = ['user', 'course_id', 'status']
+    search_fields = ['status', 'course_id']
+    list_filter = ['status', 'course_id']

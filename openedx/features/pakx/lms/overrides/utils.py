@@ -1,17 +1,21 @@
 from re import search
-
+from logging import getLogger
+from datetime import datetime
 from completion.models import BlockCompletion
 from django.db.models import Case, IntegerField, Sum, When
 from django.db.models.functions import Coalesce
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
+from student.models import CourseEnrollment
 from lms.djangoapps.course_api.blocks.serializers import BlockDictSerializer
 from lms.djangoapps.course_api.blocks.transformers.blocks_api import BlocksAPITransformer
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
-from student.models import CourseEnrollment
+
+
+log = getLogger(__name__)
 
 CORE_BLOCK_TYPES = ['html', 'video', 'problem']
 BLOCK_TYPES_TO_FILTER = [
@@ -53,7 +57,7 @@ def _get_resume_course_info(request, course_id, are_future_start_dates_allowed=F
     return has_visited_course, resume_course_url, resume_course_title
 
 
-def add_course_progress_and_resume_info_tags_to_enrolled_courses(request, courses_list):
+def add_course_progress_to_enrolled_courses(request, courses_list):
     """
     Adds a tag enrolled to the course in which user is enrolled
 
@@ -201,6 +205,7 @@ def get_course_progress_percentage(request, course_key):
     )
     total_completed_blocks = sum(list(filter(lambda value: value is not None, total_completed_block_types.values()))) \
         if total_completed_block_types and total_completed_block_types.values() else 0
+
     return format((total_completed_blocks/total_blocks)*100, '.0f') if total_blocks > 0 else total_blocks
 
 
@@ -222,3 +227,15 @@ def check_rtl_characters_in_string(string):
     rtl_range = r'[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF\uFE70-\uFEFF]'
     matched_groups = search(rtl_range, string)
     return matched_groups is not None
+
+
+def get_date_diff_in_days(future_date):
+    """
+    get date diff in days with ref to current date
+    :param future_date: (datetime) a date in future
+
+    :returns: (int) difference in days i.e 23
+    """
+
+    current_date = datetime.now().date()
+    return (future_date.date() - current_date).days

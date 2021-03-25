@@ -37,7 +37,7 @@ from openedx.features.course_experience.utils import get_course_outline_block_tr
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.pakx.cms.custom_settings.models import CourseOverviewContent
-from openedx.features.pakx.lms.overrides.utils import add_course_progress_and_resume_info_tags_to_enrolled_courses
+from openedx.features.pakx.lms.overrides.utils import add_course_progress_to_enrolled_courses
 from student.models import CourseEnrollment
 from util.cache import cache_if_anonymous
 from util.milestones_helpers import get_prerequisite_courses_display
@@ -89,7 +89,7 @@ def courses(request, section='in-progress'):
     upcoming_courses = []
     completed_courses = []
 
-    add_course_progress_and_resume_info_tags_to_enrolled_courses(request, courses_list)
+    add_course_progress_to_enrolled_courses(request, courses_list)
 
     show_only_enrolled_courses = waffle.switch_is_active('show_only_enrolled_courses')
 
