@@ -492,6 +492,7 @@ class RegistrationView(APIView):
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
+    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
     def post(self, request):
         """Create the user's account.
 
@@ -510,6 +511,10 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+        should_be_rate_limited = getattr(request, 'limited', False)
+        if should_be_rate_limited:
+            return JsonResponse({'error_code': 'forbidden-request'}, status=403)
+
         if is_require_third_party_auth_enabled() and not pipeline.running(request):
             # if request is not running a third-party auth pipeline
             return HttpResponseForbidden(
