@@ -31,6 +31,7 @@ the time the certificate is generated:
 * The user must be on the allowlist for the course run (see the *CertificateWhitelist* model)
 * The user must not have an invalidated certificate for the course run (see the *CertificateInvalidation* model)
 * Automatic certificate generation must be globally enabled
+* HTML (web) certificates must be globally enabled, and also enabled for the course run
 
 Note: the above requirements were written for the allowlist, which assumes the
 CourseWaffleFlag *certificates_revamp.use_allowlist* has been enabled for the

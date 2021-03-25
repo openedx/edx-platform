@@ -52,7 +52,8 @@ CERTIFICATES_USE_ALLOWLIST = CourseWaffleFlag(
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable the updated regular (non-allowlist) course certificate logic on a
-#   per-course run basis.
+#   per-course run basis. Note that if this flag is enabled for a course run, certificates_revamp.use_allowlist
+#   should also be enabled for that course run.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-03-05
 # .. toggle_target_removal_date: 2022-03-05
@@ -183,6 +184,12 @@ def _can_generate_allowlist_certificate(user, course_key):
         log.info(f'{user.id} does not have a verified id. Allowlist certificate cannot be generated for {course_key}.')
         return False
 
+    course = _get_course(course_key)
+    if not has_html_certificates_enabled(course):
+        log.info(f'{course_key} does not have HTML certificates enabled. Allowlist certificate cannot be generated for '
+                 f'{user.id}.')
+        return False
+
     log.info(f'{user.id} : {course_key} is on the certificate allowlist')
     return _can_generate_allowlist_certificate_for_status(user, course_key)
 
@@ -226,7 +233,7 @@ def _can_generate_v2_certificate(user, course_key):
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
         return False
 
-    course = modulestore().get_course(course_key, depth=0)
+    course = _get_course(course_key)
     if _is_beta_tester(user, course):
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
@@ -236,6 +243,12 @@ def _can_generate_v2_certificate(user, course_key):
         return False
 
     if not _can_generate_certificate_for_status(user, course_key):
+        return False
+
+    course = _get_course(course_key)
+    if not has_html_certificates_enabled(course):
+        log.info(f'{course_key} does not have HTML certificates enabled. Certificate cannot be generated for '
+                 f'{user.id}.')
         return False
 
     log.info(f'V2 certificate can be generated for {user.id} : {course_key}')
@@ -330,6 +343,13 @@ def _has_passing_grade(user, course):
     """
     course_grade = CourseGradeFactory().read(user, course)
     return course_grade.passed
+
+
+def _get_course(course_key):
+    """
+    Get the course from the course key
+    """
+    return modulestore().get_course(course_key, depth=0)
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
