@@ -518,7 +518,7 @@ def generate_anonymous_ids(_xmodule_instance_args, _entry_id, course_id, task_in
     task_progress.attempted = students.count
     _log_and_update_progress({'step': "Finished compiling learner rows"})
 
-    filename = str(course_id).replace('/', '-') + '-anon-ids'
-    upload_csv_to_report_store([header] + rows, filename, course_id, start_date)
+    csv_name = 'anonymized_ids'
+    upload_csv_to_report_store([header] + rows, csv_name, course_id, start_date)
 
     return UPDATE_STATUS_SUCCEEDED
