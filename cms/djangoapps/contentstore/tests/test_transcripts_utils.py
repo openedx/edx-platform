@@ -650,6 +650,41 @@ class TestTranscript(unittest.TestCase):
         with self.assertRaises(NotFoundError):
             transcripts_utils.Transcript.asset(None, None, filename=transcripts_utils.NON_EXISTENT_TRANSCRIPT)
 
+    def test_latin1(self):
+        """
+        Test to make sure Latin-1 encoded transcripts work.
+        """
+        latin1_sjson_str = textwrap.dedent("""\
+            {
+                "start": [
+                    10500,
+                    15000
+                ],
+                "end": [
+                    13000,
+                    18000
+                ],
+                "text": [
+                    "û",
+                    "At the left we can see..."
+                ]
+            }
+        """)
+        latin1_sjson_bytes = latin1_sjson_str.encode('latin-1')
+
+        expected_result = textwrap.dedent("""\
+            0
+            00:00:10,500 --> 00:00:13,000
+            û
+
+            1
+            00:00:15,000 --> 00:00:18,000
+            At the left we can see...
+
+        """)
+        result = transcripts_utils.Transcript.convert(latin1_sjson_bytes, 'sjson', 'srt')
+        assert result == expected_result
+
 
 class TestSubsFilename(unittest.TestCase):
     """
