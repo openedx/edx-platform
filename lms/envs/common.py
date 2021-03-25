@@ -3367,11 +3367,16 @@ LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
 
-# For each of the fields, give one of the following values:
-# - 'required': to display the field, and make it mandatory
-# - 'optional': to display the field, and make it non-mandatory
-# - 'hidden': to not display the field
-
+# .. setting_name: REGISTRATION_EXTRA_FIELDS
+# .. setting_default: {'confirm_email': 'hidden', 'level_of_education': 'optional', 'gender': 'optional',
+#   'year_of_birth': 'optional', 'mailing_address': 'optional', 'goals': 'optional', 'honor_code': 'required',
+#   'terms_of_service': 'hidden', 'city': 'hidden', 'country': 'hidden'}
+# .. setting_description: The signup form may contain extra fields that are presented to every user. For every field, we
+#   can specifiy whether it should be "required": to display the field, and make it mandatory; "optional": to display
+#   the field, and make it non-mandatory; "hidden": to not display the field.
+#   When the terms of service are not visible and agreement to the honor code is required (the default), the signup page
+#   includes a paragraph that links to the honor code page (defined my MKTG_URLS["HONOR"]). This page might not be
+#   available for all Open edX platforms. In such cases, the "honor_code" registration field should be "hidden".
 REGISTRATION_EXTRA_FIELDS = {
     'confirm_email': 'hidden',
     'level_of_education': 'optional',
