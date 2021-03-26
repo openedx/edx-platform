@@ -642,6 +642,14 @@ def _section_data_download(course, access):
         section_data['xblockcompletion_url_all'] = '{}?{}'.format(reverse('xblockcompletion-data:data'), urllib.parse.urlencode({'format': 'all', 'course': six.text_type(course_key)}))
     except ImportError:
         section_data['has_xblockcompletion'] = False
+    
+    try:
+        from gradeucursos import views
+        section_data['has_gradeucursos'] = True
+        section_data['gradeucursos_url_data'] = reverse('gradeucursos-export:data')
+        section_data['gradeucursos_course'] = six.text_type(course_key)
+    except ImportError:
+        section_data['has_gradeucursos'] = False
     ######### EOL #############
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True
