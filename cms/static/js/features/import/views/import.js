@@ -240,7 +240,7 @@ define(
              *
              * @param {int} [stage=0] Starting stage.
              */
-            pollStatus: function(stage) {
+            pollStatus: function(stage, message) {
                 if (current.state !== STATE.IN_PROGRESS) {
                     return;
                 }
@@ -250,13 +250,13 @@ define(
                 if (current.stage === STAGE.SUCCESS) {
                     success();
                 } else if (current.stage < STAGE.UPLOADING) { // Failed
-                    error(gettext('Error importing course'));
+                    error(message || gettext('Error importing course'));
                 } else { // In progress
                     updateFeedbackList();
 
                     $.getJSON(file.url, function(data) {
                         timeout.id = setTimeout(function() {
-                            this.pollStatus(data.ImportStatus);
+                            this.pollStatus(data.ImportStatus, data.Message);
                         }.bind(this), timeout.delay);
                     }.bind(this));
                 }

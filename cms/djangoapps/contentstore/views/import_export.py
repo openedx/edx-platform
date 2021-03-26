@@ -253,6 +253,7 @@ def import_status_handler(request, course_key_string, filename=None):
     args = {'course_key_string': course_key_string, 'archive_name': filename}
     name = CourseImportTask.generate_name(args)
     task_status = UserTaskStatus.objects.filter(name=name)
+    message = ''
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, import_status_handler)
     task_status = task_status.order_by('-created').first()
@@ -267,10 +268,13 @@ def import_status_handler(request, course_key_string, filename=None):
         status = 4
     elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
         status = max(-(task_status.completed_steps + 1), -3)
+        artifact = UserTaskArtifact.objects.filter(name='Error', status=task_status).order_by('-created').first()
+        if artifact:
+            message = artifact.text
     else:
         status = min(task_status.completed_steps + 1, 3)
 
-    return JsonResponse({"ImportStatus": status})
+    return JsonResponse({"ImportStatus": status, "Message": message})
 
 
 def send_tarball(tarball, size):
