@@ -31,7 +31,7 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are exempted from hidden content rules.
     """
-    WRITE_VERSION = 2
+    WRITE_VERSION = 3
     READ_VERSION = 2
     MERGED_DUE_DATE = 'merged_due_date'
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
@@ -88,7 +88,7 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
             func_merge_ancestors=min,
         )
 
-        block_structure.request_xblock_fields('self_paced', 'end')
+        block_structure.request_xblock_fields('self_paced', 'end', 'due')
 
     def transform_block_filters(self, usage_info, block_structure):
         # Users with staff access bypass the Visibility check.
