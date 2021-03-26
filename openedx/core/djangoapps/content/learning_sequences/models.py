@@ -188,9 +188,6 @@ class UserPartitionGroup(models.Model):
 class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
     """
     Course Section data, mapping to the 'chapter' block type.
-
-    Do NOT make a foreign key against this table, as the values are deleted and
-    re-created on course publish.
     """
     id = models.BigAutoField(primary_key=True)
     course_context = models.ForeignKey(
