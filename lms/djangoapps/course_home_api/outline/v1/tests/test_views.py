@@ -13,6 +13,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_OUTLINE_TAB
@@ -126,6 +127,29 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         # Now switch users and confirm we get a different result
         self.update_masquerade(username=user.username)
         assert self.client.get(self.url).data['dates_widget']['user_timezone'] == 'Asia/Tokyo'
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
+    def test_course_staff_can_see_non_user_specific_content_in_masquerade(self):
+        """
+        Test that course staff can see the outline and other non-user-specific content when masquerading as a learner
+        """
+        self.store.create_item(
+            self.user.id, self.course.id, 'course_info', 'handouts', fields={'data': '<p>Handouts</p>'}
+        )
+
+        instructor = UserFactory(
+            username='instructor',
+            email=u'instructor@example.com',
+            password='foo',
+            is_staff=False
+        )
+        CourseInstructorRole(self.course.id).add_users(instructor)
+        self.client.login(username=instructor, password='foo')
+        self.update_masquerade(role="student")
+        response = self.client.get(self.url)
+        assert response.data['course_blocks'] is not None
+        assert response.data['handouts_html'] is not None
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
