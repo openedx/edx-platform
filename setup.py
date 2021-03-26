@@ -4,7 +4,7 @@ from setuptools import find_packages, find_namespace_packages
 setuptools.setup(
     packages=(
         find_namespace_packages(include=['lms*']) +
-        find_packages(include=['cms*', 'openedx*']) +
+        find_packages(include=['cms*', 'openedx*', 'common.djangoapps.*']) +
         find_packages(include=['capa*'], where='common/lib/capa', exclude=["tests"]) +
         find_packages(include=['safe_lxml*'], where='common/lib/safe_lxml') +
         find_packages(include=['symmath*'], where='common/lib/symmath') +
