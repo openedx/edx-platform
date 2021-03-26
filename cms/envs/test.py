@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This config file runs the simplest dev environment using sqlite, and db-based
 sessions. Assumes structure:
@@ -33,6 +32,7 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
+    LOGIN_ISSUE_SUPPORT_LINK,
     MEDIA_ROOT,
     MEDIA_URL,
     PLATFORM_DESCRIPTION,
@@ -46,8 +46,8 @@ from lms.envs.test import (  # pylint: disable=wrong-import-order
 
 # Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
-STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_NAME = ugettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
@@ -74,7 +74,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 FEATURES['ENABLE_EXPORT_GIT'] = True
 GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
 
-# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing
+# TODO (cpennington): We need to figure out how envs/test.py can inject things into common.py so that we don't have to repeat this sort of thing  # lint-amnesty, pylint: disable=line-too-long
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
@@ -98,11 +98,11 @@ BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
-        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'db': f'test_xmodule_{THIS_UUID}',
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
         'collection': 'test_modulestore',
@@ -113,7 +113,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'test_xcontent_{}'.format(THIS_UUID),
+        'db': f'test_xcontent_{THIS_UUID}',
         'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
@@ -134,7 +134,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-LMS_ROOT_URL = "http://{}".format(LMS_BASE)
+LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
@@ -320,8 +320,20 @@ DEFAULT_MOBILE_AVAILABLE = True
 
 PROCTORING_SETTINGS = {}
 
+# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
+# (ref MST-637)
+PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
+LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '6/5m'
 LOGISTRATION_API_RATELIMIT = '5/m'
 
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
+REGISTRATION_RATELIMIT = '5/minute'
+
+RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
+RESET_PASSWORD_API_RATELIMIT = '2/m'
+
+############### Settings for proctoring  ###############
+PROCTORING_USER_OBFUSCATION_KEY = 'test_key'

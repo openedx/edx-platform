@@ -1,10 +1,10 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
+from unittest.mock import Mock
 
 from fs.memoryfs import MemoryFS
 from lxml import etree
-from mock import Mock
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -33,7 +33,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
             display_name="Hello Randomize",
         )
         self.child_blocks = [
-            self.make_block("html", self.randomize_block, display_name="Hello HTML {}".format(i))
+            self.make_block("html", self.randomize_block, display_name=f"Hello HTML {i}")
             for i in range(1, 4)
         ]
 
@@ -78,7 +78,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
             exported_olx = f.read()
 
         # And compare.
-        self.assertEqual(exported_olx, expected_olx)
+        assert exported_olx == expected_olx
 
         runtime = TestImportSystem(load_error_modules=True, course_id=randomize_block.location.course_key)
         runtime.resources_fs = export_fs
@@ -89,9 +89,9 @@ class RandomizeBlockTest(MixedSplitTestCase):
         imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None, id_generator)
 
         # Check the new XBlock has the same properties as the old one.
-        self.assertEqual(imported_randomize_block.display_name, randomize_block.display_name)
-        self.assertEqual(len(imported_randomize_block.children), 3)
-        self.assertEqual(imported_randomize_block.children, randomize_block.children)
+        assert imported_randomize_block.display_name == randomize_block.display_name
+        assert len(imported_randomize_block.children) == 3
+        assert imported_randomize_block.children == randomize_block.children
 
     def test_children_seen_by_a_user(self):
         """
@@ -101,18 +101,18 @@ class RandomizeBlockTest(MixedSplitTestCase):
         self._bind_module_system(randomize_block, 3)
 
         # Make sure the runtime knows that the block's children vary per-user:
-        self.assertTrue(randomize_block.has_dynamic_children())
+        assert randomize_block.has_dynamic_children()
 
-        self.assertEqual(len(randomize_block.children), 3)
+        assert len(randomize_block.children) == 3
 
         # Check how many children each user will see:
-        self.assertEqual(len(randomize_block.get_child_descriptors()), 1)
-        self.assertEqual(randomize_block.get_child_descriptors()[0].display_name, 'Hello HTML 1')
+        assert len(randomize_block.get_child_descriptors()) == 1
+        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 1'
         # Check that get_content_titles() doesn't return titles for hidden/unused children
         # get_content_titles() is not overridden in RandomizeBlock so titles of the 3 children are returned.
-        self.assertEqual(len(randomize_block.get_content_titles()), 3)
+        assert len(randomize_block.get_content_titles()) == 3
 
         # Bind to another user and check a different child block is displayed to user.
         randomize_block = self.store.get_item(self.randomize_block.location)
         self._bind_module_system(randomize_block, 1)
-        self.assertEqual(randomize_block.get_child_descriptors()[0].display_name, 'Hello HTML 2')
+        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 2'

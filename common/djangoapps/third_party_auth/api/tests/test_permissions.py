@@ -10,7 +10,6 @@ from django.conf import settings
 from django.test import RequestFactory, TestCase
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-from mock import patch
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -33,7 +32,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         permission_classes = (TPA_PERMISSIONS,)
         required_scopes = ['tpa:read']
 
-        def get(self, request, provider_id=None):
+        def get(self, request, provider_id=None):  # lint-amnesty, pylint: disable=unused-argument
             return Response(data="Success")
 
     def _create_user(self, is_superuser=False, is_staff=False):
@@ -49,12 +48,12 @@ class ThirdPartyAuthPermissionTest(TestCase):
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
         token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
-        return "JWT {}".format(token)
+        return f"JWT {token}"
 
     def test_anonymous_fails(self):
         request = self._create_request()
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
     @ddt.data(
         (True, False, 200),
@@ -68,7 +67,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         self._create_session(request, user)
 
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
 
     @ddt.data(
         # unrestricted (for example, jwt cookies)
@@ -97,7 +96,7 @@ class ThirdPartyAuthPermissionTest(TestCase):
         )
 
         response = self.SomeTpaClassView().dispatch(request)
-        self.assertEqual(response.status_code, expected_response)
+        assert response.status_code == expected_response
 
     @ddt.data(
         # valid scopes
@@ -152,4 +151,4 @@ class ThirdPartyAuthPermissionTest(TestCase):
         request = self._create_request(auth_header=auth_header)
 
         response = self.SomeTpaClassView().dispatch(request, provider_id='some_tpa_provider')
-        self.assertEqual(response.status_code, expected_response)
+        assert response.status_code == expected_response

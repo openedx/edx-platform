@@ -52,7 +52,7 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
-from common.djangoapps.student.models import (
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -164,11 +164,13 @@ class AccountViewSet(ViewSet):
             "OK" response is returned. The response contains the following
             values.
 
+            * id: numerical lms user id in db
             * bio: null or textual representation of user biographical
               information ("about me").
             * country: An ISO 3166 country code or null.
             * date_joined: The date the account was created, in the string
               format provided by datetime. For example, "2014-08-26T17:52:11Z".
+            * last_login: The latest date the user logged in, in the string datetime format.
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
@@ -454,7 +456,7 @@ class DeactivateLogoutView(APIView):
                         default=settings.LANGUAGE_CODE
                     )
                     notification = DeletionNotificationMessage().personalize(
-                        recipient=Recipient(username='', email_address=user_email),
+                        recipient=Recipient(lms_user_id=0, email_address=user_email),
                         language=language_code,
                         user_context=notification_context,
                     )
@@ -868,7 +870,7 @@ class AccountRetirementStatusView(ViewSet):
             # than one row returned here (due to our MySQL collation being case-insensitive), and need
             # to disambiguate them in Python, which will respect case in the comparison.
             retirement = None
-            if len(retirements) < 1:
+            if len(retirements) < 1:  # lint-amnesty, pylint: disable=no-else-raise
                 raise UserRetirementStatus.DoesNotExist()
             elif len(retirements) >= 1:
                 for r in retirements:
@@ -1077,7 +1079,7 @@ class AccountRetirementView(ViewSet):
         DataSharingConsent.objects.filter(username=username).update(username=retired_username)
 
     @staticmethod
-    def retire_sapsf_data_transmission(user):
+    def retire_sapsf_data_transmission(user):  # lint-amnesty, pylint: disable=missing-function-docstring
         for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
             for enrollment in EnterpriseCourseEnrollment.objects.filter(
                 enterprise_customer_user=ent_user
@@ -1088,7 +1090,7 @@ class AccountRetirementView(ViewSet):
                 audits.update(sapsf_user_id='')
 
     @staticmethod
-    def retire_degreed_data_transmission(user):
+    def retire_degreed_data_transmission(user):  # lint-amnesty, pylint: disable=missing-function-docstring
         for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
             for enrollment in EnterpriseCourseEnrollment.objects.filter(
                 enterprise_customer_user=ent_user

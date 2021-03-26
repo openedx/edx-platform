@@ -57,4 +57,4 @@ class ConfigurationModelStrategy(DjangoStrategy):
 
         # At this point, we know 'name' is not set in a [OAuth2|LTI|SAML]ProviderConfig row.
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
-        return super(ConfigurationModelStrategy, self).setting(name, default, backend)
+        return super().setting(name, default, backend)

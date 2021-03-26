@@ -6,22 +6,21 @@ Django module for Course Metadata class -- manages advanced settings and related
 from datetime import datetime
 
 import pytz
-import six
 from crum import get_current_user
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
-from six import text_type
 from xblock.fields import Scope
 
-from openedx.core.lib.teams_config import TeamsetType
-from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from cms.djangoapps.contentstore import toggles
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.lib.teams_config import TeamsetType
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
 
 
-class CourseMetadata(object):
+class CourseMetadata:
     '''
     For CRUD operations on metadata fields which do not have specific editors
     on the other pages including any user generated ones.
@@ -84,7 +83,7 @@ class CourseMetadata(object):
         exclude_list = list(cls.FIELDS_EXCLUDE_LIST)
 
         # Do not show giturl if feature is not enabled.
-        if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+        if not toggles.EXPORT_GIT.is_enabled():
             exclude_list.append('giturl')
 
         # Do not show edxnotes if the feature is disabled.
@@ -157,7 +156,7 @@ class CourseMetadata(object):
         metadata = cls.fetch_all(descriptor)
         exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
-        for key, value in six.iteritems(metadata):
+        for key, value in metadata.items():
             if key in exclude_list_of_fields:
                 continue
             result[key] = value
@@ -173,14 +172,14 @@ class CourseMetadata(object):
             if field.scope != Scope.settings:
                 continue
 
-            field_help = _(field.help)
+            field_help = _(field.help)  # lint-amnesty, pylint: disable=translation-of-non-string
             help_args = field.runtime_options.get('help_format_args')
             if help_args is not None:
                 field_help = field_help.format(**help_args)
 
             result[field.name] = {
                 'value': field.read_json(descriptor),
-                'display_name': _(field.display_name),
+                'display_name': _(field.display_name),  # lint-amnesty, pylint: disable=translation-of-non-string
                 'help': field_help,
                 'deprecated': field.runtime_options.get('deprecated', False),
                 'hide_on_enabled_publisher': field.runtime_options.get('hide_on_enabled_publisher', False)
@@ -202,7 +201,7 @@ class CourseMetadata(object):
         # Validate the values before actually setting them.
         key_values = {}
 
-        for key, model in six.iteritems(jsondict):
+        for key, model in jsondict.items():
             # should it be an error if one of the filtered list items is in the payload?
             if key in exclude_list_of_fields:
                 continue
@@ -211,8 +210,8 @@ class CourseMetadata(object):
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError) as err:
-                raise ValueError(_(u"Incorrect format for field '{name}'. {detailed_message}").format(
-                    name=model['display_name'], detailed_message=text_type(err)))
+                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(  # lint-amnesty, pylint: disable=raise-missing-from
+                    name=model['display_name'], detailed_message=str(err)))
 
         return cls.update_from_dict(key_values, descriptor, user)
 
@@ -235,20 +234,20 @@ class CourseMetadata(object):
         if not filter_tabs:
             exclude_list_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in six.iteritems(jsondict) if k not in exclude_list_of_fields)
+        filtered_dict = {k: v for k, v in jsondict.items() if k not in exclude_list_of_fields}
         did_validate = True
         errors = []
         key_values = {}
         updated_data = None
 
-        for key, model in six.iteritems(filtered_dict):
+        for key, model in filtered_dict.items():
             try:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
             except (TypeError, ValueError, ValidationError) as err:
                 did_validate = False
-                errors.append({'key': key, 'message': text_type(err), 'model': model})
+                errors.append({'key': key, 'message': str(err), 'model': model})
 
         team_setting_errors = cls.validate_team_settings(filtered_dict)
         if team_setting_errors:
@@ -271,7 +270,7 @@ class CourseMetadata(object):
         """
         Update metadata descriptor from key_values. Saves to modulestore if save is true.
         """
-        for key, value in six.iteritems(key_values):
+        for key, value in key_values.items():
             setattr(descriptor, key, value)
 
         if save and key_values:

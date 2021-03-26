@@ -6,12 +6,12 @@ Experimentation factories
 import factory
 import factory.fuzzy
 
-from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 
 
-class ExperimentDataFactory(factory.DjangoModelFactory):
-    class Meta(object):
+class ExperimentDataFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = ExperimentData
 
     user = factory.SubFactory(UserFactory)
@@ -20,8 +20,8 @@ class ExperimentDataFactory(factory.DjangoModelFactory):
     value = factory.Faker('word')
 
 
-class ExperimentKeyValueFactory(factory.DjangoModelFactory):
-    class Meta(object):
+class ExperimentKeyValueFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = ExperimentKeyValue
 
     experiment_id = factory.fuzzy.FuzzyInteger(0)

@@ -8,4 +8,4 @@ class TeamDiscussionHiddenFromUserException(BaseException):
     This is the exception raised when a user is not
     permitted to view the discussion thread
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass

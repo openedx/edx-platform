@@ -55,35 +55,35 @@ class TestCourseUpdatesUtils(BaseCourseUpdatesTestCase):
             course=self.course.id.course,
             run=self.course.id.run,
         )
-        self.assertEqual(updates[0]['content'], expected)
+        assert updates[0]['content'] == expected
 
     def test_ordered_update_includes_dismissed_updates(self):
         """Ordered update list should still have dismissed updates."""
         self.create_course_update('Dismissed')
         dismiss_current_update_for_user(self.request, self.course)
         updates = get_ordered_updates(self.request, self.course)
-        self.assertEqual(len(updates), 1)
+        assert len(updates) == 1
 
     def test_get_current_update_is_newest(self):
         """Tests that the current update is also the newest."""
         self.create_course_update('Oldest', date='January 1, 1900')
         self.create_course_update('New', date='January 1, 2017')
         self.create_course_update('Oldish', date='January 1, 2000')
-        self.assertEqual(get_current_update_for_user(self.request, self.course), 'New')
+        assert get_current_update_for_user(self.request, self.course) == 'New'
 
     def test_get_current_update_when_dismissed(self):
         """Tests that a dismissed update is not returned."""
         self.create_course_update('Dismissed')
         dismiss_current_update_for_user(self.request, self.course)
-        self.assertIsNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is None
 
     def test_get_current_update_when_dismissed_but_edited(self):
         """Tests that a dismissed but edited update is returned."""
         self.create_course_update('Original')
         dismiss_current_update_for_user(self.request, self.course)
-        self.assertIsNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is None
         self.edit_course_update(1, content='Edited')
-        self.assertIsNotNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is not None
 
     def test_get_current_update_remembers_dismissals(self):
         """Tests that older dismissed updates are remembered."""
@@ -94,21 +94,21 @@ class TestCourseUpdatesUtils(BaseCourseUpdatesTestCase):
         dismiss_current_update_for_user(self.request, self.course)
         self.create_course_update('Fourth')
 
-        self.assertEqual(get_current_update_for_user(self.request, self.course), 'Fourth')
+        assert get_current_update_for_user(self.request, self.course) == 'Fourth'
         self.edit_course_update(4, deleted=True)
-        self.assertIsNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is None
         self.edit_course_update(3, deleted=True)
-        self.assertIsNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is None
         self.edit_course_update(2, deleted=True)
-        self.assertEqual(get_current_update_for_user(self.request, self.course), 'First')
+        assert get_current_update_for_user(self.request, self.course) == 'First'
 
     def test_legacy_ignore_all_support(self):
         """Storing 'False' as the dismissal ignores all updates."""
         self.create_course_update('First')
-        self.assertEqual(get_current_update_for_user(self.request, self.course), 'First')
+        assert get_current_update_for_user(self.request, self.course) == 'First'
 
         set_course_tag(self.user, self.course.id, self.UPDATES_TAG, 'False')
-        self.assertIsNone(get_current_update_for_user(self.request, self.course))
+        assert get_current_update_for_user(self.request, self.course) is None
 
     def test_dismissal_hashing(self):
         """Confirm that the stored dismissal values are what we expect, to catch accidentally changing formats."""
@@ -118,4 +118,4 @@ class TestCourseUpdatesUtils(BaseCourseUpdatesTestCase):
         dismiss_current_update_for_user(self.request, self.course)
 
         tag = get_course_tag(self.user, self.course.id, self.UPDATES_TAG)
-        self.assertEqual(tag, '7fb55ed0b7a30342ba6da306428cae04,c22cf8376b1893dcfcef0649fe1a7d87')
+        assert tag == '7fb55ed0b7a30342ba6da306428cae04,c22cf8376b1893dcfcef0649fe1a7d87'

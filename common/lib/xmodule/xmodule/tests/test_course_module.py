@@ -4,13 +4,14 @@
 import itertools
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
+import pytest
 import ddt
 from dateutil import parser
 from django.conf import settings
 from django.test import override_settings
 from fs.memoryfs import MemoryFS
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -32,13 +33,10 @@ _NEXT_WEEK = _TODAY + timedelta(days=7)
 class CourseFieldsTestCase(unittest.TestCase):
 
     def test_default_start_date(self):
-        self.assertEqual(
-            xmodule.course_module.CourseFields.start.default,
-            datetime(2030, 1, 1, tzinfo=utc)
-        )
+        assert xmodule.course_module.CourseFields.start.default == datetime(2030, 1, 1, tzinfo=utc)
 
 
-class DummySystem(ImportSystem):
+class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
     def __init__(self, load_error_modules, course_id=None):
 
@@ -49,7 +47,7 @@ class DummySystem(ImportSystem):
         course_dir = "test_dir"
         error_tracker = Mock()
 
-        super(DummySystem, self).__init__(
+        super().__init__(
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
@@ -65,7 +63,7 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
     system = DummySystem(load_error_modules=True)
 
     def to_attrb(n, v):
-        return '' if v is None else '{0}="{1}"'.format(n, v).lower()
+        return '' if v is None else f'{n}="{v}"'.lower()
 
     is_new = to_attrb('is_new', is_new)
     announcement = to_attrb('announcement', announcement)
@@ -103,11 +101,11 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
     def setUp(self):
-        super(HasEndedMayCertifyTestCase, self).setUp()
+        super().setUp()
 
-        system = DummySystem(load_error_modules=True)
+        system = DummySystem(load_error_modules=True)  # lint-amnesty, pylint: disable=unused-variable
         #sample_xml = """
-        # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
+        # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"  # lint-amnesty, pylint: disable=line-too-long
         #        graceperiod="1 day" url_name="test"
         #        start="2012-01-01T12:00"
         #        {end}
@@ -132,21 +130,21 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
 
     def test_has_ended(self):
         """Check that has_ended correctly tells us when a course is over."""
-        self.assertTrue(self.past_show_certs.has_ended())
-        self.assertTrue(self.past_show_certs_no_info.has_ended())
-        self.assertTrue(self.past_noshow_certs.has_ended())
-        self.assertFalse(self.future_show_certs.has_ended())
-        self.assertFalse(self.future_show_certs_no_info.has_ended())
-        self.assertFalse(self.future_noshow_certs.has_ended())
+        assert self.past_show_certs.has_ended()
+        assert self.past_show_certs_no_info.has_ended()
+        assert self.past_noshow_certs.has_ended()
+        assert not self.future_show_certs.has_ended()
+        assert not self.future_show_certs_no_info.has_ended()
+        assert not self.future_noshow_certs.has_ended()
 
     def test_may_certify(self):
         """Check that may_certify correctly tells us when a course may wrap."""
-        self.assertTrue(self.past_show_certs.may_certify())
-        self.assertTrue(self.past_noshow_certs.may_certify())
-        self.assertTrue(self.past_show_certs_no_info.may_certify())
-        self.assertTrue(self.future_show_certs.may_certify())
-        self.assertTrue(self.future_show_certs_no_info.may_certify())
-        self.assertFalse(self.future_noshow_certs.may_certify())
+        assert self.past_show_certs.may_certify()
+        assert self.past_noshow_certs.may_certify()
+        assert self.past_show_certs_no_info.may_certify()
+        assert self.future_show_certs.may_certify()
+        assert self.future_show_certs_no_info.may_certify()
+        assert not self.future_noshow_certs.may_certify()
 
 
 class CourseSummaryHasEnded(unittest.TestCase):
@@ -156,7 +154,7 @@ class CourseSummaryHasEnded(unittest.TestCase):
         test_course = get_dummy_course("2012-01-01T12:00")
         bad_end_date = parser.parse("2012-02-21 10:28:45")
         summary = xmodule.course_module.CourseSummary(test_course.id, end=bad_end_date)
-        self.assertTrue(summary.has_ended())
+        assert summary.has_ended()
 
 
 @ddt.ddt
@@ -164,7 +162,7 @@ class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
 
     def setUp(self):
-        super(IsNewCourseTestCase, self).setUp()
+        super().setUp()
 
         # Needed for test_is_newish
         datetime_patcher = patch.object(
@@ -213,13 +211,13 @@ class IsNewCourseTestCase(unittest.TestCase):
         for a, b, assertion in dates:
             a_score = get_dummy_course(start=a[0], announcement=a[1], advertised_start=a[2]).sorting_score
             b_score = get_dummy_course(start=b[0], announcement=b[1], advertised_start=b[2]).sorting_score
-            print("Comparing %s to %s" % (a, b))
+            print(f"Comparing {a} to {b}")
             assertion(a_score, b_score)
 
     start_advertised_settings = [
         # start, advertised, result, is_still_default, date_time_result
-        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, u'Dec 02, 2012 at 12:00 UTC'),
-        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, u'Nov 01, 2011 at 12:00 UTC'),
+        ('2012-12-02T12:00', None, 'Dec 02, 2012', False, 'Dec 02, 2012 at 12:00 UTC'),
+        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False, 'Nov 01, 2011 at 12:00 UTC'),
         ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False, 'Spring 2012'),
         ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False, 'November, 2011'),
         (xmodule.course_module.CourseFields.start.default, None, 'TBD', True, 'TBD'),
@@ -229,17 +227,17 @@ class IsNewCourseTestCase(unittest.TestCase):
     def test_start_date_is_default(self):
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
-            self.assertEqual(d.start_date_is_still_default, s[3])
+            assert d.start_date_is_still_default == s[3]
 
     def test_display_organization(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        self.assertNotEqual(descriptor.location.org, descriptor.display_org_with_default)
-        self.assertEqual(descriptor.display_org_with_default, "{0}_display".format(ORG))
+        assert descriptor.location.org != descriptor.display_org_with_default
+        assert descriptor.display_org_with_default == f'{ORG}_display'
 
     def test_display_coursenumber(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
-        self.assertNotEqual(descriptor.location.course, descriptor.display_number_with_default)
-        self.assertEqual(descriptor.display_number_with_default, "{0}_display".format(COURSE))
+        assert descriptor.location.course != descriptor.display_number_with_default
+        assert descriptor.display_number_with_default == f'{COURSE}_display'
 
     def test_is_newish(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
@@ -268,7 +266,7 @@ class DiscussionTopicsTestCase(unittest.TestCase):
 
     def test_default_discussion_topics(self):
         d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual({'General': {'id': 'i4x-test_org-test_course-course-test'}}, d.discussion_topics)
+        assert {'General': {'id': 'i4x-test_org-test_course-course-test'}} == d.discussion_topics
 
 
 class TeamsConfigurationTestCase(unittest.TestCase):
@@ -277,7 +275,7 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super(TeamsConfigurationTestCase, self).setUp()
+        super().setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
         self.course.teams_configuration = TeamsConfig(None)
         self.count = itertools.count()
@@ -293,9 +291,9 @@ class TeamsConfigurationTestCase(unittest.TestCase):
     def make_topic(self):
         """ Make a sample topic dictionary. """
         next_num = next(self.count)
-        topic_id = "topic_id_{}".format(next_num)
-        name = "Name {}".format(next_num)
-        description = "Description {}".format(next_num)
+        topic_id = f"topic_id_{next_num}"
+        name = f"Name {next_num}"
+        description = f"Description {next_num}"
         return {
             "name": name,
             "description": description,
@@ -306,52 +304,49 @@ class TeamsConfigurationTestCase(unittest.TestCase):
 
     def test_teams_enabled_new_course(self):
         # Make sure we can detect when no teams exist.
-        self.assertFalse(self.course.teams_enabled)
+        assert not self.course.teams_enabled
 
         # add topics
         self.add_team_configuration(max_team_size=4, topics=[self.make_topic()])
-        self.assertTrue(self.course.teams_enabled)
+        assert self.course.teams_enabled
 
         # remove them again
         self.add_team_configuration(max_team_size=4, topics=[])
-        self.assertFalse(self.course.teams_enabled)
+        assert not self.course.teams_enabled
 
     def test_teams_enabled_max_size_only(self):
         self.add_team_configuration(max_team_size=4)
-        self.assertFalse(self.course.teams_enabled)
+        assert not self.course.teams_enabled
 
     def test_teams_enabled_no_max_size(self):
         self.add_team_configuration(max_team_size=None, topics=[self.make_topic()])
-        self.assertTrue(self.course.teams_enabled)
+        assert self.course.teams_enabled
 
     def test_teams_max_size_no_teams_configuration(self):
-        self.assertEqual(
-            self.course.teams_configuration.default_max_team_size,
-            DEFAULT_COURSE_RUN_MAX_TEAM_SIZE,
-        )
+        assert self.course.teams_configuration.default_max_team_size == DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 
     def test_teams_max_size_with_teams_configured(self):
         size = 4
         self.add_team_configuration(max_team_size=size, topics=[self.make_topic(), self.make_topic()])
-        self.assertTrue(self.course.teams_enabled)
-        self.assertEqual(size, self.course.teams_configuration.default_max_team_size)
+        assert self.course.teams_enabled
+        assert size == self.course.teams_configuration.default_max_team_size
 
     def test_teamsets_no_config(self):
-        self.assertEqual(self.course.teamsets, [])
+        assert self.course.teamsets == []
 
     def test_teamsets_empty(self):
         self.add_team_configuration(max_team_size=4)
-        self.assertEqual(self.course.teamsets, [])
+        assert self.course.teamsets == []
 
     def test_teamsets_present(self):
         topics = [self.make_topic(), self.make_topic()]
         self.add_team_configuration(max_team_size=4, topics=topics)
-        self.assertTrue(self.course.teams_enabled)
+        assert self.course.teams_enabled
         expected_teamsets_data = [
             teamset.cleaned_data
             for teamset in self.course.teamsets
         ]
-        self.assertEqual(expected_teamsets_data, topics)
+        assert expected_teamsets_data == topics
 
     def test_teams_conf_cached_by_xblock_field(self):
         self.add_team_configuration(max_team_size=5, topics=[self.make_topic()])
@@ -360,29 +355,29 @@ class TeamsConfigurationTestCase(unittest.TestCase):
         self.add_team_configuration(max_team_size=5, topics=[self.make_topic(), self.make_topic()])
         new_cold_cache_conf = self.course.teams_configuration
         new_warm_cache_conf = self.course.teams_configuration
-        self.assertIs(cold_cache_conf, warm_cache_conf)
-        self.assertIs(new_cold_cache_conf, new_warm_cache_conf)
-        self.assertIsNot(cold_cache_conf, new_cold_cache_conf)
+        assert cold_cache_conf is warm_cache_conf
+        assert new_cold_cache_conf is new_warm_cache_conf
+        assert cold_cache_conf is not new_cold_cache_conf
 
 
 class SelfPacedTestCase(unittest.TestCase):
     """Tests for self-paced courses."""
 
     def setUp(self):
-        super(SelfPacedTestCase, self).setUp()
+        super().setUp()
         self.course = get_dummy_course('2012-12-02T12:00')
 
     def test_default(self):
-        self.assertFalse(self.course.self_paced)
+        assert not self.course.self_paced
 
 
-class CourseDescriptorTestCase(unittest.TestCase):
+class CourseBlockTestCase(unittest.TestCase):
     """
-    Tests for a select few functions from CourseDescriptor.
+    Tests for a select few functions from CourseBlock.
 
     I wrote these test functions in order to satisfy the coverage checker for
-    PR #8484, which modified some code within CourseDescriptor. However, this
-    class definitely isn't a comprehensive test case for CourseDescriptor, as
+    PR #8484, which modified some code within CourseBlock. However, this
+    class definitely isn't a comprehensive test case for CourseBlock, as
     writing a such a test case was out of the scope of the PR.
     """
 
@@ -390,36 +385,30 @@ class CourseDescriptorTestCase(unittest.TestCase):
         """
         Initialize dummy testing course.
         """
-        super(CourseDescriptorTestCase, self).setUp()
+        super().setUp()
         self.course = get_dummy_course(start=_TODAY, end=_NEXT_WEEK)
 
     def test_clean_id(self):
         """
-        Test CourseDescriptor.clean_id.
+        Test CourseBlock.clean_id.
         """
-        self.assertEqual(
-            self.course.clean_id(),
-            "course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q="
-        )
-        self.assertEqual(
-            self.course.clean_id(padding_char='$'),
-            "course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q$"
-        )
+        assert self.course.clean_id() == 'course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q='
+        assert self.course.clean_id(padding_char='$') == 'course_ORSXG5C7N5ZGOL3UMVZXIX3DN52XE43FF52GK43UL5ZHK3Q$'
 
     def test_has_started(self):
         """
-        Test CourseDescriptor.has_started.
+        Test CourseBlock.has_started.
         """
         self.course.start = _LAST_WEEK
-        self.assertTrue(self.course.has_started())
+        assert self.course.has_started()
         self.course.start = _NEXT_WEEK
-        self.assertFalse(self.course.has_started())
+        assert not self.course.has_started()
 
     def test_number(self):
         """
-        Test CourseDescriptor.number.
+        Test CourseBlock.number.
         """
-        self.assertEqual(self.course.number, COURSE)
+        assert self.course.number == COURSE
 
     def test_set_default_certificate_available_date(self):
         """
@@ -427,7 +416,7 @@ class CourseDescriptorTestCase(unittest.TestCase):
         after the course end date.
         """
         expected_certificate_available_date = self.course.end + timedelta(days=2)
-        self.assertEqual(expected_certificate_available_date, self.course.certificate_available_date)
+        assert expected_certificate_available_date == self.course.certificate_available_date
 
 
 class ProctoringProviderTestCase(unittest.TestCase):
@@ -439,7 +428,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         """
         Initialize dummy testing course.
         """
-        super(ProctoringProviderTestCase, self).setUp()
+        super().setUp()
         self.proctoring_provider = xmodule.course_module.ProctoringProvider()
 
     def test_from_json_with_platform_default(self):
@@ -451,7 +440,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
 
         # we expect the validated value to be equivalent to the value passed in,
         # since there are no validation errors or missing data
-        self.assertEqual(self.proctoring_provider.from_json(default_provider), default_provider)
+        assert self.proctoring_provider.from_json(default_provider) == default_provider
 
     def test_from_json_with_invalid_provider(self):
         """
@@ -459,15 +448,13 @@ class ProctoringProviderTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        allowed_proctoring_providers = [u'mock', u'mock_proctoring_without_rules']
+        allowed_proctoring_providers = ['mock', 'mock_proctoring_without_rules']
 
-        with self.assertRaises(ValueError) as context_manager:
+        with pytest.raises(ValueError) as context_manager:
             self.proctoring_provider.from_json(provider)
-        self.assertEqual(
-            context_manager.exception.args[0],
-            ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
-                .format(provider, allowed_proctoring_providers)]
-        )
+        assert context_manager.value.args[0] ==\
+               [f'The selected proctoring provider, {provider},'
+                f' is not a valid provider. Please select from one of {allowed_proctoring_providers}.']
 
     def test_from_json_adds_platform_default_for_missing_provider(self):
         """
@@ -476,7 +463,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         """
         default_provider = 'mock'
 
-        self.assertEqual(self.proctoring_provider.from_json(None), default_provider)
+        assert self.proctoring_provider.from_json(None) == default_provider
 
     @override_settings(
         PROCTORING_BACKENDS={
@@ -488,7 +475,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
         """
         Test that, when the platform defaults are not set, the default is correct.
         """
-        self. assertEqual(self.proctoring_provider.default, None)
+        assert self.proctoring_provider.default is None
 
     @override_settings(PROCTORING_BACKENDS=None)
     def test_default_with_no_platform_configuration(self):
@@ -496,4 +483,4 @@ class ProctoringProviderTestCase(unittest.TestCase):
         Test that, when the platform default is not specified, the default is correct.
         """
         default = self.proctoring_provider.default
-        self.assertEqual(default, None)
+        assert default is None

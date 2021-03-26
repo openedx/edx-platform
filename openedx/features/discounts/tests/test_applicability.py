@@ -1,8 +1,8 @@
 """Tests of openedx.features.discounts.applicability"""
-# -*- coding: utf-8 -*-
 
 
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
 import ddt
 import pytest
@@ -11,16 +11,15 @@ from django.contrib.sites.models import Site
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
-from mock import Mock, patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.experiments.models import ExperimentData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.discounts.models import DiscountRestrictionConfig
 from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -35,14 +34,14 @@ class TestApplicability(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(TestApplicability, self).setUp()
+        super().setUp()
         self.site, _ = Site.objects.get_or_create(domain='example.com')
         self.user = UserFactory.create()
         self.course = CourseFactory.create(run='test', display_name='test')
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
-        now_time = datetime.now(tz=pytz.UTC).strftime(u"%Y-%m-%d %H:%M:%S%z")
+        now_time = datetime.now(tz=pytz.UTC).strftime("%Y-%m-%d %H:%M:%S%z")
         ExperimentData.objects.create(
-            user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course), value=now_time
+            user=self.user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
         )
 
         holdback_patcher = patch(
@@ -54,7 +53,7 @@ class TestApplicability(ModuleStoreTestCase):
     def test_can_receive_discount(self):
         # Right now, no one should be able to receive the discount
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_can_receive_discount_course_requirements(self):
@@ -68,22 +67,22 @@ class TestApplicability(ModuleStoreTestCase):
         )
 
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, True)
+        assert applicability is True
 
         no_verified_mode_course = CourseFactory(end=now() + timedelta(days=30))
         applicability = can_receive_discount(user=self.user, course=no_verified_mode_course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
         course_that_has_ended = CourseFactory(end=now() - timedelta(days=30))
         applicability = can_receive_discount(user=self.user, course=course_that_has_ended)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
         disabled_course = CourseFactory()
-        CourseModeFactory.create(course_id=disabled_course.id, mode_slug='verified')
-        disabled_course_overview = CourseOverview.get_from_id(disabled_course.id)
+        CourseModeFactory.create(course_id=disabled_course.id, mode_slug='verified')  # lint-amnesty, pylint: disable=no-member
+        disabled_course_overview = CourseOverview.get_from_id(disabled_course.id)  # lint-amnesty, pylint: disable=no-member
         DiscountRestrictionConfig.objects.create(disabled=True, course=disabled_course_overview)
         applicability = can_receive_discount(user=self.user, course=disabled_course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @ddt.data(*(
         [[]] +
@@ -149,7 +148,7 @@ class TestApplicability(ModuleStoreTestCase):
         )
 
         applicability = can_receive_discount(user=self.user, course=self.course)
-        self.assertEqual(applicability, False)
+        assert applicability is False
 
     @override_waffle_flag(DISCOUNT_APPLICABILITY_FLAG, active=True)
     def test_holdback_denies_discount(self):

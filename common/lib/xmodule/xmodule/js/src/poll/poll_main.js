@@ -1,5 +1,5 @@
 (function(requirejs, require, define) {
-    define('PollMain', [], function() {
+    define('PollMain', ['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         PollMain.prototype = {
 
             showAnswerGraph: function(poll_answers, total) {
@@ -23,7 +23,8 @@
                     percentValue = (numValue / totalValue) * 100.0;
 
                     _this.answersObj[index].statsEl.show();
-                    _this.answersObj[index].numberEl.html('' + value + ' (' + percentValue.toFixed(1) + '%)');
+                    // eslint-disable-next-line max-len
+                    _this.answersObj[index].numberEl.html(HtmlUtils.HTML('' + value + ' (' + percentValue.toFixed(1) + '%)').toString());
                     _this.answersObj[index].percentEl.css({
                         width: '' + percentValue.toFixed(1) + '%'
                     });
@@ -119,10 +120,12 @@
         (this.jsonConfig.poll_answer.length > 0) &&
         (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
     ) {
-                    this.questionEl.append(
-            '<h3>Error!</h3>' +
-            '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
-        );
+                    HtmlUtils.append(this.questionEl, HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<h3>Error!</h3>'),
+                        HtmlUtils.HTML(
+                          '<p>XML data format changed. List of answers was modified, but poll data was not updated.</p>'
+                        )
+                    ));
 
                     return;
                 }
@@ -133,8 +136,8 @@
     // Get the URL to which we will post the users answer to the question.
                 this.ajax_url = this.questionEl.data('ajax-url');
 
-                this.questionHtmlMarkup = $('<div />').html(this.jsonConfig.question).text();
-                this.questionEl.append(this.questionHtmlMarkup);
+                this.questionHtmlMarkup = $('<div />').html(HtmlUtils.HTML(this.jsonConfig.question).toString()).text();
+                this.questionEl.append(HtmlUtils.HTML(this.questionHtmlMarkup).toString());
 
     // When the user selects and answer, we will set this flag to true.
                 this.questionAnswered = false;
@@ -160,24 +163,24 @@
                     answer.questionEl = $('<div class="question"></div>');
                     answer.buttonEl = $('<div class="button"></div>');
                     answer.textEl = $('<div class="text"></div>');
-                    answer.questionEl.append(answer.buttonEl);
-                    answer.questionEl.append(answer.textEl);
+                    answer.questionEl.append(HtmlUtils.HTML(answer.buttonEl).toString());
+                    answer.questionEl.append(HtmlUtils.HTML(answer.textEl).toString());
 
-                    answer.el.append(answer.questionEl);
+                    answer.el.append(HtmlUtils.HTML(answer.questionEl).toString());
 
                     answer.statsEl = $('<div class="stats"></div>');
                     answer.barEl = $('<div class="bar"></div>');
                     answer.percentEl = $('<div class="percent"></div>');
-                    answer.barEl.append(answer.percentEl);
+                    answer.barEl.append(HtmlUtils.HTML(answer.percentEl).toString());
                     answer.numberEl = $('<div class="number"></div>');
-                    answer.statsEl.append(answer.barEl);
-                    answer.statsEl.append(answer.numberEl);
+                    answer.statsEl.append(HtmlUtils.HTML(answer.barEl).toString());
+                    answer.statsEl.append(HtmlUtils.HTML(answer.numberEl).toString());
 
                     answer.statsEl.hide();
 
-                    answer.el.append(answer.statsEl);
+                    answer.el.append(HtmlUtils.HTML(answer.statsEl).toString());
 
-                    answer.textEl.html(value);
+                    answer.textEl.html(HtmlUtils.HTML(value).toString());
 
                     if (_this.shortVersion === true) {
                         $.each(answer, function(index, value) {
@@ -214,8 +217,7 @@
                         this.resetButton.hide();
                     }
 
-                    this.resetButton.appendTo(this.questionEl);
-
+                    HtmlUtils.append(this.questionEl, this.resetButton);
                     this.resetButton.on('click', function() {
                         _this.submitReset();
                     });
@@ -298,6 +300,7 @@
                     _this.jsonConfig.poll_answers[index] = value;
                 });
 
+                // xss-lint: disable=javascript-jquery-html
                 _this.questionEl.children('.poll_question_div').html(JSON.stringify(_this.jsonConfig));
 
                 _this.postInit();

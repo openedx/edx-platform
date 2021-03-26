@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 import openedx.core.djangoapps.content.block_structure.models
 

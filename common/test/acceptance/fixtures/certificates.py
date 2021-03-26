@@ -13,14 +13,14 @@ class CertificateConfigFixtureError(Exception):
     """
     Error occurred while installing certificate config fixture.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CertificateConfigUpdateFixtureError(Exception):
     """
     Error occurred while updating certificate config fixture.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class CertificateConfigFixture(StudioApiFixture):
@@ -32,21 +32,21 @@ class CertificateConfigFixture(StudioApiFixture):
     def __init__(self, course_id, certificates_data):
         self.course_id = course_id
         self.certificates = certificates_data
-        super(CertificateConfigFixture, self).__init__()
+        super().__init__()
 
     def install(self):
         """
         Push the certificates config data to certificate endpoint.
         """
         response = self.session.post(
-            '{}/certificates/{}'.format(STUDIO_BASE_URL, self.course_id),
+            f'{STUDIO_BASE_URL}/certificates/{self.course_id}',
             data=json.dumps(self.certificates),
             headers=self.headers
         )
 
         if not response.ok:
             raise CertificateConfigFixtureError(
-                u"Could not create certificate {0}.  Status was {1}".format(
+                "Could not create certificate {}.  Status was {}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )
@@ -58,14 +58,14 @@ class CertificateConfigFixture(StudioApiFixture):
         Update the certificates config data to certificate endpoint.
         """
         response = self.session.put(
-            '{}/certificates/{}/{}'.format(STUDIO_BASE_URL, self.course_id, certificate_id),
+            f'{STUDIO_BASE_URL}/certificates/{self.course_id}/{certificate_id}',
             data=json.dumps(self.certificates),
             headers=self.headers
         )
 
         if not response.ok:
             raise CertificateConfigUpdateFixtureError(
-                u"Could not update certificate {0}.  Status was {1}".format(
+                "Could not update certificate {}.  Status was {}".format(
                     json.dumps(self.certificates), response.status_code
                 )
             )

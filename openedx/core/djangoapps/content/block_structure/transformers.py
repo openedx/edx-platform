@@ -1,9 +1,6 @@
 """
 Module for a collection of BlockStructureTransformers.
 """
-
-
-import functools
 from logging import getLogger
 
 from .exceptions import TransformerDataIncompatible, TransformerException
@@ -13,7 +10,7 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
-class BlockStructureTransformers(object):
+class BlockStructureTransformers:
     """
     The BlockStructureTransformers class encapsulates an ordered list of block
     structure transformers.  It uses the Transformer Registry to verify the
@@ -61,7 +58,7 @@ class BlockStructureTransformers(object):
         unregistered_transformers = TransformerRegistry.find_unregistered(transformers)
         if unregistered_transformers:
             raise TransformerException(
-                u"The following requested transformers are not registered: {}".format(unregistered_transformers)
+                f"The following requested transformers are not registered: {unregistered_transformers}"
             )
 
         for transformer in transformers:
@@ -100,8 +97,8 @@ class BlockStructureTransformers(object):
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
-            raise TransformerDataIncompatible(
-                u"Collected Block Structure data for the following transformers is outdated: '%s'.",
+            raise TransformerDataIncompatible(  # lint-amnesty, pylint: disable=raising-format-tuple
+                "Collected Block Structure data for the following transformers is outdated: '%s'.",
                 [(transformer.name(), transformer.READ_VERSION) for transformer in outdated_transformers],
             )
         return True

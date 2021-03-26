@@ -47,7 +47,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         )
 
     def setUp(self):
-        super(MicrobachelorsExternalIDTest, self).setUp()
+        super(MicrobachelorsExternalIDTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         RequestCache.clear_all_namespaces()
         self.program = self._create_cached_program()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)

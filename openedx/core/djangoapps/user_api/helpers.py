@@ -12,6 +12,7 @@ from functools import wraps
 
 import six
 from django import forms
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
@@ -63,7 +64,7 @@ def intercept_errors(api_error, ignore_errors=None):
                             func_name=func.__name__,
                             args=args,
                             kwargs=kwargs,
-                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
+                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)  # lint-amnesty, pylint: disable=no-member
                         )
                         LOGGER.warning(msg)
                         raise
@@ -79,11 +80,11 @@ def intercept_errors(api_error, ignore_errors=None):
                     func_name=func.__name__,
                     args=args,
                     kwargs=kwargs,
-                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),  # lint-amnesty, pylint: disable=no-member
                     caller=caller.strip(),
                 )
                 LOGGER.exception(msg)
-                raise api_error(msg)
+                raise api_error(msg)  # lint-amnesty, pylint: disable=raise-missing-from
         return _wrapped
     return _decorator
 
@@ -206,7 +207,8 @@ class FormDescription(object):
             "restrictions": {},
             "errorMessages": {},
             "supplementalLink": supplementalLink,
-            "supplementalText": supplementalText
+            "supplementalText": supplementalText,
+            "loginIssueSupportLink": settings.LOGIN_ISSUE_SUPPORT_LINK,
         }
 
         field_override = self._field_overrides.get(name, {})
@@ -345,13 +347,13 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
     JSON handler that evaluates ugettext_lazy promises.
     """
     # pylint: disable=method-hidden
-    def default(self, obj):
+    def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Forces evaluation of ugettext_lazy promises.
         """
         if isinstance(obj, Promise):
             return force_text(obj)
-        super(LocalizedJSONEncoder, self).default(obj)
+        super(LocalizedJSONEncoder, self).default(obj)  # lint-amnesty, pylint: disable=super-with-arguments
 
 
 def serializer_is_dirty(preference_serializer):

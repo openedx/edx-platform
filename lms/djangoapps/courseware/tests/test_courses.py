@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for course access
 """
@@ -7,10 +6,10 @@ Tests for course access
 import datetime
 import itertools
 
+from unittest import mock
+import pytest
 import ddt
-import mock
 import pytz
-import six
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from crum import set_current_request
@@ -19,8 +18,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
-from six.moves import range
 
 from lms.djangoapps.courseware.courses import (
     course_open_for_self_enrollment,
@@ -70,14 +67,14 @@ class CoursesTest(ModuleStoreTestCase):
         """
         Tests that get_cms_course_link_by_id and get_cms_block_link_by_id return the right thing
         """
-        self.course = CourseFactory.create(
+        self.course = CourseFactory.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             org='org', number='num', display_name='name'
         )
 
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.id))
-        self.assertEqual(cms_url, get_cms_course_link(self.course))
-        cms_url = u"//{}/course/{}".format(CMS_BASE_TEST, six.text_type(self.course.location))
-        self.assertEqual(cms_url, get_cms_block_link(self.course, 'course'))
+        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.id))
+        assert cms_url == get_cms_course_link(self.course)
+        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.location))
+        assert cms_url == get_cms_block_link(self.course, 'course')
 
     @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)
     def test_get_course_func_with_access_error(self, course_access_func_name):
@@ -85,11 +82,11 @@ class CoursesTest(ModuleStoreTestCase):
         user = UserFactory.create()
         course = CourseFactory.create(visible_to_staff_only=True)
 
-        with self.assertRaises(CoursewareAccessException) as error:
+        with pytest.raises(CoursewareAccessException) as error:
             course_access_func(user, 'load', course.id)
-        self.assertEqual(text_type(error.exception), "Course not found.")
-        self.assertEqual(error.exception.access_response.error_code, "not_visible_to_user")
-        self.assertFalse(error.exception.access_response.has_access)
+        assert str(error.value) == 'Course not found.'
+        assert error.value.access_response.error_code == 'not_visible_to_user'
+        assert not error.value.access_response.has_access
 
     @ddt.data(
         (GET_COURSE_WITH_ACCESS, 1),
@@ -125,18 +122,14 @@ class CoursesTest(ModuleStoreTestCase):
         primary_course = CourseFactory.create(org=primary, emit_signals=True)
         alternate_course = CourseFactory.create(org=alternate, emit_signals=True)
 
-        self.assertNotEqual(primary_course.org, alternate_course.org)
+        assert primary_course.org != alternate_course.org
 
         unfiltered_courses = get_courses(user)
         for org in [primary_course.org, alternate_course.org]:
-            self.assertTrue(
-                any(course.org == org for course in unfiltered_courses)
-            )
+            assert any((course.org == org) for course in unfiltered_courses)
 
         filtered_courses = get_courses(user, org=primary)
-        self.assertTrue(
-            all(course.org == primary_course.org for course in filtered_courses)
-        )
+        assert all((course.org == primary_course.org) for course in filtered_courses)
 
         with mock.patch(
             'openedx.core.djangoapps.site_configuration.helpers.get_value',
@@ -146,13 +139,11 @@ class CoursesTest(ModuleStoreTestCase):
 
             # Request filtering for an org distinct from the designated org.
             no_courses = get_courses(user, org=primary)
-            self.assertEqual(list(no_courses), [])
+            assert list(no_courses) == []
 
             # Request filtering for an org matching the designated org.
             site_courses = get_courses(user, org=alternate)
-            self.assertTrue(
-                all(course.org == alternate_course.org for course in site_courses)
-            )
+            assert all((course.org == alternate_course.org) for course in site_courses)
 
     def test_get_courses_with_filter(self):
         """
@@ -169,32 +160,25 @@ class CoursesTest(ModuleStoreTestCase):
             (dict(mobile_available=False), {non_mobile_course.id}),
         )
         for filter_, expected_courses in test_cases:
-            self.assertEqual(
-                {
-                    course.id
-                    for course in
-                    get_courses(user, filter_=filter_)
-                },
-                expected_courses,
-                u"testing get_courses with filter_={}".format(filter_),
-            )
+            assert {course.id for course in get_courses(user, filter_=filter_)} ==\
+                   expected_courses, f'testing get_courses with filter_={filter_}'
 
     def test_get_current_child(self):
         mock_xmodule = mock.MagicMock()
-        self.assertIsNone(get_current_child(mock_xmodule))
+        assert get_current_child(mock_xmodule) is None
 
         mock_xmodule.position = -1
         mock_xmodule.get_display_items.return_value = ['one', 'two', 'three']
-        self.assertEqual(get_current_child(mock_xmodule), 'one')
+        assert get_current_child(mock_xmodule) == 'one'
 
         mock_xmodule.position = 2
-        self.assertEqual(get_current_child(mock_xmodule), 'two')
-        self.assertEqual(get_current_child(mock_xmodule, requested_child='first'), 'one')
-        self.assertEqual(get_current_child(mock_xmodule, requested_child='last'), 'three')
+        assert get_current_child(mock_xmodule) == 'two'
+        assert get_current_child(mock_xmodule, requested_child='first') == 'one'
+        assert get_current_child(mock_xmodule, requested_child='last') == 'three'
 
         mock_xmodule.position = 3
         mock_xmodule.get_display_items.return_value = []
-        self.assertIsNone(get_current_child(mock_xmodule))
+        assert get_current_child(mock_xmodule) is None
 
 
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
@@ -208,7 +192,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_preview_mapping(self):
-        self.assertEqual(_get_modulestore_branch_setting(), ModuleStoreEnum.Branch.draft_preferred)
+        assert _get_modulestore_branch_setting() == ModuleStoreEnum.Branch.draft_preferred
 
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
@@ -219,7 +203,7 @@ class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
         MODULESTORE_BRANCH='fake_default_branch',
     )
     def test_default_modulestore_branch_mapping(self):
-        self.assertEqual(_get_modulestore_branch_setting(), 'fake_default_branch')
+        assert _get_modulestore_branch_setting() == 'fake_default_branch'
 
 
 @override_settings(CMS_BASE=CMS_BASE_TEST)
@@ -229,29 +213,17 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create(org='edX', course='999')
-        self.assertEqual(course_image_url(course), '/c4x/edX/999/asset/{0}'.format(course.course_image))
+        assert course_image_url(course) == f'/c4x/edX/999/asset/{course.course_image}'
 
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
-        course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
-        self.assertEqual(
-            course_image_url(course),
-            '/c4x/{org}/{course}/asset/before___after.jpg'.format(
-                org=course.location.org,
-                course=course.location.course
-            )
-        )
+        course = CourseFactory.create(course_image='before_\N{SNOWMAN}_after.jpg')
+        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before___after.jpg'  # pylint: disable=line-too-long
 
     def test_spaces_in_image_name(self):
         # Verify that image names with spaces in them are cleaned
-        course = CourseFactory.create(course_image=u'before after.jpg')
-        self.assertEqual(
-            course_image_url(course),
-            '/c4x/{org}/{course}/asset/before_after.jpg'.format(
-                org=course.location.org,
-                course=course.location.course
-            )
-        )
+        course = CourseFactory.create(course_image='before after.jpg')
+        assert course_image_url(course) == f'/c4x/{course.location.org}/{course.location.course}/asset/before_after.jpg'  # pylint: disable=line-too-long
 
     def test_static_asset_path_course_image_default(self):
         """
@@ -259,22 +231,16 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         being set that we get the right course_image url.
         """
         course = CourseFactory.create(static_asset_path="foo")
-        self.assertEqual(
-            course_image_url(course),
-            '/static/foo/images/course_image.jpg'
-        )
+        assert course_image_url(course) == '/static/foo/images/course_image.jpg'
 
     def test_static_asset_path_course_image_set(self):
         """
         Test that with course_image and static_asset_path both
         being set, that we get the right course_image url.
         """
-        course = CourseFactory.create(course_image=u'things_stuff.jpg',
+        course = CourseFactory.create(course_image='things_stuff.jpg',
                                       static_asset_path="foo")
-        self.assertEqual(
-            course_image_url(course),
-            '/static/foo/things_stuff.jpg'
-        )
+        assert course_image_url(course) == '/static/foo/things_stuff.jpg'
 
 
 class XmlCourseImageTestCase(XModuleXmlImportTest):
@@ -283,15 +249,15 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = self.process_xml(xml.CourseFactory.build())
-        self.assertEqual(course_image_url(course), '/static/xml_test_course/images/course_image.jpg')
+        assert course_image_url(course) == '/static/xml_test_course/images/course_image.jpg'
 
     def test_non_ascii_image_name(self):
-        course = self.process_xml(xml.CourseFactory.build(course_image=u'before_\N{SNOWMAN}_after.jpg'))
-        self.assertEqual(course_image_url(course), u'/static/xml_test_course/before_\N{SNOWMAN}_after.jpg')
+        course = self.process_xml(xml.CourseFactory.build(course_image='before_\N{SNOWMAN}_after.jpg'))
+        assert course_image_url(course) == '/static/xml_test_course/before_☃_after.jpg'
 
     def test_spaces_in_image_name(self):
-        course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
-        self.assertEqual(course_image_url(course), u'/static/xml_test_course/before after.jpg')
+        course = self.process_xml(xml.CourseFactory.build(course_image='before after.jpg'))
+        assert course_image_url(course) == '/static/xml_test_course/before after.jpg'
 
 
 class CoursesRenderTest(ModuleStoreTestCase):
@@ -303,7 +269,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         """
         Set up the course and user context
         """
-        super(CoursesRenderTest, self).setUp()
+        super().setUp()
 
         store = modulestore()
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
@@ -315,7 +281,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
     def test_get_course_info_section_render(self):
         # Test render works okay
         course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
-        self.assertEqual(course_info, u"<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>")
+        assert course_info == "<a href='/c4x/edX/toy/asset/handouts_sample_handout.txt'>Sample</a>"
 
         # Test when render raises an exception
         with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
@@ -323,13 +289,13 @@ class CoursesRenderTest(ModuleStoreTestCase):
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
             course_info = get_course_info_section(self.request, self.request.user, self.course, 'handouts')
-            self.assertIn("this module is temporarily unavailable", course_info)
+            assert 'this module is temporarily unavailable' in course_info
 
     def test_get_course_about_section_render(self):
 
         # Test render works okay
         course_about = get_course_about_section(self.request, self.course, 'short_description')
-        self.assertEqual(course_about, "A course about toys.")
+        assert course_about == 'A course about toys.'
 
         # Test when render raises an exception
         with mock.patch('lms.djangoapps.courseware.courses.get_module') as mock_module_render:
@@ -337,53 +303,53 @@ class CoursesRenderTest(ModuleStoreTestCase):
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
             course_about = get_course_about_section(self.request, self.course, 'short_description')
-            self.assertIn("this module is temporarily unavailable", course_about)
+            assert 'this module is temporarily unavailable' in course_about
 
 
-class CourseEnrollmentOpenTests(ModuleStoreTestCase):
+class CourseEnrollmentOpenTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(CourseEnrollmentOpenTests, self).setUp()
+        super().setUp()
         self.now = datetime.datetime.now().replace(tzinfo=pytz.UTC)
 
     def test_course_enrollment_open(self):
         start = self.now - datetime.timedelta(days=1)
         end = self.now + datetime.timedelta(days=1)
         course = CourseFactory(enrollment_start=start, enrollment_end=end)
-        self.assertTrue(course_open_for_self_enrollment(course.id))
+        assert course_open_for_self_enrollment(course.id)
 
     def test_course_enrollment_closed_future(self):
         start = self.now + datetime.timedelta(days=1)
         end = self.now + datetime.timedelta(days=2)
         course = CourseFactory(enrollment_start=start, enrollment_end=end)
-        self.assertFalse(course_open_for_self_enrollment(course.id))
+        assert not course_open_for_self_enrollment(course.id)
 
     def test_course_enrollment_closed_past(self):
         start = self.now - datetime.timedelta(days=2)
         end = self.now - datetime.timedelta(days=1)
         course = CourseFactory(enrollment_start=start, enrollment_end=end)
-        self.assertFalse(course_open_for_self_enrollment(course.id))
+        assert not course_open_for_self_enrollment(course.id)
 
     def test_course_enrollment_dates_missing(self):
         course = CourseFactory()
-        self.assertTrue(course_open_for_self_enrollment(course.id))
+        assert course_open_for_self_enrollment(course.id)
 
     def test_course_enrollment_dates_missing_start(self):
         end = self.now + datetime.timedelta(days=1)
         course = CourseFactory(enrollment_end=end)
-        self.assertTrue(course_open_for_self_enrollment(course.id))
+        assert course_open_for_self_enrollment(course.id)
 
         end = self.now - datetime.timedelta(days=1)
         course = CourseFactory(enrollment_end=end)
-        self.assertFalse(course_open_for_self_enrollment(course.id))
+        assert not course_open_for_self_enrollment(course.id)
 
     def test_course_enrollment_dates_missing_end(self):
         start = self.now - datetime.timedelta(days=1)
         course = CourseFactory(enrollment_start=start)
-        self.assertTrue(course_open_for_self_enrollment(course.id))
+        assert course_open_for_self_enrollment(course.id)
 
         start = self.now + datetime.timedelta(days=1)
         course = CourseFactory(enrollment_start=start)
-        self.assertFalse(course_open_for_self_enrollment(course.id))
+        assert not course_open_for_self_enrollment(course.id)
 
 
 @ddt.ddt
@@ -392,7 +358,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
     Tests around instantiating a course multiple times in the same request.
     """
     def setUp(self):
-        super(CourseInstantiationTests, self).setUp()
+        super().setUp()
 
         self.factory = RequestFactory()
 
@@ -407,7 +373,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             __ = ItemFactory(parent=section, category='problem')
 
         fake_request = self.factory.get(
-            reverse('progress', kwargs={'course_id': six.text_type(course.id)})
+            reverse('progress', kwargs={'course_id': str(course.id)})
         )
 
         course = modulestore().get_course(course.id, depth=course_depth)
@@ -427,7 +393,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
             for chapter in course_module.get_children():
                 for section in chapter.get_children():
                     for item in section.get_children():
-                        self.assertTrue(item.graded)
+                        assert item.graded
 
 
 class TestGetCourseChapters(ModuleStoreTestCase):
@@ -439,10 +405,10 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         """
         Test non-existant course returns empty list.
         """
-        self.assertEqual(get_course_chapter_ids(None), [])
+        assert get_course_chapter_ids(None) == []
         # build a fake key
         fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
-        self.assertEqual(get_course_chapter_ids(fake_course_key), [])
+        assert get_course_chapter_ids(fake_course_key) == []
 
     def test_get_chapters(self):
         """
@@ -452,11 +418,8 @@ class TestGetCourseChapters(ModuleStoreTestCase):
         ItemFactory(parent=course, category='chapter')
         ItemFactory(parent=course, category='chapter')
         course_chapter_ids = get_course_chapter_ids(course.location.course_key)
-        self.assertEqual(len(course_chapter_ids), 2)
-        self.assertEqual(
-            course_chapter_ids,
-            [six.text_type(child) for child in course.children]
-        )
+        assert len(course_chapter_ids) == 2
+        assert course_chapter_ids == [str(child) for child in course.children]
 
 
 class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
@@ -478,5 +441,5 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         BlockCompletion.objects.submit_completion(self.user, problem.location, 1)
 
         assignments = get_course_assignments(course.location.context_key, self.user, None)
-        self.assertEqual(len(assignments), 1)
-        self.assertTrue(assignments[0].complete)
+        assert len(assignments) == 1
+        assert assignments[0].complete

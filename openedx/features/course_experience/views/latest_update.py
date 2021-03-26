@@ -22,7 +22,7 @@ class LatestUpdateFragmentView(EdxFragmentView):
     A fragment that displays the latest course update.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders the latest update message fragment for the specified course.
 

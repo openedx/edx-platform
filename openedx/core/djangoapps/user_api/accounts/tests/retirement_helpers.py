@@ -152,10 +152,10 @@ class RetirementTestCase(TestCase):
         return [create_retirement_status(UserFactory(), state=state) for state in RetirementState.objects.all()]
 
     def _get_non_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]
+        return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
     def _get_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
+        return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]  # lint-amnesty, pylint: disable=unnecessary-comprehension
 
 
 def fake_requested_retirement(user):

@@ -24,10 +24,10 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test Setup
         """
-        super(TPAContextViewTest, self).setUp()
+        super(TPAContextViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.url = reverse('third_party_auth_context')
-        self.query_params = {'redirect_to': '/dashboard'}
+        self.query_params = {'next': '/dashboard'}
 
         # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
@@ -87,15 +87,6 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'pipeline_user_details': {'email': 'test@test.com'} if add_user_details else {}
         }
 
-    def test_missing_arguments(self):
-        """
-        Test that if required arguments are missing, proper status code and message
-        is returned.
-        """
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {'message': 'Request missing required parameter: redirect_to'})
-
     @patch.dict(settings.FEATURES, {'ENABLE_THIRD_PARTY_AUTH': False})
     def test_no_third_party_auth_providers(self):
         """
@@ -103,8 +94,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         the provider information
         """
         response = self.client.get(self.url, self.query_params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context())
+        assert response.status_code == 200
+        assert response.data == self.get_context()
 
     def test_third_party_auth_providers(self):
         """
@@ -112,11 +103,11 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         response = self.client.get(self.url, self.query_params)
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context(params))
+        assert response.status_code == 200
+        assert response.data == self.get_context(params)
 
     @ddt.data(
         ('google-oauth2', 'Google', False),
@@ -131,7 +122,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         email = 'test@test.com' if add_user_details else None
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
 
         # Simulate a running pipeline
@@ -139,8 +130,8 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         with simulate_running_pipeline(pipeline_target, current_backend, email=email):
             response = self.client.get(self.url, self.query_params)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, self.get_context(params, current_provider, current_backend, add_user_details))
+        assert response.status_code == 200
+        assert response.data == self.get_context(params, current_provider, current_backend, add_user_details)
 
     def test_tpa_hint(self):
         """
@@ -148,7 +139,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         even if it is not visible on the login page
         """
         params = {
-            'next': self.query_params['redirect_to']
+            'next': self.query_params['next']
         }
         tpa_hint = self.hidden_enabled_provider.provider_id
         self.query_params.update({'tpa_hint': tpa_hint})
@@ -164,4 +155,4 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         })
 
         response = self.client.get(self.url, self.query_params)
-        self.assertEqual(response.data['providers'], provider_data)
+        assert response.data['providers'] == provider_data

@@ -1,8 +1,11 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
-
 from contextlib import closing
+from unittest import mock
+from unittest.mock import patch
+
+import pytest
 import datetime
 from pytz import UTC
 
@@ -10,8 +13,6 @@ from django.urls import reverse
 from django.http import HttpResponse
 
 import ddt
-import mock
-from mock import patch
 from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
@@ -43,7 +44,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     _view_name = None
 
     def setUp(self):
-        super(ProfileImageEndpointMixin, self).setUp()
+        super().setUp()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
@@ -54,14 +55,14 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         self.table = 'auth_userprofile'
         # this assertion is made here as a sanity check because all tests
         # assume user.profile.has_profile_image is False by default
-        self.assertFalse(self.user.profile.has_profile_image)
+        assert not self.user.profile.has_profile_image
 
         # Reset the mock event tracker so that we're not considering the
         # initial profile creation events.
         self.reset_tracker()
 
     def tearDown(self):
-        super(ProfileImageEndpointMixin, self).tearDown()
+        super().tearDown()
         for name in get_profile_image_names(self.user.username).values():
             self.storage.delete(name)
 
@@ -74,26 +75,26 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         """
         for size, name in get_profile_image_names(self.user.username).items():
             if exist:
-                self.assertTrue(self.storage.exists(name))
+                assert self.storage.exists(name)
                 with closing(Image.open(self.storage.path(name))) as img:
-                    self.assertEqual(img.size, (size, size))
-                    self.assertEqual(img.format, 'JPEG')
+                    assert img.size == (size, size)
+                    assert img.format == 'JPEG'
             else:
-                self.assertFalse(self.storage.exists(name))
+                assert not self.storage.exists(name)
 
     def check_response(self, response, expected_code, expected_developer_message=None, expected_user_message=None):
         """
         Make sure the response has the expected code, and if that isn't 204,
         optionally check the correctness of a developer-facing message.
         """
-        self.assertEqual(expected_code, response.status_code)
+        assert expected_code == response.status_code
         if expected_code == 204:
-            self.assertIsNone(response.data)
+            assert response.data is None
         else:
             if expected_developer_message is not None:
-                self.assertEqual(response.data.get('developer_message'), expected_developer_message)
+                assert response.data.get('developer_message') == expected_developer_message
             if expected_user_message is not None:
-                self.assertEqual(response.data.get('user_message'), expected_user_message)
+                assert response.data.get('user_message') == expected_user_message
 
     def check_has_profile_image(self, has_profile_image=True):
         """
@@ -103,7 +104,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         # it's necessary to reload this model from the database since save()
         # would have been called on another instance.
         profile = self.user.profile.__class__.objects.get(user=self.user)
-        self.assertEqual(profile.has_profile_image, has_profile_image)
+        assert profile.has_profile_image == has_profile_image
 
     def check_anonymous_request_rejected(self, method):
         """
@@ -128,10 +129,10 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
         """
         Test that GET, PUT, and PATCH are not supported.
         """
-        self.assertEqual(405, self.client.get(self.url).status_code)
-        self.assertEqual(405, self.client.put(self.url).status_code)
-        self.assertEqual(405, self.client.patch(self.url).status_code)
-        self.assertFalse(mock_log.info.called)
+        assert 405 == self.client.get(self.url).status_code
+        assert 405 == self.client.put(self.url).status_code
+        assert 405 == self.client.patch(self.url).status_code
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
 
@@ -161,7 +162,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that an anonymous client (not logged in) cannot call POST.
         """
         self.check_anonymous_request_rejected('post')
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
 
     @ddt.data('.jpg', '.jpeg', '.jpg', '.jpeg', '.png', '.gif', '.GIF')
     @patch(
@@ -211,7 +212,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
                 self.url,
                 data,
                 content_type=content_type,
-                HTTP_CONTENT_DISPOSITION='attachment;filename=filename{}'.format(extension),
+                HTTP_CONTENT_DISPOSITION=f'attachment;filename=filename{extension}',
             )
             self.check_response(response, 204)
             self.check_images()
@@ -238,7 +239,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_response(response, 415)
             self.check_images(False)
             self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_upload_nonexistent_user(self, mock_log):
@@ -251,7 +252,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         with make_image_file() as image_file:
             response = self.client.post(nonexistent_user_url, {'file': image_file}, format='multipart')
             self.check_response(response, 403)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
 
     def test_upload_other(self, mock_log):
         """
@@ -268,7 +269,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_response(response, 403)
             self.check_images(False)
             self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_upload_staff(self, mock_log):
@@ -286,7 +287,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
             self.check_response(response, 403)
             self.check_images(False)
             self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_upload_missing_file(self, mock_log):
@@ -296,12 +297,12 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_upload_not_a_file(self, mock_log):
@@ -312,12 +313,12 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {'file': 'not a file'}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_upload_validation(self, mock_log):
@@ -328,17 +329,17 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         with make_image_file() as image_file:
             with mock.patch(
                 'openedx.core.djangoapps.profile_images.views.validate_uploaded_image',
-                side_effect=ImageValidationError(u"test error message")
+                side_effect=ImageValidationError("test error message")
             ):
                 response = self.client.post(self.url, {'file': image_file}, format='multipart')
                 self.check_response(
                     response, 400,
-                    expected_developer_message=u"test error message",
-                    expected_user_message=u"test error message",
+                    expected_developer_message="test error message",
+                    expected_user_message="test error message",
                 )
                 self.check_images(False)
                 self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     @patch('PIL.Image.open')
@@ -347,13 +348,13 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
         """
-        image_open.side_effect = [Exception(u"whoops"), None]
+        image_open.side_effect = [Exception("whoops"), None]
         with make_image_file() as image_file:
-            with self.assertRaises(Exception):
+            with pytest.raises(Exception):
                 self.client.post(self.url, {'file': image_file}, format='multipart')
             self.check_images(False)
             self.check_has_profile_image(False)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
 
@@ -366,7 +367,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     _view_name = "accounts_profile_image_api"
 
     def setUp(self):
-        super(ProfileImageViewDeleteTestCase, self).setUp()
+        super().setUp()
         with make_image_file() as image_file:
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
@@ -388,7 +389,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that an anonymous client (not logged in) cannot call DELETE.
         """
         self.check_anonymous_request_rejected('delete')
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
 
     def test_remove_self(self, mock_log):
         """
@@ -419,7 +420,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         self.check_response(response, 403)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_remove_staff(self, mock_log):
@@ -446,12 +447,12 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when remove validation fails, the proper HTTP response and
         messages are returned.
         """
-        user_profile_save.side_effect = [Exception(u"whoops"), None]
-        with self.assertRaises(Exception):
+        user_profile_save.side_effect = [Exception("whoops"), None]
+        with pytest.raises(Exception):
             self.client.delete(self.url)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
 
@@ -468,11 +469,11 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
         """
         Test that GET, PUT, PATCH, and DELETE are not supported.
         """
-        self.assertEqual(405, self.client.get(self.url).status_code)
-        self.assertEqual(405, self.client.put(self.url).status_code)
-        self.assertEqual(405, self.client.patch(self.url).status_code)
-        self.assertEqual(405, self.client.delete(self.url).status_code)
-        self.assertFalse(mock_log.info.called)
+        assert 405 == self.client.get(self.url).status_code
+        assert 405 == self.client.put(self.url).status_code
+        assert 405 == self.client.patch(self.url).status_code
+        assert 405 == self.client.delete(self.url).status_code
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
     def test_post_calls_replacement_view_method(self, mock_log):
@@ -483,7 +484,7 @@ class DeprecatedProfileImageTestMixin(ProfileImageEndpointMixin):
             mock_method.return_value = HttpResponse()
             self.client.post(self.url)
             assert mock_method.called
-        self.assertFalse(mock_log.info.called)
+        assert not mock_log.info.called
         self.assert_no_events_were_emitted()
 
 

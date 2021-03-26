@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 
 from django.db import migrations, models

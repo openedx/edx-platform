@@ -6,14 +6,12 @@ Test the Data Aggregation Layer for Course Enrollments.
 
 import datetime
 import unittest
+from unittest.mock import patch
 
 import ddt
 import pytest
-import six
 from django.conf import settings
-from mock import patch
 from pytz import UTC
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -26,7 +24,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
+from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError  # lint-amnesty, pylint: disable=line-too-long
 from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -45,7 +43,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a course and user, then log in. """
-        super(EnrollmentDataTest, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -66,20 +64,20 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self._create_course_modes(course_modes)
         enrollment = data.create_course_enrollment(
             self.user.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             enrollment_mode,
             True
         )
 
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
-        self.assertTrue(is_active)
-        self.assertEqual(course_mode, enrollment_mode)
+        assert is_active
+        assert course_mode == enrollment_mode
 
         # Confirm the returned enrollment and the data match up.
-        self.assertEqual(course_mode, enrollment['mode'])
-        self.assertEqual(is_active, enrollment['is_active'])
-        self.assertEqual(self.course.display_name_with_default, enrollment['course_details']['course_name'])
+        assert course_mode == enrollment['mode']
+        assert is_active == enrollment['is_active']
+        assert self.course.display_name_with_default == enrollment['course_details']['course_name']
 
     def test_unenroll(self):
         # Enroll the user in the course
@@ -87,15 +85,15 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
         enrollment = data.update_course_enrollment(
             self.user.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             is_active=False
         )
 
         # Determine that the returned enrollment is inactive.
-        self.assertFalse(enrollment['is_active'])
+        assert not enrollment['is_active']
 
         # Expect that we're no longer enrolled
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
 
     @ddt.data(
         # No course modes, no course enrollments.
@@ -106,10 +104,10 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     )
     def test_get_course_info(self, course_modes):
         self._create_course_modes(course_modes, course=self.course)
-        result_course = data.get_course_enrollment_info(six.text_type(self.course.id))
+        result_course = data.get_course_enrollment_info(str(self.course.id))
         result_slugs = [mode['slug'] for mode in result_course['course_modes']]
         for course_mode in course_modes:
-            self.assertIn(course_mode, result_slugs)
+            assert course_mode in result_slugs
 
     @ddt.data(
         # No course modes, no course enrollments.
@@ -131,7 +129,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             # Create the original enrollment.
             created_enrollments.append(data.create_course_enrollment(
                 self.user.username,
-                six.text_type(course.id),
+                str(course.id),
                 'honor',
                 True
             ))
@@ -139,7 +137,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # Compare the created enrollments with the results
         # from the get enrollments request.
         results = data.get_course_enrollments(self.user.username)
-        self.assertEqual(results, created_enrollments)
+        assert results == created_enrollments
 
         # Now create a course enrollment with some invalid course (does
         # not exist in database) for the user and check that the method
@@ -155,7 +153,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         enrollement.course.delete()
 
         updated_results = data.get_course_enrollments(self.user.username)
-        self.assertEqual(results, updated_results)
+        assert results == updated_results
 
     def test_get_enrollments_including_inactive(self):
         """ Verify that if 'include_inactive' is True, all enrollments
@@ -172,7 +170,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             # Create the original enrollment.
             created_enrollments.append(data.create_course_enrollment(
                 self.user.username,
-                six.text_type(course.id),
+                str(course.id),
                 'honor',
                 True
             ))
@@ -180,18 +178,18 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # deactivate one enrollment
         data.update_course_enrollment(
             self.user.username,
-            six.text_type(created_courses[0].id),
+            str(created_courses[0].id),
             'honor',
             False
         )
 
         # by default in-active enrollment will be excluded.
         results = data.get_course_enrollments(self.user.username)
-        self.assertNotEqual(len(results), len(created_enrollments))
+        assert len(results) != len(created_enrollments)
 
         # we can get all enrollments including inactive by passing "include_inactive"
         results = data.get_course_enrollments(self.user.username, include_inactive=True)
-        self.assertEqual(len(results), len(created_enrollments))
+        assert len(results) == len(created_enrollments)
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -208,20 +206,20 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self._create_course_modes(course_modes)
 
         # Try to get an enrollment before it exists.
-        result = data.get_course_enrollment(self.user.username, six.text_type(self.course.id))
-        self.assertIsNone(result)
+        result = data.get_course_enrollment(self.user.username, str(self.course.id))
+        assert result is None
 
         # Create the original enrollment.
         enrollment = data.create_course_enrollment(
             self.user.username,
-            six.text_type(self.course.id),
+            str(self.course.id),
             enrollment_mode,
             True
         )
         # Get the enrollment and compare it to the original.
-        result = data.get_course_enrollment(self.user.username, six.text_type(self.course.id))
-        self.assertEqual(self.user.username, result['user'])
-        self.assertEqual(enrollment, result)
+        result = data.get_course_enrollment(self.user.username, str(self.course.id))
+        assert self.user.username == result['user']
+        assert enrollment == result
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -239,7 +237,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
         # Try to get enrollments before they exist.
         result = data.get_user_enrollments(self.course.id)
-        self.assertFalse(result.exists())
+        assert not result.exists()
 
         # Create 10 test users to enroll in the course
         users = []
@@ -255,7 +253,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         for user in users:
             created_enrollments.append(data.create_course_enrollment(
                 user.username,
-                six.text_type(self.course.id),
+                str(self.course.id),
                 enrollment_mode,
                 True
             ))
@@ -265,8 +263,8 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         results = data.get_user_enrollments(
             self.course.id
         )
-        self.assertTrue(result.exists())
-        self.assertEqual(CourseEnrollmentSerializer(results, many=True).data, created_enrollments)
+        assert result.exists()
+        assert CourseEnrollmentSerializer(results, many=True).data == created_enrollments
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -282,7 +280,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     def test_add_or_update_enrollment_attr(self, course_modes, enrollment_mode):
         # Create the course modes (if any) required for this test case
         self._create_course_modes(course_modes)
-        data.create_course_enrollment(self.user.username, six.text_type(self.course.id), enrollment_mode, True)
+        data.create_course_enrollment(self.user.username, str(self.course.id), enrollment_mode, True)
         enrollment_attributes = [
             {
                 "namespace": "credit",
@@ -291,9 +289,9 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             }
         ]
 
-        data.add_or_update_enrollment_attr(self.user.username, six.text_type(self.course.id), enrollment_attributes)
-        enrollment_attr = data.get_enrollment_attributes(self.user.username, six.text_type(self.course.id))
-        self.assertEqual(enrollment_attr[0], enrollment_attributes[0])
+        data.add_or_update_enrollment_attr(self.user.username, str(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, str(self.course.id))
+        assert enrollment_attr[0] == enrollment_attributes[0]
 
         enrollment_attributes = [
             {
@@ -303,9 +301,9 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             }
         ]
 
-        data.add_or_update_enrollment_attr(self.user.username, six.text_type(self.course.id), enrollment_attributes)
-        enrollment_attr = data.get_enrollment_attributes(self.user.username, six.text_type(self.course.id))
-        self.assertEqual(enrollment_attr[0], enrollment_attributes[0])
+        data.add_or_update_enrollment_attr(self.user.username, str(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, str(self.course.id))
+        assert enrollment_attr[0] == enrollment_attributes[0]
 
     def test_non_existent_course(self):
         with pytest.raises(CourseNotFoundError):
@@ -323,7 +321,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def test_enrollment_for_non_existent_user(self):
         with pytest.raises(UserNotFoundError):
-            data.create_course_enrollment("some_fake_user", six.text_type(self.course.id), 'honor', True)
+            data.create_course_enrollment("some_fake_user", str(self.course.id), 'honor', True)
 
     def test_enrollment_for_non_existent_course(self):
         with pytest.raises(CourseNotFoundError):
@@ -333,27 +331,27 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     def test_enrollment_for_closed_course(self, mock_enroll):
         mock_enroll.side_effect = EnrollmentClosedError("Bad things happened")
         with pytest.raises(CourseEnrollmentClosedError):
-            data.create_course_enrollment(self.user.username, six.text_type(self.course.id), 'honor', True)
+            data.create_course_enrollment(self.user.username, str(self.course.id), 'honor', True)
 
     @patch.object(CourseEnrollment, "enroll")
     def test_enrollment_for_full_course(self, mock_enroll):
         mock_enroll.side_effect = CourseFullError("Bad things happened")
         with pytest.raises(CourseEnrollmentFullError):
-            data.create_course_enrollment(self.user.username, six.text_type(self.course.id), 'honor', True)
+            data.create_course_enrollment(self.user.username, str(self.course.id), 'honor', True)
 
     @patch.object(CourseEnrollment, "enroll")
     def test_enrollment_for_enrolled_course(self, mock_enroll):
         mock_enroll.side_effect = AlreadyEnrolledError("Bad things happened")
         with pytest.raises(CourseEnrollmentExistsError):
-            data.create_course_enrollment(self.user.username, six.text_type(self.course.id), 'honor', True)
+            data.create_course_enrollment(self.user.username, str(self.course.id), 'honor', True)
 
     def test_update_for_non_existent_user(self):
         with pytest.raises(UserNotFoundError):
-            data.update_course_enrollment("some_fake_user", six.text_type(self.course.id), is_active=False)
+            data.update_course_enrollment("some_fake_user", str(self.course.id), is_active=False)
 
     def test_update_for_non_existent_course(self):
         enrollment = data.update_course_enrollment(self.user.username, "some/fake/course", is_active=False)
-        self.assertIsNone(enrollment)
+        assert enrollment is None
 
     def test_get_course_with_expired_mode_included(self):
         """Verify that method returns expired modes if include_expired
@@ -378,13 +376,13 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def assert_enrollment_modes(self, expected_modes, include_expired):
         """Get enrollment data and assert response with expected modes."""
-        result_course = data.get_course_enrollment_info(six.text_type(self.course.id), include_expired=include_expired)
+        result_course = data.get_course_enrollment_info(str(self.course.id), include_expired=include_expired)
         result_slugs = [mode['slug'] for mode in result_course['course_modes']]
         for course_mode in expected_modes:
-            self.assertIn(course_mode, result_slugs)
+            assert course_mode in result_slugs
 
         if not include_expired:
-            self.assertNotIn('verified', result_slugs)
+            assert 'verified' not in result_slugs
 
     def test_get_roles(self):
         """Create a role for a user, then get it"""
@@ -392,12 +390,12 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             course_id=self.course.id, user=self.user, role="SuperCoolTestRole",
         )
         roles = data.get_user_roles(self.user.username)
-        self.assertEqual(roles, {expected_role})
+        assert roles == {expected_role}
 
     def test_get_roles_no_roles(self):
         """Get roles for a user who has no roles"""
         roles = data.get_user_roles(self.user.username)
-        self.assertEqual(roles, set())
+        assert roles == set()
 
     def test_get_roles_invalid_user(self):
         """Get roles for a user that doesn't exist"""

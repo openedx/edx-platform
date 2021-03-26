@@ -7,7 +7,6 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-import six
 from django.conf import settings
 from django.urls import reverse
 from pytz import UTC, timezone
@@ -47,7 +46,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         CourseOverview.load_from_module_store(course.id)
 
         data = {
-            'course': six.text_type(course.id),
+            'course': str(course.id),
             'mode_slug': 'verified',
             'mode_display_name': 'verified',
             'min_price': 10,
@@ -74,7 +73,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         # Verify that the expiration datetime is the same as what we set
         # (hasn't changed because of a timezone translation).
         course_mode = CourseMode.objects.get(pk=1)
-        self.assertEqual(course_mode.expiration_datetime.replace(tzinfo=None), expiration.replace(tzinfo=None))
+        assert course_mode.expiration_datetime.replace(tzinfo=None) == expiration.replace(tzinfo=None)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -91,7 +90,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         """
         Create a test course.
         """
-        super(AdminCourseModeFormTest, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         CourseOverview.load_from_module_store(self.course.id)
 
@@ -116,12 +115,9 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         # but ONLY for verified modes.
         loaded_deadline = form.initial.get("verification_deadline")
         if expect_deadline:
-            self.assertEqual(
-                loaded_deadline.replace(tzinfo=None),
-                self.VERIFICATION_DEADLINE.replace(tzinfo=None)
-            )
+            assert loaded_deadline.replace(tzinfo=None) == self.VERIFICATION_DEADLINE.replace(tzinfo=None)
         else:
-            self.assertIs(loaded_deadline, None)
+            assert loaded_deadline is None
 
     @ddt.data("verified", "professional")
     def test_set_verification_deadline(self, course_mode):
@@ -140,7 +136,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
 
         # Check that the deadline was updated
         updated_deadline = VerificationDeadline.deadline_for_course(self.course.id)
-        self.assertEqual(updated_deadline, new_deadline)
+        assert updated_deadline == new_deadline
 
     def test_disable_verification_deadline(self):
         # Configure a verification deadline for the course
@@ -154,7 +150,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         form.save()
 
         # Check that the deadline was disabled
-        self.assertIs(VerificationDeadline.deadline_for_course(self.course.id), None)
+        assert VerificationDeadline.deadline_for_course(self.course.id) is None
 
     @ddt.data("honor", "professional", "no-id-professional", "credit")
     def test_validate_upgrade_deadline_only_for_verified(self, course_mode):
@@ -202,7 +198,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             mode_slug=mode,
         )
         return CourseModeForm({
-            "course": six.text_type(self.course.id),
+            "course": str(self.course.id),
             "mode_slug": mode,
             "mode_display_name": mode,
             "_expiration_datetime": upgrade_deadline,
@@ -221,4 +217,4 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
     def _assert_form_has_error(self, form, error):
         """Check that a form has a validation error. """
         validation_errors = form.errors.get("__all__", [])
-        self.assertIn(error, validation_errors)
+        assert error in validation_errors

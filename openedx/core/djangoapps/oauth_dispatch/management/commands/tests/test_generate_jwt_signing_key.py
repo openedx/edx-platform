@@ -8,13 +8,13 @@ import os
 import sys
 import tempfile
 from contextlib import contextmanager
-from six import StringIO
+from io import StringIO
+from unittest.mock import patch
 
 import ddt
 import yaml
 from django.core.management import call_command
 from django.test import TestCase
-from mock import patch
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -44,7 +44,7 @@ class TestGenerateJwtSigningKey(TestCase):
             message in log_entry[0][0]
             for log_entry in mock_log.call_args_list
         )
-        self.assertEqual(log_message_exists, expected_to_exist)
+        assert log_message_exists == expected_to_exist
 
     def _assert_key_output(self, output_stream, filename, strip_key_prefix):
         expected_in_output = [
@@ -53,23 +53,23 @@ class TestGenerateJwtSigningKey(TestCase):
             '{}JWT_PUBLIC_SIGNING_JWK_SET'.format('' if strip_key_prefix else 'COMMON_'),
         ]
         for expected in expected_in_output:
-            self.assertIn(expected, output_stream.getvalue())
+            assert expected in output_stream.getvalue()
 
-        with open(filename) as file_obj:  # pylint: disable=open-builtin
+        with open(filename) as file_obj:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
             output_from_yaml = yaml.safe_load(file_obj)
             for expected in expected_in_output:
-                self.assertIn(expected, output_from_yaml['JWT_AUTH'])
+                assert expected in output_from_yaml['JWT_AUTH']
 
     def _assert_presence_of_old_keys(self, mock_log, add_previous_public_keys):
         self._assert_log_message(mock_log, 'Old JWT_PUBLIC_SIGNING_JWK_SET', expected_to_exist=add_previous_public_keys)
 
     def _assert_presence_of_key_id(self, mock_log, output_stream, provide_key_id, key_id_size):
         if provide_key_id:
-            self.assertIn(TEST_KEY_IDENTIFIER, output_stream.getvalue())
+            assert TEST_KEY_IDENTIFIER in output_stream.getvalue()
         else:
-            self.assertNotIn(TEST_KEY_IDENTIFIER, output_stream.getvalue())
+            assert TEST_KEY_IDENTIFIER not in output_stream.getvalue()
             key_id = mock_log.call_args_list[0][0][1]
-            self.assertEqual(len(key_id), key_id_size or 8)
+            assert len(key_id) == (key_id_size or 8)
 
     @ddt.data(
         dict(add_previous_public_keys=True, provide_key_id=False, key_id_size=None, strip_key_prefix=True),

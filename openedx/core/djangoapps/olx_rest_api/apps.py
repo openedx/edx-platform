@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 olx_rest_api Django application initialization.
 """

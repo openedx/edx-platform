@@ -3,13 +3,12 @@ Tests for Course Blocks serializers
 """
 
 
-import six
-from mock import MagicMock
+from unittest.mock import MagicMock
 
-from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
-from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
+from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -26,7 +25,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestBlockSerializerBase, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = ToyCourseFactory.create()
 
@@ -37,7 +36,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         cls.store.update_item(cls.html_block, ModuleStoreEnum.UserID.test)
 
     def setUp(self):
-        super(TestBlockSerializerBase, self).setUp()
+        super().setUp()
 
         self.user = UserFactory.create()
 
@@ -64,14 +63,8 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         Verifies the given serialized_block when basic fields are requested.
         """
         block_key = deserialize_usage_key(block_key_string, self.course.id)
-        self.assertEqual(
-            self.block_structure.get_xblock_field(block_key, 'category'),
-            serialized_block['type'],
-        )
-        self.assertEqual(
-            set(six.iterkeys(serialized_block)),
-            {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'},
-        )
+        assert self.block_structure.get_xblock_field(block_key, 'category') == serialized_block['type']
+        assert set(serialized_block.keys()) == {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'}
 
     def add_additional_requested_fields(self, context=None):
         """
@@ -95,32 +88,24 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Verifies the given serialized_block when additional fields are requested.
         """
-        self.assertLessEqual(
-            {
-                'id', 'type', 'lms_web_url', 'student_view_url',
-                'display_name', 'graded',
-                'student_view_multi_device',
-                'lti_url',
-                'visible_to_staff_only',
-            },
-            set(six.iterkeys(serialized_block)),
-        )
+        assert {'id', 'type', 'lms_web_url', 'student_view_url', 'display_name', 'graded', 'student_view_multi_device',
+                'lti_url', 'visible_to_staff_only'} <= set(serialized_block.keys())
 
         # video blocks should have student_view_data
         if serialized_block['type'] == 'video':
-            self.assertIn('student_view_data', serialized_block)
+            assert 'student_view_data' in serialized_block
 
         # html blocks should have student_view_multi_device set to True
         if serialized_block['type'] == 'html':
-            self.assertIn('student_view_multi_device', serialized_block)
-            self.assertTrue(serialized_block['student_view_multi_device'])
+            assert 'student_view_multi_device' in serialized_block
+            assert serialized_block['student_view_multi_device']
 
         # chapters with video should have block_counts
         if serialized_block['type'] == 'chapter':
             if serialized_block['display_name'] not in ('poll_test', 'handout_container'):
-                self.assertIn('block_counts', serialized_block)
+                assert 'block_counts' in serialized_block
             else:
-                self.assertNotIn('block_counts', serialized_block)
+                assert 'block_counts' not in serialized_block
 
     def create_staff_context(self):
         """
@@ -145,10 +130,10 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         """
         Test fields accessed by a staff user
         """
-        if serialized_block['id'] == six.text_type(self.html_block.location):
-            self.assertTrue(serialized_block['visible_to_staff_only'])
+        if serialized_block['id'] == str(self.html_block.location):
+            assert serialized_block['visible_to_staff_only']
         else:
-            self.assertFalse(serialized_block['visible_to_staff_only'])
+            assert not serialized_block['visible_to_staff_only']
 
 
 class TestBlockSerializer(TestBlockSerializerBase):
@@ -170,14 +155,14 @@ class TestBlockSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_basic_block(serialized_block['id'], serialized_block)
-        self.assertEqual(len(serializer.data), 28)
+        assert len(serializer.data) == 28
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
-        self.assertEqual(len(serializer.data), 28)
+        assert len(serializer.data) == 28
 
     def test_staff_fields(self):
         """
@@ -189,7 +174,7 @@ class TestBlockSerializer(TestBlockSerializerBase):
         for serialized_block in serializer.data:
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEqual(len(serializer.data), 29)
+        assert len(serializer.data) == 29
 
 
 class TestBlockDictSerializer(TestBlockSerializerBase):
@@ -211,20 +196,20 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         serializer = self.create_serializer()
 
         # verify root
-        self.assertEqual(serializer.data['root'], six.text_type(self.block_structure.root_block_usage_key))
+        assert serializer.data['root'] == str(self.block_structure.root_block_usage_key)
 
         # verify blocks
-        for block_key_string, serialized_block in six.iteritems(serializer.data['blocks']):
-            self.assertEqual(serialized_block['id'], block_key_string)
+        for block_key_string, serialized_block in serializer.data['blocks'].items():
+            assert serialized_block['id'] == block_key_string
             self.assert_basic_block(block_key_string, serialized_block)
-        self.assertEqual(len(serializer.data['blocks']), 28)
+        assert len(serializer.data['blocks']) == 28
 
     def test_additional_requested_fields(self):
         self.add_additional_requested_fields()
         serializer = self.create_serializer()
-        for serialized_block in six.itervalues(serializer.data['blocks']):
+        for serialized_block in serializer.data['blocks'].values():
             self.assert_extended_block(serialized_block)
-        self.assertEqual(len(serializer.data['blocks']), 28)
+        assert len(serializer.data['blocks']) == 28
 
     def test_staff_fields(self):
         """
@@ -233,7 +218,7 @@ class TestBlockDictSerializer(TestBlockSerializerBase):
         context = self.create_staff_context()
         self.add_additional_requested_fields(context)
         serializer = self.create_serializer(context)
-        for serialized_block in six.itervalues(serializer.data['blocks']):
+        for serialized_block in serializer.data['blocks'].values():
             self.assert_extended_block(serialized_block)
             self.assert_staff_fields(serialized_block)
-        self.assertEqual(len(serializer.data['blocks']), 29)
+        assert len(serializer.data['blocks']) == 29

@@ -3,10 +3,10 @@ Waffle flags and switches for user authn.
 """
 
 
-from edx_toggles.toggles import WaffleSwitch, WaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
 
 _WAFFLE_NAMESPACE = u'user_authn'
-_WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix=u'UserAuthN: ')
+_WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_prefix=u'UserAuthN: ')
 
 # .. toggle_name: user_authn.enable_login_using_thirdparty_auth_only
 # .. toggle_implementation: WaffleSwitch
@@ -18,7 +18,7 @@ _WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name=_WAFFLE_NAMESPACE, log_pre
 # .. toggle_target_removal_date: 2020-01-31
 # .. toggle_warnings: Requires THIRD_PARTY_AUTH_ONLY_DOMAIN to also be set.
 # .. toggle_tickets: ENT-2461
-ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = WaffleSwitch(
+ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY = LegacyWaffleSwitch(
     _WAFFLE_SWITCH_NAMESPACE,
     'enable_login_using_thirdparty_auth_only',
     __name__

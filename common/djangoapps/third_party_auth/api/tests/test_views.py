@@ -4,6 +4,7 @@ Tests for the Third Party Auth REST API
 
 
 import unittest
+from unittest.mock import patch
 
 import ddt
 import six
@@ -12,9 +13,7 @@ from django.http import QueryDict
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
-from mock import patch
 from rest_framework.test import APITestCase
-from six.moves import range
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -49,7 +48,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
-        super(TpaAPITestCase, self).setUp()
+        super().setUp()
 
         google = self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)
@@ -67,7 +66,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             make_staff = (username == STAFF_USERNAME) or make_superuser
             user = UserFactory.create(
                 username=username,
-                email='{}@example.com'.format(username),
+                email=f'{username}@example.com',
                 password=PASSWORD,
                 is_staff=make_staff,
                 is_superuser=make_superuser,
@@ -75,19 +74,19 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             UserSocialAuth.objects.create(
                 user=user,
                 provider=google.backend_name,
-                uid='{}@gmail.com'.format(username),
+                uid=f'{username}@gmail.com',
             )
             UserSocialAuth.objects.create(
                 user=user,
                 provider=testshib.backend_name,
-                uid='{}:remote_{}'.format(testshib.slug, username),
+                uid=f'{testshib.slug}:remote_{username}',
             )
         # Create another user not linked to any providers:
-        UserFactory.create(username=CARL_USERNAME, email='{}@example.com'.format(CARL_USERNAME), password=PASSWORD)
+        UserFactory.create(username=CARL_USERNAME, email=f'{CARL_USERNAME}@example.com', password=PASSWORD)
 
 
 @ddt.ddt
-class UserViewsMixin(object):
+class UserViewsMixin:
     """
     Generic TestCase to exercise the v1 and v2 UserViews.
     """
@@ -100,7 +99,7 @@ class UserViewsMixin(object):
             {
                 "provider_id": "oa2-google-oauth2",
                 "name": "Google",
-                "remote_id": "{}@gmail.com".format(username),
+                "remote_id": f"{username}@gmail.com",
             },
             {
                 "provider_id": PROVIDER_ID_TESTSHIB,
@@ -131,10 +130,10 @@ class UserViewsMixin(object):
         url = self.make_url({'username': target_user})
 
         response = self.client.get(url)
-        self.assertEqual(response.status_code, expect_result)
+        assert response.status_code == expect_result
         if expect_result == 200:
-            self.assertIn("active", response.data)
-            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
+            assert 'active' in response.data
+            self.assertCountEqual(response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         # A server with a valid API key can query any user's list of providers
@@ -147,10 +146,10 @@ class UserViewsMixin(object):
     def test_list_connected_providers_with_api_key(self, api_key, target_user, expect_result):
         url = self.make_url({'username': target_user})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=api_key)
-        self.assertEqual(response.status_code, expect_result)
+        assert response.status_code == expect_result
         if expect_result == 200:
-            self.assertIn("active", response.data)
-            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
+            assert 'active' in response.data
+            self.assertCountEqual(response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         (True, ALICE_USERNAME, 200, True),
@@ -164,18 +163,18 @@ class UserViewsMixin(object):
         with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=allow_unprivileged):
             url = self.make_url({'username': ALICE_USERNAME})
             response = self.client.get(url)
-        self.assertEqual(response.status_code, expect)
+        assert response.status_code == expect
         if response.status_code == 200:
-            self.assertGreater(len(response.data['active']), 0)
+            assert len(response.data['active']) > 0
             for provider_data in response.data['active']:
-                self.assertEqual(include_remote_id, 'remote_id' in provider_data)
+                assert include_remote_id == ('remote_id' in provider_data)
 
     def test_allow_query_by_email(self):
         self.client.login(username=ALICE_USERNAME, password=PASSWORD)
-        url = self.make_url({'email': '{}@example.com'.format(ALICE_USERNAME)})
+        url = self.make_url({'email': f'{ALICE_USERNAME}@example.com'})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.data['active']), 0)
+        assert response.status_code == 200
+        assert len(response.data['active']) > 0
 
     def test_throttling(self):
         # Default throttle is 10/min.  Make 11 requests to verify
@@ -185,9 +184,9 @@ class UserViewsMixin(object):
         with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=True):
             for _ in range(10):
                 response = self.client.get(url)
-                self.assertEqual(response.status_code, 200)
+                assert response.status_code == 200
             response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
+            assert response.status_code == 200
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -247,7 +246,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
 
     def _create_jwt_header(self, user, is_restricted=False, scopes=None, filters=None):
         token = generate_jwt(user, is_restricted=is_restricted, scopes=scopes, filters=filters)
-        return "JWT {}".format(token)
+        return f"JWT {token}"
 
     @ddt.data(
         (True, 200, get_mapping_data_by_usernames(LINKED_USERS)),
@@ -311,7 +310,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         for attr in ['username', 'remote_id']:
             if attr in query_params:
                 params.setlist(attr, query_params[attr])
-        url = "{}?{}".format(base_url, params.urlencode())
+        url = f"{base_url}?{params.urlencode()}"
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
         self._verify_response(response, expect_code, expect_data)
 
@@ -327,12 +326,12 @@ class UserMappingViewAPITests(TpaAPITestCase):
         UserSocialAuth.objects.create(
             user=user,
             provider=testshib2.backend_name,
-            uid='{}:{}'.format(testshib2.slug, username),
+            uid=f'{testshib2.slug}:{username}',
         )
 
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=VALID_API_KEY)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self._verify_response(response, 200, get_mapping_data_by_usernames(LINKED_USERS))
 
     @ddt.data(
@@ -346,15 +345,15 @@ class UserMappingViewAPITests(TpaAPITestCase):
             with patch.object(JwtRestrictedApplication, 'has_permission', return_value=has_permission):
                 with patch.object(JwtHasScope, 'has_permission', return_value=has_permission):
                     response = self.client.get(url)
-                    self.assertEqual(response.status_code, expect)
+                    assert response.status_code == expect
 
     def _verify_response(self, response, expect_code, expect_result):
         """ verify the items in data_list exists in response and data_results matches results in response """
-        self.assertEqual(response.status_code, expect_code)
+        assert response.status_code == expect_code
         if expect_code == 200:
             for item in ['results', 'count', 'num_pages']:
-                self.assertIn(item, response.data)
-            six.assertCountEqual(self, response.data['results'], expect_result)
+                assert item in response.data
+            self.assertCountEqual(response.data['results'], expect_result)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -364,7 +363,7 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
     """
 
     def setUp(self, *args, **kwargs):
-        super(TestThirdPartyAuthUserStatusView, self).setUp(*args, **kwargs)
+        super().setUp(*args, **kwargs)
         self.user = UserFactory.create(password=PASSWORD)
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
         self.url = reverse('third_party_auth_user_status_api')
@@ -375,15 +374,11 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
         """
         self.client.login(username=self.user.username, password=PASSWORD)
         response = self.client.get(self.url, content_type="application/json")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            [{
-                "accepts_logins": True,
-                "name": "Google",
-                "disconnect_url": "/auth/disconnect/google-oauth2/?",
-                "connect_url": "/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings",
-                "connected": False,
-                "id": "oa2-google-oauth2"
-            }]
-        )
+        assert response.status_code == 200
+        assert (response.data ==
+               [{
+                   'accepts_logins': True, 'name': 'Google',
+                   'disconnect_url': '/auth/disconnect/google-oauth2/?',
+                   'connect_url': '/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings',
+                   'connected': False, 'id': 'oa2-google-oauth2'
+               }])

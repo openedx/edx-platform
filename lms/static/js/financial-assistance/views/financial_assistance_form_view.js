@@ -10,6 +10,7 @@
         'text!../../../templates/financial-assistance/financial_assessment_form.underscore',
         'text!../../../templates/financial-assistance/financial_assessment_submitted.underscore',
         'text!templates/student_account/form_field.underscore',
+        'edx-ui-toolkit/js/utils/html-utils',
         'string_utils'
     ],
          function(
@@ -21,7 +22,8 @@
              FormView,
              formViewTpl,
              successTpl,
-             formFieldTpl
+             formFieldTpl,
+             HtmlUtils
          ) {
              return FormView.extend({
                  el: '.financial-assistance-wrapper',
@@ -74,7 +76,7 @@
                          fields: html || ''
                      });
 
-                     this.$el.html(_.template(this.tpl)(data));
+                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.tpl)(data));
 
                      this.postRender();
                      this.validateCountry();
@@ -83,7 +85,7 @@
                  },
 
                  renderSuccess: function() {
-                     this.$el.html(_.template(this.successTpl)({
+                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.successTpl)({
                          course: this.model.get('course'),
                          dashboard_url: this.context.dashboard_url
                      }));
@@ -103,7 +105,9 @@
                          msg = gettext('An error has occurred. Check your Internet connection and try again.');
                      }
 
-                     this.errors = ['<li>' + msg + '</li>'];
+                     this.errors = [HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<li>'), msg, HtmlUtils.HTML('</li>')
+                     ).toString()];
                      this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                      this.toggleDisableButton(false);
                  },
@@ -122,14 +126,22 @@
                             // Translators: link_start and link_end denote the html to link back to the profile page.
                             gettext(txt.join('')),
                              {
-                                 link_start: '<a href="' + this.context.account_settings_url + '">',
+                                 link_start: HtmlUtils.joinHtml(
+                                    HtmlUtils.HTML('<a href="'),
+                                    this.context.account_settings_url,
+                                    HtmlUtils.HTML('">')
+                                 ).toString(),
                                  link_end: '</a>'
                              }
                         );
 
                      if (!this.model.get('country')) {
                          $countryLabel.addClass('error');
-                         this.renderErrors(this.defaultFormErrorsTitle, ['<li>' + msg + '</li>']);
+                         this.renderErrors(this.defaultFormErrorsTitle, [HtmlUtils.joinHtml(
+                            HtmlUtils.HTML('<li>'),
+                            msg,
+                            HtmlUtils.HTML('</li>')
+                         ).toString()]);
                          this.toggleDisableButton(true);
                      }
                  },

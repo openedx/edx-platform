@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from lxml import etree
 
@@ -28,4 +27,4 @@ def stringify_children(node):
         parts.append(etree.tostring(c, with_tail=True, encoding='unicode'))
 
     # filter removes possible Nones in texts and tails
-    return u''.join([part for part in parts if part])
+    return ''.join([part for part in parts if part])

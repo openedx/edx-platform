@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=django-not-configured
 """
 Management command for updating entitlements modes.
 """

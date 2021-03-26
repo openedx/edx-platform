@@ -1,7 +1,6 @@
 """ CCX API v0 Serializers. """
 
 
-import six
 from ccx_keys.locator import CCXLocator
 from rest_framework import serializers
 
@@ -21,7 +20,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
     max_students_allowed = serializers.IntegerField(source='max_student_enrollments_allowed')
     course_modules = serializers.SerializerMethodField()
 
-    class Meta(object):
+    class Meta:
         model = CustomCourseForEdX
         fields = (
             "ccx_course_id",
@@ -45,7 +44,7 @@ class CCXCourseSerializer(serializers.ModelSerializer):
         """
         Getter for the CCX Course ID
         """
-        return six.text_type(CCXLocator.from_course_locator(obj.course.id, obj.id))
+        return str(CCXLocator.from_course_locator(obj.course.id, obj.id))
 
     @staticmethod
     def get_course_modules(obj):

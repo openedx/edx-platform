@@ -573,8 +573,7 @@ describe('CourseOutlinePage', function() {
     });
 
     describe('Content Highlights', function() {
-        var createCourse, createCourseWithHighlights, createCourseWithHighlightsDisabled,
-            clickSaveOnModal, clickCancelOnModal;
+        let createCourse, createCourseWithHighlights, clickSaveOnModal, clickCancelOnModal;
 
         beforeEach(function() {
             setSelfPaced();
@@ -590,11 +589,6 @@ describe('CourseOutlinePage', function() {
 
         createCourseWithHighlights = function(highlights) {
             createCourse({highlights: highlights});
-        };
-
-        createCourseWithHighlightsDisabled = function() {
-            var highlightsDisabled = {highlights_enabled: false};
-            createCourse(highlightsDisabled, highlightsDisabled);
         };
 
         clickSaveOnModal = function() {
@@ -642,11 +636,6 @@ describe('CourseOutlinePage', function() {
             openHighlightsSettings = function() {
                 $('button.status-highlights-enabled-value').click();
             };
-
-            it('does not display settings when disabled', function() {
-                createCourseWithHighlightsDisabled();
-                expect(highlightsSetting()).not.toExist();
-            });
 
             it('displays settings when enabled', function() {
                 createCourseWithHighlights([]);
@@ -777,11 +766,6 @@ describe('CourseOutlinePage', function() {
                 openHighlights();
                 expectHighlightsToBe(updatedHighlights);
             };
-
-            it('does not display link when disabled', function() {
-                createCourseWithHighlightsDisabled();
-                expect(highlightsLink()).not.toExist();
-            });
 
             it('displays link when no highlights exist', function() {
                 createCourseWithHighlights([]);

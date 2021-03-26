@@ -11,7 +11,7 @@
         var MessageBannerView = Backbone.View.extend({
 
             events: {
-                'click #close': 'closeBanner'
+                'click .close-btn': 'closeBanner'
             },
 
             closeBanner: function(event) {

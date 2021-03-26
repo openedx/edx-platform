@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <div class="imageinput capa_inputtype" id="inputtype_${id}">
   <input
     type="hidden"
@@ -37,7 +38,7 @@
   </div>
 
   <script type="text/javascript" charset="utf-8">
-    (new ImageInput('${id}'));
+    (new ImageInput('${id | n, decode.utf8}'));
   </script>
 
   <%include file="status_span.html" args="status=status, status_id=id"/>

@@ -10,10 +10,8 @@ and otherwise returns i4x://org/course/cat/name).
 import logging
 
 import pymongo
-import six
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from six import text_type
 from xblock.core import XBlock
 
 from openedx.core.lib.cache_utils import request_cached
@@ -60,7 +58,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-    def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):
+    def get_item(self, usage_key, depth=0, revision=None, using_descriptor_system=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
 
@@ -94,13 +92,13 @@ class DraftModuleStore(MongoModuleStore):
             is found at that usage_key
         """
         def get_published():
-            return wrap_draft(super(DraftModuleStore, self).get_item(
+            return wrap_draft(super(DraftModuleStore, self).get_item(  # lint-amnesty, pylint: disable=super-with-arguments
                 usage_key, depth=depth, using_descriptor_system=using_descriptor_system,
                 for_parent=kwargs.get('for_parent'),
             ))
 
         def get_draft():
-            return wrap_draft(super(DraftModuleStore, self).get_item(
+            return wrap_draft(super(DraftModuleStore, self).get_item(  # lint-amnesty, pylint: disable=super-with-arguments
                 as_draft(usage_key), depth=depth, using_descriptor_system=using_descriptor_system,
                 for_parent=kwargs.get('for_parent')
             ))
@@ -133,7 +131,7 @@ class DraftModuleStore(MongoModuleStore):
         else:
             raise UnsupportedRevisionError()
 
-    def has_item(self, usage_key, revision=None):
+    def has_item(self, usage_key, revision=None):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns True if location exists in this ModuleStore.
 
@@ -143,13 +141,13 @@ class DraftModuleStore(MongoModuleStore):
                 ModuleStoreEnum.RevisionOption.draft_only - checks for the draft item only
                 None - uses the branch setting, as follows:
                     if branch setting is ModuleStoreEnum.Branch.published_only, checks for the published item only
-                    if branch setting is ModuleStoreEnum.Branch.draft_preferred, checks whether draft or published item exists
+                    if branch setting is ModuleStoreEnum.Branch.draft_preferred, checks whether draft or published item exists  # lint-amnesty, pylint: disable=line-too-long
         """
         def has_published():
-            return super(DraftModuleStore, self).has_item(usage_key)
+            return super(DraftModuleStore, self).has_item(usage_key)  # lint-amnesty, pylint: disable=super-with-arguments
 
         def has_draft():
-            return super(DraftModuleStore, self).has_item(as_draft(usage_key))
+            return super(DraftModuleStore, self).has_item(as_draft(usage_key))  # lint-amnesty, pylint: disable=super-with-arguments
 
         if revision == ModuleStoreEnum.RevisionOption.draft_only:
             return has_draft()
@@ -165,7 +163,7 @@ class DraftModuleStore(MongoModuleStore):
         else:
             raise UnsupportedRevisionError()
 
-    def delete_course(self, course_key, user_id):
+    def delete_course(self, course_key, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         :param course_key: which course to delete
         :param user_id: id of the user deleting the course
@@ -173,7 +171,7 @@ class DraftModuleStore(MongoModuleStore):
         # Note: does not need to inform the bulk mechanism since after the course is deleted,
         # it can't calculate inheritance anyway. Nothing is there to be dirty.
         # delete the assets
-        super(DraftModuleStore, self).delete_course(course_key, user_id)
+        super().delete_course(course_key, user_id)  # lint-amnesty, pylint: disable=super-with-arguments
 
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
@@ -189,7 +187,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         # check to see if the source course is actually there
         if not self.has_course(source_course_id):
-            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
+            raise ItemNotFoundError(f"Cannot find a course at {source_course_id}. Aborting")
 
         with self.bulk_operations(dest_course_id):
             # verify that the dest_location really is an empty course
@@ -199,14 +197,14 @@ class DraftModuleStore(MongoModuleStore):
             if self.collection.count_documents(query, limit=1) > 0:
                 raise DuplicateCourseError(
                     dest_course_id,
-                    "Course at destination {0} is not an empty course. "
+                    "Course at destination {} is not an empty course. "
                     "You can only clone into an empty course. Aborting...".format(
                         dest_course_id
                     )
                 )
 
             # clone the assets
-            super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
+            super().clone_course(source_course_id, dest_course_id, user_id, fields)  # lint-amnesty, pylint: disable=super-with-arguments
 
             # get the whole old course
             new_course = self.get_course(dest_course_id)
@@ -217,7 +215,7 @@ class DraftModuleStore(MongoModuleStore):
                 )
             else:
                 # update fields on existing course
-                for key, value in six.iteritems(fields):
+                for key, value in fields.items():
                     setattr(new_course, key, value)
                 self.update_item(new_course, user_id)
 
@@ -242,7 +240,7 @@ class DraftModuleStore(MongoModuleStore):
 
             log.info("Cloning module %s to %s....", original_loc, module.location)
 
-            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, six.string_types):
+            if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, str):  # lint-amnesty, pylint: disable=line-too-long
                 module.data = rewrite_nonportable_content_links(
                     original_loc.course_key, dest_course_id, module.data
                 )
@@ -275,14 +273,14 @@ class DraftModuleStore(MongoModuleStore):
 
         # create a query to find all items in the course that have the given location listed as a child
         query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = text_type(location)
+        query['definition.children'] = str(location)
 
         # find all the items that satisfy the query
         parents = self.collection.find(query, {'_id': True}, sort=[SORT_REVISION_FAVOR_DRAFT])
 
         # return only the parent(s) that satisfy the request
         return [
-            BlockUsageLocator._from_deprecated_son(parent['_id'], location.course_key.run)
+            BlockUsageLocator._from_deprecated_son(parent['_id'], location.course_key.run)  # lint-amnesty, pylint: disable=protected-access
             for parent in parents
             if (
                 # return all versions of the parent if revision is ModuleStoreEnum.RevisionOption.all
@@ -319,9 +317,9 @@ class DraftModuleStore(MongoModuleStore):
             revision = ModuleStoreEnum.RevisionOption.published_only \
                 if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only \
                 else ModuleStoreEnum.RevisionOption.draft_preferred
-        return super(DraftModuleStore, self).get_parent_location(location, revision, **kwargs)
+        return super().get_parent_location(location, revision, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
-    def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
+    def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator if
         the category allows drafts. If the category does not allow drafts, just creates a published module.
@@ -332,13 +330,13 @@ class DraftModuleStore(MongoModuleStore):
         :param runtime: if you already have an xmodule from the course, the xmodule.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        new_block = super(DraftModuleStore, self).create_xblock(
+        new_block = super().create_xblock(  # lint-amnesty, pylint: disable=super-with-arguments
             runtime, course_key, block_type, block_id, fields, **kwargs
         )
         new_block.location = self.for_branch_setting(new_block.location)
         return wrap_draft(new_block)
 
-    def get_items(self, course_key, revision=None, **kwargs):
+    def get_items(self, course_key, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Performance Note: This is generally a costly operation, but useful for wildcard searches.
 
@@ -360,7 +358,7 @@ class DraftModuleStore(MongoModuleStore):
                         returns either Draft or Published, preferring Draft items.
         """
         def base_get_items(key_revision):
-            return super(DraftModuleStore, self).get_items(course_key, key_revision=key_revision, **kwargs)
+            return super(DraftModuleStore, self).get_items(course_key, key_revision=key_revision, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
         def draft_items():
             return [wrap_draft(item) for item in base_get_items(MongoRevisionKey.draft)]
@@ -406,7 +404,7 @@ class DraftModuleStore(MongoModuleStore):
         # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
         return self.get_item(location)
 
-    def _convert_to_draft(self, location, user_id, delete_published=False, ignore_if_draft=False):
+    def _convert_to_draft(self, location, user_id, delete_published=False, ignore_if_draft=False):  # lint-amnesty, pylint: disable=unused-argument
         """
         Internal method with additional internal parameters to convert a subtree to draft.
 
@@ -451,7 +449,7 @@ class DraftModuleStore(MongoModuleStore):
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:
-                    raise DuplicateItemError(item['_id'], self, 'collection')
+                    raise DuplicateItemError(item['_id'], self, 'collection')  # lint-amnesty, pylint: disable=raise-missing-from
 
             # delete the old PUBLISHED version if requested
             if delete_published:
@@ -463,8 +461,8 @@ class DraftModuleStore(MongoModuleStore):
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
 
-    def update_item(
-            self,
+    def update_item(  # lint-amnesty, pylint: disable=arguments-differ
+            self,  # lint-amnesty, pylint: disable=unused-argument
             xblock,
             user_id,
             allow_not_found=False,
@@ -481,13 +479,13 @@ class DraftModuleStore(MongoModuleStore):
 
         # if the revision is published, defer to base
         if draft_loc.branch == MongoRevisionKey.published:
-            item = super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+            item = super().update_item(xblock, user_id, allow_not_found)  # lint-amnesty, pylint: disable=super-with-arguments
             course_key = xblock.location.course_key
             if isPublish or (item.category in DIRECT_ONLY_CATEGORIES and not child_update):
                 self._flag_publish_event(course_key)
             return item
 
-        if not super(DraftModuleStore, self).has_item(draft_loc):
+        if not super().has_item(draft_loc):  # lint-amnesty, pylint: disable=super-with-arguments
             try:
                 # ignore any descendants which are already draft
                 self._convert_to_draft(xblock.location, user_id, ignore_if_draft=True)
@@ -499,10 +497,10 @@ class DraftModuleStore(MongoModuleStore):
                     raise
 
         xblock.location = draft_loc
-        super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found, isPublish=isPublish)
+        super().update_item(xblock, user_id, allow_not_found, isPublish=isPublish)  # lint-amnesty, pylint: disable=super-with-arguments
         return wrap_draft(xblock)
 
-    def delete_item(self, location, user_id, revision=None, **kwargs):
+    def delete_item(self, location, user_id, revision=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Delete an item from this modulestore.
         The method determines which revisions to delete. It disconnects and deletes the subtree.
@@ -560,7 +558,7 @@ class DraftModuleStore(MongoModuleStore):
                 if self.collection.count_documents(query) > 1:
                     continue
 
-            parent_block = super(DraftModuleStore, self).get_item(parent_location)
+            parent_block = super().get_item(parent_location)  # lint-amnesty, pylint: disable=super-with-arguments
             parent_block.children.remove(location)
             parent_block.location = parent_location  # ensure the location is with the correct revision
             self.update_item(parent_block, user_id, child_update=True)
@@ -663,11 +661,11 @@ class DraftModuleStore(MongoModuleStore):
 
     @request_cached(
         # use the XBlock's location value in the cache key
-        arg_map_function=lambda arg: six.text_type(arg.location if isinstance(arg, XBlock) else arg),
+        arg_map_function=lambda arg: str(arg.location if isinstance(arg, XBlock) else arg),
         # use this store's request_cache
         request_cache_getter=lambda args, kwargs: args[1],
     )
-    def _cached_has_changes(self, request_cache, xblock):
+    def _cached_has_changes(self, request_cache, xblock):  # lint-amnesty, pylint: disable=unused-argument
         """
         Internal has_changes method that caches the result.
         """
@@ -679,12 +677,12 @@ class DraftModuleStore(MongoModuleStore):
             # fix a bug where dangling pointers should imply a change
             if len(xblock.children) > len(xblock.get_children()):
                 return True
-            return any([self.has_changes(child) for child in xblock.get_children()])
+            return any(self.has_changes(child) for child in xblock.get_children())
         # otherwise there are no changes
         else:
             return False
 
-    def publish(self, location, user_id, **kwargs):
+    def publish(self, location, user_id, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Publish the subtree rooted at location to the live course and remove the drafts.
         Such publishing may cause the deletion of previously published but subsequently deleted
@@ -727,7 +725,7 @@ class DraftModuleStore(MongoModuleStore):
 
             # try to find the originally PUBLISHED version, if it exists
             try:
-                original_published = super(DraftModuleStore, self).get_item(item_location)
+                original_published = super(DraftModuleStore, self).get_item(item_location)  # lint-amnesty, pylint: disable=super-with-arguments
             except ItemNotFoundError:
                 original_published = None
 
@@ -751,7 +749,7 @@ class DraftModuleStore(MongoModuleStore):
 
             # update the published (not draft) item (ignoring that item is "draft"). The published
             # may not exist; (if original_published is None); so, allow_not_found
-            super(DraftModuleStore, self).update_item(
+            super(DraftModuleStore, self).update_item(  # lint-amnesty, pylint: disable=super-with-arguments
                 item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
             )
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
@@ -771,7 +769,7 @@ class DraftModuleStore(MongoModuleStore):
 
         return self.get_item(as_published(location))
 
-    def unpublish(self, location, user_id, **kwargs):
+    def unpublish(self, location, user_id, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Turn the published version into a draft, removing the published version.
 
@@ -858,7 +856,7 @@ class DraftModuleStore(MongoModuleStore):
             try:
                 source_item = self.get_item(item_location)
             except ItemNotFoundError:
-                log.error('Unable to find the item %s', six.text_type(item_location))
+                log.error('Unable to find the item %s', str(item_location))
                 return
 
             if source_item.parent and source_item.parent.block_id != original_parent_location.block_id:
@@ -867,11 +865,11 @@ class DraftModuleStore(MongoModuleStore):
 
     def _query_children_for_cache_children(self, course_key, items):
         # first get non-draft in a round-trip
-        to_process_non_drafts = super(DraftModuleStore, self)._query_children_for_cache_children(course_key, items)
+        to_process_non_drafts = super()._query_children_for_cache_children(course_key, items)  # lint-amnesty, pylint: disable=super-with-arguments
 
         to_process_dict = {}
         for non_draft in to_process_non_drafts:
-            to_process_dict[BlockUsageLocator._from_deprecated_son(non_draft["_id"], course_key.run)] = non_draft
+            to_process_dict[BlockUsageLocator._from_deprecated_son(non_draft["_id"], course_key.run)] = non_draft  # lint-amnesty, pylint: disable=protected-access
 
         if self.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
             # now query all draft content in another round-trip
@@ -888,7 +886,7 @@ class DraftModuleStore(MongoModuleStore):
                 # with the draft. This is because the semantics of the DraftStore is to
                 # always return the draft - if available
                 for draft in to_process_drafts:
-                    draft_loc = BlockUsageLocator._from_deprecated_son(draft["_id"], course_key.run)
+                    draft_loc = BlockUsageLocator._from_deprecated_son(draft["_id"], course_key.run)  # lint-amnesty, pylint: disable=protected-access
                     draft_as_non_draft_loc = as_published(draft_loc)
 
                     # does non-draft exist in the collection

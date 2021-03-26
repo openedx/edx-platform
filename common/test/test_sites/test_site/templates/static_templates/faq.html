@@ -4,6 +4,8 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.urls import reverse
+
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="title"><title>${_("FAQ")}</title></%block>
@@ -23,7 +25,7 @@ from django.urls import reverse
         <h2>${_("Organization")}</h2>
         <article class="response">
           <h3>${_("What is {edX}?").format(edX="edX")}</h3>
-          <p>${_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at <a href=\"http://www.edx.org\">www.edx.org</a> for online education.').format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University")}</p>
+            <p>${Text(_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at {link_start}www.edx.org{link_end} for online education.')).format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University", link_start=HTML('<a href="http://www.edx.org">'), link_end=HTML('</a>'))}</p>
           <p>${_("{EdX} currently offers {HarvardX}, {MITx} and {BerkeleyX} classes online for free. Beginning in fall 2013, {edX} will offer {WellesleyX} , {GeorgetownX} and the {UTexas} classes online for free. The {UT} System includes nine universities and six health institutions. In 2014, {edX} will further expand its consortium, including several international schools, when it begins offering courses from {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}.  The {edX} institutions aim to extend their collective reach to build a global community of online students. Along with offering online courses, the three universities undertake research on how students learn and how technology can transform learning both on-campus and online throughout the world.").format(
               EdX="EdX",
               edX="edX",
@@ -89,7 +91,7 @@ from django.urls import reverse
         </article>
         <article class="response">
           <h3>${_("What will the scope of the online courses be? How many? Which faculty?")}</h3>
-          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the {edX} platform.').format(link_start='<a href="/courses">', link_end='</a>', edX="edX")}</p>
+          <p>${Text(_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the {edX} platform.')).format(link_start=HTML('<a href="/courses">'), link_end=HTML('</a>'), edX="edX")}</p>
         </article>
         <article class="response">
           <h3>${_("Who is the learner? Domestic or international? Age range?")}</h3>
@@ -105,11 +107,11 @@ from django.urls import reverse
         </article>
         <article class="response">
           <h3>${_("How may I apply to study with {edX}?").format(edX="edX")}</h3>
-          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>', edX="edX")}</p>
+          <p>${Text(_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.')).format(link_start=HTML('<a href="#signup-modal" rel="leanModal">'), link_end=HTML('</a>'), edX="edX")}</p>
         </article>
         <article class="response">
           <h3>${_("How may another university participate in {edX}? ").format(edX="edX")}</h3>
-          <p>${_('If you are from a university interested in discussing {edX}, please email {email}').format(email='<a href="mailto:university@edx.org">university@edx.org</a>', edX="edX")}</p>
+          <p>${Text(_('If you are from a university interested in discussing {edX}, please email {email}')).format(email=HTML('<a href="mailto:university@edx.org">university@edx.org</a>'), edX="edX")}</p>
         </article>
       </section>
 
@@ -118,7 +120,7 @@ from django.urls import reverse
         <article class="response">
           <h3>${_("What technology will {edX} use?").format(edX="edX")}</h3>
           <p>${_("The {edX} open-source online learning platform will feature interactive learning designed specifically for the web. Features will include: self-paced learning, online discussion groups, wiki-based collaborative learning, assessment of learning as a student progresses through a course, and online laboratories and other interactive learning tools. The platform will also serve as a laboratory from which data will be gathered to better understand how students learn. Because it is open source, the platform will be continuously improved by a worldwide community of collaborators, with new features added as needs arise.").format(edX="edX")}</p>
-          <p>${_("The first version of the technology was used in the first <em>{MITx}</em> course, 6.002x Circuits and Electronics, which launched in Spring, 2012.").format(MITx="MITx")}</p>
+            <p>${Text(_("The first version of the technology was used in the first {em_start}{MITx}{em_end} course, 6.002x Circuits and Electronics, which launched in Spring, 2012.")).format(em_start=HTML('<em>'), MITx="MITx", em_end=HTML('</em>'))}</p>
         </article>
         <article class="response">
           <h3>${_("How is this different from what other universities are doing online?")}</h3>

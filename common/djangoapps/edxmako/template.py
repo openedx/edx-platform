@@ -1,4 +1,4 @@
-#   Copyright (c) 2008 Mikeal Rogers
+#   Copyright (c) 2008 Mikeal Rogers  # lint-amnesty, pylint: disable=missing-module-docstring
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ from django.conf import settings
 from django.template import Context, engines, Origin
 from edx_django_utils.cache import RequestCache
 from mako.template import Template as MakoTemplate
-from six import text_type
 
 from . import Engines, LOOKUP
 from .request_context import get_template_request_context
@@ -40,7 +39,7 @@ class Template(object):
         self.engine = kwargs.pop('engine', engines[Engines.MAKO])
         if kwargs.get('origin') is None:
             self.origin = Origin(UNKNOWN_SOURCE)
-        if len(args) and isinstance(args[0], MakoTemplate):
+        if len(args) and isinstance(args[0], MakoTemplate):  # lint-amnesty, pylint: disable=len-as-condition
             self.mako_template = args[0]
         else:
             kwargs['lookup'] = LOOKUP['main']
@@ -122,4 +121,4 @@ class Template(object):
         """
         for key in KEY_CSRF_TOKENS:
             if key in context_dictionary:
-                context_dictionary[key] = text_type(context_dictionary[key])
+                context_dictionary[key] = str(context_dictionary[key])

@@ -5,15 +5,16 @@ Asynchronous tasks related to the Course Blocks sub-application.
 
 import logging
 
-from celery.task import task
+from celery import shared_task
 from django.conf import settings
+from edx_django_utils.monitoring import set_code_owner_attribute
 from edxval.api import ValInternalError
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
 
 from capa.responsetypes import LoncapaProblemError
 from openedx.core.djangoapps.content.block_structure import api
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
+from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('edx.celery.task')
@@ -27,7 +28,7 @@ def block_structure_task(**kwargs):
     """
     Decorator for block structure tasks.
     """
-    return task(
+    return shared_task(
         default_retry_delay=settings.BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY'],
         max_retries=settings.BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES'],
         bind=True,
@@ -36,6 +37,7 @@ def block_structure_task(**kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def update_course_in_cache_v2(self, **kwargs):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
@@ -48,6 +50,7 @@ def update_course_in_cache_v2(self, **kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def update_course_in_cache(self, course_id):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
@@ -60,11 +63,12 @@ def _update_course_in_cache(self, **kwargs):
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     """
     if kwargs.get('with_storage'):
-        waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
+        enable_storage_backing_for_cache_in_request()
     _call_and_retry_if_needed(self, api.update_course_in_cache, **kwargs)
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def get_course_in_cache_v2(self, **kwargs):
     """
     Gets the course blocks for the specified course, updating the cache if needed.
@@ -77,6 +81,7 @@ def get_course_in_cache_v2(self, **kwargs):
 
 
 @block_structure_task()
+@set_code_owner_attribute
 def get_course_in_cache(self, course_id):
     """
     Gets the course blocks for the specified course, updating the cache if needed.
@@ -89,7 +94,7 @@ def _get_course_in_cache(self, **kwargs):
     Gets the course blocks for the specified course, updating the cache if needed.
     """
     if kwargs.get('with_storage'):
-        waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
+        enable_storage_backing_for_cache_in_request()
     _call_and_retry_if_needed(self, api.get_course_in_cache, **kwargs)
 
 
@@ -103,18 +108,18 @@ def _call_and_retry_if_needed(self, api_method, **kwargs):
     except NO_RETRY_TASKS:
         # Known unrecoverable errors
         log.exception(
-            u"BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
+            "BlockStructure: %s encountered unrecoverable error in course %s, task_id %s",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,
         )
         raise
     except RETRY_TASKS as exc:
-        log.exception(u"%s encountered expected error, retrying.", self.__name__)
+        log.exception("%s encountered expected error, retrying.", self.__name__)
         raise self.retry(kwargs=kwargs, exc=exc)
     except Exception as exc:
         log.exception(
-            u"BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
+            "BlockStructure: %s encountered unknown error in course %s, task_id %s. Retry #%d",
             self.__name__,
             kwargs.get('course_id'),
             self.request.id,

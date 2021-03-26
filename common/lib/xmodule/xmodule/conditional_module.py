@@ -6,12 +6,10 @@ ConditionalBlock is an XBlock which you can use for disabling some XBlocks by co
 import json
 import logging
 
-import six
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
-from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
@@ -194,11 +192,11 @@ class ConditionalBlock(
         """
         Create an instance of the Conditional XBlock.
         """
-        super(ConditionalBlock, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
         # substitution can be done.
         if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], six.string_types):
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], str):
                 self.sources_list = [
                     # TODO: it is not clear why we are replacing the run here (which actually is a no-op
                     # for old-style course locators. However, this is the implementation of
@@ -208,7 +206,7 @@ class ConditionalBlock(
                     for item in ConditionalBlock.parse_sources(self.xml_attributes)
                 ]
 
-    def is_condition_satisfied(self):
+    def is_condition_satisfied(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         attr_name = self.conditions_map[self.conditional_attr]
 
         if self.conditional_value and self.get_required_blocks:
@@ -216,7 +214,7 @@ class ConditionalBlock(
                 if not hasattr(module, attr_name):
                     # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
-                    # for the resulting module to be a (flavor of) ErrorModule.
+                    # for the resulting module to be a (flavor of) ErrorBlock.
                     # So just log and return false.
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester
@@ -343,7 +341,7 @@ class ConditionalBlock(
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in six.iterkeys(cls.conditions_map):
+        for conditional_attr in cls.conditions_map:
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -360,7 +358,7 @@ class ConditionalBlock(
                 try:
                     descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(descriptor.scope_ids.usage_id)
-                except:
+                except:  # lint-amnesty, pylint: disable=bare-except
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)
                     system.error_tracker(msg)
@@ -377,28 +375,28 @@ class ConditionalBlock(
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = HTML(u'<show sources="{sources}" />').format(
-                sources=Text(';'.join(text_type(location) for location in self.show_tag_list)))
+            show_str = HTML('<show sources="{sources}" />').format(
+                sources=Text(';'.join(str(location) for location in self.show_tag_list)))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
+        stringified_sources_list = [str(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message
         return xml_object
 
     def validate(self):
-        validation = super(ConditionalBlock, self).validate()
+        validation = super().validate()
         if not self.sources_list:
             conditional_validation = StudioValidation(self.location)
             conditional_validation.add(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"This component has no source components configured yet."),
+                    _("This component has no source components configured yet."),
                     action_class='edit-button',
-                    action_label=_(u"Configure list of sources")
+                    action_label=_("Configure list of sources")
                 )
             )
             validation = StudioValidation.copy(validation)
@@ -407,7 +405,7 @@ class ConditionalBlock(
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(ConditionalBlock, self).non_editable_metadata_fields
+        non_editable_fields = super().non_editable_metadata_fields
         non_editable_fields.extend([
             ConditionalBlock.due,
             ConditionalBlock.show_tag_list,

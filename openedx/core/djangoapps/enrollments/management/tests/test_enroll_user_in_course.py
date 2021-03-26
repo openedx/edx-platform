@@ -4,7 +4,7 @@
 import unittest
 from uuid import uuid4
 import ddt
-
+import pytest
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -14,8 +14,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-import six
-from six.moves import range
 
 
 @ddt.ddt
@@ -27,12 +25,12 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(EnrollManagementCommandTest, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create(org='fooX', number='007')
 
     def setUp(self):
-        super(EnrollManagementCommandTest, self).setUp()
-        self.course_id = six.text_type(self.course.id)
+        super().setUp()
+        self.course_id = str(self.course.id)
         self.username = 'ralph' + uuid4().hex
         self.user_email = self.username + '@example.com'
 
@@ -51,7 +49,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
         )
 
         user_enroll = get_enrollment(self.username, self.course_id)
-        self.assertTrue(user_enroll['is_active'])
+        assert user_enroll['is_active']
 
     def test_enroll_user_twice(self):
         """
@@ -72,7 +70,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
         # Second run does not impact the first run (i.e., the
         # user is still enrolled, no exception was raised, etc)
         user_enroll = get_enrollment(self.username, self.course_id)
-        self.assertTrue(user_enroll['is_active'])
+        assert user_enroll['is_active']
 
     @ddt.data(['--email', 'foo'], ['--course', 'bar'], ['--bad-param', 'baz'])
     def test_not_enough_args(self, arg):
@@ -83,7 +81,7 @@ class EnrollManagementCommandTest(SharedModuleStoreTestCase):
 
         command_args = arg
 
-        with self.assertRaises(CommandError):
+        with pytest.raises(CommandError):
             call_command(
                 'enroll_user_in_course',
                 *command_args

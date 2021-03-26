@@ -101,7 +101,7 @@ class XBlockEventTestMixin(object):
         passed into it.
 
         """
-        super(XBlockEventTestMixin, self).setUp()
+        super(XBlockEventTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         saved_init = lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__
 
         def patched_init(runtime_self, **kwargs):
@@ -136,7 +136,7 @@ class XBlockEventTestMixin(object):
 
         """
         for event in self.events:
-            self.assertNotEqual(event['event_type'], event_type)
+            assert event['event_type'] != event_type
 
     def assert_event_published(self, event_type, event_fields=None):
         """
@@ -157,9 +157,7 @@ class XBlockEventTestMixin(object):
                         found = False
                 if found:
                     return
-        self.assertIn({'event_type': event_type,
-                       'event': event_fields},
-                      self.events)
+        assert {'event_type': event_type, 'event': event_fields} in self.events
 
     def reset_published_events(self):
         """
@@ -190,7 +188,7 @@ class GradePublishTestMixin(object):
         '''
         Hot-patch the grading emission system to capture grading events.
         '''
-        super(GradePublishTestMixin, self).setUp()
+        super(GradePublishTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         def capture_score(user_id, usage_key, score, max_score):
             '''
@@ -217,7 +215,7 @@ class GradePublishTestMixin(object):
 
         HACK: In the future, this should take a user ID and a block url_name.
         '''
-        self.assertEqual(grade, self.scores[-1]['score'])
+        assert grade == self.scores[(- 1)]['score']
 
 
 class XBlockScenarioTestCaseMixin(object):
@@ -305,7 +303,7 @@ class XBlockStudentTestCaseMixin(object):
         users, so we exercise more corner cases, but we could
         standardize if this is more hassle than it's worth.
         """
-        super(XBlockStudentTestCaseMixin, self).setUp()
+        super(XBlockStudentTestCaseMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         for idx, student in enumerate(self.student_list):
             username = "u{}".format(idx)
             self._enroll_user(username, student['email'], student['password'])

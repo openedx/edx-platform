@@ -4,9 +4,9 @@ Tests of edX Studio runtime functionality
 
 
 from unittest import TestCase
+from urllib.parse import urlparse
 
-from mock import Mock
-from six.moves.urllib.parse import urlparse
+from unittest.mock import Mock
 
 from cms.lib.xblock.runtime import handler_url
 
@@ -15,7 +15,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        super(TestHandlerUrl, self).setUp()
+        super().setUp()
         self.block = Mock()
 
     def test_trailing_characters(self):

@@ -3,7 +3,6 @@ Helper classes and methods for running modulestore tests without Django.
 """
 
 
-import io
 import os
 from contextlib import contextmanager
 from importlib import import_module
@@ -12,10 +11,8 @@ from tempfile import mkdtemp
 from unittest import TestCase
 from uuid import uuid4
 
-import six
 from contextlib2 import ExitStack
 from path import Path as path
-from six.moves import range, zip
 
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
@@ -33,7 +30,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
 
-def load_function(path):
+def load_function(path):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Load a function by name.
 
@@ -79,23 +76,23 @@ def mock_tab_from_json(tab_dict):
     return tab_dict
 
 
-def add_temp_files_from_dict(file_dict, dir):
+def add_temp_files_from_dict(file_dict, dir):  # lint-amnesty, pylint: disable=redefined-builtin
     """
     Takes in a dict formatted as: { file_name: content }, and adds files to directory
     """
     for file_name in file_dict:
-        with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
+        with open(f"{dir}/{file_name}", "w") as opened_file:
             content = file_dict[file_name]
             if content:
-                opened_file.write(six.text_type(content))
+                opened_file.write(str(content))
 
 
-def remove_temp_files_from_list(file_list, dir):
+def remove_temp_files_from_list(file_list, dir):  # lint-amnesty, pylint: disable=redefined-builtin
     """
     Takes in a list of file names and removes them from dir if they exist
     """
     for file_name in file_list:
-        file_path = "{}/{}".format(dir, file_name)
+        file_path = f"{dir}/{file_name}"
         if os.path.exists(file_path):
             os.remove(file_path)
 
@@ -105,9 +102,9 @@ class MixedSplitTestCase(TestCase):
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': '{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
         'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
@@ -115,7 +112,7 @@ class MixedSplitTestCase(TestCase):
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_mongo_libs_{0}'.format(os.getpid()),
+        'db': f'test_mongo_libs_{os.getpid()}',
         'collection': 'modulestore',
         'asset_collection': 'assetstore',
     }
@@ -134,7 +131,7 @@ class MixedSplitTestCase(TestCase):
         """
         Set up requirements for testing: a user ID and a modulestore
         """
-        super(MixedSplitTestCase, self).setUp()
+        super().setUp()
         self.user_id = ModuleStoreEnum.UserID.test
 
         self.store = MixedModuleStore(
@@ -162,7 +159,7 @@ class MixedSplitTestCase(TestCase):
         )
 
 
-class ProceduralCourseTestMixin(object):
+class ProceduralCourseTestMixin:
     """
     Contains methods for testing courses generated procedurally
     """
@@ -193,7 +190,7 @@ class ProceduralCourseTestMixin(object):
             descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
 
 
-class MemoryCache(object):
+class MemoryCache:
     """
     This fits the metadata_inheritance_cache_subsystem interface used by
     the modulestore, and stores the data in a dictionary in memory.
@@ -222,7 +219,7 @@ class MemoryCache(object):
         self.data[key] = value
 
 
-class MongoContentstoreBuilder(object):
+class MongoContentstoreBuilder:
     """
     A builder class for a MongoContentStore.
     """
@@ -233,7 +230,7 @@ class MongoContentstoreBuilder(object):
         when the context closes.
         """
         contentstore = MongoContentStore(
-            db='contentstore{}'.format(THIS_UUID),
+            db=f'contentstore{THIS_UUID}',
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -249,7 +246,7 @@ class MongoContentstoreBuilder(object):
         return 'MongoContentstoreBuilder()'
 
 
-class StoreBuilderBase(object):
+class StoreBuilderBase:
     """
     Base class for all modulestore builders.
     """
@@ -291,7 +288,7 @@ class MongoModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(THIS_UUID),
+            db=f'modulestore{THIS_UUID}',
             collection='xmodule',
             asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
@@ -339,7 +336,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(THIS_UUID),
+            db=f'modulestore{THIS_UUID}',
             collection='split_module',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -421,7 +418,7 @@ class MixedModulestoreBuilder(StoreBuilderBase):
         names, generators = list(zip(*self.store_builders))
 
         with ExitStack() as stack:
-            modulestores = [stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators]
+            modulestores = [stack.enter_context(gen.build_with_contentstore(contentstore, **kwargs)) for gen in generators]  # lint-amnesty, pylint: disable=line-too-long
             # Make the modulestore creation function just return the already-created modulestores
             store_iterator = iter(modulestores)
             next_modulestore = lambda *args, **kwargs: next(store_iterator)
@@ -440,7 +437,7 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             yield self.mixed_modulestore
 
     def __repr__(self):
-        return 'MixedModulestoreBuilder({!r}, {!r})'.format(self.store_builders, self.mappings)
+        return f'MixedModulestoreBuilder({self.store_builders!r}, {self.mappings!r})'
 
     def asset_collection(self):
         """
@@ -519,7 +516,7 @@ class PureModulestoreTestCase(TestCase):
     MODULESTORE = None
 
     def setUp(self):
-        super(PureModulestoreTestCase, self).setUp()
+        super().setUp()
 
         builder = self.MODULESTORE.build()
         self.assets, self.store = builder.__enter__()

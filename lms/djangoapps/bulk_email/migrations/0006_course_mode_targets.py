@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 
@@ -23,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='target',
             name='target_type',
-            field=models.CharField(max_length=64, choices=[(u'myself', u'Myself'), (u'staff', u'Staff and instructors'), (u'learners', u'All students'), (u'cohort', u'Specific cohort'), (u'track', u'Specific course mode')]),
+            field=models.CharField(max_length=64, choices=[('myself', 'Myself'), ('staff', 'Staff and instructors'), ('learners', 'All students'), ('cohort', 'Specific cohort'), ('track', 'Specific course mode')]),
         ),
     ]

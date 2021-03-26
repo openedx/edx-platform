@@ -23,22 +23,25 @@ $(function() {
         var cancel_submit = false;
 
         $inputs.each(function() {
+            var val, fieldLabel;
             /* see if it is a required field and - if so - make sure user presented all information */
             if (typeof $(this).attr('required') !== typeof undefined) {
-                var val = $(this).val();
+                val = $(this).val();
                 if (typeof(val) === 'string') {
                     if (val.trim().length === 0) {
-                        var field_label = $(this).parent().find('label');
+                        fieldLabel = $(this).parent().find('label');
                         $(this).parent().addClass('field-error');
-                        $('.status.message.submission-error .message-copy').append("<li class='error-item'>" + field_label.text() + '</li>');
+                        // eslint-disable-next-line max-len
+                        $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
                         cancel_submit = true;
                     }
                 } else if (typeof(val) === 'object') {
                     /* for SELECT statements */
                     if (val === null || val.length === 0 || val[0] === '') {
-                        var field_label = $(this).parent().find('label');
+                        fieldLabel = $(this).parent().find('label');
                         $(this).parent().addClass('field-error');
-                        $('.status.message.submission-error .message-copy').append("<li class='error-item'>" + field_label.text() + '</li>');
+                        // eslint-disable-next-line max-len
+                        $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
                         cancel_submit = true;
                     }
                 }
@@ -70,7 +73,7 @@ $(function() {
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
         $('.status.message.submission-error .message-copy').
-            html(gettext('There has been an error processing your survey.')).
+            text(gettext('There has been an error processing your survey.')).
             stop().
             css('display', 'block');
     });

@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
@@ -15,10 +16,10 @@ class UserDemographics(TimeStampedModel):
     show_call_to_action = models.BooleanField(default=True)
     history = HistoricalRecords(app='demographics')
 
-    class Meta(object):
+    class Meta:
         app_label = "demographics"
         verbose_name = "user demographic"
         verbose_name_plural = "user demographic"
 
     def __str__(self):
-        return 'UserDemographics for {}'.format(self.user)
+        return f'UserDemographics for {self.user}'

@@ -110,7 +110,6 @@ module.exports = Merge.smart({
             CourseHome: './openedx/features/course_experience/static/course_experience/js/CourseHome.js',
             CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
             CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
-            CourseTalkReviews: './openedx/features/course_experience/static/course_experience/js/CourseTalkReviews.js',
             Currency: './openedx/features/course_experience/static/course_experience/js/currency.js',
             Enrollment: './openedx/features/course_experience/static/course_experience/js/Enrollment.js',
             LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
@@ -168,7 +167,7 @@ module.exports = Merge.smart({
                 // common/djangoapps/pipeline_mako/templates/static_content.html
                 name: 'commons',
                 filename: 'commons.js',
-                minChunks: 3
+                minChunks: 10
             })
         ],
 
@@ -424,7 +423,6 @@ module.exports = Merge.smart({
             $: 'jQuery',
             backbone: 'Backbone',
             canvas: 'canvas',
-            coursetalk: 'CourseTalk',
             gettext: 'gettext',
             jquery: 'jQuery',
             logger: 'Logger',

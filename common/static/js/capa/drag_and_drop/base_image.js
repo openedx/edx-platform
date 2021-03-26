@@ -1,21 +1,14 @@
 (function(requirejs, require, define) {
-    define([], function() {
+    define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         return BaseImage;
 
         function BaseImage(state) {
             var $baseImageElContainer;
 
-            $baseImageElContainer = $(
-            '<div ' +
-                'class="base_image_container" ' +
-                'style=" ' +
-                    'position: relative; ' +
-                    'margin-bottom: 25px; ' +
-                    'margin-left: auto; ' +
-                    'margin-right: auto; ' +
-                '" ' +
-            '></div>'
-        );
+            $baseImageElContainer = $(HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<div class="base_image_container" style=" position: relative; margin-bottom: 25px; '),
+                HtmlUtils.HTML('margin-left: auto; margin-right: auto; " ></div>')
+            ).toString());
 
             state.baseImageEl = $('<img />', {
                 alt: gettext('Drop target image')
@@ -38,12 +31,13 @@
                 state.baseImageLoaded = true;
             });
             state.baseImageEl.error(function() {
+                var errorMsg = HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span style="color: red;">'),
+                        HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),
+                    HtmlUtils.HTML('</span>')
+                );
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');
-                $baseImageElContainer.html(
-                '<span style="color: red;">' +
-                    'ERROR: Image "' + state.config.baseImage + '" was not found!' +
-                '</span>'
-            );
+                HtmlUtils.setHtml($baseImageElContainer, errorMsg);
                 $baseImageElContainer.appendTo(state.containerEl);
             });
         }

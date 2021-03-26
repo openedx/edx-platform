@@ -11,11 +11,11 @@ from .models import ExperimentData, ExperimentKeyValue
 User = get_user_model()  # pylint:disable=invalid-name
 
 
-class ExperimentDataCreateSerializer(serializers.ModelSerializer):
+class ExperimentDataCreateSerializer(serializers.ModelSerializer):  # lint-amnesty, pylint: disable=missing-class-docstring
     user = serializers.SlugRelatedField(slug_field='username', default=serializers.CurrentUserDefault(), required=False,
                                         queryset=User.objects.all())
 
-    class Meta(object):
+    class Meta:
         model = ExperimentData
         fields = ('id', 'experiment_id', 'user', 'key', 'value', 'created', 'modified',)
 
@@ -28,6 +28,6 @@ class ExperimentDataSerializer(serializers.ModelSerializer):
 
 
 class ExperimentKeyValueSerializer(serializers.ModelSerializer):
-    class Meta(object):
+    class Meta:
         model = ExperimentKeyValue
         fields = ('id', 'experiment_id', 'key', 'value', 'created', 'modified',)

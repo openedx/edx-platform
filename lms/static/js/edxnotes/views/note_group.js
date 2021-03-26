@@ -1,8 +1,8 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'gettext', 'underscore', 'backbone'
-    ], function(gettext, _, Backbone) {
+        'gettext', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/html-utils'
+    ], function(gettext, _, Backbone, HtmlUtils) {
         var GroupView, ChapterView;
 
         GroupView = Backbone.View.extend({
@@ -13,12 +13,12 @@
 
             initialize: function(options) {
                 this.options = _.extend({}, options);
-                this.template = _.template(this.options.template);
+                this.template = HtmlUtils.template(this.options.template);
                 this.className = this.options.className;
             },
 
             render: function() {
-                this.$el.prepend(this.template({
+                HtmlUtils.prepend(this.$el, this.template({
                     displayName: this.options.displayName
                 }));
 
@@ -26,7 +26,7 @@
             },
 
             addChild: function(child) {
-                this.$el.append(child);
+                this.$el.append(HtmlUtils.HTML(child).toString());
             }
         });
 
@@ -36,7 +36,7 @@
             id: function() {
                 return 'note-group-' + _.uniqueId();
             },
-            template: _.template('<h3 class="course-title"><%- chapterName %></h3>'),
+            template: HtmlUtils.template('<h3 class="course-title"><%- chapterName %></h3>'),
 
             initialize: function(options) {
                 this.children = [];
@@ -45,13 +45,11 @@
 
             render: function() {
                 var container = document.createDocumentFragment();
-                this.$el.html(this.template({
-                    chapterName: this.options.chapter.display_name || ''
-                }));
+                HtmlUtils.setHtml(this.$el, this.template({chapterName: this.options.chapter.display_name || ''}));
                 _.each(this.children, function(section) {
                     container.appendChild(section.render().el);
                 });
-                this.$el.append(container);
+                this.$el.append(HtmlUtils.HTML(container).toString());
 
                 return this;
             },

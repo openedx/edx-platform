@@ -1,22 +1,26 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 import datetime
 import logging
 import six
 from six.moves import range
 
-from celery import task, current_app
+from celery import shared_task, current_app
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_custom_attribute
+from edx_django_utils.monitoring import (
+    set_code_owner_attribute,
+    set_code_owner_attribute_from_module,
+    set_custom_attribute
+)
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
@@ -42,8 +46,9 @@ COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX = 'Course Next Section Update'
 
 
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
-def update_course_schedules(self, **kwargs):
+@shared_task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
+@set_code_owner_attribute
+def update_course_schedules(self, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
     course_key = CourseKey.from_string(kwargs['course_id'])
     new_start_date = deserialize(kwargs['new_start_date_str'])
     new_upgrade_deadline = deserialize(kwargs['new_upgrade_deadline_str'])
@@ -59,7 +64,7 @@ def update_course_schedules(self, **kwargs):
         raise self.retry(kwargs=kwargs, exc=exc)
 
 
-class ScheduleMessageBaseTask(LoggedTask):
+class ScheduleMessageBaseTask(LoggedTask):  # lint-amnesty, pylint: disable=abstract-method
     """
     Base class for top-level Schedule tasks that create subtasks.
     """
@@ -100,8 +105,9 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
     task_instance = None
 
     @classmethod
-    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
-        current_date = resolvers._get_datetime_beginning_of_day(current_date)
+    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+        set_code_owner_attribute_from_module(__name__)
+        current_date = resolvers._get_datetime_beginning_of_day(current_date)  # lint-amnesty, pylint: disable=protected-access
 
         if not cls.is_enqueue_enabled(site):
             cls.log_info(u'Message queuing disabled for site %s', site.domain)
@@ -109,7 +115,7 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
 
         target_date = current_date + datetime.timedelta(days=day_offset)
         cls.log_info(u'Target date = %s', target_date.isoformat())
-        for bin in range(cls.num_bins):
+        for bin in range(cls.num_bins):  # lint-amnesty, pylint: disable=redefined-builtin
             task_args = (
                 site.id,
                 serialize(target_date),
@@ -123,14 +129,15 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
                 retry=False,
             )
 
-    def run(
+    def run(  # lint-amnesty, pylint: disable=arguments-differ
         self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
     ):
+        set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
             msg_type = self.make_message_type(day_offset)
             _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
-            return self.resolver(
+            return self.resolver(  # lint-amnesty, pylint: disable=not-callable
                 self.async_send_task,
                 site,
                 deserialize(target_day_str),
@@ -143,7 +150,8 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
         raise NotImplementedError
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -153,7 +161,8 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     )
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -163,7 +172,8 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
     )
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -173,7 +183,7 @@ def _course_update_schedule_send(site_id, msg_str):
     )
 
 
-class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):
+class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
     log_prefix = RECURRING_NUDGE_LOG_PREFIX
@@ -187,7 +197,7 @@ ScheduleRecurringNudge.task_instance = current_app.register_task(ScheduleRecurri
 ScheduleRecurringNudge = ScheduleRecurringNudge.task_instance
 
 
-class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):
+class ScheduleUpgradeReminder(BinnedScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
     num_bins = resolvers.UPGRADE_REMINDER_NUM_BINS
     enqueue_config_var = 'enqueue_upgrade_reminder'
     log_prefix = UPGRADE_REMINDER_LOG_PREFIX
@@ -201,7 +211,7 @@ ScheduleUpgradeReminder.task_instance = current_app.register_task(ScheduleUpgrad
 ScheduleUpgradeReminder = ScheduleUpgradeReminder.task_instance
 
 
-class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):
+class ScheduleCourseUpdate(BinnedScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
     num_bins = resolvers.COURSE_UPDATE_NUM_BINS
     enqueue_config_var = 'enqueue_course_update'
     log_prefix = COURSE_UPDATE_LOG_PREFIX
@@ -215,7 +225,7 @@ ScheduleCourseUpdate.task_instance = current_app.register_task(ScheduleCourseUpd
 ScheduleCourseUpdate = ScheduleCourseUpdate.task_instance
 
 
-class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
+class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
     enqueue_config_var = 'enqueue_course_update'
     log_prefix = COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX
     resolver = resolvers.CourseNextSectionUpdate
@@ -223,7 +233,8 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
     task_instance = None
 
     @classmethod
-    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):
+    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+        set_code_owner_attribute_from_module(__name__)
         target_datetime = (current_date - datetime.timedelta(days=day_offset))
 
         if not cls.is_enqueue_enabled(site):
@@ -244,7 +255,8 @@ class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):
                 retry=False,
             )
 
-    def run(self, site_id, target_day_str, course_key, override_recipient_email=None):
+    def run(self, site_id, target_day_str, course_key, override_recipient_email=None):  # lint-amnesty, pylint: disable=arguments-differ
+        set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
             _annotate_for_monitoring(message_types.CourseUpdate(), site, 0, target_day_str, -1)
@@ -260,12 +272,12 @@ ScheduleCourseNextSectionUpdate.task_instance = current_app.register_task(Schedu
 ScheduleCourseNextSectionUpdate = ScheduleCourseNextSectionUpdate.task_instance
 
 
-def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
+def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):  # lint-amnesty, pylint: disable=missing-function-docstring
     site = Site.objects.select_related('configuration').get(pk=site_id)
     if _is_delivery_enabled(site, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
 
-        user = User.objects.get(username=msg.recipient.username)
+        user = User.objects.get(id=msg.recipient.lms_user_id)
         with emulate_http_request(site=site, user=user):
             _annonate_send_task_for_monitoring(msg)
             LOG.debug(u'%s: Sending message = %s', log_prefix, msg_str)
@@ -273,7 +285,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):
             _track_message_sent(site, user, msg)
 
 
-def _track_message_sent(site, user, msg):
+def _track_message_sent(site, user, msg):  # lint-amnesty, pylint: disable=missing-function-docstring
     properties = {
         'site': site.domain,
         'app_label': msg.app_label,
@@ -316,7 +328,7 @@ def _is_delivery_enabled(site, delivery_config_var, log_prefix):
         LOG.info(u'%s: Message delivery disabled for site %s', log_prefix, site.domain)
 
 
-def _annotate_for_monitoring(message_type, site, bin_num=None, target_day_str=None, day_offset=None, course_key=None):
+def _annotate_for_monitoring(message_type, site, bin_num=None, target_day_str=None, day_offset=None, course_key=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     # This identifies the type of message being sent, for example: schedules.recurring_nudge3.
     set_custom_attribute('message_name', '{0}.{1}'.format(message_type.app_label, message_type.name))
     # The domain name of the site we are sending the message for.

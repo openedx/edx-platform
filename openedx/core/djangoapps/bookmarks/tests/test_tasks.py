@@ -4,7 +4,6 @@ Tests for tasks.
 
 
 import ddt
-import six
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
@@ -21,7 +20,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
     """
 
     def setUp(self):
-        super(XBlockCacheTaskTests, self).setUp()
+        super().setUp()
 
         self.course_expected_cache_data = {
             self.course.location: [
@@ -124,7 +123,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
 
         with check_mongo_calls(expected_mongo_calls):
             blocks_data = _calculate_course_xblocks_data(course.id)
-            self.assertGreater(len(blocks_data), children_per_block ** depth)
+            assert len(blocks_data) > (children_per_block ** depth)
 
     @ddt.data(
         ('course',),
@@ -140,14 +139,12 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
 
         expected_cache_data = getattr(self, course_attr + '_expected_cache_data')
         for usage_key, __ in expected_cache_data.items():
-            for path_index, path in enumerate(blocks_data[six.text_type(usage_key)]['paths']):
+            for path_index, path in enumerate(blocks_data[str(usage_key)]['paths']):
                 for path_item_index, path_item in enumerate(path):
-                    self.assertEqual(
-                        path_item['usage_key'], expected_cache_data[usage_key][path_index][path_item_index]
-                    )
+                    assert path_item['usage_key'] == expected_cache_data[usage_key][path_index][path_item_index]
 
     @ddt.data(
-        ('course', 47),
+        ('course', 36),
         ('other_course', 34)
     )
     @ddt.unpack
@@ -165,9 +162,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             xblock_cache = XBlockCache.objects.get(usage_key=usage_key)
             for path_index, path in enumerate(xblock_cache.paths):
                 for path_item_index, path_item in enumerate(path):
-                    self.assertEqual(
-                        path_item.usage_key, expected_cache_data[usage_key][path_index][path_item_index + 1]
-                    )
+                    assert path_item.usage_key == expected_cache_data[usage_key][path_index][(path_item_index + 1)]
 
         with self.assertNumQueries(3):
             _update_xblocks_cache(course.id)
@@ -199,7 +194,5 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             xblock_cache = XBlockCache.objects.get(usage_key=usage_key)
             for path_index, path in enumerate(xblock_cache.paths):
                 for path_item_index, path_item in enumerate(path):
-                    self.assertEqual(
-                        path_item.usage_key,
-                        self.course_expected_cache_data[usage_key][path_index][path_item_index + 1]
-                    )
+                    assert path_item.usage_key == \
+                           self.course_expected_cache_data[usage_key][path_index][(path_item_index + 1)]

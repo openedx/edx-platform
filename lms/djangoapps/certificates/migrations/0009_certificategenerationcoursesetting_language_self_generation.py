@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.apps import apps
 from django.db import migrations, models
 from django.db.models import F

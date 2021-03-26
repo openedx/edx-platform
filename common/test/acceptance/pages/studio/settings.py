@@ -1,4 +1,3 @@
-# coding: utf-8
 """
 Course Schedule and Details Settings page.
 """

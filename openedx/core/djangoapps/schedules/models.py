@@ -1,4 +1,4 @@
-
+# lint-amnesty, pylint: disable=missing-module-docstring
 
 from config_models.models import ConfigurationModel
 from django.contrib.sites.models import Site
@@ -15,6 +15,9 @@ class Schedule(TimeStampedModel):
     """
 
     enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE)
+    # The active field on the schedule is deprecated, please do not rely on it.
+    # You can use the is_active field on the CourseEnrollment model instead (i.e. schedule.enrollment.is_active).
+    # Removing this field from the database is a TODO for https://openedx.atlassian.net/browse/AA-574.
     active = models.BooleanField(
         default=True,
         help_text=_('Indicates if this schedule is actively used')
@@ -51,14 +54,12 @@ class ScheduleConfig(ConfigurationModel):
     KEY_FIELDS = ('site',)
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    create_schedules = models.BooleanField(default=False)
     enqueue_recurring_nudge = models.BooleanField(default=False)
     deliver_recurring_nudge = models.BooleanField(default=False)
     enqueue_upgrade_reminder = models.BooleanField(default=False)
     deliver_upgrade_reminder = models.BooleanField(default=False)
     enqueue_course_update = models.BooleanField(default=False)
     deliver_course_update = models.BooleanField(default=False)
-    hold_back_ratio = models.FloatField(default=0)
 
 
 class ScheduleExperience(models.Model):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
@@ -24,7 +23,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         """
         Set up a cohorted course
         """
-        super(CohortConfigurationTest, self).setUp()
+        super().setUp()
 
         # create course with cohorts
         self.manual_cohort_name = "ManualCohort1"

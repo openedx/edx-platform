@@ -5,14 +5,16 @@ Declaration of CourseOverview model
 
 import json
 import logging
+from urllib.parse import urlparse, urlunparse
 
-import six
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Q
-from django.db.models.fields import BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, TextField
+from django.db.models.fields import (
+    BooleanField, DateTimeField, DecimalField, FloatField, IntegerField, NullBooleanField, TextField
+)
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
@@ -20,8 +22,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
-from six import text_type  # pylint: disable=ungrouped-imports
-from six.moves.urllib.parse import urlparse, urlunparse  # pylint: disable=import-error
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.discussion import django_comment_client
@@ -31,8 +31,8 @@ from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
-from xmodule.course_module import DEFAULT_START_DATE, CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
+from xmodule.course_module import DEFAULT_START_DATE, CourseBlock
+from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
 
@@ -59,11 +59,11 @@ class CourseOverview(TimeStampedModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 11  # this one goes to eleven
+    VERSION = 12  # this one goes to thirteen
 
     # Cache entry versioning.
     version = IntegerField()
@@ -71,7 +71,7 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
-    org = TextField(max_length=255, default=u'outdated_entry')
+    org = TextField(max_length=255, default='outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -86,6 +86,8 @@ class CourseOverview(TimeStampedModel):
     announcement = DateTimeField(null=True)
 
     # URLs
+    # Not allowing null per django convention; not sure why many TextFields in this model do allow null
+    banner_image_url = TextField()
     course_image_url = TextField()
     social_sharing_url = TextField(null=True)
     end_of_course_survey_url = TextField(null=True)
@@ -124,20 +126,23 @@ class CourseOverview(TimeStampedModel):
     marketing_url = TextField(null=True)
     eligible_for_financial_aid = BooleanField(default=True)
 
+    # Course highlight info, used to guide course update emails
+    has_highlights = NullBooleanField(default=None)  # if None, you have to look up the answer yourself
+
     language = TextField(null=True)
 
     history = HistoricalRecords()
 
     @classmethod
-    def _create_or_update(cls, course):
+    def _create_or_update(cls, course):  # lint-amnesty, pylint: disable=too-many-statements
         """
-        Creates or updates a CourseOverview object from a CourseDescriptor.
+        Creates or updates a CourseOverview object from a CourseBlock.
 
         Does not touch the database, simply constructs and returns an overview
         from the given course.
 
         Arguments:
-            course (CourseDescriptor): any course descriptor object
+            course (CourseBlock): any course descriptor object
 
         Returns:
             CourseOverview: created or updated overview extracted from the given course
@@ -169,7 +174,7 @@ class CourseOverview(TimeStampedModel):
 
         course_overview = cls.objects.filter(id=course.id)
         if course_overview.exists():
-            log.info(u'Updating course overview for %s.', six.text_type(course.id))
+            log.info('Updating course overview for %s.', str(course.id))
             course_overview = course_overview.first()
             # MySQL ignores casing, but CourseKey doesn't. To prevent multiple
             # courses with different cased keys from overriding each other, we'll
@@ -177,12 +182,12 @@ class CourseOverview(TimeStampedModel):
             if course_overview.id != course.id:
                 raise CourseOverviewCaseMismatchException(course_overview.id, course.id)
         else:
-            log.info(u'Creating course overview for %s.', six.text_type(course.id))
+            log.info('Creating course overview for %s.', str(course.id))
             course_overview = cls()
 
         course_overview.version = cls.VERSION
         course_overview.id = course.id
-        course_overview._location = course.location
+        course_overview._location = course.location  # lint-amnesty, pylint: disable=protected-access
         course_overview.org = course.location.org
         course_overview.display_name = display_name
         course_overview.display_number_with_default = course.display_number_with_default
@@ -196,6 +201,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.advertised_start = course.advertised_start
         course_overview.announcement = course.announcement
 
+        course_overview.banner_image_url = course_image_url(course, 'banner_image')
         course_overview.course_image_url = course_image_url(course)
         course_overview.social_sharing_url = course.social_sharing_url
 
@@ -212,7 +218,7 @@ class CourseOverview(TimeStampedModel):
         course_overview.days_early_for_beta = course.days_early_for_beta
         course_overview.mobile_available = course.mobile_available
         course_overview.visible_to_staff_only = course.visible_to_staff_only
-        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)
+        course_overview._pre_requisite_courses_json = json.dumps(course.pre_requisite_courses)  # lint-amnesty, pylint: disable=protected-access
 
         course_overview.enrollment_start = course.enrollment_start
         course_overview.enrollment_end = course.enrollment_end
@@ -226,6 +232,8 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_video_url = CourseDetails.fetch_video_url(course.id)
         course_overview.self_paced = course.self_paced
 
+        course_overview.has_highlights = cls._get_course_has_highlights(course)
+
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language
 
@@ -234,7 +242,7 @@ class CourseOverview(TimeStampedModel):
     @classmethod
     def load_from_module_store(cls, course_id):
         """
-        Load a CourseDescriptor, create or update a CourseOverview from it, cache the
+        Load a CourseBlock, create or update a CourseOverview from it, cache the
         overview, and return it.
 
         Arguments:
@@ -256,7 +264,7 @@ class CourseOverview(TimeStampedModel):
         store = modulestore()
         with store.bulk_operations(course_id):
             course = store.get_course(course_id)
-            if isinstance(course, CourseDescriptor):
+            if isinstance(course, CourseBlock):
                 try:
                     course_overview = cls._create_or_update(course)
                     with transaction.atomic():
@@ -303,11 +311,11 @@ class CourseOverview(TimeStampedModel):
 
                 return course_overview
             elif course is not None:
-                raise IOError(
+                raise OSError(  # lint-amnesty, pylint: disable=raising-format-tuple
                     "Error while loading CourseOverview for course {} "
                     "from the module store: {}",
-                    six.text_type(course_id),
-                    course.error_msg if isinstance(course, ErrorDescriptor) else six.text_type(course)
+                    str(course_id),
+                    course.error_msg if isinstance(course, ErrorBlock) else str(course)
                 )
             else:
                 log.info(
@@ -369,8 +377,14 @@ class CourseOverview(TimeStampedModel):
         # Regenerate the thumbnail images if they're missing (either because
         # they were never generated, or because they were flushed out after
         # a change to CourseOverviewImageConfig.
-        if course_overview and not hasattr(course_overview, 'image_set'):
-            CourseOverviewImageSet.create(course_overview)
+        if course_overview:
+            if hasattr(course_overview, 'image_set'):
+                image_set = course_overview.image_set
+                if not image_set.small_url or not image_set.large_url:
+                    CourseOverviewImageSet.objects.filter(course_overview=course_overview).delete()
+                    CourseOverviewImageSet.create(course_overview)
+            else:
+                CourseOverviewImageSet.create(course_overview)
 
         return course_overview or cls.load_from_module_store(course_id)
 
@@ -403,6 +417,12 @@ class CourseOverview(TimeStampedModel):
                 except CourseOverview.DoesNotExist:
                     overviews[course_id] = None
         return overviews
+
+    @classmethod
+    def _get_course_has_highlights(cls, course):
+        # Avoid circular import here
+        from openedx.core.djangoapps.schedules.content_highlights import course_has_highlights
+        return course_has_highlights(course)
 
     def clean_id(self, padding_char='='):
         """
@@ -536,11 +556,11 @@ class CourseOverview(TimeStampedModel):
         Returns the type of the course's 'start' field.
         """
         if self.advertised_start:
-            return u'string'
+            return 'string'
         elif self.start != DEFAULT_START_DATE:
-            return u'timestamp'
+            return 'timestamp'
         else:
-            return u'empty'
+            return 'empty'
 
     @property
     def start_display(self):
@@ -583,7 +603,7 @@ class CourseOverview(TimeStampedModel):
         cause a lot of issues. These should not be mutable after
         construction, so for now we just eat this.
         """
-        pass
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     @classmethod
     def update_select_courses(cls, course_keys, force_update=False):
@@ -598,8 +618,8 @@ class CourseOverview(TimeStampedModel):
                 whether the requested CourseOverview objects should be
                 forcefully updated (i.e., re-synched with the modulestore).
         """
-        log.info(u'Generating course overview for %d courses.', len(course_keys))
-        log.debug(u'Generating course overview(s) for the following courses: %s', course_keys)
+        log.info('Generating course overview for %d courses.', len(course_keys))
+        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
 
         action = CourseOverview.load_from_module_store if force_update else CourseOverview.get_from_id
 
@@ -608,9 +628,9 @@ class CourseOverview(TimeStampedModel):
                 action(course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    u'An error occurred while generating course overview for %s: %s',
-                    six.text_type(course_key),
-                    text_type(ex),
+                    'An error occurred while generating course overview for %s: %s',
+                    str(course_key),
+                    str(ex),
                 )
 
         log.info('Finished generating course overviews.')
@@ -728,6 +748,22 @@ class CourseOverview(TimeStampedModel):
         """
         return get_closest_released_language(self.language) if self.language else None
 
+    def apply_cdn_to_url(self, image_url):
+        """
+        Applies a new CDN/base URL to the given URLs if CDN configuration is
+        enabled.
+
+        If CDN does not exist or is disabled, just returns the original. The
+        URL that we store in CourseOverviewImageSet is already top level path,
+        so we don't need to go through the /static remapping magic that happens
+        with other course assets. We just need to add the CDN server if appropriate.
+        """
+        cdn_config = AssetBaseUrlConfig.current()
+        if not cdn_config.enabled:
+            return image_url
+
+        return self._apply_cdn_to_url(image_url, cdn_config.base_url)
+
     def apply_cdn_to_urls(self, image_urls):
         """
         Given a dict of resolutions -> urls, return a copy with CDN applied.
@@ -738,14 +774,8 @@ class CourseOverview(TimeStampedModel):
         happens with other course assets. We just need to add the CDN server if
         appropriate.
         """
-        cdn_config = AssetBaseUrlConfig.current()
-        if not cdn_config.enabled:
-            return image_urls
-
-        base_url = cdn_config.base_url
-
         return {
-            resolution: self._apply_cdn_to_url(url, base_url)
+            resolution: self.apply_cdn_to_url(url)
             for resolution, url in image_urls.items()
         }
 
@@ -857,7 +887,7 @@ class CourseOverview(TimeStampedModel):
 
     def __str__(self):
         """Represent ourselves with the course key."""
-        return six.text_type(self.id)
+        return str(self.id)
 
 
 class CourseOverviewTab(models.Model):
@@ -952,8 +982,8 @@ class CourseOverviewImageSet(TimeStampedModel):
     """
     course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
                                            on_delete=models.CASCADE)
-    small_url = models.TextField(blank=True, default=u"")
-    large_url = models.TextField(blank=True, default=u"")
+    small_url = models.TextField(blank=True, default="")
+    large_url = models.TextField(blank=True, default="")
 
     @classmethod
     def create(cls, course_overview, course=None):
@@ -988,7 +1018,7 @@ class CourseOverviewImageSet(TimeStampedModel):
                 image_set.large_url = create_course_image_thumbnail(course, config.large)
             except Exception:  # pylint: disable=broad-except
                 log.exception(
-                    u"Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
                     course.id,
                     course.course_image,
                     config.small,
@@ -1017,7 +1047,7 @@ class CourseOverviewImageSet(TimeStampedModel):
             pass
 
     def __str__(self):
-        return u"CourseOverviewImageSet({}, small_url={}, large_url={})".format(
+        return "CourseOverviewImageSet({}, small_url={}, large_url={})".format(
             self.course_overview_id, self.small_url, self.large_url
         )
 
@@ -1053,7 +1083,7 @@ class CourseOverviewImageConfig(ConfigurationModel):
         return (self.large_width, self.large_height)
 
     def __str__(self):
-        return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
+        return "CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
             self.enabled, self.small, self.large
         )
 
@@ -1066,19 +1096,19 @@ class SimulateCoursePublishConfig(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = 'course_overviews'
         verbose_name = 'simulate_publish argument'
 
     arguments = models.TextField(
         blank=True,
-        help_text=u'Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
+        help_text='Useful for manually running a Jenkins job. Specify like "--delay 10 --receivers A B C \
         --courses X Y Z".',
-        default=u'',
+        default='',
     )
 
     def __str__(self):
-        return six.text_type(self.arguments)
+        return str(self.arguments)
 
 
 def _invalidate_overview_cache(**kwargs):  # pylint: disable=unused-argument

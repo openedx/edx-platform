@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Miscellaneous tests for the student app.
 """
@@ -7,35 +6,27 @@ Miscellaneous tests for the student app.
 import logging
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 from urllib.parse import quote
 
 import ddt
 import pytz
 from config_models.models import cache
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase, override_settings
 from django.test.client import Client
 from django.urls import reverse
 from markupsafe import escape
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.certificates.models import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from lms.djangoapps.verify_student.tests import TestVerificationBase
-from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.student.helpers import _cert_info, process_survey_link
 from common.djangoapps.student.models import (
+    AnonymousUserId,
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     UserAttribute,
@@ -47,6 +38,15 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from common.djangoapps.student.views import complete_course_mode_info
 from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from common.djangoapps.util.testing import EventTestMixin
+from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.verify_student.tests import TestVerificationBase
+from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
+from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
@@ -63,11 +63,11 @@ class CourseEndingTest(ModuleStoreTestCase):
         user = Mock(username=username)
         user_id = unique_id_for_user(user)
         link1 = "http://www.mysurvey.com"
-        self.assertEqual(process_survey_link(link1, user), link1)
+        assert process_survey_link(link1, user) == link1
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=user_id)
-        self.assertEqual(process_survey_link(link2, user), link2_expected)
+        link2_expected = f"http://www.mysurvey.com?unique={user_id}"
+        assert process_survey_link(link2, user) == link2_expected
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
@@ -86,56 +86,24 @@ class CourseEndingTest(ModuleStoreTestCase):
             download_url='http://s3.edx/cert'
         )
 
-        self.assertEqual(
-            _cert_info(user, course, None),
-            {
-                'status': 'processing',
-                'show_survey_button': False,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course, None) ==\
+               {'status': 'processing', 'show_survey_button': False, 'can_unenroll': True}
 
         cert_status = {'status': 'unavailable', 'mode': 'honor', 'uuid': None}
-        self.assertEqual(
-            _cert_info(user, course, cert_status),
-            {
-                'status': 'processing',
-                'show_survey_button': False,
-                'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                         'mode': 'honor', 'linked_in_url': None, 'can_unenroll': True}
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor', 'uuid': None}
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=1.0)
-            self.assertEqual(
-                _cert_info(user, course, cert_status),
-                {
-                    'status': 'generating',
-                    'show_survey_button': True,
-                    'survey_url': survey_url,
-                    'grade': '1.0',
-                    'mode': 'honor',
-                    'linked_in_url': None,
-                    'can_unenroll': False,
-                }
-            )
+            assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                             'survey_url': survey_url, 'grade': '1.0', 'mode': 'honor',
+                                                             'linked_in_url': None, 'can_unenroll': False}
 
         cert_status = {'status': 'generating', 'grade': '0.67', 'mode': 'honor', 'uuid': None}
-        self.assertEqual(
-            _cert_info(user, course, cert_status),
-            {
-                'status': 'generating',
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '0.67',
-                'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': False,
-            }
-        )
+        assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                         'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
+                                                         'linked_in_url': None, 'can_unenroll': False}
 
         cert_status = {
             'status': 'downloadable',
@@ -144,19 +112,10 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine',
         }
-        self.assertEqual(
-            _cert_info(user, course, cert_status),
-            {
-                'status': 'downloadable',
-                'download_url': cert.download_url,
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '0.67',
-                'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': False,
-            }
-        )
+        assert _cert_info(user, course, cert_status) == {'status': 'downloadable', 'download_url': cert.download_url,
+                                                         'show_survey_button': True, 'survey_url': survey_url,
+                                                         'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
+                                                         'can_unenroll': False}
 
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
@@ -164,18 +123,9 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine',
         }
-        self.assertEqual(
-            _cert_info(user, course, cert_status),
-            {
-                'status': 'notpassing',
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '0.67',
-                'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course, cert_status) == {'status': 'notpassing', 'show_survey_button': True,
+                                                         'survey_url': survey_url, 'grade': '0.67', 'mode': 'honor',
+                                                         'linked_in_url': None, 'can_unenroll': True}
 
         # Test a course that doesn't have a survey specified
         course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
@@ -183,29 +133,15 @@ class CourseEndingTest(ModuleStoreTestCase):
             'status': 'notpassing', 'grade': '0.67',
             'download_url': cert.download_url, 'mode': 'honor', 'uuid': 'fakeuuidbutitsfine'
         }
-        self.assertEqual(
-            _cert_info(user, course2, cert_status),
-            {
-                'status': 'notpassing',
-                'show_survey_button': False,
-                'grade': '0.67',
-                'mode': 'honor',
-                'linked_in_url': None,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course2, cert_status) == {'status': 'notpassing', 'show_survey_button': False,
+                                                          'grade': '0.67', 'mode': 'honor', 'linked_in_url': None,
+                                                          'can_unenroll': True}
 
         # test when the display is unavailable or notpassing, we get the correct results out
         course2.certificates_display_behavior = 'early_no_info'
         cert_status = {'status': 'unavailable', 'mode': 'honor', 'uuid': None}
-        self.assertEqual(
-            _cert_info(user, course2, cert_status),
-            {
-                'status': 'processing',
-                'show_survey_button': False,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course2, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                          'can_unenroll': True}
 
         cert_status = {
             'status': 'notpassing', 'grade': '0.67',
@@ -213,14 +149,8 @@ class CourseEndingTest(ModuleStoreTestCase):
             'mode': 'honor',
             'uuid': 'fakeuuidbutitsfine'
         }
-        self.assertEqual(
-            _cert_info(user, course2, cert_status),
-            {
-                'status': 'processing',
-                'show_survey_button': False,
-                'can_unenroll': True,
-            }
-        )
+        assert _cert_info(user, course2, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                          'can_unenroll': True}
 
     @ddt.data(
         (0.70, 0.60),
@@ -253,18 +183,10 @@ class CourseEndingTest(ModuleStoreTestCase):
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = Mock(percent=persisted_grade)
-            self.assertEqual(
-                _cert_info(user, course, cert_status),
-                {
-                    'status': 'generating',
-                    'show_survey_button': True,
-                    'survey_url': survey_url,
-                    'grade': str(expected_grade),
-                    'mode': 'honor',
-                    'linked_in_url': None,
-                    'can_unenroll': False,
-                }
-            )
+            assert _cert_info(user, course, cert_status) == {'status': 'generating', 'show_survey_button': True,
+                                                             'survey_url': survey_url, 'grade': str(expected_grade),
+                                                             'mode': 'honor', 'linked_in_url': None,
+                                                             'can_unenroll': False}
 
     def test_cert_grade_no_grades(self):
         """
@@ -282,14 +204,8 @@ class CourseEndingTest(ModuleStoreTestCase):
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as patch_persisted_grade:
             patch_persisted_grade.return_value = None
-            self.assertEqual(
-                _cert_info(user, course, cert_status),
-                {
-                    'status': 'processing',
-                    'show_survey_button': False,
-                    'can_unenroll': True,
-                }
-            )
+            assert _cert_info(user, course, cert_status) == {'status': 'processing', 'show_survey_button': False,
+                                                             'can_unenroll': True}
 
 
 @ddt.ddt
@@ -300,7 +216,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super(DashboardTest, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         self.client = Client()
@@ -323,7 +239,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         if mode in ['professional', 'no-id-professional']:
             self.assertContains(response, 'class="course professional"')
         else:
-            self.assertContains(response, 'class="course {0}"'.format(mode))
+            self.assertContains(response, f'class="course {mode}"')
         self.assertContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': True})
@@ -358,9 +274,9 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
         if mode == 'audit':
             # Audit mode does not have a banner.  Assert no banner element.
-            self.assertEqual(pq(response.content)(".sts-enrollment").length, 0)
+            assert pq(response.content)('.sts-enrollment').length == 0
         else:
-            self.assertNotContains(response, "class=\"course {0}\"".format(mode))
+            self.assertNotContains(response, f"class=\"course {mode}\"")
             self.assertNotContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
@@ -383,14 +299,14 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
-        self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEqual(course_mode_info['days_for_upsell'], 1)
+        assert course_mode_info['show_upsell']
+        assert course_mode_info['days_for_upsell'] == 1
 
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
         verified_mode.save()
         course_mode_info = complete_course_mode_info(self.course.id, enrollment)
-        self.assertFalse(course_mode_info['show_upsell'])
-        self.assertIsNone(course_mode_info['days_for_upsell'])
+        assert not course_mode_info['show_upsell']
+        assert course_mode_info['days_for_upsell'] is None
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
@@ -408,7 +324,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
         self.course.start = datetime.now(pytz.UTC) - timedelta(days=2)
         self.course.end = datetime.now(pytz.UTC) - timedelta(days=1)
-        self.course.display_name = u"Omega"
+        self.course.display_name = "Omega"
         self.course = self.update_course(self.course, self.user.id)
 
         download_url = 'www.edx.org'
@@ -422,7 +338,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertNotContains(response, 'Add Certificate to LinkedIn')
 
         response_url = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'
@@ -459,7 +375,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         )
         response = self.client.get(reverse('dashboard'))
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'Add Certificate to LinkedIn')
 
         # We can switch to this and the commented out assertContains once edx-platform reaches Python 3.8
@@ -501,10 +417,10 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
 
         Note to future developers:
             If you break this test so that the "check_mongo_calls(0)" fails,
-            please do NOT change it to "check_mongo_calls(n>1)". Instead, change
+            please do NOT change it to "check_mongo_calls(n>=1)". Instead, change
             your code to not load courses from the module store. This may
             involve adding fields to CourseOverview so that loading a full
-            CourseDescriptor isn't necessary.
+            CourseBlock isn't necessary.
         """
         # Create a course and log in the user.
         # Creating a new course will trigger a publish event and the course will be cached
@@ -518,9 +434,9 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         # CourseOverview object that has been created.
         with check_mongo_calls(0):
             response_1 = self.client.get(reverse('dashboard'))
-            self.assertEqual(response_1.status_code, 200)
+            assert response_1.status_code == 200
             response_2 = self.client.get(reverse('dashboard'))
-            self.assertEqual(response_2.status_code, 200)
+            assert response_2.status_code == 200
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_dashboard_header_nav_has_find_courses(self):
@@ -537,8 +453,8 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
     def test_course_mode_info_with_honor_enrollment(self):
         """It will be true only if enrollment mode is honor and course has verified mode."""
         course_mode_info = self._enrollment_with_complete_course('honor')
-        self.assertTrue(course_mode_info['show_upsell'])
-        self.assertEqual(course_mode_info['days_for_upsell'], 1)
+        assert course_mode_info['show_upsell']
+        assert course_mode_info['days_for_upsell'] == 1
 
     @ddt.data('verified', 'credit')
     def test_course_mode_info_with_different_enrollments(self, enrollment_mode):
@@ -546,8 +462,8 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         will be always false.
         """
         course_mode_info = self._enrollment_with_complete_course(enrollment_mode)
-        self.assertFalse(course_mode_info['show_upsell'])
-        self.assertIsNone(course_mode_info['days_for_upsell'])
+        assert not course_mode_info['show_upsell']
+        assert course_mode_info['days_for_upsell'] is None
 
     def _enrollment_with_complete_course(self, enrollment_mode):
         """"Dry method for course enrollment."""
@@ -568,7 +484,7 @@ class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(DashboardTestsWithSiteOverrides, self).setUp()
+        super().setUp()
         self.org = 'fakeX'
         self.course = CourseFactory.create(org=self.org)
         self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
@@ -623,8 +539,8 @@ class UserSettingsEventTestMixin(EventTestMixin):
     """
     Mixin for verifying that user setting events were emitted during a test.
     """
-    def setUp(self):
-        super(UserSettingsEventTestMixin, self).setUp('common.djangoapps.util.model_utils.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super().setUp('common.djangoapps.util.model_utils.tracker')
 
     def assert_user_setting_event_emitted(self, **kwargs):
         """
@@ -645,13 +561,13 @@ class UserSettingsEventTestMixin(EventTestMixin):
         """
         Helper method to assert that the user is enrolled in the given course.
         """
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, CourseKey.from_string(course_key)))
+        assert CourseEnrollment.is_enrolled(self.user, CourseKey.from_string(course_key))
 
 
 class EnrollmentEventTestMixin(EventTestMixin):
     """ Mixin with assertions for validating enrollment events. """
-    def setUp(self):
-        super(EnrollmentEventTestMixin, self).setUp('common.djangoapps.student.models.tracker')
+    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+        super().setUp('common.djangoapps.student.models.tracker')
 
     def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
         """Ensures an enrollment mode change event was emitted"""
@@ -700,29 +616,29 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         course_id_partial = CourseKey.from_string("edX/Test101/")
 
         # Test basic enrollment
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
+        assert not CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
         CourseEnrollment.enroll(user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
+        assert CourseEnrollment.is_enrolled(user, course_id)
+        assert CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Enrolling them again should be harmless
         CourseEnrollment.enroll(user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
+        assert CourseEnrollment.is_enrolled(user, course_id)
+        assert CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
         self.assert_no_events_were_emitted()
 
         # Now unenroll the user
         CourseEnrollment.unenroll(user, course_id)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
+        assert not CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
         self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Unenrolling them again should also be harmless
         CourseEnrollment.unenroll(user, course_id)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user, course_id_partial))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
+        assert not CourseEnrollment.is_enrolled_by_partial(user, course_id_partial)
         self.assert_no_events_were_emitted()
 
         # The enrollment record should still exist, just be inactive
@@ -730,22 +646,22 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
             user=user,
             course_id=course_id
         )
-        self.assertFalse(enrollment_record.is_active)
+        assert not enrollment_record.is_active
 
         # Make sure mode is updated properly if user unenrolls & re-enrolls
         enrollment = CourseEnrollment.enroll(user, course_id, "verified")
-        self.assertEqual(enrollment.mode, "verified")
+        assert enrollment.mode == 'verified'
         CourseEnrollment.unenroll(user, course_id)
         enrollment = CourseEnrollment.enroll(user, course_id, "audit")
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
-        self.assertEqual(enrollment.mode, "audit")
+        assert CourseEnrollment.is_enrolled(user, course_id)
+        assert enrollment.mode == 'audit'
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)
         user = User(username="rusty", email="rusty@fake.edx.org")
         course_id = CourseLocator("edX", "Test101", "2013")
 
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
 
         # Unenroll does nothing
         CourseEnrollment.unenroll(user, course_id)
@@ -754,7 +670,7 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         # Implicit save() happens on new User object when enrolling, so this
         # should still work
         CourseEnrollment.enroll(user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_enrollment_event_was_emitted(user, course_id)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -763,13 +679,11 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         course_id = CourseLocator("edX", "Test101", "2013")
 
         CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # This won't throw an exception, even though the user is not found
-        self.assertIsNone(
-            CourseEnrollment.enroll_by_email("not_jack@fake.edx.org", course_id)
-        )
+        assert CourseEnrollment.enroll_by_email('not_jack@fake.edx.org', course_id) is None
         self.assert_no_events_were_emitted()
 
         self.assertRaises(
@@ -783,12 +697,12 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
 
         # Now unenroll them by email
         CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Harmless second unenroll
         CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
         # Unenroll on non-existent user shouldn't throw an error
@@ -805,55 +719,55 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
         self.assert_enrollment_event_was_emitted(user, course_id1)
         CourseEnrollment.enroll(user, course_id2)
         self.assert_enrollment_event_was_emitted(user, course_id2)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id1))
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+        assert CourseEnrollment.is_enrolled(user, course_id1)
+        assert CourseEnrollment.is_enrolled(user, course_id2)
 
         CourseEnrollment.unenroll(user, course_id1)
         self.assert_unenrollment_event_was_emitted(user, course_id1)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+        assert not CourseEnrollment.is_enrolled(user, course_id1)
+        assert CourseEnrollment.is_enrolled(user, course_id2)
 
         CourseEnrollment.unenroll(user, course_id2)
         self.assert_unenrollment_event_was_emitted(user, course_id2)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
+        assert not CourseEnrollment.is_enrolled(user, course_id1)
+        assert not CourseEnrollment.is_enrolled(user, course_id2)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
         course_id = CourseLocator("edX", "Test101", "2013")
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
 
         # Creating an enrollment doesn't actually enroll a student
         # (calling CourseEnrollment.enroll() would have)
         enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
         # Until you explicitly activate it
         enrollment.activate()
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_enrollment_event_was_emitted(user, course_id)
 
         # Activating something that's already active does nothing
         enrollment.activate()
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
         # Now deactive
         enrollment.deactivate()
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_unenrollment_event_was_emitted(user, course_id)
 
         # Deactivating something that's already inactive does nothing
         enrollment.deactivate()
-        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        assert not CourseEnrollment.is_enrolled(user, course_id)
         self.assert_no_events_were_emitted()
 
         # A deactivated enrollment should be activated if enroll() is called
         # for that user/course_id combination
         CourseEnrollment.enroll(user, course_id)
-        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        assert CourseEnrollment.is_enrolled(user, course_id)
         self.assert_enrollment_event_was_emitted(user, course_id)
 
     def test_change_enrollment_modes(self):
@@ -879,7 +793,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
 
     def setUp(self):
-        super(ChangeEnrollmentViewTest, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(password='secret')
         self.client.login(username=self.user.username, password='secret')
@@ -898,12 +812,12 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     def test_enroll_as_default(self):
         """Tests that a student can successfully enroll through this view"""
         response = self._enroll_through_view(self.course)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
         )
-        self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
+        assert is_active
+        assert enrollment_mode == CourseMode.DEFAULT_MODE_SLUG
 
     def test_cannot_enroll_if_already_enrolled(self):
         """
@@ -911,49 +825,49 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         they are already enrolled in the course
         """
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         # now try to enroll that student
         response = self._enroll_through_view(self.course)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_change_to_default_if_verified(self):
         """
         Tests that a student that is a currently enrolled verified student cannot
         accidentally change their enrollment mode
         """
-        CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         # now try to enroll the student in the default mode:
         response = self._enroll_through_view(self.course)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
         )
-        self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'verified')
+        assert is_active
+        assert enrollment_mode == 'verified'
 
     def test_change_to_default_if_verified_not_active(self):
         """
         Tests that one can renroll for a course if one has already unenrolled
         """
         # enroll student
-        CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
+        CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
         # now unenroll student:
         CourseEnrollment.unenroll(self.user, self.course.id)
         # check that they are verified but inactive
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
         )
-        self.assertFalse(is_active)
-        self.assertEqual(enrollment_mode, u'verified')
+        assert not is_active
+        assert enrollment_mode == 'verified'
         # now enroll them through the view:
         response = self._enroll_through_view(self.course)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
         )
-        self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
+        assert is_active
+        assert enrollment_mode == CourseMode.DEFAULT_MODE_SLUG
 
 
 class AnonymousLookupTable(ModuleStoreTestCase):
@@ -961,7 +875,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
     Tests for anonymous_id_functions
     """
     def setUp(self):
-        super(AnonymousLookupTable, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         CourseModeFactory.create(
@@ -969,40 +883,68 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             mode_slug='honor',
             mode_display_name='Honor Code',
         )
+        self.user2 = UserFactory.create()
         patcher = patch('common.djangoapps.student.models.tracker')
         patcher.start()
         self.addCleanup(patcher.stop)
 
+    def test_same_user_over_multiple_sessions(self):
+        """
+        Anonymous ids are stored in AnonymousUserId model.
+        This tests to make sure stored value is used rather than a creating a new one
+        """
+        anonymous_id_1 = anonymous_id_for_user(self.user, None)
+        delattr(self.user, "_anonymous_id")  # pylint: disable=literal-used-as-attribute
+        anonymous_id_2 = anonymous_id_for_user(self.user, None)
+        assert anonymous_id_1 == anonymous_id_2
+
+    def test_diff_anonymous_id_for_diff_users(self):
+        anonymous_id_1 = anonymous_id_for_user(self.user, None)
+        anonymous_id_2 = anonymous_id_for_user(self.user2, None)
+        assert anonymous_id_1 != anonymous_id_2
+
     def test_for_unregistered_user(self):  # same path as for logged out user
-        self.assertEqual(None, anonymous_id_for_user(AnonymousUser(), self.course.id))
-        self.assertIsNone(user_by_anonymous_id(None))
+        assert anonymous_id_for_user(AnonymousUser(), self.course.id) is None
+        assert user_by_anonymous_id(None) is None
 
     def test_roundtrip_for_logged_user(self):
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
-        self.assertEqual(self.user, real_user)
-        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
+        assert self.user == real_user
+        assert anonymous_id == anonymous_id_for_user(self.user, self.course.id)
 
     def test_roundtrip_with_unicode_course_id(self):
-        course2 = CourseFactory.create(display_name=u"Omega Course Ω")
+        course2 = CourseFactory.create(display_name="Omega Course Ω")
         CourseEnrollment.enroll(self.user, course2.id)
         anonymous_id = anonymous_id_for_user(self.user, course2.id)
         real_user = user_by_anonymous_id(anonymous_id)
-        self.assertEqual(self.user, real_user)
-        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
+        assert self.user == real_user
+        assert anonymous_id == anonymous_id_for_user(self.user, course2.id)
 
-    def test_secret_key_changes(self):
-        """Test that a new anonymous id is returned when the secret key changes."""
+    def test_anonymous_id_secret_key_changes_do_not_change_existing_anonymous_ids(self):
+        """Test that a same anonymous id is returned when the SECRET_KEY changes."""
         CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
             # Recreate user object to clear cached anonymous id.
             self.user = User.objects.get(pk=self.user.id)
             new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-            self.assertNotEqual(anonymous_id, new_anonymous_id)
-            self.assertEqual(self.user, user_by_anonymous_id(anonymous_id))
-            self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
+            assert anonymous_id == new_anonymous_id
+            assert self.user == user_by_anonymous_id(anonymous_id)
+            assert self.user == user_by_anonymous_id(new_anonymous_id)
+
+    def test_anonymous_id_secret_key_changes_result_in_diff_values_for_same_new_user(self):
+        """Test that a different anonymous id is returned when the SECRET_KEY changes."""
+        CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
+            # Recreate user object to clear cached anonymous id.
+            self.user = User.objects.get(pk=self.user.id)
+            AnonymousUserId.objects.filter(user=self.user).filter(course_id=self.course.id).delete()
+            new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            assert anonymous_id != new_anonymous_id
+            assert self.user == user_by_anonymous_id(new_anonymous_id)
 
 
 @skip_unless_lms
@@ -1015,14 +957,14 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(RelatedProgramsTests, cls).setUpClass()
+        super().setUpClass()
 
         cls.user = UserFactory()
         cls.course = CourseFactory()
         cls.enrollment = CourseEnrollmentFactory(user=cls.user, course_id=cls.course.id)  # pylint: disable=no-member
 
     def setUp(self):
-        super(RelatedProgramsTests, self).setUp()
+        super().setUp()
 
         self.url = reverse('dashboard')
 
@@ -1044,7 +986,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def expected_link_text(self, program):
         """Construct expected dashboard link text."""
-        return u'{title} {type}'.format(title=program['title'], type=program['type'])
+        return '{title} {type}'.format(title=program['title'], type=program['type'])
 
     def test_related_programs_listed(self, mock_get_programs):
         """Verify that related programs are listed when available."""
@@ -1076,7 +1018,7 @@ class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
     def test_program_title_unicode(self, mock_get_programs):
         """Verify that the dashboard can deal with programs whose titles contain Unicode."""
-        self.programs[0]['title'] = u'Bases matemáticas para estudiar ingeniería'
+        self.programs[0]['title'] = 'Bases matemáticas para estudiar ingeniería'
         mock_get_programs.return_value = self.programs
 
         response = self.client.get(self.url)
@@ -1087,20 +1029,20 @@ class UserAttributeTests(TestCase):
     """Tests for the UserAttribute model."""
 
     def setUp(self):
-        super(UserAttributeTests, self).setUp()
+        super().setUp()
         self.user = UserFactory()
         self.name = 'test'
         self.value = 'test-value'
 
     def test_get_set_attribute(self):
-        self.assertIsNone(UserAttribute.get_user_attribute(self.user, self.name))
+        assert UserAttribute.get_user_attribute(self.user, self.name) is None
         UserAttribute.set_user_attribute(self.user, self.name, self.value)
-        self.assertEqual(UserAttribute.get_user_attribute(self.user, self.name), self.value)
+        assert UserAttribute.get_user_attribute(self.user, self.name) == self.value
         new_value = 'new_value'
         UserAttribute.set_user_attribute(self.user, self.name, new_value)
-        self.assertEqual(UserAttribute.get_user_attribute(self.user, self.name), new_value)
+        assert UserAttribute.get_user_attribute(self.user, self.name) == new_value
 
     def test_unicode(self):
         UserAttribute.set_user_attribute(self.user, self.name, self.value)
         for field in (self.name, self.value, self.user.username):
-            self.assertIn(field, str(UserAttribute.objects.get(user=self.user)))
+            assert field in str(UserAttribute.objects.get(user=self.user))

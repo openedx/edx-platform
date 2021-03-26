@@ -23,7 +23,7 @@ from common.djangoapps.student.models import (
     email_exists_or_retired,
     username_exists_or_retired
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
@@ -161,11 +161,11 @@ def update_account_settings(requesting_user, update, username=None):
         _update_state_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
-        raise AccountValidationError(err.preference_errors)
+        raise AccountValidationError(err.preference_errors)  # lint-amnesty, pylint: disable=raise-missing-from
     except (AccountUpdateError, AccountValidationError) as err:
         raise err
     except Exception as err:
-        raise AccountUpdateError(
+        raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
             u"Error thrown when saving account updates: '{}'".format(text_type(err))
         )
 
@@ -270,12 +270,15 @@ def _update_preferences_if_needed(data, requesting_user, user):
 def _notify_language_proficiencies_update_if_needed(data, user, user_profile, old_language_proficiencies):
     if "language_proficiencies" in data:
         new_language_proficiencies = data["language_proficiencies"]
-        emit_setting_changed_event(
+        emit_settings_changed_event(
             user=user,
             db_table=user_profile.language_proficiencies.model._meta.db_table,
-            setting_name="language_proficiencies",
-            old_value=old_language_proficiencies,
-            new_value=new_language_proficiencies,
+            changed_fields={
+                "language_proficiencies": (
+                    old_language_proficiencies,
+                    new_language_proficiencies,
+                )
+            }
         )
 
 
@@ -320,7 +323,7 @@ def _send_email_change_requests_if_needed(data, user):
         try:
             student_views.do_email_change_request(user, new_email)
         except ValueError as err:
-            raise AccountUpdateError(
+            raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
@@ -334,7 +337,7 @@ def _send_email_change_requests_if_needed(data, user):
                 secondary_email_change_request=True,
             )
         except ValueError as err:
-            raise AccountUpdateError(
+            raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
@@ -456,7 +459,7 @@ def _get_user_and_profile(username):
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        raise errors.UserNotFound()
+        raise errors.UserNotFound()  # lint-amnesty, pylint: disable=raise-missing-from
 
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
@@ -586,7 +589,7 @@ def _validate_country(country):
     :return: None
 
     """
-    if country == '' or country == '--':
+    if country == '' or country == '--':  # lint-amnesty, pylint: disable=consider-using-in
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
 
@@ -598,7 +601,7 @@ def _validate_username_doesnt_exist(username):
     :raises: errors.AccountUsernameAlreadyExists
     """
     if username is not None and username_exists_or_retired(username):
-        raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))
+        raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def _validate_email_doesnt_exist(email):
@@ -609,7 +612,7 @@ def _validate_email_doesnt_exist(email):
     :raises: errors.AccountEmailAlreadyExists
     """
     if email is not None and email_exists_or_retired(email):
-        raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
+        raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def _validate_secondary_email_doesnt_exist(email):
@@ -643,10 +646,10 @@ def _validate_password_works_with_username(password, username=None):
     :raises: errors.AccountPasswordInvalid
     """
     if password == username:
-        raise errors.AccountPasswordInvalid(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)
+        raise errors.AccountPasswordInvalid(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)  # lint-amnesty, pylint: disable=no-member
 
 
-def _validate_type(data, type, err):
+def _validate_type(data, type, err):  # lint-amnesty, pylint: disable=redefined-builtin
     """Checks whether the input data is of type. If not,
     throws a generic error message.
 
@@ -661,7 +664,7 @@ def _validate_type(data, type, err):
         raise errors.AccountDataBadType(err)
 
 
-def _validate_length(data, min, max, err):
+def _validate_length(data, min, max, err):  # lint-amnesty, pylint: disable=redefined-builtin
     """Validate that the data's length is less than or equal to max,
     and greater than or equal to min.
 
@@ -692,4 +695,4 @@ def _validate_unicode(data, err=u"Input not valid unicode"):
         # In some cases we pass the above, but it's still inappropriate utf-8.
         six.text_type(data)
     except UnicodeError:
-        raise UnicodeError(err)
+        raise UnicodeError(err)  # lint-amnesty, pylint: disable=raise-missing-from

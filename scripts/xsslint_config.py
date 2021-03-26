@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=django-not-configured, missing-module-docstring
 # xsslint config module for edx-platform
 
 

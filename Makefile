@@ -67,7 +67,9 @@ pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
 
 requirements: pre-requirements ## install development environment requirements
-	pip-sync -q requirements/edx/development.txt requirements/edx/private.*
+	# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
+	# of it if it does not.  Shell wildcarding can't do that with default options.
+	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
 	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
@@ -130,4 +132,3 @@ docker_push: docker_tag docker_auth ## push to docker hub
 	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
 	docker push 'openedx/edx-platform:latest-devstack'
 	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
-

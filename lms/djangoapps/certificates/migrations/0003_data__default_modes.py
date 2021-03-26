@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 from django.core.files import File
 from django.db import migrations, models
@@ -19,9 +16,9 @@ def forwards(apps, schema_editor):
     if not objects.exists():
         for mode in ['honor', 'verified', 'professional']:
             conf = objects.create(mode=mode)
-            file_name = '{0}{1}'.format(mode, '.png')
+            file_name = '{}{}'.format(mode, '.png')
             conf.icon.save(
-                'badges/{}'.format(file_name),
+                f'badges/{file_name}',
                 File(open(settings.PROJECT_ROOT / 'static' / 'images' / 'default-badges' / file_name, 'rb'))
             )
 

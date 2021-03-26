@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 Student Views
 """
 
@@ -8,39 +8,37 @@ import logging
 import uuid
 from collections import namedtuple
 
-import six
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save
-from django.dispatch import Signal, receiver
+from django.dispatch import Signal, receiver  # lint-amnesty, pylint: disable=unused-import
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie  # lint-amnesty, pylint: disable=unused-import
+from django.views.decorators.http import require_GET, require_http_methods, require_POST  # lint-amnesty, pylint: disable=unused-import
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_django_utils import monitoring as monitoring_utils
 from eventtracking import tracker
-from ipware.ip import get_ip
+from ipware.ip import get_client_ip
 # Note that this lives in LMS, so this dependency should be refactored.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from six import text_type
 
 from common.djangoapps.track import views as track_views
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
-from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response, render_to_string  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.catalog.utils import get_programs_with_type
@@ -50,13 +48,15 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangolib.markup import HTML, Text
-from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info, generate_activation_email_context
-from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate
-from common.djangoapps.student.models import (
+from common.djangoapps.student.email_helpers import generate_activation_email_context
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
+from common.djangoapps.student.message_types import AccountActivation, EmailChange, EmailChangeConfirmation, RecoveryEmailCreate  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
-    PendingEmailChange,
+    PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -92,6 +92,7 @@ REGISTRATION_UTM_PARAMETERS = {
     'utm_content': 'registration_utm_content',
 }
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
+USER_ACCOUNT_ACTIVATED = 'edx.user.account.activated'
 
 
 def csrf_token(context):
@@ -101,7 +102,7 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (HTML(u'<div style="display:none"><input type="hidden"'
+    return (HTML('<div style="display:none"><input type="hidden"'
                  ' name="csrfmiddlewaretoken" value="{}" /></div>').format(Text(token)))
 
 
@@ -188,7 +189,7 @@ def compose_activation_email(root_url, user, user_registration=None, route_enabl
         dest_addr = user.email
 
     msg = AccountActivation().personalize(
-        recipient=Recipient(user.username, dest_addr),
+        recipient=Recipient(user.id, dest_addr),
         language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
         user_context=message_context,
     )
@@ -238,7 +239,7 @@ def course_run_refund_status(request, course_id):
         return JsonResponse({'course_refundable_status': ''}, status=406)
 
     refundable_status = course_enrollment.refundable()
-    logging.info("Course refund status for course {0} is {1}".format(course_id, refundable_status))
+    logging.info(f"Course refund status for course {course_id} is {refundable_status}")
 
     return JsonResponse({'course_refundable_status': refundable_status}, status=200)
 
@@ -305,7 +306,7 @@ def change_enrollment(request, check_access=True):
         course_id = CourseKey.from_string(request.POST.get("course_id"))
     except InvalidKeyError:
         log.warning(
-            u"User %s tried to %s with invalid course id: %s",
+            "User %s tried to %s with invalid course id: %s",
             user.username,
             action,
             request.POST.get("course_id"),
@@ -314,14 +315,14 @@ def change_enrollment(request, check_access=True):
 
     # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
     # on a per-course basis.
-    monitoring_utils.set_custom_attribute('course_id', text_type(course_id))
+    monitoring_utils.set_custom_attribute('course_id', str(course_id))
 
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         if not modulestore().has_course(course_id):
             log.warning(
-                u"User %s tried to enroll in non-existent course %s",
+                "User %s tried to enroll in non-existent course %s",
                 user.username,
                 course_id
             )
@@ -338,14 +339,14 @@ def change_enrollment(request, check_access=True):
         # or if the user is enrolling in a country in which the course
         # is not available.
         redirect_url = embargo_api.redirect_if_blocked(
-            course_id, user=user, ip_address=get_ip(request),
+            course_id, user=user, ip_address=get_client_ip(request)[0],
             url=request.path
         )
         if redirect_url:
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[six.text_type(course_id)]))
+            return HttpResponse(reverse('courseware', args=[str(course_id)]))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -369,7 +370,7 @@ def change_enrollment(request, check_access=True):
         # funnels users directly into the verification / payment flow)
         if CourseMode.has_verified_mode(available_modes) or CourseMode.has_professional_mode(available_modes):
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': text_type(course_id)})
+                reverse("course_modes_choose", kwargs={'course_id': str(course_id)})
             )
 
         # Otherwise, there is only one mode available (the default)
@@ -451,11 +452,11 @@ def disable_account_ajax(request):
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
             context['message'] = _("Successfully disabled {}'s account").format(username)
-            log.info(u"%s disabled %s's account", request.user, username)
+            log.info("%s disabled %s's account", request.user, username)
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
             context['message'] = _("Successfully reenabled {}'s account").format(username)
-            log.info(u"%s reenabled %s's account", request.user, username)
+            log.info("%s reenabled %s's account", request.user, username)
         else:
             context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
@@ -476,7 +477,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
         if site:
             user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
             user_signup_source.save()
-            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+            log.info('user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
 @ensure_csrf_cookie
@@ -485,16 +486,18 @@ def activate_account(request, key):
     When link in activation e-mail is clicked
     """
     # If request is in Studio call the appropriate view
-    if theming_helpers.get_project_root_name().lower() == u'cms':
+    if theming_helpers.get_project_root_name().lower() == 'cms':
         monitoring_utils.set_custom_attribute('student_activate_account', 'cms')
         return activate_account_studio(request, key)
 
     # TODO: Use custom attribute to determine if there are any `activate_account` calls for cms in Production.
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
     monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
+    activation_message_type = None
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
+        activation_message_type = 'error'
         messages.error(
             request,
             HTML(_(
@@ -511,6 +514,7 @@ def activate_account(request, key):
         )
     else:
         if registration.user.is_active:
+            activation_message_type = 'info'
             messages.info(
                 request,
                 HTML(_('{html_start}This account has already been activated.{html_end}')).format(
@@ -524,6 +528,14 @@ def activate_account(request, key):
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
 
+            tracker.emit(
+                USER_ACCOUNT_ACTIVATED,
+                {
+                    "user_id": registration.user.id,
+                    "activation_timestamp": registration.activation_timestamp
+                }
+            )
+
             if not request.user.is_authenticated:
                 # Success message for logged out users
                 message = _(
@@ -533,6 +545,7 @@ def activate_account(request, key):
                 )
 
             # Add message for later use.
+            activation_message_type = 'success'
             messages.success(
                 request,
                 HTML(message).format(
@@ -541,6 +554,10 @@ def activate_account(request, key):
                 ),
                 extra_tags='account-activation aa-icon',
             )
+
+    if should_redirect_to_authn_microfrontend() and not request.user.is_authenticated:
+        url_path = f'/login?account_activation_status={activation_message_type}'
+        return redirect(settings.AUTHN_MICROFRONTEND_URL + url_path)
 
     return redirect('dashboard')
 
@@ -581,7 +598,7 @@ def validate_new_email(user, new_email):
     try:
         validate_email(new_email)
     except ValidationError:
-        raise ValueError(_('Valid e-mail address required.'))
+        raise ValueError(_('Valid e-mail address required.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
@@ -658,13 +675,13 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
     if secondary_email_change_request:
         msg = RecoveryEmailCreate().personalize(
-            recipient=Recipient(user.username, new_email),
+            recipient=Recipient(user.id, new_email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
     else:
         msg = EmailChange().personalize(
-            recipient=Recipient(user.username, new_email),
+            recipient=Recipient(user.id, new_email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
@@ -673,8 +690,8 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         ace.send(msg)
     except Exception:
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-        log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
-        raise ValueError(_('Unable to send email activation link. Please try again later.'))
+        log.error('Unable to send email activation link to user from "%s"', from_address, exc_info=True)
+        raise ValueError(_('Unable to send email activation link. Please try again later.'))  # lint-amnesty, pylint: disable=raise-missing-from
 
     if not secondary_email_change_request:
         # When the email address change is complete, a "edx.user.settings.changed" event will be emitted.
@@ -764,7 +781,7 @@ def confirm_email_change(request, key):
         })
 
         msg = EmailChangeConfirmation().personalize(
-            recipient=Recipient(user.username, user.email),
+            recipient=Recipient(user.id, user.email),
             language=preferences_api.get_user_preference(user, LANGUAGE_KEY),
             user_context=message_context,
         )
@@ -789,7 +806,7 @@ def confirm_email_change(request, key):
         user.save()
         pec.delete()
         # And send it to the new email...
-        msg.recipient = Recipient(user.username, pec.new_email)
+        msg.recipient = Recipient(user.id, pec.new_email)
         try:
             ace.send(msg)
         except Exception:  # pylint: disable=broad-except
@@ -819,7 +836,7 @@ def change_email_settings(request):
         if optout_object:
             optout_object.delete()
         log.info(
-            u"User %s (%s) opted in to receive emails from course %s",
+            "User %s (%s) opted in to receive emails from course %s",
             user.username,
             user.email,
             course_id,
@@ -833,7 +850,7 @@ def change_email_settings(request):
     else:
         Optout.objects.get_or_create(user=user, course_id=course_key)
         log.info(
-            u"User %s (%s) opted out of receiving emails from course %s",
+            "User %s (%s) opted out of receiving emails from course %s",
             user.username,
             user.email,
             course_id,

@@ -3,7 +3,7 @@ Django ORM model specifications for the User API application
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
@@ -29,7 +29,10 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import (
+    emit_settings_changed_event,
+    get_changed_fields_dict,
+)
 
 
 class RetirementStateError(Exception):
@@ -58,7 +61,7 @@ class UserPreference(models.Model):
 
         Returns: Set of (preference type, value) pairs for each of the user's preferences
         """
-        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
+        return dict([(pref.key, pref.value) for pref in user.preferences.all()])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
     @classmethod
     def get_value(cls, user, preference_key, default=None):
@@ -118,9 +121,14 @@ def post_save_callback(sender, **kwargs):
     """
 
     user_preference = kwargs["instance"]
-    emit_setting_changed_event(
-        user_preference.user, sender._meta.db_table, user_preference.key,
-        user_preference._old_value, user_preference.value  # pylint: disable=protected-access
+    emit_settings_changed_event(
+        user_preference.user, sender._meta.db_table,
+        {
+            user_preference.key: (
+                user_preference._old_value,  # pylint: disable=protected-access
+                user_preference.value
+            )
+        }
     )
     user_preference._old_value = None  # pylint: disable=protected-access
 
@@ -131,8 +139,10 @@ def post_delete_callback(sender, **kwargs):
     Event changes to user preferences.
     """
     user_preference = kwargs["instance"]
-    emit_setting_changed_event(
-        user_preference.user, sender._meta.db_table, user_preference.key, user_preference.value, None
+    emit_settings_changed_event(
+        user_preference.user, sender._meta.db_table, {
+            user_preference.key: (user_preference.value, None)
+        }
     )
 
 
@@ -308,7 +318,7 @@ class UserRetirementStatus(TimeStampedModel):
             err = u'{} does not exist or is an eariler state than current state {}'.format(
                 new_state, self.current_state
             )
-            raise RetirementStateError(err)
+            raise RetirementStateError(err)  # lint-amnesty, pylint: disable=raise-missing-from
 
     def _validate_update_data(self, data):
         """
@@ -337,7 +347,7 @@ class UserRetirementStatus(TimeStampedModel):
         try:
             pending = RetirementState.objects.all().order_by('state_execution_order')[0]
         except IndexError:
-            raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')
+            raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')  # lint-amnesty, pylint: disable=raise-missing-from
 
         if cls.objects.filter(user=user).exists():
             raise RetirementStateError(u'User {} already has a retirement status row!'.format(user))

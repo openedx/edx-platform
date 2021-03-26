@@ -3,6 +3,7 @@
 
 import unittest
 from datetime import datetime, timedelta
+from unittest.mock import patch
 
 import ddt
 import six
@@ -10,12 +11,9 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-
-from mock import patch
 from pytz import UTC
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from common.djangoapps.student.helpers import (
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
@@ -26,6 +24,7 @@ from common.djangoapps.student.helpers import (
 )
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -48,12 +47,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def setUp(self):
         # Invoke UrlResetMixin
-        super(TestCourseVerificationStatus, self).setUp()
+        super().setUp()
 
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
         success = self.client.login(username=self.user.username, password="edx")
-        self.assertTrue(success, msg="Did not log in successfully")
+        assert success, 'Did not log in successfully'
         self.dashboard_url = reverse('dashboard')
 
     def test_enrolled_as_non_verified(self):
@@ -379,7 +378,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
-        self.assertContains(response, six.text_type(self.course.id))
+        self.assertContains(response, str(self.course.id))
 
         # Verify that the correct banner is rendered on the dashboard
         alt_text = self.BANNER_ALT_MESSAGES.get(status)
@@ -407,7 +406,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
                 fail_msg = "Could not find any of these messages: {expected}".format(
                     expected=self.NOTIFICATION_MESSAGES[status]
                 )
-                self.assertTrue(found_msg, msg=fail_msg)
+                assert found_msg, fail_msg
         else:
             # Combine all possible messages into a single list
             all_messages = []

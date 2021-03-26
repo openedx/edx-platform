@@ -6,10 +6,11 @@ Tests for programs celery tasks.
 import json
 import logging
 from datetime import datetime, timedelta
+from unittest import mock
 
+import pytest
 import ddt
 import httpretty
-import mock
 import pytz
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
@@ -70,9 +71,9 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         ]
 
         result = tasks.get_certified_programs(student)
-        self.assertEqual(mock_get_credentials.call_args[0], (student,))
-        self.assertEqual(mock_get_credentials.call_args[1], {'credential_type': 'program'})
-        self.assertEqual(result, [1])
+        assert mock_get_credentials.call_args[0] == (student,)
+        assert mock_get_credentials.call_args[1] == {'credential_type': 'program'}
+        assert result == [1]
 
 
 @skip_unless_lms
@@ -110,7 +111,7 @@ class AwardProgramCertificateTestCase(TestCase):
             ]
         }
         last_request_body = httpretty.last_request().body.decode('utf-8')
-        self.assertEqual(json.loads(last_request_body), expected_body)
+        assert json.loads(last_request_body) == expected_body
 
 
 @skip_unless_lms
@@ -125,7 +126,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     """
 
     def setUp(self):
-        super(AwardProgramCertificatesTestCase, self).setUp()
+        super().setUp()
         self.create_credentials_config()
         self.student = UserFactory.create(username='test-student')
         self.site = SiteFactory()
@@ -171,10 +172,11 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         tasks.award_program_certificates.delay(self.student.username).get()
 
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
-        self.assertEqual(actual_program_uuids, expected_awarded_program_uuids)
+        assert actual_program_uuids == expected_awarded_program_uuids
 
         actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        self.assertEqual(actual_visible_dates, expected_awarded_program_uuids)  # program uuids are same as mock dates
+        assert actual_visible_dates == expected_awarded_program_uuids
+        # program uuids are same as mock dates
 
     @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration')
     def test_awarding_certs_with_skip_program_certificate(
@@ -208,9 +210,10 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         tasks.award_program_certificates.delay(self.student.username).get()
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
-        self.assertEqual(actual_program_uuids, expected_awarded_program_uuids)
+        assert actual_program_uuids == expected_awarded_program_uuids
         actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
-        self.assertEqual(actual_visible_dates, expected_awarded_program_uuids)  # program uuids are same as mock dates
+        assert actual_visible_dates == expected_awarded_program_uuids
+        # program uuids are same as mock dates
 
     @ddt.data(
         ('credentials', 'enable_learner_issuance'),
@@ -226,13 +229,13 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the task is aborted if any relevant api configs are
         disabled.
         """
-        getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
+        getattr(self, f'create_{disabled_config_type}_config')(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            with self.assertRaises(MaxRetriesExceededError):
+            with pytest.raises(MaxRetriesExceededError):
                 tasks.award_program_certificates.delay(self.student.username).get()
-            self.assertTrue(mock_warning.called)
+            assert mock_warning.called
         for mock_helper in mock_helpers:
-            self.assertFalse(mock_helper.called)
+            assert not mock_helper.called
 
     def test_abort_if_invalid_username(self, *mock_helpers):
         """
@@ -241,9 +244,9 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             tasks.award_program_certificates.delay('nonexistent-username').get()
-            self.assertTrue(mock_exception.called)
+            assert mock_exception.called
         for mock_helper in mock_helpers:
-            self.assertFalse(mock_helper.called)
+            assert not mock_helper.called
 
     def test_abort_if_no_completed_programs(
         self,
@@ -257,9 +260,9 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         mock_get_completed_programs.return_value = {}
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertTrue(mock_get_completed_programs.called)
-        self.assertFalse(mock_get_certified_programs.called)
-        self.assertFalse(mock_award_program_certificate.called)
+        assert mock_get_completed_programs.called
+        assert not mock_get_certified_programs.called
+        assert not mock_award_program_certificate.called
 
     @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value')
     def test_programs_without_certificates(
@@ -276,9 +279,32 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_value.return_value = ["ALL"]
         mock_get_completed_programs.return_value = {1: 1, 2: 2}
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertFalse(mock_get_completed_programs.called)
-        self.assertFalse(mock_get_certified_programs.called)
-        self.assertFalse(mock_award_program_certificate.called)
+        assert not mock_get_completed_programs.called
+        assert not mock_get_certified_programs.called
+        assert not mock_award_program_certificate.called
+
+    @mock.patch(TASKS_MODULE + '.get_credentials_api_client')
+    def test_failure_to_create_api_client_retries(
+        self,
+        mock_get_api_client,
+        mock_get_completed_programs,
+        mock_get_certified_programs,
+        mock_award_program_certificate
+    ):
+        """
+        Checks that we log an exception and retry if the API client isn't creating.
+        """
+        mock_get_api_client.side_effect = Exception('boom')
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
+        mock_get_certified_programs.return_value = [2]
+
+        with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
+            with pytest.raises(MaxRetriesExceededError):
+                tasks.award_program_certificates.delay(self.student.username).get()
+
+        assert mock_exception.called
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert not mock_award_program_certificate.called
 
     def _make_side_effect(self, side_effects):
         """
@@ -318,17 +344,17 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
         with mock.patch(TASKS_MODULE + '.LOGGER.info') as mock_info, \
-                mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
+                mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 3)
+        assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            u'Failed to award certificate for program {uuid} to user {username}.'.format(
+            'Failed to award certificate for program {uuid} to user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )
-        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
-        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(f"Awarded certificate for program {1} to user {self.student.username}")
+        mock_info.assert_any_call(f"Awarded certificate for program {2} to user {self.student.username}")
 
     def test_retry_on_programs_api_errors(
         self,
@@ -343,7 +369,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         mock_get_completed_programs.side_effect = self._make_side_effect([Exception('boom'), None])
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertEqual(mock_get_completed_programs.call_count, 3)
+        assert mock_get_completed_programs.call_count == 3
 
     def test_retry_on_credentials_api_errors(
         self,
@@ -361,8 +387,8 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_certified_programs.return_value = [1]
         mock_get_certified_programs.side_effect = self._make_side_effect([Exception('boom'), None])
         tasks.award_program_certificates.delay(self.student.username).get()
-        self.assertEqual(mock_get_certified_programs.call_count, 2)
-        self.assertEqual(mock_award_program_certificate.call_count, 1)
+        assert mock_get_certified_programs.call_count == 2
+        assert mock_award_program_certificate.call_count == 1
 
     def test_retry_on_credentials_api_429_error(
         self,
@@ -382,7 +408,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 3)
+        assert mock_award_program_certificate.call_count == 3
 
     def test_no_retry_on_credentials_api_404_error(
         self,
@@ -402,7 +428,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 2)
+        assert mock_award_program_certificate.call_count == 2
 
     def test_no_retry_on_credentials_api_4XX_error(
         self,
@@ -422,7 +448,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
-        self.assertEqual(mock_award_program_certificate.call_count, 2)
+        assert mock_award_program_certificate.call_count == 2
 
 
 @skip_unless_lms
@@ -431,7 +457,7 @@ class PostCourseCertificateTestCase(TestCase):
     Test the award_program_certificate function
     """
 
-    def setUp(self):
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
         self.student = UserFactory.create(username='test-student')
         self.course = CourseOverviewFactory.create(
             self_paced=True  # Any option to allow the certificate to be viewable for the course
@@ -473,7 +499,7 @@ class PostCourseCertificateTestCase(TestCase):
             }]
         }
         last_request_body = httpretty.last_request().body.decode('utf-8')
-        self.assertEqual(json.loads(last_request_body), expected_body)
+        assert json.loads(last_request_body) == expected_body
 
 
 @skip_unless_lms
@@ -487,7 +513,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
 
     def setUp(self):
-        super(AwardCourseCertificatesTestCase, self).setUp()
+        super().setUp()
 
         self.available_date = datetime.now(pytz.UTC) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
@@ -521,9 +547,9 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.certificate.save()
         tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         call_args, _ = mock_post_course_certificate.call_args
-        self.assertEqual(call_args[1], self.student.username)
-        self.assertEqual(call_args[2], self.certificate)
-        self.assertEqual(call_args[3], self.certificate.modified_date)
+        assert call_args[1] == self.student.username
+        assert call_args[2] == self.certificate
+        assert call_args[3] == self.certificate.modified_date
 
     def test_award_course_certificates_available_date(self, mock_post_course_certificate):
         """
@@ -533,9 +559,9 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.course.save()
         tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         call_args, _ = mock_post_course_certificate.call_args
-        self.assertEqual(call_args[1], self.student.username)
-        self.assertEqual(call_args[2], self.certificate)
-        self.assertEqual(call_args[3], self.available_date)
+        assert call_args[1] == self.student.username
+        assert call_args[2] == self.certificate
+        assert call_args[3] == self.available_date
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """
@@ -543,10 +569,10 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         self.create_credentials_config(enabled=False)
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            with self.assertRaises(MaxRetriesExceededError):
+            with pytest.raises(MaxRetriesExceededError):
                 tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
-        self.assertTrue(mock_warning.called)
-        self.assertFalse(mock_post_course_certificate.called)
+        assert mock_warning.called
+        assert not mock_post_course_certificate.called
 
     def test_award_course_cert_not_called_if_user_not_found(self, mock_post_course_certificate):
         """
@@ -555,8 +581,8 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             # Use a random username here since this user won't be found in the DB
             tasks.award_course_certificate.delay('random_username', str(self.course.id)).get()
-        self.assertTrue(mock_exception.called)
-        self.assertFalse(mock_post_course_certificate.called)
+        assert mock_exception.called
+        assert not mock_post_course_certificate.called
 
     def test_award_course_cert_not_called_if_certificate_not_found(self, mock_post_course_certificate):
         """
@@ -565,8 +591,8 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.certificate.delete()
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
-        self.assertTrue(mock_exception.called)
-        self.assertFalse(mock_post_course_certificate.called)
+        assert mock_exception.called
+        assert not mock_post_course_certificate.called
 
     def test_award_course_cert_not_called_if_course_overview_not_found(self, mock_post_course_certificate):
         """
@@ -576,8 +602,8 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             # Use the certificate course id here since the course will be deleted
             tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
-        self.assertTrue(mock_exception.called)
-        self.assertFalse(mock_post_course_certificate.called)
+        assert mock_exception.called
+        assert not mock_post_course_certificate.called
 
     def test_award_course_cert_not_called_if_certificated_not_verified_mode(self, mock_post_course_certificate):
         """
@@ -590,7 +616,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.create_credentials_config()
 
         tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
-        self.assertFalse(mock_post_course_certificate.called)
+        assert not mock_post_course_certificate.called
 
 
 @skip_unless_lms
@@ -623,7 +649,7 @@ class RevokeProgramCertificateTestCase(TestCase):
             }
         }
         last_request_body = httpretty.last_request().body.decode('utf-8')
-        self.assertEqual(json.loads(last_request_body), expected_body)
+        assert json.loads(last_request_body) == expected_body
 
 
 @skip_unless_lms
@@ -638,7 +664,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
     """
 
     def setUp(self):
-        super(RevokeProgramCertificatesTestCase, self).setUp()
+        super().setUp()
 
         self.student = UserFactory.create(username='test-student')
         self.course_key = 'course-v1:testX+test101+2T2020'
@@ -682,8 +708,8 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
         call_args, _ = mock_revoke_program_certificate.call_args
-        self.assertEqual(call_args[1], self.student.username)
-        self.assertEqual(call_args[2], expected_program_uuid)
+        assert call_args[1] == self.student.username
+        assert call_args[2] == expected_program_uuid
 
     @ddt.data(
         ('credentials', 'enable_learner_issuance'),
@@ -699,13 +725,13 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         Checks that the task is aborted if any relevant api configs are
         disabled.
         """
-        getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
+        getattr(self, f'create_{disabled_config_type}_config')(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
-            with self.assertRaises(MaxRetriesExceededError):
+            with pytest.raises(MaxRetriesExceededError):
                 tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
-            self.assertTrue(mock_warning.called)
+            assert mock_warning.called
         for mock_helper in mock_helpers:
-            self.assertFalse(mock_helper.called)
+            assert not mock_helper.called
 
     def test_abort_if_invalid_username(self, *mock_helpers):
         """
@@ -714,9 +740,9 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         """
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             tasks.revoke_program_certificates.delay('nonexistent-username', self.course_key).get()
-            self.assertTrue(mock_exception.called)
+            assert mock_exception.called
         for mock_helper in mock_helpers:
-            self.assertFalse(mock_helper.called)
+            assert not mock_helper.called
 
     def test_abort_if_no_program(
         self,
@@ -730,9 +756,9 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         """
         mock_get_inverted_programs.return_value = {}
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
-        self.assertTrue(mock_get_inverted_programs.called)
-        self.assertFalse(mock_get_certified_programs.called)
-        self.assertFalse(mock_revoke_program_certificate.called)
+        assert mock_get_inverted_programs.called
+        assert not mock_get_certified_programs.called
+        assert not mock_revoke_program_certificate.called
 
     def _make_side_effect(self, side_effects):
         """
@@ -775,14 +801,14 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
                 mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
             tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
-        self.assertEqual(mock_revoke_program_certificate.call_count, 3)
+        assert mock_revoke_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            u'Failed to revoke certificate for program {uuid} of user {username}.'.format(
+            'Failed to revoke certificate for program {uuid} of user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )
-        mock_info.assert_any_call(mock.ANY, 1, self.student.username)
-        mock_info.assert_any_call(mock.ANY, 2, self.student.username)
+        mock_info.assert_any_call(f"Revoked certificate for program {1} for user {self.student.username}")
+        mock_info.assert_any_call(f"Revoked certificate for program {2} for user {self.student.username}")
 
     def test_retry_on_credentials_api_errors(
         self,
@@ -800,8 +826,8 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         mock_get_certified_programs.return_value = [1]
         mock_get_certified_programs.side_effect = self._make_side_effect([Exception('boom'), None])
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
-        self.assertEqual(mock_get_certified_programs.call_count, 2)
-        self.assertEqual(mock_revoke_program_certificate.call_count, 1)
+        assert mock_get_certified_programs.call_count == 2
+        assert mock_revoke_program_certificate.call_count == 1
 
     def test_retry_on_credentials_api_429_error(
         self,
@@ -822,7 +848,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
-        self.assertEqual(mock_revoke_program_certificate.call_count, 3)
+        assert mock_revoke_program_certificate.call_count == 3
 
     def test_no_retry_on_credentials_api_404_error(
         self,
@@ -843,7 +869,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
-        self.assertEqual(mock_revoke_program_certificate.call_count, 2)
+        assert mock_revoke_program_certificate.call_count == 2
 
     def test_no_retry_on_credentials_api_4XX_error(
         self,
@@ -864,4 +890,28 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
-        self.assertEqual(mock_revoke_program_certificate.call_count, 2)
+        assert mock_revoke_program_certificate.call_count == 2
+
+    def test_get_api_client_failure_retries(
+        self,
+        mock_get_inverted_programs,
+        mock_get_certified_programs,
+        mock_revoke_program_certificate,
+    ):
+        """
+        Verify that a 404 error causes the task to fail but there is no retry.
+        """
+        mock_get_inverted_programs.return_value = self.inverted_programs
+        mock_get_certified_programs.return_value = [1, 2]
+
+        with mock.patch(
+            TASKS_MODULE + ".get_credentials_api_client"
+        ) as mock_get_api_client, mock.patch(
+            TASKS_MODULE + '.LOGGER.exception'
+        ) as mock_exception:
+            mock_get_api_client.side_effect = Exception("boom")
+            with pytest.raises(MaxRetriesExceededError):
+                tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
+        assert mock_exception.called
+        assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
+        assert not mock_revoke_program_certificate.called

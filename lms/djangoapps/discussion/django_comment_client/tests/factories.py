@@ -1,10 +1,11 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 from factory.django import DjangoModelFactory
 
 from openedx.core.djangoapps.django_comment_common.models import Permission, Role
 
 
-class RoleFactory(DjangoModelFactory):
-    class Meta(object):
+class RoleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = Role
 
     name = 'Student'
@@ -12,7 +13,7 @@ class RoleFactory(DjangoModelFactory):
 
 
 class PermissionFactory(DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = Permission
 
     name = 'create_comment'

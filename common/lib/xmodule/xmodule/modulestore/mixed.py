@@ -11,7 +11,6 @@ import itertools
 import logging
 from contextlib import contextmanager
 
-import six
 from contracts import contract, new_contract
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
@@ -28,10 +27,7 @@ new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
-if six.PY2:
-    new_contract('long', long)
-else:
-    new_contract('long', int)
+new_contract('long', int)
 
 log = logging.getLogger(__name__)
 
@@ -85,7 +81,7 @@ def strip_key(func):
                 if isinstance(field_value, list):
                     field_value = [strip_key_func(fv) for fv in field_value]
                 elif isinstance(field_value, dict):
-                    for key, val in six.iteritems(field_value):
+                    for key, val in field_value.items():
                         field_value[key] = strip_key_func(val)
                 else:
                     field_value = strip_key_func(field_value)
@@ -125,7 +121,7 @@ def prepare_asides_to_store(asides_source):
         asides = []
         for asd in asides_source:
             aside_fields = {}
-            for asd_field_key, asd_field_val in six.iteritems(asd.fields):
+            for asd_field_key, asd_field_val in asd.fields.items():
                 aside_fields[asd_field_key] = asd_field_val.read_from(asd)
             asides.append({
                 'aside_type': asd.scope_ids.block_type,
@@ -154,7 +150,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
         """
-        super(MixedModuleStore, self).__init__(contentstore, **kwargs)
+        super().__init__(contentstore, **kwargs)
 
         if create_modulestore_instance is None:
             raise ValueError('MixedModuleStore constructor must be passed a create_modulestore_instance function')
@@ -162,7 +158,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         self.modulestores = []
         self.mappings = {}
 
-        for course_id, store_name in six.iteritems(mappings):
+        for course_id, store_name in mappings.items():
             try:
                 self.mappings[CourseKey.from_string(course_id)] = store_name
             except InvalidKeyError:
@@ -182,7 +178,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 signal_handler=signal_handler,
             )
             # replace all named pointers to the store into actual pointers
-            for course_key, store_name in six.iteritems(self.mappings):
+            for course_key, store_name in self.mappings.items():
                 if store_name == key:
                     self.mappings[course_key] = store
             self.modulestores.append(store)
@@ -253,7 +249,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.has_item(usage_key, **kwargs)
 
     @strip_key
-    def get_item(self, usage_key, depth=0, **kwargs):
+    def get_item(self, usage_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         see parent doc
         """
@@ -261,7 +257,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.get_item(usage_key, depth, **kwargs)
 
     @strip_key
-    def get_items(self, course_key, **kwargs):
+    def get_items(self, course_key, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -306,7 +302,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 # Check if course is indeed unique. Save it in result if unique
                 if course_id in course_summaries:
                     log.warning(
-                        u"Modulestore %s have duplicate courses %s; skipping from result.", store, course_id
+                        "Modulestore %s have duplicate courses %s; skipping from result.", store, course_id
                     )
                 else:
                     course_summaries[course_id] = course_summary
@@ -326,6 +322,23 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     # course is indeed unique. save it in result
                     courses[course_id] = course
         return list(courses.values())
+
+    def get_library_keys(self):
+        """
+        Returns a list of all unique content library keys in the mixed
+        modulestore.
+
+        Returns: list[LibraryLocator]
+        """
+        all_library_keys = set()
+        for store in self.modulestores:
+            if not hasattr(store, 'get_library_keys'):
+                continue
+            all_library_keys |= {
+                self._clean_locator_for_mapping(library_key)
+                for library_key in store.get_library_keys()
+            }
+        return list(all_library_keys)
 
     @strip_key
     def get_library_summaries(self, **kwargs):
@@ -369,7 +382,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         This key may represent a course that doesn't exist in this modulestore.
         """
         # If there is a mapping that match this org/course/run, use that
-        for course_id, store in six.iteritems(self.mappings):
+        for course_id, store in self.mappings.items():
             candidate_key = store.make_course_key(org, course, run)
             if candidate_key == course_id:
                 return candidate_key
@@ -387,7 +400,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.make_course_usage_key(course_key)
 
     @strip_key
-    def get_course(self, course_key, depth=0, **kwargs):
+    def get_course(self, course_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         returns the course module associated with the course_id. If no such course exists,
         it returns None
@@ -435,7 +448,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courselike(course_id)
         return store.has_course(course_id, ignore_case, **kwargs)
 
-    def delete_course(self, course_key, user_id):
+    def delete_course(self, course_key, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
@@ -576,7 +589,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.set_asset_metadata_attrs(asset_key, {attr: value}, user_id)
 
     @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
-    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
 
@@ -593,7 +606,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.set_asset_metadata_attrs(asset_key, attr_dict, user_id)
 
     @strip_key
-    def get_parent_location(self, location, **kwargs):
+    def get_parent_location(self, location, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         returns the parent locations for a given location
         """
@@ -643,7 +656,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return errs
 
     @strip_key
-    def create_course(self, org, course, run, user_id, **kwargs):
+    def create_course(self, org, course, run, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Creates and returns the course.
 
@@ -655,7 +668,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
-        Returns: a CourseDescriptor
+        Returns: a CourseBlock
         """
         # first make sure an existing course doesn't already exist in the mapping
         course_key = self.make_course_key(org, course, run)
@@ -728,7 +741,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                                                 dest_course_id.course, dest_course_id.run, fields, **kwargs)
 
             # the super handles assets and any other necessities
-            super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+            super().clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
         else:
             raise NotImplementedError("No code for cloning from {} to {}".format(
                 source_modulestore, dest_modulestore
@@ -774,7 +787,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 in the newly created block
         """
         modulestore = self._verify_modulestore_support(parent_usage_key.course_key, 'create_child')
-        return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)
+        return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)  # lint-amnesty, pylint: disable=line-too-long
 
     @strip_key
     @prepare_asides
@@ -788,7 +801,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime, **kwargs)
 
     @strip_key
-    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         See :py:meth `SplitMongoModuleStore.copy_from_template`
         """
@@ -797,7 +810,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
     @strip_key
     @prepare_asides
-    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
+    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
@@ -806,7 +819,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.update_item(xblock, user_id, allow_not_found, **kwargs)
 
     @strip_key
-    def delete_item(self, location, user_id, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Delete the given item from persistence. kwargs allow modulestore specific parameters.
         """
@@ -825,6 +838,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(location.course_key, 'revert_to_published')
         return store.revert_to_published(location, user_id)
+
+    def reset_course_to_version(self, course_key, version_guid, user_id):
+        """
+        Resets the content of a course at `course_key` to a version specified by `version_guid`.
+
+        :raises NotImplementedError: if not supported by store.
+        """
+        store = self._verify_modulestore_support(course_key, 'reset_course_to_version')
+        return store.reset_course_to_version(
+            course_key=course_key,
+            version_guid=version_guid,
+            user_id=user_id,
+        )
 
     def close_all_connections(self):
         """
@@ -886,7 +912,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # could be done in parallel threads if needed
         return dict(
             itertools.chain.from_iterable(
-                six.iteritems(store.heartbeat())
+                store.heartbeat().items()
                 for store in self.modulestores
             )
         )
@@ -964,7 +990,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if hasattr(store, method):
             return store
         else:
-            raise NotImplementedError(u"Cannot call {} on store {}".format(method, store))
+            raise NotImplementedError(f"Cannot call {method} on store {store}")
 
     @property
     def default_modulestore(self):
@@ -987,7 +1013,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # find the store corresponding to the given type
         store = next((store for store in self.modulestores if store.get_modulestore_type() == store_type), None)
         if not store:
-            raise Exception(u"Cannot find store of type {}".format(store_type))
+            raise Exception(f"Cannot find store of type {store_type}")
 
         prev_thread_local_store = getattr(self.thread_cache, 'default_store', None)
         try:

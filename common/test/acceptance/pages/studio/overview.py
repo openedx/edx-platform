@@ -3,7 +3,7 @@ Course Outline page in Studio.
 """
 
 
-from bok_choy.javascript import js_defined, wait_for_js
+from bok_choy.javascript import js_defined  # lint-amnesty, pylint: disable=unused-import
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.ui import Select
@@ -13,7 +13,7 @@ from common.test.acceptance.pages.studio.course_page import CoursePage
 
 
 @js_defined('jQuery')
-class CourseOutlineItem(object):
+class CourseOutlineItem:
     """
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
@@ -33,9 +33,9 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return u"{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
+            return f"{self.__class__.__name__}(<browser>, {self.locator!r})"
         except AttributeError:
-            return u"{}(<browser>)".format(self.__class__.__name__)
+            return f"{self.__class__.__name__}(<browser>)"
 
     def _bounded_selector(self, selector):
         """
@@ -45,7 +45,7 @@ class CourseOutlineItem(object):
         # This happens in the context of the CourseOutlinePage
         # pylint: disable=no-member
         if self.BODY_SELECTOR and hasattr(self, 'locator'):
-            return u'{}[data-locator="{}"] {}'.format(
+            return '{}[data-locator="{}"] {}'.format(
                 self.BODY_SELECTOR,
                 self.locator,
                 selector
@@ -58,7 +58,7 @@ class CourseOutlineItem(object):
         Puts the item into editable form.
         """
         self.q(css=self._bounded_selector(self.CONFIGURATION_BUTTON_SELECTOR)).first.click()  # pylint: disable=no-member
-        if 'subsection' in self.BODY_SELECTOR:
+        if 'subsection' in self.BODY_SELECTOR:  # lint-amnesty, pylint: disable=unsupported-membership-test
             modal = SubsectionOutlineModal(self)
         else:
             modal = CourseOutlineModal(self)
@@ -105,17 +105,17 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
     BODY_SELECTOR = '.outline-item'
 
     def __init__(self, browser, locator):
-        super(CourseOutlineChild, self).__init__(browser)
+        super().__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
-        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
+        return self.q(css=f'{self.BODY_SELECTOR}[data-locator="{self.locator}"]').present
 
     def _bounded_selector(self, selector):
         """
         Return `selector`, but limited to this particular `CourseOutlineChild` context
         """
-        return u'{}[data-locator="{}"] {}'.format(
+        return '{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector
@@ -160,7 +160,7 @@ class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
         """
         Return the :class:`.CourseOutlineUnit with the title `title`.
         """
-        return self.child(title)
+        return self.child(title)  # lint-amnesty, pylint: disable=no-member
 
     def units(self):
         """
@@ -195,7 +195,7 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         """
         Return the :class:`.CourseOutlineSubsection` with the title `title`.
         """
-        return self.child(title)
+        return self.child(title)  # lint-amnesty, pylint: disable=no-member
 
     def subsections(self):
         """
@@ -213,10 +213,10 @@ class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
         """
         Adds a subsection to this section
         """
-        self.add_child()
+        self.add_child()  # lint-amnesty, pylint: disable=no-member
 
 
-class ExpandCollapseLinkState(object):
+class ExpandCollapseLinkState:
     """
     Represents the three states that the expand/collapse link can be in
     """
@@ -251,7 +251,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Starts course reindex by clicking reindex button
         """
-        self.reindex_button.click()
+        self.reindex_button.click()  # lint-amnesty, pylint: disable=no-member
 
     def open_subsection_settings_dialog(self, index=0):
         """
@@ -271,7 +271,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.wait_for_element_visibility('#is_prereq', 'Gating settings fields are present.')
 
 
-class CourseOutlineModal(object):
+class CourseOutlineModal:
     """
     Page object specifically for a modal window on the course outline page.
 
@@ -363,7 +363,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         """
         Returns the current visibility setting for a subsection
         """
-        self.ensure_staff_lock_visible()
+        self.ensure_staff_lock_visible()  # lint-amnesty, pylint: disable=no-member
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
@@ -380,7 +380,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         """
         Sets the subsection visibility to the given value.
         """
-        self.ensure_staff_lock_visible()
+        self.ensure_staff_lock_visible()  # lint-amnesty, pylint: disable=no-member
         self.find_css('input[name=content-visibility][value=' + value + ']').click()
         EmptyPromise(lambda: value == self.subsection_visibility, "Subsection visibility is updated").fulfill()
 

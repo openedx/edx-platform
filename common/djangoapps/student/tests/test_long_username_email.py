@@ -1,18 +1,18 @@
-# -*- coding: utf-8 -*-
-
-
+""" Test case for longer user emails."""
 import json
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 
 from openedx.core.djangoapps.user_api.accounts import USERNAME_BAD_LENGTH_MSG
 
 
-class TestLongUsernameEmail(TestCase):
+@override_settings(RATELIMIT_ENABLE=False)
+class TestLongUsernameEmail(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestLongUsernameEmail, self).setUp()
+        super().setUp()
         self.url = reverse('create_account')
         self.url_params = {
             'username': 'username',
@@ -32,21 +32,18 @@ class TestLongUsernameEmail(TestCase):
         response = self.client.post(self.url, self.url_params)
 
         # Status code should be 400.
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['username'][0]['user_message'],
-            USERNAME_BAD_LENGTH_MSG,
-        )
+        assert obj['username'][0]['user_message'] == USERNAME_BAD_LENGTH_MSG
 
     def test_spoffed_name(self):
         """
         Test name cannot contain html.
         """
-        self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'
+        self.url_params['name'] = '<p style="font-size:300px; color:green;"></br>Name<input type="text"></br>Content spoof'  # lint-amnesty, pylint: disable=line-too-long
         response = self.client.post(self.url, self.url_params)
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
     def test_long_email(self):
         """
@@ -57,13 +54,10 @@ class TestLongUsernameEmail(TestCase):
         response = self.client.post(self.url, self.url_params)
 
         # Assert that we get error when email has more than 254 characters.
-        self.assertGreater(len(self.url_params['email']), 254)
+        assert len(self.url_params['email']) > 254
 
         # Status code should be 400.
-        self.assertEqual(response.status_code, 400)
+        assert response.status_code == 400
 
         obj = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(
-            obj['email'][0]['user_message'],
-            "Email cannot be more than 254 characters long",
-        )
+        assert obj['email'][0]['user_message'] == 'Email cannot be more than 254 characters long'

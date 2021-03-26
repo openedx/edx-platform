@@ -87,7 +87,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         """
         Adds our custom URL to the admin
         """
-        urls = super(UserRetirementStatusAdmin, self).get_urls()
+        urls = super(UserRetirementStatusAdmin, self).get_urls()  # lint-amnesty, pylint: disable=super-with-arguments
         custom_urls = [
             url(
                 r'^(?P<retirement_id>.+)/cancel_retirement/$',
@@ -121,7 +121,7 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
         Removes the default bulk delete option provided by Django,
         it doesn't do what we need for this model.
         """
-        actions = super(UserRetirementStatusAdmin, self).get_actions(request)
+        actions = super(UserRetirementStatusAdmin, self).get_actions(request)  # lint-amnesty, pylint: disable=super-with-arguments
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions

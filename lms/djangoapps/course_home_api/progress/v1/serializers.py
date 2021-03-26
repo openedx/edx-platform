@@ -3,23 +3,26 @@ Progress Tab Serializers
 """
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from lms.djangoapps.certificates.models import CertificateStatuses
 
 
-class GradedTotalSerializer(serializers.Serializer):
-    earned = serializers.FloatField()
-    possible = serializers.FloatField()
+class CourseGradeSerializer(serializers.Serializer):
+    """
+    Serializer for course grade
+    """
+    percent = serializers.FloatField()
+    is_passing = serializers.BooleanField(source='passed')
 
 
-class SubsectionSerializer(serializers.Serializer):
+class SubsectionScoresSerializer(serializers.Serializer):
+    """
+    Serializer for subsections in section_scores
+    """
+    assignment_type = serializers.CharField(source='format')
     display_name = serializers.CharField()
-    due = serializers.DateTimeField()
-    format = serializers.CharField()
-    graded = serializers.BooleanField()
-    graded_total = GradedTotalSerializer()
-    # TODO: override serializer
+    has_graded_assignment = serializers.BooleanField(source='graded')
+    num_points_earned = serializers.IntegerField(source='graded_total.earned')
+    num_points_possible = serializers.IntegerField(source='graded_total.possible')
     percent_graded = serializers.FloatField()
-    problem_scores = serializers.SerializerMethodField()
     show_correctness = serializers.CharField()
     show_grades = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
@@ -29,64 +32,41 @@ class SubsectionSerializer(serializers.Serializer):
         request = self.context['request']
         return request.build_absolute_uri(relative_path)
 
-    def get_problem_scores(self, subsection):
-        problem_scores = [
-            {
-                'earned': score.earned,
-                'possible': score.possible,
-            }
-            for score in subsection.problem_scores.values()
-        ]
-        return problem_scores
-
     def get_show_grades(self, subsection):
         return subsection.show_grades(self.context['staff_access'])
 
 
-class ChapterSerializer(serializers.Serializer):
+class SectionScoresSerializer(serializers.Serializer):
     """
-    Serializer for chapters in coursewaresummary
+    Serializer for sections in section_scores
     """
     display_name = serializers.CharField()
-    subsections = SubsectionSerializer(source='sections', many=True)
+    subsections = SubsectionScoresSerializer(source='sections', many=True)
+
+
+class GradingPolicySerializer(serializers.Serializer):
+    """
+    Serializer for grading policy
+    """
+    assignment_policies = serializers.SerializerMethodField()
+    grade_range = serializers.DictField(source='GRADE_CUTOFFS')
+
+    def get_assignment_policies(self, grading_policy):
+        return [{
+            'num_droppable': assignment_policy['drop_count'],
+            'short_label': assignment_policy.get('short_label', ''),
+            'type': assignment_policy['type'],
+            'weight': assignment_policy['weight'],
+        } for assignment_policy in grading_policy['GRADER']]
 
 
 class CertificateDataSerializer(serializers.Serializer):
+    """
+    Serializer for certificate data
+    """
     cert_status = serializers.CharField()
     cert_web_view_url = serializers.CharField()
     download_url = serializers.CharField()
-    msg = serializers.CharField()
-    title = serializers.CharField()
-
-
-class CreditRequirementSerializer(serializers.Serializer):
-    """
-    Serializer for credit requirement objects
-    """
-    display_name = serializers.CharField()
-    min_grade = serializers.SerializerMethodField()
-    status = serializers.CharField()
-    status_date = serializers.DateTimeField()
-
-    def get_min_grade(self, requirement):
-        if requirement['namespace'] == 'grade':
-            return requirement['criteria']['min_grade'] * 100
-        else:
-            return None
-
-
-class CreditCourseRequirementsSerializer(serializers.Serializer):
-    """
-    Serializer for credit_course_requirements
-    """
-    dashboard_url = serializers.SerializerMethodField()
-    eligibility_status = serializers.CharField()
-    requirements = CreditRequirementSerializer(many=True)
-
-    def get_dashboard_url(self, _):
-        relative_path = reverse('dashboard')
-        request = self.context['request']
-        return request.build_absolute_uri(relative_path)
 
 
 class VerificationDataSerializer(serializers.Serializer):
@@ -103,10 +83,10 @@ class ProgressTabSerializer(serializers.Serializer):
     Serializer for progress tab
     """
     certificate_data = CertificateDataSerializer()
-    credit_course_requirements = CreditCourseRequirementsSerializer()
-    credit_support_url = serializers.URLField()
-    courseware_summary = ChapterSerializer(many=True)
+    completion_summary = serializers.DictField()
+    course_grade = CourseGradeSerializer()
+    section_scores = SectionScoresSerializer(many=True)
     enrollment_mode = serializers.CharField()
+    grading_policy = GradingPolicySerializer()
     studio_url = serializers.CharField()
-    user_timezone = serializers.CharField()
     verification_data = VerificationDataSerializer()

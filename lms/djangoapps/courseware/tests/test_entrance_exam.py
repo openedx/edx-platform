@@ -3,14 +3,13 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 """
 
 
-import six
+from unittest.mock import Mock, patch
 from crum import set_current_request
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -52,7 +51,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test case scaffolding
         """
-        super(EntranceExamTestCases, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,
@@ -139,7 +138,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         self.course.entrance_exam_enabled = True
         self.course.entrance_exam_minimum_score_pct = 0.50
-        self.course.entrance_exam_id = six.text_type(self.entrance_exam.scope_ids.usage_id)
+        self.course.entrance_exam_id = str(self.entrance_exam.scope_ids.usage_id)
 
         self.anonymous_user = AnonymousUserFactory()
         self.addCleanup(set_current_request, None)
@@ -155,17 +154,17 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                     'active': True,
                     'sections': [
                         {
-                            'url_name': u'Exam_Sequential_-_Subsection_1',
-                            'display_name': u'Exam Sequential - Subsection 1',
+                            'url_name': 'Exam_Sequential_-_Subsection_1',
+                            'display_name': 'Exam Sequential - Subsection 1',
                             'graded': True,
                             'format': '',
                             'due': None,
                             'active': True
                         }
                     ],
-                    'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1',
-                    'display_id': u'entrance-exam-section-chapter-1',
+                    'url_name': 'Entrance_Exam_Section_-_Chapter_1',
+                    'display_name': 'Entrance Exam Section - Chapter 1',
+                    'display_id': 'entrance-exam-section-chapter-1',
                 }
             ]
         )
@@ -175,55 +174,55 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                     'active': False,
                     'sections': [
                         {
-                            'url_name': u'Welcome',
-                            'display_name': u'Welcome',
+                            'url_name': 'Welcome',
+                            'display_name': 'Welcome',
                             'graded': False,
                             'format': '',
                             'due': None,
                             'active': False
                         },
                         {
-                            'url_name': u'Lesson_1',
-                            'display_name': u'Lesson 1',
+                            'url_name': 'Lesson_1',
+                            'display_name': 'Lesson 1',
                             'graded': False,
                             'format': '',
                             'due': None,
                             'active': False
                         }
                     ],
-                    'url_name': u'Overview',
-                    'display_name': u'Overview',
-                    'display_id': u'overview'
+                    'url_name': 'Overview',
+                    'display_name': 'Overview',
+                    'display_id': 'overview'
                 },
                 {
                     'active': False,
                     'sections': [],
-                    'url_name': u'Week_1',
-                    'display_name': u'Week 1',
-                    'display_id': u'week-1'
+                    'url_name': 'Week_1',
+                    'display_name': 'Week 1',
+                    'display_id': 'week-1'
                 },
                 {
                     'active': False,
                     'sections': [],
-                    'url_name': u'Instructor',
-                    'display_name': u'Instructor',
-                    'display_id': u'instructor'
+                    'url_name': 'Instructor',
+                    'display_name': 'Instructor',
+                    'display_id': 'instructor'
                 },
                 {
                     'active': True,
                     'sections': [
                         {
-                            'url_name': u'Exam_Sequential_-_Subsection_1',
-                            'display_name': u'Exam Sequential - Subsection 1',
+                            'url_name': 'Exam_Sequential_-_Subsection_1',
+                            'display_name': 'Exam Sequential - Subsection 1',
                             'graded': True,
                             'format': '',
                             'due': None,
                             'active': True
                         }
                     ],
-                    'url_name': u'Entrance_Exam_Section_-_Chapter_1',
-                    'display_name': u'Entrance Exam Section - Chapter 1',
-                    'display_id': u'entrance-exam-section-chapter-1'
+                    'url_name': 'Entrance_Exam_Section_-_Chapter_1',
+                    'display_name': 'Entrance Exam Section - Chapter 1',
+                    'display_id': 'entrance-exam-section-chapter-1'
                 }
             ]
         )
@@ -232,10 +231,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Unit Test: if entrance exam is required. Should return a redirect.
         """
-        url = reverse('courseware', kwargs={'course_id': six.text_type(self.course.id)})
+        url = reverse('courseware', kwargs={'course_id': str(self.course.id)})
         expected_url = reverse('courseware_section',
                                kwargs={
-                                   'course_id': six.text_type(self.course.id),
+                                   'course_id': str(self.course.id),
                                    'chapter': self.entrance_exam.location.block_id,
                                    'section': self.exam_1.location.block_id
                                })
@@ -247,10 +246,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Unit Test: If entrance exam is not enabled then page should be redirected with chapter contents.
         """
-        url = reverse('courseware', kwargs={'course_id': six.text_type(self.course.id)})
+        url = reverse('courseware', kwargs={'course_id': str(self.course.id)})
         expected_url = reverse('courseware_section',
                                kwargs={
-                                   'course_id': six.text_type(self.course.id),
+                                   'course_id': str(self.course.id),
                                    'chapter': self.chapter.location.block_id,
                                    'section': self.welcome.location.block_id
                                })
@@ -264,10 +263,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         Unit Test: If entrance exam is enabled then its content e.g. problems should be loaded and redirection will
         occur with entrance exam contents.
         """
-        url = reverse('courseware', kwargs={'course_id': six.text_type(self.course.id)})
+        url = reverse('courseware', kwargs={'course_id': str(self.course.id)})
         expected_url = reverse('courseware_section',
                                kwargs={
-                                   'course_id': six.text_type(self.course.id),
+                                   'course_id': str(self.course.id),
                                    'chapter': self.entrance_exam.location.block_id,
                                    'section': self.exam_1.location.block_id
                                })
@@ -281,15 +280,15 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         test get entrance exam content method
         """
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
-        self.assertEqual(exam_chapter.url_name, self.entrance_exam.url_name)
-        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert exam_chapter.url_name == self.entrance_exam.url_name
+        assert not user_has_passed_entrance_exam(self.request.user, self.course)
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
-        self.assertEqual(exam_chapter, None)
-        self.assertTrue(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert exam_chapter is None
+        assert user_has_passed_entrance_exam(self.request.user, self.course)
 
     def test_entrance_exam_requirement_message(self):
         """
@@ -298,7 +297,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.entrance_exam.location.block_id,
                 'section': self.exam_1.location.block_id,
             }
@@ -321,7 +320,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.entrance_exam.location.block_id,
                 'section': self.exam_1.location.block_id
             }
@@ -329,9 +328,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         resp = self.client.get(url)
         self.assertContains(
             resp,
-            u'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
+            f'To access course materials, you must score {minimum_score_pct}% or higher',
         )
-        self.assertIn(u'Your current score is 20%.', resp.content.decode(resp.charset))
+        assert 'Your current score is 20%.' in resp.content.decode(resp.charset)
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -346,13 +345,13 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.chapter.location.block_id,
                 'section': self.chapter_subsection.location.block_id
             }
         )
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertNotContains(resp, 'To access course materials, you must score')
         self.assertNotContains(resp, 'You have passed the entrance exam.')
 
@@ -366,7 +365,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': six.text_type(self.course.id),
+                'course_id': str(self.course.id),
                 'chapter': self.entrance_exam.location.block_id,
                 'section': self.exam_1.location.block_id
             }
@@ -377,7 +376,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         resp = self.client.get(url)
         self.assertNotContains(resp, 'To access course materials, you must score')
-        self.assertContains(resp, u'Your score is 100%. You have passed the entrance exam.')
+        self.assertContains(resp, 'Your score is 100%. You have passed the entrance exam.')
         self.assertContains(resp, 'Lesson 1')
 
     def test_entrance_exam_gating(self):
@@ -388,7 +387,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         chaos_user = UserFactory()
         locked_toc = self._return_table_of_contents()
         for toc_section in self.expected_locked_toc:
-            self.assertIn(toc_section, locked_toc)
+            assert toc_section in locked_toc
 
         # Set up the chaos user
         answer_entrance_exam_problem(self.course, self.request, self.problem_1, chaos_user)
@@ -398,7 +397,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         unlocked_toc = self._return_table_of_contents()
 
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_skip_entrance_exam_gating(self):
         """
@@ -407,20 +406,20 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         # make sure toc is locked before allowing user to skip entrance exam
         locked_toc = self._return_table_of_contents()
         for toc_section in self.expected_locked_toc:
-            self.assertIn(toc_section, locked_toc)
+            assert toc_section in locked_toc
 
         # hit skip entrance exam api in instructor app
         instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=instructor.username, password='test')
-        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': six.text_type(self.course.id)})
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.request.user.email,
         })
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         unlocked_toc = self._return_table_of_contents()
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_entrance_exam_gating_for_staff(self):
         """
@@ -437,7 +436,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.request.user = staff_user
         unlocked_toc = self._return_table_of_contents()
         for toc_section in self.expected_unlocked_toc:
-            self.assertIn(toc_section, unlocked_toc)
+            assert toc_section in unlocked_toc
 
     def test_courseware_page_access_without_passing_entrance_exam(self):
         """
@@ -445,12 +444,12 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': six.text_type(self.course.id), 'chapter': self.chapter.url_name}
+            kwargs={'course_id': str(self.course.id), 'chapter': self.chapter.url_name}
         )
         response = self.client.get(url)
         expected_url = reverse('courseware_section',
                                kwargs={
-                                   'course_id': six.text_type(self.course.id),
+                                   'course_id': str(self.course.id),
                                    'chapter': self.entrance_exam.location.block_id,
                                    'section': self.exam_1.location.block_id
                                })
@@ -461,9 +460,9 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test courseware access page without passing entrance exam
         """
-        url = reverse('info', args=[six.text_type(self.course.id)])
+        url = reverse('info', args=[str(self.course.id)])
         response = self.client.get(url)
-        redirect_url = reverse('courseware', args=[six.text_type(self.course.id)])
+        redirect_url = reverse('courseware', args=[str(self.course.id)])
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=302)
         response = self.client.get(redirect_url)
         exam_url = response.get('Location')
@@ -508,14 +507,14 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Test can_skip_entrance_exam method with anonymous user
         """
-        self.assertFalse(user_can_skip_entrance_exam(self.anonymous_user, self.course))
+        assert not user_can_skip_entrance_exam(self.anonymous_user, self.course)
 
     def test_has_passed_entrance_exam_with_anonymous_user(self):
         """
         Test has_passed_entrance_exam method with anonymous user
         """
         self.request.user = self.anonymous_user
-        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
+        assert not user_has_passed_entrance_exam(self.request.user, self.course)
 
     def test_course_has_entrance_exam_missing_exam_id(self):
         course = CourseFactory.create(
@@ -523,12 +522,12 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        self.assertFalse(course_has_entrance_exam(course))
+        assert not course_has_entrance_exam(course)
 
     def test_user_has_passed_entrance_exam_short_circuit_missing_exam(self):
         course = CourseFactory.create(
         )
-        self.assertTrue(user_has_passed_entrance_exam(self.request.user, course))
+        assert user_has_passed_entrance_exam(self.request.user, course)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
     def test_entrance_exam_xblock_response(self):
@@ -536,7 +535,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
         request_factory = RequestFactoryNoCsrf()
-        data = {'input_{}_2_1'.format(six.text_type(self.problem_1.location.html_id())): 'choice_2'}
+        data = {'input_{}_2_1'.format(str(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
             'problem_check',
             data=data
@@ -544,12 +543,12 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         request.user = self.user
         response = handle_xblock_callback(
             request,
-            six.text_type(self.course.id),
-            six.text_type(self.problem_1.location),
+            str(self.course.id),
+            str(self.problem_1.location),
             'xmodule_handler',
             'problem_check',
         )
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'entrance_exam_passed')
 
     def _assert_chapter_loaded(self, course, chapter):
@@ -558,10 +557,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         url = reverse(
             'courseware_chapter',
-            kwargs={'course_id': six.text_type(course.id), 'chapter': chapter.url_name}
+            kwargs={'course_id': str(course.id), 'chapter': chapter.url_name}
         )
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
     def _return_table_of_contents(self):
         """
@@ -640,13 +639,13 @@ def add_entrance_exam_milestone(course, entrance_exam):
         }
     )
     add_course_milestone(
-        six.text_type(course.id),
+        str(course.id),
         milestone_relationship_types['REQUIRES'],
         milestone
     )
     add_course_content_milestone(
-        six.text_type(course.id),
-        six.text_type(entrance_exam.location),
+        str(course.id),
+        str(entrance_exam.location),
         milestone_relationship_types['FULFILLS'],
         milestone
     )

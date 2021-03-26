@@ -24,9 +24,11 @@
          },
 
          render: function() {
-             var renderedHtml = _.template($(this.template).html())({});
-             $(this.el).html(renderedHtml);
-
+             var renderedHtml = edx.HtmlUtils.template($(this.template).html())({});
+             edx.HtmlUtils.setHtml(
+                 $(this.el),
+                 renderedHtml
+             );
             // Set the submit button to disabled by default
              this.setSubmitButtonEnabled(false);
 

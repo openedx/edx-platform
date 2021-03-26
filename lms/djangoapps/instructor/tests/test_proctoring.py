@@ -2,17 +2,19 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
+from unittest.mock import patch
+
 import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
-from six import text_type
-
 from edx_proctoring.api import create_exam
 from edx_proctoring.backends.tests.test_backend import TestBackendProvider
+from edx_toggles.toggles.testutils import override_waffle_flag
+
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
+from lms.djangoapps.courseware.toggles import EXAM_RESUME_PROCTORING_IMPROVEMENTS
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -26,12 +28,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestProctoringDashboardViews, cls).setUpClass()
-        button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'
+        super().setUpClass()
+        button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'  # lint-amnesty, pylint: disable=line-too-long
         cls.proctoring_link = button
 
     def setUp(self):
-        super(TestProctoringDashboardViews, self).setUp()
+        super().setUp()
 
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -41,13 +43,13 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         Create URL for instructor dashboard
         """
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': str(course.id)})  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
     def setup_course(self, enable_proctored_exams, enable_timed_exams):
         """
         Create course based on proctored exams and timed exams values
         """
-        self.course = CourseFactory.create(enable_proctored_exams=enable_proctored_exams,
+        self.course = CourseFactory.create(enable_proctored_exams=enable_proctored_exams,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
                                            enable_timed_exams=enable_timed_exams)
         self.setup_course_url(self.course)
 
@@ -176,6 +178,32 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.is_staff = True
         self.instructor.save()
         self._assert_escalation_email_available(True)
+
+    @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, True)
+    def test_exam_resume_proctoring_improvements_toggle_enabled(self):
+        """
+        The value of the feature toggle EXAM_RESUME_PROCTORING_IMPROVEMENTS should be included in the response
+        via the data-enable-exam-resume-proctoring-improvements data attribute when the toggle is enabled.
+        """
+        self.setup_course(True, True)
+        self.instructor.is_staff = True
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        assert 'data-enable-exam-resume-proctoring-improvements="True"' in response.content.decode('utf-8')
+
+    @override_waffle_flag(EXAM_RESUME_PROCTORING_IMPROVEMENTS, False)
+    def test_exam_resume_proctoring_improvements_toggle_disabled(self):
+        """
+        The value of the feature toggle EXAM_RESUME_PROCTORING_IMPROVEMENTS should be included in the response
+        via the data-enable-exam-resume-proctoring-improvements data attribute when the toggle is disabled.
+        """
+        self.setup_course(True, True)
+        self.instructor.is_staff = True
+        self.instructor.save()
+
+        response = self.client.get(self.url)
+        assert 'data-enable-exam-resume-proctoring-improvements="False"' in response.content.decode('utf-8')
 
     def test_review_dashboard(self):
         """

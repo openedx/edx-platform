@@ -201,8 +201,8 @@ Mostly adapted from math.stackexchange.com: http://cdn.sstatic.net/js/mathjax-ed
                               .append($("<textarea>")
                               .addClass("wmd-input")
                               .attr("id", wmdInputId)
-                              .html(initialText))
-                              .append($wmdPreviewContainer); // xss-lint: disable=javascript-jquery-html
+                              .html(initialText)) // xss-lint: disable=javascript-jquery-html
+                              .append($wmdPreviewContainer);
         $elem.append($wmdPanel);
       }
       converter = Markdown.getMathCompatibleConverter(postProcessor);

@@ -59,8 +59,11 @@
                     startHeader: this.startHeader,
                     form_id: this.mode + (this.topicId ? '-' + this.topicId : '')
                 });
-                this.$el.html(_.template($('#new-post-template').html())(context));
-                threadTypeTemplate = _.template($('#thread-type-template').html());
+                edx.HtmlUtils.setHtml(
+                    this.$el,
+                    edx.HtmlUtils.template($('#new-post-template').html())(context)
+                );
+                threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html());
                 if ($('.js-group-select').prop('disabled')) {
                     $('.group-selector-wrapper').addClass('disabled');
                 }
@@ -77,7 +80,7 @@
                     if (this.course_settings.get('is_discussion_division_enabled')) {
                         this.topicView.on('thread:topic_change', this.updateVisibilityMessage);
                     }
-                    this.addField(this.topicView.render());
+                    this.addField(edx.HtmlUtils.HTML(this.topicView.render()));
                 } else {
                     this.group_name = this.getGroupName();
                     this.updateVisibilityMessage(null, this.is_commentable_divided);
@@ -86,7 +89,10 @@
             };
 
             NewPostView.prototype.addField = function(fieldView) {
-                return this.$('.forum-new-post-form-wrapper').append(fieldView);
+                return edx.HtmlUtils.append(
+                    this.$('.forum-new-post-form-wrapper'),
+                    fieldView
+                );
             };
 
             NewPostView.prototype.isTabMode = function() {

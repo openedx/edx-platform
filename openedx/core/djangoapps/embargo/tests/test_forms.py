@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for embargo app admin forms.
 """
 
 
-import six
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
 from django.test import TestCase
@@ -23,12 +21,12 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
     def test_save_valid_data(self):
         course = CourseFactory.create()
         data = {
-            'course_key': six.text_type(course.id),
+            'course_key': str(course.id),
             'enroll_msg_key': 'default',
             'access_msg_key': 'default'
         }
         form = RestrictedCourseForm(data=data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_invalid_course_key(self):
         # Invalid format for the course key
@@ -44,10 +42,10 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
         """
         Validation shouldn't work.
         """
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
         msg = 'COURSE NOT FOUND'
-        self.assertIn(msg, form._errors['course_key'][0])  # pylint: disable=protected-access
+        assert msg in form._errors['course_key'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(
             ValueError, "The RestrictedCourse could not be created because the data didn't validate."
@@ -59,7 +57,7 @@ class IPFilterFormTest(TestCase):
     """Test form for adding [black|white]list IP addresses"""
 
     def tearDown(self):
-        super(IPFilterFormTest, self).tearDown()
+        super().tearDown()
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
         # and don't interfere with each other
         cache.clear()
@@ -69,32 +67,32 @@ class IPFilterFormTest(TestCase):
         # should be able to do both ipv4 and ipv6
         # spacing should not matter
         form_data = {
-            'whitelist': u'127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101, 1.1.0.1/32, 1.0.0.0/24',
-            'blacklist': u'  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1, 1.0.0.0/16'
+            'whitelist': '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101, 1.1.0.1/32, 1.0.0.0/24',
+            'blacklist': '  18.244.1.5  ,  2002:c0a8:101::42, 18.36.22.1, 1.0.0.0/16'
         }
         form = IPFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
         whitelist = IPFilter.current().whitelist_ips
         blacklist = IPFilter.current().blacklist_ips
-        for addr in u'127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
-            self.assertIn(addr.strip(), whitelist)
-        for addr in u'18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
-            self.assertIn(addr.strip(), blacklist)
+        for addr in '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
+            assert addr.strip() in whitelist
+        for addr in '18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
+            assert addr.strip() in blacklist
 
         # Network tests
         # ips not in whitelist network
-        for addr in [u'1.1.0.2', u'1.0.1.0']:
-            self.assertNotIn(addr.strip(), whitelist)
+        for addr in ['1.1.0.2', '1.0.1.0']:
+            assert addr.strip() not in whitelist
         # ips in whitelist network
-        for addr in [u'1.1.0.1', u'1.0.0.100']:
-            self.assertIn(addr.strip(), whitelist)
+        for addr in ['1.1.0.1', '1.0.0.100']:
+            assert addr.strip() in whitelist
         # ips not in blacklist network
-        for addr in [u'2.0.0.0', u'1.1.0.0']:
-            self.assertNotIn(addr.strip(), blacklist)
+        for addr in ['2.0.0.0', '1.1.0.0']:
+            assert addr.strip() not in blacklist
         # ips in blacklist network
-        for addr in [u'1.0.100.0', u'1.0.0.10']:
-            self.assertIn(addr.strip(), blacklist)
+        for addr in ['1.0.100.0', '1.0.0.10']:
+            assert addr.strip() in blacklist
 
         # Test clearing by adding an empty list is OK too
         form_data = {
@@ -102,35 +100,27 @@ class IPFilterFormTest(TestCase):
             'blacklist': ''
         }
         form = IPFilterForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
         form.save()
-        self.assertEqual(len(IPFilter.current().whitelist), 0)
-        self.assertEqual(len(IPFilter.current().blacklist), 0)
+        assert len(IPFilter.current().whitelist) == 0
+        assert len(IPFilter.current().blacklist) == 0
 
     def test_add_invalid_ips(self):
         # test adding invalid ip addresses
         form_data = {
-            'whitelist': u'.0.0.1, :dead:beef:::, 1.0.0.0/55',
-            'blacklist': u'  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
+            'whitelist': '.0.0.1, :dead:beef:::, 1.0.0.0/55',
+            'blacklist': '  18.244.*  ,  999999:c0a8:101::42, 1.0.0.0/'
         }
         form = IPFilterForm(data=form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
-        if six.PY2:
-            wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
-                   " Please fix the error(s) and try again."
-        else:
-            wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']" \
-                   " Please fix the error(s) and try again."
-        self.assertEqual(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
+        wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']"\
+               " Please fix the error(s) and try again."
+        assert wmsg == form._errors['whitelist'][0]  # pylint: disable=protected-access
 
-        if six.PY2:
-            bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
-                   " Please fix the error(s) and try again."
-        else:
-            bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']" \
-                   " Please fix the error(s) and try again."
-        self.assertEqual(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
+        bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']"\
+               " Please fix the error(s) and try again."
+        assert bmsg == form._errors['blacklist'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(ValueError, "The IPFilter could not be created because the data didn't validate."):
             form.save()

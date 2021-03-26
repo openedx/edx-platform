@@ -27,11 +27,11 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super(TestStudentDashboardEmailView, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
-        super(TestStudentDashboardEmailView, self).setUp()
+        super().setUp()
 
         # Create student account
         student = UserFactory.create()
@@ -51,7 +51,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super(TestStudentDashboardEmailView, self).tearDown()
+        super().tearDown()
         BulkEmailFlag.objects.all().delete()
 
     def test_email_flag_true(self):
@@ -69,7 +69,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
     def test_email_unauthorized(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         # Assert that instructor email is not enabled for this course
-        self.assertFalse(is_bulk_email_feature_enabled(self.course.id))
+        assert not is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)
@@ -81,7 +81,7 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
         cauth.save()
         # Assert that instructor email is enabled for this course
-        self.assertTrue(is_bulk_email_feature_enabled(self.course.id))
+        assert is_bulk_email_feature_enabled(self.course.id)
         # Assert that the URL for the email view is not in the response
         # if this course isn't authorized
         response = self.client.get(self.url)

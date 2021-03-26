@@ -9,7 +9,8 @@ define([
         var StaffDebug = window.StaffDebug;
 
         describe('StaffDebugActions', function() {
-            var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
+            var courseId = 'course-v1:edX+DemoX+1';
+            var location = 'block-v1:edX+DemoX+1+type@problem+block@9518dd51055b40cd82feb01502644c89';
             var locationName = 'test_loc';
             var usernameFixtureID = 'sd_fu_' + locationName;
             var $usernameFixture = $('<input>', {id: usernameFixtureID, placeholder: 'userman'});
@@ -24,19 +25,15 @@ define([
 
             describe('getURL ', function() {
                 it('defines url to courseware ajax entry point', function() {
-                    spyOn(StaffDebug, 'getCurrentUrl')
-                      .and.returnValue('/courses/edX/Open_DemoX/edx_demo_course/courseware/stuff');
-                    expect(StaffDebug.getURL('rescore_problem'))
-                      .toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
+                    expect(StaffDebug.getURL(courseId, 'rescore_problem'))
+                      .toBe('/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem');
                 });
             });
 
             describe('getURL ', function() {
-                it('defines that getCurrentUrl works on instructor page as expected', function() {
-                    spyOn(StaffDebug, 'getCurrentUrl')
-                      .and.returnValue('/courses/edx_demo_course/instructor#view-open_response_assessment');
-                    expect(StaffDebug.getURL('rescore_problem'))
-                      .toBe('/courses/edx_demo_course/instructor/api/rescore_problem');
+                it('defines url to courseware ajax entry point for deprecated courses', function() {
+                    expect(StaffDebug.getURL('edX/DemoX/1', 'rescore_problem'))
+                      .toBe('/courses/edX/DemoX/1/instructor/api/rescore_problem');
                 });
             });
 
@@ -87,6 +84,7 @@ define([
                     $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
+                        courseId: courseId,
                         locationName: esclocationName,
                         success_msg: 'Successfully reset the attempts for user userman'
                     };
@@ -101,6 +99,7 @@ define([
                     $('body').append($escapableResultArea);
                     var requests = AjaxHelpers.requests(this);
                     var action = {
+                        courseId: courseId,
                         locationName: esclocationName,
                         error_msg: 'Failed to reset attempts for user.'
                     };
@@ -115,7 +114,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.reset(locationName, location);
+                    StaffDebug.reset(courseId, locationName, location);
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -126,7 +125,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/reset_student_attempts'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -136,7 +135,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.deleteStudentState(locationName, location);
+                    StaffDebug.deleteStudentState(courseId, locationName, location);
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -147,7 +146,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/reset_student_attempts'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/reset_student_attempts'
                     );
 
                     $('#' + usernameFixtureID).remove();
@@ -158,7 +157,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.rescore(locationName, location);
+                    StaffDebug.rescore(courseId, locationName, location);
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -169,7 +168,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/rescore_problem'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -179,7 +178,7 @@ define([
                     $('body').append($usernameFixture);
 
                     spyOn($, 'ajax');
-                    StaffDebug.rescoreIfHigher(locationName, location);
+                    StaffDebug.rescoreIfHigher(courseId, locationName, location);
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -190,7 +189,7 @@ define([
                         score: undefined
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/rescore_problem'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/rescore_problem'
                     );
                     $('#' + usernameFixtureID).remove();
                 });
@@ -201,7 +200,7 @@ define([
                     $('body').append($scoreFixture);
                     $('#' + scoreFixtureID).val('1');
                     spyOn($, 'ajax');
-                    StaffDebug.overrideScore(locationName, location);
+                    StaffDebug.overrideScore(courseId, locationName, location);
 
                     expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
                     expect($.ajax.calls.mostRecent().args[0].data).toEqual({
@@ -212,7 +211,7 @@ define([
                         score: '1'
                     });
                     expect($.ajax.calls.mostRecent().args[0].url).toEqual(
-                        '/instructor/api/override_problem_score'
+                        '/courses/course-v1:edX+DemoX+1/instructor/api/override_problem_score'
                     );
                     $('#' + usernameFixtureID).remove();
                 });

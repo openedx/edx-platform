@@ -3,7 +3,7 @@ Forms to support third-party to first-party OAuth 2.0 access token exchange
 """
 
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.forms import CharField
 from django.conf import settings
 from django.utils.encoding import smart_text
@@ -55,7 +55,7 @@ class ScopeChoiceField(forms.ChoiceField):
             value = value.split(' ')
 
         # Split values into list
-        return u' '.join([smart_text(val) for val in value]).split(u' ')
+        return ' '.join([smart_text(val) for val in value]).split(' ')
 
     def validate(self, value):
         """
@@ -86,7 +86,7 @@ class AccessTokenExchangeForm(forms.Form):
     client_id = CharField(required=False)
 
     def __init__(self, request, oauth2_adapter, *args, **kwargs):
-        super(AccessTokenExchangeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request = request
         self.oauth2_adapter = oauth2_adapter
 
@@ -96,7 +96,7 @@ class AccessTokenExchangeForm(forms.Form):
         instead of validating each field.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_fields()
+            super()._clean_fields()
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -105,7 +105,7 @@ class AccessTokenExchangeForm(forms.Form):
         Overriding the default cleaning behaviour for a shallow error dict.
         """
         try:
-            super(AccessTokenExchangeForm, self)._clean_form()
+            super()._clean_form()
         except OAuthValidationError as e:
             self._errors.update(e.args[0])
 
@@ -118,7 +118,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": u"{} is required".format(field_name),
+                    "error_description": f"{field_name} is required",
                 }
             )
         return field_val
@@ -154,7 +154,7 @@ class AccessTokenExchangeForm(forms.Form):
             raise OAuthValidationError(
                 {
                     "error": "invalid_request",
-                    "error_description": u"{} is not a supported provider".format(backend.name),
+                    "error_description": f"{backend.name} is not a supported provider",
                 }
             )
 
@@ -164,10 +164,10 @@ class AccessTokenExchangeForm(forms.Form):
         try:
             client = self.oauth2_adapter.get_client(client_id=client_id)
         except Application.DoesNotExist:
-            raise OAuthValidationError(
+            raise OAuthValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 {
                     "error": "invalid_client",
-                    "error_description": u"{} is not a valid client_id".format(client_id),
+                    "error_description": f"{client_id} is not a valid client_id",
                 }
             )
         if client.client_type != Application.CLIENT_PUBLIC:
@@ -176,7 +176,7 @@ class AccessTokenExchangeForm(forms.Form):
                     # invalid_client isn't really the right code, but this mirrors
                     # https://github.com/edx/django-oauth2-provider/blob/edx/provider/oauth2/forms.py#L331
                     "error": "invalid_client",
-                    "error_description": u"{} is not a public client".format(client_id),
+                    "error_description": f"{client_id} is not a public client",
                 }
             )
         self.cleaned_data["client"] = client
@@ -187,6 +187,17 @@ class AccessTokenExchangeForm(forms.Form):
             user = backend.do_auth(access_token, allow_inactive_user=True)
         except (HTTPError, AuthException):
             pass
+        # check if user is disabled
+        if isinstance(user, User) and not user.has_usable_password():
+            self.request.social_strategy.clean_partial_pipeline(access_token)
+            raise OAuthValidationError(
+                {
+                    "error": "account_disabled",
+                    "error_description": 'user account is disabled',
+                    "error_code": 403
+                }
+            )
+
         if user and isinstance(user, User):
             self.cleaned_data["user"] = user
         else:

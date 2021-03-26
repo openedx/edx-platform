@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Tests for linters.py
 """
@@ -8,7 +7,6 @@ import textwrap
 from unittest import TestCase
 
 from ddt import data, ddt
-from six.moves import range, zip
 
 from xsslint.linters import (
     JavaScriptLinter, MakoTemplateLinter,
@@ -69,11 +67,11 @@ class TestLinter(TestCase):
         # Print violations if the lengths are different.
         if len(results.violations) != len(rules):
             for violation in results.violations:
-                print("Found violation: {}".format(violation.rule))
+                print(f"Found violation: {violation.rule}")
 
-        self.assertEqual(len(results.violations), len(rules))
+        assert len(results.violations) == len(rules)
         for violation, rule in zip(results.violations, rules):
-            self.assertEqual(violation.rule, rule)
+            assert violation.rule == rule
 
 
 @ddt
@@ -99,7 +97,7 @@ class TestUnderscoreTemplateLinter(TestLinter):
 
         linter.check_underscore_file_is_safe(template, results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
     def test_check_underscore_file_is_not_safe(self):
         """
@@ -118,9 +116,9 @@ class TestUnderscoreTemplateLinter(TestLinter):
 
         linter.check_underscore_file_is_safe(template, results)
 
-        self.assertEqual(len(results.violations), 2)
-        self.assertEqual(results.violations[0].rule, UNDERSCORE_LINTER_RULESET.underscore_not_escaped)
-        self.assertEqual(results.violations[1].rule, UNDERSCORE_LINTER_RULESET.underscore_not_escaped)
+        assert len(results.violations) == 2
+        assert results.violations[0].rule == UNDERSCORE_LINTER_RULESET.underscore_not_escaped
+        assert results.violations[1].rule == UNDERSCORE_LINTER_RULESET.underscore_not_escaped
 
     @data(
         {
@@ -182,9 +180,9 @@ class TestUnderscoreTemplateLinter(TestLinter):
         linter.check_underscore_file_is_safe(data['template'], results)
 
         violation_count = len(data['is_disabled'])
-        self.assertEqual(len(results.violations), violation_count)
+        assert len(results.violations) == violation_count
         for index in range(0, violation_count - 1):
-            self.assertEqual(results.violations[index].is_disabled, data['is_disabled'][index])
+            assert results.violations[index].is_disabled == data['is_disabled'][index]
 
     def test_check_underscore_file_disables_one_violation(self):
         """
@@ -202,9 +200,9 @@ class TestUnderscoreTemplateLinter(TestLinter):
 
         linter.check_underscore_file_is_safe(template, results)
 
-        self.assertEqual(len(results.violations), 2)
-        self.assertEqual(results.violations[0].is_disabled, True)
-        self.assertEqual(results.violations[1].is_disabled, False)
+        assert len(results.violations) == 2
+        assert results.violations[0].is_disabled is True
+        assert results.violations[1].is_disabled is False
 
     @data(
         {'template': '<%= edx.HtmlUtils.ensureHtml(message) %>'},
@@ -221,7 +219,7 @@ class TestUnderscoreTemplateLinter(TestLinter):
 
         linter.check_underscore_file_is_safe(data['template'], results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
 
 @ddt
@@ -468,8 +466,8 @@ class TestPythonLinter(TestLinter):
 
         linter.check_python_file_is_safe(python_file, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_deprecated_display_name)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == PYTHON_LINTER_RULESET.python_deprecated_display_name
 
     def test_check_custom_escaping(self):
         """
@@ -484,8 +482,8 @@ class TestPythonLinter(TestLinter):
 
         linter.check_python_file_is_safe(python_file, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_custom_escape)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == PYTHON_LINTER_RULESET.python_custom_escape
 
     @data(
         {
@@ -663,12 +661,12 @@ class TestPythonLinter(TestLinter):
 
         results.violations.sort(key=lambda violation: violation.sort_key())
 
-        self.assertEqual(len(results.violations), 5)
-        self.assertEqual(results.violations[0].rule, PYTHON_LINTER_RULESET.python_wrap_html)
-        self.assertEqual(results.violations[1].rule, PYTHON_LINTER_RULESET.python_requires_html_or_text)
-        self.assertEqual(results.violations[2].rule, PYTHON_LINTER_RULESET.python_close_before_format)
-        self.assertEqual(results.violations[3].rule, PYTHON_LINTER_RULESET.python_wrap_html)
-        self.assertEqual(results.violations[4].rule, PYTHON_LINTER_RULESET.python_interpolate_html)
+        assert len(results.violations) == 5
+        assert results.violations[0].rule == PYTHON_LINTER_RULESET.python_wrap_html
+        assert results.violations[1].rule == PYTHON_LINTER_RULESET.python_requires_html_or_text
+        assert results.violations[2].rule == PYTHON_LINTER_RULESET.python_close_before_format
+        assert results.violations[3].rule == PYTHON_LINTER_RULESET.python_wrap_html
+        assert results.violations[4].rule == PYTHON_LINTER_RULESET.python_interpolate_html
 
     @data(
         {
@@ -742,7 +740,7 @@ class TestPythonLinter(TestLinter):
         linter.check_python_file_is_safe(file_content, results)
 
         self._validate_data_rules(data, results)
-        self.assertEqual(results.violations[0].start_line, data['start_line'])
+        assert results.violations[0].start_line == data['start_line']
 
 
 @ddt
@@ -766,7 +764,7 @@ class TestMakoTemplateLinter(TestLinter):
         linter = _build_mako_linter()
         linter._skip_mako_dirs = ('test_root',)
 
-        self.assertEqual(linter._is_valid_directory(data['directory']), data['expected'])
+        assert linter._is_valid_directory(data['directory']) == data['expected']
 
     @data(
         {
@@ -818,9 +816,9 @@ class TestMakoTemplateLinter(TestLinter):
         linter._check_mako_file_is_safe(data['template'], results)
 
         num_violations = 0 if data['rule'] is None else 1
-        self.assertEqual(len(results.violations), num_violations)
+        assert len(results.violations) == num_violations
         if num_violations > 0:
-            self.assertEqual(results.violations[0].rule, data['rule'])
+            assert results.violations[0].rule == data['rule']
 
     @data(
         {'expression': '${x}', 'rule': None},
@@ -862,8 +860,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.python_deprecated_display_name)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.python_deprecated_display_name
 
     @data(
         {
@@ -1022,8 +1020,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.mako_missing_default
 
     def test_check_mako_expression_default_disabled(self):
         """
@@ -1042,8 +1040,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertTrue(results.violations[0].is_disabled)
+        assert len(results.violations) == 1
+        assert results.violations[0].is_disabled
 
     def test_check_mako_expression_disabled(self):
         """
@@ -1061,8 +1059,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertTrue(results.violations[0].is_disabled)
+        assert len(results.violations) == 1
+        assert results.violations[0].is_disabled
 
     @data(
         {'template': '{% extends "wiki/base.html" %}'},
@@ -1079,7 +1077,7 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(data['template'], results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
     def test_check_mako_expressions_in_html_with_escape_filter(self):
         """
@@ -1095,7 +1093,7 @@ class TestMakoTemplateLinter(TestLinter):
         """)
 
         linter._check_mako_file_is_safe(mako_template, results)
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
     def test_check_mako_expressions_in_html_without_default(self):
         """
@@ -1111,8 +1109,8 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.mako_missing_default
 
     @data(
         {'expression': '${x}', 'rule': MAKO_LINTER_RULESET.mako_invalid_js_filter},
@@ -1254,14 +1252,14 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 7)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[1].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
-        self.assertEqual(results.violations[2].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[3].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
-        self.assertEqual(results.violations[4].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
-        self.assertEqual(results.violations[5].rule, MAKO_LINTER_RULESET.mako_invalid_js_filter)
-        self.assertEqual(results.violations[6].rule, MAKO_LINTER_RULESET.mako_unwanted_html_filter)
+        assert len(results.violations) == 7
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.mako_unwanted_html_filter
+        assert results.violations[1].rule == MAKO_LINTER_RULESET.mako_invalid_js_filter
+        assert results.violations[2].rule == MAKO_LINTER_RULESET.mako_unwanted_html_filter
+        assert results.violations[3].rule == MAKO_LINTER_RULESET.mako_invalid_js_filter
+        assert results.violations[4].rule == MAKO_LINTER_RULESET.mako_unwanted_html_filter
+        assert results.violations[5].rule == MAKO_LINTER_RULESET.mako_invalid_js_filter
+        assert results.violations[6].rule == MAKO_LINTER_RULESET.mako_unwanted_html_filter
 
     def test_check_mako_expressions_javascript_strings(self):
         """
@@ -1294,10 +1292,10 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 3)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_js_missing_quotes)
-        self.assertEqual(results.violations[1].rule, MAKO_LINTER_RULESET.mako_js_html_string)
-        self.assertEqual(results.violations[2].rule, MAKO_LINTER_RULESET.mako_js_html_string)
+        assert len(results.violations) == 3
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.mako_js_missing_quotes
+        assert results.violations[1].rule == MAKO_LINTER_RULESET.mako_js_html_string
+        assert results.violations[2].rule == MAKO_LINTER_RULESET.mako_js_html_string
 
     def test_check_javascript_in_mako_javascript_context(self):
         """
@@ -1316,9 +1314,9 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(mako_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.javascript_concat_html)
-        self.assertEqual(results.violations[0].start_line, 4)
+        assert len(results.violations) == 1
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.javascript_concat_html
+        assert results.violations[0].start_line == 4
 
     @data(
         {'template': "\n${x | n}", 'parseable': True},
@@ -1343,22 +1341,22 @@ class TestMakoTemplateLinter(TestLinter):
 
         linter._check_mako_file_is_safe(data['template'], results)
 
-        self.assertEqual(len(results.violations), 2)
-        self.assertEqual(results.violations[0].rule, MAKO_LINTER_RULESET.mako_missing_default)
+        assert len(results.violations) == 2
+        assert results.violations[0].rule == MAKO_LINTER_RULESET.mako_missing_default
 
         violation = results.violations[1]
         lines = list(data['template'].splitlines())
-        self.assertTrue("${" in lines[violation.start_line - 1])
-        self.assertTrue(lines[violation.start_line - 1].startswith("${", violation.start_column - 1))
+        assert ('${' in lines[(violation.start_line - 1)])
+        assert lines[(violation.start_line - 1)].startswith('${', (violation.start_column - 1))
         if data['parseable']:
-            self.assertTrue("}" in lines[violation.end_line - 1])
-            self.assertTrue(lines[violation.end_line - 1].startswith("}", violation.end_column - len("}") - 1))
+            assert ('}' in lines[(violation.end_line - 1)])
+            assert lines[(violation.end_line - 1)].startswith('}', ((violation.end_column - len('}')) - 1))
         else:
-            self.assertEqual(violation.start_line, violation.end_line)
-            self.assertEqual(violation.end_column, "?")
-        self.assertEqual(len(violation.lines), violation.end_line - violation.start_line + 1)
+            assert violation.start_line == violation.end_line
+            assert violation.end_column == '?'
+        assert len(violation.lines) == ((violation.end_line - violation.start_line) + 1)
         for line_index in range(0, len(violation.lines)):
-            self.assertEqual(violation.lines[line_index], lines[line_index + violation.start_line - 1])
+            assert violation.lines[line_index] == lines[((line_index + violation.start_line) - 1)]
 
     @data(
         {'template': "${x}"},
@@ -1377,11 +1375,11 @@ class TestMakoTemplateLinter(TestLinter):
 
         expressions = linter._find_mako_expressions(data['template'])
 
-        self.assertEqual(len(expressions), 1)
+        assert len(expressions) == 1
         start_index = expressions[0].start_index
         end_index = expressions[0].end_index
-        self.assertEqual(data['template'][start_index:end_index], data['template'].strip())
-        self.assertEqual(expressions[0].expression, data['template'].strip())
+        assert data['template'][start_index:end_index] == data['template'].strip()
+        assert expressions[0].expression == data['template'].strip()
 
     @data(
         {'template': " ${{unparseable} ${}", 'start_index': 1},
@@ -1394,9 +1392,9 @@ class TestMakoTemplateLinter(TestLinter):
         linter = _build_mako_linter()
 
         expressions = linter._find_mako_expressions(data['template'])
-        self.assertTrue(2 <= len(expressions))
-        self.assertEqual(expressions[0].start_index, data['start_index'])
-        self.assertIsNone(expressions[0].expression)
+        assert (2 <= len(expressions))
+        assert expressions[0].start_index == data['start_index']
+        assert expressions[0].expression is None
 
     @data(
         {
@@ -1439,10 +1437,10 @@ class TestMakoTemplateLinter(TestLinter):
 
         self.assertDictEqual(string_dict, data['result'])
         if parse_string.end_index is not None:
-            self.assertEqual(data['template'][parse_string.start_index:parse_string.end_index], parse_string.string)
+            assert data['template'][parse_string.start_index:parse_string.end_index] == parse_string.string
             start_inner_index = parse_string.start_index + parse_string.quote_length
             end_inner_index = parse_string.end_index - parse_string.quote_length
-            self.assertEqual(data['template'][start_inner_index:end_inner_index], parse_string.string_inner)
+            assert data['template'][start_inner_index:end_inner_index] == parse_string.string_inner
 
 
 @ddt
@@ -1589,8 +1587,8 @@ class TestDjangoTemplateLinter(TestLinter):
 
         linter._check_django_file_is_safe(django_template, results)
 
-        self.assertEqual(len(results.violations), 1)
-        self.assertTrue(results.violations[0].is_disabled)
+        assert len(results.violations) == 1
+        assert results.violations[0].is_disabled
 
         def test_check_django_blocktrans_expression_disabled(self):
             """
@@ -1616,8 +1614,8 @@ class TestDjangoTemplateLinter(TestLinter):
 
             linter._check_django_file_is_safe(django_template, results)
 
-            self.assertEqual(len(results.violations), 1)
-            self.assertTrue(results.violations[0].is_disabled)
+            assert len(results.violations) == 1
+            assert results.violations[0].is_disabled
 
     def test_check_django_trans_expression_commented(self):
         """
@@ -1640,7 +1638,7 @@ class TestDjangoTemplateLinter(TestLinter):
 
         linter._check_django_file_is_safe(django_template, results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
     def test_check_django_blocktrans_expression_commented(self):
         """
@@ -1666,7 +1664,7 @@ class TestDjangoTemplateLinter(TestLinter):
 
         linter._check_django_file_is_safe(django_template, results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0
 
     def test_check_django_interpolate_tag_expression_commented(self):
         """
@@ -1691,4 +1689,4 @@ class TestDjangoTemplateLinter(TestLinter):
 
         linter._check_django_file_is_safe(django_template, results)
 
-        self.assertEqual(len(results.violations), 0)
+        assert len(results.violations) == 0

@@ -6,12 +6,11 @@ Serializers for Bulk Enrollment.
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
-from six.moves import zip
 
 from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 
 
-class StringListField(serializers.ListField):
+class StringListField(serializers.ListField):  # lint-amnesty, pylint: disable=missing-class-docstring
     def to_internal_value(self, data):
         if not data:
             return []
@@ -20,7 +19,7 @@ class StringListField(serializers.ListField):
         return data.split(',')
 
 
-class BulkEnrollmentSerializer(serializers.Serializer):
+class BulkEnrollmentSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method
     """Serializes enrollment information for a collection of students/emails.
 
     This is mainly useful for implementing validation when performing bulk enrollment operations.
@@ -47,7 +46,7 @@ class BulkEnrollmentSerializer(serializers.Serializer):
             try:
                 CourseKey.from_string(course)
             except InvalidKeyError:
-                raise serializers.ValidationError(u"Course key not valid: {}".format(course))
+                raise serializers.ValidationError(f"Course key not valid: {course}")  # lint-amnesty, pylint: disable=raise-missing-from
         return value
 
     def validate(self, attrs):
@@ -63,7 +62,7 @@ class BulkEnrollmentSerializer(serializers.Serializer):
 
             for course_id, cohort_name in zip(attrs['courses'], attrs['cohorts']):
                 if not is_cohort_exists(course_key=CourseKey.from_string(course_id), name=cohort_name):
-                    raise serializers.ValidationError(u"cohort {cohort_name} not found in course {course_id}.".format(
+                    raise serializers.ValidationError("cohort {cohort_name} not found in course {course_id}.".format(
                         cohort_name=cohort_name, course_id=course_id)
                     )
 

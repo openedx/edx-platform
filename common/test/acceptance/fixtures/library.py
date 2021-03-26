@@ -1,9 +1,6 @@
 """
 Fixture to create a Content Library
 """
-
-
-import six
 from opaque_keys.edx.keys import CourseKey
 
 from common.test.acceptance.fixtures import STUDIO_BASE_URL
@@ -22,7 +19,7 @@ class LibraryFixture(XBlockContainerFixture):
         """
         Configure the library fixture to create a library with
         """
-        super(LibraryFixture, self).__init__()
+        super().__init__()
         self.library_info = {
             'org': org,
             'number': number,
@@ -31,13 +28,13 @@ class LibraryFixture(XBlockContainerFixture):
 
         self.display_name = display_name
         self._library_key = None
-        super(LibraryFixture, self).__init__()
+        super().__init__()
 
     def __str__(self):
         """
         String representation of the library fixture, useful for debugging.
         """
-        return u"<LibraryFixture: org='{org}', number='{number}'>".format(**self.library_info)
+        return "<LibraryFixture: org='{org}', number='{number}'>".format(**self.library_info)
 
     def install(self):
         """
@@ -64,7 +61,7 @@ class LibraryFixture(XBlockContainerFixture):
         Return the locator string for the LibraryRoot XBlock that is the root of the library hierarchy.
         """
         lib_key = CourseKey.from_string(self._library_key)
-        return six.text_type(lib_key.make_usage_key('library', 'library'))
+        return str(lib_key.make_usage_key('library', 'library'))
 
     def _create_library(self):
         """
@@ -84,7 +81,7 @@ class LibraryFixture(XBlockContainerFixture):
                 err_msg = response.json().get('ErrMsg')
             except ValueError:
                 err_msg = "Unknown Error"
-            raise FixtureError(u"Could not create library {}. Status was {}, error was: {}".format(
+            raise FixtureError("Could not create library {}. Status was {}, error was: {}".format(
                 self.library_info, response.status_code, err_msg
             ))
 
@@ -92,4 +89,4 @@ class LibraryFixture(XBlockContainerFixture):
         # Disable publishing for library XBlocks:
         xblock_desc.publish = "not-applicable"
 
-        return super(LibraryFixture, self).create_xblock(parent_loc, xblock_desc)
+        return super().create_xblock(parent_loc, xblock_desc)

@@ -2,21 +2,22 @@
 
 
 import datetime
-import unittest
+from unittest import mock
 
 import ddt
-import mock
+import pytest
 import pytz
 from django import test
 from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
-from lms.djangoapps.verify_student.models import SSOVerification
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+from lms.djangoapps.verify_student.models import SSOVerification
+
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
 User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
@@ -27,7 +28,7 @@ class TestCase(testutil.TestCase, test.TestCase):
     """Base test case."""
 
     def setUp(self):
-        super(TestCase, self).setUp()
+        super().setUp()
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
@@ -35,7 +36,7 @@ class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
     def setUp(self):
-        super(GetAuthenticatedUserTestCase, self).setUp()
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def get_by_username(self, username):
@@ -43,45 +44,45 @@ class GetAuthenticatedUserTestCase(TestCase):
         return social_models.DjangoStorage.user.user_model().objects.get(username=username)
 
     def test_raises_does_not_exist_if_user_missing(self):
-        with self.assertRaises(models.User.DoesNotExist):
+        with pytest.raises(models.User.DoesNotExist):
             pipeline.get_authenticated_user(self.enabled_provider, 'new_' + self.user.username, 'user@example.com')
 
     def test_raises_does_not_exist_if_user_found_but_no_association(self):
         backend_name = 'backend'
 
-        self.assertIsNotNone(self.get_by_username(self.user.username))
-        self.assertFalse(any(provider.Registry.get_enabled_by_backend_name(backend_name)))
+        assert self.get_by_username(self.user.username) is not None
+        assert not any(provider.Registry.get_enabled_by_backend_name(backend_name))
 
-        with self.assertRaises(models.User.DoesNotExist):
+        with pytest.raises(models.User.DoesNotExist):
             pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'user@example.com')
 
     def test_raises_does_not_exist_if_user_and_association_found_but_no_match(self):
-        self.assertIsNotNone(self.get_by_username(self.user.username))
+        assert self.get_by_username(self.user.username) is not None
         social_models.DjangoStorage.user.create_social_auth(
             self.user, 'uid', 'other_' + self.enabled_provider.backend_name)
 
-        with self.assertRaises(models.User.DoesNotExist):
+        with pytest.raises(models.User.DoesNotExist):
             pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'uid')
 
     def test_returns_user_with_is_authenticated_and_backend_set_if_match(self):
         social_models.DjangoStorage.user.create_social_auth(self.user, 'uid', self.enabled_provider.backend_name)
         user = pipeline.get_authenticated_user(self.enabled_provider, self.user.username, 'uid')
 
-        self.assertEqual(self.user, user)
-        self.assertEqual(self.enabled_provider.get_authentication_backend(), user.backend)
+        assert self.user == user
+        assert self.enabled_provider.get_authentication_backend() == user.backend
 
 
 class GetProviderUserStatesTestCase(TestCase):
     """Tests generation of ProviderUserStates."""
 
     def setUp(self):
-        super(GetProviderUserStatesTestCase, self).setUp()
+        super().setUp()
         self.configure_google_provider(enabled=False)
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def test_returns_empty_list_if_no_enabled_providers(self):
-        self.assertFalse(provider.Registry.enabled())
-        self.assertEqual([], pipeline.get_provider_user_states(self.user))
+        assert not provider.Registry.enabled()
+        assert [] == pipeline.get_provider_user_states(self.user)
 
     def test_state_not_returned_for_disabled_provider(self):
         disabled_provider = self.configure_google_provider(enabled=False)
@@ -89,9 +90,9 @@ class GetProviderUserStatesTestCase(TestCase):
         social_models.DjangoStorage.user.create_social_auth(self.user, 'uid', disabled_provider.backend_name)
         states = pipeline.get_provider_user_states(self.user)
 
-        self.assertEqual(1, len(states))
-        self.assertNotIn(disabled_provider.provider_id, (state.provider.provider_id for state in states))
-        self.assertIn(enabled_provider.provider_id, (state.provider.provider_id for state in states))
+        assert 1 == len(states)
+        assert disabled_provider.provider_id not in (state.provider.provider_id for state in states)
+        assert enabled_provider.provider_id in (state.provider.provider_id for state in states)
 
     def test_states_for_enabled_providers_user_has_accounts_associated_with(self):
         # Enable two providers - Google and LinkedIn:
@@ -103,48 +104,48 @@ class GetProviderUserStatesTestCase(TestCase):
             self.user, 'uid', linkedin_provider.backend_name)
         states = pipeline.get_provider_user_states(self.user)
 
-        self.assertEqual(2, len(states))
+        assert 2 == len(states)
 
         google_state = [state for state in states if state.provider.provider_id == google_provider.provider_id][0]
         linkedin_state = [state for state in states if state.provider.provider_id == linkedin_provider.provider_id][0]
 
-        self.assertTrue(google_state.has_account)
-        self.assertEqual(google_provider.provider_id, google_state.provider.provider_id)
+        assert google_state.has_account
+        assert google_provider.provider_id == google_state.provider.provider_id
         # Also check the row ID. Note this 'id' changes whenever the configuration does:
-        self.assertEqual(google_provider.id, google_state.provider.id)
-        self.assertEqual(self.user, google_state.user)
-        self.assertEqual(user_social_auth_google.id, google_state.association_id)
+        assert google_provider.id == google_state.provider.id
+        assert self.user == google_state.user
+        assert user_social_auth_google.id == google_state.association_id
 
-        self.assertTrue(linkedin_state.has_account)
-        self.assertEqual(linkedin_provider.provider_id, linkedin_state.provider.provider_id)
-        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)
-        self.assertEqual(self.user, linkedin_state.user)
-        self.assertEqual(user_social_auth_linkedin.id, linkedin_state.association_id)
+        assert linkedin_state.has_account
+        assert linkedin_provider.provider_id == linkedin_state.provider.provider_id
+        assert linkedin_provider.id == linkedin_state.provider.id
+        assert self.user == linkedin_state.user
+        assert user_social_auth_linkedin.id == linkedin_state.association_id
 
     def test_states_for_enabled_providers_user_has_no_account_associated_with(self):
         # Enable two providers - Google and LinkedIn:
         google_provider = self.configure_google_provider(enabled=True)
         linkedin_provider = self.configure_linkedin_provider(enabled=True)
-        self.assertEqual(len(provider.Registry.enabled()), 2)
+        assert len(provider.Registry.enabled()) == 2
 
         states = pipeline.get_provider_user_states(self.user)
 
-        self.assertEqual([], [x for x in social_models.DjangoStorage.user.objects.all()])
-        self.assertEqual(2, len(states))
+        assert [] == list(social_models.DjangoStorage.user.objects.all())
+        assert 2 == len(states)
 
         google_state = [state for state in states if state.provider.provider_id == google_provider.provider_id][0]
         linkedin_state = [state for state in states if state.provider.provider_id == linkedin_provider.provider_id][0]
 
-        self.assertFalse(google_state.has_account)
-        self.assertEqual(google_provider.provider_id, google_state.provider.provider_id)
+        assert not google_state.has_account
+        assert google_provider.provider_id == google_state.provider.provider_id
         # Also check the row ID. Note this 'id' changes whenever the configuration does:
-        self.assertEqual(google_provider.id, google_state.provider.id)
-        self.assertEqual(self.user, google_state.user)
+        assert google_provider.id == google_state.provider.id
+        assert self.user == google_state.user
 
-        self.assertFalse(linkedin_state.has_account)
-        self.assertEqual(linkedin_provider.provider_id, linkedin_state.provider.provider_id)
-        self.assertEqual(linkedin_provider.id, linkedin_state.provider.id)
-        self.assertEqual(self.user, linkedin_state.user)
+        assert not linkedin_state.has_account
+        assert linkedin_provider.provider_id == linkedin_state.provider.provider_id
+        assert linkedin_provider.id == linkedin_state.provider.id
+        assert self.user == linkedin_state.user
 
 
 class UrlFormationTestCase(TestCase):
@@ -153,62 +154,59 @@ class UrlFormationTestCase(TestCase):
     def test_complete_url_raises_value_error_if_provider_not_enabled(self):
         provider_name = 'oa2-not-enabled'
 
-        self.assertIsNone(provider.Registry.get(provider_name))
+        assert provider.Registry.get(provider_name) is None
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_complete_url(provider_name)
 
     def test_complete_url_returns_expected_format(self):
         complete_url = pipeline.get_complete_url(self.enabled_provider.backend_name)
 
-        self.assertTrue(complete_url.startswith('/auth/complete'))
-        self.assertIn(self.enabled_provider.backend_name, complete_url)
+        assert complete_url.startswith('/auth/complete')
+        assert self.enabled_provider.backend_name in complete_url
 
     def test_disconnect_url_raises_value_error_if_provider_not_enabled(self):
         provider_name = 'oa2-not-enabled'
 
-        self.assertIsNone(provider.Registry.get(provider_name))
+        assert provider.Registry.get(provider_name) is None
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_disconnect_url(provider_name, 1000)
 
     def test_disconnect_url_returns_expected_format(self):
         disconnect_url = pipeline.get_disconnect_url(self.enabled_provider.provider_id, 1000)
         disconnect_url = disconnect_url.rstrip('?')
-        self.assertEqual(
-            disconnect_url,
-            '/auth/disconnect/{backend}/{association_id}/'.format(
-                backend=self.enabled_provider.backend_name, association_id=1000)
-        )
+        assert disconnect_url == '/auth/disconnect/{backend}/{association_id}/'\
+            .format(backend=self.enabled_provider.backend_name, association_id=1000)
 
     def test_login_url_raises_value_error_if_provider_not_enabled(self):
         provider_id = 'oa2-not-enabled'
 
-        self.assertIsNone(provider.Registry.get(provider_id))
+        assert provider.Registry.get(provider_id) is None
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_login_url(provider_id, pipeline.AUTH_ENTRY_LOGIN)
 
     def test_login_url_returns_expected_format(self):
         login_url = pipeline.get_login_url(self.enabled_provider.provider_id, pipeline.AUTH_ENTRY_LOGIN)
 
-        self.assertTrue(login_url.startswith('/auth/login'))
-        self.assertIn(self.enabled_provider.backend_name, login_url)
-        self.assertTrue(login_url.endswith(pipeline.AUTH_ENTRY_LOGIN))
+        assert login_url.startswith('/auth/login')
+        assert self.enabled_provider.backend_name in login_url
+        assert login_url.endswith(pipeline.AUTH_ENTRY_LOGIN)
 
     def test_for_value_error_if_provider_id_invalid(self):
         provider_id = 'invalid'  # Format is normally "{prefix}-{identifier}"
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             provider.Registry.get(provider_id)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_login_url(provider_id, pipeline.AUTH_ENTRY_LOGIN)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_disconnect_url(provider_id, 1000)
 
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             pipeline.get_complete_url(provider_id)
 
 
@@ -217,7 +215,7 @@ class TestPipelineUtilityFunctions(TestCase):
     Test some of the isolated utility functions in the pipeline
     """
     def setUp(self):
-        super(TestPipelineUtilityFunctions, self).setUp()
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
         self.social_auth = social_models.UserSocialAuth.objects.create(
             user=self.user,
@@ -242,7 +240,7 @@ class TestPipelineUtilityFunctions(TestCase):
         with mock.patch('common.djangoapps.third_party_auth.pipeline.get') as get_pipeline:
             get_pipeline.return_value = pipeline_partial
             real_social = pipeline.get_real_social_auth_object(request)
-            self.assertEqual(real_social, self.social_auth)
+            assert real_social == self.social_auth
 
     def test_get_real_social_auth(self):
         """
@@ -259,7 +257,7 @@ class TestPipelineUtilityFunctions(TestCase):
         with mock.patch('common.djangoapps.third_party_auth.pipeline.get') as get_pipeline:
             get_pipeline.return_value = pipeline_partial
             real_social = pipeline.get_real_social_auth_object(request)
-            self.assertEqual(real_social, self.social_auth)
+            assert real_social == self.social_auth
 
     def test_get_real_social_auth_no_pipeline(self):
         """
@@ -268,7 +266,7 @@ class TestPipelineUtilityFunctions(TestCase):
         """
         request = mock.MagicMock(session={})
         real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, None)
+        assert real_social is None
 
     def test_get_real_social_auth_no_social(self):
         """
@@ -283,7 +281,7 @@ class TestPipelineUtilityFunctions(TestCase):
             }
         )
         real_social = pipeline.get_real_social_auth_object(request)
-        self.assertEqual(real_social, None)
+        assert real_social is None
 
     def test_quarantine(self):
         """
@@ -294,12 +292,10 @@ class TestPipelineUtilityFunctions(TestCase):
             session={}
         )
         pipeline.quarantine_session(request, locations=('my_totally_real_module', 'other_real_module',))
-        self.assertEqual(
-            request.session['third_party_auth_quarantined_modules'],
-            ('my_totally_real_module', 'other_real_module',),
-        )
+        assert request.session['third_party_auth_quarantined_modules'] ==\
+               ('my_totally_real_module', 'other_real_module')
         pipeline.lift_quarantine(request)
-        self.assertNotIn('third_party_auth_quarantined_modules', request.session)
+        assert 'third_party_auth_quarantined_modules' not in request.session
 
 
 @ddt.ddt
@@ -307,7 +303,7 @@ class EnsureUserInformationTestCase(TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(
             username='username',
             password='password',
@@ -325,12 +321,12 @@ class EnsureUserInformationTestCase(TestCase):
         based on the provider's setting for send_to_registration_first.
         """
 
-        provider = mock.MagicMock(
+        provider = mock.MagicMock(  # lint-amnesty, pylint: disable=redefined-outer-name
             send_to_registration_first=send_to_registration_first,
             skip_email_verification=False
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:  # lint-amnesty, pylint: disable=line-too-long
             get_from_pipeline.return_value = provider
             with mock.patch('social_core.pipeline.partial.partial_prepare') as partial_prepare:
                 partial_prepare.return_value = mock.MagicMock(token='')
@@ -363,7 +359,7 @@ class EnsureUserInformationTestCase(TestCase):
             send_to_registration_first=True,
             skip_email_verification=False
         )
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline') as get_from_pipeline:  # lint-amnesty, pylint: disable=line-too-long
             get_from_pipeline.return_value = saml_provider
             with mock.patch(
                 'common.djangoapps.third_party_auth.pipeline.provider.Registry.get_enabled_by_backend_name'
@@ -387,15 +383,15 @@ class UserDetailsForceSyncTestCase(TestCase):
     """Tests to ensure learner profile data is properly synced if the provider requires it."""
 
     def setUp(self):
-        super(UserDetailsForceSyncTestCase, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.old_email = self.user.email
         self.old_username = self.user.username
         self.old_fullname = self.user.profile.name
         self.details = {
-            'email': u'new+{}'.format(self.user.email),
-            'username': u'new_{}'.format(self.user.username),
-            'fullname': u'Grown Up {}'.format(self.user.profile.name),
+            'email': f'new+{self.user.email}',
+            'username': f'new_{self.user.username}',
+            'fullname': f'Grown Up {self.user.profile.name}',
             'country': 'PK',
             'non_existing_field': 'value',
         }
@@ -404,7 +400,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')  # lint-amnesty, pylint: disable=line-too-long
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(sync_learner_profile_data=True)
         self.addCleanup(get_from_pipeline.stop)
@@ -423,8 +419,8 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # User now has updated information in the DB.
         user = User.objects.get()
-        assert user.email == 'new+{}'.format(self.old_email)
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.email == f'new+{self.old_email}'
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -437,7 +433,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         The user details were attempted to be synced but the incoming email already exists for another account.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(email='new+{}'.format(self.old_email))
+        UserFactory.create(email=f'new+{self.old_email}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -450,7 +446,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         # The email is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
         assert user.email == self.old_email
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # Now verify that username field is not updated
@@ -466,7 +462,7 @@ class UserDetailsForceSyncTestCase(TestCase):
         An email should still be sent in this case.
         """
         # Create a user with an email that conflicts with the incoming value.
-        UserFactory.create(username='new_{}'.format(self.old_username))
+        UserFactory.create(username=f'new_{self.old_username}')
 
         # Begin the pipeline.
         pipeline.user_details_force_sync(
@@ -478,9 +474,9 @@ class UserDetailsForceSyncTestCase(TestCase):
 
         # The username is not changed, but everything else is.
         user = User.objects.get(pk=self.user.pk)
-        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.email == f'new+{self.old_email}'
         assert user.username == self.old_username
-        assert user.profile.name == u'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.name == f'Grown Up {self.old_fullname}'
         assert user.profile.country == 'PK'
 
         # An email should still be sent because the email changed.
@@ -491,7 +487,7 @@ class SetIDVerificationStatusTestCase(TestCase):
     """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
 
     def setUp(self):
-        super(SetIDVerificationStatusTestCase, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.provider_class_name = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
         self.provider_slug = 'default'
@@ -501,7 +497,7 @@ class SetIDVerificationStatusTestCase(TestCase):
         self.strategy = mock.MagicMock()
         self.strategy.storage.user.changed.side_effect = lambda user: user.save()
 
-        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        get_from_pipeline = mock.patch('common.djangoapps.third_party_auth.pipeline.provider.Registry.get_from_pipeline')  # lint-amnesty, pylint: disable=line-too-long
         self.get_from_pipeline = get_from_pipeline.start()
         self.get_from_pipeline.return_value = mock.MagicMock(
             enable_sso_id_verification=True,
@@ -565,7 +561,7 @@ class SetIDVerificationStatusTestCase(TestCase):
             identity_provider_slug=self.provider_slug,
         )
 
-        with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
+        with mock.patch('common.djangoapps.third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:  # lint-amnesty, pylint: disable=line-too-long
             earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
             # Begin the pipeline.
             pipeline.set_id_verification_status(
@@ -597,4 +593,4 @@ class SetIDVerificationStatusTestCase(TestCase):
             )
 
         # Ensure a verification signal was sent
-        self.assertEqual(mock_signal.call_count, 1)
+        assert mock_signal.call_count == 1

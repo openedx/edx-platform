@@ -30,13 +30,12 @@ DEFAULT_TRANSITION_STATE = _DEFAULT_TRANSITION_STATE
 log = logging.getLogger(__name__)
 
 
-def create_manual_enrollment_audit(
+def create_manual_enrollment_audit(  # lint-amnesty, pylint: disable=missing-function-docstring
     enrolled_by,
     user_email,
     state_transition,
     reason,
-    course_enrollment,
-    role
+    course_enrollment
 ):
     _ManualEnrollmentAudit.create_manual_enrollment_audit(
         user=enrolled_by,
@@ -44,7 +43,6 @@ def create_manual_enrollment_audit(
         state_transition=state_transition,
         reason=reason,
         enrollment=course_enrollment,
-        role=role,
     )
 
 
