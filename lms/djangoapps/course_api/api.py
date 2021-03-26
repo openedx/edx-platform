@@ -271,7 +271,7 @@ def get_course_run_url(request, course_id):
     return request.build_absolute_uri(course_run_url)
 
 
-def get_course_members(course_key, include_students=True, access_roles=None, page=1, limit=20):
+def get_course_members(course_key, include_students=True, access_roles=None, page=1, per_page=20):
     """
     Returns a dict containing User information that filters all users related to a course.
     For example - Students, Teachers, Staffs etc.
@@ -296,16 +296,16 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
         - Paginating
             get_course_members(course_key, page=2)
         - Paginating with custom limit
-            get_course_members(course_key, limit=50)
+            get_course_members(course_key, per_page=50)
 
     Arguments:
         course_key (CourseKey): the CourseKey for the course
-        include_students: wether or not to include students,
+        include_students: whether or not to include students,
         access_roles:
             accepts an array of string course access roles.
             If None provided, it includes all roles.
         page (int): the page number for pagination
-        limit (int): how many results to include per page
+        per_page (int): how many results to include per page
 
     Returns:
         dict: A dictionary with paginated result with following format -
@@ -333,7 +333,8 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
                                 'role': user's role in course
                             }
                         ]
-                    }
+                    },
+                    ... more users
                 ]
             }
     """
@@ -369,8 +370,7 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
     # prefetch CourseAccessRole items related to the course and given roles
     queryset = queryset.prefetch_related(Prefetch(
         'courseaccessrole_set',
-        CourseAccessRole.objects.filter(
-            course_id=course_key, role__in=access_roles)
+        CourseAccessRole.objects.filter(course_id=course_key, role__in=access_roles)
     ))
 
     # prefetch CourseEnrollment items related to the course
@@ -379,7 +379,7 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
         CourseEnrollment.objects.filter(course_id=course_key)
     ))
 
-    paginator = Paginator(queryset, limit)
+    paginator = Paginator(queryset, per_page)
 
     serialized_data = CourseMemberSerializer(paginator.page(page), many=True).data
 

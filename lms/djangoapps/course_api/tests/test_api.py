@@ -405,20 +405,20 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
         Test get_course_members pagination
         """
         # there are 3 users in self.course
-        members = get_course_members(self.course.id, limit=1)
+        members = get_course_members(self.course.id, per_page=1)
         assert members['num_pages'] == 3
         assert members['count'] == 3
         assert members['current_page'] == 1
 
         # check next page
-        members = get_course_members(self.course.id, page=2, limit=1)
+        members = get_course_members(self.course.id, page=2, per_page=1)
         assert members['num_pages'] == 3
         assert members['count'] == 3
         assert members['current_page'] == 2
 
         # check if exceptions throws as expected
         with self.assertRaises(InvalidPage):
-            get_course_members(self.course.id, page=4, limit=1)
+            get_course_members(self.course.id, page=4, per_page=1)
 
     def test_number_of_queries(self):
         """
