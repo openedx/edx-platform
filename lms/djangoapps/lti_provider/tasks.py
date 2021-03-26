@@ -9,7 +9,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
-from lms import CELERY_APP
+from lms.celery_app import CELERY_APP
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.lti_provider.models import GradedAssignment
 from xmodule.modulestore.django import modulestore

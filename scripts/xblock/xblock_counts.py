@@ -336,7 +336,8 @@ def get_access_token(username, password, oauth2_client_id, api_root):
     )
     return json.loads(response.text).get('access_token', None)
 
-if __name__ == "__main__":
+
+def main():
     # Get username and password from command line arguments
     username = None
     password = None
@@ -384,3 +385,7 @@ if __name__ == "__main__":
         write_block_summary_report(course_data)
         write_course_block_detail_report(course_data)
     print('Start time: {} Total run time: {}'.format(str(start_time), str(datetime.now() - start_time)))
+
+
+if __name__ == "__main__":
+    main()

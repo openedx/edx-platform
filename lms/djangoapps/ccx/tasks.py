@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
-from lms import CELERY_APP
+from lms.celery_app import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from xmodule.modulestore.django import SignalHandler
 
