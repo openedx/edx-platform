@@ -7,7 +7,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from lms.djangoapps.certificates.api import is_using_certificate_allowlist_and_is_on_allowlist
+from lms.djangoapps.certificates.api import can_generate_certificate_task
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -17,8 +17,8 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Management command to find and grade all students that need to be graded, unless the user is on the allowlist
-    for that course run.
+    Management command to find and grade all students that need to be graded, unless the course run is using V2 of
+    course certificates.
     """
 
     help = """
@@ -52,9 +52,9 @@ class Command(BaseCommand):
         ).filter(grade__exact='')
         course = courses.get_course_by_id(course_id)
         for cert in ungraded:
-            if is_using_certificate_allowlist_and_is_on_allowlist(cert.user, course_id):
-                log.info(f'{course_id} is using allowlist certificates, and the user {cert.user.id} is on its '
-                         f'allowlist. Certificate will not be regraded')
+            if can_generate_certificate_task(cert.user, course_id):
+                log.info(f'{course_id} is using V2 certificates. Certificate will not be regraded for user '
+                         f'{cert.user.id}.')
             else:
                 # grade the student
                 grade = CourseGradeFactory().read(cert.user, course)

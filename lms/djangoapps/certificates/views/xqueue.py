@@ -16,9 +16,9 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
 from lms.djangoapps.certificates.api import (
-    generate_allowlist_certificate_task,
-    generate_user_certificates,
-    is_using_certificate_allowlist_and_is_on_allowlist
+    can_generate_certificate_task,
+    generate_certificate_task,
+    generate_user_certificates
 )
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
@@ -51,10 +51,10 @@ def request_certificate(request):
             course = modulestore().get_course(course_key, depth=2)
 
             status = certificate_status_for_student(student, course_key)['status']
-            if is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
-                log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its '
-                         f'allowlist. Attempt will be made to generate an allowlist certificate.')
-                generate_allowlist_certificate_task(student, course_key)
+            if can_generate_certificate_task(student, course_key):
+                log.info(f'{course_key} is using V2 course certificates. Attempt will be made to generate a V2 '
+                         f'certificate for user {student.id}.')
+                generate_certificate_task(student, course_key)
             elif status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = 'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
@@ -101,9 +101,9 @@ def update_certificate(request):
             }), content_type='application/json')
 
         user = cert.user
-        if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-            log.warning(f'{course_key} is using allowlist certificates, and the user {user.id} is on its allowlist. '
-                        f'Request to update the certificate will be ignored.')
+        if can_generate_certificate_task(user, course_key):
+            log.warning(f'{course_key} is using V2 certificates. Request to update the certificate for user {user.id} '
+                        f'will be ignored.')
             return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
                 json.dumps({
                     'return_code': 1,
