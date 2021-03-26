@@ -76,12 +76,12 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import WaffleSwitch
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 # .. toggle_name: safe_session.log_request_user_changes
-# .. toggle_implementation: WaffleFlag
+# .. toggle_implementation: WaffleSwitch
 # .. toggle_default: False
 # .. toggle_description: Turn this toggle on to log anytime the `user` attribute of the request object gets
 #   changed.  This will also log the location where the change is coming from to quickly find issues.
@@ -90,7 +90,7 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 # .. toggle_creation_date: 2021-03-25
 # .. toggle_target_removal_date: 2021-05-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
-LOG_REQUEST_USER_CHANGES_FLAG = WaffleFlag('safe_session.log_request_user_changes', __name__)
+LOG_REQUEST_USER_CHANGES_FLAG = WaffleSwitch('safe_session.log_request_user_changes', __name__)
 
 log = getLogger(__name__)
 
@@ -535,7 +535,7 @@ def log_request_user_changes(request):
             if name == 'user':
                 stack = inspect.stack()
                 # Written this way in case you need more of the stack for debugging.
-                location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[1:2])
+                location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:6])
 
                 if not hasattr(request, name):
                     original_user = value
