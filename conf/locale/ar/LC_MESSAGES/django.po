@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-03-19 11:38+0000\n"
+"POT-Creation-Date: 2021-03-25 15:05+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -7162,6 +7162,8 @@ msgstr "اسم المستخدم"
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the password reset
 #. form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
 #. Translators: This label appears above a field on the login form
 #. meant to hold the user's email address.
 #. Translators: This label appears above a field on the password reset
@@ -10027,6 +10029,14 @@ msgstr ""
 msgid "Unaizah"
 msgstr ""
 
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Please select your City."
+msgstr "حدد تخصصك."
+
+#: openedx/adg/lms/registration_extension/constants.py
+msgid "Please select your Company."
+msgstr "حدد تخصصك."
+
 #: openedx/adg/lms/registration_extension/forms.py
 msgid "I am a current Al-Dabbagh Group employee."
 msgstr ""
@@ -10078,12 +10088,6 @@ msgstr "نعم"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No"
 msgstr "لا"
-
-#. Translators: This example email address is used as a placeholder in
-#. a field on the password reset form meant to hold the user's email address.
-#: openedx/adg/lms/user_authn_override/password_reset.py
-msgid "Email Address"
-msgstr "العنوان البريدي"
 
 #: openedx/core/djangoapps/ace_common/apps.py
 msgid "ACE Common"
