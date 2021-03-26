@@ -6,15 +6,15 @@ __init__.py imports from here, and is a more stable place to import from.
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional, List  # lint-amnesty, pylint: disable=unused-import
+from typing import Dict, FrozenSet, Optional, List, Union
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from django.db import transaction
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from opaque_keys import OpaqueKey
 from opaque_keys.edx.locator import LibraryLocator
-from edx_django_utils.cache import TieredCache  # lint-amnesty, pylint: disable=unused-import
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=unused-import
+from edx_django_utils.cache import TieredCache
+from opaque_keys.edx.keys import CourseKey
 
 from ..data import (
     ContentErrorData,
@@ -37,6 +37,7 @@ from ..models import (
     LearningContext,
     LearningSequence,
     PublishReport,
+    UserPartitionGroup,
 )
 from .permissions import can_see_all_content
 from .processors.content_gating import ContentGatingOutlineProcessor
@@ -111,7 +112,7 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     course_context = _get_course_context_for_outline(course_key)
 
     # Check to see if it's in the cache.
-    cache_key = "learning_sequences.api.get_course_outline.v1.{}.{}".format(
+    cache_key = "learning_sequences.api.get_course_outline.v1.1.{}.{}".format(
         course_context.learning_context.context_key, course_context.learning_context.published_version
     )
     outline_cache_result = TieredCache.get_cached_response(cache_key)
@@ -122,9 +123,11 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     # represented (so query CourseSection explicitly instead of relying only on
     # select_related from CourseSectionSequence).
     section_models = CourseSection.objects \
+        .prefetch_related('user_partition_groups') \
         .filter(course_context=course_context) \
         .order_by('ordering')
     section_sequence_models = CourseSectionSequence.objects \
+        .prefetch_related('user_partition_groups') \
         .filter(course_context=course_context) \
         .order_by('ordering') \
         .select_related('sequence', 'exam')
@@ -152,7 +155,10 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
                 hide_from_toc=sec_seq_model.hide_from_toc,
                 visible_to_staff_only=sec_seq_model.visible_to_staff_only,
             ),
-            exam=exam_data
+            exam=exam_data,
+            user_partition_groups=_get_user_partition_groups_from_qset(
+                sec_seq_model.user_partition_groups.all()
+            ),
         )
         sec_ids_to_sequence_list[sec_seq_model.section_id].append(sequence_data)
 
@@ -164,7 +170,10 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
             visibility=VisibilityData(
                 hide_from_toc=section_model.hide_from_toc,
                 visible_to_staff_only=section_model.visible_to_staff_only,
-            )
+            ),
+            user_partition_groups=_get_user_partition_groups_from_qset(
+                section_model.user_partition_groups.all()
+            ),
         )
         for section_model in section_models
     ]
@@ -183,6 +192,21 @@ def get_course_outline(course_key: CourseKey) -> CourseOutlineData:
     TieredCache.set_all_tiers(cache_key, outline_data, 300)
 
     return outline_data
+
+
+def _get_user_partition_groups_from_qset(upg_qset) -> Dict[int, FrozenSet[int]]:
+    """
+    Given a QuerySet of UserPartitionGroup, return a mapping of UserPartition
+    IDs to the set of Group IDs for each UserPartition.
+    """
+    user_part_groups = defaultdict(set)
+    for upg in upg_qset:
+        user_part_groups[upg.partition_id].add(upg.group_id)
+
+    return {
+        partition_id: frozenset(group_ids)
+        for partition_id, group_ids in user_part_groups.items()
+    }
 
 
 def _get_course_context_for_outline(course_key: CourseKey) -> CourseContext:
@@ -412,7 +436,7 @@ def _update_sections(course_outline: CourseOutlineData, course_context: CourseCo
     Add/Update relevant sections
     """
     for ordering, section_data in enumerate(course_outline.sections):
-        CourseSection.objects.update_or_create(
+        sec_model, _created = CourseSection.objects.update_or_create(
             course_context=course_context,
             usage_key=section_data.usage_key,
             defaults={
@@ -422,6 +446,9 @@ def _update_sections(course_outline: CourseOutlineData, course_context: CourseCo
                 'visible_to_staff_only': section_data.visibility.visible_to_staff_only,
             }
         )
+        # clear out any user partition group mappings, and remake them...
+        _update_user_partition_groups(section_data.user_partition_groups, sec_model)
+
     # Delete sections that we don't want any more
     section_usage_keys_to_keep = [
         section_data.usage_key for section_data in course_outline.sections
@@ -493,6 +520,24 @@ def _update_course_section_sequences(course_outline: CourseOutlineData, course_c
             else:
                 # Otherwise, delete any exams associated with it
                 CourseSequenceExam.objects.filter(course_section_sequence=course_section_sequence).delete()
+
+            # clear out any user partition group mappings, and remake them...
+            _update_user_partition_groups(sequence_data.user_partition_groups, course_section_sequence)
+
+
+def _update_user_partition_groups(upg_data: Dict[int, FrozenSet[int]],
+                                  model_obj: Union[CourseSection, CourseSectionSequence]):
+    """
+    Replace UserPartitionGroups associated with this content with `upg_data`.
+    """
+    model_obj.user_partition_groups.all().delete()
+    if upg_data:
+        for partition_id, group_ids in upg_data.items():
+            for group_id in group_ids:
+                upg, _created = UserPartitionGroup.objects.get_or_create(
+                    partition_id=partition_id, group_id=group_id
+                )
+                model_obj.user_partition_groups.add(upg)
 
 
 def _update_publish_report(course_outline: CourseOutlineData,

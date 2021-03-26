@@ -114,9 +114,10 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
         # First lets seed the data...
         replace_course_outline(self.course_outline)
 
-        # Uncached access always makes three database checks: LearningContext,
-        # CourseSection, and CourseSectionSequence.
-        with self.assertNumQueries(3):
+        # Uncached access always makes five database checks: LearningContext,
+        # CourseSection (+1 for user partition group prefetch),
+        # CourseSectionSequence (+1 for user partition group prefetch)
+        with self.assertNumQueries(5):
             uncached_outline = get_course_outline(self.course_key)
             assert uncached_outline == self.course_outline
 
@@ -137,7 +138,7 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
 
         # Make sure this new outline is returned instead of the previously
         # cached one.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             uncached_new_version_outline = get_course_outline(self.course_key)  # lint-amnesty, pylint: disable=unused-variable
             assert new_version_outline == new_version_outline  # lint-amnesty, pylint: disable=comparison-with-itself
 
@@ -1277,6 +1278,39 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                     assert len(user_course_outline.sequences) == 6
                     assert all(is_sequence_accessible),\
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
+
+
+class UserPartitionGroupTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+    """Tests for user partitions that affect outlines (e.g. Enrollment Track)"""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+    def test_roundtrip(self):
+        new_outline = CourseOutlineData(
+            course_key=self.course_key,
+            title="User Partition Test Course",
+            published_at=datetime(2021, 3, 26, tzinfo=timezone.utc),
+            published_version="8ebece4b69dd593d82fe2021",
+            sections=[
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups={
+                        50: frozenset([1, 2]),
+                    }
+                )
+            ],
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+
+        replace_course_outline(new_outline)
+        assert new_outline == get_course_outline(self.course_key)
+
 
 
 class ContentErrorTestCase(CacheIsolationTestCase):

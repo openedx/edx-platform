@@ -129,6 +129,7 @@ def _make_section_data(section):
                     hide_from_toc=sequence.hide_from_toc,
                     visible_to_staff_only=sequence.visible_to_staff_only,
                 ),
+                user_partition_groups=sequence.group_access,
             )
         )
 
@@ -140,6 +141,7 @@ def _make_section_data(section):
             hide_from_toc=section.hide_from_toc,
             visible_to_staff_only=section.visible_to_staff_only,
         ),
+        user_partition_groups=section.group_access,
     )
     return section_data, section_errors
 

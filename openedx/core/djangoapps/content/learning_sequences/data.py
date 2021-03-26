@@ -26,7 +26,7 @@ TODO: Validate all datetimes to be UTC.
 import logging
 from datetime import datetime  # lint-amnesty, pylint: disable=unused-import
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Dict, FrozenSet, List, Optional
 
 import attr
 from django.contrib.auth import get_user_model
@@ -113,6 +113,11 @@ class CourseLearningSequenceData:
     exam = attr.ib(type=ExamData, default=ExamData())
     inaccessible_after_due = attr.ib(type=bool, default=False)
 
+    # Mapping of UserPartition IDs to list of UserPartition Groups that are
+    # associated with this piece of content. See models.UserPartitionGroup
+    # for more details.
+    user_partition_groups = attr.ib(type=Dict[int, FrozenSet[int]], factory=dict)
+
 
 @attr.s(frozen=True)
 class CourseSectionData:
@@ -121,8 +126,13 @@ class CourseSectionData:
     """
     usage_key = attr.ib(type=UsageKey)
     title = attr.ib(type=str)
-    visibility = attr.ib(type=VisibilityData)
-    sequences = attr.ib(type=List[CourseLearningSequenceData])
+    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
+    sequences = attr.ib(type=List[CourseLearningSequenceData], factory=list)
+
+    # Mapping of UserPartition IDs to list of UserPartition Groups that are
+    # associated with this piece of content. See models.UserPartitionGroup
+    # for more details.
+    user_partition_groups = attr.ib(type=Dict[int, List[int]], factory=dict)
 
 
 @attr.s(frozen=True)
@@ -317,7 +327,7 @@ class UserCourseOutlineData(CourseOutlineData):
     # * If anonymous course access is enabled in "public_outline" mode,
     #   unauthenticated users (AnonymousUser) will see the course outline but
     #   not be able to access anything inside.
-    accessible_sequences = attr.ib(type=Set[UsageKey])
+    accessible_sequences = attr.ib(type=FrozenSet[UsageKey])
 
 
 @attr.s(frozen=True)
