@@ -146,10 +146,8 @@ urlpatterns = [
         name='tabs_handler'),
     url(fr'^settings/details/{settings.COURSE_KEY_PATTERN}$', contentstore_views.settings_handler,
         name='settings_handler'),
-    url(fr'^settings/grading/{settings.COURSE_KEY_PATTERN}', include([
-        url(r'^$', contentstore_views.grading_handler, name='grading_handler'),
-        url(fr'^(?P<grader_index>\d+)?$', contentstore_views.grading_handler, name='grading_handler_id')
-    ])),
+    url(fr'^settings/grading/{settings.COURSE_KEY_PATTERN}(/)?(?P<grader_index>\d+)?$',
+        contentstore_views.grading_handler, name='grading_handler'),
     url(fr'^settings/advanced/{settings.COURSE_KEY_PATTERN}$', contentstore_views.advanced_settings_handler,
         name='advanced_settings_handler'),
     url(fr'^textbooks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.textbooks_list_handler,
