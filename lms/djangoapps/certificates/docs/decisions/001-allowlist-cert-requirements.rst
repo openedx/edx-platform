@@ -1,4 +1,4 @@
-Course Certificate Allowlist Requirements
+Allowlist Course Certificate Requirements
 =========================================
 
 Status
@@ -7,6 +7,8 @@ Accepted
 
 Background
 ----------
+This doc covers requirements for allowlist course certificates.
+
 Users can earn a course certificate in a particular course run (the certificate
 is stored in the *GeneratedCertificate* model). If a user has not earned a certificate
 but the course staff would like them to have a certificate anyway, the user can
@@ -22,16 +24,16 @@ won't necessarily have a course certificate available to them. To receive a
 downloadable allowlist course certificate, the following things must be true at
 the time the certificate is generated:
 
-* The user must have an enrollment in the course
+* The user must have an enrollment in the course run
 
   * The enrollment mode must be eligible for a certificate
   * The enrollment does not need to be active
 
 * The user must have an approved, unexpired, ID verification
-* The user must be on the allowlist for the course run (see the *CertificateWhitelist* model)
 * The user must not have an invalidated certificate for the course run (see the *CertificateInvalidation* model)
 * Automatic certificate generation must be globally enabled
 * HTML (web) certificates must be globally enabled, and also enabled for the course run
+* The user must be on the allowlist for the course run (see the *CertificateWhitelist* model)
 
 Note: the above requirements were written for the allowlist, which assumes the
 CourseWaffleFlag *certificates_revamp.use_allowlist* has been enabled for the
