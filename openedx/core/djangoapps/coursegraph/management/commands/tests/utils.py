@@ -84,12 +84,12 @@ class MockTransaction:
         self.graph.number_rollbacks += 1
 
 
-class MockNodeSelector:
+class MockNodeMatcher:
     """
-    Mocks out py2neo's NodeSelector class. Used to select a node from a graph.
-    py2neo's NodeSelector expects a real graph object to run queries against,
+    Mocks out py2neo's NodeMatcher class. Used to select a node from a graph.
+    py2neo's NodeMatcher expects a real graph object to run queries against,
     so, rather than have to mock out MockGraph to accommodate those queries,
-    it seemed simpler to mock out NodeSelector as well.
+    it seemed simpler to mock out NodeMatcher as well.
     """
     def __init__(self, graph):
         self.graph = graph
@@ -113,7 +113,7 @@ class MockNodeSelector:
 class MockNodeSelection(list):
     """
     Mocks out py2neo's NodeSelection class: this is the type of what
-    MockNodeSelector's `select` method returns.
+    MockNodeMatcher's `select` method returns.
     """
     def first(self):
         """

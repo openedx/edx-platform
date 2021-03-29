@@ -11,8 +11,8 @@ from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
-from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
-from py2neo.compat import integer, string
+from py2neo import Graph, Node, Relationship, NodeMatcher
+from py2neo.internal.compat import integer_types, string_types
 
 
 log = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ celery_log = logging.getLogger('edx.celery.task')
 bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
 bolt_log.setLevel(logging.ERROR)
 
-PRIMITIVE_NEO4J_TYPES = (integer, string, str, float, bool)
+PRIMITIVE_NEO4J_TYPES = (integer_types, string_types, str, float, bool)
 
 
 def serialize_item(item):
@@ -110,7 +110,7 @@ def get_command_last_run(course_key, graph):
     Returns: The datetime that the command was last run, converted into
         text, or None, if there's no record of this command last being run.
     """
-    selector = NodeSelector(graph)
+    selector = NodeMatcher(graph)
     course_node = selector.select(
         "course",
         course_key=str(course_key)
@@ -388,15 +388,9 @@ def authenticate_and_create_graph(credentials):
     neo4j_user = credentials['user']
     neo4j_password = credentials['password']
 
-    authenticate(
-        "{host}:{port}".format(
-            host=host, port=https_port if secure else http_port
-        ),
-        neo4j_user,
-        neo4j_password,
-    )
-
     graph = Graph(
+        port=https_port if secure else http_port,
+        auth=(neo4j_user, neo4j_password),
         bolt=True,
         password=neo4j_password,
         user=neo4j_user,
