@@ -13,7 +13,7 @@ from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, NodeMatcher
-from py2neo.compat import integer, string
+from py2neo.compat import integer_types, string_types
 
 
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ celery_log = logging.getLogger('edx.celery.task')
 bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
 bolt_log.setLevel(logging.ERROR)
 
-PRIMITIVE_NEO4J_TYPES = (integer, string, str, float, bool)
+PRIMITIVE_NEO4J_TYPES = (integer_types, string_types, str, float, bool)
 
 
 def serialize_item(item):
