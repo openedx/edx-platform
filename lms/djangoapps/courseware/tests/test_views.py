@@ -613,7 +613,6 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': str(self.course_key),
             'learner_identifier': 'dummy',
-            'student_username': 'dummy',
             'location': str(self.problem.location),
         })
         response = self.client.get(url)
@@ -630,7 +629,6 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': str(self.course_key),
             'learner_identifier': 'dummy',
-            'student_username': 'dummy',
             'location': '<script>alert("hello");</script>'
         })
         response = self.client.get(url)
@@ -640,7 +638,6 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': str(self.course_key),
             'learner_identifier': '<script>alert("hello");</script>',
-            'student_username': '<script>alert("hello");</script>',
             'location': 'dummy'
         })
         response = self.client.get(url)
@@ -674,7 +671,6 @@ class ViewsTestCase(BaseViewsTestCase):
         url = reverse('submission_history', kwargs={
             'course_id': str(self.course_key),
             'learner_identifier': admin.email,
-            'student_username': admin.username,
             'location': str(usage_key),
         })
         response = self.client.get(url)
@@ -716,7 +712,6 @@ class ViewsTestCase(BaseViewsTestCase):
                 url = reverse('submission_history', kwargs={
                     'course_id': str(course_key),
                     'learner_identifier': admin.username,
-                    'student_username': admin.username,
                     'location': str(usage_key),
                 })
                 response = client.get(url)
