@@ -209,14 +209,42 @@ class UserApplication(TimeStampedModel):
         return scores_in_prereq_courses
 
     @property
+    def has_work_experience(self):
+        """
+        Check if any work experience is associated with the user application
+        """
+        return self.applications_workexperiences.exists()
+
+    @property
     def has_no_work_experience(self):
         """
-        Check if any work experience is associated with the user application.
+        Check if no work experience is associated with the user application.
 
         Returns:
             bool: True if no work experience is associated with the application, False otherwise
         """
-        return not WorkExperience.objects.filter(user_application=self).exists()
+        return not self.has_work_experience
+
+    @property
+    def is_education_completed(self):
+        """
+        Check if any education is associated with the user application.
+        """
+        return self.applications_educations.exists()
+
+    @property
+    def is_work_experience_completed(self):
+        """
+        Check if user added any work experience or marked user application as work experience not applicable
+        """
+        return self.is_work_experience_not_applicable or self.has_work_experience
+
+    @property
+    def is_education_experience_completed(self):
+        """
+        Check user completed the education and experience step in user application
+        """
+        return self.is_education_completed and self.is_work_experience_completed
 
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         if self.pk:

@@ -111,6 +111,22 @@ def test_user_application_string_representation(user_application):
     assert expected_str == actual_str
 
 
+@pytest.mark.django_db
+def test_is_work_experience_completed(work_experience):
+    """
+    Test that is_work_experience_completed returns true if user_application has any work experience
+    """
+    assert work_experience.user_application.is_work_experience_completed
+
+
+@pytest.mark.django_db
+def test_is_work_experience_not_completed(user_application):
+    """
+    Test that is_work_experience_completed returns false if user_application has no work experience
+    """
+    assert not user_application.is_work_experience_completed
+
+
 @pytest.mark.parametrize('percent', [0.9250, 0.7649])
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.models.CourseGradeFactory.read')
