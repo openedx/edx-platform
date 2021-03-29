@@ -101,7 +101,7 @@ def student_certificates(request):
         start_date = course.start
 
         try:
-            completion_date = course.end
+            completion_date = certificate.created_date
         except Exception as ex:  # pylint: disable=unused-variable, broad-except
             completion_date = datetime.now()
 
