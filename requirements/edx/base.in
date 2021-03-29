@@ -112,7 +112,6 @@ openedx-calc                        # Library supporting mathematical calculatio
 pdfminer.six                        # Used in shoppingcart for extracting/parsing pdf text
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo<4.0.0                        # Used to communicate with Neo4j, which is used internally for modulestore inspection
 PyContracts
 pycountry
 pycryptodomex
