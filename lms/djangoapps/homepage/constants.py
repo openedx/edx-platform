@@ -1,3 +1,6 @@
+"""
+All constants for Homepage app
+"""
 CONFIGS = {
     'refresh_watcher': {
         'name': 'short-poll',

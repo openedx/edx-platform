@@ -1,3 +1,6 @@
+"""
+All test for custom context processors in homepage app
+"""
 import mock
 
 from lms.djangoapps.homepage.constants import CONFIGS
