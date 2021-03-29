@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
 from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
 from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
-from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeSelector
+from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeMatcher
 from openedx.core.djangoapps.coursegraph.tasks import (
     coerce_types,
     serialize_course,
@@ -75,10 +75,10 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
     def setup_mock_graph(mock_selector_class, mock_graph_class, transaction_errors=False):
         """
         Replaces the py2neo Graph object with a MockGraph; similarly replaces
-        NodeSelector with MockNodeSelector.
+        NodeMatcher with MockNodeMatcher.
 
         Arguments:
-            mock_selector_class: a mocked NodeSelector class
+            mock_selector_class: a mocked NodeMatcher class
             mock_graph_class: a mocked Graph class
             transaction_errors: a bool for whether we should get errors
                 when transactions try to commit
@@ -89,7 +89,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         mock_graph = MockGraph(transaction_errors=transaction_errors)
         mock_graph_class.return_value = mock_graph
 
-        mock_node_selector = MockNodeSelector(mock_graph)
+        mock_node_selector = MockNodeMatcher(mock_graph)
         mock_selector_class.return_value = mock_node_selector
         return mock_graph
 
@@ -115,7 +115,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
     Tests for the dump to neo4j management command
     """
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     @ddt.data(1, 2)
     def test_dump_specific_courses(self, number_of_courses, mock_graph_class, mock_selector_class):
@@ -140,7 +140,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_skip_course(self, mock_graph_class, mock_selector_class):
         """
@@ -166,7 +166,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0,
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_skip_beats_specifying(self, mock_graph_class, mock_selector_class):
         """
@@ -193,7 +193,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             number_rollbacks=0,
         )
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.Graph')
     def test_dump_all_courses(self, mock_graph_class, mock_selector_class):
         """
@@ -395,7 +395,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         coerced_value = coerce_types(original_value)
         assert coerced_value == coerced_expected
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
     def test_dump_to_neo4j(self, mock_graph_constructor, mock_selector_class):
         """
@@ -404,7 +404,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
-        mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_selector_class.return_value = MockNodeMatcher(mock_graph)
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
@@ -423,7 +423,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         assert len(mock_graph.nodes) == 11
         self.assertCountEqual(submitted, self.course_strings)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
     def test_dump_to_neo4j_rollback(self, mock_graph_constructor, mock_selector_class):
         """
@@ -432,7 +432,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         mock_graph = MockGraph(transaction_errors=True)
         mock_graph_constructor.return_value = mock_graph
-        mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_selector_class.return_value = MockNodeMatcher(mock_graph)
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
@@ -447,7 +447,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         self.assertCountEqual(submitted, self.course_strings)
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
     @ddt.data((True, 2), (False, 0))
     @ddt.unpack
@@ -464,7 +464,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
-        mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_selector_class.return_value = MockNodeMatcher(mock_graph)
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
@@ -480,7 +480,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         )
         assert len(submitted) == expected_number_courses
 
-    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeSelector')
+    @mock.patch('openedx.core.djangoapps.coursegraph.tasks.NodeMatcher')
     @mock.patch('openedx.core.djangoapps.coursegraph.tasks.authenticate_and_create_graph')
     def test_dump_to_neo4j_published(self, mock_graph_constructor, mock_selector_class):
         """
@@ -489,7 +489,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
-        mock_selector_class.return_value = MockNodeSelector(mock_graph)
+        mock_selector_class.return_value = MockNodeMatcher(mock_graph)
         # mocking is thorwing error in kombu serialzier and its not require here any more.
         credentials = {}
 
