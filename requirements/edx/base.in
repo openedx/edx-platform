@@ -163,4 +163,4 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
-
+py2neo                              # Used to communicate with Neo4j, which is used internally for modulestore inspection
