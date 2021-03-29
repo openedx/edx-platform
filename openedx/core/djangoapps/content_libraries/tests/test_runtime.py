@@ -2,6 +2,7 @@
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
 import json
+from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections
@@ -100,6 +101,13 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
         assert library_api.get_library_block_olx(unit_block_key) == library_api.get_library_block_olx(unit_block2_key)
         assert unit_block.children != unit_block2.children
+
+    def test_dndv2_sets_translator(self):
+        dnd_block_key = library_api.create_library_block(self.library.key, "drag-and-drop-v2", "dnd1").usage_key
+        library_api.publish_changes(self.library.key)
+        dnd_block = xblock_api.load_block(dnd_block_key, self.student_a)
+        i18n_service = dnd_block.runtime.service(dnd_block, 'i18n')
+        assert isinstance(i18n_service.translator, GNUTranslations)
 
     def test_has_score(self):
         """
