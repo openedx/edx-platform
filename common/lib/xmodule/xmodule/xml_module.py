@@ -1,4 +1,5 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
+import datetime
 
 import copy
 import json
@@ -65,6 +66,10 @@ def serialize_field(value):
     """
     if isinstance(value, str):
         return value
+    elif isinstance(value, datetime.datetime):
+        if value.tzinfo is not None and value.utcoffset() is None:
+            return value.isoformat() + 'Z'
+        return value.isoformat()
 
     return json.dumps(value, cls=EdxJSONEncoder)
 
