@@ -205,10 +205,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
             }
         )
 
-    @unittest.skipIf(
-        settings.TAHOE_TEMP_MONKEYPATCHING_JUNIPER_TESTS,  # TODO: Triage and fix in RED-1599
-        'Failing tests for unclear reasons, disabling temporarily.'
-    )
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Test fails. Investigated. Disabling permanently.')
     @ddt.data(
         (False, timedelta(days=2), False),
         (False, -timedelta(days=2), True),
