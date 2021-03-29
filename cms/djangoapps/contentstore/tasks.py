@@ -10,6 +10,7 @@ import tarfile
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
+import olxcleaner
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -25,9 +26,10 @@ from edx_django_utils.monitoring import (
     set_code_owner_attribute,
     set_code_owner_attribute_from_module,
     set_custom_attribute,
-    set_custom_attributes_for_course_key,
+    set_custom_attributes_for_course_key
 )
-from common.djangoapps.util.monitoring import monitor_import_failure
+from olxcleaner.exceptions import ErrorLevel
+from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.api import add_organization_course, ensure_organization
@@ -47,6 +49,7 @@ from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_us
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
@@ -60,6 +63,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml, export_librar
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 from .outlines import update_outline_from_modulestore
+from .toggles import course_import_olx_validation_is_enabled
 
 User = get_user_model()
 
@@ -442,6 +446,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         return file_is_valid
 
     def file_exists_in_storage():
+        """Verify archive path exists in storage."""
         archive_path_exists = course_import_export_storage.exists(archive_path)
 
         if not archive_path_exists:
@@ -451,6 +456,39 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return archive_path_exists
+
+    def verify_root_name_exists(course_dir, root_name):
+        """Verify root xml file exists."""
+
+        def get_all_files(directory):
+            """
+            For each file in the directory, yield a 2-tuple of (file-name,
+            directory-path)
+            """
+            for directory_path, _dirnames, filenames in os.walk(directory):
+                for filename in filenames:
+                    yield (filename, directory_path)
+
+        def get_dir_for_filename(directory, filename):
+            """
+            Returns the directory path for the first file found in the directory
+            with the given name.  If there is no file in the directory with
+            the specified name, return None.
+            """
+            for name, directory_path in get_all_files(directory):
+                if name == filename:
+                    return directory_path
+            return None
+
+        dirpath = get_dir_for_filename(course_dir, root_name)
+        if not dirpath:
+            message = f'Could not find the {root_name} file in the package.'
+            with translation_language(language):
+                self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
+            LOGGER.error(f'{log_prefix}: {message}')
+            monitor_import_failure(courselike_key, current_step, message=message)
+            return
+        return dirpath
 
     user = validate_user()
     if not user:
@@ -543,34 +581,11 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         self.status.increment_completed_steps()
         LOGGER.info(f'{log_prefix}: Uploaded file extracted. Verification step started')
 
-        # find the 'course.xml' file
-        def get_all_files(directory):
-            """
-            For each file in the directory, yield a 2-tuple of (file-name,
-            directory-path)
-            """
-            for directory_path, _dirnames, filenames in os.walk(directory):
-                for filename in filenames:
-                    yield (filename, directory_path)
-
-        def get_dir_for_filename(directory, filename):
-            """
-            Returns the directory path for the first file found in the directory
-            with the given name.  If there is no file in the directory with
-            the specified name, return None.
-            """
-            for name, directory_path in get_all_files(directory):
-                if name == filename:
-                    return directory_path
-            return None
-
-        dirpath = get_dir_for_filename(course_dir, root_name)
+        dirpath = verify_root_name_exists(course_dir, root_name)
         if not dirpath:
-            message = f'Could not find the {root_name} file in the package.'
-            with translation_language(language):
-                self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
-            LOGGER.error(f'{log_prefix}: {message}')
-            monitor_import_failure(courselike_key, current_step, message=message)
+            return
+
+        if not validate_course_olx(courselike_key, dirpath, self.status):
             return
 
         dirpath = os.path.relpath(dirpath, data_root)
@@ -643,3 +658,42 @@ def update_outline_from_modulestore_task(course_key_str):
     except Exception:  # pylint disable=broad-except
         LOGGER.exception("Could not create course outline for course %s", course_key_str)
         raise  # Re-raise so that errors are noted in reporting.
+
+
+def validate_course_olx(courselike_key, course_dir, status):
+    """
+    Validates course olx and records the errors as artifact.
+    Arguments:
+        course_dir: complete path to the course olx
+        status: UserTaskStatus object.
+    """
+    olx_is_valid = True
+    log_prefix = f'Course import {courselike_key}'
+
+    if not course_import_olx_validation_is_enabled():
+        return olx_is_valid
+
+    try:
+        __, errorstore, __ = olxcleaner.validate(course_dir, steps=6)
+    except Exception:
+        LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
+        return olx_is_valid
+
+    has_errors = errorstore.return_error(ErrorLevel.ERROR.value)
+    if not has_errors:
+        return olx_is_valid
+
+    errorstore.errors = [error for error in errorstore.errors if error.level_val == ErrorLevel.ERROR.value]
+    error_summary = report_error_summary(errorstore)
+    error_report = report_errors(errorstore)
+    message = json.dumps({
+        'error_summary': error_summary,
+        'error_report': error_report,
+    })
+    UserTaskArtifact.objects.create(status=status, name='OLX_VALIDATION_ERROR', text=message)
+    LOGGER.error(f'{log_prefix}: CourseOlx validation failed')
+
+    # TODO: Do not fail the task until we have some data about kinds of
+    #  olx validation failures. TNL-8151
+
+    return olx_is_valid
