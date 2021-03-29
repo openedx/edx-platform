@@ -387,21 +387,21 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
                 # If a view overrode the request.user with a masqueraded user, this will
                 #   revert/clean-up that change during response processing.
                 request.user = request.user.real_user
-            if request.safe_cookie_verified_user_id != request.user.id:
-                # The user at response time is expected to be None when the user
-                # is logging out. To prevent extra noise in the logs,
-                # conditionally set the log level.
-                log_func = log.debug if request.user.id is None else log.warning
-                log_func(
+            # The user at response time is expected to be None when the user
+            # is logging out.  We won't log that.
+            if request.safe_cookie_verified_user_id != request.user.id and request.user.id is not None:
+                log.warning(
                     (
                         "SafeCookieData user at request '{0}' does not match user at response: '{1}' "
                         "for request path '{2}'"
-                    ).format(
+                    ).format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id, request.user.id, request.path,
                     ),
                 )
                 set_custom_attribute("safe_sessions.user_mismatch", "request-response-mismatch")
-            if request.safe_cookie_verified_user_id != userid_in_session:
+            # The user session at response time is expected to be None when the user
+            # is logging out.  We won't log that.
+            if request.safe_cookie_verified_user_id != userid_in_session and userid_in_session is not None:
                 log.warning(
                     (
                         "SafeCookieData user at request '{0}' does not match user in session: '{1}' "
