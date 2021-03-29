@@ -15,7 +15,6 @@ from openedx.adg.lms.applications.constants import (
     COVER_LETTER_ONLY,
     FILE_MAX_SIZE,
     HTML_FOR_EMBEDDED_FILE_VIEW,
-    LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
@@ -32,8 +31,7 @@ from openedx.adg.lms.applications.helpers import (
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_email,
-    validate_file_size,
-    validate_logo_size
+    validate_file_size
 )
 from openedx.adg.lms.applications.models import UserApplication
 
@@ -44,25 +42,6 @@ DATE_COMPLETED_YEAR = 2020
 DATE_STARTED_MONTH = 2
 DATE_STARTED_YEAR = 2018
 ERROR_MESSAGE = '{key}, some error message'
-
-
-def test_validate_logo_size_with_valid_size():
-    """
-    Verify that file size up to LOGO_IMAGE_MAX_SIZE is allowed
-    """
-    mocked_file = Mock()
-    mocked_file.size = LOGO_IMAGE_MAX_SIZE
-    validate_logo_size(mocked_file)
-
-
-def test_validate_logo_size_with_invalid_size():
-    """
-    Verify that size greater than LOGO_IMAGE_MAX_SIZE is not allowed
-    """
-    mocked_file = Mock()
-    mocked_file.size = LOGO_IMAGE_MAX_SIZE + 1
-    with pytest.raises(Exception):
-        validate_logo_size(mocked_file)
 
 
 @patch('openedx.adg.lms.applications.helpers.task_send_mandrill_email')

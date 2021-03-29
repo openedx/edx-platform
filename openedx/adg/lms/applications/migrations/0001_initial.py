@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('title', models.CharField(max_length=150, unique=True, verbose_name='Title')),
-                ('logo', models.ImageField(help_text='Accepted extensions: .png, .jpg, .svg', upload_to='business-lines/logos/', validators=[django.core.validators.FileExtensionValidator(('png', 'jpg', 'svg')), openedx.adg.lms.applications.helpers.validate_logo_size], verbose_name='Logo')),
+                ('logo', models.ImageField(help_text='Accepted extensions: .png, .jpg, .svg', upload_to='business-lines/logos/', validators=[django.core.validators.FileExtensionValidator(('png', 'jpg', 'svg')), openedx.adg.lms.helpers.validate_image_size], verbose_name='Logo')),
                 ('description', models.TextField(verbose_name='Description')),
             ],
         ),
