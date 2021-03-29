@@ -1583,7 +1583,7 @@ def generate_user_cert(request, course_id):
     if certs_api.can_generate_certificate_task(student, course_key):
         log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'user {student.id}.')
-        certs_api.generate_certificate_task(student, course_key)
+        certs_api.generate_certificate_task(student, course_key, 'self')
         return HttpResponse()
 
     if not is_course_passed(student, course):

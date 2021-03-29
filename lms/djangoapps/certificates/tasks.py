@@ -11,7 +11,6 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.generation import (
-    generate_allowlist_certificate,
     generate_course_certificate,
     generate_user_certificates
 )
@@ -37,23 +36,19 @@ def generate_certificate(self, **kwargs):
             that the actual verification status is as expected before
             generating a certificate, in the off chance that the database
             has not yet updated with the user's new verification status.
-        - allowlist_certificate: A flag indicating whether to generate an allowlist certificate (which is V2 of
-            whitelisted certificates)
         - v2_certificate: A flag indicating whether to generate a v2 course certificate
+        - generation_mode: Only used when emitting an event for V2 certificates. Options are "self" (implying the user
+            generated the cert themself) and "batch" for everything else.
     """
     original_kwargs = kwargs.copy()
     student = User.objects.get(id=kwargs.pop('student'))
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     expected_verification_status = kwargs.pop('expected_verification_status', None)
-    allowlist_certificate = kwargs.pop('allowlist_certificate', False)
     v2_certificate = kwargs.pop('v2_certificate', False)
-
-    if allowlist_certificate:
-        generate_allowlist_certificate(user=student, course_key=course_key)
-        return
+    generation_mode = kwargs.pop('generation_mode', 'batch')
 
     if v2_certificate:
-        generate_course_certificate(user=student, course_key=course_key)
+        generate_course_certificate(user=student, course_key=course_key, generation_mode=generation_mode)
         return
 
     if expected_verification_status:
