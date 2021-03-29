@@ -108,7 +108,6 @@ oauthlib==2.0.1                     # OAuth specification support for authentica
 pdfminer                            # Used in shoppingcart for extracting/parsing pdf text
 piexif==1.0.2                       # Exif image metadata manipulation, used in the profile_images app
 Pillow==3.4                         # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo<4.0.0                       # Used to communicate with Neo4j, which is used internally for modulestore inspection
 PyContracts==1.7.1
 pycountry==1.20
 pycryptodomex==3.4.7
