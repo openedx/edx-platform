@@ -389,15 +389,10 @@ def authenticate_and_create_graph(credentials):
     neo4j_user = credentials['user']
     neo4j_password = credentials['password']
 
-    authenticate(
-        "{host}:{port}".format(
-            host=host, port=https_port if secure else http_port
-        ),
-        neo4j_user,
-        neo4j_password,
-    )
+    port = https_port if secure else http_port
 
     graph = Graph(
+        port=port, auth=(neo4j_user, neo4j_password),
         bolt=True,
         password=neo4j_password,
         user=neo4j_user,
