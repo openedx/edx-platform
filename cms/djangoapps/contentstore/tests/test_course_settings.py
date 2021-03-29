@@ -1349,8 +1349,10 @@ class CourseMetadataEditingTest(CourseTestCase):
         if include_blank_email:
             json_data["proctoring_escalation_email"] = {"value": ""}
 
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict({"enable_proctored_exams": True}, course, self.user)
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
-            self.course,
+            course,
             json_data,
             user=self.user
         )
@@ -1390,7 +1392,11 @@ class CourseMetadataEditingTest(CourseTestCase):
     )
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
         course = CourseFactory.create()
-        CourseMetadata.update_from_dict({"proctoring_provider": 'proctortrack'}, course, self.user)
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": True},
+            course,
+            self.user
+        )
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             course,
             {
@@ -1425,6 +1431,78 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(len(errors), 0)
         self.assertIn('proctoring_provider', test_model)
         self.assertIn('proctoring_escalation_email', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disable_proctoring_with_no_escalation_email(self):
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "proctoring_escalation_email": '', "enable_proctored_exams": True},
+            course,
+            self.user
+        )
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                "enable_proctored_exams": {"value": False},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('enable_proctored_exams', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disable_proctoring_and_change_escalation_email(self):
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "proctoring_provider": {"value": "proctortrack"},
+                "proctoring_escalation_email": {"value": ""},
+                "enable_proctored_exams": {"value": False},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
+        self.assertIn('enable_proctored_exams', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disabled_proctoring_and_unset_escalation_email(self):
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": False},
+            course,
+            self.user
+        )
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                "proctoring_escalation_email": {"value": ""},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
+        self.assertIn('enable_proctored_exams', test_model)
 
     def test_create_zendesk_tickets_present_for_edx_staff(self):
         """

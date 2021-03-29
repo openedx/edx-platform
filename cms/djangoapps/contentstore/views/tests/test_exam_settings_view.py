@@ -97,6 +97,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         # create an error by setting proctortrack as the provider and not setting
         # the (required) escalation contact
         self.course.proctoring_provider = 'proctortrack'
+        self.course.enable_proctored_exams = True
         self.save_course()
 
         url = reverse_course_url(page_handler, self.course.id)
@@ -131,6 +132,7 @@ class TestExamSettingsView(CourseTestCase, UrlResetMixin):
         # create an error by setting proctortrack as the provider and not setting
         # the (required) escalation contact
         self.course.proctoring_provider = 'proctortrack'
+        self.course.enable_proctored_exams = True
         self.save_course()
 
         url = reverse_course_url(page_handler, self.course.id)
