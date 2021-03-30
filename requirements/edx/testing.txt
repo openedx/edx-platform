@@ -133,7 +133,7 @@ enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscor
 event-tracking==1.0.4     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
-faker==7.0.0              # via factory-boy
+faker==7.0.1              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 fs-s3fs==0.1.8            # via -r requirements/edx/base.txt, django-pyfs
@@ -213,7 +213,7 @@ pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.txt, drf-jwt, edx-rest-
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.4.2      # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
-pylint==2.7.2             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
+pylint==2.7.3             # via edx-lint, pylint-celery, pylint-django, pylint-plugin-utils
 pymongo==3.10.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, edx-opaque-keys, event-tracking, mongodbproxy, mongoengine
 pynliner==0.8.0           # via -r requirements/edx/base.txt
 pyparsing==2.4.7          # via -r requirements/edx/base.txt, chem, openedx-calc, packaging, pycontracts
