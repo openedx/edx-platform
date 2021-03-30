@@ -45,7 +45,7 @@ SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
 # .. toggle_description: Studio Import
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-04-01
-# .. toggle_target_removal_date: None
+# .. toggle_target_removal_date: 2021-05-01
 # .. toggle_warnings: ??
 # .. toggle_tickets: TNL-8151
 COURSE_IMPORT_OLX_VALIDATION = LegacyWaffleFlag(
