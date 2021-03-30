@@ -672,10 +672,9 @@ def validate_course_olx(courselike_key, course_dir, status):
 
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
-
     try:
-        __, errorstore, __ = olxcleaner.validate(course_dir, steps=6)
-    except Exception:
+        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8)
+    except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
         return olx_is_valid
 
