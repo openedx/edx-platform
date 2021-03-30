@@ -19,14 +19,15 @@ from organizations.api import get_course_organization_id
 
 from common.djangoapps.student.api import is_user_enrolled_in_course
 from lms.djangoapps.branding import api as branding_api
-from lms.djangoapps.certificates.generation_handler import \
-    generate_allowlist_certificate_task as _generate_allowlist_certificate_task
-from lms.djangoapps.certificates.generation_handler import generate_user_certificates as _generate_user_certificates
-from lms.djangoapps.certificates.generation_handler import \
-    is_using_certificate_allowlist as _is_using_certificate_allowlist
-from lms.djangoapps.certificates.generation_handler import \
-    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist
-from lms.djangoapps.certificates.generation_handler import regenerate_user_certificates as _regenerate_user_certificates
+from lms.djangoapps.certificates.generation_handler import (
+    can_generate_certificate_task as _can_generate_certificate_task,
+    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
+    generate_certificate_task as _generate_certificate_task,
+    generate_user_certificates as _generate_user_certificates,
+    is_using_certificate_allowlist as _is_using_certificate_allowlist,
+    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
+    regenerate_user_certificates as _regenerate_user_certificates
+)
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
@@ -40,8 +41,10 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import get_certificate_url as _get_certificate_url
-from lms.djangoapps.certificates.utils import has_html_certificates_enabled as _has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import (
+    get_certificate_url as _get_certificate_url,
+    has_html_certificates_enabled as _has_html_certificates_enabled
+)
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -206,6 +209,28 @@ def regenerate_user_certificates(student, course_key, course=None,
 
 def generate_allowlist_certificate_task(user, course_key):
     return _generate_allowlist_certificate_task(user, course_key)
+
+
+def can_generate_certificate_task(user, course_key):
+    """
+    Determine if we can create a task to generate a certificate for this user in this course run.
+
+    This will return True if either:
+    - the course run is using the allowlist and the user is on the allowlist, or
+    - the course run is using v2 course certificates
+    """
+    return _can_generate_certificate_task(user, course_key)
+
+
+def generate_certificate_task(user, course_key):
+    """
+    Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
+    can be generated.
+
+    If the allowlist is enabled for this course run and the user is on the allowlist, the allowlist logic will be used.
+    Otherwise, the regular course certificate generation logic will be used.
+    """
+    return _generate_certificate_task(user, course_key)
 
 
 def certificate_downloadable_status(student, course_key):

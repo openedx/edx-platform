@@ -1577,10 +1577,10 @@ def generate_user_cert(request, course_id):
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
-    if certs_api.is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
-        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
-                 f'Attempt will be made to generate an allowlist certificate.')
-        certs_api.generate_allowlist_certificate_task(student, course_key)
+    if certs_api.can_generate_certificate_task(student, course_key):
+        log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
+                 f'user {student.id}.')
+        certs_api.generate_certificate_task(student, course_key)
         return HttpResponse()
 
     if not is_course_passed(student, course):

@@ -307,11 +307,11 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             )
             with mock_passing_grade():
                 with mock.patch(
-                    'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                    'lms.djangoapps.certificates.signals.generate_certificate_task',
                     return_value=None
-                ) as mock_allowlist_task:
+                ) as mock_cert_task:
                     CourseGradeFactory().update(self.user, self.course)
-                    mock_allowlist_task.assert_not_called()
+                    mock_cert_task.assert_not_called()
 
             # User who is on the allowlist
             u = UserFactory.create()
@@ -328,11 +328,11 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             )
             with mock_passing_grade():
                 with mock.patch(
-                    'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                    'lms.djangoapps.certificates.signals.generate_certificate_task',
                     return_value=None
-                ) as mock_allowlist_task:
+                ) as mock_cert_task:
                     CourseGradeFactory().update(u, c)
-                    mock_allowlist_task.assert_called_with(u, course_key)
+                    mock_cert_task.assert_called_with(u, course_key)
 
 
 @ddt.ddt
@@ -617,11 +617,11 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
         Test that we try to generate a certificate when the user switches from audit to verified
         """
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+            'lms.djangoapps.certificates.signals.generate_certificate_task',
             return_value=None
-        ) as mock_allowlist_task:
+        ) as mock_cert_task:
             self.audit_enrollment.change_mode('verified')
-            mock_allowlist_task.assert_called_with(self.user, self.audit_course_key)
+            mock_cert_task.assert_called_with(self.user, self.audit_course_key)
 
     def test_verified_to_audit(self):
         """
