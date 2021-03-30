@@ -2052,8 +2052,8 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
-    #'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    #'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
