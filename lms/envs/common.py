@@ -660,6 +660,17 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
+    # .. toggle_name: FEATURES['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable custom certificate templates which are configured via Django admin.
+    # .. toggle_warnings: None
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-08-13
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1044
+    'CUSTOM_CERTIFICATE_TEMPLATES_ENABLED': False,
+
     # .. toggle_name: FEATURES['ENABLE_COURSE_DISCOVERY']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
