@@ -2,15 +2,16 @@
 """
 Tests for cache_utils.py
 """
-
+from datetime import datetime
 from unittest import TestCase
 
 import ddt
+import pytz
 import six
 from edx_django_utils.cache import RequestCache
 from mock import Mock
 
-from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.cache_utils import request_cached, zunpickle
 
 
 @ddt.ddt
@@ -297,3 +298,20 @@ class TestRequestCachedDecorator(TestCase):
         result = wrapped(3)
         assert result == 2
         assert to_be_wrapped.call_count == 2
+
+
+def test_date_util_unpickling():
+    """
+    This tests is here to catch the dateutil object cache unpickling issue we faced twice on prod when attempting to
+    upgrade python-dateutil. This will help us catching such problem before it reaches production in future.
+    See https://openedx.atlassian.net/browse/BOM-2245 for more details on the issue.
+
+    The pickle is saved to the pickled_datetime.txt file using the script below.
+    >>> import dateutil.parser
+    >>> from openedx.core.lib.cache_utils import zpickle
+    >>> with open('openedx/core/lib/tests/pickled_data/pickled_datetime.txt', 'wb') as file:
+    >>>        file.write(zpickle(dateutil.parser.parse("2020-01-20T07:00:00Z")))
+    """
+    with open('openedx/core/lib/tests/pickled_data/pickled_datetime.txt', 'rb') as fp:
+        val = zunpickle(fp.read())
+        assert val < datetime.now(pytz.utc)
