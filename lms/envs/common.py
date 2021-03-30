@@ -4163,6 +4163,13 @@ MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
 # https://github.com/SmileyChris/django-countries#show-certain-countries-first
 COUNTRIES_FIRST = []
 
+################# Settings for brand logos. #################
+LOGO_URL = None
+LOGO_URL_PNG = None
+LOGO_TRADEMARK_URL = None
+FAVICON_URL = None
+DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
 ############## EOL #########################
 REGISTRATION_EMAIL_PATTERNS_DISALLOWED = None
 

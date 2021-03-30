@@ -124,6 +124,10 @@
       a {
         display: inline-block;
 
+        img {
+          height: $header-logo-height*1.05;
+        }
+
         &:hover {
           border-bottom: 0;
         }
