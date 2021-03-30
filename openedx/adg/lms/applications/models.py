@@ -10,14 +10,12 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from lms.djangoapps.grades.api import CourseGradeFactory
-from openedx.adg.lms.constants import ALLOWED_IMAGE_EXTENSIONS
-from openedx.adg.lms.helpers import validate_image_size
 from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.grade_utils import round_away_from_zero
 
-from .constants import CourseScore
-from .helpers import max_year_value_validator, min_year_value_validator
+from .constants import ALLOWED_LOGO_EXTENSIONS, CourseScore
+from .helpers import max_year_value_validator, min_year_value_validator, validate_logo_size
 from .managers import MultilingualCourseGroupManager, MultilingualCourseManager, SubmittedApplicationsManager
 
 
@@ -106,7 +104,7 @@ class BusinessLine(TimeStampedModel):
     title = models.CharField(verbose_name=_('Title'), max_length=150, unique=True, )
     logo = models.ImageField(
         upload_to='business-lines/logos/', verbose_name=_('Logo'),
-        validators=[FileExtensionValidator(ALLOWED_IMAGE_EXTENSIONS), validate_image_size],
+        validators=[FileExtensionValidator(ALLOWED_LOGO_EXTENSIONS), validate_logo_size],
         help_text=_('Accepted extensions: .png, .jpg, .svg'),
     )
     description = models.TextField(verbose_name=_('Description'), )

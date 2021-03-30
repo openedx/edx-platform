@@ -8,4 +8,5 @@ class OurTeamConfig(AppConfig):
     """
     Our Team app configuration.
     """
+
     name = 'openedx.adg.lms.our_team'

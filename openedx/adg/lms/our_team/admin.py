@@ -7,12 +7,11 @@ from .models import OurTeamMember
 
 
 @admin.register(OurTeamMember)
-class ApplicationHubAdmin(admin.ModelAdmin):
+class OurTeamMemberAdmin(admin.ModelAdmin):
     """
-    Django admin class for OurTeam
+    Django admin class for OurTeamMember
     """
 
-    fields = ('name', 'designation', 'image', 'description', 'url',)
     list_display = ('id', 'name', 'designation', 'image', 'description',)
-    list_filter = ('name',)
+    list_filter = ('designation',)
     search_fields = ('name',)

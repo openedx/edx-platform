@@ -4,7 +4,7 @@ Helper methods for applications
 from datetime import datetime
 
 from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
@@ -16,11 +16,27 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from .constants import (
     COVER_LETTER_ONLY,
     HTML_FOR_EMBEDDED_FILE_VIEW,
+    LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
     SCORES
 )
+
+
+def validate_logo_size(file_):
+    """
+    Validate maximum allowed file upload size, raise validation error if file size exceeds.
+
+    Arguments:
+         file_(object): file that needs to be validated for size
+
+    Returns:
+        None
+    """
+    size = getattr(file_, 'size', None)
+    if size and LOGO_IMAGE_MAX_SIZE < size:
+        raise ValidationError(_('File size must not exceed {size} KB').format(size=LOGO_IMAGE_MAX_SIZE / 1024))
 
 
 # pylint: disable=translation-of-non-string
