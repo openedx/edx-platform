@@ -970,12 +970,6 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
         )
     ]
 
-# Branch.io Text Me The App
-if settings.BRANCH_IO_KEY:
-    urlpatterns += [
-        url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
-    ]
-
 # API docs.
 urlpatterns += make_docs_urls(api_info)
 

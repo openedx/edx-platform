@@ -69,7 +69,6 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
 )
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tasks import send_activation_email
-from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
@@ -863,19 +862,3 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
-
-
-@ensure_csrf_cookie
-def text_me_the_app(request):
-    """
-    Text me the app view.
-    """
-    text_me_fragment = TextMeTheAppFragmentView().render_to_fragment(request)
-    context = {
-        'nav_hidden': True,
-        'show_dashboard_tabs': True,
-        'show_program_listing': ProgramsApiConfig.is_enabled(),
-        'fragment': text_me_fragment
-    }
-
-    return render_to_response('text-me-the-app.html', context)
