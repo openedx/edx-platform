@@ -84,7 +84,7 @@ class MockTransaction:
         self.graph.number_rollbacks += 1
 
 
-class MockNodeSelector:
+class MockNodeMatcher:
     """
     Mocks out py2neo's NodeSelector class. Used to select a node from a graph.
     py2neo's NodeSelector expects a real graph object to run queries against,
