@@ -53,6 +53,6 @@ jobs:
           cd $GITHUB_WORKSPACE/testeng-ci
           python -m jenkins.pull_request_creator --repo-root=$GITHUB_WORKSPACE \
           --target-branch="${{ env.target_branch }}" --base-branch-name="upgrade-python-requirements" \
-          --commit-message="Updating Python Requirements" --pr-title="Python Requirements Update" \
+          --commit-message="chore: Updating Python Requirements" --pr-title="chore: Python Requirements Update" \
           --pr-body="Python requirements update.Please review the [changelogs](https://openedx.atlassian.net/wiki/spaces/TE/pages/1001521320/Python+Package+Changelogs) for the upgraded packages." \
           --user-reviewers="" --team-reviewers="arbi-bom" --delete-old-pull-requests
