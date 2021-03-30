@@ -118,7 +118,6 @@ openedx-calc                        # Library supporting mathematical calculatio
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo<4.0.0                        # Used to communicate with Neo4j, which is used internally for modulestore inspection
 PyContracts
 pycountry
 pycryptodomex
