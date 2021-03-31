@@ -1,7 +1,7 @@
 """
 Celery tasks used by cms_user_tasks
 """
-
+import json
 
 from boto.exception import NoAuthHandlerFound
 from celery import shared_task
@@ -21,7 +21,7 @@ TASK_COMPLETE_EMAIL_TIMEOUT = 60
 
 @shared_task(bind=True)
 @set_code_owner_attribute
-def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url):
+def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url, olx_validation_text=None):
     """
     Sending an email to the users when an async task completes.
     """
@@ -32,6 +32,14 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
         'task_status': task_state_text,
         'detail_url': detail_url
     }
+    if olx_validation_text:
+        try:
+            olx_validations = json.loads(olx_validation_text)
+            context['olx_validation_errors'] = True
+            context['error_summary'] = olx_validations.get('error_summary')
+            context['error_report'] = olx_validations.get('error_report')
+        except ValueError:  # includes simplejson.decoder.JSONDecodeError
+            LOGGER.error(f'Unable to parse CourseOlx validation text: {olx_validation_text}')
 
     subject = render_to_string('emails/user_task_complete_email_subject.txt', context)
     # Eliminate any newlines

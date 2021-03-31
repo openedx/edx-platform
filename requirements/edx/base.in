@@ -115,6 +115,7 @@ mysqlclient                         # Driver for the default production relation
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
+olxcleaner                          # Library to support syntex validation during course import
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
