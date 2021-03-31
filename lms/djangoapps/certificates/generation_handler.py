@@ -160,40 +160,15 @@ def _can_generate_allowlist_certificate(user, course_key):
                  f'generated.')
         return False
 
-    if not auto_certificate_generation_enabled():
-        # Automatic certificate generation is globally disabled
-        log.info(f'Automatic certificate generation is globally disabled. Allowlist certificate cannot be generated'
-                 f'for {user.id} : {course_key}.')
-        return False
-
-    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
-        # The invalidation list overrides the allowlist
-        log.info(f'{user.id} : {course_key} is on the certificate invalidation list. Allowlist certificate cannot be '
-                 f'generated.')
-        return False
-
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    if enrollment_mode is None:
-        log.info(f'{user.id} : {course_key} does not have an enrollment. Allowlist certificate cannot be generated.')
-        return False
-
-    if not modes_api.is_eligible_for_certificate(enrollment_mode):
-        log.info(f'{user.id} : {course_key} has an enrollment mode of {enrollment_mode}, which is not eligible for an '
-                 f'allowlist certificate. Certificate cannot be generated.')
-        return False
-
-    if not IDVerificationService.user_is_verified(user):
-        log.info(f'{user.id} does not have a verified id. Allowlist certificate cannot be generated for {course_key}.')
-        return False
-
-    course = _get_course(course_key)
-    if not has_html_certificates_enabled(course):
-        log.info(f'{course_key} does not have HTML certificates enabled. Allowlist certificate cannot be generated for '
-                 f'{user.id}.')
-        return False
-
     log.info(f'{user.id} : {course_key} is on the certificate allowlist')
-    return _can_generate_allowlist_certificate_for_status(user, course_key)
+
+    if not _can_generate_certificate_common(user, course_key):
+        log.info(f'One of the common checks failed. Allowlist certificate cannot be generated for {user.id} : '
+                 f'{course_key}.')
+        return False
+
+    log.info(f'Allowlist certificate can be generated for {user.id} : {course_key}')
+    return True
 
 
 def _can_generate_v2_certificate(user, course_key):
@@ -206,6 +181,34 @@ def _can_generate_v2_certificate(user, course_key):
         log.info(f'{course_key} is not using v2 course certificates. Certificate cannot be generated.')
         return False
 
+    if _is_ccx_course(course_key):
+        log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
+        return False
+
+    course = _get_course(course_key)
+    if _is_beta_tester(user, course):
+        log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
+        return False
+
+    if not _has_passing_grade(user, course):
+        log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
+        return False
+
+    if not _can_generate_certificate_common(user, course_key):
+        log.info(f'One of the common checks failed. Certificate cannot be generated for {user.id} : {course_key}.')
+        return False
+
+    log.info(f'V2 certificate can be generated for {user.id} : {course_key}')
+    return True
+
+
+def _can_generate_certificate_common(user, course_key):
+    """
+    Check if a course certificate can be generated (created if it doesn't already exist, or updated if it does
+    exist) for this user, in this course run.
+
+    This method contains checks that are common to both allowlist and V2 regular course certificates.
+    """
     if not auto_certificate_generation_enabled():
         # Automatic certificate generation is globally disabled
         log.info(f'Automatic certificate generation is globally disabled. Certificate cannot be generated for '
@@ -223,25 +226,12 @@ def _can_generate_v2_certificate(user, course_key):
         return False
 
     if not modes_api.is_eligible_for_certificate(enrollment_mode):
-        log.info(f'{user.id} : {course_key} has an enrollment mode of {enrollment_mode}, which is not eligible for an '
-                 f'allowlist certificate. Certificate cannot be generated.')
+        log.info(f'{user.id} : {course_key} has an enrollment mode of {enrollment_mode}, which is not eligible for a '
+                 f'certificate. Certificate cannot be generated.')
         return False
 
     if not IDVerificationService.user_is_verified(user):
         log.info(f'{user.id} does not have a verified id. Certificate cannot be generated for {course_key}.')
-        return False
-
-    if _is_ccx_course(course_key):
-        log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
-        return False
-
-    course = _get_course(course_key)
-    if _is_beta_tester(user, course):
-        log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
-        return False
-
-    if not _has_passing_grade(user, course):
-        log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
         return False
 
     if not _can_generate_certificate_for_status(user, course_key):
@@ -253,7 +243,6 @@ def _can_generate_v2_certificate(user, course_key):
                  f'{user.id}.')
         return False
 
-    log.info(f'V2 certificate can be generated for {user.id} : {course_key}')
     return True
 
 
@@ -285,25 +274,6 @@ def _is_on_certificate_allowlist(user, course_key):
     Check if the user is on the allowlist, and is enabled for the allowlist, for this course run
     """
     return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
-
-
-def _can_generate_allowlist_certificate_for_status(user, course_key):
-    """
-    Check if the user's certificate status can handle allowlist certificate generation
-    """
-    cert = GeneratedCertificate.certificate_for_student(user, course_key)
-    if cert is None:
-        return True
-
-    if cert.status == CertificateStatuses.downloadable:
-        log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is not '
-                 f'eligible for allowlist generation. Allowlist certificate cannot be generated as it is already in a '
-                 f'final state.')
-        return False
-
-    log.info(f'Certificate with status {cert.status} already exists for {user.id} : {course_key}, and is eligible for '
-             f'allowlist generation')
-    return True
 
 
 def _can_generate_certificate_for_status(user, course_key):
