@@ -14,17 +14,11 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from .test_utils import with_organization_context, create_org_user
+from ...settings.helpers import get_tahoe_multitenant_auth_backends
 
 
 @skip_unless_lms
-@override_settings(
-    AUTHENTICATION_BACKENDS=(
-        # Match the Appsembler configuration in appsembler.settings..production_common
-        'organizations.backends.DefaultSiteBackend',
-        'organizations.backends.SiteMemberBackend',
-        'organizations.backends.OrganizationMemberBackend',
-    )
-)
+@override_settings(AUTHENTICATION_BACKENDS=get_tahoe_multitenant_auth_backends(settings))
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
 class MultiTenantLoginTest(CacheIsolationTestCase):
     """
@@ -49,16 +43,6 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         cache.clear()
         # Store the login url
         self.url = reverse('login_api')
-
-    def test_auth_backends(self):
-        """
-        Ensure the correct authentication backends are enabled for this test case.
-        """
-        assert settings.AUTHENTICATION_BACKENDS == (
-            'organizations.backends.DefaultSiteBackend',
-            'organizations.backends.SiteMemberBackend',
-            'organizations.backends.OrganizationMemberBackend',
-        )
 
     def create_user(self, org, email=EMAIL, password=PASSWORD):
         """
