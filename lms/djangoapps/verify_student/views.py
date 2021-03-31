@@ -852,7 +852,7 @@ class SubmitPhotosView(View):
         # Retrieve the image data
         # Validation ensures that we'll have a face image, but we may not have
         # a photo ID image if this is a re-verification.
-        face_image, photo_id_image, response = self._decode_image_data(
+        face_image, photo_id_image, response = self._validate_and_decode_image_data(
             request, params["face_image"], params.get("photo_id_image")
         )
 
@@ -957,9 +957,9 @@ class SubmitPhotosView(View):
             )
             return HttpResponseBadRequest(msg)
 
-    def _decode_image_data(self, request, face_data, photo_id_data=None):
+    def _validate_and_decode_image_data(self, request, face_data, photo_id_data=None):
         """
-        Decode image data sent with the request.
+        Validate and decode image data sent with the request.
 
         Arguments:
             face_data (str): base64-encoded face image data.
@@ -971,6 +971,24 @@ class SubmitPhotosView(View):
             tuple of (str, str, HttpResponse)
 
         """
+        for image_data in [face_data, photo_id_data]:
+            # Validate that the media type is image
+            if image_data and not image_data.startswith('data:image'):
+                msg = _("Image data is in an unsupported format.")
+                data_type = image_data.split(',')[0]
+                if data_type:
+                    log.error(
+                        "Image data for user_id={user_id} was uploaded in an unsupported "
+                        "format: {data_type}".format(user_id=request.user.id, data_type=data_type)
+                    )
+                else:
+                    log.error(
+                        "Image data type for user_id={user_id} could not be identified.".format(
+                            user_id=request.user.id
+                        )
+                    )
+                return None, None, HttpResponseBadRequest(msg)
+
         try:
             # Decode face image data (used for both an initial and re-verification)
             face_image = decode_image_data(face_data)
