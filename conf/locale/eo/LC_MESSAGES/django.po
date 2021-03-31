@@ -19348,26 +19348,26 @@ msgid "View Consent"
 msgstr "Vïéw Çönsént Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Approved"
+msgid "Current ID Verification Status: Approved"
 msgstr ""
-"Çürrént Vérïfïçätïön Stätüs: Àpprövéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Çürrént ÌD Vérïfïçätïön Stätüs: Àpprövéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
+"Your edX ID verification has been approved. Your ID verification is effective for "
+"two years after submission."
 msgstr ""
-"Ýöür édX vérïfïçätïön häs ßéén äpprövéd. Ýöür vérïfïçätïön ïs éfféçtïvé för "
-"öné ýéär äftér süßmïssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"Ýöür édX ÌD vérïfïçätïön häs ßéén äpprövéd. Ýöür ÌD vérïfïçätïön ïs éfféçtïvé för "
+"twö ýéärs äftér süßmïssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}. Please be aware "
+"Your photo ID verification expires on {verification_expiry}. Please be aware "
 "photo verification can take up to three days once initiated and you will not"
 " be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
-"Ýöür phötö vérïfïçätïön éxpïrés ön {verification_expiry}. Pléäsé ßé äwäré "
+"Ýöür phötö ÌD vérïfïçätïön éxpïrés ön {verification_expiry}. Pléäsé ßé äwäré "
 "phötö vérïfïçätïön çän täké üp tö thréé däýs önçé ïnïtïätéd änd ýöü wïll nöt"
 " ßé äßlé tö éärn ä çértïfïçäté ör täké ä pröçtöréd éxäm üntïl äpprövéd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
@@ -19381,31 +19381,31 @@ msgid "Resubmit Verification"
 msgstr "Résüßmït Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Pending"
+msgid "Current ID Verification Status: Pending"
 msgstr ""
-"Çürrént Vérïfïçätïön Stätüs: Péndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Çürrént ÌD Vérïfïçätïön Stätüs: Péndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX ID verification is pending. Your verification information has been "
+"Your edX ID verification is pending. Your ID verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
-"Ýöür édX ÌD vérïfïçätïön ïs péndïng. Ýöür vérïfïçätïön ïnförmätïön häs ßéén "
+"Ýöür édX ÌD vérïfïçätïön ïs péndïng. Ýöür ÌD vérïfïçätïön ïnförmätïön häs ßéén "
 "süßmïttéd änd wïll ßé révïéwéd shörtlý. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Denied"
+msgid "Current ID Verification Status: Denied"
 msgstr ""
-"Çürrént Vérïfïçätïön Stätüs: Dénïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Çürrént ÌD Vérïfïçätïön Stätüs: Dénïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification submission was not accepted. To receive a verified "
+"Your ID verification submission was not accepted. To receive a verified "
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
-"Ýöür vérïfïçätïön süßmïssïön wäs nöt äççéptéd. Tö réçéïvé ä vérïfïéd "
+"Ýöür ÌD vérïfïçätïön süßmïssïön wäs nöt äççéptéd. Tö réçéïvé ä vérïfïéd "
 "çértïfïçäté, ýöü müst süßmït ä néw phötö öf ýöürsélf änd ýöür gövérnmént-"
 "ïssüéd phötö ÌD ßéföré thé vérïfïçätïön déädlïné för ýöür çöürsé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
@@ -19415,15 +19415,15 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕι#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification was denied for the following reasons:"
+msgid "Your ID verification was denied for the following reasons:"
 msgstr ""
-"Ýöür vérïfïçätïön wäs dénïéd för thé föllöwïng réäsöns: Ⱡ'σяєм ιρѕυм ∂σłσя "
+"Ýöür ÌD vérïfïçätïön wäs dénïéd för thé föllöwïng réäsöns: Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Expired"
+msgid "Current ID Verification Status: Expired"
 msgstr ""
-"Çürrént Vérïfïçätïön Stätüs: Éxpïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Çürrént ÌD Vérïfïçätïön Stätüs: Éxpïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -20013,10 +20013,10 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
+"Your verification is effective for two years. It will expire on "
 "{expiration_datetime}"
 msgstr ""
-"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön "
+"Ýöür vérïfïçätïön ïs éfféçtïvé för twö ýéärs. Ìt wïll éxpïré ön "
 "{expiration_datetime} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
