@@ -1,3 +1,6 @@
+"""
+All template tags for specialization app
+"""
 from django import template
 from django.template.loader import get_template
 
