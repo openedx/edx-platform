@@ -286,6 +286,7 @@ class LoncapaProblem(object):
             child_options = []
             for option_element in optioninput.findall('./option'):
                 text = option_element.text
+                text = text or ''
                 option_name = text.strip()
                 if option_element.get('correct').upper() == 'TRUE':
                     correct_option = option_name

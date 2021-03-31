@@ -397,6 +397,26 @@ class CAPAProblemTest(unittest.TestCase):
         problem = new_loncapa_problem(xml.format(correctness=False))
         assert problem is not None
 
+    def test_optionresponse_option_with_empty_text(self):
+        """
+        Verify successful instantiation of an optionresponse problem
+        with an option with empty text
+        """
+        xml = """
+        <problem>
+            <optionresponse>
+                <label>Select True or False</label>
+                <optioninput>
+                    <option correct="False">True <optionhint>Not this one</optionhint></option>
+                    <option correct="True">False</option>
+                    <option correct="False"><optionhint>Not this empty one either</optionhint></option>
+                </optioninput>
+            </optionresponse>
+        </problem>
+        """
+        problem = new_loncapa_problem(xml)
+        assert problem is not None
+
 
 @ddt.ddt
 class CAPAMultiInputProblemTest(unittest.TestCase):
