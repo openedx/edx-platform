@@ -1,3 +1,6 @@
+"""
+Serializers for smart_referral app
+"""
 from rest_framework import serializers
 
 from .models import SmartReferral

@@ -1,3 +1,6 @@
+"""
+Factories used for smart_referral app tests
+"""
 import factory
 
 from lms.djangoapps.onboarding.tests.factories import UserFactory
@@ -9,7 +12,7 @@ class SmartReferralFactory(factory.django.DjangoModelFactory):
     Factory for SmartReferral model. It contains fake data and sub-factory for mandatory fields
     """
 
-    class Meta:
+    class Meta(object):
         model = SmartReferral
         django_get_or_create = ['contact_email', 'user']
 

@@ -1,24 +1,31 @@
+"""
+Tests for smart_referral helpers
+"""
 from ddt import ddt, file_data
 from django.test import TestCase
+
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
+from openedx.features.smart_referral import helpers as filter_contacts_helpers
+from openedx.features.smart_referral.tests.factories import SmartReferralFactory
 
 from .constants import (
     FILTER_CONTACTS_LIST_INDEX,
-    SORTED_PLATFORM_CONTACT_LIST_KEY,
-    SORTED_PLATFORM_CONTACT_LIST_INDEX,
-    SORTED_NON_PLATFORM_CONTACT_LIST_KEY,
-    SORTED_NON_PLATFORM_CONTACT_LIST_INDEX,
-    SORTED_CONTACT_LIST_KEY,
     SORTED_CONTACT_LIST_INDEX,
-    UNSORTED_CONTACT_LIST_KEY,
+    SORTED_CONTACT_LIST_KEY,
+    SORTED_NON_PLATFORM_CONTACT_LIST_INDEX,
+    SORTED_NON_PLATFORM_CONTACT_LIST_KEY,
+    SORTED_PLATFORM_CONTACT_LIST_INDEX,
+    SORTED_PLATFORM_CONTACT_LIST_KEY,
     UNSORTED_CONTACT_LIST_INDEX,
+    UNSORTED_CONTACT_LIST_KEY
 )
-from openedx.features.smart_referral import helpers as filter_contacts_helpers
-from openedx.features.smart_referral.tests.factories import SmartReferralFactory
 
 
 @ddt
 class FilterContactsAPIViewTestHelpers(TestCase):
+    """
+    Class contains tests for smart_referral helpers
+    """
 
     def test_get_email_domain(self):
         """
@@ -44,7 +51,7 @@ class FilterContactsAPIViewTestHelpers(TestCase):
 
         user = UserFactory(email='testing.101@edx.com')
         user.extended_profile.organization = org
-        user.extended_profile.save()
+        user.extended_profile.save()  # pylint: disable=no-member
 
         contact_list = contacts_data[UNSORTED_CONTACT_LIST_INDEX][UNSORTED_CONTACT_LIST_KEY]
         expected_output = contacts_data[SORTED_CONTACT_LIST_INDEX][SORTED_CONTACT_LIST_KEY]
@@ -86,7 +93,7 @@ class FilterContactsAPIViewTestHelpers(TestCase):
 
         user = UserFactory(email='testing.101@test.com')
         user.extended_profile.organization = org
-        user.extended_profile.save()
+        user.extended_profile.save()  # pylint: disable=no-member
 
         actual_result = filter_contacts_helpers.get_org_admin_email(user)
         self.assertEqual(org_admin_email, actual_result)
@@ -101,7 +108,7 @@ class FilterContactsAPIViewTestHelpers(TestCase):
 
         user = UserFactory(email='testing.101@test.com')
         user.extended_profile.organization = org
-        user.extended_profile.save()
+        user.extended_profile.save()  # pylint: disable=no-member
 
         actual_result = filter_contacts_helpers.get_org_admin_email(user)
         self.assertIsNone(actual_result)
