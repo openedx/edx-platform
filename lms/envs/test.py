@@ -586,7 +586,9 @@ CAPTCHA_SITE_KEY = 'test-key'
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'test_bucket'
 AWS_ACCESS_KEY_ID = 'test_access_Key'
 AWS_SECRET_ACCESS_KEY = 'test_secret_access_key'
-COMPREHENSIVE_THEME_DIRS = ['/edx/src/philu-edx-theme/edx-platform']
+DEFAULT_SITE_THEME = 'philu'
+COMPREHENSIVE_THEME_DIRS = ['/edx/src/philu-edx-theme/edx-platform/']
+ENABLE_COMPREHENSIVE_THEMING = True
 
 ################## End PhilU Settings #####################
 

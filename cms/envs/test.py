@@ -339,6 +339,9 @@ NODEBB_MASTER_TOKEN = 'test-master-token-nodebb'
 MANDRILL_API_KEY = os.environ.get('MANDRILL_API_KEY')
 MAILCHIMP_API_KEY = os.environ.get('MAILCHIMP_API_KEY')
 MAILCHIMP_LEARNERS_LIST_ID = 'test'
+DEFAULT_SITE_THEME = 'philu'
+COMPREHENSIVE_THEME_DIRS = ['/edx/src/philu-edx-theme/edx-platform/']
+ENABLE_COMPREHENSIVE_THEMING = True
 ################## End PhilU Settings #####################
 
 ########################## VIDEO IMAGE STORAGE ############################
