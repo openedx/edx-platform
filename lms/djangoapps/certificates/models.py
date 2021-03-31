@@ -89,9 +89,7 @@ class CertificateWhitelist(models.Model):
     """
     Tracks students who are whitelisted, all users
     in this table will always qualify for a certificate
-    regardless of their grade unless they are on the
-    embargoed country restriction list
-    (allow_certificate set to False in userprofile).
+    regardless of their grade.
 
     .. no_pii:
     """
@@ -584,10 +582,9 @@ def certificate_status(generated_certificate):
     deleted      - The certificate has been deleted.
     downloadable - The certificate is available for download.
     notpassing   - The student was graded but is not passing
-    restricted   - The student is on the restricted embargo list and
-                   should not be issued a certificate. This will
-                   be set if allow_certificate is set to False in
-                   the userprofile table
+    restricted   - The student is on the restricted list. This status was
+                   previously set if allow_certificate was set to False in
+                   the userprofile table.
     unverified   - The student is in verified enrollment track and
                    the student did not have their identity verified,
                    even though they should be eligible for the cert otherwise.
@@ -643,7 +640,7 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     user_is_verified = grade is not None and mode_is_verified
 
     eligible_for_certificate = 'Y' if (user_is_whitelisted or user_is_verified or certificate_generated) \
-        and user.profile.allow_certificate else 'N'
+        else 'N'
 
     if certificate_generated and can_have_certificate:
         certificate_is_delivered = 'Y'

@@ -1889,14 +1889,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             data=problem_xml
         )
 
-    def user_is_embargoed(self, user, is_embargoed):
-        """
-        Set a users embargoed state.
-        """
-        user_profile = UserFactory(username=user.username, email=user.email).profile
-        user_profile.allow_certificate = not is_embargoed
-        user_profile.save()  # pylint: disable=no-member
-
     def _verify_csv_data(self, username, expected_data):
         """
         Verify grade report data.
@@ -1919,7 +1911,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
                           user_enroll_mode,
                           has_passed,
                           whitelisted,
-                          is_embargoed,
                           verification_status,
                           certificate_status,
                           certificate_mode):
@@ -1933,8 +1924,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             self.submit_student_answer('u1', 'test_problem', ['choice_1'])
 
         CertificateWhitelistFactory.create(user=user, course_id=self.course.id, whitelist=whitelisted)
-
-        self.user_is_embargoed(user, is_embargoed)
 
         if user_enroll_mode in CourseMode.VERIFIED_MODES:
             SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
@@ -1950,19 +1939,19 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
 
     @ddt.data(
         (
-            'verified', False, False, False, 'approved', 'notpassing', 'honor',
+            'verified', False, False, 'approved', 'notpassing', 'honor',
             ['verified', 'ID Verified', 'N', 'N', 'N/A']
         ),
         (
-            'verified', False, True, False, 'approved', 'downloadable', 'verified',
+            'verified', False, True, 'approved', 'downloadable', 'verified',
             ['verified', 'ID Verified', 'Y', 'Y', 'verified']
         ),
         (
-            'honor', True, True, True, 'approved', 'restricted', 'honor',
-            ['honor', 'N/A', 'N', 'N', 'N/A']
+            'honor', True, True, 'approved', 'restricted', 'honor',
+            ['honor', 'N/A', 'Y', 'N', 'N/A']
         ),
         (
-            'verified', True, True, False, 'must_retry', 'downloadable', 'honor',
+            'verified', True, True, 'must_retry', 'downloadable', 'honor',
             ['verified', 'Not ID Verified', 'Y', 'Y', 'honor']
         ),
     )
@@ -1972,7 +1961,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             user_enroll_mode,
             has_passed,
             whitelisted,
-            is_embargoed,
             verification_status,
             certificate_status,
             certificate_mode,
@@ -1983,7 +1971,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             user_enroll_mode,
             has_passed,
             whitelisted,
-            is_embargoed,
             verification_status,
             certificate_status,
             certificate_mode
@@ -2034,7 +2021,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(174):
+        with self.assertNumQueries(169):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
