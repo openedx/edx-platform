@@ -38,7 +38,7 @@ cffi==1.14.5              # via -r requirements/edx/../edx-sandbox/shared.txt, c
 chardet==4.0.0            # via -r requirements/edx/paver.txt, pysrt, requests
 chem==1.2.0               # via -r requirements/edx/base.in
 click==7.1.2              # via -r requirements/edx/../edx-sandbox/shared.txt, code-annotations, nltk, user-util
-code-annotations==1.1.0   # via edx-enterprise, edx-toggles
+code-annotations==1.1.1   # via edx-enterprise, edx-toggles
 contextlib2==0.6.0.post1  # via -r requirements/edx/base.in
 coreapi==2.3.3            # via drf-yasg
 coreschema==0.0.4         # via coreapi, drf-yasg
@@ -103,7 +103,7 @@ edx-drf-extensions==6.5.0  # via -r requirements/edx/base.in, edx-completion, ed
 edx-enterprise==3.20.1    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
-edx-milestones==0.3.0     # via -r requirements/edx/base.in
+edx-milestones==0.3.1     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
