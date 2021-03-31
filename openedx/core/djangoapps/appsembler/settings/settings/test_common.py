@@ -29,6 +29,6 @@ def plugin_settings(settings):
     settings.TAHOE_ALWAYS_SKIP_TEST = True
 
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-        settings.INSTALLED_APPS += (
+        settings.INSTALLED_APPS += [
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',
-        )
+        ]

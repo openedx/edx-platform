@@ -12,14 +12,14 @@ def plugin_settings(settings):
     """
     settings.APPSEMBLER_FEATURES = {}
 
-    settings.INSTALLED_APPS += (
+    settings.INSTALLED_APPS += [
         'hijack',
         'hijack_admin',
 
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
-    )
+    ]
 
     # insert at beginning because it needs to be earlier in the list than various
     # redirect middleware which will cause later `process_request()` methods to be skipped

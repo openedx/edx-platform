@@ -53,9 +53,11 @@ def plugin_settings(settings):
 
     settings.LMS_BASE = settings.ENV_TOKENS.get('LMS_BASE')
 
-    settings.INSTALLED_APPS += (
-        'openedx.core.djangoapps.appsembler.tpa_admin',
-    )
+    tpa_admin_app_name = 'openedx.core.djangoapps.appsembler.tpa_admin'
+    if tpa_admin_app_name not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS += [
+            tpa_admin_app_name,
+        ]
 
     settings.CORS_ORIGIN_ALLOW_ALL = True
 

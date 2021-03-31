@@ -27,9 +27,11 @@ def plugin_settings(settings):
             if cache_key != 'celery':  # NOTE: Disabling cache breaks things like Celery subtasks
                 settings.CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
 
-    settings.INSTALLED_APPS += (
-        'django_extensions',
-    )
+    django_extensions_app_name = 'django_extensions'
+    if django_extensions_app_name not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS += [
+            django_extensions_app_name,
+        ]
 
     settings.CUSTOMER_THEMES_BACKEND_OPTIONS = {}
 
