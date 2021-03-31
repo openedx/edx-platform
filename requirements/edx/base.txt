@@ -183,7 +183,7 @@ piexif==1.0.2
 pillow==3.4.0
 polib==1.1.0              # via edx-i18n-tools
 psutil==1.2.1
-py2neo==3.1.2
+-e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2 # via -r requirements/edx/github.in
 pycontracts==1.7.1
 pycountry==1.20
 pycparser==2.18
