@@ -30,7 +30,7 @@ perform operations currently only enabled by these views.
 Decision
 --------
 
-We will expose the existing studio APIs under new a new versioned endpoint. These
+We will expose the existing studio APIs under a new versioned endpoint. These
 endpoints will support the new JWT/OAuth2 authentication mechanisms supported by
 MFEs.
 
