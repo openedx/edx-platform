@@ -284,7 +284,10 @@
                 sequenceLinks.click(this.goto);
 
                 this.sr_container.focus();
-                document.querySelector(".view-in-course.view-courseware.courseware").scrollIntoView();
+                var courseware_view = document.querySelector(".view-in-course.view-courseware.courseware")
+                if (courseware_view) {
+                  courseware_view.scrollIntoView();
+                }
             }
         };
 
