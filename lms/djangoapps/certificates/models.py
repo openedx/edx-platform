@@ -1245,3 +1245,26 @@ class AllowListGenerationConfiguration(ConfigurationModel):
 
     def __str__(self):
         return str(self.arguments)
+
+
+class CertificateGenerationCommandConfiguration(ConfigurationModel):
+    """
+    Manages configuration for a run of the cert_generation management command.
+
+    .. no_pii:
+    """
+
+    class Meta(object):
+        app_label = "certificates"
+        verbose_name = "cert_generation argument"
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=(
+            "Arguments for the 'cert_generation' management command. Specify like '-u <user_id> -c <course_run_key>'"
+        ),
+        default="",
+    )
+
+    def __str__(self):
+        return str(self.arguments)
