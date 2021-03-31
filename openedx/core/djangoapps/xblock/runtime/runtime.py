@@ -78,9 +78,6 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
                 XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
-            services={
-                "i18n": ModuleI18nService(),
-            },
             default_class=None,
             select=None,
             id_generator=system.id_generator,
@@ -229,6 +226,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == "completion":
             context_key = block.scope_ids.usage_id.context_key
             return CompletionService(user=self.user, context_key=context_key)
+        elif service_name == "i18n":
+            return ModuleI18nService(block=block)
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
         # Otherwise, fall back to the base implementation which loads services
