@@ -145,10 +145,13 @@ def get_credential_certificates(user):
 
         program_name = program['title']
         completion_date = datetime.strptime(credential.get('created'), CREDENTIALS_DATE_FORMAT)
+
+        # We are facing Import Error due to circular dependency that's why we are importing locally.
+        from openedx.core.djangoapps.programs.utils import get_logged_in_program_certificate_url
         certificates.append({
             'display_name': program_name,
             'certificate_title': program_name,
-            'certificate_url': certificate_url,
+            'certificate_url': get_logged_in_program_certificate_url(certificate_url),
             'completion_date': completion_date.strftime(COMPLETION_DATE_FORMAT),
             'is_program_cert': True,
         })
