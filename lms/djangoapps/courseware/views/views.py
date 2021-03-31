@@ -1346,7 +1346,6 @@ def submission_history(request, course_id, learner_identifier, location):
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
-    found_user_name = None
     found_user_name = get_learner_username(learner_identifier)
     if not found_user_name:
         return HttpResponse(escape(_('User does not exist.')))
