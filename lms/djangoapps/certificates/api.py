@@ -222,15 +222,21 @@ def can_generate_certificate_task(user, course_key):
     return _can_generate_certificate_task(user, course_key)
 
 
-def generate_certificate_task(user, course_key):
+def generate_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
     can be generated.
 
     If the allowlist is enabled for this course run and the user is on the allowlist, the allowlist logic will be used.
     Otherwise, the regular course certificate generation logic will be used.
+
+    Args:
+        user: user for whom to generate a certificate
+        course_key: course run key for which to generate a certificate
+        generation_mode: Used when emitting an events. Options are "self" (implying the user generated the cert
+            themself) and "batch" for everything else.
     """
-    return _generate_certificate_task(user, course_key)
+    return _generate_certificate_task(user, course_key, generation_mode)
 
 
 def certificate_downloadable_status(student, course_key):

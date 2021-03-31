@@ -81,7 +81,7 @@ def can_generate_certificate_task(user, course_key):
     return False
 
 
-def generate_certificate_task(user, course_key):
+def generate_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a certificate for this user in this course run, if the user is eligible and a certificate
     can be generated.
@@ -92,18 +92,18 @@ def generate_certificate_task(user, course_key):
     if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
         log.info(f'{course_key} is using allowlist certificates, and the user {user.id} is on its allowlist. Attempt '
                  f'will be made to generate an allowlist certificate.')
-        return generate_allowlist_certificate_task(user, course_key)
+        return generate_allowlist_certificate_task(user, course_key, generation_mode)
 
     elif _is_using_v2_course_certificates(course_key):
         log.info(f'{course_key} is using v2 course certificates. Attempt will be made to generate a certificate for '
                  f'user {user.id}.')
-        return generate_regular_certificate_task(user, course_key)
+        return generate_regular_certificate_task(user, course_key, generation_mode)
 
     log.info(f'Neither an allowlist nor a v2 course certificate can be generated for {user.id} : {course_key}.')
     return False
 
 
-def generate_allowlist_certificate_task(user, course_key):
+def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
@@ -111,18 +111,10 @@ def generate_allowlist_certificate_task(user, course_key):
         log.info(f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
         return False
 
-    log.info(f'About to create an allowlist certificate task for {user.id} : {course_key}')
-
-    kwargs = {
-        'student': str(user.id),
-        'course_key': str(course_key),
-        'allowlist_certificate': True
-    }
-    generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
-    return True
+    return _generate_certificate_task(user, course_key, generation_mode)
 
 
-def generate_regular_certificate_task(user, course_key):
+def generate_regular_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
@@ -131,13 +123,23 @@ def generate_regular_certificate_task(user, course_key):
         log.info(f'Cannot generate a v2 course certificate for {user.id} : {course_key}')
         return False
 
-    log.info(f'About to create a v2 course certificate task for {user.id} : {course_key}')
+    return _generate_certificate_task(user, course_key, generation_mode)
+
+
+def _generate_certificate_task(user, course_key, generation_mode=None):
+    """
+    Create a task to generate a certificate
+    """
+    log.info(f'About to create a V2 certificate task for {user.id} : {course_key}')
 
     kwargs = {
         'student': str(user.id),
         'course_key': str(course_key),
         'v2_certificate': True
     }
+    if generation_mode is not None:
+        kwargs['generation_mode'] = generation_mode
+
     generate_certificate.apply_async(countdown=CERTIFICATE_DELAY_SECONDS, kwargs=kwargs)
     return True
 

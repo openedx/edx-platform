@@ -302,6 +302,14 @@ class CertificateTests(ModuleStoreTestCase):
         assert _can_generate_v2_certificate(self.user, self.course_run_key)
         assert can_generate_certificate_task(self.user, self.course_run_key)
         assert generate_certificate_task(self.user, self.course_run_key)
+
+    def test_handle_valid_task(self):
+        """
+        Test handling of a valid user/course run combo.
+
+        We test generate_certificate_task() and generate_regular_certificate_task() separately since they both
+        generate a cert.
+        """
         assert generate_regular_certificate_task(self.user, self.course_run_key)
 
     @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
