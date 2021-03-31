@@ -36,13 +36,12 @@ class ExtendedUserProfileForm(forms.Form):
         """
         data = self.cleaned_data
         user = request.user
-        saudi_national = request.POST.get('saudi_national') == 'Yes'
 
         ExtendedUserProfile.objects.update_or_create(
             user=user,
             defaults={
                 'birth_date': data.get('birth_date'),
-                'saudi_national': saudi_national,
+                'saudi_national': data.get('saudi_national'),
             }
         )
 
@@ -75,6 +74,17 @@ class ExtendedUserProfileForm(forms.Form):
                 )
             cleaned_data['birth_date'] = birth_date
         return cleaned_data
+
+    def clean_saudi_national(self):
+        """
+        Verify if the user is a saudi_national or not, and raise validation error accordingly.
+        """
+        saudi_national = self.cleaned_data.get('saudi_national')
+        if not saudi_national:
+            raise forms.ValidationError(
+                _('Sorry, only a Saudi national can enter this program')
+            )
+        return saudi_national
 
 
 class UserApplicationForm(forms.ModelForm):
