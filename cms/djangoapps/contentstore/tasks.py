@@ -662,13 +662,19 @@ def update_outline_from_modulestore_task(course_key_str):
 
 def validate_course_olx(courselike_key, course_dir, status):
     """
-    Validates course olx and records the errors as artifact.
+    Validates course olx and records the errors as an artifact.
+
     Arguments:
+        courselike_key: A locator identifies a course resource.
         course_dir: complete path to the course olx
         status: UserTaskStatus object.
     """
+    is_library = isinstance(courselike_key, LibraryLocator)
     olx_is_valid = True
     log_prefix = f'Course import {courselike_key}'
+
+    if is_library:
+        return olx_is_valid
 
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
