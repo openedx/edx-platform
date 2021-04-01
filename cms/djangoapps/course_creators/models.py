@@ -10,6 +10,7 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
+from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 # A signal that will be sent when users should be added or removed from the creator group
 update_creator_state = Signal(providing_args=["caller", "user", "state"])
@@ -47,6 +48,7 @@ class CourseCreator(models.Model):
                              help_text=_("Current course creator state"))
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
+    orgs = models.ManyToManyField(Organization, blank=True, help_text = _("Organizations for which content creator is a part of"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"
