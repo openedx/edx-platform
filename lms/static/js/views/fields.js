@@ -401,7 +401,7 @@
 
             events: {
                 click: 'startEditing',
-                'focusout select': 'finishEditing'
+                'change select': 'finishEditing'
             },
 
             initialize: function(options) {
