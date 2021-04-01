@@ -68,27 +68,31 @@ def send_reminder_email(data, course_key):
 
 
 @task(name='add_enrollment_record')
-def add_enrollment_record(user, course_id):
+def add_enrollment_record(username, user_email, course_id):
     """
     Add current enrollment record
-    :param user: (settings.User) user object
+    :param username: (str) user name
+    :param user_email: (str) user email
     :param course_id: (CourseKeyField) course key
     """
 
     try:
+        user = User.objects.get(username=username, email=user_email)
         CourseProgressEmailModel.objects.create(user=user, course_id=course_id)
     except IntegrityError:
-        log.info("Enrollment record for {} & User:{} already registered".format(course_id, user))
+        log.info("Enrollment record for {} & User:{} already registered".format(course_id, username))
 
 
 @task(name='remove_enrollment_record')
-def remove_enrollment_record(user, course_id):
+def remove_enrollment_record(username, user_email, course_id):
     """
     Remove current enrollment record
-    :param user: (settings.User) user object
+    :param username: (str) user name
+    :param user_email: (str) user email
     :param course_id: (CourseKeyField) course key
     """
 
+    user = User.objects.get(username=username, email=user_email)
     record = CourseProgressEmailModel.objects.filter(user=user, course_id=course_id)
     if record:
         record.delete()
