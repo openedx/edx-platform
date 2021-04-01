@@ -216,10 +216,10 @@ def reset_course_deadlines(request):
 
 
 def expose_header(header, response):
-        """
-        Add a header name to Access-Control-Expose-Headers to allow client code to access that header's value
-        """
-        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
-        exposedHeaders += f', {header}' if exposedHeaders else header
-        response['Access-Control-Expose-Headers'] = exposedHeaders
-        return response
+    """
+    Add a header name to Access-Control-Expose-Headers to allow client code to access that header's value
+    """
+    exposedHeaders = response.get('Access-Control-Expose-Headers', '')
+    exposedHeaders += f', {header}' if exposedHeaders else header
+    response['Access-Control-Expose-Headers'] = exposedHeaders
+    return response
