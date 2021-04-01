@@ -3,6 +3,7 @@ Management command to generate course certificates for one or more users in a gi
 """
 
 import logging
+import shlex
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
@@ -10,6 +11,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.generation_handler import generate_certificate_task
+from lms.djangoapps.certificates.models import CertificateGenerationCommandConfiguration
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -33,18 +35,40 @@ class Command(BaseCommand):
             nargs='+',
             metavar='USER',
             dest='user',
-            required=True,
             help='user_id or space-separated list of user_ids for whom to generate course certificates'
         )
         parser.add_argument(
             '-c', '--course-key',
             metavar='COURSE_KEY',
             dest='course_key',
-            required=True,
             help='course run key'
         )
+        parser.add_argument(
+            '--args-from-database',
+            action='store_true',
+            help='Use arguments from the CertificateGenerationCommandConfiguration model instead of the command line'
+        )
+
+    def get_args_from_database(self):
+        """
+        Returns an options dictionary from the current CertificateGenerationCommandConfiguration model.
+        """
+        config = CertificateGenerationCommandConfiguration.current()
+        if not config.enabled:
+            raise CommandError(
+                "CertificateGenerationCommandConfiguration is disabled, but --args-from-database was requested"
+            )
+
+        args = shlex.split(config.arguments)
+        parser = self.create_parser("manage.py", "cert_generation")
+
+        return vars(parser.parse_args(args))
 
     def handle(self, *args, **options):
+        # database args will override cmd line args
+        if options['args_from_database']:
+            options = self.get_args_from_database()
+
         if not options.get('user'):
             raise CommandError('You must specify a list of users')
 

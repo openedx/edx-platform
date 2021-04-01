@@ -15,6 +15,7 @@ from organizations.api import get_organizations
 from lms.djangoapps.certificates.models import (
     AllowListGenerationConfiguration,
     CertificateGenerationConfiguration,
+    CertificateGenerationCommandConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
@@ -93,6 +94,11 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
 
 @admin.register(AllowListGenerationConfiguration)
 class AllowListGenerationConfigurationAdmin(ConfigurationModelAdmin):
+    pass
+
+
+@admin.register(CertificateGenerationCommandConfiguration)
+class CertificateGenerationCommandConfigurationAdmin(ConfigurationModelAdmin):
     pass
 
 admin.site.register(CertificateGenerationConfiguration)

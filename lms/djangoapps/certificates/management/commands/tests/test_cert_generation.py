@@ -43,12 +43,19 @@ class CertGenerationTests(ModuleStoreTestCase):
             mode="verified",
         )
 
-    def test_command_with_missing_param(self):
+    def test_command_with_missing_param_course_key(self):
         """
-        Verify command with a missing param
+        Verify command with a missing param -- course key.
         """
-        with pytest.raises(CommandError, match="Error: the following arguments are required"):
+        with pytest.raises(CommandError, match="You must specify a course-key"):
             call_command("cert_generation", "--u", self.user.username)
+
+    def test_command_with_missing_param_users(self):
+        """
+        Verify command with a missing param -- users.
+        """
+        with pytest.raises(CommandError, match="You must specify a list of users"):
+            call_command("cert_generation", "--c", "blah")
 
     def test_command_with_invalid_key(self):
         """
