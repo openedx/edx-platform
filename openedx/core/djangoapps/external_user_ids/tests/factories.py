@@ -11,7 +11,7 @@ from openedx.core.djangoapps.external_user_ids.models import ExternalId, Externa
 
 
 class ExternalIDTypeFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = ExternalIdType
 
     name = FuzzyChoice([ExternalIdType.MICROBACHELORS_COACHING])
@@ -19,7 +19,7 @@ class ExternalIDTypeFactory(factory.django.DjangoModelFactory):  # lint-amnesty,
 
 
 class ExternalIdFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = ExternalId
 
     external_user_id = factory.LazyFunction(uuid4)

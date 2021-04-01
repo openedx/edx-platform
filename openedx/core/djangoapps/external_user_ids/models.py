@@ -49,7 +49,7 @@ class ExternalId(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     history = HistoricalRecords()
 
-    class Meta(object):
+    class Meta:
         unique_together = (('user', 'external_id_type'),)
         app_label = 'external_user_ids'
 

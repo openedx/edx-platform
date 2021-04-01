@@ -32,7 +32,7 @@ class ExternalIdAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missin
     template = 'openedx/core/djangoapps/external_user_ids/templates/admin/generate_external_ids_template.html'
 
     def get_urls(self):
-        urls = super(ExternalIdAdmin, self).get_urls()  # lint-amnesty, pylint: disable=super-with-arguments
+        urls = super().get_urls()
         custom_urls = [
             url(
                 r'^bulk_generate_external_ids/$',
@@ -44,10 +44,10 @@ class ExternalIdAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missin
 
     def _generate_results_msg(self, user_id_list, unknown_users, created_id_list, existing_id):
         return (
-            'Attempted to create for: {}\n'.format(user_id_list) +
-            'Could not find: {}\n'.format(unknown_users) +
-            'Created External IDs for: {}\n'.format(created_id_list) +
-            'External IDs already exist for: {}\n'.format(existing_id)
+            f'Attempted to create for: {user_id_list}\n' +
+            f'Could not find: {unknown_users}\n' +
+            f'Created External IDs for: {created_id_list}\n' +
+            f'External IDs already exist for: {existing_id}\n'
         )
 
     def process_generate_ids_request(self, user_id_list, id_type, request, redirect_url):  # lint-amnesty, pylint: disable=missing-function-docstring

@@ -3,12 +3,13 @@ Tests for CountryMiddleware.
 """
 
 
+from unittest.mock import MagicMock, PropertyMock, patch
+
 import geoip2
 import maxminddb
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import MagicMock, PropertyMock, patch
 
 from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
@@ -19,7 +20,7 @@ class CountryMiddlewareTests(TestCase):
     Tests of CountryMiddleware.
     """
     def setUp(self):
-        super(CountryMiddlewareTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.country_middleware = CountryMiddleware()
         self.session_middleware = SessionMiddleware()
         self.authenticated_user = UserFactory.create()
