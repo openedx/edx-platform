@@ -40,7 +40,7 @@ def plugin_settings(settings):
         settings.ANYMAIL = {
             "MANDRILL_API_KEY": settings.MANDRILL_API_KEY,
         }
-        settings.INSTALLED_APPS += ("anymail",)
+        settings.INSTALLED_APPS += ['anymail']
 
     # Sentry
     settings.SENTRY_DSN = settings.AUTH_TOKENS.get('SENTRY_DSN', False)
@@ -54,7 +54,7 @@ def plugin_settings(settings):
             'dsn': settings.SENTRY_DSN,
         }
 
-        settings.INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+        settings.INSTALLED_APPS += ['raven.contrib.django.raven_compat']
 
     if settings.FEATURES.get('ENABLE_TIERS_APP', False):
         settings.TIERS_ORGANIZATION_MODEL = 'organizations.Organization'
@@ -65,17 +65,17 @@ def plugin_settings(settings):
         settings.DATABASES['tiers'] = dj_database_url.parse(settings.TIERS_DATABASE_URL, ssl_require=True)
         settings.DATABASE_ROUTERS.insert(0, 'openedx.core.djangoapps.appsembler.sites.routers.TiersDbRouter')
 
-        settings.MIDDLEWARE += (
+        settings.MIDDLEWARE += [
             'tiers.middleware.TierMiddleware',
-        )
-        settings.INSTALLED_APPS += (
+        ]
+        settings.INSTALLED_APPS += [
             'tiers',
-        )
+        ]
 
     if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
-        settings.INSTALLED_APPS += (
+        settings.INSTALLED_APPS += [
             'openedx.core.djangoapps.appsembler.multi_tenant_emails',
-        )
+        ]
 
     settings.TAHOE_DEFAULT_COURSE_NAME = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_NAME', '')
     settings.TAHOE_DEFAULT_COURSE_GITHUB_ORG = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_GITHUB_ORG', '')
