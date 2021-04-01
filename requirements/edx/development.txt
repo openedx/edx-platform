@@ -9,6 +9,7 @@
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki  # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock  # via -r requirements/edx/testing.txt
+-e git+https://github.com/edx/edx-drf-extensions.git@3401926966d812cdbdd8c812571c3ae847f0d547#egg=edx-drf-extensions  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/testing.txt
 -e .  # via -r requirements/edx/testing.txt
 -e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2  # via -r requirements/edx/testing.txt
@@ -29,7 +30,7 @@ astroid==2.5.2            # via -r requirements/edx/testing.txt, pylint, pylint-
 attrs==20.3.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
 babel==2.9.0              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
-billiard==3.6.3.0         # via -r requirements/edx/testing.txt, celery
+billiard==3.6.4.0         # via -r requirements/edx/testing.txt, celery
 bleach==3.3.0             # via -r requirements/edx/testing.txt, django-wiki, edx-enterprise, lti-consumer-xblock, ora2, xblock-drag-and-drop-v2, xblock-poll
 bok-choy==1.1.1           # via -r requirements/edx/testing.txt
 boto3==1.4.8              # via -r requirements/edx/testing.txt, django-ses, fs-s3fs, ora2
@@ -110,7 +111,6 @@ edx-completion==4.0.3     # via -r requirements/edx/testing.txt
 edx-django-release-util==1.0.0  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/testing.txt
 edx-django-utils==3.15.0  # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
-edx-drf-extensions==6.5.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.20.4    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.5.3     # via -r requirements/edx/testing.txt, ora2
