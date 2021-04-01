@@ -46,6 +46,7 @@ from .processors.schedule import ScheduleOutlineProcessor
 from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
 from .processors.enrollment import EnrollmentOutlineProcessor
+from .processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -322,6 +323,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('special_exams', SpecialExamsOutlineProcessor),
         ('visibility', VisibilityOutlineProcessor),
         ('enrollment', EnrollmentOutlineProcessor),
+        ('enrollment_track_partitions', EnrollmentTrackPartitionGroupsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to
