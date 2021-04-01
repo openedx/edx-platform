@@ -74,7 +74,7 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 django-ratelimit==3.0.1   # via -r requirements/edx/base.in
 django-require==1.0.11    # via -r requirements/edx/base.in
 django-sekizai==2.0.0     # via -r requirements/edx/base.in, django-wiki
-django-ses==1.0.3         # via -r requirements/edx/base.in
+django-ses==2.0.0         # via -r requirements/edx/base.in
 django-simple-history==2.12.0  # via -r requirements/edx/base.in, edx-enterprise, edx-organizations, ora2
 django-splash==1.0.0      # via -r requirements/edx/base.in
 django-statici18n==2.0.1  # via -r requirements/edx/base.in
