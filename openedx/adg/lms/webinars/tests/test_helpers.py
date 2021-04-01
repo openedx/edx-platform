@@ -1,12 +1,18 @@
 """
-Tests for all the helpers in webinars app
+All test cases for webinars app helpers
 """
+from datetime import datetime
+
 import factory
 import pytest
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.lms.webinars.helpers import send_cancellation_emails_for_given_webinars, send_webinar_emails
+from openedx.adg.lms.webinars.helpers import (
+    send_cancellation_emails_for_given_webinars,
+    send_webinar_emails,
+    send_webinar_registration_email
+)
 
 from .factories import WebinarFactory, WebinarRegistrationFactory
 
@@ -96,3 +102,22 @@ def test_send_cancellation_emails_for_given_webinars(
     assert actual_template == MandrillClient.WEBINAR_CANCELLATION
     assert actual_context == expected_context
     assert sorted(actual_email_addresses) == sorted(expected_email_addresses)
+
+
+@pytest.mark.django_db
+def test_send_webinar_registration_email(mocker):
+    """
+    Test sending webinar registration email to user
+    """
+    mock_task = mocker.patch('openedx.adg.lms.webinars.helpers.task_send_mandrill_email.delay')
+    webinar = WebinarFactory(start_time=datetime(2020, 1, 1, 13, 10, 1))
+    email = 'email@example.com'
+
+    send_webinar_registration_email(webinar, email)
+
+    mock_task.assert_called_once_with(MandrillClient.WEBINAR_REGISTRATION_CONFIRMATION, [email], {
+        'webinar_title': webinar.title,
+        'webinar_description': webinar.description,
+        'webinar_link': webinar.meeting_link,
+        'webinar_start_time': 'Jan 01, 2020 01:10 PM GMT',
+    })

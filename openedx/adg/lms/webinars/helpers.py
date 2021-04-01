@@ -59,3 +59,22 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
             cancelled_webinar.start_time,
             list(webinar_email_addresses)
         )
+
+
+def send_webinar_registration_email(webinar, email):
+    """
+    Send webinar registration email to user.
+
+    Args:
+        webinar (Webinar): The webinar in which user is registered
+        email (str): User's email
+
+    Returns:
+        None
+    """
+    task_send_mandrill_email.delay(MandrillClient.WEBINAR_REGISTRATION_CONFIRMATION, [email], {
+        'webinar_title': webinar.title,
+        'webinar_description': webinar.description,
+        'webinar_link': webinar.meeting_link,
+        'webinar_start_time': webinar.start_time.strftime('%b %d, %Y %I:%M %p GMT'),
+    })
