@@ -535,7 +535,7 @@ def log_request_user_changes(request):
             if name == 'user':
                 stack = inspect.stack()
                 # Written this way in case you need more of the stack for debugging.
-                location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:6])
+                location = "\n".join("%30s : %s:%d" % (t[3], t[1], t[2]) for t in stack[0:12])
 
                 if not hasattr(request, name):
                     original_user = value
