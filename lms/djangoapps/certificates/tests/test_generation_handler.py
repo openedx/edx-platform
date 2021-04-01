@@ -13,7 +13,6 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.certificates.generation_handler import (
     CERTIFICATES_USE_ALLOWLIST,
     CERTIFICATES_USE_UPDATED,
-    _can_generate_allowlist_certificate_for_status,
     is_using_certificate_allowlist,
     _is_using_v2_course_certificates,
     _can_generate_allowlist_certificate,
@@ -145,13 +144,13 @@ class AllowlistTests(ModuleStoreTestCase):
             status=status,
         )
 
-        assert _can_generate_allowlist_certificate_for_status(u, key) == expected_response
+        assert _can_generate_certificate_for_status(u, key) == expected_response
 
     def test_generation_status_for_none(self):
         """
         Test handling of certificate statuses for a non-existent cert
         """
-        assert _can_generate_allowlist_certificate_for_status(None, None)
+        assert _can_generate_certificate_for_status(None, None)
 
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
     def test_handle_invalid(self):
