@@ -106,7 +106,7 @@ def copy_active_course_enrollments():
     active_enrollments = CourseEnrollment.objects.filter(is_active=True)
     log.info("Found {} active enrollment records, ".format(len(active_enrollments)))
     for enrollment in active_enrollments:
-        add_enrollment_record(enrollment.user, enrollment.course.id)
+        add_enrollment_record(enrollment.user.username, enrollment.user.email, enrollment.course.id)
 
 
 @task(name='send_course_completion_email')
