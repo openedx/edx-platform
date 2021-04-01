@@ -292,7 +292,7 @@ define(
                     if (current.stage !== STAGE.UPLOADING) {
                         current.state = STATE.IN_PROGRESS;
 
-                        this.pollStatus(current.stage);
+                        this.pollStatus(current.stage, data.Message);
                     } else {
                         // An import in the upload stage cannot be resumed
                         error(gettext('There was an error with the upload'));
