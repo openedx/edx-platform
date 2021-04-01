@@ -331,6 +331,14 @@ class OrgInstructorRole(OrgRole):
     def __init__(self, *args, **kwargs):
         super().__init__('instructor', *args, **kwargs)
 
+class OrgContentCreatorRole(OrgRole):
+    """An organization instructor"""
+
+    ROLE = "org_course_creator_group"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self.ROLE, *args, **kwargs)
+
 
 class OrgLibraryUserRole(OrgRole):
     """
