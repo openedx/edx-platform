@@ -19,6 +19,7 @@ from rest_framework.response import Response
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.views import expose_header
 from lms.djangoapps.course_goals.api import (
     add_course_goal,
     get_course_goal,
@@ -301,10 +302,7 @@ class OutlineTabView(RetrieveAPIView):
         """
         response = super().finalize_response(request, response, *args, **kwargs)
         # Adding this header should be moved somewhere global, not just this endpoint
-        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
-        exposedHeaders += ', Date' if exposedHeaders else 'Date'
-        response['Access-Control-Expose-Headers'] = exposedHeaders
-        return response
+        return expose_header('Date', response)
 
 
 @api_view(['POST'])

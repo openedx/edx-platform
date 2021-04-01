@@ -213,3 +213,13 @@ def reset_course_deadlines(request):
 
     referrer = request.META.get('HTTP_REFERER')
     return redirect(referrer) if referrer else HttpResponse()
+
+
+def expose_header(header, response):
+        """
+        Add a header name to Access-Control-Expose-Headers to allow client code to access that header's value
+        """
+        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
+        exposedHeaders += f', {header}' if exposedHeaders else header
+        response['Access-Control-Expose-Headers'] = exposedHeaders
+        return response

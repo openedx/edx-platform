@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -447,10 +448,7 @@ class CoursewareInformation(RetrieveAPIView):
         """
         response = super().finalize_response(request, response, *args, **kwargs)
         # Adding this header should be moved somewhere global, not just this endpoint
-        exposedHeaders = response.get('Access-Control-Expose-Headers', '')
-        exposedHeaders += ', Date' if exposedHeaders else 'Date'
-        response['Access-Control-Expose-Headers'] = exposedHeaders
-        return response
+        return expose_header('Date', response)
 
 
 class SequenceMetadata(DeveloperErrorViewMixin, APIView):
