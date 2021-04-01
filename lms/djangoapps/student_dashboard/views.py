@@ -4,15 +4,15 @@ Student Custom Dashboard View
 from datetime import datetime
 
 import pytz
+
+from common.lib.nodebb_client.client import NodeBBClient
 from course_action_state.models import CourseRerunState
 from custom_settings.models import CustomSettings
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_card.helpers import get_course_cards_list, get_course_open_date, get_related_card
 from student.models import CourseEnrollment
 from student.views.dashboard import get_course_enrollments
 from xmodule.modulestore.django import modulestore
-
-from common.lib.nodebb_client.client import NodeBBClient
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_card.helpers import get_course_cards_list, get_related_card, get_course_open_date
 
 
 def get_enrolled_past_courses(request, course_enrollments):
@@ -37,7 +37,7 @@ def get_enrolled_past_courses(request, course_enrollments):
             else:
                 enrolled.append(course)
 
-    for card, courses in past_course_cards.items():
+    for courses in past_course_cards.values():
         sorted_courses = sorted(courses, key=lambda co: co.course_overview.start)
         past.append(sorted_courses[-1])
 
