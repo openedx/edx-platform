@@ -110,6 +110,20 @@ FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
 
+def _toggle_mfe_waffle_flag(active: bool):
+    """
+    A decorator/contextmanager to force the base courseware MFE flag on or off.
+    """
+    return override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=active)
+
+
+def _toggle_mfe_preview_waffle_flag(active: bool):
+    """
+    A decorator/contextmanager to force the courseware MFE educator preview flag on or off.
+    """
+    return override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, active=active)
+
+
 @ddt.ddt
 class TestJumpTo(ModuleStoreTestCase):
     """
@@ -3255,21 +3269,21 @@ class TestShowCoursewareMFE(TestCase):
 
         # Old style course keys are never supported and should always return false...
         old_mongo_combos = itertools.product(
-            [regular_user, global_staff_user],  # User (is global staff)
+            [regular_user, global_staff_user],  # User (is global staf`f)
             [True, False],  # is_course_staff
             [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
             [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
-            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
+            with _toggle_mfe_preview_waffle_flag(preview_active):
+                with _toggle_mfe_waffle_flag(redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
-        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_preview_waffle_flag(True):
+            with _toggle_mfe_waffle_flag(True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3279,7 +3293,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with _toggle_mfe_waffle_flag(False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3289,8 +3303,8 @@ class TestShowCoursewareMFE(TestCase):
                 # Regular users don't see the link.
                 assert not show_courseware_mfe_link(regular_user, False, new_course_key)
 
-        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_preview_waffle_flag(False):
+            with _toggle_mfe_waffle_flag(True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3303,7 +3317,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with _toggle_mfe_waffle_flag(False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3361,7 +3375,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_waffle_flag(True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3373,14 +3387,14 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_waffle_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_waffle_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3390,7 +3404,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _toggle_mfe_waffle_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
 
