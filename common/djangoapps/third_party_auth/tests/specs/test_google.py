@@ -19,6 +19,10 @@ from common.djangoapps.third_party_auth.tests.specs import base
 class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Integration tests for provider.GoogleOauth2."""
 
+    PROVIDER_NAME = "google"
+    PROVIDER_BACKEND = "google-oauth2"
+    PROVIDER_ID = "oa2-google-oauth2"
+
     def setUp(self):
         super().setUp()
         self.provider = self.configure_google_provider(

@@ -789,6 +789,27 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         post_request = self._get_login_post_request(strategy)
         self.assert_json_failure_response_is_missing_social_auth(login_user(post_request))
 
+    @django_utils.override_settings(ENABLE_REQUIRE_THIRD_PARTY_AUTH=True)
+    def test_signin_associates_user_if_oauth_provider_and_tpa_is_required(self):
+        """
+        Tests associate user by email with oauth provider and `ENABLE_REQUIRE_THIRD_PARTY_AUTH` enabled
+        """
+        username, email, password = self.get_username(), 'user@example.com', 'password'
+
+        _, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+
+        user = self.create_user_models_for_existing_account(strategy, email, password, username, skip_social_auth=True)
+
+        with mock.patch(
+            'common.djangoapps.third_party_auth.pipeline.get_associated_user_by_email_response',
+            return_value=[{'user': user}, True],
+        ):
+            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+
+            post_request = self._get_login_post_request(strategy)
+            self.assert_json_success_response_looks_correct(login_user(post_request), verify_redirect_url=True)
+
     def test_first_party_auth_trumps_third_party_auth_but_is_invalid_when_only_email_in_request(self):
         self.assert_first_party_auth_trumps_third_party_auth(email='user@example.com')
 
