@@ -1,8 +1,10 @@
+"""
+Celery tasks for smart_referral app
+"""
 from celery.task import task
 from django.conf import settings
 
 from common.lib.mandrill_client.client import MandrillClient
-
 from openedx.features.smart_referral.models import SmartReferral
 
 

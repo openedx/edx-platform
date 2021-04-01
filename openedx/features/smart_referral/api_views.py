@@ -1,3 +1,6 @@
+"""
+API views for smart_referral app
+"""
 from django.http import JsonResponse
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import status
@@ -9,8 +12,8 @@ from rest_framework.views import APIView
 
 from .helpers import (
     filter_referred_contacts,
-    sort_contacts_by_org_and_user_domain,
-    get_platform_contacts_and_non_platform_contacts
+    get_platform_contacts_and_non_platform_contacts,
+    sort_contacts_by_org_and_user_domain
 )
 from .serializers import SmartReferralSerializer
 from .tasks import task_send_referral_and_toolkit_emails
@@ -24,6 +27,15 @@ class FilterContactsAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        """
+        Filter platform and non-platform contacts and returns it in separate lists
+
+        Arguments:
+            request (HttpRequest): Request object for post call
+
+        Returns:
+            JsonResponse: JsonResponse object consists of platform and non-platform contacts.
+        """
         user = request.user
         user_contacts = request.data.get('contacts_list', [])
 
@@ -46,6 +58,15 @@ class FilterContactsAPIView(APIView):
 @permission_classes([IsAuthenticated])
 @authentication_classes([SessionAuthenticationAllowInactiveUser, ])
 def send_initial_emails_and_save_record(request):
+    """
+    Send referral emails and save an entry in database.
+
+    Arguments:
+        request (HttpRequest): Request object for post call
+
+    Returns:
+        Response: Response object contains status.
+    """
     serializer = SmartReferralSerializer(context={'request': request}, data=request.data, many=True, allow_empty=False)
 
     if not serializer.is_valid():

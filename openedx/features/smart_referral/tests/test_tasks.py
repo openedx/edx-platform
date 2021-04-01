@@ -1,9 +1,11 @@
+"""
+Tests for smart_referral app tasks
+"""
 import mock
 from django.conf import settings
 from django.test import TestCase
 
 from common.lib.mandrill_client.client import MandrillClient
-
 from openedx.features.smart_referral.models import SmartReferral
 from openedx.features.smart_referral.tasks import (
     task_send_referral_and_toolkit_emails,
@@ -14,9 +16,15 @@ from .factories import SmartReferralFactory
 
 
 class SmartReferralTasksTest(TestCase):
+    """
+    Class contains tests for smart_referral app tasks
+    """
 
     @mock.patch('openedx.features.smart_referral.tasks.MandrillClient.send_mail')
     def test_task_send_referral_and_toolkit_emails_successfully(self, mock_send_mail):
+        """
+        Test task to send smart referral toolkit email successfully
+        """
         test_email1 = 'test.referral1@example.com'
         test_email2 = 'test.referral2@example.com'
         user_email = 'user_email@example.com'
@@ -38,6 +46,9 @@ class SmartReferralTasksTest(TestCase):
 
     @mock.patch('openedx.features.smart_referral.tasks.MandrillClient.send_mail')
     def test_task_send_referral_follow_up_emails_successfully(self, mock_send_mail):
+        """
+        Test task to send smart referral follow-up email successfully
+        """
         test_email1 = 'test.referral1@example.com'
         test_email2 = 'test.referral2@example.com'
 

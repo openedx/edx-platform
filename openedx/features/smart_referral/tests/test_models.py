@@ -1,5 +1,8 @@
-from ddt import data, ddt, unpack
-from django.db import DataError, IntegrityError
+"""
+Tests for smart_referral models
+"""
+from ddt import data, ddt
+from django.db import IntegrityError
 from django.test import TestCase
 
 from openedx.features.smart_referral.models import SmartReferral

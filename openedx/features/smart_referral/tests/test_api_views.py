@@ -1,6 +1,9 @@
+"""
+Tests for smart_referral API views
+"""
 import json
-import mock
 
+import mock
 from ddt import data, ddt, file_data
 from django.urls import reverse
 from rest_framework import status
@@ -13,10 +16,10 @@ from .constants import (
     CONTACT_EMAIL,
     SELECTED_CONTACTS_LIST,
     SELECTED_CONTACTS_LIST_INDEX,
-    SORTED_PLATFORM_CONTACT_LIST_INDEX,
-    SORTED_PLATFORM_CONTACT_LIST_KEY,
     SORTED_NON_PLATFORM_CONTACT_LIST_INDEX,
     SORTED_NON_PLATFORM_CONTACT_LIST_KEY,
+    SORTED_PLATFORM_CONTACT_LIST_INDEX,
+    SORTED_PLATFORM_CONTACT_LIST_KEY,
     UNSORTED_CONTACT_LIST_INDEX
 )
 from .factories import SmartReferralFactory
@@ -24,6 +27,9 @@ from .factories import SmartReferralFactory
 
 @ddt
 class SmartReferralInvitationAPIViewTest(APITestCase):
+    """
+    Class contains tests for invitation referral API view
+    """
 
     def setUp(self):
         super(SmartReferralInvitationAPIViewTest, self).setUp()
@@ -37,11 +43,11 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
     def test_send_initial_emails_and_save_record_success(self, invites_data, mock_task_send_emails):
         """Successfully send referral emails to two users and current user will receive a toolkit email"""
 
-        data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST]
-        response = self.client.post(reverse('initial_referral_emails'), data=json.dumps(data),
+        contact_data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST]
+        response = self.client.post(reverse('initial_referral_emails'), data=json.dumps(contact_data),
                                     content_type='application/json')
 
-        contact_emails = [data[0][CONTACT_EMAIL], data[1][CONTACT_EMAIL]]
+        contact_emails = [contact_data[0][CONTACT_EMAIL], contact_data[1][CONTACT_EMAIL]]
         mock_task_send_emails.assert_called_once_with(contact_emails=contact_emails, user_email=self.user.email)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
@@ -79,12 +85,12 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
     def test_send_initial_emails_and_save_record_refer_particular_user_once(self, invites_data, mock_task_send_emails):
         """Submit smart referral invitation request and assert that user can refer other, particular, user only once"""
 
-        data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST][0]
-        SmartReferralFactory(user=self.user, contact_email=data[CONTACT_EMAIL])
+        contact_data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST][0]
+        SmartReferralFactory(user=self.user, contact_email=contact_data[CONTACT_EMAIL])
 
         response = self.client.post(
             reverse('initial_referral_emails'),
-            data=json.dumps(data),
+            data=json.dumps(contact_data),
             content_type='application/json'
         )
 
@@ -92,17 +98,17 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     @file_data('data/test_data_invites.json')
-    @mock.patch('webpack_loader.loader.WebpackLoader.get_bundle')
+    @mock.patch('webpack_loader.loader.WebpackLoader.get_bundle', mock.Mock())
     @mock.patch('openedx.features.smart_referral.api_views.task_send_referral_and_toolkit_emails.delay')
-    def test_send_initial_emails_and_save_record_login_required(self, invites_data, mock_task_send_emails, mock_bundle):
+    def test_send_initial_emails_and_save_record_login_required(self, invites_data, mock_task_send_emails):
         """Submit smart referral invitation request without authentication"""
 
         self.client.logout()
 
-        data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST][0]
+        contact_data = invites_data[SELECTED_CONTACTS_LIST_INDEX][SELECTED_CONTACTS_LIST][0]
         response = self.client.post(
             reverse('initial_referral_emails'),
-            data=json.dumps(data),
+            data=json.dumps(contact_data),
             content_type='application/json'
         )
 
@@ -112,6 +118,9 @@ class SmartReferralInvitationAPIViewTest(APITestCase):
 
 @ddt
 class FilterContactsAPIViewTestCases(APITestCase):
+    """
+    Class contains tests for filtering contacts API view
+    """
 
     def setUp(self):
         super(FilterContactsAPIViewTestCases, self).setUp()

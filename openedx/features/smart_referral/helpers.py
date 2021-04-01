@@ -1,3 +1,6 @@
+"""
+Helper methods for smart_referral app
+"""
 from django.contrib.auth.models import User
 
 from lms.djangoapps.onboarding.models import UserExtendedProfile
@@ -73,6 +76,6 @@ def filter_referred_contacts(contacts, user):
         referrals = SmartReferral.objects.filter(contact_email=contact.get('contact_email'))
         referral_count = referrals.count()
         is_referable = referral_count == 0 or (referral_count == 1 and referrals.first().user != user)
-        filtered_contacts.append(contact) if is_referable else None
+        filtered_contacts.append(contact) if is_referable else None  # pylint: disable=expression-not-assigned
 
     return filtered_contacts
