@@ -366,7 +366,7 @@ class ImportManager:
             logging.exception(f'Course import {course_id}: Error while parsing asset xml.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
                 if self.status:
-                    self.status.fail(_('Error while parsing asset xml.'))
+                    self.status.fail(_(f'Error while parsing xml for {asset_xml_file}'))
                 raise
             else:
                 return
@@ -485,7 +485,9 @@ class ImportManager:
                             f'Course import {dest_id}: failed to import module location {child.location}'
                         )
                         if self.status:
-                            self.status.fail(_(f'Failed to import module at location {child.location}'))
+                            self.status.fail(
+                                _(f'Failed to import module: {child.display_name} at location: {child.location}')
+                            )
                         raise
 
                     depth_first(child)
@@ -510,7 +512,9 @@ class ImportManager:
                 msg = f'Course import {dest_id}: failed to import module location {leftover}'
                 log.error(msg)
                 if self.status:
-                    self.status.fail(_(f'Failed to import module at location {leftover}'))
+                    self.status.fail(
+                        _(f'Failed to import module: {leftover.display_name} at location: {leftover.location}')
+                    )
                 raise
 
     def run_imports(self):
