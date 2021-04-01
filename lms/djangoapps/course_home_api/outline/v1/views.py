@@ -35,7 +35,7 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
-from lms.djangoapps.courseware.masquerade import setup_masquerade
+from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -170,12 +170,14 @@ class OutlineTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
-        _masquerade, request.user = setup_masquerade(
+        masquerade_object, request.user = setup_masquerade(
             request,
             course_key,
             staff_access=has_access(request.user, 'staff', course_key),
             reset_masquerade_data=True,
         )
+
+        user_is_masquerading = is_masquerading(request.user, course_key, course_masquerade=masquerade_object)
 
         course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
@@ -259,9 +261,9 @@ class OutlineTabView(RetrieveAPIView):
                 start_block = get_start_block(course_blocks)
                 resume_course['url'] = start_block['lms_web_url']
 
-        elif allow_public_outline or allow_public:
+        elif allow_public_outline or allow_public or user_is_masquerading:
             course_blocks = get_course_outline_block_tree(request, course_key_string, None)
-            if allow_public:
+            if allow_public or user_is_masquerading:
                 handouts_html = get_course_info_section(request, request.user, course, 'handouts')
 
         if not show_enrolled:
