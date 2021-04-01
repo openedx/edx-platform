@@ -331,6 +331,7 @@ class OrgInstructorRole(OrgRole):
     def __init__(self, *args, **kwargs):
         super().__init__('instructor', *args, **kwargs)
 
+@register_access_role
 class OrgContentCreatorRole(OrgRole):
     """An organization instructor"""
 

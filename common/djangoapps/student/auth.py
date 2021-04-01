@@ -98,7 +98,7 @@ def get_user_permissions(user, course_key, org=None):
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
-   if OrgContentCreatorRole(org=org).has_user(user):
+    if OrgContentCreatorRole(org=org).has_user(user):
         return all_perms
     return STUDIO_NO_PERMISSIONS
 

@@ -38,23 +38,16 @@ def add_user_with_status_granted(caller, user):
         update_course_creator_group(caller, user, True)
 
 
-def update_course_creator_group(caller, user, add, orgs=None):
+def update_course_creator_group(caller, user, add):
     """
     Method for adding and removing users from the creator group.
 
     Caller must have staff permissions.
     """
-    remove = not add
-    if add and (orgs is None):
+    if add:
         auth.add_users(caller, CourseCreatorRole(), user)
-    elif add and orgs:
-        for org in orgs:
-            auth.add_user(caller, OrgContentCreatorRole(org=org), user)
-    elif remove and (orgs is None):
+    else:
         auth.remove_users(caller, CourseCreatorRole(), user)
-    elif remove and orgs:
-        for org in orgs:
-            auth.remove_users(caller, OrgContentCreatorRole(org=org), user)
 
 
 def get_course_creator_status(user):

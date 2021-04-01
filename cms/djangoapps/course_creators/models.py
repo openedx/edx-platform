@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "state"])
+update_creator_state = Signal(providing_args=["caller", "user", "state", "orgs"])
 
 # A signal that will be sent when admin should be notified of a pending user request
 send_admin_notification = Signal(providing_args=["user"])

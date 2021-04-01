@@ -87,8 +87,7 @@ def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: di
     """
     user = kwargs['user']
     updated_state = kwargs['state']
-    orgs = kwargs['orgs']
-    update_course_creator_group(kwargs['caller'], user, updated_state == CourseCreator.GRANTED, orgs)
+    update_course_creator_group(kwargs['caller'], user, updated_state == CourseCreator.GRANTED)
 
 
 @receiver(send_user_notification, sender=CourseCreator)
