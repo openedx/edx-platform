@@ -144,20 +144,20 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
-    def test_jumpto_from_section(self):
+    def test_jumpto_from_sequence(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/?{activate_block_id}'.format(
             course_id=str(course.id),
             chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(section.location)})
+            sequence_id=sequence.url_name,
+            activate_block_id=urlencode({'activate_block_id': str(sequence.location)})
         )
         jumpto_url = '{}/{}/jump_to/{}'.format(
             '/courses',
             str(course.id),
-            str(section.location),
+            str(sequence.location),
         )
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
@@ -165,16 +165,16 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jumpto_from_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        vertical1 = ItemFactory.create(category='vertical', parent_location=section.location)
-        vertical2 = ItemFactory.create(category='vertical', parent_location=section.location)
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical1 = ItemFactory.create(category='vertical', parent_location=sequence.location)
+        vertical2 = ItemFactory.create(category='vertical', parent_location=sequence.location)
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/1?{activate_block_id}'.format(
             course_id=str(course.id),
             chapter_id=chapter.url_name,
-            section_id=section.url_name,
+            sequence_id=sequence.url_name,
             activate_block_id=urlencode({'activate_block_id': str(module1.location)})
         )
         jumpto_url = '{}/{}/jump_to/{}'.format(
@@ -185,10 +185,10 @@ class TestJumpTo(ModuleStoreTestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/2?{activate_block_id}'.format(
             course_id=str(course.id),
             chapter_id=chapter.url_name,
-            section_id=section.url_name,
+            sequence_id=sequence.url_name,
             activate_block_id=urlencode({'activate_block_id': str(module2.location)})
         )
         jumpto_url = '{}/{}/jump_to/{}'.format(
@@ -202,20 +202,20 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jumpto_from_nested_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
-        nested_section = ItemFactory.create(category='sequential', parent_location=vertical.location)
-        nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical = ItemFactory.create(category='vertical', parent_location=sequence.location)
+        nested_sequence = ItemFactory.create(category='sequential', parent_location=vertical.location)
+        nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_sequence.location)
         # put a module into nested_vertical1 for completeness
         ItemFactory.create(category='html', parent_location=nested_vertical1.location)
-        nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
+        nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_sequence.location)
         module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/1?{activate_block_id}'.format(
             course_id=str(course.id),
             chapter_id=chapter.url_name,
-            section_id=section.url_name,
+            sequence_id=sequence.url_name,
             activate_block_id=urlencode({'activate_block_id': str(module2.location)})
         )
         jumpto_url = '{}/{}/jump_to/{}'.format(
@@ -248,11 +248,11 @@ class TestJumpTo(ModuleStoreTestCase):
         request.session = {}
         course_key = CourseKey.from_string(str(course.id))
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        __ = ItemFactory.create(category='vertical', parent_location=section.location)
-        staff_only_vertical = ItemFactory.create(category='vertical', parent_location=section.location,
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        __ = ItemFactory.create(category='vertical', parent_location=sequence.location)
+        staff_only_vertical = ItemFactory.create(category='vertical', parent_location=sequence.location,
                                                  metadata=dict(visible_to_staff_only=True))
-        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+        __ = ItemFactory.create(category='vertical', parent_location=sequence.location)
 
         usage_key = UsageKey.from_string(str(staff_only_vertical.location)).replace(course_key=course_key)
         expected_url = reverse(
@@ -260,7 +260,7 @@ class TestJumpTo(ModuleStoreTestCase):
             kwargs={
                 'course_id': str(course.id),
                 'chapter': chapter.url_name,
-                'section': section.url_name,
+                'section': sequence.url_name,
                 'position': position,
             }
         )
@@ -3269,7 +3269,7 @@ class TestShowCoursewareMFE(TestCase):
 
         # Old style course keys are never supported and should always return false...
         old_mongo_combos = itertools.product(
-            [regular_user, global_staff_user],  # User (is global staf`f)
+            [regular_user, global_staff_user],  # User (is global staff)
             [True, False],  # is_course_staff
             [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
             [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
