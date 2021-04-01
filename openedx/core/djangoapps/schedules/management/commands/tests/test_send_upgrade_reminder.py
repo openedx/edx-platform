@@ -5,15 +5,13 @@ Tests for send_upgrade_reminder management command.
 
 import logging
 from unittest import skipUnless
+from unittest.mock import patch
 
 import ddt
-import six
 from django.conf import settings
 from edx_ace import Message
 from edx_ace.utils.date import serialize
-from mock import patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
@@ -69,7 +67,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):  
         schedules = [
             self._schedule_factory(
                 enrollment__user=user,
-                enrollment__course__id=CourseLocator('edX', 'toy', 'Course{}'.format(i)),
+                enrollment__course__id=CourseLocator('edX', 'toy', f'Course{i}'),
                 enrollment__mode=CourseMode.VERIFIED if i in (0, 3) else CourseMode.AUDIT,
             )
             for i in range(5)
@@ -87,8 +85,7 @@ class TestUpgradeReminder(ScheduleSendEmailTestMixin, CacheIsolationTestCase):  
             messages = [Message.from_string(m) for m in sent_messages]
             assert len(messages) == 1
             message = messages[0]
-            six.assertCountEqual(
-                self,
+            self.assertCountEqual(
                 message.context['course_ids'],
                 [str(schedules[i].enrollment.course.id) for i in (1, 2, 4)]
             )

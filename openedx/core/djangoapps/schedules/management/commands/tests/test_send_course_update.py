@@ -4,13 +4,12 @@ Tests for send_course_update management command.
 
 
 from unittest import skipUnless
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.core import mail
 from edx_ace.utils.date import serialize
-from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_course_update as nudge
@@ -51,10 +50,10 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
     queries_deadline_for_each_course = True
 
     def setUp(self):
-        super(TestSendCourseUpdate, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.highlights_patcher = patch('openedx.core.djangoapps.schedules.resolvers.get_week_highlights')
         mock_highlights = self.highlights_patcher.start()
-        mock_highlights.return_value = [u'Highlight {}'.format(num + 1) for num in range(3)]
+        mock_highlights.return_value = ['Highlight {}'.format(num + 1) for num in range(3)]
         self.addCleanup(self.stop_highlights_patcher)
 
     def prepare_course_data(self, is_self_paced=True):
@@ -66,9 +65,9 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
 
         course = CourseFactory(highlights_enabled_for_messaging=True, self_paced=is_self_paced)
         with self.store.bulk_operations(course.id):
-            ItemFactory.create(parent=course, category='chapter', highlights=[u'highlights'])
+            ItemFactory.create(parent=course, category='chapter', highlights=['highlights'])
 
-        enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode=u'audit')
+        enrollment = CourseEnrollmentFactory(course_id=course.id, user=self.user, mode='audit')
         assert enrollment.schedule.get_experience_type() == ScheduleExperience.EXPERIENCES.course_updates
 
         _, offset, target_day, _ = self._get_dates(offset=self.expected_offsets[0])
@@ -119,4 +118,4 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
             day_offset=offset,
             bin_num=self._calculate_bin_for_user(enrollment.user),
         ))
-        assert u'{} Weekly Update'.format(enrollment.course.display_name) == mail.outbox[0].subject
+        assert f'{enrollment.course.display_name} Weekly Update' == mail.outbox[0].subject

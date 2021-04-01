@@ -6,19 +6,19 @@ Base file for testing schedules with upsell
 import datetime
 import itertools
 from collections import namedtuple
+from unittest.mock import PropertyMock, patch
 
 import ddt
 from edx_ace.message import Message
 from edx_ace.utils.date import serialize
 from freezegun import freeze_time
-from mock import PropertyMock, patch
 
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleUpsellTestMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ScheduleUpsellTestMixin:  # lint-amnesty, pylint: disable=missing-class-docstring
     UpsellTestCase = namedtuple('UpsellTestCase', 'set_deadline, deadline_offset, expect_upsell')
 
     def _setup_schedule_and_dates(self, set_deadline=True, deadline_offset=7):
@@ -96,4 +96,4 @@ class ScheduleUpsellTestMixin(object):  # lint-amnesty, pylint: disable=missing-
             mock_course_language.return_value = course_language
             message = self._send_message_task(schedule, offset, target_day)
 
-        assert message.context['user_schedule_upgrade_deadline_time'] == u'8 de agosto de 2017'
+        assert message.context['user_schedule_upgrade_deadline_time'] == '8 de agosto de 2017'

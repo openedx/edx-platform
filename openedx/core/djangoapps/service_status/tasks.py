@@ -16,7 +16,7 @@ def delayed_ping(value, delay):
     if value == 'ping':
         result = 'pong'
     else:
-        result = u'got: {0}'.format(value)
+        result = f'got: {value}'
 
     time.sleep(delay)
 
