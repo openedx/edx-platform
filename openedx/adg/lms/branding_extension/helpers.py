@@ -8,7 +8,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from lms.djangoapps.branding.api import _build_support_form_url
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -24,7 +23,7 @@ def get_footer_navigation_links():
         (marketing_link('ABOUT'), _('About')),
         (marketing_link('OUR_TEAM'), _('Our Team')),
         (marketing_link('TOS'), _('Terms')),
-        (_build_support_form_url(), _('Contact')),
+        (marketing_link('CONTACT'), _('Contact')),
     ]
 
     return [
