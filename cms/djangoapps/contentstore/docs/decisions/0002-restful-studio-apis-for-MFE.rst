@@ -44,7 +44,7 @@ The first APIs to get this treatment are:
 1. The tabs APIs currently available at `<studio_url>/tabs/<course_key>`
    will now also be exposed at `<studio_url>/api/contentstore/v0/tabs/<course_key>`.
 2. The advanced course settings APIs currently available at `<studio_url>/settings/advanced/<course_key>`
-   will now also be exposed at `<studio_url>/api/v0/contentstore/advanced_settings/<course_key>`
+   will now also be exposed at `<studio_url>/api/contentstore/v0/advanced_settings/<course_key>`
 
 
 Consequences
