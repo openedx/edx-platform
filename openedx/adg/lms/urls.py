@@ -18,6 +18,11 @@ adg_url_patterns = [
         r'^api/applications/',
         include('openedx.adg.lms.applications.api_urls', namespace='applications_api')
     ),
+    # ADG webinars app
+    url(
+        r'^webinars/',
+        include('openedx.adg.lms.webinars.urls'),
+    ),
     path('adg-admin/', adg_admin_site.urls)
 ]
 
