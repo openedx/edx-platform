@@ -107,7 +107,7 @@ edx-enterprise==3.2.14    # via -r requirements/edx/base.in
 edx-i18n-tools==0.5.3     # via ora2
 edx-milestones==0.3.0     # via -r requirements/edx/base.in
 edx-opaque-keys[django]==2.1.0  # via -r requirements/edx/paver.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, xmodule
-https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler11.tar.gz  # edx-organizations==5.2.0
+https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler13.tar.gz  # edx-organizations==5.2.0
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.in
 edx-proctoring==2.4.0     # via -r requirements/edx/base.in, edx-proctoring-proctortrack
 edx-rbac==1.2.1           # via edx-enterprise
