@@ -4,11 +4,11 @@ Tests for comprehensive theme static files storage classes.
 
 
 import re
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test import TestCase, override_settings
-from mock import patch
 
 from openedx.core.djangoapps.theming.helpers import Theme, get_theme_base_dir, get_theme_base_dirs
 from openedx.core.djangoapps.theming.storage import ThemeStorage
@@ -23,7 +23,7 @@ class TestStorageLMS(TestCase):
     """
 
     def setUp(self):
-        super(TestStorageLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.themes_dir = get_theme_base_dirs()[0]
         self.enabled_theme = "red-theme"
         self.system_dir = settings.REPO_ROOT / "lms"

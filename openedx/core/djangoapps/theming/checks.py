@@ -5,7 +5,6 @@ Settings validations for the theming app
 
 import os
 
-import six
 from django.conf import settings
 from django.core.checks import Error, Tags, register
 from edx_toggles.toggles import SettingToggle
@@ -55,7 +54,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, 
                     id='openedx.core.djangoapps.theming.E004',
                 )
             )
-        if not all(isinstance(theme_dir, six.string_types) for theme_dir in theme_dirs):
+        if not all(isinstance(theme_dir, str) for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain only strings.",
