@@ -58,6 +58,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'name': 'Facebook',
                 'iconClass': 'fa-facebook',
                 'iconImage': None,
+                'skipHintedLogin': False,
                 'loginUrl': self._third_party_login_url('facebook', 'login', params),
                 'registerUrl': self._third_party_login_url('facebook', 'register', params)
             },
@@ -66,6 +67,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'name': 'Google',
                 'iconClass': 'fa-google-plus',
                 'iconImage': None,
+                'skipHintedLogin': False,
                 'loginUrl': self._third_party_login_url('google-oauth2', 'login', params),
                 'registerUrl': self._third_party_login_url('google-oauth2', 'register', params)
             },
@@ -150,6 +152,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'name': 'LinkedIn',
             'iconClass': 'fa-linkedin',
             'iconImage': None,
+            'skipHintedLogin': False,
             'loginUrl': self._third_party_login_url('linkedin-oauth2', 'login', params),
             'registerUrl': self._third_party_login_url('linkedin-oauth2', 'register', params)
         })

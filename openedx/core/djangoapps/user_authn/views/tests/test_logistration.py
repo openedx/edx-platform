@@ -283,6 +283,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "name": "Dummy",
                 "iconClass": None,
                 "iconImage": settings.MEDIA_URL + "icon.svg",
+                "skipHintedLogin": False,
                 "loginUrl": self._third_party_login_url("dummy", "login", params),
                 "registerUrl": self._third_party_login_url("dummy", "register", params)
             },
@@ -291,6 +292,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "iconImage": None,
+                "skipHintedLogin": False,
                 "loginUrl": self._third_party_login_url("facebook", "login", params),
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
@@ -299,6 +301,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "iconImage": None,
+                "skipHintedLogin": False,
                 "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
             },
@@ -571,7 +574,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         finish_auth_url = None
         if current_backend:
             finish_auth_url = reverse("social:complete", kwargs={"backend": current_backend}) + "?"
-
         auth_info = {
             "currentProvider": current_provider,
             "platformName": settings.PLATFORM_NAME,
