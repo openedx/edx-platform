@@ -113,6 +113,7 @@ class SubscriptionRetrieveUpdateViewTests(TestCase):
             'user': self.user.username,
             'max_allowed_courses': 4,
             'subscription_type': UserSubscription.LIMITED_ACCESS,
+            'description': '',
         }
 
         response = self.client.put(path, json.dumps(expected_data), content_type=JSON_CONTENT_TYPE, **request_kwargs)

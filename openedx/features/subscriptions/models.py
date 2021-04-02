@@ -22,6 +22,7 @@ class UserSubscription(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subscription_id = models.PositiveIntegerField(db_index=True)
     expiration_date = models.DateField(default=None, null=True, blank=True)
+    description = models.TextField(_('Description'), blank=True)
 
     LIMITED_ACCESS = 'limited-access'
     FULL_ACCESS_COURSES = 'full-access-courses'
@@ -117,6 +118,7 @@ class UserSubscriptionHistory(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subscription_id = models.PositiveIntegerField()
     expiration_date = models.DateField(default=None, null=True, blank=True)
+    description = models.TextField(_('Description'), blank=True)
 
     LIMITED_ACCESS = 'limited-access'
     FULL_ACCESS_COURSES = 'full-access-courses'
@@ -167,6 +169,7 @@ def update_user_subscription_history(sender, instance, **kwargs):  # pylint: dis
         subscription_id=instance.subscription_id,
         expiration_date=instance.expiration_date,
         subscription_type=instance.subscription_type,
+        description=instance.description,
         max_allowed_courses=instance.max_allowed_courses
     )
     for course_enrollment in instance.course_enrollments.all():

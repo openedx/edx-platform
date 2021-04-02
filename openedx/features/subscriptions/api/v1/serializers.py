@@ -15,7 +15,15 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSubscription
-        fields = ['subscription_id', 'subscription_type', 'expiration_date', 'course_enrollments', 'max_allowed_courses', 'user']
+        fields = [
+            'subscription_id',
+            'subscription_type',
+            'description',
+            'expiration_date',
+            'course_enrollments',
+            'max_allowed_courses',
+            'user',
+        ]
 
     def to_internal_value(self, data):
         """

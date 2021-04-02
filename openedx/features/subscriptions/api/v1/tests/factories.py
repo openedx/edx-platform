@@ -4,7 +4,7 @@ The UserSubscription factory.
 from datetime import date, timedelta
 import factory
 from factory import SubFactory
-from factory.fuzzy import FuzzyDate, FuzzyInteger
+from factory.fuzzy import FuzzyDate, FuzzyInteger, FuzzyText
 from factory.django import DjangoModelFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -22,6 +22,7 @@ class UserSubscriptionFactory(DjangoModelFactory):
     user = SubFactory(UserFactory)
     subscription_id = FuzzyInteger(1, 10)
     max_allowed_courses = FuzzyInteger(1, 10)
+    description = FuzzyText(length=25)
     expiration_date = FuzzyDate(
         start_date=date.today() - timedelta(days=1),
         end_date=date.today() + timedelta(days=365)

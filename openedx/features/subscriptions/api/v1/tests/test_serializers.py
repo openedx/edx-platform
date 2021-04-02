@@ -22,6 +22,7 @@ class UserSubscriptionSerializerTests(TestCase):
                 'max_allowed_courses': user_subscription.max_allowed_courses,
                 'subscription_id': user_subscription.subscription_id,
                 'subscription_type': user_subscription.subscription_type,
+                'description': user_subscription.description,
                 'user': user_subscription.user.username,
                 'course_enrollments': [],
             }
