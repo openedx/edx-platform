@@ -446,7 +446,11 @@ class CoursewareInformation(RetrieveAPIView):
         """
         Return the final response, exposing the 'Date' header for computing relative time to the dates in the data.
 
-        Important dates such as 'access_expiration' are enforced server-side based on correct time; client-side clocks are frequently substantially far off which could lead to inaccurate messaging and incorrect expectations.  Therefore, any messaging about those dates should be based on the server time and preferably in relative terms (time remaining); the 'Date' header is a straightforward and generalizable way for client-side code to get this reference.
+        Important dates such as 'access_expiration' are enforced server-side based on correct time; client-side clocks
+        are frequently substantially far off which could lead to inaccurate messaging and incorrect expectations.
+        Therefore, any messaging about those dates should be based on the server time and preferably in relative terms
+        (time remaining); the 'Date' header is a straightforward and generalizable way for client-side code to get this
+        reference.
         """
         response = super().finalize_response(request, response, *args, **kwargs)
         # Adding this header should be moved to global middleware, not just this endpoint
