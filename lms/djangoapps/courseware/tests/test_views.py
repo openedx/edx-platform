@@ -112,14 +112,14 @@ FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
 
-def _toggle_mfe_waffle_flag(active: bool):
+def _set_mfe_flag(active: bool):
     """
     A decorator/contextmanager to force the base courseware MFE flag on or off.
     """
     return override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=active)
 
 
-def _toggle_mfe_preview_waffle_flag(active: bool):
+def _set_preview_mfe_flag(active: bool):
     """
     A decorator/contextmanager to force the courseware MFE educator preview flag on or off.
     """
@@ -161,14 +161,14 @@ class TestJumpTo(ModuleStoreTestCase):
             expected_url = f'/courses/{course.id}/courseware/{chapter.url_name}/'
 
         jumpto_url = f'/courses/{course.id}/jump_to/{chapter.location}?{querystring}'
-        with _toggle_mfe_waffle_flag(activate_mfe):
+        with _set_mfe_flag(activate_mfe):
             response = self.client.get(jumpto_url)
         assert response.status_code == 302
         # Check the response URL, but chop off the querystring; we don't care here.
         assert response.url.split('?')[0] == expected_url
 
         jumpto_id_url = f'/courses/{course.id}/jump_to_id/{chapter.url_name}?{querystring}'
-        with _toggle_mfe_waffle_flag(activate_mfe):
+        with _set_mfe_flag(activate_mfe):
             response = self.client.get(jumpto_id_url)
         assert response.status_code == 302
         # Check the response URL, but chop off the querystring; we don't care here.
@@ -186,51 +186,40 @@ class TestJumpTo(ModuleStoreTestCase):
             location = course.id.make_usage_key(None, 'NoSuchPlace')
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        jumpto_url = '{}/{}/jump_to/{}'.format('/courses', str(course.id), str(location))
-        with _toggle_mfe_waffle_flag(activate_mfe):
+        jumpto_url = f'/courses/{course.id}/jump_to/{location}'
+        with _set_mfe_flag(activate_mfe):
             response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
-    @_toggle_mfe_waffle_flag(False)
+    @_set_mfe_flag(False)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_jump_to_legacy_from_sequence(self, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
-            expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/?{activate_block_id}'.format(
-                course_id=str(course.id),
-                chapter_id=chapter.url_name,
-                sequence_id=sequence.url_name,
-                activate_block_id=urlencode({'activate_block_id': str(sequence.location)})
-            )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(sequence.location),
+        activate_block_id = urlencode({'activate_block_id': str(sequence.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/?{activate_block_id}'
         )
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-    @_toggle_mfe_waffle_flag(True)
+    @_set_mfe_flag(True)
     def test_jump_to_mfe_from_sequence(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = 'http://learning-mfe/course/{course_id}/{sequence_id}'.format(
-            course_id=str(course.id),
-            sequence_id=sequence.location,
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(sequence.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
-        assert response.url == expected
+        assert response.url == expected_redirect_url
 
-    @_toggle_mfe_waffle_flag(False)
+    @_set_mfe_flag(False)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_jump_to_legacy_from_module(self, store_type):
         with self.store.default_store(store_type):
@@ -242,35 +231,23 @@ class TestJumpTo(ModuleStoreTestCase):
             module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
             module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/1?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            sequence_id=sequence.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module1.location)})
+        activate_block_id = urlencode({'activate_block_id': str(module1.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module1.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/2?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            sequence_id=sequence.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
+        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module2.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-    @_toggle_mfe_waffle_flag(True)
+    @_set_mfe_flag(True)
     def test_jump_to_mfe_from_module(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
@@ -280,37 +257,25 @@ class TestJumpTo(ModuleStoreTestCase):
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = 'http://learning-mfe/course/{course_id}/{sequence_id}/{unit_id}'.format(
-            course_id=str(course.id),
-            sequence_id=sequence.location,
-            unit_id=vertical1.location,
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical1.location}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module1.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
-        assert response.url == expected
+        assert response.url == expected_redirect_url
 
-        expected = 'http://learning-mfe/course/{course_id}/{sequence_id}/{unit_id}'.format(
-            course_id=str(course.id),
-            sequence_id=sequence.location,
-            unit_id=vertical2.location,
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical2.location}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module2.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
-        assert response.url == expected
+        assert response.url == expected_redirect_url
 
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
-    @_toggle_mfe_waffle_flag(False)
+    @_set_mfe_flag(False)
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_jump_to_legacy_from_nested_module(self, store_type):
         with self.store.default_store(store_type):
@@ -326,19 +291,13 @@ class TestJumpTo(ModuleStoreTestCase):
             module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{sequence_id}/1?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            sequence_id=sequence.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
+        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module2.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
         (False, ModuleStoreEnum.Type.mongo),
@@ -349,12 +308,12 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jump_to_id_invalid_location(self, activate_mfe, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-        jumpto_url = '{}/{}/jump_to_id/{}'.format('/courses', str(course.id), "NoSuchPlace")
-        with _toggle_mfe_waffle_flag(activate_mfe):
+        jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace'
+        with _set_mfe_flag(activate_mfe):
             response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
-    @_toggle_mfe_waffle_flag(False)
+    @_set_mfe_flag(False)
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, False, '1'),
         (ModuleStoreEnum.Type.mongo, True, '2'),
@@ -3412,15 +3371,15 @@ class TestShowCoursewareMFE(TestCase):
             [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
-            with _toggle_mfe_preview_waffle_flag(preview_active):
-                with _toggle_mfe_waffle_flag(redirect_active):
+            with _set_preview_mfe_flag(preview_active):
+                with _set_mfe_flag(redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
-        with _toggle_mfe_preview_waffle_flag(True):
-            with _toggle_mfe_waffle_flag(True):
+        with _set_preview_mfe_flag(True):
+            with _set_mfe_flag(True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3430,7 +3389,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with _toggle_mfe_waffle_flag(False):
+            with _set_mfe_flag(False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3440,8 +3399,8 @@ class TestShowCoursewareMFE(TestCase):
                 # Regular users don't see the link.
                 assert not show_courseware_mfe_link(regular_user, False, new_course_key)
 
-        with _toggle_mfe_preview_waffle_flag(False):
-            with _toggle_mfe_waffle_flag(True):
+        with _set_preview_mfe_flag(False):
+            with _set_mfe_flag(True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3454,7 +3413,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with _toggle_mfe_waffle_flag(False):
+            with _set_mfe_flag(False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3512,7 +3471,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with _toggle_mfe_waffle_flag(True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3524,14 +3483,14 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with _toggle_mfe_waffle_flag(True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with _toggle_mfe_waffle_flag(True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3541,7 +3500,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
-        with _toggle_mfe_waffle_flag(True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
 
