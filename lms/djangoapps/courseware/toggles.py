@@ -46,7 +46,6 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of the new micro-frontend-based implementation of the course exit page.
-# .. toggle_category: micro-frontend
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
@@ -95,7 +94,6 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: MST-432
 COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'proctoring_improvements', __name__
@@ -111,7 +109,6 @@ COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-02-09
 # .. toggle_target_removal_date: 2021-05-01
-# .. toggle_warnings: None
 COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
 )

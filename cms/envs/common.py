@@ -375,8 +375,6 @@ FEATURES = {
     #   default because enabling allows a method to bypass password policy.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2020-02-21
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/21616'
     'ENABLE_CHANGE_USER_PASSWORD_ADMIN': False,
 
@@ -443,8 +441,6 @@ FEATURES = {
     #   otherwise the course creation functionality will work as it should.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-02
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: None
     # .. toggle_warnings: Another toggle DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
     'DISABLE_COURSE_CREATION': False,
 
