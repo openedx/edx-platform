@@ -427,12 +427,6 @@ def _section_course_info(course, access):
         ).format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
-    if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
-        section_data['detailed_gitlogs_url'] = reverse(
-            'gitlogs_detail',
-            kwargs={'course_id': str(course_key)}
-        )
-
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
         advance = lambda memo, letter_score_tuple: "{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) \

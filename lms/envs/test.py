@@ -270,10 +270,6 @@ OAUTH_ENFORCE_SECURE = False
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
-########################### SYSADMIN DASHBOARD ################################
-FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
-GIT_REPO_DIR = TEST_ROOT / "course_repos"
-
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True

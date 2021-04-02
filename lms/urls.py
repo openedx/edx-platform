@@ -222,12 +222,6 @@ urlpatterns += [
     url(r'^openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
 
-# sysadmin dashboard, to see what courses are loaded, to delete & load courses
-if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
-    urlpatterns += [
-        url(r'^sysadmin/', include('lms.djangoapps.dashboard.sysadmin_urls')),
-    ]
-
 urlpatterns += [
     url(r'^support/', include('lms.djangoapps.support.urls')),
 ]
