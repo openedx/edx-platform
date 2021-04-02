@@ -410,7 +410,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     Unit test for transforming asset information into something
     we can send out to the client via JSON.
     """
-    @override_settings(LMS_BASE="lms_base_url")
+    @override_settings(LMS_ROOT_URL="https://lms_root_url")
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
         content_type = 'image/jpg'
@@ -425,7 +425,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEqual(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
         self.assertEqual(output["url"], "/asset-v1:org+class+run+type@asset+block@my_file_name.jpg")
         self.assertEqual(
-            output["external_url"], "lms_base_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
+            output["external_url"], "https://lms_root_url/asset-v1:org+class+run+type@asset+block@my_file_name.jpg"
         )
         self.assertEqual(output["portable_url"], "/static/my_file_name.jpg")
         self.assertEqual(output["thumbnail"], "/asset-v1:org+class+run+type@thumbnail+block@my_file_name_thumb.jpg")
