@@ -195,17 +195,6 @@ FEATURES = {
     # .. toggle_creation_date: 2013-04-13
     'ENABLE_MASQUERADE': True,
 
-    # .. toggle_name: FEATURES['ENABLE_SYSADMIN_DASHBOARD']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
-    #   deleting and loading courses, for seeing log of git imports of courseware. Note that some views are noopen_edx
-    # .. toggle_use_cases: temporary, open_edx
-    # .. toggle_creation_date: 2013-12-12
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: This feature is not supported anymore and should have a target removal date.
-    'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
-
     # .. toggle_name: FEATURES['DISABLE_LOGIN_BUTTON']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1267,8 +1256,6 @@ DATA_DIR = '/edx/var/edxapp/data'
 # .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
 #   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
-
-GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
 
 DJFS = {
     'type': 'osfs',
@@ -2845,7 +2832,6 @@ INSTALLED_APPS = [
     'eventtracking.django.apps.EventTrackingConfig',
     'common.djangoapps.util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
-    'lms.djangoapps.dashboard',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'lms.djangoapps.bulk_email',
