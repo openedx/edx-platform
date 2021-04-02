@@ -1,7 +1,7 @@
 """
 Helper functions for logic related to learning (courseare & course home) URLs.
 
-Centralizdd in openedx/features/course_experience instead of lms/djangoapps/courseware
+Centralized in openedx/features/course_experience instead of lms/djangoapps/courseware
 because the Studio course outline may need these utilities.
 """
 from enum import Enum
@@ -48,9 +48,9 @@ def get_courseware_url(
     course that the block is in, the requesting user, and the state of
     the 'courseware' waffle flags.
 
-    If you know the specific Sequence or Sequence/Unit you need to redirect to,
-    and you know that you want a Learning MFE URL regardless of configuration,
-    then it is more performant to call `make_learning_mfe_courseware_url` directly.
+    If redirecting to a specific Sequence or Sequence/Unit in a Learning MFE
+    regardless of configuration, call make_learning_mfe_courseware_url directly
+    for better performance.
 
     Raises:
         * ItemNotFoundError if no data at the `usage_key`.
@@ -114,9 +114,6 @@ def _get_new_courseware_url(
 ) -> str:
     """
     Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
-
-    If you know the specific Sequence or Sequence/Unit you need to redirect to,
-    then it is more performant to call `make_learning_mfe_courseware_url` directly.
 
     Raises:
         * ItemNotFoundError if no data at the `usage_key`.
