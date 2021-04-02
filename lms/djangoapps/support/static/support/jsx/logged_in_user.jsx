@@ -40,7 +40,7 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
   const subjectElement = (<div>
     <label htmlFor="subject">{gettext('Subject')}</label>
     <select className="form-control select-subject" id="subject">
-      <option value="">--------</option>
+      <option value="">{gettext('Select a category')}</option>
       <option value="Account Settings">{gettext('Account Settings')}</option>
       <option value="Billing/Payment Options">{gettext('Billing/Payment Options')}</option>
       <option value="Certificates">{gettext('Certificates')}</option>
@@ -48,12 +48,8 @@ function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarn
       <option value="Deadlines">{gettext('Deadlines')}</option>
       <option value="Errors/Technical Issues">{gettext('Errors/Technical Issues')}</option>
       <option value="Financial Aid">{gettext('Financial Aid')}</option>
-      <option value="Masters">{gettext('Masters')}</option>
-      <option value="MicroMasters">{gettext('MicroMasters')}</option>
-      <option value="MicroBachelors">{gettext('MicroBachelors')}</option>
       <option value="Photo Verification">{gettext('Photo Verification')}</option>
       <option value="Proctoring">{gettext('Proctoring')}</option>
-      <option value="Security">{gettext('Security')}</option>
       <option value="Other">{gettext('Other')}</option>
     </select>
   </div>);
