@@ -978,8 +978,8 @@ derive_settings(__name__)
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
                                                       COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
-COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
-                                                      COMPLETION_BY_VIEWING_DELAY_MS)
+COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
+                                                COMPLETION_BY_VIEWING_DELAY_MS)
 
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
