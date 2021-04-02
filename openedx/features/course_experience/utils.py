@@ -201,7 +201,9 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         'problem-builder',
         'edly_assessment',
         'edly_kwl',
-        'edly_carousel'
+        'edly_carousel',
+        'pakx_flashcard',
+        'image-explorer'
     ]
     all_blocks = get_blocks(
         request,
