@@ -213,8 +213,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
         self.request.user = AnonymousUser()
         self.request.session[SESSION_KEY] = self.user.id
         with self.assert_no_error_logged():
-            with self.assert_logged_for_request_user_mismatch(self.user.id, None, 'debug', self.request.path):
-                self.assert_response(set_request_user=False, set_session_cookie=True)
+            self.assert_response(set_request_user=False, set_session_cookie=True)
 
     def test_update_cookie_data_at_step_3(self):
         self.assert_response(set_request_user=True, set_session_cookie=True)

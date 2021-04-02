@@ -6,11 +6,12 @@ Unit tests for masquerade.
 import json
 import pickle
 from datetime import datetime
+from importlib import import_module
 from unittest.mock import patch
 import pytest
 import ddt
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
@@ -18,9 +19,11 @@ from xblock.runtime import DictKeyValueStore
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from lms.djangoapps.courseware.masquerade import (
+    MASQUERADE_SETTINGS_KEY,
     CourseMasquerade,
     MasqueradingKeyValueStore,
-    get_masquerading_user_group
+    get_masquerading_user_group,
+    setup_masquerade,
 )
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
@@ -535,3 +538,45 @@ class CourseMasqueradeTest(TestCase):
         pickled_cmasq = pickle.dumps(cmasq)
         unpickled_cmasq = pickle.loads(pickled_cmasq)
         assert unpickled_cmasq.user_name is None
+
+
+class SetupMasqueradeTests(SharedModuleStoreTestCase,):
+    """
+    Tests for the setup_masquerade function.
+    """
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create(number='setup-masquerade-test', metadata={'start': datetime.now(UTC)})
+        self.request = RequestFactory().request()
+        self.staff = StaffFactory(course_key=self.course.id)
+        self.student = UserFactory()
+
+        CourseEnrollment.enroll(self.student, self.course.id)
+
+        session_key = "abcdef"
+        self.request.user = self.staff
+        self.request.session = import_module(settings.SESSION_ENGINE).SessionStore(session_key)
+
+    def test_setup_masquerade(self):
+        masquerade_settings = {
+            self.course.id: CourseMasquerade(
+                course_key=self.course.id,
+                role='student',
+                user_name=self.student.username
+            )
+        }
+        self.request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
+
+        course_masquerade, masquerade_user = setup_masquerade(
+            self.request,
+            self.course.id,
+            staff_access=True
+        )
+
+        # Warning: the SafeSessions middleware relies on the `real_user` attribute to see if a
+        # user is masquerading as another user.  If the name of this attribute is changing, please update
+        # the check in SafeSessionMiddleware._verify_user as well.
+        assert masquerade_user.real_user == self.staff
+        assert masquerade_user == self.student
+        assert self.request.user.masquerade_settings == masquerade_settings
+        assert course_masquerade == masquerade_settings[self.course.id]

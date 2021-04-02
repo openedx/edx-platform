@@ -27,7 +27,9 @@ from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from openedx.core.djangoapps.user_authn.cookies import JWT_COOKIE_NAMES
 from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
+from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
@@ -145,8 +147,10 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             response = self.client.get(login_url)
             assert response.status_code == 200
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
+        setup_login_oauth_client()
         # call the account registration api that sets the login cookies
         url = reverse('user_api_registration')
         request_data = {
@@ -166,6 +170,19 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         # Verify that we're redirected to the dashboard
         response = self.client.get(reverse(url_name))
         self.assertRedirects(response, reverse("dashboard"))
+
+        # Refresh login even if JWT cookies are expired.
+        # (Give precedence to the session.)
+        for name in JWT_COOKIE_NAMES:
+            del self.client.cookies[name]
+
+        # Verify that we're still redirected to the dashboard
+        response = self.client.get(reverse(url_name))
+        self.assertRedirects(response, reverse("dashboard"))
+
+        # Verify that we got new JWT cookies.
+        for name in JWT_COOKIE_NAMES:
+            assert name in self.client.cookies
 
     @ddt.data(
         (None, "signin_user"),
