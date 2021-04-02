@@ -413,7 +413,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             return User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
             with translation_language(language):
-                self.status.fail(_('The given user was not found in the system'))
+                self.status.fail(_('User permission denied.'))
             LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -519,7 +519,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             shutil.rmtree(course_dir)
             LOGGER.info(f'{log_prefix}: Temp data cleared')
 
-        self.status.fail(_('Unknown error while unpacking.'))
+        self.status.fail(_('An Unknown error occurred during the unpacking step.'))
         LOGGER.exception(f'{log_prefix}: Unknown error while unpacking', exc_info=True)
         monitor_import_failure(courselike_key, current_step, exception=exception)
         return
