@@ -76,21 +76,19 @@ from django.utils.crypto import get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import python_2_unicode_compatible
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleSwitch
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
-# .. toggle_name: safe_session.log_request_user_changes
-# .. toggle_implementation: WaffleSwitch
+# .. toggle_name: LOG_REQUEST_USER_CHANGES
+# .. toggle_implementation: SettingToggle
 # .. toggle_default: False
 # .. toggle_description: Turn this toggle on to log anytime the `user` attribute of the request object gets
 #   changed.  This will also log the location where the change is coming from to quickly find issues.
 # .. toggle_warnings: This logging will be very verbose and so should probably not be left on all the time.
-# .. toggle_use_cases: temporary
+# .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2021-03-25
-# .. toggle_target_removal_date: 2021-05-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/ARCHBOM-1718
-LOG_REQUEST_USER_CHANGES_FLAG = WaffleSwitch('safe_session.log_request_user_changes', __name__)
+LOG_REQUEST_USER_CHANGES = getattr(settings, 'LOG_REQUEST_USER_CHANGES', False)
 
 log = getLogger(__name__)
 
@@ -308,7 +306,7 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             user_id = self.get_user_id_from_session(request)
             if safe_cookie_data.verify(user_id):  # Step 4
                 request.safe_cookie_verified_user_id = user_id  # Step 5
-                if LOG_REQUEST_USER_CHANGES_FLAG.is_enabled():
+                if LOG_REQUEST_USER_CHANGES:
                     log_request_user_changes(request)
             else:
                 return self._on_user_authentication_failed(request)
