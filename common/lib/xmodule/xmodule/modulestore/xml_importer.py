@@ -606,7 +606,9 @@ class CourseImportManager(ImportManager):
                     "since it collides with an existing one", dest_id
                 )
                 if self.status:
-                    self.status.fail(_('Aborting import because a course with this id already exists.'))
+                    self.status.fail(
+                        _('Aborting import because a course with this id: {} already exists.').format(dest_id)
+                    )
                 raise
 
         return dest_id, runtime
