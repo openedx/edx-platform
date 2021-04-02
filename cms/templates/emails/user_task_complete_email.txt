@@ -12,13 +12,16 @@ ${_("Your {task_name} task has completed with the status '{task_status}'. Sign i
 
 % if olx_validation_errors:
 
-${_("Here are some validation errors we found with your course content.")}
+${_("Here are some validations we found with your course content.")}
 
-
-% for error in error_report:
-    ${error}
+${_("Errors:")}
+% for error in olx_validation_errors.get('errors'):
+  * ${error}
 % endfor
 
-% else:
+${_("Warnings:")}
+% for warning in olx_validation_errors.get('warnings'):
+  * ${warning}
+% endfor
 
 % endif

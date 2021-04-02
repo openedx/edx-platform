@@ -684,21 +684,31 @@ def validate_course_olx(courselike_key, course_dir, status):
         LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
         return olx_is_valid
 
+    log_errors = len(errorstore.errors) > 0
+    if log_errors:
+        log_errors_to_artifact(errorstore, status)
+
     has_errors = errorstore.return_error(ErrorLevel.ERROR.value)
     if not has_errors:
         return olx_is_valid
 
-    errorstore.errors = [error for error in errorstore.errors if error.level_val == ErrorLevel.ERROR.value]
-    error_summary = report_error_summary(errorstore)
-    error_report = report_errors(errorstore)
-    message = json.dumps({
-        'error_summary': error_summary,
-        'error_report': error_report,
-    })
-    UserTaskArtifact.objects.create(status=status, name='OLX_VALIDATION_ERROR', text=message)
     LOGGER.error(f'{log_prefix}: CourseOlx validation failed')
 
     # TODO: Do not fail the task until we have some data about kinds of
     #  olx validation failures. TNL-8151
-
     return olx_is_valid
+
+
+def log_errors_to_artifact(errorstore, status):
+    """Log errors as a task artifact."""
+    def get_error_by_type(error_type):
+        return [error for error in error_report if error.startswith(error_type)]
+
+    error_summary = report_error_summary(errorstore)
+    error_report = report_errors(errorstore)
+    message = json.dumps({
+        'summary': error_summary,
+        'errors': get_error_by_type(ErrorLevel.ERROR.name),
+        'warnings': get_error_by_type(ErrorLevel.WARNING.name),
+    })
+    UserTaskArtifact.objects.create(status=status, name='OLX_VALIDATION_ERROR', text=message)

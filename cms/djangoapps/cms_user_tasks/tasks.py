@@ -30,14 +30,12 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
     context = {
         'task_name': task_name,
         'task_status': task_state_text,
-        'detail_url': detail_url
+        'detail_url': detail_url,
+        'olx_validation_errors': False
     }
     if olx_validation_text:
         try:
-            olx_validations = json.loads(olx_validation_text)
-            context['olx_validation_errors'] = True
-            context['error_summary'] = olx_validations.get('error_summary')
-            context['error_report'] = olx_validations.get('error_report')
+            context['olx_validation_errors'] = json.loads(olx_validation_text)
         except ValueError:  # includes simplejson.decoder.JSONDecodeError
             LOGGER.error(f'Unable to parse CourseOlx validation text: {olx_validation_text}')
 
