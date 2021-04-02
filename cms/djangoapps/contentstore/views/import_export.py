@@ -177,7 +177,7 @@ def _write_chunk(request, courselike_key):
             # This shouldn't happen, even if different instances are handling
             # the same session, but it's always better to catch errors earlier.
             if size < int(content_range['start']):
-                error_message = _('File upload corrupted. Please try again')
+                error_message = _('File upload failed. Please try again')
                 _save_request_status(request, courselike_string, -1)
                 log.error(f'Course import {courselike_key}: A chunk has been missed')
                 monitor_import_failure(courselike_key, current_step, message=error_message)
