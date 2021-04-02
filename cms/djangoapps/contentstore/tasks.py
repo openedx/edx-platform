@@ -413,7 +413,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             return User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
             with translation_language(language):
-                self.status.fail(_('Unknown User ID: {0}').format(user_id))
+                self.status.fail(_('The given user was not found in the system'))
             LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -598,7 +598,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
     except Exception as exception:  # pylint: disable=broad-except
         msg = str(exception)
         LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
-        self.status.fail(_('Unknown error while importing course.'))
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail(_('Unknown error while importing course.'))
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():
