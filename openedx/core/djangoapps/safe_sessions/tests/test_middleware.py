@@ -71,10 +71,9 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         """
         assert SafeSessionMiddleware.get_user_id_from_session(self.request) == self.user.id
 
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", False)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES_FLAG")
-    def test_success(self, mock_log_request_user_changes_flag, mock_log_request_user_changes):
-        mock_log_request_user_changes_flag.is_enabled.return_value = False
+    def test_success(self, mock_log_request_user_changes):
         self.client.login(username=self.user.username, password='test')
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
@@ -99,10 +98,9 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
         # verify extra request_user_logging not called.
         assert not mock_log_request_user_changes.called
 
+    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES", True)
     @patch("openedx.core.djangoapps.safe_sessions.middleware.log_request_user_changes")
-    @patch("openedx.core.djangoapps.safe_sessions.middleware.LOG_REQUEST_USER_CHANGES_FLAG")
-    def test_log_request_user_flag_on(self, mock_log_request_user_changes_flag, mock_log_request_user_changes):
-        mock_log_request_user_changes_flag.is_enabled.return_value = True
+    def test_log_request_user_on(self, mock_log_request_user_changes):
         self.client.login(username=self.user.username, password='test')
         session_id = self.client.session.session_key
         safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
