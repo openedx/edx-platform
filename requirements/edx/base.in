@@ -78,7 +78,7 @@ edx-django-utils
 edx-drf-extensions
 edx-enterprise
 edx-milestones
-https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler11.tar.gz  # edx-organizations
+https://github.com/appsembler/edx-organizations/archive/5.2.0-appsembler13.tar.gz  # edx-organizations
 edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
