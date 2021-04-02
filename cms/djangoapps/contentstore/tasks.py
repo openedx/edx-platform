@@ -417,7 +417,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             return User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
             with translation_language(language):
-                self.status.fail(_('Unknown User ID: {0}').format(user_id))
+                self.status.fail(_('User permission denied.'))
             LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -428,7 +428,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not has_access:
             message = f'User permission denied: {user.username}'
             with translation_language(language):
-                self.status.fail(_('Permission denied'))
+                self.status.fail(_('Permission denied. You do not have write access to this course.'))
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return has_access
@@ -452,7 +452,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not archive_path_exists:
             message = f'Uploaded file {archive_path} not found'
             with translation_language(language):
-                self.status.fail(_('Tar file not found'))
+                self.status.fail(_('Uploaded Tar file not found. Try again.'))
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return archive_path_exists
@@ -557,7 +557,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             shutil.rmtree(course_dir)
             LOGGER.info(f'{log_prefix}: Temp data cleared')
 
-        self.status.fail(str(exception))
+        self.status.fail(_('An Unknown error occurred during the unpacking step.'))
         LOGGER.exception(f'{log_prefix}: Unknown error while unpacking', exc_info=True)
         monitor_import_failure(courselike_key, current_step, exception=exception)
         return
@@ -601,7 +601,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             load_error_modules=False,
             static_content_store=contentstore(),
             target_id=courselike_key,
-            verbose=True
+            verbose=True,
+            status=self.status
         )
 
         new_location = courselike_items[0].location
@@ -611,8 +612,9 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         set_custom_attribute('course_import_completed', True)
     except Exception as exception:  # pylint: disable=broad-except
         msg = str(exception)
-        LOGGER.exception(f'{log_prefix}: Unknown error while updating course {msg}')
-        self.status.fail(msg)
+        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail(_('Unknown error while importing course.'))
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():

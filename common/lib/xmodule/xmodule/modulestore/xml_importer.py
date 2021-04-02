@@ -30,6 +30,7 @@ import re
 from abc import abstractmethod
 
 import xblock
+from django.utils.translation import ugettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -233,6 +234,7 @@ class ImportManager:
             create_if_not_present=False, raise_on_failure=False,
             static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
             python_lib_filename='python_lib.zip',
+            status=None
     ):
         self.store = store
         self.user_id = user_id
@@ -257,6 +259,7 @@ class ImportManager:
             xblock_select=store.xblock_select,
             target_course_id=target_id,
         )
+        self.status = status
         self.logger, self.errors = make_error_tracker()
 
     def preflight(self):
@@ -362,6 +365,8 @@ class ImportManager:
             monitor_import_failure(course_id, 'Updating', exception=exc)
             logging.exception(f'Course import {course_id}: Error while parsing asset xml.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
+                if self.status:
+                    self.status.fail(_('Error while parsing xml for {}').format(assets_filename))
                 raise
             else:
                 return
@@ -479,6 +484,12 @@ class ImportManager:
                         log.exception(
                             f'Course import {dest_id}: failed to import module location {child.location}'
                         )
+                        if self.status:
+                            self.status.fail(
+                                _('Failed to import module: {} at location: {}').format(
+                                    child.display_name, child.location
+                                )
+                            )
                         raise
 
                     depth_first(child)
@@ -502,6 +513,12 @@ class ImportManager:
             except Exception:
                 msg = f'Course import {dest_id}: failed to import module location {leftover}'
                 log.error(msg)
+                if self.status:
+                    self.status.fail(
+                        _('Failed to import module: {} at location: {}').format(
+                            leftover.display_name, leftover.location
+                        )
+                    )
                 raise
 
     def run_imports(self):
@@ -588,6 +605,10 @@ class CourseImportManager(ImportManager):
                     "Skipping import of course with id, %s, "
                     "since it collides with an existing one", dest_id
                 )
+                if self.status:
+                    self.status.fail(
+                        _('Aborting import because a course with this id: {} already exists.').format(dest_id)
+                    )
                 raise
 
         return dest_id, runtime
@@ -697,6 +718,8 @@ class LibraryImportManager(ImportManager):
                     "Skipping import of Library with id %s, "
                     "since it collides with an existing one", dest_id
                 )
+                if self.status:
+                    self.status.fail(_('Aborting import since a library with this id already exists.'))
                 raise
 
         return dest_id, runtime
