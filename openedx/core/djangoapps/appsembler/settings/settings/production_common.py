@@ -18,6 +18,9 @@ def plugin_settings(settings):
     settings.APPSEMBLER_AMC_API_BASE = settings.AUTH_TOKENS.get('APPSEMBLER_AMC_API_BASE')
     settings.APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 
+    # Tahoe: RED-1909 - Credentials should be disabled on all sites.
+    settings.FEATURES['TAHOE_ENABLE_CREDENTIALS'] = False
+
     settings.AMC_APP_URL = settings.ENV_TOKENS.get('AMC_APP_URL')
     settings.AMC_APP_OAUTH2_CLIENT_ID = settings.ENV_TOKENS.get('AMC_APP_OAUTH2_CLIENT_ID')
 
