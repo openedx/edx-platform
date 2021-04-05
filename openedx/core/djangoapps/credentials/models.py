@@ -96,8 +96,13 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         Publicly-accessible Records URL root.
         """
+        # Tahoe: Credentials can be turned off on all sites by default.
+        #        The feature is set to `False` but only in `production_common.py`, so it stays `True` during test
+        #        to avoid massively breaking upstream tests.
+        default_credentials_enabled = settings.FEATURES.get('TAHOE_ENABLE_CREDENTIALS', True)
+
         # Not every site wants the Learner Records feature, so we allow opting out.
-        if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
+        if not helpers.get_value('ENABLE_LEARNER_RECORDS', default_credentials_enabled):
             return None
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/records/')
