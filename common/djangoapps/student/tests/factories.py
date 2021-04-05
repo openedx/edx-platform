@@ -59,7 +59,6 @@ class UserProfileFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=m
     gender = 'm'
     mailing_address = None
     goals = 'Learn a lot'
-    allow_certificate = True
 
 
 class RegistrationFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring

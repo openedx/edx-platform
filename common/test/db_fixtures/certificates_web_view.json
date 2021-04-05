@@ -37,8 +37,7 @@
     "fields": {
       "user": 99,
       "name": "test cert",
-      "courseware": "course.xml",
-      "allow_certificate": true
+      "courseware": "course.xml"
     }
   },
   {
