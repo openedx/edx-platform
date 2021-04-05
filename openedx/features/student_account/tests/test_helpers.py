@@ -1,4 +1,7 @@
-from ddt import ddt, data
+"""
+Tests for helper methods in student_account app
+"""
+from ddt import data, ddt
 from django.test import RequestFactory, TestCase
 from mock import patch
 
@@ -31,6 +34,7 @@ class TestComposeAndSendActivationEmail(TestCase):
         using the UserFactory and a registration object using RegistrationFactory
         for each test case
         """
+        super(TestComposeAndSendActivationEmail, self).setUp()
         self.request = RequestFactory().post('/user_api/v1/account/registration/')
         self.user = UserFactory.create()
         self.registration = RegistrationFactory.create(user=self.user)
@@ -63,6 +67,7 @@ class TestSaveUserUTMInfo(TestCase):
         """
         Create a user object using UserFactory for each test case
         """
+        super(TestSaveUserUTMInfo, self).setUp()
         self.user = UserFactory.create()
 
     def test_save_utm_normal(self):
@@ -128,6 +133,7 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
 
         Also create a user type object using UserFactory, for each new test case.
         """
+        super(TestSetOptInAndAffiliateOrganization, self).setUp()
         self.request_data = {
             'email': 'testUser@example.com',
             'username': 'testUser',
@@ -164,7 +170,9 @@ class TestSetOptInAndAffiliateOrganization(TestCase):
 
         mock_org_get_or_create_method.assert_not_called()
         mock_user_extended_profile_create_method.assert_called_once_with(user=self.user, **{})
-        mock_email_preferences_create_method.assert_called_once_with(user=self.user, opt_in=form.cleaned_data.get('opt_in'))
+        mock_email_preferences_create_method.assert_called_once_with(
+            user=self.user, opt_in=form.cleaned_data.get('opt_in')
+        )
 
     @patch('openedx.features.student_account.helpers.EmailPreference.objects.create')
     @patch('openedx.features.student_account.helpers.UserExtendedProfile.objects.create')
