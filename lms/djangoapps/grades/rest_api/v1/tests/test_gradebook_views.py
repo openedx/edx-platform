@@ -1384,6 +1384,42 @@ class GradebookViewTest(GradebookViewTestBase):
 
         self._assert_usernames(response, expected_usernames)
 
+    @ddt.data(False, True)
+    def test_exclude_course_roles_for_another_course(self, other_student_role_in_self_course):
+        """
+        Test for filtering errors when users have roles in other courses.
+        """
+        # Conditionally make other_student a beta tester (arbitrary role) in self.course
+        if other_student_role_in_self_course:
+            CourseBetaTesterRole(self.course.id).add_users(self.other_student)
+
+        # Create another course, enroll other_student, and make other_student course staff in other course
+        another_course = CourseFactory.create(display_name='another-course', run='run-1')
+        CourseEnrollmentFactory(
+            course_id=another_course.id,
+            user=self.other_student,
+        )
+        CourseStaffRole(another_course.id).add_users(self.other_student)
+
+        # Query the gradebook view for self.course, excluding staff.
+        # other_student is staff in another-course, not self.course, so
+        # they should still be included.
+        self.login_staff()
+        with self._mock_all_course_grade_reads():
+            with override_waffle_flag(self.waffle_flag, active=True):
+                response = self.client.get(
+                    self.get_url(course_key=self.course.id),
+                    {'excluded_course_roles': CourseStaffRole.ROLE}
+                )
+        self._assert_usernames(
+            response,
+            [
+                self.student.username,
+                self.other_student.username,
+                self.program_student.username,
+                self.program_masters_student.username,
+            ]
+        )
 
 @ddt.ddt
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
