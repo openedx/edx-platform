@@ -1,5 +1,5 @@
 """
-Registering models for webinar app.
+Registering models for webinars app.
 """
 from django.contrib import admin
 

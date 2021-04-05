@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
                 ('is_registered', models.BooleanField(verbose_name='Registered')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='webinar_registrations', to=settings.AUTH_USER_MODEL, verbose_name='Registered User')),
-                ('webinar', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='registrations', to='webinar.Webinar', verbose_name='Webinar')),
+                ('webinar', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='registrations', to='webinars.Webinar', verbose_name='Webinar')),
             ],
         ),
     ]

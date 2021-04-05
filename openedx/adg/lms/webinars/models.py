@@ -1,5 +1,5 @@
 """
-All models for webinar app
+All models for webinars app
 """
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -69,7 +69,7 @@ class Webinar(TimeStampedModel):
     )
 
     class Meta:
-        app_label = 'webinar'
+        app_label = 'webinars'
 
     def __str__(self):
         return self.title
@@ -97,7 +97,7 @@ class WebinarRegistration(TimeStampedModel):
     is_registered = models.BooleanField(verbose_name=_('Registered'), )
 
     class Meta:
-        app_label = 'webinar'
+        app_label = 'webinars'
 
     def __str__(self):
         return f'User {self.user}, webinar {self.webinar}'

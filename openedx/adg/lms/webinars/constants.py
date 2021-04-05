@@ -1,5 +1,5 @@
 """
-Constants for webinar app
+Constants for webinars app
 """
 
 ALLOWED_BANNER_EXTENSIONS = ('png', 'jpg', 'jpeg', 'svg')

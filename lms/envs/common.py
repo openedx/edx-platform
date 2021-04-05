@@ -2679,7 +2679,7 @@ ADG_INSTALLED_APPS = [
     'openedx.adg.lms.applications',
     'openedx.adg.lms.registration_extension',
     'openedx.adg.lms.our_team',
-    'openedx.adg.lms.webinar',
+    'openedx.adg.lms.webinars',
 ]
 
 INSTALLED_APPS.extend(ADG_INSTALLED_APPS)
