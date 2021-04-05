@@ -453,8 +453,9 @@ class ProctoringProviderTestCase(unittest.TestCase):
 
         with pytest.raises(InvalidProctoringProvider) as context_manager:
             self.proctoring_provider.from_json(provider)
-        assert str(context_manager.value) == f'The selected proctoring provider, {provider},'\
-                f' is not a valid provider. Please select from one of {allowed_proctoring_providers}.'
+        expected_error = f'The selected proctoring provider, {provider}, is not a valid provider. ' \
+                   f'Please select from one of {allowed_proctoring_providers}.'
+        assert str(context_manager.value) == expected_error
 
     def test_from_json_adds_platform_default_for_missing_provider(self):
         """

@@ -20,6 +20,7 @@ from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_F
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidProctoringProvider
 
+
 class CourseMetadata:
     '''
     For CRUD operations on metadata fields which do not have specific editors

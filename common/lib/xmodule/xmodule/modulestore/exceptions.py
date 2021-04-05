@@ -107,6 +107,7 @@ class InvalidBranchSetting(Exception):
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting
 
+
 class InvalidProctoringProvider(Exception):
     """
     Raised when the selected proctoring provider is not in the settings.
