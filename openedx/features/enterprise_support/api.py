@@ -782,13 +782,13 @@ def get_enterprise_learner_data_from_db(user):
 
 
 @enterprise_is_enabled()
-def get_enterprise_learner_portal_enabled_message(request):
+def enterprise_customer_from_session_or_learner_data(request):
     """
-    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
+    Returns the Enterprise Customer for the authenticated user.
 
-    Note: request.session[ENTERPRISE_CUSTOMER_KEY_NAME] will be used in case the user is linked to
-        multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
-        will be used. If that doesn't exist return None.
+    Retrieves customer from session by default. If _CACHE_MISS,
+    retrieve customer using learner data and add customer data
+    to the session.
 
     Args:
         request: request made to the LMS dashboard
@@ -807,7 +807,21 @@ def get_enterprise_learner_portal_enabled_message(request):
         add_enterprise_customer_to_session(request, enterprise_customer)
         if enterprise_customer:
             cache_enterprise(enterprise_customer)
+    return enterprise_customer
 
+
+@enterprise_is_enabled()
+def get_enterprise_learner_portal_enabled_message(enterprise_customer):
+    """
+    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
+
+    Note: request.session[ENTERPRISE_CUSTOMER_KEY_NAME] will be used in case the user is linked to
+        multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
+        will be used. If that doesn't exist return None.
+
+    Args:
+        enterprise_customer: EnterpriseCustomer object
+    """
     if not enterprise_customer:
         return None
 
