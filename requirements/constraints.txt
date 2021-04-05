@@ -33,9 +33,6 @@ django-storages<1.9
 # for them.
 edx-enterprise==3.21.0
 
-# edx-proctoring 3.8.3 resulted in 500 error on StudentOnboardingStatusView. Temporarily pinned to 3.8.2 version
-edx-proctoring==3.8.2
-
 # Upgrading to 2.12.0 breaks several test classes due to API changes, need to update our code accordingly
 factory-boy==2.8.1
 
