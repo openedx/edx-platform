@@ -24,7 +24,6 @@ from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_c
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.modulestore.django import modulestore
 
@@ -209,12 +208,6 @@ def _can_generate_certificate_common(user, course_key):
 
     This method contains checks that are common to both allowlist and V2 regular course certificates.
     """
-    if not auto_certificate_generation_enabled():
-        # Automatic certificate generation is globally disabled
-        log.info(f'Automatic certificate generation is globally disabled. Certificate cannot be generated for '
-                 f'{user.id} : {course_key}.')
-        return False
-
     if CertificateInvalidation.has_certificate_invalidation(user, course_key):
         # The invalidation list prevents certificate generation
         log.info(f'{user.id} : {course_key} is on the certificate invalidation list. Certificate cannot be generated.')

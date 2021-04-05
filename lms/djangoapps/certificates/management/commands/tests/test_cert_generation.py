@@ -9,12 +9,11 @@ from django.core.management import CommandError, call_command
 from waffle.testutils import override_switch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.tests.test_generation_handler import AUTO_GENERATION_SWITCH_NAME, ID_VERIFIED_METHOD
+from lms.djangoapps.certificates.tests.test_generation_handler import ID_VERIFIED_METHOD
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 class CertGenerationTests(ModuleStoreTestCase):
     """

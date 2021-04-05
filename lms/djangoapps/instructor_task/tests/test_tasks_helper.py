@@ -2021,7 +2021,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(169):
+        with self.assertNumQueries(170):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
