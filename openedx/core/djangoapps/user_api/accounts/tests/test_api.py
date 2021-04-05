@@ -121,20 +121,20 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         config = {
             "default_visibility": "private",
             "public_fields": [
-                'email', 'name',
+                'gender', 'name',
             ],
         }
 
-        # With default configuration settings, email is not shared with other (non-staff) users.
+        # With default configuration settings, gender is not shared with other (non-staff) users.
         account_settings = get_account_settings(self.default_request, [self.different_user.username])[0]
-        assert 'email' not in account_settings
+        assert 'gender' not in account_settings
 
         account_settings = get_account_settings(
             self.default_request,
             [self.different_user.username],
             configuration=config,
         )[0]
-        assert self.different_user.email == account_settings['email']
+        assert self.different_user.profile.gender == account_settings['gender']
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
