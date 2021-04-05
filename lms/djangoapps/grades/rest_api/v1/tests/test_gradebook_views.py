@@ -1321,7 +1321,8 @@ class GradebookViewTest(GradebookViewTestBase):
             self.program_student.username,
             self.program_masters_student.username
         ]
-        self._assert_usernames(response,
+        self._assert_usernames(
+            response,
             course_students + [staff_user.username]
         )
 
@@ -1422,6 +1423,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.program_masters_student.username,
             ]
         )
+
 
 @ddt.ddt
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
