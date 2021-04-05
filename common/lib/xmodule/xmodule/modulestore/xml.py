@@ -375,8 +375,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         course_descriptor = None
         try:
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
-        except ValueError as value_error:
-            raise value_error
         except Exception as exc:  # pylint: disable=broad-except
             msg = f'Course import {target_course_id}: ERROR: Failed to load courselike "{course_dir}": {str(exc)}'
             log.exception(msg)

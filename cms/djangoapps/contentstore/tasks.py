@@ -58,7 +58,7 @@ from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, InvalidProctoringProvider
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
@@ -614,7 +614,8 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         msg = str(exception)
         LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
         if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(msg)
+            self.status.fail(msg if isinstance(exception, InvalidProctoringProvider)
+                             else _('Unknown error while importing course.'))
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():

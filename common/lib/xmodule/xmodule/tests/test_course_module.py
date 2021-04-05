@@ -19,6 +19,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from openedx.core.lib.teams_config import TeamsConfig, DEFAULT_COURSE_RUN_MAX_TEAM_SIZE
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.exceptions import InvalidProctoringProvider
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -450,11 +451,10 @@ class ProctoringProviderTestCase(unittest.TestCase):
         provider = 'invalid-provider'
         allowed_proctoring_providers = ['mock', 'mock_proctoring_without_rules']
 
-        with pytest.raises(ValueError) as context_manager:
+        with pytest.raises(InvalidProctoringProvider) as context_manager:
             self.proctoring_provider.from_json(provider)
-        assert context_manager.value.args[0] ==\
-               [f'The selected proctoring provider, {provider},'
-                f' is not a valid provider. Please select from one of {allowed_proctoring_providers}.']
+        assert str(context_manager.value) == f'The selected proctoring provider, {provider},'\
+                f' is not a valid provider. Please select from one of {allowed_proctoring_providers}.'
 
     def test_from_json_adds_platform_default_for_missing_provider(self):
         """

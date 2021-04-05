@@ -106,3 +106,20 @@ class InvalidBranchSetting(Exception):
         super().__init__(f"Invalid branch: expected {expected_setting} but got {actual_setting}")  # lint-amnesty, pylint: disable=line-too-long, super-with-arguments
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting
+
+class InvalidProctoringProvider(Exception):
+    """
+    Raised when the selected proctoring provider is not in the settings.
+    """
+
+    def __init__(self, proctoring_provider, available_providers):
+        super().__init__()
+        self.proctoring_provider = proctoring_provider
+        self.available_providers = available_providers
+
+    def __str__(self, *args, **kwargs):
+        """
+        Print details about error
+        """
+        return f"The selected proctoring provider, {self.proctoring_provider}, is not a valid provider. " \
+               f"Please select from one of {self.available_providers}."
