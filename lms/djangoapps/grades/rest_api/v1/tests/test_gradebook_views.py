@@ -1315,13 +1315,15 @@ class GradebookViewTest(GradebookViewTestBase):
         with override_waffle_flag(self.waffle_flag, active=True):
             with self._mock_all_course_grade_reads():
                 response = self.client.get(self.get_url(course_key=self.course.id))
-        self._assert_usernames(response, [
+        course_students = [
             self.student.username,
             self.other_student.username,
             self.program_student.username,
-            self.program_masters_student.username,
-            staff_user.username,
-        ])
+            self.program_masters_student.username
+        ]
+        self._assert_usernames(response,
+            course_students + [staff_user.username]
+        )
 
     @ddt.data(
         None,
