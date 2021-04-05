@@ -2,8 +2,8 @@
 Utility functions for validating custom form
 """
 import json
-import requests
 
+import requests
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -72,6 +72,9 @@ class AccountCreationFormCustom(AccountCreationForm):
         return cleaned_opt_in
 
     def clean_organization_name(self):
+        """
+        Validates organization name
+        """
         org_name = self.cleaned_data.get('organization_name')
         is_org_selected = self.cleaned_data.get('is_org_selected')
 
@@ -85,6 +88,9 @@ class AccountCreationFormCustom(AccountCreationForm):
         return org_name
 
     def clean_recaptcha(self):
+        """
+        Validates recaptcha result
+        """
         recaptcha = self.cleaned_data.get('recaptcha')
         response = requests.post(
             settings.CAPTCHA_VERIFY_URL,
@@ -125,17 +131,25 @@ class AccountCreationFormCustom(AccountCreationForm):
                 if not existing_org_size and not cleaned_org_size:
                     self.errors.update({'organization_size': [_('Organization size not provided.'), ]})
                 elif existing_org_size and cleaned_org_size:
-                    self.errors.update({'organization_size': [_('Organization size provided for existing organization'), ]})
+                    self.errors.update(
+                        {'organization_size': [_('Organization size provided for existing organization'), ]}
+                    )
 
                 if not existing_org_type and not cleaned_org_type:
                     self.errors.update({'organization_type': [_('Organization type not provided.'), ]})
                 elif existing_org_type and cleaned_org_type:
-                    self.errors.update({'organization_type': [_('Organization type provided for existing organization'), ]})
+                    self.errors.update(
+                        {'organization_type': [_('Organization type provided for existing organization'), ]}
+                    )
 
             else:
                 if not cleaned_org_size:
-                    self.errors.update({'organization_size': [_('Organization size not provided for new organization'), ]})
+                    self.errors.update(
+                        {'organization_size': [_('Organization size not provided for new organization'), ]}
+                    )
                 if not cleaned_org_type:
-                    self.errors.update({'organization_type': [_('Organization type not provided for new organization'), ]})
+                    self.errors.update(
+                        {'organization_type': [_('Organization type not provided for new organization'), ]}
+                    )
 
         return self.cleaned_data

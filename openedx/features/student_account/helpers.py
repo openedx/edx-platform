@@ -1,31 +1,40 @@
+"""
+Helper methods for student_account app
+"""
 import logging
 import operator
-
 from datetime import datetime
+
+from django.db.utils import IntegrityError
 from pytz import utc
 
 import third_party_auth
-
-from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
-
-from constants import NON_ACTIVE_COURSE_NOTIFICATION, TOP_REGISTRATION_COUNTRIES
-from student.models import CourseEnrollment
 from courseware.models import StudentModule
-
-from openedx.features.course_card.helpers import get_course_open_date
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
-from openedx.core.lib.request_utils import safe_get_host
-
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import EmailPreference, Organization, UserExtendedProfile
 from lms.djangoapps.philu_overrides.constants import ACTIVATION_ALERT_TYPE
+from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+from openedx.core.lib.request_utils import safe_get_host
+from openedx.features.course_card.helpers import get_course_open_date
+from student.models import CourseEnrollment
 
+from .constants import NON_ACTIVE_COURSE_NOTIFICATION, TOP_REGISTRATION_COUNTRIES
 
 log = logging.getLogger("edx.student")
 
 
 def get_non_active_course(user):
+    """
+    Get non active course for given user
+
+    Arguments:
+        user (User): Django User object
+
+    Returns:
+        list: list contains notification info of non active courses.
+    """
     DAYS_TO_DISPLAY_NOTIFICATION = 7
 
     all_user_courses = CourseEnrollment.objects.filter(user=user, is_active=True)
@@ -51,10 +60,10 @@ def get_non_active_course(user):
                                                    created__gt=course_start_date)
 
             # Make this check equals to zero to make it more generic.
-            if len(modules) <= 0:
+            if not modules:
                 non_active_courses.append(course)
 
-    if len(non_active_courses) > 0:
+    if non_active_courses:
         error = NON_ACTIVE_COURSE_NOTIFICATION % (non_active_courses[0].display_name,
                                                   get_course_first_chapter_link(course=non_active_courses[0]))
         non_active_course_info.append({"type": ACTIVATION_ALERT_TYPE,
@@ -71,6 +80,16 @@ def save_user_utm_info(req, user):
     :return:
     """
     def extract_param_value(request, param_name):
+        """
+        Get value of params from request
+
+        Arguments:
+            request (Request): Request Object
+            param_name (string): Key in string format
+
+        Returns:
+            string: Value for `param_name`.
+        """
         utm_value = request.POST.get(param_name, None)
 
         if not utm_value and param_name in request.session:
@@ -95,12 +114,21 @@ def save_user_utm_info(req, user):
             utm_term=utm_term,
             user=user
         )
-    except Exception as ex:
+    except IntegrityError as ex:
         log.error("There is some error saving UTM {}".format(str(ex)))
-        pass
 
 
 def set_opt_in_and_affiliate_user_organization(user, form):
+    """
+    Save `opt_in` and `affiliate_user_organization` in db.
+
+    Arguments:
+        user (User): Django User object
+        form (Django Form): Form to get values from
+
+    Returns:
+        None
+    """
     org_name = form.cleaned_data.get('organization_name')
     org_type = form.cleaned_data.get('organization_type')
     user_extended_profile_data = {}
@@ -130,13 +158,24 @@ def set_opt_in_and_affiliate_user_organization(user, form):
         }
 
     # create User Extended Profile
-    user_extended_profile = UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
+    UserExtendedProfile.objects.create(user=user, **user_extended_profile_data)
 
     # create user email preferences object
     EmailPreference.objects.create(user=user, opt_in=form.cleaned_data.get('opt_in'))
 
 
 def compose_and_send_activation_email_custom(request, registration, user):
+    """
+    Compose and send account activation email.
+
+    Arguments:
+        request (Request): Request Object
+        registration (Registration): Registration object for the currently logged-in user
+        user (User): Django User object
+
+    Returns:
+        None
+    """
     activation_link = '{protocol}://{site}/activate/{key}'.format(
         protocol='https' if request.is_secure() else 'http',
         site=safe_get_host(request),

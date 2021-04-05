@@ -1,18 +1,25 @@
+"""
+Tests for display notification in student_account app
+"""
 from datetime import timedelta
 
-from openedx.features.student_account.constants import NON_ACTIVE_COURSE_NOTIFICATION
 from custom_settings.models import CustomSettings
 from lms.djangoapps.onboarding.helpers import get_current_utc_date
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+from openedx.features.course_card.tests.helpers import initialize_test_user, set_course_dates
+from openedx.features.student_account.constants import NON_ACTIVE_COURSE_NOTIFICATION
 from openedx.features.student_account.helpers import get_non_active_course
 from student.tests.factories import CourseEnrollmentFactory
-from openedx.features.course_card.tests.helpers import initialize_test_user, set_course_dates
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class DisplayNotification(ModuleStoreTestCase):
+    """
+    Base class for `DisplayNotificationTest` to prepare test data.
+    """
+
     password = 'test'
 
     def setUp(self):
@@ -23,6 +30,9 @@ class DisplayNotification(ModuleStoreTestCase):
 
 
 class DisplayNotificationTest(DisplayNotification):
+    """
+    Class contains tests related to display notification.
+    """
 
     def test_non_active_course(self):
         courses = create_courses(self.user, 1)
@@ -65,6 +75,16 @@ class DisplayNotificationTest(DisplayNotification):
 
 
 def create_courses(user, no_of_courses):
+    """
+    Helper method to create test data. Create courses and enroll user in courses.
+
+    Arguments:
+        user (User): Django User object
+        no_of_courses (int) Number of courses we want to create as test data.
+
+    Returns:
+        list: list of courses
+    """
     org = 'edX'
     course_number_f = 'CS10{}'
     course_run = '2019_Q1'
