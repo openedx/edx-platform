@@ -15,11 +15,11 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument('--data-file-path', type=str, required=True, help="Path to file where your data is specified.")
+        parser.add_argument('--path', type=str, required=True, help="Path to yaml file where your data is specified.")
 
 
     def handle(self, *args, **options):
-        with open(options["data_file_path"], 'r') as f:
+        with open(options["path"], 'r') as f:
             data_spec = yaml.safe_load(f)
         for user_spec in data_spec.get('users', []):
             self.create_user(user_spec)
