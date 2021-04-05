@@ -200,7 +200,8 @@ def _fire_ungenerated_certificate_task(user, course_key, expected_verification_s
     cert = GeneratedCertificate.certificate_for_student(user, course_key)
 
     generate_learner_certificate = (
-        enrollment_mode in allowed_enrollment_modes_list and (cert is None or cert.status == 'unverified')
+        enrollment_mode in allowed_enrollment_modes_list and (
+            cert is None or cert.status == CertificateStatuses.unverified)
     )
 
     if generate_learner_certificate:

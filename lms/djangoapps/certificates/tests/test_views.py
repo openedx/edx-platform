@@ -16,6 +16,7 @@ from opaque_keys.edx.locator import CourseLocator
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
+    CertificateStatuses,
     ExampleCertificate,
     ExampleCertificateSet
 )
@@ -231,7 +232,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='downloadable',
+            status=CertificateStatuses.downloadable,
             mode='honor',
             name=self.user.profile.name,
             verify_uuid=uuid4().hex

@@ -573,7 +573,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
 
         # Verify that the certificate has been marked with status error
         cert = GeneratedCertificate.eligible_certificates.get(user=self.student, course_id=self.course.id)
-        assert cert.status == 'error'
+        assert cert.status == CertificateStatuses.error
         assert self.ERROR_REASON in cert.error_reason
 
     def test_generate_user_certificates_with_unverified_cert_status(self):
@@ -594,7 +594,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         with mock_passing_grade():
             with self._mock_queue():
                 status = generate_user_certificates(self.student, self.course.id)
-                assert status == 'generating'
+                assert status == CertificateStatuses.generating
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True})
     def test_new_cert_requests_returns_generating_for_html_certificate(self):

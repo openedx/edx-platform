@@ -103,7 +103,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='downloadable',
+            status=CertificateStatuses.downloadable,
             mode='honor',
             name=self.user.profile.name,
         )
