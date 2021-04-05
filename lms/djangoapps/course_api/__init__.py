@@ -12,8 +12,6 @@ WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='course_list_api_rate
 #   users, this limit is 10 requests/minute.
 # .. toggle_use_cases: circuit_breaker
 # .. toggle_creation_date: 2018-06-12
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
 USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_2', __name__)
 # .. toggle_name: course_list_api_rate_limit.rate_limit_10
@@ -23,7 +21,5 @@ USE_RATE_LIMIT_2_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPAC
 #   users, this limit is 20 requests/minute.
 # .. toggle_use_cases: circuit_breaker
 # .. toggle_creation_date: 2018-06-12
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: https://openedx.atlassian.net/browse/LEARNER-5527
 USE_RATE_LIMIT_10_FOR_COURSE_LIST_API = LegacyWaffleSwitch(WAFFLE_SWITCH_NAMESPACE, 'rate_limit_10', __name__)

@@ -12,19 +12,29 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 WAFFLE_NAMESPACE = 'studio'
 
 # Switches
+# TODO: Replace with WaffleSwitch(). See waffle() docstring.
 ENABLE_ACCESSIBILITY_POLICY_PAGE = 'enable_policy_page'
 
 
 def waffle():
     """
-    Returns the namespaced, cached, audited Waffle Switch class for Studio pages.
+    Deprecated: Returns the namespaced, cached, audited Waffle Switch class for Studio pages.
+
+    IMPORTANT: Do NOT copy this pattern and do NOT use this to reference new switches.
+      Instead, replace the string constant above with the actual switch instance.
+      For example::
+
+        ENABLE_ACCESSIBILITY_POLICY_PAGE = WaffleSwitch(f'{WAFFLE_NAMESPACE}.enable_policy_page')
     """
     return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix='Studio: ')
 
 
 def waffle_flags():
     """
-    Returns the namespaced, cached, audited Waffle Flag class for Studio pages.
+    Deprecated: Returns the namespaced, cached, audited Waffle Flag class for Studio pages.
+
+    IMPORTANT: Do NOT copy this pattern and do NOT use this to reference new flags.
+      See waffle() docstring for more details.
     """
     return LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Studio: ')
 

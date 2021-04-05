@@ -15,8 +15,6 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE)
 # .. toggle_description: instructor
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: ??
 # .. toggle_tickets: PROD-1309
 DATA_DOWNLOAD_V2 = LegacyWaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
@@ -24,18 +22,15 @@ DATA_DOWNLOAD_V2 = LegacyWaffleFlag(
     module_name=__name__,
 )
 
-# Waffle flag to use optimised is_small_course.
 # .. toggle_name: verify_student.optimised_is_small_course
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout to improved is_small_course method.
-# .. toggle_category: instructor
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-02
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: n/a
+# .. toggle_warnings: Description mentions staged rollout, but the use case is not set as temporary.
+#      This may actually be a temporary toggle.
 # .. toggle_tickets: PROD-1740
-# .. toggle_status: supported
 OPTIMISED_IS_SMALL_COURSE = LegacyWaffleFlag(
     waffle_namespace=WAFFLE_FLAG_NAMESPACE,
     flag_name='optimised_is_small_course',
