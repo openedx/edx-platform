@@ -363,10 +363,10 @@ class ImportManager:
             return
         except Exception as exc:  # pylint: disable=W0703
             monitor_import_failure(course_id, 'Updating', exception=exc)
-            logging.exception(f'Course import {course_id}: Error while parsing asset xml.')
+            logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
                 if self.status:
-                    self.status.fail(_('Error while parsing xml for {}').format(assets_filename))
+                    self.status.fail(_('Error while reading {}. Check file for XML errors.').format(assets_filename))
                 raise
             else:
                 return
