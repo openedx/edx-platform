@@ -217,7 +217,7 @@ class ProctoringProvider(String):
         errors.extend(provider_errors)
 
         if errors:
-            raise ValueError(errors)
+            raise ValueError(errors) if len(errors) > 1 else ValueError(errors[0])
 
         value = self._get_proctoring_value(value)
 

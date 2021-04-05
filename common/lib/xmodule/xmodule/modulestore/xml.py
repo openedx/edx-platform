@@ -375,23 +375,26 @@ class XMLModuleStore(ModuleStoreReadBase):
         course_descriptor = None
         try:
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
+        except ValueError as value_error:
+            raise value_error
         except Exception as exc:  # pylint: disable=broad-except
             msg = f'Course import {target_course_id}: ERROR: Failed to load courselike "{course_dir}": {str(exc)}'
             log.exception(msg)
             errorlog.tracker(msg)
             self.errored_courses[course_dir] = errorlog
             monitor_import_failure(target_course_id, 'Updating', exception=exc)
-
-        if course_descriptor is None:
-            pass
-        elif isinstance(course_descriptor, ErrorBlock):
-            # Didn't load course.  Instead, save the errors elsewhere.
-            self.errored_courses[course_dir] = errorlog
-        else:
-            self.courses[course_dir] = course_descriptor
-            course_descriptor.parent = None
-            course_id = self.id_from_descriptor(course_descriptor)
-            self._course_errors[course_id] = errorlog
+            raise exc
+        finally:
+            if course_descriptor is None:
+                pass
+            elif isinstance(course_descriptor, ErrorBlock):
+                # Didn't load course.  Instead, save the errors elsewhere.
+                self.errored_courses[course_dir] = errorlog
+            else:
+                self.courses[course_dir] = course_descriptor
+                course_descriptor.parent = None
+                course_id = self.id_from_descriptor(course_descriptor)
+                self._course_errors[course_id] = errorlog
 
     def __str__(self):
         '''

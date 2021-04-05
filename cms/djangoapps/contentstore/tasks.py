@@ -614,7 +614,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         msg = str(exception)
         LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
         if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(_('Unknown error while importing course.'))
+            self.status.fail(msg)
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():
