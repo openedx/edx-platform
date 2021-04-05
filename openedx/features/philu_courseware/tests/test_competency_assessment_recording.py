@@ -1,3 +1,6 @@
+"""
+All tests for competency assessment recording
+"""
 from copy import deepcopy
 
 from django.urls import reverse
@@ -13,9 +16,14 @@ NOT_VALID_CHOICE_FORMAT = '"{}" is not a valid choice.'
 
 
 class CompetencyAssessmentRecordTest(APITestCase):
+    """
+    All tests for saving user attempts and get assessment scores
+    """
+
     def setUp(self):
+        super(CompetencyAssessmentRecordTest, self).setUp()
         self.user = UserFactory()
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.user)  # pylint: disable=no-member
         self.end_point = reverse('competency_assessment', kwargs=dict(chapter_id=1))
         self.valid_record = {
             'chapter_id': 'test-chapter',
@@ -30,6 +38,9 @@ class CompetencyAssessmentRecordTest(APITestCase):
         }
 
     def test_valid_record(self):
+        """
+        Test valid records, and assert response is 201
+        """
         response = self.client.post(
             self.end_point,
             data=[self.valid_record], format='json'
@@ -37,6 +48,9 @@ class CompetencyAssessmentRecordTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_invalid_problem_id(self):
+        """
+        Test invalid records, and assert response is 400
+        """
         record = deepcopy(self.valid_record)
         record['problem_id'] = 'this_is_invalid_problem_id'
 
@@ -48,6 +62,9 @@ class CompetencyAssessmentRecordTest(APITestCase):
         self.assertIn(INVALID_PROBLEM_ID_MSG, response.data[0]['problem_id'])
 
     def test_invalid_correctness_and_assessment_type(self):
+        """
+        Test invalid correctness and assessment type, and assert response is 400
+        """
         record = deepcopy(self.valid_record)
         record['assessment_type'] = INVALID_ASSESSMENT_TYPE
         record['correctness'] = INVALID_CORRECTNESS
@@ -61,12 +78,18 @@ class CompetencyAssessmentRecordTest(APITestCase):
         self.assertIn(NOT_VALID_CHOICE_FORMAT.format(INVALID_CORRECTNESS), response.data[0]['correctness'])
 
     def test_all_missing_keys(self):
-        for key in self.valid_record.keys():
+        """
+        Test all missing keys, and assert response is 400
+        """
+        for key in self.valid_record:
             record = deepcopy(self.valid_record)
             record.pop(key)  # pop the key we want to miss
             self._assert_missing_keys(record, key)
 
     def _assert_missing_keys(self, pay_load, missing_key):
+        """
+        A collection of assert statements for competency assessment recording response
+        """
         response = self.client.post(
             self.end_point,
             data=[pay_load], format='json'

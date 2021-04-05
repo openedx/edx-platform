@@ -1,3 +1,6 @@
+"""
+All helpers for philu_courseware app
+"""
 from logging import getLogger
 
 from django.conf import settings
@@ -15,6 +18,16 @@ log = getLogger(__name__)
 
 
 def get_nth_chapter_link(course, chapter_index=0):
+    """
+    Create and return link of a specific chapter in a course
+
+    Args:
+        course (CourseOverview): Course for which we want to send email
+        chapter_index (int): Chapter index for which url be returned
+
+    Returns:
+        str: Link to course chapter
+    """
     course_chapters = modulestore().get_items(
         course.id,
         qualifiers={'category': 'course'}
@@ -62,4 +75,4 @@ def validate_problem_id(problem_id):
     try:
         return UsageKey.from_string(problem_id)
     except InvalidKeyError:
-        raise ValidationError(_(constants.INVALID_PROBLEM_ID_MSG))
+        raise ValidationError(constants.INVALID_PROBLEM_ID_MSG)
