@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-03-26 09:57+0000\n"
+"POT-Creation-Date: 2021-04-05 09:19+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -144,8 +144,15 @@ msgstr "هناك مشكلة في ملف النص هذا. حاول تحميل م�
 msgid "In Progress"
 msgstr "العلامات"
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
 #: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
+#: openedx/adg/lms/webinars/models.py
+msgid "Cancelled"
+msgstr "إلغاء"
+
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/instructor/views/api.py openedx/adg/lms/our_team/models.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Name"
 msgstr "الاسم"
@@ -7183,7 +7190,7 @@ msgstr "اسم المستخدم"
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
-#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/api.py openedx/adg/lms/webinars/models.py
 msgid "Language"
 msgstr "اللغة"
 
@@ -9558,6 +9565,10 @@ msgid "Sorry, the age limit for the program is 21-60"
 msgstr ""
 
 #: openedx/adg/lms/applications/forms.py
+msgid "Sorry, only a Saudi national can enter this program"
+msgstr ""
+
+#: openedx/adg/lms/applications/forms.py
 msgid "Either upload a cover letter file or type text"
 msgstr ""
 
@@ -9579,7 +9590,7 @@ msgstr ""
 msgid "Date should not be in future"
 msgstr ""
 
-#: openedx/adg/lms/applications/helpers.py
+#: openedx/adg/lms/applications/helpers.py openedx/adg/lms/our_team/helpers.py
 #, python-brace-format
 msgid "File size must not exceed {size} MB"
 msgstr ""
@@ -9616,7 +9627,7 @@ msgstr "آخر توقيت للتقديم"
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
-#: openedx/adg/lms/applications/models.py
+#: openedx/adg/lms/applications/models.py openedx/adg/lms/webinars/models.py
 #: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
@@ -9631,7 +9642,8 @@ msgstr ""
 msgid "Accepted extensions: .png, .jpg, .svg"
 msgstr ""
 
-#: openedx/adg/lms/applications/models.py
+#: openedx/adg/lms/applications/models.py openedx/adg/lms/our_team/models.py
+#: openedx/adg/lms/webinars/models.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: wiki/plugins/attachments/forms.py
@@ -9788,6 +9800,18 @@ msgstr ""
 #: openedx/adg/lms/constants.py
 msgid "Are you a Saudi National?"
 msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
+msgid "Designation"
+msgstr "السؤال"
+
+#: openedx/adg/lms/our_team/models.py
+msgid "Image"
+msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
+msgid "URL"
+msgstr "رابط ’LTI‘"
 
 #: openedx/adg/lms/registration_extension/constants.py
 msgid "Yanbu"
@@ -10088,6 +10112,79 @@ msgstr "نعم"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No"
 msgstr "لا"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Start Time"
+msgstr "وقت بدء تشغيل الفيديو"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "End Time"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Presenter"
+msgstr "إعادة الضبط"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Meeting Link"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Banner"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Accepted extensions: .png, .jpg, .jpeg, .svg"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Co-Hosts"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Panelists"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
+msgid "Upcoming"
+msgstr "قريبًا"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Delivered"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Webinar Status"
+msgstr "حالة التحقق"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Virtual Event"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Created By"
+msgstr "أُنشئ المقال."
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Last Modified By"
+msgstr "تاريخ التعديل الأخير:"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "End date must be greater than start date"
+msgstr ""
+"لا بدّ أن يتأخّر تاريخ الاستحقاق الخاضع للتمديد عن تاريخ الاستحقاق الأساسي."
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Webinar"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Registered User"
+msgstr "التسجيل"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Registered"
+msgstr "التسجيل"
 
 #: openedx/core/djangoapps/ace_common/apps.py
 msgid "ACE Common"
@@ -13052,12 +13149,6 @@ msgstr "تم الرفع"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr "خلل أثناء المعالجة"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "تم الإلغاء"
 
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
@@ -16717,10 +16808,6 @@ msgstr "عذرًا، لقد جرى رفض عملية التحقّق"
 #: lms/templates/courseware/progress.html
 msgid "Completed by {date}"
 msgstr "تم إكماله في {date}"
-
-#: lms/templates/courseware/progress.html
-msgid "Upcoming"
-msgstr "قريبًا"
 
 #: lms/templates/courseware/progress.html
 msgid "Less"
