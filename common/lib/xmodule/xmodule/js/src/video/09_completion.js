@@ -48,6 +48,7 @@
                 this.startTime = this.state.config.startTime;
                 this.endTime = this.state.config.endTime;
                 this.isEnabled = this.state.config.completionEnabled;
+                this.isProgressTrackingEnabled = this.state.config.progressTrackingEnabled;
                 if (this.endTime) {
                     this.completeAfterTime = this.calculateCompleteAfterTime(this.startTime, this.endTime);
                 }
@@ -113,7 +114,7 @@
                 }
 
                 // Duration may not be available at initialization time
-                if (duration) {
+                if (duration && this.isProgressTrackingEnabled) {
                     this.computeProgress(currentTime, duration);
                 }
 
