@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.courses import get_course_by_id
+from xmodule.modulestore.django import modulestore
 
 from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
@@ -79,6 +81,66 @@ class LtiSerializer(serializers.ModelSerializer):
         return instance
 
 
+class LegacySettingsSerializer(serializers.BaseSerializer):
+    """
+    Serialize legacy discussions settings
+    """
+    class Meta:
+        fields = [
+            'allow_anonymous',
+            'allow_anonymous_to_peers',
+            'discussion_blackouts',
+            'discussion_topics',
+            # The following fields are deprecated;
+            # they technically still exist in Studio (so we mention them here),
+            # but they are not supported in the new experience:
+            # 'discussion_link',
+            # 'discussion_sort_alpha',
+        ]
+
+    def create(self, validated_data):
+        """
+        We do not need this.
+        """
+        raise NotImplementedError
+
+    def to_internal_value(self, data: dict) -> dict:
+        """
+        Transform the incoming primitive data into a native value
+        """
+        payload = {
+            key: value
+            for key, value in data.items()
+            if key in self.Meta.fields
+        }
+        return payload
+
+    def to_representation(self, instance) -> dict:
+        """
+        Serialize data into a dictionary, to be used as a response
+        """
+        settings = {
+            field.name: field.read_json(instance)
+            for field in instance.fields.values()
+            if field.name in self.Meta.fields
+        }
+        return settings
+
+    def update(self, instance, validated_data: dict):
+        """
+        Update and save an existing instance
+        """
+        save = False
+        for field in self.Meta.fields:
+            if field in validated_data:
+                value = validated_data[field]
+                setattr(instance, field, value)
+                save = True
+        if save:
+            modulestore().update_item(instance, self.context['user_id'])
+        return instance
+
+
 class DiscussionsConfigurationView(APIView):
     """
     Handle configuration-related view-logic
@@ -97,10 +159,15 @@ class DiscussionsConfigurationView(APIView):
         class Meta:
             model = DiscussionsConfiguration
             fields = [
-                'context_key',
                 'enabled',
                 'provider_type',
             ]
+
+        def create(self, validated_data):
+            """
+            We do not need this.
+            """
+            raise NotImplementedError
 
         def to_internal_value(self, data: dict) -> dict:
             """
@@ -125,6 +192,17 @@ class DiscussionsConfigurationView(APIView):
             if supports_lti:
                 lti_configuration = LtiSerializer(instance.lti_configuration)
                 lti_configuration_data = lti_configuration.data
+            provider_type = instance.provider_type or DEFAULT_PROVIDER_TYPE
+            plugin_configuration = instance.plugin_configuration
+            if provider_type == 'legacy':
+                course_key = instance.context_key
+                course = get_course_by_id(course_key)
+                legacy_settings = LegacySettingsSerializer(
+                    course,
+                    data=plugin_configuration,
+                )
+                if legacy_settings.is_valid(raise_exception=True):
+                    plugin_configuration = legacy_settings.data
             payload.update({
                 'features': {
                     'discussion-page',
@@ -133,9 +211,9 @@ class DiscussionsConfigurationView(APIView):
                     'wcag-2.1',
                 },
                 'lti_configuration': lti_configuration_data,
-                'plugin_configuration': instance.plugin_configuration,
+                'plugin_configuration': plugin_configuration,
                 'providers': {
-                    'active': instance.provider_type or DEFAULT_PROVIDER_TYPE,
+                    'active': provider_type or DEFAULT_PROVIDER_TYPE,
                     'available': PROVIDER_FEATURE_MAP,
                 },
             })
@@ -145,18 +223,14 @@ class DiscussionsConfigurationView(APIView):
             """
             Update and save an existing instance
             """
-            keys = [
-                'enabled',
-                'plugin_configuration',
-                'provider_type',
-            ]
-            for key in keys:
+            for key in self.Meta.fields:
                 value = validated_data.get(key)
                 if value is not None:
                     setattr(instance, key, value)
             # _update_* helpers assume `enabled` and `provider_type`
             # have already been set
             instance = self._update_lti(instance, validated_data)
+            instance = self._update_plugin_configuration(instance, validated_data)
             instance.save()
             return instance
 
@@ -180,6 +254,35 @@ class DiscussionsConfigurationView(APIView):
                 instance.lti_configuration = lti_configuration
             return instance
 
+        def _update_plugin_configuration(
+                self,
+                instance: DiscussionsConfiguration,
+                validated_data: dict,
+        ) -> DiscussionsConfiguration:
+            """
+            Create/update legacy provider settings
+            """
+            updated_provider_type = validated_data.get('provider_type') or instance.provider_type
+            will_support_legacy = bool(
+                updated_provider_type == 'legacy'
+            )
+            if will_support_legacy:
+                course_key = instance.context_key
+                course = get_course_by_id(course_key)
+                legacy_settings = LegacySettingsSerializer(
+                    course,
+                    context={
+                        'user_id': self.context['user_id'],
+                    },
+                    data=validated_data.get('plugin_configuration', {}),
+                )
+                if legacy_settings.is_valid(raise_exception=True):
+                    legacy_settings.save()
+                instance.plugin_configuration = {}
+            else:
+                instance.plugin_configuration = validated_data.get('plugin_configuration') or {}
+            return instance
+
     # pylint: disable=redefined-builtin
     def get(self, request, course_key_string: str, **_kwargs) -> Response:
         """
@@ -198,7 +301,14 @@ class DiscussionsConfigurationView(APIView):
         """
         course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
-        serializer = self.Serializer(configuration, data=request.data, partial=True)
+        serializer = self.Serializer(
+            configuration,
+            context={
+                'user_id': request.user.id,
+            },
+            data=request.data,
+            partial=True,
+        )
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data)
