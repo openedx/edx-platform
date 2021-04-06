@@ -10,6 +10,7 @@
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock  # via -r requirements/edx/base.txt
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/base.txt
+-e git+https://github.com/openedx/olxcleaner.git@ff7cff2e770c160793d8f1fef6483d5176868189#egg=olxcleaner  # via -r requirements/edx/base.txt
 -e .  # via -r requirements/edx/base.txt
 -e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock  # via -r requirements/edx/base.txt
@@ -190,7 +191,6 @@ nltk==3.5                 # via -r requirements/edx/base.txt, chem
 nodeenv==1.5.0            # via -r requirements/edx/base.txt
 numpy==1.20.2             # via -r requirements/edx/base.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
-olxcleaner==0.1.4         # via -r requirements/edx/base.txt
 openedx-calc==2.0.1       # via -r requirements/edx/base.txt
 ora2==3.4.0               # via -r requirements/edx/base.txt
 packaging==20.9           # via -r requirements/edx/base.txt, bleach, drf-yasg, pytest, tox
@@ -212,7 +212,7 @@ pycryptodomex==3.10.1     # via -r requirements/edx/base.txt, edx-proctoring, lt
 pygments==2.8.1           # via -r requirements/edx/base.txt, -r requirements/edx/coverage.txt, diff-cover
 pyjwkest==1.4.2           # via -r requirements/edx/base.txt, edx-drf-extensions, lti-consumer-xblock
 pyjwt[crypto]==1.7.1      # via -r requirements/edx/base.txt, drf-jwt, edx-rest-api-client, social-auth-core
-pylatexenc==2.9           # via -r requirements/edx/base.txt, olxcleaner
+pylatexenc==2.10          # via -r requirements/edx/base.txt, olxcleaner
 pylint-celery==0.3        # via edx-lint
 pylint-django==2.4.2      # via edx-lint
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
