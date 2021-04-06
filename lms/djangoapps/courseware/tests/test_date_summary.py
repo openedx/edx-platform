@@ -150,7 +150,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         self.assert_block_types(course, user, expected_blocks)
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_enabled_block_types_with_assignments(self):  # pylint: disable=too-many-statements
         """
         Creates a course with multiple subsections to test all of the different
@@ -309,7 +309,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
                 for html_tag in assignment_title_html:
                     assert html_tag in assignment_title
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @ddt.data(
         ([], 3),
         ([{
@@ -375,7 +375,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
         assert len(blocks) == date_block_count
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_enabled_block_types_with_expired_course(self):
         course = create_course_run(days_till_start=-100)
         user = create_user()
@@ -544,7 +544,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
         {'weeks_to_complete': 4},  # Weeks to complete < time til end (end date not shown)
     )
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_course_end_date_self_paced(self, cr_details):
         """
         In self-paced courses, the end date will now only show up if the learner
@@ -727,7 +727,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     @override_waffle_flag(DISABLE_UNIFIED_COURSE_TAB_FLAG, active=False)
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_dates_tab_link_render(self, url_name, mfe_active):
         """ The dates tab link should only show for enrolled or staff users """
         course = create_course_run()

@@ -7,7 +7,6 @@ from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
-from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -73,16 +72,16 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(
 )
 
 # .. toggle_name: course_experience.relative_dates
-# .. toggle_implementation: ExperimentWaffleFlag
+# .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable relative dates for course content. A 'Dates' tab will be visible in the
-#   course view showing key course dates.
+#   course view showing key course dates. Was previously an ExperimentWaffleFlag with experiment_id=17.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2020-02-10
 # .. toggle_warnings: To set a relative due date for self-paced courses, the weeks_to_complete field for a course run
 #   needs to be set. Currently it can be set through the publisher app.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-27
-RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__, experiment_id=17)
+RELATIVE_DATES_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__)
 
 # .. toggle_name: course_experience.calendar_sync
 # .. toggle_implementation: CourseWaffleFlag
