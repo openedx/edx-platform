@@ -138,7 +138,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
-faker==7.0.1              # via -r requirements/edx/testing.txt, factory-boy
+faker==8.0.0              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
@@ -300,7 +300,7 @@ tincan==1.0.0             # via -r requirements/edx/testing.txt, edx-event-routi
 toml==0.10.2              # via -r requirements/edx/testing.txt, pylint, pytest, tox, vulture
 tox-battery==0.6.1        # via -r requirements/edx/testing.txt
 tox==3.23.0               # via -r requirements/edx/testing.txt, tox-battery
-tqdm==4.59.0              # via -r requirements/edx/testing.txt, nltk
+tqdm==4.60.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.txt
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
