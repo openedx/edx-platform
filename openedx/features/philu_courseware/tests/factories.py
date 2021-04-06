@@ -1,3 +1,6 @@
+"""
+All factories for philu_courseware app
+"""
 import factory
 from opaque_keys.edx.keys import UsageKey
 
@@ -6,7 +9,11 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class CompetencyAssessmentRecordFactory(factory.django.DjangoModelFactory):
-    class Meta:
+    """
+    Factory for competency assessment record model
+    """
+
+    class Meta(object):
         model = CompetencyAssessmentRecord
 
     chapter_id = 'test-chapter'
@@ -23,7 +30,7 @@ class CompetencyAssessmentRecordFactory(factory.django.DjangoModelFactory):
 
 
 class CourseEnrollmentMetaFactory(factory.django.DjangoModelFactory):
-    class Meta:
+    class Meta(object):
         model = CourseEnrollmentMeta
 
     course_enrollment = factory.SubFactory(CourseEnrollmentFactory)

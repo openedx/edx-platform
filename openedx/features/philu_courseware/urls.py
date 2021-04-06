@@ -1,3 +1,6 @@
+"""
+All urls for philu_courseware app
+"""
 from django.conf import settings
 from django.conf.urls import url
 

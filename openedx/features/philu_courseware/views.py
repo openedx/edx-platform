@@ -1,10 +1,9 @@
 """
 Views to add features in courseware.
 """
-
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.django.models import CourseKey, UsageKey
+from opaque_keys.edx.django.models import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.response import Response
@@ -22,14 +21,20 @@ from .serializers import CompetencyAssessmentRecordSerializer
 
 @view_auth_classes(is_authenticated=True)
 class CompetencyAssessmentAPIView(APIView):
-    """Competency assessment APIs to save user attempts and get assessment scores"""
+    """
+    Competency assessment APIs to save user attempts and get assessment scores
+    """
 
     def get(self, request, chapter_id):
-        """Return assessment score"""
+        """
+        Return assessment score
+        """
         return self._get_score_response(chapter_id)
 
     def post(self, request, chapter_id):
-        """Save list of competency assessment records and return assessment score or errors"""
+        """
+        Save list of competency assessment records and return assessment score or errors
+        """
         competency_records = request.data
         serializer = CompetencyAssessmentRecordSerializer(data=competency_records, many=True, context={
             'request': request
@@ -40,16 +45,31 @@ class CompetencyAssessmentAPIView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def _get_score_response(self, chapter_id, status=status.HTTP_200_OK):
+    def _get_score_response(self, chapter_id, http_status=status.HTTP_200_OK):
+        """
+        Return response based on score got from competency assessment record
+        """
         score = CompetencyAssessmentRecord.objects.get_score(self.request.user, chapter_id)
-        return Response(score, status=status)
+        return Response(score, status=http_status)
 
 
 @view_auth_classes(is_authenticated=True)
 class RevertPostAssessmentAttemptsAPIView(APIView):
-    """Revert user post assessment attempts API"""
+    """
+    Revert user post assessment attempts API
+    """
 
     def post(self, request, course_id):
+        """
+        Post API call for revert user post assessment attempts
+
+        Args:
+            request(`Request`): The Django Request object
+            course_id (str): Course id
+
+        Returns:
+            HttpResponse: Response with status code
+        """
         user = request.user
         problem_id = request.data.get('problem_id')
         validated_problem_id = validate_problem_id(problem_id)

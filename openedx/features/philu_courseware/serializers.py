@@ -1,3 +1,6 @@
+"""
+All Serializers for philu_courseware app
+"""
 from rest_framework import serializers
 
 from .helpers import validate_problem_id
@@ -5,6 +8,10 @@ from .models import CompetencyAssessmentRecord
 
 
 class CompetencyAssessmentRecordSerializer(serializers.ModelSerializer):
+    """
+    Serializer for model CompetencyAssessmentRecord
+    """
+
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     def validate_problem_id(self, problem_id):

@@ -1,3 +1,6 @@
+"""
+All models for philu_courseware app
+"""
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -16,6 +19,10 @@ from .constants import (
 
 
 class CompetencyAssessmentManager(models.Manager):
+    """
+    Manager for model CompetencyAssessmentRecord
+    """
+
     def revert_user_post_assessment_attempts(self, user, problem_id):
         post_assessment_records = self.get_queryset().filter(problem_id=problem_id, user=user, assessment_type='post')
         delete_result = post_assessment_records.delete()
@@ -48,8 +55,8 @@ class CompetencyAssessmentManager(models.Manager):
 
         """
             Sample result of upper query. This Query will return results of problems from latest attempt
-            for both "Pre" and "Post" assessments. All attempts are saved in our table and we are concerned only with the
-            latest one, hence sub query provides us the latest attempt of all problems
+            for both "Pre" and "Post" assessments. All attempts are saved in our table and we are concerned only with
+            the latest one, hence sub query provides us the latest attempt of all problems
 
             |  id   | assessment_count | assessment_type   |  correctness  |
             +-------+------------------+-------------------+---------------+
@@ -57,7 +64,7 @@ class CompetencyAssessmentManager(models.Manager):
             |  229  |         4        |       pre         |   correct     |
             |  232  |         1        |       post        |   incorrect   |
             |  233  |         1        |       pre         |   incorrect   |
-        """
+        """  # pylint: disable=pointless-string-statement
 
         for assessment in assessment_records:
             if assessment.assessment_type == PRE_ASSESSMENT_KEY:
@@ -81,6 +88,10 @@ class CompetencyAssessmentManager(models.Manager):
 
 
 class CompetencyAssessmentRecord(TimeStampedModel):
+    """
+    Model for storing competency assessment records
+    """
+
     chapter_id = models.TextField(max_length=255)
     problem_id = UsageKeyField(max_length=255)
     problem_text = models.TextField(null=False)
@@ -108,6 +119,16 @@ class CompetencyAssessmentRecord(TimeStampedModel):
 
 
 class CourseEnrollmentMeta(models.Model):
+    """
+    A model to establish linkages between course enrollment and specialisation through which it is being enrolled in
+    """
+
     course_enrollment = models.OneToOneField(CourseEnrollment, related_name='course_enrollment_meta',
                                              related_query_name='course_enrollment_meta', on_delete=models.CASCADE)
     program_uuid = models.UUIDField(null=True, blank=True, verbose_name=_('Program UUID'))
+
+    def __unicode__(self):
+        return 'Program {program_uuid}, {course_id}'.format(
+            program_uuid=self.program_uuid,
+            course_id=self.course_enrollment.course_id,
+        )

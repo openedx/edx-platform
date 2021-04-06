@@ -1,3 +1,6 @@
+"""
+Admin configurations for philu_courseware app
+"""
 from django.contrib import admin
 
 from .models import CompetencyAssessmentRecord, CourseEnrollmentMeta
