@@ -69,6 +69,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -1329,16 +1330,13 @@ def grading_handler(request, course_key_string, grader_index=None):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def teamset_handler(request, course_key_string, grader_index=None):
+def teamset_handler(request, course_key_string):
     """
-    Course Grading policy configuration
-    GET
-        html: get the page
-        json no grader_index: get the CourseGrading model (graceperiod, cutoffs, and graders)
-        json w/ grader_index: get the specific grader
-    PUT
-        json no grader_index: update the Course through the CourseGrading model
-        json w/ grader_index: create or update the specific grader (create if index out of range)
+    Course Team Set handler
+
+    GET: get the edit page
+        TODO: Add json response, returning teamset config
+    POST/PUT: set the teamset config for course
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
