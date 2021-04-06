@@ -148,6 +148,8 @@ urlpatterns = [
         name='settings_handler'),
     url(fr'^settings/grading/{settings.COURSE_KEY_PATTERN}(/)?(?P<grader_index>\d+)?$',
         contentstore_views.grading_handler, name='grading_handler'),
+    url(fr'^settings/teams_config/{settings.COURSE_KEY_PATTERN}(/)?$',
+        contentstore_views.teamset_handler, name='teamset_handler'),
     url(fr'^settings/advanced/{settings.COURSE_KEY_PATTERN}$', contentstore_views.advanced_settings_handler,
         name='advanced_settings_handler'),
     url(fr'^textbooks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.textbooks_list_handler,

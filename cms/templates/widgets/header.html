@@ -36,6 +36,7 @@
             export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(course_key)})
             settings_url = reverse('settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
             grading_url = reverse('grading_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            teams_url = reverse('teamset_handler', kwargs={'course_key_string': six.text_type(course_key)})
             advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
             tabs_url = reverse('tabs_handler', kwargs={'course_key_string': six.text_type(course_key)})
             certificates_url = ''
@@ -97,6 +98,9 @@
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${grading_url}">${_("Grading")}</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-teams">
+                    <a href="${teams_url}">${_("Teams Configuration")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
                     <a href="${course_team_url}">${_("Course Team")}</a>
