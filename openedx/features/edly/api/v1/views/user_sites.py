@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from lms.djangoapps.mobile_api.decorators import mobile_view
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.edly.api.serializers import UserSiteSerializer
 
 
@@ -52,6 +53,11 @@ class UserSitesViewSet(viewsets.ViewSet):
         user_sites = []
         for edly_sub_org_of_user in edly_sub_orgs_of_user.all():
             context['edly_sub_org_of_user'] = edly_sub_org_of_user
+            site_configuration = SiteConfiguration.get_configuration_for_org(
+                edly_sub_org_of_user.edx_organization.short_name
+            )
+            site_configuration = site_configuration.__dict__.get('site_values', {}) if site_configuration else {}
+            context['site_configuration'] = site_configuration
             serializer = self.serializer({}, context=context)
             user_sites.append(
                 serializer.data

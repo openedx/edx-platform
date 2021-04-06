@@ -58,6 +58,7 @@ class UserSiteSerializerTests(TestCase):
             enabled=True,
             site_values=self.test_site_configuration,
         )
+        self.context['site_configuration'] = self.site_configuration.site_values.copy()
 
     def validate_url(self, url):
         """
@@ -101,6 +102,7 @@ class UserSiteSerializerTests(TestCase):
 
         self.site_configuration.site_values['MOBILE_ENABLED'] = False
         self.site_configuration.save()
+        self.context['site_configuration'] = self.site_configuration.site_values.copy()
         serializer = self.serializer({}, context=self.context)
 
         assert not serializer.data['app_config']
@@ -110,7 +112,6 @@ class UserSiteSerializerTests(TestCase):
         Verify that `site_data` returns correct value.
         """
         serializer = self.serializer({}, context=self.context)
-
         for branding_key, branding_value in self.test_site_configuration['BRANDING'].items():
             assert branding_value == serializer.data['site_data'].get(branding_key)
 
@@ -137,6 +138,7 @@ class UserSiteSerializerTests(TestCase):
 
         self.site_configuration.site_values['MOBILE_ENABLED'] = False
         self.site_configuration.save()
+        self.context['site_configuration'] = self.site_configuration.site_values.copy()
         serializer = self.serializer({}, context=self.context)
 
         assert not serializer.data['mobile_enabled']

@@ -5,8 +5,6 @@ import json
 
 from rest_framework import serializers
 
-from openedx.core.djangoapps.site_configuration.helpers import get_value_for_org
-
 from openedx.features.edly.utils import get_marketing_link
 
 
@@ -23,16 +21,8 @@ class UserSiteSerializer(serializers.Serializer):
         Returns mobile specific data of a site using site configuration
         """
         if self.get_mobile_enabled(obj):
-            mobile_app_config = get_value_for_org(
-                self.context['edly_sub_org_of_user'].edx_organization.short_name,
-                'MOBILE_APP_CONFIG',
-                default={}
-            )
-            url = get_value_for_org(
-                self.context['edly_sub_org_of_user'].edx_organization.short_name,
-                'SITE_NAME',
-                default=''
-            )
+            mobile_app_config = self.context['site_configuration'].get('MOBILE_APP_CONFIG', {})
+            url = self.context['site_configuration'].get('SITE_NAME', '')
             protocol = 'https' if self.context['request'].is_secure() else 'http'
             mobile_app_config['API_HOST_URL'] = '{}://{}'.format(protocol, url) if url else ''
             mobile_app_config['ORGANIZATION_CODE'] = self.context['edly_sub_org_of_user'].edx_organization.short_name
@@ -42,34 +32,11 @@ class UserSiteSerializer(serializers.Serializer):
         """
         Returns site relevant data from site configuration
         """
-        site_data = get_value_for_org(
-            self.context['edly_sub_org_of_user'].edx_organization.short_name,
-            'BRANDING',
-            default={}
-        )
-        site_data.update(
-            get_value_for_org(
-                self.context['edly_sub_org_of_user'].edx_organization.short_name,
-                'COLORS',
-                default={}
-            )
-        )
+        site_data = self.context['site_configuration'].get('BRANDING', {}).copy()
+        site_data.update(self.context['site_configuration'].get('COLORS', {}))
         site_data['display_name'] = self.context['edly_sub_org_of_user'].lms_site.name
-        url = get_value_for_org(
-            self.context['edly_sub_org_of_user'].edx_organization.short_name,
-            'SITE_NAME',
-            default=''
-        )
-        site_data['contact_email'] = get_value_for_org(
-            self.context['edly_sub_org_of_user'].edx_organization.short_name,
-            'contact_email',
-            default=''
-        )
-        marketing_urls = get_value_for_org(
-            self.context['edly_sub_org_of_user'].edx_organization.short_name,
-            'MKTG_URLS',
-            default={}
-        )
+        site_data['contact_email'] = self.context['site_configuration'].get('contact_email', '')
+        marketing_urls = self.context['site_configuration'].get('MKTG_URLS', {})
         site_data['site_url'] = marketing_urls.get('ROOT')
         site_data['tos'] = get_marketing_link(marketing_urls, 'TOS')
         site_data['honor'] = get_marketing_link(marketing_urls, 'HONOR')
@@ -80,9 +47,4 @@ class UserSiteSerializer(serializers.Serializer):
         """
         Returns mobile_enabled flag
         """
-        mobile_enabled = get_value_for_org(
-            self.context['edly_sub_org_of_user'].edx_organization.short_name,
-            'MOBILE_ENABLED',
-            default=False
-        )
-        return mobile_enabled
+        return self.context['site_configuration'].get('MOBILE_ENABLED', False)
