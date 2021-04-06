@@ -58,12 +58,17 @@ class TestEnterpriseUtils(TestCase):
     def test_get_data_consent_share_cache_key(self, mock_get_cache_key):
         expected_cache_key = mock_get_cache_key.return_value
 
-        assert expected_cache_key == get_data_consent_share_cache_key('some-user-id', 'some-course-id')
+        assert expected_cache_key == get_data_consent_share_cache_key(
+            'some-user-id',
+            'some-course-id',
+            '1a9cae8f-abb7-4336-b075-6ff32ecf73de'
+        )
 
         mock_get_cache_key.assert_called_once_with(
             type='data_sharing_consent_needed',
             user_id='some-user-id',
             course_id='some-course-id',
+            enterprise_customer_uuid='1a9cae8f-abb7-4336-b075-6ff32ecf73de'
         )
 
     @mock.patch('openedx.features.enterprise_support.utils.get_cache_key')
@@ -71,13 +76,15 @@ class TestEnterpriseUtils(TestCase):
     def test_clear_data_consent_share_cache(self, mock_tiered_cache, mock_get_cache_key):
         user_id = 'some-user-id'
         course_id = 'some-course-id'
+        enterprise_customer_uuid = '1a9cae8f-abb7-4336-b075-6ff32ecf73de'
 
-        clear_data_consent_share_cache(user_id, course_id)
+        clear_data_consent_share_cache(user_id, course_id, enterprise_customer_uuid)
 
         mock_get_cache_key.assert_called_once_with(
             type='data_sharing_consent_needed',
             user_id='some-user-id',
             course_id='some-course-id',
+            enterprise_customer_uuid=enterprise_customer_uuid
         )
         mock_tiered_cache.delete_all_tiers.assert_called_once_with(mock_get_cache_key.return_value)
 

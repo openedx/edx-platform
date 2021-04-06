@@ -26,12 +26,20 @@ from common.djangoapps.student.helpers import get_next_url_for_login_page
 ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
 
 
-def get_data_consent_share_cache_key(user_id, course_id):
+def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):
     """
-        Returns cache key for data sharing consent needed against user_id and course_id
+        Returns cache key for data sharing consent needed against user_id, course_id and enterprise_customer_uuid
     """
+    cache_key_params = dict(
+        type='data_sharing_consent_needed',
+        user_id=user_id,
+        course_id=course_id,
+    )
 
-    return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+    if enterprise_customer_uuid:
+        cache_key_params['enterprise_customer_uuid'] = enterprise_customer_uuid
+
+    return get_cache_key(**cache_key_params)
 
 
 def get_is_enterprise_cache_key(user_id):
@@ -41,11 +49,11 @@ def get_is_enterprise_cache_key(user_id):
     return get_cache_key(type='is_enterprise_learner', user_id=user_id)
 
 
-def clear_data_consent_share_cache(user_id, course_id):
+def clear_data_consent_share_cache(user_id, course_id, enterprise_customer_uuid):
     """
         clears data_sharing_consent_needed cache
     """
-    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid)
     TieredCache.delete_all_tiers(consent_cache_key)
 
 
