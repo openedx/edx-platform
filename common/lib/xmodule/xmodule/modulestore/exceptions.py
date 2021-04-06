@@ -110,7 +110,7 @@ class InvalidBranchSetting(Exception):
 
 class InvalidProctoringProvider(Exception):
     """
-    Raised when the selected proctoring provider is not in the settings.
+    Error with selected proctoring provider raised when the provided is unknown.
     """
 
     def __init__(self, proctoring_provider, available_providers):

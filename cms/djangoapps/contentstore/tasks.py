@@ -612,10 +612,12 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         set_custom_attribute('course_import_completed', True)
     except Exception as exception:  # pylint: disable=broad-except
         msg = str(exception)
-        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {msg}')
+        status_msg = _('Unknown error while importing course.')
+        if isinstance(exception, InvalidProctoringProvider):
+            status_msg = msg
+        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {str(exception)}')
         if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(msg if isinstance(exception, InvalidProctoringProvider)
-                             else _('Unknown error while importing course.'))
+            self.status.fail(status_msg)
         monitor_import_failure(courselike_key, current_step, exception=exception)
     finally:
         if course_dir.isdir():
