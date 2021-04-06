@@ -375,8 +375,10 @@ class VideoBlock(
         completion_service = self.runtime.service(self, 'completion')
         if completion_service:
             completion_enabled = completion_service.completion_tracking_enabled()
+            progress_tracking_enabled = completion_service.progress_tracking_enabled()
         else:
             completion_enabled = False
+            progress_tracking_enabled = False
 
         # This is the setting that controls whether the autoadvance button will be visible, not whether the
         # video will autoadvance or not.
@@ -418,6 +420,7 @@ class VideoBlock(
             'poster': poster,
             'prioritizeHls': self.prioritize_hls(self.youtube_streams, sources),
             'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', '').rstrip('?'),
+            'progressTrackingEnabled': progress_tracking_enabled,
             # This is the server's guess at whether youtube is available for
             # this user, based on what was recorded the last time we saw the
             # user, and defaulting to True.
