@@ -2,6 +2,7 @@
 Tasks for Mandrill client
 """
 import logging
+from collections import defaultdict
 
 from celery.task import task
 
@@ -27,13 +28,10 @@ def task_send_mandrill_email(template, emails, context):
     """
     log.info(f'Sending an email using template: {template} to accounts: {emails}, from inside task_send_mandrill_email')
 
-    template_to_email_adresses_map = {}
+    template_to_email_adresses_map = defaultdict(list)
     for email in emails:
         template_slug = add_user_preferred_language_to_template_slug(template, email)
-        if template_to_email_adresses_map.get(template_slug, None):
-            template_to_email_adresses_map[template_slug].append({'email': email})
-        else:
-            template_to_email_adresses_map[template_slug] = [{'email': email}]
+        template_to_email_adresses_map[template_slug].append({'email': email})
 
     for template_slug, recipient_emails in template_to_email_adresses_map.items():
         MandrillClient().send_mandrill_email(template_slug, recipient_emails, context)
