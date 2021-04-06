@@ -12,6 +12,7 @@
             state = jasmine.initializePlayer({
                 recordedYoutubeIsAvailable: true,
                 completionEnabled: true,
+                progressTrackingEnabled: false,
                 publishCompletionUrl: 'https://example.com/publish_completion_url'
             });
             state.completionHandler.completeAfterTime = 20;
@@ -68,34 +69,89 @@
             expect(state.completionHandler.markCompletion).toHaveBeenCalled();
         });
 
-        it('triggers progress', function(done) {
-            var duration = 0;
-            jasmine.waitUntil(function() {
-                duration = state.videoPlayer.duration();
-                return duration > 0;
-            }).then(function() {
-                spyOn(state.completionHandler, 'computeProgress').and.callThrough();
-                spyOn(state.completionHandler, 'triggerProgress').and.callThrough();
-                // 4 percents should be equivalent to 0
-                time = 4 * duration / 100;
-                state.el.trigger('timeupdate', time);
-                expect(state.completionHandler.computeProgress).toHaveBeenCalled();
-                expect(state.completionHandler.triggerProgress).toHaveBeenCalled();
-                state.completionHandler.computeProgress.calls.reset();
-                state.completionHandler.triggerProgress.calls.reset();
-                // 8 percents should be equivalent to 5
-                time = 8 * duration / 100;
-                state.el.trigger('timeupdate', time);
-                expect(state.completionHandler.computeProgress).toHaveBeenCalled();
-                expect(state.completionHandler.triggerProgress).toHaveBeenCalled();
-                state.completionHandler.computeProgress.calls.reset();
-                state.completionHandler.triggerProgress.calls.reset();
-                // Another timeupdate in the same 5-range should not trigger "triggerProgress"
-                time = 9 * duration / 100;
-                state.el.trigger('timeupdate', time);
-                expect(state.completionHandler.computeProgress).toHaveBeenCalled();
-                expect(state.completionHandler.triggerProgress).not.toHaveBeenCalled();
-            }).always(done);
+        describe('when isProgressTrackingEnabled is false', function() {
+            it('does not call progress', function(done) {
+                var duration = 0;
+                jasmine.waitUntil(function() {
+                    duration = state.videoPlayer.duration();
+                    return duration > 0;
+                }).then(function() {
+                    spyOn(state.completionHandler, 'computeProgress').and.callThrough();
+                    spyOn(state.completionHandler, 'triggerProgress').and.callThrough();
+                    // 4 percents should be equivalent to 0
+                    time = 4 * duration / 100;
+                    state.el.trigger('timeupdate', time);
+                    expect(state.completionHandler.computeProgress).not.toHaveBeenCalled();
+                    expect(state.completionHandler.triggerProgress).not.toHaveBeenCalled();
+                    state.completionHandler.computeProgress.calls.reset();
+                    state.completionHandler.triggerProgress.calls.reset();
+                    // 8 percents should be equivalent to 5
+                    time = 8 * duration / 100;
+                    state.el.trigger('timeupdate', time);
+                    expect(state.completionHandler.computeProgress).not.toHaveBeenCalled();
+                    expect(state.completionHandler.triggerProgress).not.toHaveBeenCalled();
+                    state.completionHandler.computeProgress.calls.reset();
+                    state.completionHandler.triggerProgress.calls.reset();
+                }).always(done);
+            });
+        });
+        
+        describe('when isProgressTrackingEnabled is true', function() {
+            beforeEach(function() {
+                oldOTBD = window.onTouchBasedDevice;
+                window.onTouchBasedDevice = jasmine
+                    .createSpy('onTouchBasedDevice')
+                    .and.returnValue(null);
+    
+                state = jasmine.initializePlayer({
+                    recordedYoutubeIsAvailable: true,
+                    completionEnabled: true,
+                    progressTrackingEnabled: true,
+                    publishCompletionUrl: 'https://example.com/publish_completion_url'
+                });
+                state.completionHandler.completeAfterTime = 20;
+    
+                completionAjaxCall = {
+                    url: state.config.publishCompletionUrl,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({completion: 1.0}),
+                    success: jasmine.any(Function),
+                    error: jasmine.any(Function)
+                };
+            });
+
+            it('call the progress', function(done) {
+                var duration = 0;
+                
+                jasmine.waitUntil(function() {
+                    duration = state.videoPlayer.duration();
+                    return duration > 0;
+                }).then(function() {
+                    spyOn(state.completionHandler, 'computeProgress').and.callThrough();
+                    spyOn(state.completionHandler, 'triggerProgress').and.callThrough();
+                    // 4 percents should be equivalent to 0
+                    time = 4 * duration / 100;
+                    state.el.trigger('timeupdate', time);
+                    expect(state.completionHandler.computeProgress).toHaveBeenCalled();
+                    expect(state.completionHandler.triggerProgress).toHaveBeenCalled();
+                    state.completionHandler.computeProgress.calls.reset();
+                    state.completionHandler.triggerProgress.calls.reset();
+                    // 8 percents should be equivalent to 5
+                    time = 8 * duration / 100;
+                    state.el.trigger('timeupdate', time);
+                    expect(state.completionHandler.computeProgress).toHaveBeenCalled();
+                    expect(state.completionHandler.triggerProgress).toHaveBeenCalled();
+                    state.completionHandler.computeProgress.calls.reset();
+                    state.completionHandler.triggerProgress.calls.reset();
+                    // Another timeupdate in the same 5-range should not trigger "triggerProgress"
+                    time = 9 * duration / 100;
+                    state.el.trigger('timeupdate', time);
+                    expect(state.completionHandler.computeProgress).toHaveBeenCalled();
+                    expect(state.completionHandler.triggerProgress).not.toHaveBeenCalled();
+                }).always(done);
+            });
         });
     });
 }).call(this);
