@@ -285,7 +285,7 @@ def test_send_application_status_update_email(
 
     UserApplicationADGAdmin._send_application_status_update_email('self', user_application, TEST_MESSAGE_FOR_APPLICANT)
     mock_send_mandrill_email.delay.assert_called_once_with(
-        expected_email_template, user_application.user.email, expected_email_context
+        expected_email_template, [user_application.user.email], expected_email_context
     )
 
 

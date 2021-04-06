@@ -135,7 +135,7 @@ def send_application_submission_confirmation_email(recipient_email):
     context = {
         'course_catalog_url': course_catalog_url
     }
-    task_send_mandrill_email.delay(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_email, context)
+    task_send_mandrill_email.delay(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, [recipient_email], context)
 
 
 def min_year_value_validator(value):

@@ -405,7 +405,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         }
 
         task_send_mandrill_email.delay(
-            status_email_template_map[application.status], applicant.email, email_context
+            status_email_template_map[application.status], [applicant.email], email_context
         )
 
     def email(self, obj):

@@ -37,7 +37,7 @@ def compose_and_send_adg_activation_email(user, activation_key):
         'activation_link': activation_url
     }
 
-    task_send_mandrill_email(MandrillClient.USER_ACCOUNT_ACTIVATION, user.email, context)
+    task_send_mandrill_email(MandrillClient.USER_ACCOUNT_ACTIVATION, [user.email], context)
 
 
 def compose_and_send_adg_password_reset_email(user, request):
@@ -65,7 +65,7 @@ def compose_and_send_adg_password_reset_email(user, request):
         'reset_link': reset_link
     }
 
-    task_send_mandrill_email(MandrillClient.PASSWORD_RESET, user.email, context)
+    task_send_mandrill_email(MandrillClient.PASSWORD_RESET, [user.email], context)
 
 
 def compose_and_send_adg_update_email_verification(user, use_https, confirm_link):
@@ -90,7 +90,7 @@ def compose_and_send_adg_update_email_verification(user, use_https, confirm_link
         'update_email_link': update_email_link
     }
 
-    task_send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, user.email, context)
+    task_send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, [user.email], context)
 
 
 def compose_and_send_adg_update_email_confirmation(user, context):
@@ -104,7 +104,7 @@ def compose_and_send_adg_update_email_confirmation(user, context):
     Returns:
         None
     """
-    task_send_mandrill_email(MandrillClient.VERIFY_CHANGE_USER_EMAIL, user.email, context)
+    task_send_mandrill_email(MandrillClient.VERIFY_CHANGE_USER_EMAIL, [user.email], context)
 
 
 def compose_and_send_adg_course_enrollment_confirmation_email(user, course_id):
@@ -129,7 +129,7 @@ def compose_and_send_adg_course_enrollment_confirmation_email(user, course_id):
         'course_name': course.display_name,
         'course_url': course_url
     }
-    task_send_mandrill_email.delay(MandrillClient.ENROLLMENT_CONFIRMATION, user.email, context)
+    task_send_mandrill_email.delay(MandrillClient.ENROLLMENT_CONFIRMATION, [user.email], context)
 
 
 def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_context):
@@ -153,4 +153,4 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
         message_context['full_name'] = user.profile.name
 
     message_context.pop('course')
-    task_send_mandrill_email.delay(MandrillClient.COURSE_ENROLLMENT_INVITATION, user_email, message_context)
+    task_send_mandrill_email.delay(MandrillClient.COURSE_ENROLLMENT_INVITATION, [user_email], message_context)
