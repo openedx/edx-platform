@@ -1,6 +1,8 @@
 """
 All models for webinars app
 """
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -75,8 +77,20 @@ class Webinar(TimeStampedModel):
         return self.title
 
     def clean(self):
-        if self.start_time > self.end_time:
+        """
+        Adding custom validation on start & end time and banner size
+        """
+        super().clean()
+
+        if self.start_time and self.start_time < datetime.now():
+            raise ValidationError({'start_time': _('Start date should be in future')})
+
+        if self.end_time and self.end_time < datetime.now():
+            raise ValidationError({'end_time': _('End date should be in future')})
+
+        if self.start_time and self.end_time and self.start_time > self.end_time:
             raise ValidationError({'start_time': _('End date must be greater than start date')})
+
         if self.banner:
             error = validate_file_size(self.banner, BANNER_MAX_SIZE)
             if error:
