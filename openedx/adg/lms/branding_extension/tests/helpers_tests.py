@@ -18,9 +18,7 @@ def test_get_footer_navigation_links(mocker):
     Tests `get_footer_navigation_links` helper method of branding extension
     """
     test_url = 'test_url'
-    test_support_url = 'test_support_url'
     mocker.patch('openedx.adg.lms.branding_extension.helpers.marketing_link', return_value=test_url)
-    mocker.patch('openedx.adg.lms.branding_extension.helpers._build_support_form_url', return_value=test_support_url)
 
     branding_links = get_footer_navigation_links()
     assert len(branding_links) == 4
@@ -38,7 +36,7 @@ def test_get_footer_navigation_links(mocker):
             'title': 'Terms',
         },
         {
-            'url': test_support_url,
+            'url': test_url,
             'title': 'Contact',
         },
     ]
