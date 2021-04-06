@@ -2,10 +2,8 @@
 Tests for site configuration's django models.
 """
 import six
-from urllib.parse import urlsplit
 import unittest
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db import IntegrityError, transaction
 from django.test import TestCase
@@ -162,19 +160,14 @@ class SiteConfigurationTests(TestCase):
             site_values=self.test_config1
         )
 
-        scheme = urlsplit(settings.LMS_ROOT_URL).scheme
-        expected_site_root_url = '{scheme}://{domain}'.format(scheme=scheme, domain=self.domain)
         # Make sure entry is saved and retrieved correctly
         self.assertEqual(site_configuration.get_value("university"), self.test_config1['university'])
         self.assertEqual(site_configuration.get_value("platform_name"), self.test_config1['platform_name'])
-        self.assertEqual(site_configuration.get_value("PLATFORM_NAME"), self.test_config1['platform_name'])
         self.assertEqual(site_configuration.get_value("SITE_NAME"), self.test_config1['SITE_NAME'])
         self.assertEqual(site_configuration.get_value("course_org_filter"), self.test_config1['course_org_filter'])
         self.assertEqual(site_configuration.get_value("css_overrides_file"), self.test_config1['css_overrides_file'])
         self.assertEqual(site_configuration.get_value("ENABLE_MKTG_SITE"), self.test_config1['ENABLE_MKTG_SITE'])
         self.assertEqual(site_configuration.get_value("favicon_path"), self.test_config1['favicon_path'])
-        self.assertEqual(site_configuration.get_value("LMS_ROOT_URL"), expected_site_root_url)
-
         self.assertEqual(
             site_configuration.get_value("ENABLE_THIRD_PARTY_AUTH"),
             self.test_config1['ENABLE_THIRD_PARTY_AUTH'],
@@ -310,15 +303,6 @@ class SiteConfigurationTests(TestCase):
                 "platform_name",
                 "dummy-default-value"),
             "dummy-default-value",
-        )
-        # Test that LMS_ROOT_URL is assigned to the SiteConfiguration on creation
-        scheme = urlsplit(settings.LMS_ROOT_URL).scheme
-        expected_site_root_url = '{scheme}://{domain}'.format(scheme=scheme,
-                                                              domain=self.domain)
-        self.assertEqual(
-            SiteConfiguration.get_value_for_org(
-                self.test_config1['course_org_filter'], 'LMS_ROOT_URL'),
-            expected_site_root_url
         )
 
     def test_get_site_for_org(self):
