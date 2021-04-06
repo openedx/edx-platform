@@ -26,7 +26,6 @@ be true at the time the certificate is generated:
 
 * The user must have an approved, unexpired, ID verification
 * The user must not have an invalidated certificate for the course run (see the *CertificateInvalidation* model)
-* Automatic certificate generation must be globally enabled
 * HTML (web) certificates must be globally enabled, and also enabled for the course run
 * The user must have passed the course run
 * The user must not be a beta tester in the course run

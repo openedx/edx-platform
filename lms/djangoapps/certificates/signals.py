@@ -57,13 +57,13 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
     """
     Listen for a user being added to or modified on the whitelist (allowlist)
     """
+    if not auto_certificate_generation_enabled():
+        return
+
     if is_using_certificate_allowlist_and_is_on_allowlist(instance.user, instance.course_id):
         log.info(f'{instance.course_id} is using allowlist certificates, and the user {instance.user.id} is now on '
                  f'its allowlist. Attempt will be made to generate an allowlist certificate.')
         return generate_allowlist_certificate_task(instance.user, instance.course_id)
-
-    if not auto_certificate_generation_enabled():
-        return
 
     if _fire_ungenerated_certificate_task(instance.user, instance.course_id):
         log.info('Certificate generation task initiated for {user} : {course} via whitelist'.format(
@@ -78,13 +78,13 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED
     """
+    if not auto_certificate_generation_enabled():
+        return
+
     if can_generate_certificate_task(user, course_id):
         log.info(f'{course_id} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'{user.id} as a passing grade was received.')
         return generate_certificate_task(user, course_id)
-
-    if not auto_certificate_generation_enabled():
-        return
 
     if _fire_ungenerated_certificate_task(user, course_id):
         log.info('Certificate generation task initiated for {user} : {course} via passing grade'.format(
