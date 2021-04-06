@@ -27,51 +27,63 @@ const typeValue = (type) => {
   return 'open';
 };
 
-const TeamSet = ({ uniqueTeamSetId, teamSetId, displayName, description, type, maxSize, handleTeamSetChange, handleDeleteTeamSet }) => (
-  <div className="teamset field">
-    <InputText
-      name="teamSetId"
-      label="Team Set ID"
-      value={teamSetId}
-      onChange={(targetValue, targetName) => handleTeamSetChange(targetValue, targetName, uniqueTeamSetId)} // Paragon.asInput calls onChange with these params
-    />
-    <br />
-    <InputText
-      name="displayName"
-      label="Display Name"
-      value={displayName}
-      onChange={(targetValue, targetName) => handleTeamSetChange(targetValue, targetName, uniqueTeamSetId)}
-    />
-    <br />
-    <InputText
-      name="description"
-      label="Description"
-      value={description}
-      onChange={(targetValue, targetName) => handleTeamSetChange(targetValue, targetName, uniqueTeamSetId)}
-    />
-    <br />
-    <InputSelect
-      name="type"
-      label="Teamset Type"
-      value={typeValue(type)}
-      options={typeValues}
-      onChange={(targetValue, targetName) => handleTeamSetChange(targetValue, targetName, uniqueTeamSetId)}
-    />
-    <br />
-    <InputText
-      name="maxSize"
-      label="Max Team Size"
-      value={maxSize}
-      onChange={(targetValue, targetName) => handleTeamSetChange(targetValue, targetName, uniqueTeamSetId)}
-    />
-    <br />
-    <Button
-      name="deleteTeamSet"
-      label="Delete"
-      onClick={() => handleDeleteTeamSet(uniqueTeamSetId)}
-    />
-  </div>
+const TeamSet = ({
+  uniqueTeamSetId,
+  teamSetId,
+  displayName,
+  description,
+  type,
+  maxSize,
+  handleTeamSetChange,
+  handleDeleteTeamSet,
+}) => {
+  const handleChange = (value, name) => handleTeamSetChange(value, name, uniqueTeamSetId);
+  return (
+    <div className="teamset field">
+      <InputText
+        name="teamSetId"
+        label="Team Set ID"
+        value={teamSetId}
+        onChange={handleChange}
+      />
+      <br />
+      <InputText
+        name="displayName"
+        label="Display Name"
+        value={displayName}
+        onChange={handleChange}
+      />
+      <br />
+      <InputText
+        name="description"
+        label="Description"
+        value={description}
+        onChange={handleChange}
+      />
+      <br />
+      <InputSelect
+        name="type"
+        label="Teamset Type"
+        value={typeValue(type)}
+        options={typeValues}
+        onChange={handleChange}
+      />
+      <br />
+      <InputText
+        name="maxSize"
+        label="Max Team Size"
+        value={maxSize}
+        onChange={handleChange}
+      />
+      <br />
+      <Button
+        name="deleteTeamSet"
+        label="Delete"
+        onClick={() => handleDeleteTeamSet(uniqueTeamSetId)}
+      />
+    </div>
   );
+};
 TeamSet.propTypes = {
   uniqueTeamSetId: PropTypes.string.isRequired,
   teamSetId: PropTypes.string,

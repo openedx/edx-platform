@@ -127,7 +127,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
-           'teamset_handler',]
+           'teamset_handler']
 
 WAFFLE_NAMESPACE = 'studio_home'
 
@@ -1323,6 +1323,7 @@ def grading_handler(request, course_key_string, grader_index=None):
             elif request.method == "DELETE" and grader_index is not None:
                 CourseGradingModel.delete_grader(course_key, grader_index, request.user)
                 return JsonResponse()
+
 
 @login_required
 @ensure_csrf_cookie
