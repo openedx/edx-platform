@@ -15,7 +15,7 @@ import pytest
 import ddt
 from ccx_keys.locator import CCXBlockUsageLocator
 from django.core.cache import InvalidCacheBackendError, caches
-from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId, VersionTree
+from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId
 from path import Path as path
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
@@ -772,38 +772,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert BlockKey('problem', 'problem3_2') in block_map
 
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_course_successors(self, _from_json):
-        """
-        get_course_successors(course_locator, version_history_depth=1)
-        """
-        locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
-        course = modulestore().get_course(locator)
-        versions = [course.location.version_guid, course.previous_version]
-        locator = CourseLocator(version_guid=course.previous_version)
-        course = modulestore().get_course(locator)
-        versions.append(course.previous_version)
-
-        locator = CourseLocator(version_guid=course.previous_version)
-        result = modulestore().get_course_successors(locator)
-        assert isinstance(result, VersionTree)
-        assert result.locator.org is None
-        assert result.locator.version_guid == versions[(- 1)]
-        assert len(result.children) == 1
-        assert result.children[0].locator.version_guid == versions[(- 2)]
-        assert len(result.children[0].children) == 0, 'descended more than one level'
-
-        result = modulestore().get_course_successors(locator, version_history_depth=2)
-        assert len(result.children) == 1
-        assert result.children[0].locator.version_guid == versions[(- 2)]
-        assert len(result.children[0].children) == 1
-
-        result = modulestore().get_course_successors(locator, version_history_depth=99)
-        assert len(result.children) == 1
-        assert result.children[0].locator.version_guid == versions[(- 2)]
-        assert len(result.children[0].children) == 1
-        assert result.children[0].children[0].locator.version_guid == versions[0]
-
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_persist_dag(self, _from_json):
         """
         try saving temporary xblocks
@@ -847,78 +815,6 @@ class SplitModuleCourseTests(SplitModuleTest):
         persisted_problem.display_name = 'altered problem'
         persisted_problem = modulestore().update_item(persisted_problem, TEST_OTHER_USER_ID)
         assert persisted_problem.display_name == 'altered problem'
-
-    @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
-    def test_block_generations(self, _from_json):
-        """
-        Test get_block_generations
-        """
-        test_course = modulestore().create_course(
-            org='edu.harvard',
-            course='history',
-            run='hist101',
-            display_name='history test course',
-            user_id='testbot',
-            master_branch=ModuleStoreEnum.BranchName.draft
-        )
-        chapter = modulestore().create_child(
-            None, test_course.location,
-            block_type='chapter',
-            block_id='chapter1',
-            fields={'display_name': 'chapter 1'}
-        )
-        sub = modulestore().create_child(
-            None, chapter.location,
-            block_type='vertical',
-            block_id='subsection1',
-            fields={'display_name': 'subsection 1'}
-        )
-        first_problem = modulestore().create_child(
-            None, sub.location,
-            block_type='problem',
-            block_id='problem1',
-            fields={'display_name': 'problem 1', 'data': '<problem></problem>'}
-        )
-        first_problem.max_attempts = 3
-        first_problem.save()  # decache the above into the kvs
-        updated_problem = modulestore().update_item(first_problem, 'testbot')
-        assert updated_problem.previous_version is not None
-        assert updated_problem.previous_version == first_problem.update_version
-        assert updated_problem.update_version != first_problem.update_version
-        modulestore().delete_item(updated_problem.location, 'testbot')
-
-        second_problem = modulestore().create_child(
-            None, sub.location.version_agnostic(),
-            block_type='problem',
-            block_id='problem2',
-            fields={'display_name': 'problem 2', 'data': '<problem></problem>'}
-        )
-
-        # The draft course root has 2 revisions: the published revision, and then the subsequent
-        # changes to the draft revision
-        version_history = modulestore().get_block_generations(test_course.location)
-        assert version_history is not None
-        assert version_history.locator.version_guid == test_course.location.version_guid
-        assert len(version_history.children) == 1
-        assert version_history.children[0].children == []
-        assert version_history.children[0].locator.version_guid == chapter.location.version_guid
-
-        # sub changed on add, add problem, delete problem, add problem in strict linear seq
-        version_history = modulestore().get_block_generations(sub.location)
-        assert len(version_history.children) == 1
-        assert len(version_history.children[0].children) == 1
-        assert len(version_history.children[0].children[0].children) == 1
-        assert len(version_history.children[0].children[0].children[0].children) == 0
-
-        # first and second problem may show as same usage_id; so, need to ensure their histories are right
-        version_history = modulestore().get_block_generations(updated_problem.location)
-        assert version_history.locator.version_guid == first_problem.location.version_guid
-        assert len(version_history.children) == 1
-        # updated max_attempts
-        assert len(version_history.children[0].children) == 0
-
-        version_history = modulestore().get_block_generations(second_problem.location)
-        assert version_history.locator.version_guid != first_problem.location.version_guid
 
     @ddt.data(
         ("course-v1:edx+test_course+test_run", BlockUsageLocator),
