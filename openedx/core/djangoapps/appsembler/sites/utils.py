@@ -1173,7 +1173,7 @@ def _get_initial_page_elements():
                                     "margin-top": "marg-t-0",
                                     "margin-left": "marg-l-0",
                                     "text-content": {
-                                        "en": "We're here to support you"
+                                        "en": "We've got you covered."
                                     },
                                     "font-family": "font--primary--bold",
                                     "text-alignment": "text-align--left"
@@ -1201,7 +1201,7 @@ def _get_initial_page_elements():
                                 "element-path": "page-builder/elements/_content-block.html",
                                 "options": {
                                     "content": {
-                                        "en": "<p>We recommend you take a look at our <a title=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\" href=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\">How to Author Your First Open edX Course in 30 Minutes</a> blog post and the <a title=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\" href=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\">30 minute tutorial video from our Webinar</a>!</p>\n<p>For more, visit our <a title=\"http://help.appsembler.com/\" href=\"http://help.appsembler.com/\">Appsembler knowledge base</a>.</p>\n<p>If you run into any issues or have any questions about using our product, please feel free to contact our support team via <a title=\"mailto:support@appsembler.com\" href=\"mailto:support@appsembler.com\"><strong>support@appsembler.com</strong></a>!</p>"
+                                        "en": "<ul><li>The <a href='https://academy.appsembler.com/' target='_blank'>Appsembler Academy</a> is the home of Appsembler's own courses, including <a href='https://academy.appsembler.com/courses/course-v1:appsembleracademy+OX11+Perpetual/about' target='_blank'>Creating Your First Course</a></li><li>Our <a href='https://www.youtube.com/channel/UCINXF1QU7s1D4Tvp0AnWPKA' target='_blank'>YouTube channel</a> has plenty of videos and webinars for you to explore</li><li>Our <a href='https://help.appsembler.com/' target='_blank'>knowledge base</a> is where we keep all of our articles on how to accomplish specific tasks with your Tahoe site</li></ul><p>If you get stuck or have any questions, just contact us using the chat widget down in the bottom right. We're online from 5am to 5pm Eastern US Time, Monday to Friday, and we're happy to help!</p>"
                                     },
                                     "margin-top": "marg-t-5",
                                     "margin-left": "marg-l-0",
