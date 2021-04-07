@@ -313,8 +313,6 @@ def i18n_robot_pull(options):
     sh('git clean -fdX conf/locale/eo')
     print("\n\nValidating translations with `i18n_tool validate`...")
 
-    sh("pip install edx-i18n-tools==0.4.6")  # Hack: Fix an issue with the i18n tools
-
     resources = find_release_resources()
     sh("i18n_tool transifex pull " + " ".join(resources))
 
@@ -324,8 +322,6 @@ def i18n_robot_pull(options):
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:
         sh(django_cmd(system, settings, 'compilejsi18n'))
-
-    sh("pip install edx-i18n-tools==0.4.5")  # Hack: Get back the original version so Studio can keep working
 
     con = raw_input("Continue with committing these translations (y/n)? ")
     if con.lower() == 'y':
