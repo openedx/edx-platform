@@ -64,7 +64,14 @@ class DiscussionsConfigurationView(APIView):
             """
             Transform the *incoming* primitive data into a native value.
             """
-            raise NotImplementedError
+            payload = {
+                'context_key': data.get('course_key', ''),
+                'enabled': data.get('enabled', False),
+                'lti_configuration': data.get('lti_configuration', {}),
+                'plugin_configuration': data.get('plugin_configuration', {}),
+                'provider_type': data.get('provider_type', ''),
+            }
+            return payload
 
         def to_representation(self, instance) -> dict:
             """
