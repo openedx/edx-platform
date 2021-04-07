@@ -22,6 +22,9 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 log = logging.getLogger(__name__)
 
 
+DEFAULT_PROVIDER_TYPE = 'legacy'
+
+
 def get_supported_providers() -> list[str]:
     """
     Return the list of supported discussion providers
@@ -198,6 +201,7 @@ class DiscussionsConfiguration(TimeStampedModel):
             configuration = cls(
                 context_key=context_key,
                 enabled=False,
+                provider_type=DEFAULT_PROVIDER_TYPE,
             )
         return configuration
     # pylint: enable=undefined-variable

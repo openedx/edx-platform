@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from openedx.core.lib.api.permissions import IsStaff
 from openedx.core.lib.api.view_utils import view_auth_classes
 
+from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
 
 
@@ -69,7 +70,7 @@ class DiscussionsConfigurationView(APIView):
                 'enabled': data.get('enabled', False),
                 'lti_configuration': data.get('lti_configuration', {}),
                 'plugin_configuration': data.get('plugin_configuration', {}),
-                'provider_type': data.get('provider_type', ''),
+                'provider_type': data.get('provider_type', DEFAULT_PROVIDER_TYPE),
             }
             return payload
 
@@ -89,7 +90,7 @@ class DiscussionsConfigurationView(APIView):
                 'lti_configuration': lti_configuration.data,
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
-                    'active': instance.provider_type or None,
+                    'active': instance.provider_type or DEFAULT_PROVIDER_TYPE,
                     'available': {
                         provider: {
                             'features': PROVIDER_FEATURE_MAP.get(provider) or [],
