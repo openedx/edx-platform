@@ -1,9 +1,10 @@
 """
 All model factories for webinars
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import factory
+from django.utils.timezone import now
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.webinars.models import Webinar
@@ -23,6 +24,6 @@ class WebinarFactory(factory.DjangoModelFactory):
     banner = factory.django.ImageField()
     language = factory.Faker('word')
 
-    start_time = datetime.now() + timedelta(hours=1)
-    end_time = datetime.now() + timedelta(hours=2)
+    start_time = now() + timedelta(hours=1)
+    end_time = now() + timedelta(hours=2)
     created_by = factory.SubFactory(UserFactory)
