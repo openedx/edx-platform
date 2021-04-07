@@ -1,11 +1,7 @@
 """
 Discussion API forms
 """
-
-
-import six.moves.urllib.error
 import six.moves.urllib.parse
-import six.moves.urllib.request
 from django.core.exceptions import ValidationError
 from django.forms import BooleanField, CharField, ChoiceField, Form, IntegerField
 from opaque_keys import InvalidKeyError
