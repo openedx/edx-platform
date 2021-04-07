@@ -7,7 +7,6 @@ import mandrill
 from django.conf import settings
 
 from .email_data import EmailData
-from .helpers import add_user_preferred_language_to_template_slug
 
 log = logging.getLogger(__name__)
 
@@ -57,20 +56,18 @@ class MandrillClient(object):
             raise
         return result
 
-    def send_mandrill_email(self, template, email, context):
+    def send_mandrill_email(self, template, emails, context):
         """
         Creates EmailData object and calls _send_email
 
         Arguments:
             template (str): String containing template id
-            email (str): Email address of user
+            emails (list): Email addresses of recipient users
             context (dict): Dictionary containing email content
 
         Returns:
             None
         """
-        log.info(f'Sending email using template: {template}, account: {email} and context: {context} using mandrill')
-
-        template = add_user_preferred_language_to_template_slug(template, email)
-        email_data = EmailData(template, email, context)
+        log.info(f'Sending email using template: {template}, account: {emails} and context: {context} using mandrill')
+        email_data = EmailData(template, emails, context)
         self._send_mail(email_data)
