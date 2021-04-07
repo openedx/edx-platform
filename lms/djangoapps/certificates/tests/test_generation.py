@@ -9,6 +9,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.certificates.generation import generate_course_certificate
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -42,7 +43,7 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             user=u,
             course_id=key,
             is_active=True,
-            mode="verified",
+            mode='verified',
         )
         gen_mode = 'batch'
 
@@ -64,3 +65,36 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
             certificate_url='',
             generation_mode=gen_mode
         )
+
+    def test_generation_existing(self):
+        """
+        Test certificate generation when a certificate already exists
+        """
+        # Create user, a course run, and an enrollment
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode='verified',
+        )
+        error_reason = 'Some PDF error'
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode='verified',
+            status=CertificateStatuses.error,
+            error_reason=error_reason
+        )
+        gen_mode = 'batch'
+
+        cert = GeneratedCertificate.objects.get(user=u, course_id=key)
+        assert cert.error_reason == error_reason
+
+        generated_cert = generate_course_certificate(u, key, gen_mode)
+        assert generated_cert.status, CertificateStatuses.downloadable
+
+        cert = GeneratedCertificate.objects.get(user=u, course_id=key)
+        assert cert.error_reason == ''

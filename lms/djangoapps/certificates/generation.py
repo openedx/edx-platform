@@ -80,7 +80,8 @@ def _generate_certificate(user, course_key):
             'grade': course_grade.percent,
             'download_url': '',
             'key': key,
-            'verify_uuid': uuid
+            'verify_uuid': uuid,
+            'error_reason': ''
         }
     )
 

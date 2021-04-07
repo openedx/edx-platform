@@ -41,7 +41,7 @@ class CertificateStatuses:
     """
     Enum for certificate statuses.
 
-    Not all of these status are currently used. Some are kept for historical reasons and because existing course
+    Not all of these statuses are currently used. Some are kept for historical reasons and because existing course
     certificates may have been granted that status.
 
     audit_notpassing    - User is in the audit track and has not achieved a passing grade.
@@ -342,25 +342,17 @@ class GeneratedCertificate(models.Model):
     def invalidate(self):
         """
         Invalidate Generated Certificate by  marking it 'unavailable'.
-
-        Following is the list of fields with their defaults
-            1 - verify_uuid = '',
-            2 - download_uuid = '',
-            3 - download_url = '',
-            4 - grade = ''
-            5 - status = 'unavailable'
         """
-        log.info('Marking certificate as unavailable for {user} : {course}'.format(
-            user=self.user.id,
-            course=self.course_id
-        ))
+        log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
 
+        self.error_reason = ''
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
         self.grade = ''
         self.status = CertificateStatuses.unavailable
         self.save()
+
         COURSE_CERT_REVOKED.send_robust(
             sender=self.__class__,
             user=self.user,
@@ -371,19 +363,18 @@ class GeneratedCertificate(models.Model):
 
     def mark_notpassing(self, grade):
         """
-        Invalidates a Generated Certificate by marking it as not passing
+        Invalidates a Generated Certificate by marking it as notpassing
         """
-        log.info('Marking certificate as notpassing for {user} : {course}'.format(
-            user=self.user.id,
-            course=self.course_id
-        ))
+        log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
 
+        self.error_reason = ''
         self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
         self.grade = grade
         self.status = CertificateStatuses.notpassing
         self.save()
+
         COURSE_CERT_REVOKED.send_robust(
             sender=self.__class__,
             user=self.user,
