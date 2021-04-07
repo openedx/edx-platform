@@ -44,7 +44,7 @@ class DiscussionsConfigurationView(APIView):
             """
             raise NotImplementedError
 
-        def to_internal_data(self, data):
+        def to_internal_value(self, data):
             """
             Transform the *incoming* primitive data into a native value.
             """
