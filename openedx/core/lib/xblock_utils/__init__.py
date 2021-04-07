@@ -19,6 +19,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.html import escape
+from edx_django_utils.plugins import pluggable_override
 from lxml import etree, html
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
@@ -554,3 +555,13 @@ def hash_resource(resource):
         else:
             md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
+
+
+@pluggable_override('OVERRIDE_GET_UNIT_ICON')
+def get_icon(block):
+    """
+    A function that returns the CSS class representing an icon to use for this particular
+    XBlock (in the courseware navigation bar). Mostly used for Vertical/Unit XBlocks.
+    It can be overridden by setting `GET_UNIT_ICON_IMPL` to an alternative implementation.
+    """
+    return block.get_icon_class()
