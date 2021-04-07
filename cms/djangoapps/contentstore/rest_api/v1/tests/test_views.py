@@ -256,10 +256,8 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         self.assertDictEqual(response.data, {
             'detail': [{
-                'proctoring_provider': (
-                    '[\"The selected proctoring provider, notvalidprovider, is not a valid provider. '
-                    'Please select from one of [\'test_proctoring_provider\'].\"]'
-                )
+                'proctoring_provider': "The selected proctoring provider, notvalidprovider, is not a valid provider. "
+                                       "Please select from one of ['test_proctoring_provider']."
             }]
         })
 

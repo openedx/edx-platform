@@ -381,17 +381,18 @@ class XMLModuleStore(ModuleStoreReadBase):
             errorlog.tracker(msg)
             self.errored_courses[course_dir] = errorlog
             monitor_import_failure(target_course_id, 'Updating', exception=exc)
-
-        if course_descriptor is None:
-            pass
-        elif isinstance(course_descriptor, ErrorBlock):
-            # Didn't load course.  Instead, save the errors elsewhere.
-            self.errored_courses[course_dir] = errorlog
-        else:
-            self.courses[course_dir] = course_descriptor
-            course_descriptor.parent = None
-            course_id = self.id_from_descriptor(course_descriptor)
-            self._course_errors[course_id] = errorlog
+            raise exc
+        finally:
+            if course_descriptor is None:
+                pass
+            elif isinstance(course_descriptor, ErrorBlock):
+                # Didn't load course.  Instead, save the errors elsewhere.
+                self.errored_courses[course_dir] = errorlog
+            else:
+                self.courses[course_dir] = course_descriptor
+                course_descriptor.parent = None
+                course_id = self.id_from_descriptor(course_descriptor)
+                self._course_errors[course_id] = errorlog
 
     def __str__(self):
         '''
