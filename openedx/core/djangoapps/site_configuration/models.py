@@ -6,6 +6,7 @@ Django models for site configurations.
 import collections
 from logging import getLogger
 import os
+from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -88,6 +89,15 @@ class SiteConfiguration(models.Model):
         # Set the default language code for new sites if missing
         # TODO: Move it to somewhere else like in AMC
         self.site_values['LANGUAGE_CODE'] = self.site_values.get('LANGUAGE_CODE', 'en')
+
+        # We cannot simply use a protocol-relative URL for LMS_ROOT_URL
+        # This is because the URL here will be used by such activities as
+        # sending activation links to new users. The activation link needs the
+        # scheme address verfication emails. The callers using this variable
+        # expect the scheme in the URL
+        self.site_values['LMS_ROOT_URL'] = '{scheme}://{domain}'.format(
+            scheme=urlsplit(settings.LMS_ROOT_URL).scheme,
+            domain=self.site.domain)
 
         super(SiteConfiguration, self).save(**kwargs)
 
