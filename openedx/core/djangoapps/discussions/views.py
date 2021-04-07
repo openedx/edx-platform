@@ -104,7 +104,29 @@ class DiscussionsConfigurationView(APIView):
             """
             Update and save an existing instance
             """
-            raise NotImplementedError
+            keys = [
+                'enabled',
+                'plugin_configuration',
+                'provider_type',
+            ]
+            for key in keys:
+                value = validated_data.get(key)
+                if value is not None:
+                    setattr(instance, key, value)
+            lti_configuration_data = validated_data.get('lti_configuration')
+            if lti_configuration_data:
+                lti_key = lti_configuration_data.get('lti_1p1_client_key')
+                lti_secret = lti_configuration_data.get('lti_1p1_client_secret')
+                lti_url = lti_configuration_data.get('lti_1p1_launch_url')
+                lti_configuration = instance.lti_configuration or LtiConfiguration()
+                lti_configuration.config_store = LtiConfiguration.CONFIG_ON_DB
+                lti_configuration.lti_1p1_client_key = lti_key
+                lti_configuration.lti_1p1_client_secret = lti_secret
+                lti_configuration.lti_1p1_launch_url = lti_url
+                lti_configuration.save()
+                instance.lti_configuration = lti_configuration
+            instance.save()
+            return instance
 
     # pylint: disable=redefined-builtin
     def get(self, request, course_key_string, **_kwargs) -> Response:
