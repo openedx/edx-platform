@@ -162,9 +162,6 @@ def courseware_legacy_is_visible(
     # ALLOW: Global staff may always see the Legacy experience.
     if is_global_staff:
         return True
-    # ALLOW: The course team may always see their course in the Legacy experience.
-    if is_course_staff:
-        return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,
     #            so we effectively always ALLOW them to be viewed in Legacy.
