@@ -1,6 +1,7 @@
 """
 Handle view-logic for the djangoapp
 """
+from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from rest_framework import serializers
@@ -24,6 +25,20 @@ PROVIDER_FEATURE_MAP = {
         'lti',
     ],
 }
+
+
+class LtiSerializer(serializers.ModelSerializer):
+    """
+    Serialize LtiConfiguration responses
+    """
+    class Meta:
+        model = LtiConfiguration
+        fields = [
+            'lti_1p1_client_key',
+            'lti_1p1_client_secret',
+            'lti_1p1_launch_url',
+            'version',
+        ]
 
 
 @view_auth_classes()
@@ -56,6 +71,7 @@ class DiscussionsConfigurationView(APIView):
             Serialize data into a dictionary, to be used as a response
             """
             payload = super().to_representation(instance)
+            lti_configuration = LtiSerializer(instance.lti_configuration)
             payload.update({
                 'features': {
                     'discussion-page',
@@ -63,6 +79,7 @@ class DiscussionsConfigurationView(APIView):
                     'lti',
                     'wcag-2.1',
                 },
+                'lti_configuration': lti_configuration.data,
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
                     'active': instance.provider_type or None,
