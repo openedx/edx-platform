@@ -138,6 +138,19 @@ class DiscussionsConfigurationView(APIView):
         serializer = self.Serializer(configuration)
         return Response(serializer.data)
 
+    def post(self, request, course_key_string, **_kwargs) -> Response:
+        """
+        Handle HTTP/POST requests
+
+        TODO: Should we cleanup orphaned LTI config when swapping to cs_comments_service?
+        """
+        course_key = self._validate_course_key(course_key_string)
+        configuration = DiscussionsConfiguration.get(course_key)
+        serializer = self.Serializer(configuration, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(serializer.data)
+
     def _validate_course_key(self, course_key_string: str) -> CourseKey:
         """
         Validate and parse a course_key string, if supported
