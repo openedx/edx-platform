@@ -323,7 +323,7 @@ def i18n_robot_pull(options):
     for system in ['lms', 'cms']:
         sh(django_cmd(system, settings, 'compilejsi18n'))
 
-    con = raw_input("Continue with committing these translations (y/n)? ")
+    con = input("Continue with committing these translations (y/n)? ")
     if con.lower() == 'y':
         sh('git add conf/locale')
         sh('git add cms/static/js/i18n')
