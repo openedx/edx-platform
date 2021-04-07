@@ -11,14 +11,15 @@ from opaque_keys import InvalidKeyError
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
+from lms.djangoapps.grades.grade_utils import paginate_users, serialize_user_grade
 from lms.djangoapps.grades.rest_api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.rest_api.v1.utils import CourseEnrollmentPagination, GradeViewMixin
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import PaginatedAPIView, get_course_key, verify_course_exists
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -134,12 +135,12 @@ class CourseGradesView(GradeViewMixin, PaginatedAPIView):
             A serializable list of grade responses
         """
         user_grades = []
-        users = self._paginate_users(course_key)
+        users = paginate_users(course_key)
 
         with bulk_course_grade_context(course_key, users):
             for user, course_grade, exc in CourseGradeFactory().iter(users, course_key=course_key):
                 if not exc:
-                    user_grades.append(self._serialize_user_grade(user, course_key, course_grade))
+                    user_grades.append(serialize_user_grade(user, course_key, course_grade))
 
         return self.get_paginated_response(user_grades)
 
