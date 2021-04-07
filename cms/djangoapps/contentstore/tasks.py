@@ -5,6 +5,7 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
+import pkg_resources
 import shutil
 import tarfile
 from datetime import datetime
@@ -70,6 +71,11 @@ User = get_user_model()
 LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
+ALL_ALLOWED_XBLOCKS = frozenset(
+    [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
+    +
+    ['wiki']
+)
 
 
 def clone_instance(instance, field_values):
@@ -681,7 +687,7 @@ def validate_course_olx(courselike_key, course_dir, status):
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
     try:
-        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8)
+        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8, allowed_xblocks=ALL_ALLOWED_XBLOCKS)
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
         return olx_is_valid
@@ -703,6 +709,7 @@ def validate_course_olx(courselike_key, course_dir, status):
 
 def log_errors_to_artifact(errorstore, status):
     """Log errors as a task artifact."""
+
     def get_error_by_type(error_type):
         return [error for error in error_report if error.startswith(error_type)]
 
