@@ -297,6 +297,38 @@ def i18n_release_pull():
 @needs(
     "pavelib.i18n.i18n_clean",
 )
+def tahoe_i18n_transifex_release_pull(require_reviewed=False):
+    """
+    Pull Tahoe release translation files: adapted from `i18n.transifex.pull`.
+
+    Adapted from the edX repo edx/i18n-tools package, this helper allows to pull either reviewed or unreviewed
+    entries. This taks should be removed when https://github.com/edx/i18n-tools/issues/96 is resolved.
+    """
+    # Keeping imports locally for an easy revert.
+    from i18n import config
+    from i18n.execute import execute
+    from i18n.transifex import clean_translated_locales
+
+    i18n_configs = config.Configuration()  # Read the `locale/config.yaml`
+    resources = find_release_resources()
+
+    for locale in i18n_configs.translated_locales:
+        cmd = u'tx pull --force --mode={mode} --minimum-perc=3 -l {locale}'.format(
+            locale=locale,
+            mode='reviewed' if require_reviewed else 'onlytranslated'
+        )
+        if resources:
+            for resource in resources:
+                execute(cmd + ' -r {resource}'.format(resource=resource))
+        else:
+            execute(cmd)
+    clean_translated_locales(i18n_configs)
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_clean",
+)
 @cmdopts([
     ("settings=", "s", "The settings to use (defaults to devstack)"),
 ])
@@ -313,8 +345,7 @@ def i18n_robot_pull(options):
     sh('git clean -fdX conf/locale/eo')
     print("\n\nValidating translations with `i18n_tool validate`...")
 
-    resources = find_release_resources()
-    sh("i18n_tool transifex pull " + " ".join(resources))
+    tahoe_i18n_transifex_release_pull()
 
     sh("i18n_tool validate")
     sh("i18n_tool generate")
