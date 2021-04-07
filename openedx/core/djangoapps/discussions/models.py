@@ -195,7 +195,10 @@ class DiscussionsConfiguration(TimeStampedModel):
         try:
             configuration = cls.objects.get(context_key=context_key)
         except cls.DoesNotExist:
-            configuration = cls(context_key=context_key, enabled=False)
+            configuration = cls(
+                context_key=context_key,
+                enabled=False,
+            )
         return configuration
     # pylint: enable=undefined-variable
 
