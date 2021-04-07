@@ -12,42 +12,6 @@
 
   django.catalog = django.catalog || {};
   
-  var newcatalog = {
-    "%(sel)s of %(cnt)s selected": [
-      "%(sel)s of %(cnt)s selected",
-      "%(sel)s of %(cnt)s selected"
-    ],
-    "6 a.m.": "6 a.m.",
-    "Available %s": "Available %s",
-    "Cancel": "Cancel",
-    "Choose": "Choose",
-    "Choose a time": "Choose a time",
-    "Choose all": "Choose all",
-    "Chosen %s": "Chosen %s",
-    "Click to choose all %s at once.": "Click to choose all %s at once.",
-    "Click to remove all chosen %s at once.": "Click to remove all chosen %s at once.",
-    "Filter": "Filter",
-    "Hide": "Hide",
-    "Midnight": "Midnight",
-    "Noon": "Noon",
-    "Now": "Now",
-    "Remove": "Remove",
-    "Remove all": "Remove all",
-    "Show": "Show",
-    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.",
-    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.",
-    "Today": "Today",
-    "Tomorrow": "Tomorrow",
-    "Type into this box to filter down the list of available %s.": "Type into this box to filter down the list of available %s.",
-    "Yesterday": "Yesterday",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.",
-    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.",
-    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."
-  };
-  for (var key in newcatalog) {
-    django.catalog[key] = newcatalog[key];
-  }
-  
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {

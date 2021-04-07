@@ -1,180 +1,119 @@
-# #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2015
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
-# Andres Garcia <afgarcia0479@misena.edu.co>, 2019
-# Antonio Pardo <apardo@alabs.org>, 2013
-# Antonio Pardo <apardo@alabs.org>, 2013
-# Carlos Arias Fernandez <cararias@gmail.com>, 2016
-# Cristian Salamea <ovnicraft@gmail.com>, 2013-2015
-# morsoinferno <cristobal.acosta@usach.cl>, 2014-2015
-# David Salazar <imdjsg@gmail.com>, 2014
-# David Salazar <imdjsg@gmail.com>, 2014
-# Eduardo Zambrano <ezambrano@edx.org>, 2017,2019
-# Elias Estay <eestay@u.uchile.cl>, 2015
-# Poxtic <erandelle@outlook.com>, 2017
-# Felipe Schmidt M <fschmidt@cercano.cl>, 2015
-# Fernando Abramowitz <ferabra@gmail.com>, 2014
-# Gerardo Laster, 2014
-# Gerardo Laster, 2014
-# Javier Galnares Arias <javigalnares@yahoo.es>, 2015
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# karlman72 <karlman72@gmail.com>, 2014
-# Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2014
-# Laura Silva <lingison@edx.org>, 2015-2016
-# Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
-# Luis Moreno <morenoluisma@gmail.com>, 2017
-# Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
-# Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
-# Marina Pastor <mpastor@edx.org>, 2018
-# Mecabotware <mecabotware.ideas@gmail.com>, 2015
-# Michael Terry <mterry@edx.org>, 2018
-# Miguel Bonilla <mbonilla@edx.org>, 2019
-# Natalia, 2013
-# Natalia, 2013-2014,2016,2018
-# Ned Batchelder <ned@edx.org>, 2017
-# Ned Weitzman <nweitzman@edx.org>, 2017-2018
-# Nuri Plans Toral <nplans@gmail.com>, 2015
-# Cristian Salamea <ovnicraft@gmail.com>, 2013
-# palichis <palichis@solid-ec.org>, 2015
-# Sarina Canelake <sarina@edx.org>, 2015
-# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
-# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
-# Valeria Freire <valtodopds@hotmail.com>, 2014-2015
-# Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
-# José Luis <alagunajs@gmail.com>, 2016
-# #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
-# Andres Garcia <afgarcia0479@misena.edu.co>, 2019
-# Antonio Pardo <apardo@alabs.org>, 2013
-# Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
-# Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
-# Diego Rojas <diego.rojas@edunext.co>, 2017
-# David Salazar <imdjsg@gmail.com>, 2014
-# Felipe Schmidt M <fschmidt@cercano.cl>, 2015
-# Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
-# Fernando Abramowitz <ferabra@gmail.com>, 2014
-# Francisco Palm <francisco.palm@gmail.com>, 2017
-# gildardo lasso bañol <gildardolasso@hotmail.com>, 2016
-# 1673e3cf8bd85685e54576636ae7f409, 2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
-# Juan Fernando Villa <elite.linux@gmail.com>, 2015
-# Juan <juan.marrero@utec.edu.uy>, 2015
-# Laura Silva <lingison@edx.org>, 2015-2016
-# Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
-# Marina Pastor <mpastor@edx.org>, 2018
-# Natalia, 2013
-# Natalia, 2014,2018
-# Ned Batchelder <ned@edx.org>, 2017
-# Cristian Salamea <ovnicraft@gmail.com>, 2013
-# palichis <palichis@solid-ec.org>, 2015
-# Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
-# Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# morsoinferno <cristobal.acosta@usach.cl>, 2019
-# Laura Silva <lingison@edx.org>, 2019
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019
-#
-# #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
+#
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)
+# Copyright (C) 2020 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
-# Lohenrex <lohenrex.ragnarok@gmail.com>, 2018
-# Alex Dzul <alexexc2@gmail.com>, 2016
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
-# Andres Garcia <afgarcia0479@misena.edu.co>, 2019
-# Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
-# Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
-# Diego Rojas <diego.rojas@edunext.co>, 2017
-# Eduardo Zambrano <ezambrano@edx.org>, 2018
-# Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
-# 1673e3cf8bd85685e54576636ae7f409, 2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
-# Juan Fernando Villa <elite.linux@gmail.com>, 2015
-# Juan <juan.marrero@utec.edu.uy>, 2015
-# Laura Silva <lingison@edx.org>, 2016
-# Leandro Agustín Barrientos <agustinbarrientos@outlook.com>, 2016
-# Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
-# Marcos Buccella <marcosfiore07@hotmail.com>, 2018
-# Marina Pastor <mpastor@edx.org>, 2020
-# Mecabotware <mecabotware.ideas@gmail.com>, 2015
+# 15d70039da093fd796cb78400efe6224_d9c7fb5 <9dafa8baa31ffa87b3f23172673a99b8_107209>, 2020
+# Andres Garcia <afgarcia0479@misena.edu.co>, 2020
+# Addi Hazel Mendoza Sánchez <addictivoh@gmail.com>, 2020
+# Elias Estay <eestay@u.uchile.cl>, 2020
+# David Salazar <imdjsg@gmail.com>, 2020
+# dzepeda <davitzepeda@hotmail.com>, 2020
+# Marco Morales, 2020
 # Muhammad Adeel Khan <adeel@edx.org>, 2020
-# Natalia Aguillon, 2016
-# Natalia, 2018
-# Ned Weitzman <nweitzman@edx.org>, 2017
-# Nuri Plans Toral <nplans@gmail.com>, 2014
-# Patricia Colmenares <patrusca38@hotmail.com>, 2015
-# palichis <palichis@solid-ec.org>, 2015
-# Sergio A. Salazar <sergiosalazar@live.ru>, 2016
-# Thomas Castro <snaketh@gmail.com>, 2014
-# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
-# Valeria Freire <valtodopds@hotmail.com>, 2014-2015
-# #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
-# Copyright (C) 2020 edX
-# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# Lohenrex <lohenrex.ragnarok@gmail.com>, 2020
+# Albemarle, 2020
+# Javier Galnares Arias <javigalnares@yahoo.es>, 2020
+# Anatoli Pena <djanatoli@gmail.com>, 2020
+# Félix Antonio Valdez Noverola <felix@itesm.mx>, 2020
+# Patricia Colmenares <patrusca38@hotmail.com>, 2020
+# Leandro Bohnhoff <leandro.bohnhoff@gmail.com>, 2020
+# Leandro Agustín Barrientos <agustinbarrientos@outlook.com>, 2020
+# 71c030450a123456214226ab52e4d43a_450c5ca, 2020
+# Nicolas CS <nicolascs23@gmail.com>, 2020
+# Cristian Guerra <cristian.guerra.maya@gmail.com>, 2020
+# Ned Batchelder <ned@edx.org>, 2020
+# Clinton Blackburn <clinton.blackburn@gmail.com>, 2020
+# Lalo Cabrera <laloogcabrera@yahoo.com.mx>, 2020
+# Nuri Plans Toral <nplans@gmail.com>, 2020
+# Matías Olivera <MatiasOlivera@outlook.com>, 2020
+# Alex Dzul <alexexc2@gmail.com>, 2020
+# Miguel Bonilla <mbonilla@edx.org>, 2020
+# d140edf1d29adbbec4ddbec5a4f4eba5, 2020
+# 1673e3cf8bd85685e54576636ae7f409, 2020
+# Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2020
+# Marcos Buccella <marcosfiore07@hotmail.com>, 2020
+# Juan Fernando Villa <elite.linux@gmail.com>, 2020
+# Poxtic <erandelle@outlook.com>, 2020
+# morsoinferno <cristobal.acosta@usach.cl>, 2020
+# Ismael Saavedra <isma.18.94@gmail.com>, 2020
+# gildardo lasso bañol <gildardolasso@hotmail.com>, 2020
+# Omar Al-Ithawi <i@omardo.com>, 2020
+# Herty Nava <translation@bolmedia.ca>, 2020
+# Francisco Palm <francisco.palm@gmail.com>, 2020
+# Sarina Canelake <sarina@edx.org>, 2020
+# Escored <escored@gmail.com>, 2020
+# jorgebarrero <jorgebarrero@gmail.com>, 2020
+# d90218c7862ca3d0c3f6747c76b18fe1, 2020
+# Valeria Freire <valtodopds@hotmail.com>, 2020
+# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2020
+# Juan <juan.marrero@utec.edu.uy>, 2020
+# Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2020
+# Carlos Arias Fernandez <cararias@gmail.com>, 2020
+# Luis Moreno <morenoluisma@gmail.com>, 2020
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2020
+# Cristian Salamea <ovnicraft@gmail.com>, 2020
+# Antonio Pardo <apardo@alabs.org>, 2020
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2020
+# Natalia, 2020
+# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2020
+# diegobe <diegobe@iadb.org>, 2020
+# karlman72 <karlman72@gmail.com>, 2020
+# Irvin Cabrera <pirpinachisloco@hotmail.com>, 2020
+# Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2020
+# Felipe Schmidt M <fschmidt@cercano.cl>, 2020
+# palichis <palichis@solid-ec.org>, 2020
+# Mecabotware <mecabotware.ideas@gmail.com>, 2020
+# Laura Silva <lingison@edx.org>, 2020
+# Renzo Lucioni <rlucioni@edx.org>, 2020
+# Ned Weitzman <nweitzman@edx.org>, 2020
+# Eduardo Zambrano <ezambrano@edx.org>, 2020
+# Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2020
+# Diego Rojas <diego.rojas@edunext.co>, 2020
+# Marina Pastor <mpastor@edx.org>, 2020
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2020
+# Luis Manuel Moreno <luis.moreno@edunext.co>, 2020
 #
-# Translators:
-# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2019
-# Anatoli F. Peña Castillo <djanatoli@gmail.com>, 2016
-# Andres Garcia <afgarcia0479@misena.edu.co>, 2019
-# Morphyne <cirrosis60@gmail.com>, 2014
-# Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
-# Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
-# Diego Rojas <diego.rojas@edunext.co>, 2017
-# Poxtic <erandelle@outlook.com>, 2017
-# Javier Galnares Arias <javigalnares@yahoo.es>, 2015
-# Jose Antonio Sanchez Romero <isc.antonio.sr@gmail.com>, 2017
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
-# Juan <juan.marrero@utec.edu.uy>, 2015
-# karlman72 <karlman72@gmail.com>, 2014
-# Laura Silva <lingison@edx.org>, 2016
-# Leandro Bohnhoff <leandro.bohnhoff@gmail.com>, 2015
-# Natalia, 2018
-# Ned Batchelder <ned@edx.org>, 2016
-# Patricia Colmenares <patrusca38@hotmail.com>, 2015
-# Tala Aoun <talaaoun@gmail.com>, 2016
-# UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: edx-platform\n"
+"Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:11+0000\n"
-"PO-Revision-Date: 2020-04-27 09:13+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
+"POT-Creation-Date: 2020-06-02 20:40+0000\n"
+"PO-Revision-Date: 2020-05-28 18:04+0000\n"
+"Last-Translator: Luis Manuel Moreno <luis.moreno@edunext.co>, 2020\n"
+"Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -214,7 +153,7 @@ msgstr "Guardando"
 msgid "Delete"
 msgstr "Borrar"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
@@ -253,7 +192,7 @@ msgstr "Cancelar"
 msgid "Uploading"
 msgstr "Subiendo"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
@@ -262,13 +201,13 @@ msgstr "Subiendo"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Cerrar"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
@@ -286,7 +225,7 @@ msgstr "Nombre"
 msgid "Choose File"
 msgstr "Elegir archivo"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
@@ -295,9 +234,9 @@ msgstr "Elegir archivo"
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
-msgstr "Aceptar"
+msgstr "OK"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_video_settings.js
@@ -338,7 +277,7 @@ msgstr "¿Está seguro?"
 msgid "Upload File"
 msgstr "Subir archivo"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
@@ -359,7 +298,7 @@ msgstr "Subir archivo"
 msgid "Save"
 msgstr "Guardar"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -387,7 +326,7 @@ msgstr "Sus cambios han sido guardados."
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Warning"
-msgstr ""
+msgstr "Advertencia"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -455,58 +394,6 @@ msgstr "Comentario"
 msgid "Reply to Annotation"
 msgstr "Responder a la anotación"
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded, results hidden)"
-msgid_plural "{num_points} points possible (graded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded, results hidden)"
-msgid_plural "{num_points} points possible (ungraded, results hidden)"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded)"
-msgid_plural "{num_points} points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded)"
-msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (graded)"
-msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-msgstr[1] ""
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (ungraded)"
-msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
@@ -562,6 +449,7 @@ msgstr "No enviado"
 msgid ""
 "{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
+"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -768,7 +656,7 @@ msgstr "Limpiar formato"
 msgid "Code block"
 msgstr "Bloque de código"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -878,7 +766,7 @@ msgstr "Borrar fila"
 msgid "Delete table"
 msgstr "Borrar tabla"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -919,7 +807,7 @@ msgstr "Propiedades del documento"
 msgid "Edit HTML"
 msgstr "Editar HTML"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1019,7 +907,7 @@ msgstr "Formato"
 msgid "Formats"
 msgstr "Formatos"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1328,7 +1216,7 @@ msgstr "Documento nuevo"
 msgid "New window"
 msgstr "Nueva ventana"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1418,9 +1306,9 @@ msgstr "Pre"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
-msgstr "Previo"
+msgstr "Anterior"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
@@ -1458,7 +1346,7 @@ msgstr "Reemplazar todo"
 msgid "Replace with"
 msgstr "Reemplazar con"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1678,7 +1566,7 @@ msgstr ""
 "La URL que introdujiste parece ser un vínculo externo. ¿Desea agregarle el "
 "prefijo requerido http://?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1742,7 +1630,7 @@ msgstr "Alineación vertical"
 msgid "Vertical space"
 msgstr "Espacio vertical"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1768,7 +1656,7 @@ msgstr "Palabras completas"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
-msgstr "Anchura"
+msgstr "Ancho"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1871,7 +1759,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
 msgid "Bookmarked"
-msgstr "Añadido a marcadores"
+msgstr "Página marcada"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
@@ -1930,12 +1818,12 @@ msgstr "Muy bajo"
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
-msgstr "Bajo"
+msgstr "Baja"
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
-msgstr "Normal"
+msgstr "Promedio"
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
@@ -1983,24 +1871,6 @@ msgstr "Fin del video"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
 msgstr "Posición del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s hour"
-msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s hora"
-msgstr[1] "%(value)s horas"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s minute"
-msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s minuto"
-msgstr[1] "%(value)s minutos"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s second"
-msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s segundo"
-msgstr[1] "%(value)s segundos"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
@@ -2179,18 +2049,6 @@ msgid "image omitted"
 msgstr "imagen omitida"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "there is currently {numVotes} vote"
-msgid_plural "there are currently {numVotes} votes"
-msgstr[0] "actualmente hay {numVotes} voto"
-msgstr[1] "actualmente hay {numVotes} votos"
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "{numVotes} Vote"
-msgid_plural "{numVotes} Votes"
-msgstr[0] "{numVotes} Voto"
-msgstr[1] "{numVotes} Votos"
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "You could not be subscribed to this post. Refresh the page and try again."
 msgstr ""
@@ -2276,7 +2134,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
-msgstr "Mostrar Discusión"
+msgstr "Mostrar discusión"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
@@ -2342,26 +2200,8 @@ msgstr ""
 "nuevamente."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} other response"
-msgid_plural "{numResponses} other responses"
-msgstr[0] "{numResponses} otra respuesta"
-msgstr[1] "{numResponses} otras respuestas"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} response"
-msgid_plural "{numResponses} responses"
-msgstr[0] "{numResponses} respuesta"
-msgstr[1] "{numResponses} respuestas"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
 msgstr "Mostrando todas las respuestas"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "Showing first response"
-msgid_plural "Showing first {numResponses} responses"
-msgstr[0] "Mostrando la primera respuesta"
-msgstr[1] "Mostrando las primeras {numResponses} respuestas"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2455,55 +2295,20 @@ msgid "about a minute"
 msgstr "cerca de un minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
 msgstr "cerca de una hora"
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "about %d hour"
-msgid_plural "about %d hours"
-msgstr[0] "cerca de %d hora"
-msgstr[1] "cerca de %d horas"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
 msgstr "un día"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d día"
-msgstr[1] "%d días"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
 msgstr "cerca de un mes"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mes"
-msgstr[1] "%d meses"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
 msgstr "cerca de un año"
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d año"
-msgstr[1] "%d años"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
@@ -2569,7 +2374,7 @@ msgstr "Remover archivo"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Course Name"
-msgstr "Nombre del curso"
+msgstr "Nombre del Curso"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid ""
@@ -2584,8 +2389,8 @@ msgid "Not specific to a course"
 msgstr "No específico para un curso"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
 msgstr "Tema"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2623,11 +2428,11 @@ msgstr "Maestrías"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMasters"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "MicroBachelors"
-msgstr ""
+msgstr "MicroBachelors"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
@@ -2639,7 +2444,7 @@ msgstr "Supervisión"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Security"
-msgstr ""
+msgstr "Seguridad"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2647,31 +2452,46 @@ msgid "Other"
 msgstr "Otro"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "¿En qué podemos ayudarte, {username}?"
+msgid "Course Discussion Forum"
+msgstr "Foro de discusión del curso"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid ""
+"While our support team is happy to assist with the edX platform, the course "
+"staff has the expertise for specific assignment questions, grading or the "
+"proper procedures in each course. Please post all course related questions "
+"within the Discussion Forum where the Course Staff can directly respond."
+msgstr ""
+"Si bien nuestro equipo de soporte está encantado de ayudar con la plataforma"
+" edX, el personal del curso tiene la experiencia para preguntas específicas "
+"del curso, calificación o los procedimientos adecuados en cada curso. "
+"Publique todas las preguntas relacionadas con el curso en el Foro de "
+"discusión donde el personal del curso pueda responder directamente."
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Detalles"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "Cuanto más nos digas, antes y mejor podremos ayudarte."
+msgid "the more quickly and helpfully we can respond!"
+msgstr "¡lo más rápido y servicial que podemos responder!"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Create Support Ticket"
-msgstr ""
+msgstr "Crear caso de soporte"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "What can we help you with, {username}?"
+msgstr "¿En qué podemos ayudarte, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "Ingrese a  {platform} para que podamos ayudarle mejor."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr ""
-"Si no puedes acceder a tu cuenta, contáctanos por correo electrónico a "
-"{email}."
+#: lms/templates/student_account/form_field.underscore
+msgid "Need help logging in?"
+msgstr "¿Necesita ayuda para iniciar sesión?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2682,17 +2502,33 @@ msgstr ""
 "solicitud de soporte."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
-msgstr ""
+msgid "Select a subject for your support request."
+msgstr "Elige un tema para tu petición de ayuda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "Describe los detalles de tu solicitud de ayuda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid ""
+"Due to the recent increase in interest in online education and edX, we are "
+"currently experiencing an unusually high volume of support requests. We "
+"appreciate your patience as we work to review each request. Please check the"
+" "
+msgstr ""
+"Debido al reciente aumento en el interés en la educación en línea y en edX, "
+"actualmente estamos experimentando un volumen inusualmente alto de "
+"solicitudes de soporte. Agradecemos su paciencia mientras trabajamos para "
+"revisar cada solicitud. Por favor, consulte el"
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
+msgid " as many questions may have already been answered."
+msgstr "ya que muchas preguntas comunes pueden ya haber sido respondidas."
+
+#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Contact Us"
-msgstr "Contacta con nosotros"
+msgstr "Contáctenos"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Find answers to the top questions asked by learners."
@@ -2716,6 +2552,8 @@ msgid ""
 "Thank you for submitting a request! We appreciate your patience while we "
 "work to review your request."
 msgstr ""
+"¡Gracias por su envío! Agradecemos su paciencia mientras trabajamos para "
+"revisar su solicitud."
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -2852,6 +2690,8 @@ msgid ""
 "This learner will be removed from the team,allowing another learner to take "
 "the available spot."
 msgstr ""
+"Este estudiante será removido del equipo, permitiendo a otro estudiante "
+"tomar su lugar."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2862,6 +2702,9 @@ msgid ""
 "Deleting a team is permanent and cannot be undone.All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"Borrar un equipo es una acción permanente y no puede ser revertida. Todos "
+"los miembros son removidos del equipo, y las discusiones creadas en el "
+"equipo no pueden ser accedidas de nuevo."
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
@@ -2870,7 +2713,7 @@ msgstr "Equipo \"{team}\" eliminado exitosamente."
 #: lms/djangoapps/teams/static/teams/js/views/manage.js
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Manage"
-msgstr ""
+msgstr "Administrar"
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2886,11 +2729,11 @@ msgstr "y otros"
 #. * relative timestamp (see: http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "Last activity {date}"
-msgstr ""
+msgstr "Última actividad {date}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "View {span_start} {team_name} {span_end}"
-msgstr ""
+msgstr "Ver {span_start} {team_name} {span_end}"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2906,6 +2749,8 @@ msgid ""
 "If you leave, you can no longer post in this team's discussions.Your place "
 "will be available to another learner."
 msgstr ""
+"Si deja el equipo, no puede volver a publicar discusiones dentro del equipo."
+" Su lugar en el quipo estará disponible para otro estudiante."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2915,7 +2760,7 @@ msgstr "Confirmar"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "You already belong to another team in this team set."
-msgstr ""
+msgstr "Usted ya pertenece a otro equipo en este conjunto."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
@@ -2923,13 +2768,7 @@ msgstr "Este equipo está lleno."
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "Cannot join instructor managed team"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid " Member"
-msgid_plural " Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr "No se puede unir al equipo administrado por el instructor"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2945,7 +2784,7 @@ msgstr "Temas"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Teams"
-msgstr ""
+msgstr "Mis equipos"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -3022,16 +2861,21 @@ msgid ""
 "by topic. Join an open public team to collaborate with other learners who "
 "are interested in the same topic as you are."
 msgstr ""
+"Vea todos los equipos a los que pertenece y todos los equipos públicos en su"
+" curso, organizados por tema. Únase a un equipo público abierto para "
+"colaborar con otros estudiantes interesados en el mismo tema que usted."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid ""
 "See all teams you belong to and all public teams in your course, organized "
 "by topic."
 msgstr ""
+"Vea todos los equipos a los que pertenece y todos los equipos públicos en su"
+" curso, organizados por tema."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "See all teams you belong to."
-msgstr ""
+msgstr "Ver todos los equipos a los que usted pertenece."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
@@ -3051,14 +2895,12 @@ msgid "The team \"{team}\" could not be found."
 msgstr "El equipo \"{team}\" no pudo ser encontrado."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "{team_count} Team"
-msgid_plural "{team_count} Teams"
-msgstr[0] ""
-msgstr[1] ""
+msgid "Topic"
+msgstr "Tema"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgstr "Ver equipos en el tema {topic_name}"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -3150,13 +2992,6 @@ msgstr "URL"
 msgid "Please provide a valid URL."
 msgstr "Por favor, provee un URL válido."
 
-#. Translators: 'errorCount' is the number of errors found in the form.
-#: lms/static/js/Markdown.Editor.js
-msgid "%(errorCount)s error found in form."
-msgid_plural "%(errorCount)s errors found in form."
-msgstr[0] "%(errorCount)s error en el formulario."
-msgstr[1] "%(errorCount)s errores en el formulario."
-
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
 msgstr "Negrita (Ctrl+B)"
@@ -3239,9 +3074,9 @@ msgid ""
 "now. Click Cancel to stay on this page (you must log in again to save your "
 "work)."
 msgstr ""
-"Tu sesión ha sido cerrada. Haz clic en Aceptar para volver a iniciar sesión."
-" Haz clic en Cancelar para permanecer en está página (Deberas iniciar sesión"
-" nuevamente para guardar tu trabajo)."
+"Su sesión ha sido cerrada. Haga clic en Aceptar para volver a iniciar "
+"sesión. Haga clic en Cancelar para permanecer en esta página (Deberá iniciar"
+" sesión nuevamente para guardar su trabajo)."
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3451,7 +3286,7 @@ msgstr "previsiualización en HTML"
 #: lms/static/js/customwmd.js
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
-msgstr "Su pregunta o idea (requerido)"
+msgstr "Tu pregunta o idea (requerido)"
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
@@ -3515,13 +3350,6 @@ msgid ""
 msgstr ""
 "No se ha podido determinar si debemos darle un reembolso debido a un error "
 "del sistema. Por favor, inténtelo de nuevo más tarde."
-
-#: lms/static/js/discovery/views/search_form.js
-#, javascript-format
-msgid "Viewing %s course"
-msgid_plural "Viewing %s courses"
-msgstr[0] "Mostrando %s curso"
-msgstr[1] "Mostrando %s cursos"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3713,42 +3541,8 @@ msgid "Enter a username or email."
 msgstr "Ingresa el nombre de usuario o el correo electrónico."
 
 #: lms/static/js/groups/views/cohort_editor.js
-msgid "{numUsersAdded} learner has been added to this cohort. "
-msgid_plural "{numUsersAdded} learners have been added to this cohort. "
-msgstr[0] "{numUsersAdded} estudiante ha sido agregado a este cohorte."
-msgstr[1] "{numUsersAdded} estudiantes han sido agregados a este cohorte."
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numMoved} learner was moved from {prevCohort}"
-msgid_plural "{numMoved} learners were moved from {prevCohort}"
-msgstr[0] "{numMoved} estudiante fue movido de {prevCohort}"
-msgstr[1] "{numMoved} estudiantes fueron movidos de {prevCohort}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numPresent} learner was already in the cohort"
-msgid_plural "{numPresent} learners were already in the cohort"
-msgstr[0] "{numPresent} estudiante ya estaba en el cohorte."
-msgstr[1] "{numPresent} estudiantes ya estaban en el cohorte."
-
-#: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
 msgstr "{email}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
-" automatically be added to the cohort when they enroll in the course."
-msgid_plural ""
-"{numPreassigned} learners were pre-assigned for this cohort. These learners "
-"will automatically be added to the cohort when they enroll in the course."
-msgstr[0] ""
-"{numPreassigned} estudiante fue asignado previamente a este cohorte. Este "
-"estudiante será agregado automáticamente a este cohorte cuando se inscriban "
-"en el curso."
-msgstr[1] ""
-"{numPreassigned} estudiantes fueron asignados previamente a este cohorte. "
-"Estos estudiantes serán agregados automáticamente a este cohorte cuando se "
-"inscriban en el curso."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -3757,12 +3551,6 @@ msgstr "Usuario desconocido: {user}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
 msgstr "Correo electrónico inválido: {email}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "There was an error when trying to add learners:"
-msgid_plural "{numErrors} learners could not be added to this cohort:"
-msgstr[0] "Hubo un error al intentar agregar estudiantes:"
-msgstr[1] "{numErrors} estudiantes no pudieron ser agregados a este cohorte:"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -3985,11 +3773,14 @@ msgstr "Marcar código de inscripción como no utilizado"
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Username"
 msgstr "Nombre de usuario"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -4057,7 +3848,7 @@ msgstr "Se generaron las siguientes advertencias:"
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/views/fields.js
 msgid "Success"
-msgstr "Finalización exitosa"
+msgstr "Éxito"
 
 #: lms/static/js/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
@@ -4590,10 +4381,6 @@ msgstr ""
 "tarde. Si el problema persiste, contacta a soporte técnico."
 
 #: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Asunto"
-
-#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "Enviado por"
 
@@ -4690,12 +4477,12 @@ msgstr ""
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Change Session"
-msgstr "Cambiar sesión"
+msgstr "Cambiar edición"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 #: lms/templates/learner_dashboard/course_entitlement.underscore
 msgid "Select Session"
-msgstr "Seleccione la sesión."
+msgstr "Seleccionar la edición."
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "Leave Current Session"
@@ -4859,6 +4646,11 @@ msgid ""
 "{strongStart}you will no longer be able to use the same email on "
 "{platformName}.{strongEnd}"
 msgstr ""
+"{strongStart}Advertencia: La eliminación de la cuenta es "
+"permanente.{strongEnd} Por favor lea cuidadosamente la información en la "
+"parte superior antes de proceder. Esta es una acción irreversible, y "
+"{strongStart}no podrá volver a usar el mismo correo electrónico en "
+"{platformName}.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4866,12 +4658,17 @@ msgid ""
 "cannot be undone. {platformName} will not be able to recover your account or"
 " the data that is deleted."
 msgstr ""
+"Cuidado: la eliminación de su cuenta y datos personales es permanente e "
+"irreversible. {platformName} no podrá recuperar ni su cuenta ni los datos "
+"eliminados."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Once your account is deleted, you cannot use it to take courses on the "
 "{platformName} app, {siteName}, or any other site hosted by {platformName}."
 msgstr ""
+"Una vez tu cuenta es borrada, no podrás usarla ni tomar cursos en la app "
+"{platformName}, {siteName}, ni en cualquier otro sitio de {platformName}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4879,6 +4676,8 @@ msgid ""
 "This includes access to {siteName} from your employer’s or university’s "
 "system{additionalSiteSpecificDeletionText}."
 msgstr ""
+"Esto incluye acceso a {siteName} desde el sistema de tu empleador o "
+"universidad{additionalSiteSpecificDeletionText}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -4919,6 +4718,9 @@ msgid ""
 " data is permanent and cannot be undone. {platformName} will not be able to "
 "recover your account or the data that is deleted."
 msgstr ""
+"Ha seleccionado “Eliminar mi cuenta”. La eliminación de su cuenta y datos "
+"personales es permanente e irreversible. {platformName} no podrá recuperar "
+"su cuenta o los datos que se hayan borrado."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4926,6 +4728,8 @@ msgid ""
 "the {platformName} app, {siteName}, or any other site hosted by "
 "{platformName}."
 msgstr ""
+"Si procedes, no podrás usarla ni tomar cursos en la app {platformName}, "
+"{siteName}, ni en cualquier otro sitio de {platformName}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4957,7 +4761,7 @@ msgstr ""
 
 #: lms/static/js/student_account/tos_modal.js
 msgid "Terms of Service and Honor Code"
-msgstr "Términos del servicio y código de honor"
+msgstr "Condiciones de servicio y código de honor"
 
 #: lms/static/js/student_account/views/FinishAuthView.js
 msgid "Saving your email preference"
@@ -5030,7 +4834,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
-msgstr ""
+msgstr "Ha ocurrido un error inesperado."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5205,7 +5009,8 @@ msgid ""
 "the link in the message to update your secondary email address."
 msgstr ""
 "Hemos enviado un mensaje de confirmación a {new_secondary_email_address}. "
-"Hacer clic en el enlace del mensaje para actualizar tu correo electrónico."
+"Haga clic en el enlace del mensaje para actualizar su dirección de correo "
+"electrónico secundaria."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Social Media Links"
@@ -5217,7 +5022,7 @@ msgid ""
 "edX profile."
 msgstr ""
 "Opcionalmente, conecte sus cuentas personales a los iconos de redes sociales"
-" en su perfil de edX"
+" en su perfil de edX."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid " Link"
@@ -5369,7 +5174,7 @@ msgstr "Optar por el Certificado Verificado"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Verified Certificate"
-msgstr "Certificado Verificado"
+msgstr "Certificado verificado"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Checkout"
@@ -5433,7 +5238,7 @@ msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Webcam Detected"
-msgstr "No se detectó una cámara web."
+msgstr "No se detectó una cámara web"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "You don't seem to have a webcam connected."
@@ -5471,7 +5276,7 @@ msgstr "Error de validación"
 #: lms/static/js/views/fields.js
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "In Progress"
-msgstr "En progreso"
+msgstr "En proceso"
 
 #: lms/static/js/views/fields.js
 msgid "Placeholder"
@@ -5579,19 +5384,15 @@ msgstr "Expandir todo"
 msgid "Collapse All"
 msgstr "Colapsar todo"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
 msgstr "Mostrar más"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show Less"
 msgstr "Mostrar menos"
-
-#: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} resultado"
-msgstr[1] "{total_results} resultados"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -5894,7 +5695,7 @@ msgstr "Ha habido un error con la subida del archivo"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "Organización:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
@@ -5902,7 +5703,7 @@ msgstr "Número del curso:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "Edición del Curso:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
@@ -5910,8 +5711,9 @@ msgstr "(Solo-lectura)"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "Reabrir Curso"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Ver en vivo"
@@ -6075,11 +5877,11 @@ msgstr "Todos los capítulos deben tener un nombre y un recurso"
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
+"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
+"<%- (fileExtensions) %> to upload."
 msgstr ""
-"Sólo pueden cargarse archivos de tipo <%= fileTypes %>. Por favor selecciona"
-" un archivo que termine en <%= fileExtensions %> para ser cargado."
+"Solo archivos <%- fileTypes %> pueden ser cargados. Por favor seleccione un "
+"archivo que finalice en <%- (fileExtensions) %> para cargarlo."
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -6170,10 +5972,11 @@ msgstr "Su archivo ha sido borrado."
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
-msgstr "Fecha añadida"
+msgstr "Fecha Añadida"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Type"
 msgstr "Tipo"
 
@@ -6187,8 +5990,8 @@ msgid ""
 "Please follow the instructions here to upload a file elsewhere and link to "
 "it: {maxFileSizeRedirectUrl}"
 msgstr ""
-"Por favor siga las instrucciones aqui para cargar un archivo en otro parte y"
-" enlazelo: {maxFileSizeRedirectUrl}"
+"Por favor siga las instrucciones aquí para cargar un archivo en otra parte "
+"con su respectivo enlace: {maxFileSizeRedirectUrl}"
 
 #: cms/static/js/views/assets.js
 msgid "Max file size exceeded"
@@ -6197,7 +6000,7 @@ msgstr "Tamaño maximo del archivo excedido"
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr "Subir nuevo archivo"
+msgstr "Subir Nuevo Archivo"
 
 #: cms/static/js/views/assets.js
 msgid "Load Another File"
@@ -6251,7 +6054,7 @@ msgstr "Última actualización"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Required"
-msgstr "Requerido"
+msgstr "Obligatorio"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Automatic transcripts are disabled."
@@ -6262,8 +6065,8 @@ msgid "{selectedProvider} credentials saved"
 msgstr "{selectedProvider} credenciales guardadas"
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Subir un nuevo PDF a “<%= name %>”"
+msgid "Upload a new PDF to “<%- name %>”"
+msgstr "cargar un nuevo PDF a “<%- name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6329,29 +6132,10 @@ msgstr "El error crudo es:"
 msgid "There has been an error with your export."
 msgstr "Ha habido un error al exportar."
 
-#. Translators: 'count' is number of groups that the group
-#. configuration contains.
-#: cms/static/js/views/group_configuration_details.js
-msgid "Contains {count} group"
-msgid_plural "Contains {count} groups"
-msgstr[0] "Contiene {count} grupo"
-msgstr[1] "Contiene {count} grupos"
-
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
 msgid "Not in Use"
 msgstr "No esta en uso"
-
-#. Translators: 'count' is number of units that the group
-#. configuration is used in.
-#. Translators: 'count' is number of locations that the group
-#. configuration is used in.
-#: cms/static/js/views/group_configuration_details.js
-#: cms/static/js/views/partition_group_details.js
-msgid "Used in {count} location"
-msgid_plural "Used in {count} locations"
-msgstr[0] "Usado en {count} ubicación"
-msgstr[1] "Usado en {count} ubicaciones"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -6377,7 +6161,7 @@ msgstr "Los archivos deben estar en formato JPEG o PNG."
 
 #: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
-msgstr "Todos los derechos reservados"
+msgstr "Todos los Derechos están Reservados"
 
 #: cms/static/js/views/license.js
 msgid "You reserve all rights for your work"
@@ -6558,7 +6342,7 @@ msgstr "Visibilidad"
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr "Edición: {title}"
+msgstr "Editando: {title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
@@ -6636,7 +6420,7 @@ msgstr "Fecha de adición"
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
-msgstr ""
+msgstr "Editando acceso para: {title}"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -6844,7 +6628,7 @@ msgstr "Subir tu miniatura de la imagen del video"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%- name %>”?"
-msgstr ""
+msgstr "Eliminar “<%- name %>”?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -6874,22 +6658,6 @@ msgstr "Subir"
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
 msgstr "Lo sentimos, ha habido un error"
-
-#: cms/static/js/views/utils/create_course_utils.js
-msgid ""
-"The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
-msgstr ""
-"La longitud combinada de los campos para la organización, número de curso y "
-"grupo no puede superar los <%=limit%> caracteres."
-
-#: cms/static/js/views/utils/create_library_utils.js
-msgid ""
-"The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
-msgstr ""
-"La longitud combinada de los campos para la organización y código de la "
-"librería no puede superar los <%=limit%> caracteres."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -7030,7 +6798,7 @@ msgstr ""
 #: cms/static/js/views/video/translations_editor.js
 #: cms/static/js/views/video_transcripts.js
 msgid "Are you sure you want to remove this transcript?"
-msgstr "¿Esta seguro de que quiere eliminar esta transcripción?"
+msgstr "¿Está seguro de que quiere eliminar esta transcripción?"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
@@ -7100,6 +6868,7 @@ msgid "Video duration is {humanizeDuration}"
 msgstr "La duración del vídeo es {humanizeDuration}"
 
 #: cms/static/js/views/video_thumbnail.js
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
 msgstr "minutos"
 
@@ -7242,8 +7011,15 @@ msgstr "Ayude a traducir a {beta_language}"
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Actions"
 msgstr "Acciones"
+
+#: cms/templates/js/course-outline.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Timed Exam"
+msgstr "Examen cronometrado"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -7378,13 +7154,6 @@ msgstr "Edita tu publicación a continuación."
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update post"
 msgstr "Actualiza publicación"
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] "Mostrar comentario (%(num_comments)s)"
-msgstr[1] "Mostrar comentarios (%(num_comments)s)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
@@ -7700,6 +7469,7 @@ msgid "Course Key"
 msgstr "Llave del curso"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Status"
 msgstr "Estado"
 
@@ -7770,7 +7540,7 @@ msgstr "Nombre de usuario o  correo electrónico"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
-msgstr "Id de Curso"
+msgstr "ID del Curso"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course Start"
@@ -7782,7 +7552,7 @@ msgstr "Finalización del curso"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Upgrade Deadline"
-msgstr "Fecha límite para el upgrade"
+msgstr "Fecha límite para cambiar a la opción de Certificado Verificado"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Verification Deadline"
@@ -7815,7 +7585,7 @@ msgstr "Activo"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/ccx/schedule.underscore
 msgid "N/A"
-msgstr "N/D"
+msgstr "N/A"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Change Enrollment"
@@ -7959,7 +7729,7 @@ msgstr "Los cursos de este catálogo:"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
-msgstr "Fecha inicial:"
+msgstr "Fecha de inicio"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Due Date"
@@ -8007,33 +7777,8 @@ msgid "Remove unit %(unitName)s"
 msgstr "Borrar unidad %(unitName)s"
 
 #: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-"Todavía debe visitar el sitio web de %(display_name)s para completar el "
-"proceso de crédito."
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-"Para finalizar un crédito de curso, %(display_name)s requieres "
-"%(platform_name)s profesores para postular una solicitud de crédito."
-
-#: lms/templates/commerce/provider.underscore
 msgid "Get Credit"
-msgstr "Obtenga créditos"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-"Gracias %(full_name)s! Hemos recibido su pago para el curso %(course_name)s."
+msgstr "Obten créditos"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -8041,13 +7786,13 @@ msgid ""
 "Please print this page for your records; it serves as your receipt. You will"
 " also receive an email with the same information."
 msgstr ""
-"Por favor imprima esta página para sus registros; la misma es válida como su"
-" recibo. También recibirá un correo electrónico con la esta información."
+"Por favor imprime esta página para tus registros; la misma sirve como tu "
+"recibo. También recibirás un correo electrónico con esta misma información."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Order No."
-msgstr "Orden Num."
+msgstr "Número de orden"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -8098,7 +7843,7 @@ msgstr ""
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
-msgstr "¿Desea confirmar su identidad después?"
+msgstr "¿Deseas confirmar tu identidad después?"
 
 #: lms/templates/commerce/receipt.underscore
 msgid "Verify Now"
@@ -8144,7 +7889,7 @@ msgstr "Ocultar cronómetro"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
-msgstr "APRENDER MAS"
+msgstr "Aprender más"
 
 #: lms/templates/discovery/course_card.underscore
 #, python-format
@@ -8153,7 +7898,7 @@ msgstr "Comienza: %(start_date)s"
 
 #: lms/templates/discovery/course_card.underscore
 msgid "Starts"
-msgstr "Empieza"
+msgstr "Inicia"
 
 #: lms/templates/discovery/filter_bar.underscore
 msgid "Clear All"
@@ -8169,7 +7914,7 @@ msgstr "Nota"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
-msgstr "Usted comentó..."
+msgstr "Tú comentaste..."
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
@@ -8191,7 +7936,7 @@ msgstr "Borrar resultados de búsqueda"
 #: lms/templates/fields/field_dropdown_account.underscore
 #: lms/templates/fields/field_textarea.underscore
 msgid "Click to edit"
-msgstr "Haga clic para editar"
+msgstr "Haz clic para editar"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Order Number"
@@ -8203,7 +7948,7 @@ msgstr "Fecha de colocación"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Cost"
-msgstr "Costo"
+msgstr "Precio"
 
 #: lms/templates/fields/field_order_history.underscore
 msgid "Order Details"
@@ -8232,7 +7977,7 @@ msgstr "Solicitud de asistencia financiera"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
-msgstr "Acerca de usted"
+msgstr "Acerca de ti"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
@@ -8248,7 +7993,7 @@ msgstr "Correo electrónico"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
-msgstr "Nombre"
+msgstr "Nombre completo"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Country of residence"
@@ -8267,8 +8012,8 @@ msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr ""
-"Gracias por enviar tu aplicación de financiamiento para {course_name}!. "
-"Espera una respuesta de 2-4 dias hábiles."
+"¡Gracias por enviar tu solicitud de asistencia financiera para "
+"{course_name}! Puede esperar una respuesta en 2-4 días hábiles."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -8517,13 +8262,6 @@ msgid "Create a content group"
 msgstr "Crear contenido de grupo"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#, python-format
-msgid "(contains %(student_count)s student)"
-msgid_plural "(contains %(student_count)s students)"
-msgstr[0] "(contiene %(student_count)s estudiante)"
-msgstr[1] "(contiene %(student_count)s estudiantes)"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
 "Learners are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
@@ -8646,14 +8384,6 @@ msgid "You can change sessions until {expiration_date}."
 msgstr "Puede cambiar ediciones hasta {expiration_date}."
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "Calificación Final"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "Para {courseName}"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "Ver curso archivado"
 
@@ -8734,15 +8464,8 @@ msgid "Explore New Programs"
 msgstr "Explorar programas nuevos"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgid_plural "Courses"
-msgstr[0] "Curso"
-msgstr[1] "Cursos"
-
-#: lms/templates/learner_dashboard/program_card.underscore
 msgid "Completed"
-msgstr "Finalizado"
+msgstr "Completado"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "Remaining"
@@ -8781,7 +8504,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "View Program Record"
-msgstr "Ver registros del programa"
+msgstr "Ver Registro del Programa"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Additional Credit Opportunities"
@@ -8868,7 +8591,7 @@ msgstr "Cambiar mi dirección de correo electrónico"
 
 #: lms/templates/student_account/account.underscore
 msgid "Reset Password"
-msgstr "Restablecer Contraseña"
+msgstr "Restablecer contraseña"
 
 #: lms/templates/student_account/account_settings.underscore
 msgid "Switch Language Back"
@@ -8877,10 +8600,6 @@ msgstr "Cambiar idioma de nuevo."
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Ocurrió un error. Por favor recargue la página."
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "¿Necesita ayuda para iniciar sesión?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -8992,7 +8711,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Use my university info"
-msgstr ""
+msgstr "Usar información de mi universidad"
 
 #: lms/templates/student_account/login.underscore
 msgid "or sign in with"
@@ -9064,7 +8783,7 @@ msgstr "Lista de cursos que te has inscrito como estudiante verificado"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
-msgstr "Explora tus cursos!"
+msgstr "¡Explora tu curso!"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
@@ -9097,13 +8816,15 @@ msgstr "Lo que necesita para la verificación"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Device with Camera"
-msgstr ""
+msgstr "Dispositivo con cámara"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a device that has a webcam. If you receive a browser prompt for "
 "access to your camera, please make sure to click 'Allow'."
 msgstr ""
+"Necesita un dispositivo que tenga una cámara web. Si recibe un mensaje del "
+"navegador para acceder a su cámara, asegúrese de hacer clic en \"Permitir\"."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -9111,7 +8832,7 @@ msgstr "Identificación fotográfica."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "You need a valid ID that contains your full name and photo."
-msgstr ""
+msgstr "Necesita un ID válida que contenga su nombre completo y foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9123,6 +8844,8 @@ msgid ""
 "When your face is in position, use the Take Photo button {icon} below to "
 "take your photo."
 msgstr ""
+"Cuando su cara esté en posición, use el botón Tomar foto {icon} a "
+"continuación para tomar su foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -9141,12 +8864,14 @@ msgid ""
 "To take the photo of your face, click on the camera button {icon}. If you "
 "need to try again, click 'Retake Photo'."
 msgstr ""
+"Para tomar la foto de su cara, haga clic en el botón de la cámara {icon}. Si"
+" necesita volver a intentarlo, haga clic en 'Retomar foto'."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Frequently Asked Questions"
-msgstr "Preguntas frecuentes"
+msgstr "Preguntas Frecuentes"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9160,6 +8885,8 @@ msgid ""
 "We use your verification photos to confirm your identity and ensure the "
 "validity of your certificate."
 msgstr ""
+"Utilizamos sus fotos de verificación para confirmar su identidad y "
+"garantizar la validez de su certificado."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9176,6 +8903,10 @@ msgid ""
 "review. Your photo and information are not saved or visible anywhere on "
 "%(platformName)s after the verification process is complete."
 msgstr ""
+"Ciframos su foto de forma segura y la enviamos a nuestro servicio de "
+"autorización para su revisión. Su foto e información no se guardan ni son "
+"visibles en ningún lugar de  %(platformName)s después de que se complete el "
+"proceso de verificación."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9184,6 +8915,8 @@ msgid ""
 "What if I can't see the camera image, or if I can't see my photo do "
 "determine which side is visible?"
 msgstr ""
+"¿Qué sucede si no puedo ver la imagen de la cámara, o si no puedo ver mi "
+"foto para determinar qué lado es visible?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9195,6 +8928,13 @@ msgid ""
 " (30-45 centimeters) from the camera, with your head centered relative to "
 "the computer screen. "
 msgstr ""
+"Es posible que pueda completar el procedimiento de captura de imágenes sin "
+"ayuda, pero puede tomar un par de intentos de envío para obtener la posición"
+" correcta de la cámara. El posicionamiento óptimo de la cámara varía con "
+"cada computadora, pero generalmente la mejor posición para la doma de la "
+"cabeza es de aproximadamente 12-18 pulgadas (30-45 centímetros) de la "
+"cámara, con la cabeza centrada en relación con la pantalla de la "
+"computadora."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9204,6 +8944,10 @@ msgid ""
 "orientation to change the lighting angle.  The most common reason for "
 "rejection is inability to read the text on the ID card."
 msgstr ""
+"Si las fotos que envía son rechazadas, intente mover la computadora o la "
+"orientación de la cámara para cambiar el ángulo de iluminación. La razón más"
+" común para el rechazo es la imposibilidad de leer el texto en la tarjeta de"
+" identificación."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9211,6 +8955,8 @@ msgid ""
 "What if I have difficulty holding my head in position relative to the "
 "camera?"
 msgstr ""
+"¿Qué sucede si tengo dificultades para mantener la cabeza en posición con "
+"respecto a la cámara?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9220,6 +8966,8 @@ msgid ""
 "If you require assistance with taking either photo for submission, contact "
 "%(platformName)s support for additional suggestions."
 msgstr ""
+"Si requiere asistencia tomando cualquiera de las fotos para enviarlas, "
+"contacte soporte%(platformName)s para sugerencias adicionales."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9236,12 +8984,16 @@ msgstr "Toma una Foto de tu Identificación"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Use your webcam to take a photo of your ID."
 msgstr ""
+"Use su cámara web para tomar una fotografía de su documento de "
+"identificación."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or ID"
 " are all acceptable."
 msgstr ""
+"Necesita un documento de identificación con su nombre y foto. Licencia de "
+"conducir, pasaporte o cédula son aceptados."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9261,11 +9013,12 @@ msgstr "Asegurese que su documento está bien iluminado"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
+"Una vez en posición, use el botón Tomar foto {icon} para captura su ID"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Use the Retake Photo button if you are not pleased with your photo"
-msgstr ""
+msgstr "Use el botón Retomar foto si no está satisfecho con su foto"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -9273,6 +9026,10 @@ msgid ""
 "a photo ID. Our authorization service confirms your identity by comparing "
 "the photo you take with the photo on your ID."
 msgstr ""
+"Como parte del proceso de verificación, usted tomará una foto de su cara y "
+"de su documento de identificación con foto. Nuestro servicio de autorización"
+" confirma su identidad comparando la foto que toma con la foto en su "
+"identificación."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
@@ -9283,11 +9040,19 @@ msgid ""
 "(20-30 centimeters) from the camera, with the ID card centered relative to "
 "the camera. "
 msgstr ""
+"Es posible que pueda completar el procedimiento de captura de imágenes sin "
+"ayuda, pero puede tomar un par de intentos de envío para obtener la posición"
+" correcta de la cámara. El posicionamiento óptimo de la cámara varía con "
+"cada computadora, pero en general, la mejor posición para una foto de una "
+"tarjeta de identificación es de 8 a 12 pulgadas (20-30 centímetros) de la "
+"cámara, con la tarjeta de identificación centrada en relación con la cámara."
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "What if I have difficulty holding my ID in position relative to the camera?"
 msgstr ""
+"¿Qué sucede si tengo dificultades para mantener mi identificación en "
+"posición con respecto a la cámara?"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -9317,6 +9082,7 @@ msgstr "Verifique que su cara está completamente dentro del marco de la foto"
 msgid ""
 "Once in position, use the Take Photo button {icon} to capture your photo"
 msgstr ""
+"Una vez en posición, use el botón Tomar foto {icon} para captura su foto"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -9420,20 +9186,20 @@ msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
 msgstr ""
-"Un correo electrónico ha sido enviado a su {userEmail} con un enlaze para "
+"Un correo electrónico ha sido enviado a su {userEmail} con un enlace para "
 "activar su cuenta."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
-msgstr "Por qué activar?"
+msgstr "¿Por qué debes activarla?"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
 msgstr ""
-"Necesitamos que active su cuenta para asegurarnos que es usted realmente el "
-"que está creando la cuenta y para prevenir fraude."
+"Necesitamos que actives tu cuenta para asegurarnos de que eres realmente tú "
+"el que está creando la cuenta y para prevenir fraudes."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -9582,13 +9348,13 @@ msgstr "Verificación de identidad en progreso"
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
+"(usually within 5-7 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
-"Hemos recibido la información enviada y estamos verificando su identidad. "
-"Recibir un mensaje en su Panel principal cuando el proceso de verificación "
-"esté completado (usualmente entre 1-2 días). Durante este tiempo, igualmente"
-" tendrá acceso a todo el contenido de su curso."
+"Hemos recibido su información y estamos verificando su identidad. Verá un "
+"mensaje en su tablero cuando se complete el proceso de verificación "
+"(generalmente dentro de 5-7 días). Mientras tanto, aún puede acceder a todo "
+"el contenido del curso disponible."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -9678,13 +9444,82 @@ msgstr "Tomar nuevamente la foto"
 msgid "Take Photo"
 msgstr "Tomar foto"
 
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Add a New Allowance"
+msgstr "Añadir nueva autorización"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Special Exam"
+msgstr "Examen especial"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr "%(exam_display_name)s"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Exam Type"
+msgstr "Tipo de examen"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Type"
+msgstr "Tipo de autorización"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Additional Time (minutes)"
+msgstr "Tiempo adicional (minutos)"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Value"
+msgstr "Valor"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Username or Email"
+msgstr "Nombre de usuario o correo electrónico"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowances"
+msgstr "Autorizaciones"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Add Allowance"
+msgstr "Añadir autorización"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Exam Name"
+msgstr "Nombre del examen"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+msgid "Allowance Value"
+msgstr "Valor de la autorización"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Time Limit"
+msgstr "Límite de tiempo"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Started At"
+msgstr "Iniciado a las"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+msgid "Completed At"
+msgstr "Finalizado a las"
+
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
+msgstr "%(username)s"
+
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
-msgstr "Añadido a marcadores en"
+msgstr "Página marcada en"
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "You have not bookmarked any courseware pages yet"
-msgstr "No has añadido marcadores a ninguna página del curso todavía"
+msgstr "Todavía no ha marcado ninguna página del curso."
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid ""
@@ -9694,13 +9529,6 @@ msgstr ""
 "Usa marcadores para ayudarte a regresar fácilmente a ciertas páginas en el "
 "curso. Para marcar una página, haz clic en \"Marcar esta página\" bajo el "
 "título de la página."
-
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
-msgid "Load next {num_items} result"
-msgid_plural "Load next {num_items} results"
-msgstr[0] "Cargar el siguiente {num_items} resultado"
-msgstr[1] "Cargar los siguientes {num_items} resultados"
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -9731,7 +9559,7 @@ msgstr "Empieza a trabajar hacia tu próxima meta de aprendizaje."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Find a course"
-msgstr "Busca un curso"
+msgstr "Encontrar un curso"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
@@ -9760,6 +9588,8 @@ msgid ""
 "Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
 "existing account"
 msgstr ""
+"Crear una {link_start}cuenta en Mozilla Backpack{link_end} o iniciar sesión "
+"en una cuenta existente."
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid ""
@@ -9767,6 +9597,9 @@ msgid ""
 "as){link_end} and then {upload_link_start}upload{link_end} it to your "
 "backpack."
 msgstr ""
+"{download_link_start}descargar esta imagen (clic derecho, guardar "
+"como){link_end} y luego {upload_link_start} carguela {link_end} a su bolsa "
+"en Mozilla Backpack."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9784,7 +9617,7 @@ msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
-msgstr "Prerrequisito"
+msgstr "Prerrequisito:"
 
 #: cms/templates/js/access-editor.underscore
 msgid "No prerequisite"
@@ -9792,7 +9625,7 @@ msgstr "Sin prerrequisitos"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Minimum Score:"
-msgstr "Nota mínima"
+msgstr "Calificación mínima"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Minimum Completion:"
@@ -9865,7 +9698,7 @@ msgstr "Soportado de forma provisional"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
-msgstr "Añadir nuevo Componente"
+msgstr "Añadir Nuevo Componente"
 
 #: cms/templates/js/advanced_entry.underscore
 msgid "Deprecated"
@@ -10129,7 +9962,7 @@ msgstr ""
 
 #: cms/templates/js/copy-clipboard-button.underscore
 msgid "Copy Component Location"
-msgstr ""
+msgstr "Copiar la ubicación del Componente"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Weekly Highlight Emails"
@@ -10258,10 +10091,6 @@ msgid "Proctored Exam"
 msgstr "Examen supervisado"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Timed Exam"
-msgstr "Examen cronometrado"
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #, python-format
 msgid "Collapse/Expand this %(xblock_type)s"
@@ -10269,7 +10098,7 @@ msgstr "Contraer/Expandir esta %(xblock_type)s"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
-msgstr "Nombre para mostrar:"
+msgstr "Nombre para mostrar"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
@@ -10396,7 +10225,7 @@ msgstr "Idiomas de Transcripción"
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Add"
-msgstr "Añadir"
+msgstr "Agregar"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Press Add to language"
@@ -10574,7 +10403,7 @@ msgstr "Añadir capítulo"
 
 #: cms/templates/js/edit-title-button.underscore
 msgid "Edit Title"
-msgstr ""
+msgstr "Editar título"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -11354,12 +11183,12 @@ msgid "Read more"
 msgstr "Leer más"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "Mostrar transcripciones ({totalTranscripts})"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "No se ha subido ninguna transcripción"
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "Mostrar transcripciones ({totalTranscripts})"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"
