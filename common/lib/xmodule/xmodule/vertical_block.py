@@ -14,6 +14,7 @@ from web_fragments.fragment import Fragment
 
 from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.library_content_module import LibraryContentBlock
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -82,7 +83,15 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         # pylint: disable=no-member
         for child in child_blocks:
-            if context.get('hide_access_error_blocks') and getattr(child, 'has_access_error', False):
+
+            # Check access for regular question
+            child_has_access_error = getattr(child, 'has_access_error', False)
+
+            # Check access for randomized library question
+            if isinstance(child, LibraryContentBlock):
+                child_has_access_error = child.has_gated_content
+
+            if context.get('hide_access_error_blocks') and child_has_access_error:
                 continue
             child_block_context = copy(child_context)
             if child in list(child_blocks_to_complete_on_view):

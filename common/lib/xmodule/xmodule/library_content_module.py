@@ -649,6 +649,19 @@ class LibraryContentBlock(
         """
         return True
 
+    @property
+    def has_gated_content(self):
+        """
+        Tells whether library contains questions only accessible to upgraded learners
+        """
+        library_questions = self.get_children()
+
+        for ques in library_questions:
+            if ques.has_access_error:
+                return True
+
+        return False
+
     def get_content_titles(self):
         """
         Returns list of friendly titles for our selected children only; without
