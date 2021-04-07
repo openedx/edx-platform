@@ -520,22 +520,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         course_locator = self._map_revision_to_branch(course_locator)
         return super().get_course_history_info(course_locator)
 
-    def get_course_successors(self, course_locator, version_history_depth=1):
-        """
-        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_successors`
-        """
-        course_locator = self._map_revision_to_branch(course_locator)
-        return super().get_course_successors(
-            course_locator, version_history_depth=version_history_depth
-        )
-
-    def get_block_generations(self, block_locator):
-        """
-        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_block_generations`
-        """
-        block_locator = self._map_revision_to_branch(block_locator)
-        return super().get_block_generations(block_locator)
-
     def has_published_version(self, xblock):
         """
         Returns whether this xblock has a published version (whether it's up to date or not).

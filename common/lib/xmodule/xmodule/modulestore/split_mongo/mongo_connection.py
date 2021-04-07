@@ -353,51 +353,6 @@ class MongoConnection:
             tagger.measure("structures", len(docs))
             return docs
 
-    @autoretry_read()
-    def find_structures_derived_from(self, ids, course_context=None):
-        """
-        Return all structures that were immediately derived from a structure listed in ``ids``.
-
-        Arguments:
-            ids (list): A list of structure ids
-        """
-        with TIMER.timer("find_structures_derived_from", course_context) as tagger:
-            tagger.measure("base_ids", len(ids))
-            docs = [
-                structure_from_mongo(structure, course_context)
-                for structure in self.structures.find({'previous_version': {'$in': ids}})
-            ]
-            tagger.measure("structures", len(docs))
-            return docs
-
-    @autoretry_read()
-    def find_ancestor_structures(self, original_version, block_key, course_context=None):
-        """
-        Find all structures that originated from ``original_version`` that contain ``block_key``.
-
-        Arguments:
-            original_version (str or ObjectID): The id of a structure
-            block_key (BlockKey): The id of the block in question
-        """
-        with TIMER.timer("find_ancestor_structures", course_context) as tagger:
-            docs = [
-                structure_from_mongo(structure, course_context)
-                for structure in self.structures.find({
-                    'original_version': original_version,
-                    'blocks': {
-                        '$elemMatch': {
-                            'block_id': block_key.id,
-                            'block_type': block_key.type,
-                            'edit_info.update_version': {
-                                '$exists': True,
-                            },
-                        },
-                    },
-                })
-            ]
-            tagger.measure("structures", len(docs))
-            return docs
-
     def insert_structure(self, structure, course_context=None):
         """
         Insert a new structure into the database.
