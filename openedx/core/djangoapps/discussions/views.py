@@ -33,10 +33,17 @@ class DiscussionsConfigurationView(APIView):
     """
     permission_classes = (IsStaff,)
 
-    class Serializer(serializers.BaseSerializer):
+    class Serializer(serializers.ModelSerializer):
         """
         Serialize configuration responses
         """
+        class Meta:
+            model = DiscussionsConfiguration
+            fields = [
+                'context_key',
+                'enabled',
+                'provider_type',
+            ]
 
         def to_internal_value(self, data):
             """
@@ -48,9 +55,8 @@ class DiscussionsConfigurationView(APIView):
             """
             Serialize data into a dictionary, to be used as a response
             """
-            payload = {
-                'context_key': str(instance.context_key),
-                'enabled': instance.enabled,
+            payload = super().to_representation(instance)
+            payload.update({
                 'features': {
                     'discussion-page',
                     'embedded-course-sections',
@@ -67,7 +73,7 @@ class DiscussionsConfigurationView(APIView):
                         for provider in instance.available_providers
                     },
                 },
-            }
+            })
             return payload
 
         def update(self, instance, validated_data):
