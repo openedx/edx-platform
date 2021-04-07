@@ -51,7 +51,8 @@ def update_dsc_cache_on_course_enrollment(sender, instance, **kwargs):  # pylint
     """
     clear_data_consent_share_cache(
         instance.enterprise_customer_user.user_id,
-        instance.course_id
+        instance.course_id,
+        str(instance.enterprise_customer_user.enterprise_customer.uuid)
     )
 
 

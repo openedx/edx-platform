@@ -600,7 +600,13 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         )
     )
 
-    consent_cache_key = get_data_consent_share_cache_key(user.id, course_id)
+    enterprise_learner_details = get_enterprise_learner_data_from_db(user)
+    enterprise_customer_uuid = None
+    if enterprise_learner_details:
+        enterprise_customer = enterprise_learner_details[0]['enterprise_customer']
+        enterprise_customer_uuid = enterprise_customer['uuid']
+
+    consent_cache_key = get_data_consent_share_cache_key(user.id, course_id, enterprise_customer_uuid)
     data_sharing_consent_needed_cache = TieredCache.get_cached_response(consent_cache_key)
     if data_sharing_consent_needed_cache.is_found and data_sharing_consent_needed_cache.value == 0:
         LOGGER.info(
@@ -613,7 +619,6 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
         return False
 
     consent_needed = False
-    enterprise_learner_details = get_enterprise_learner_data_from_db(user)
     if not enterprise_learner_details:
         LOGGER.info(
             "Consent from user [{username}] is not needed for course [{course_id}]. The user is not linked to an"
