@@ -38,12 +38,6 @@ class DiscussionsConfigurationView(APIView):
         Serialize configuration responses
         """
 
-        def create(self, validated_data):
-            """
-            Create and save a new instance
-            """
-            raise NotImplementedError
-
         def to_internal_value(self, data):
             """
             Transform the *incoming* primitive data into a native value.
