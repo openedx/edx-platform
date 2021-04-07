@@ -39,7 +39,26 @@ User = get_user_model()
 
 class CertificateStatuses:
     """
-    Enum for certificate statuses
+    Enum for certificate statuses.
+
+    Not all of these status are currently used. Some are kept for historical reasons and because existing course
+    certificates may have been granted that status.
+
+    audit_notpassing    - User is in the audit track and has not achieved a passing grade.
+    audit_passing       - User is in the audit track and has achieved a passing grade.
+    deleted             - The PDF certificate has been deleted.
+    deleting            - A request has been made to delete the PDF certificate.
+    downloadable        - The user has been granted this certificate and the certificate is ready and available.
+    error               - An error occurred during PDF certificate generation.
+    generating          - A request has been made to generate a PDF certificate, but it has not been generated yet.
+    honor_passing       - User is in the honor track and has achieved a passing grade.
+    invalidated         - Certificate is not valid.
+    notpassing          - The user has not achieved a passing grade.
+    requesting          - A request has been made to generate the PDF certificate.
+    restricted          - The user is on the restricted list. This status was previously set if allow_certificate was
+                          set to False in the userprofile table.
+    unavailable         - Certificate has been invalidated.
+    unverified          - The user is in verified track but does not have an approved, unexpired identity verification.
     """
     deleted = 'deleted'
     deleting = 'deleting'
@@ -200,6 +219,10 @@ class GeneratedCertificate(models.Model):
     .. pii: PII can exist in the generated certificate linked to in this model. Certificate data is currently retained.
     .. pii_types: name, username
     .. pii_retirement: retained
+
+    The grade stored in this model is set at the same time as the status. This GeneratedCertificate grade is *not*
+    updated whenever the user's course grade changes and so it should not be considered the source of truth. It is
+    suggested that the PersistentCourseGrade be used instead of the GeneratedCertificate grade.
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
@@ -570,24 +593,6 @@ def certificate_status_for_student(student, course_id):
 def certificate_status(generated_certificate):
     """
     This returns a dictionary with a key for status, and other information.
-    The status is one of the following:
-
-    unavailable  - No entry for this student--if they are actually in
-                   the course, they probably have not been graded for
-                   certificate generation yet.
-    generating   - A request has been made to generate a certificate,
-                   but it has not been generated yet.
-    deleting     - A request has been made to delete a certificate.
-
-    deleted      - The certificate has been deleted.
-    downloadable - The certificate is available for download.
-    notpassing   - The student was graded but is not passing
-    restricted   - The student is on the restricted list. This status was
-                   previously set if allow_certificate was set to False in
-                   the userprofile table.
-    unverified   - The student is in verified enrollment track and
-                   the student did not have their identity verified,
-                   even though they should be eligible for the cert otherwise.
 
     If the status is "downloadable", the dictionary also contains
     "download_url".

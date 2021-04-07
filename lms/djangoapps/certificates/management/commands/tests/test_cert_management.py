@@ -141,7 +141,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
 
     def test_course_does_not_exist(self):
         phantom_course = CourseLocator(org='phantom', course='phantom', run='phantom')
-        self._create_cert(phantom_course, self.user, 'error')
+        self._create_cert(phantom_course, self.user, CertificateStatuses.error)
         call_command(self.command)
 
         # Expect that the certificate was NOT resubmitted
