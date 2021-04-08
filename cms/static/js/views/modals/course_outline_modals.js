@@ -1208,6 +1208,19 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }, options));
         },
 
+        /**
+         * This function allows comprehensive themes to create custom editors without adding boilerplate code.
+         *
+         * A simple example theme for this can be found at https://github.com/open-craft/custom-unit-icons-theme
+         **/
+        getCustomEditModal: function(tabs, editors, xblockInfo, options) {
+            return new SettingsXBlockModal($.extend({
+                tabs: tabs,
+                editors: editors,
+                model: xblockInfo
+            }, options));
+        },
+
         getPublishModal: function(xblockInfo, options) {
             return new PublishXBlockModal($.extend({
                 editors: [PublishEditor],

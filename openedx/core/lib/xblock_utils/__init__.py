@@ -558,6 +558,6 @@ def get_icon(block):
     """
     A function that returns the CSS class representing an icon to use for this particular
     XBlock (in the courseware navigation bar). Mostly used for Vertical/Unit XBlocks.
-    It can be overridden by setting `GET_UNIT_ICON_IMPL` to an alternative implementation.
+    It can be overridden by setting `OVERRIDE_GET_UNIT_ICON` to an alternative implementation.
     """
     return block.get_icon_class()
