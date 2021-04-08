@@ -7,10 +7,8 @@ Tests for course group views
 
 import json
 from collections import namedtuple
-
-import six
-from six.moves import range
-from django.contrib.auth.models import User
+import pytest
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -41,7 +39,7 @@ class CohortViewsTestCase(ModuleStoreTestCase):
     Base class which sets up a course and staff/non-staff users.
     """
     def setUp(self):
-        super(CohortViewsTestCase, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create()
         self.staff_user = UserFactory(is_staff=True, username="staff")
         self.non_staff_user = UserFactory(username="nonstaff")
@@ -107,10 +105,10 @@ class CohortViewsTestCase(ModuleStoreTestCase):
             user = self.staff_user
         request.user = user
         if cohort:
-            response = handler(request, six.text_type(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, six.text_type(course.id))
-        self.assertEqual(response.status_code, expected_response_code)
+            response = handler(request, str(course.id))
+        assert response.status_code == expected_response_code
         return json.loads(response.content.decode('utf-8'))
 
     def put_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
@@ -118,15 +116,15 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         Call a PUT on `handler` for a given `course` and return its response as a dict.
         Raise an exception if response status code is not as expected.
         """
-        if not isinstance(data, six.string_types):
+        if not isinstance(data, str):
             data = json.dumps(data or {})
         request = RequestFactory().put(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = handler(request, six.text_type(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, six.text_type(course.id))
-        self.assertEqual(response.status_code, expected_response_code)
+            response = handler(request, str(course.id))
+        assert response.status_code == expected_response_code
         return json.loads(response.content.decode('utf-8'))
 
     def patch_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
@@ -134,16 +132,16 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         Call a PATCH on `handler` for a given `course` and return its response as a dict.
         Raise an exception if response status code is not as expected.
         """
-        if not isinstance(data, six.string_types):
+        if not isinstance(data, str):
             data = json.dumps(data or {})
 
         request = RequestFactory().patch(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = handler(request, six.text_type(course.id), cohort.id)
+            response = handler(request, str(course.id), cohort.id)
         else:
-            response = handler(request, six.text_type(course.id))
-        self.assertEqual(response.status_code, expected_response_code)
+            response = handler(request, str(course.id))
+        assert response.status_code == expected_response_code
         return json.loads(response.content.decode('utf-8'))
 
 
@@ -165,8 +163,8 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access course_cohort_settings_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [six.text_type(self.course.id)])
-        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [six.text_type(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [str(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [str(self.course.id)])
 
     def test_update_is_cohorted_settings(self):
         """
@@ -178,12 +176,12 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
 
         expected_response = self.get_expected_response()
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
         expected_response['is_cohorted'] = False
         response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
 
-        self.assertEqual(response, expected_response)
+        assert response == expected_response
 
     def test_enabling_cohorts_does_not_change_division_scheme(self):
         """
@@ -196,18 +194,14 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
 
         expected_response = self.get_expected_response()
         expected_response['is_cohorted'] = False
-        self.assertEqual(response, expected_response)
-        self.assertEqual(
-            CourseDiscussionSettings.NONE, get_course_discussion_settings(self.course.id).division_scheme
-        )
+        assert response == expected_response
+        assert CourseDiscussionSettings.NONE == get_course_discussion_settings(self.course.id).division_scheme
 
         expected_response['is_cohorted'] = True
         response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
 
-        self.assertEqual(response, expected_response)
-        self.assertEqual(
-            CourseDiscussionSettings.NONE, get_course_discussion_settings(self.course.id).division_scheme
-        )
+        assert response == expected_response
+        assert CourseDiscussionSettings.NONE == get_course_discussion_settings(self.course.id).division_scheme
 
     def test_update_settings_with_missing_field(self):
         """
@@ -216,7 +210,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         config_course_cohorts(self.course, is_cohorted=True)
 
         response = self.patch_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
-        self.assertEqual("Bad Request", response.get("error"))
+        assert 'Bad Request' == response.get('error')
 
     def test_update_settings_with_invalid_field_data_type(self):
         """
@@ -230,10 +224,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
             expected_response_code=400,
             handler=course_cohort_settings_handler
         )
-        self.assertEqual(
-            "Cohorted must be a boolean",
-            response.get("error")
-        )
+        assert 'Cohorted must be a boolean' == response.get('error')
 
 
 class CohortHandlerTestCase(CohortViewsTestCase):
@@ -241,7 +232,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
     Tests the `cohort_handler` view.
     """
     def setUp(self):
-        super(CohortHandlerTestCase, self).setUp()
+        super().setUp()
         self.course_staff_user = StaffFactory(
             username="coursestaff",
             course_key=self.course.id
@@ -259,20 +250,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         if response_dict is None:
             response_dict = self.get_handler(self.course, user=user)
 
-        self.assertEqual(
-            response_dict.get("cohorts"),
-            [
-                {
-                    "name": cohort.name,
-                    "id": cohort.id,
-                    "user_count": cohort.user_count,
-                    "assignment_type": cohort.assignment_type,
-                    "user_partition_id": None,
-                    "group_id": None
-                }
-                for cohort in expected_cohorts
-            ]
-        )
+        assert response_dict.get('cohorts') == [{'name': cohort.name, 'id': cohort.id, 'user_count': cohort.user_count,
+                                                 'assignment_type': cohort.assignment_type, 'user_partition_id': None,
+                                                 'group_id': None} for cohort in expected_cohorts]
 
     @staticmethod
     def create_expected_cohort(cohort, user_count, assignment_type, user_partition_id=None, group_id=None):
@@ -289,8 +269,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access cohort_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(cohort_handler, "POST", [six.text_type(self.course.id)])
-        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [six.text_type(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "POST", [str(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [str(self.course.id)])
 
     def test_course_writers(self):
         """
@@ -376,7 +356,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
 
         # We should expect the DoesNotExist exception because above cohort config have
         # no effect on lms side so as a result there will be no AutoGroup cohort present
-        with self.assertRaises(CourseUserGroup.DoesNotExist):
+        with pytest.raises(CourseUserGroup.DoesNotExist):
             get_cohort_by_name(self.course.id, "AutoGroup")
 
     def test_get_single_cohort(self):
@@ -385,17 +365,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         self._create_cohorts()
         response_dict = self.get_handler(self.course, self.cohort2)
-        self.assertEqual(
-            response_dict,
-            {
-                "name": self.cohort2.name,
-                "id": self.cohort2.id,
-                "user_count": 2,
-                "assignment_type": CourseCohort.MANUAL,
-                "user_partition_id": None,
-                "group_id": None
-            }
-        )
+        assert response_dict == {'name': self.cohort2.name, 'id': self.cohort2.id, 'user_count': 2,
+                                 'assignment_type': CourseCohort.MANUAL, 'user_partition_id': None, 'group_id': None}
 
     ############### Tests of adding a new cohort ###############
 
@@ -407,19 +378,13 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         Verifies that the cohort was created properly and the correct response was returned.
         """
         created_cohort = get_cohort_by_name(self.course.id, cohort_name)
-        self.assertIsNotNone(created_cohort)
-        self.assertEqual(
-            response_dict,
-            {
-                "name": cohort_name,
-                "id": created_cohort.id,
-                "user_count": 0,
-                "assignment_type": assignment_type,
-                "user_partition_id": expected_user_partition_id,
-                "group_id": expected_group_id
-            }
-        )
-        self.assertEqual((expected_group_id, expected_user_partition_id), get_group_info_for_cohort(created_cohort))
+        assert created_cohort is not None
+        assert response_dict == {'name': cohort_name, 'id': created_cohort.id, 'user_count': 0,
+                                 'assignment_type': assignment_type,
+                                 'user_partition_id': expected_user_partition_id,
+                                 'group_id': expected_group_id}
+
+        assert (expected_group_id, expected_user_partition_id) == get_group_info_for_cohort(created_cohort)
 
     def test_create_new_cohort(self):
         """
@@ -450,14 +415,14 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         Verify that we cannot create a cohort without specifying a name.
         """
         response_dict = self.put_handler(self.course, expected_response_code=400)
-        self.assertEqual("Cohort name must be specified.", response_dict.get("error"))
+        assert 'Cohort name must be specified.' == response_dict.get('error')
 
     def test_create_new_cohort_missing_assignment_type(self):
         """
         Verify that we cannot create a cohort without specifying an assignment type.
         """
         response_dict = self.put_handler(self.course, data={'name': 'COHORT NAME'}, expected_response_code=400)
-        self.assertEqual("Assignment type must be specified.", response_dict.get("error"))
+        assert 'Assignment type must be specified.' == response_dict.get('error')
 
     def test_create_new_cohort_existing_name(self):
         """
@@ -468,7 +433,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             self.course, data={'name': self.cohort1.name, 'assignment_type': CourseCohort.MANUAL},
             expected_response_code=400
         )
-        self.assertEqual("You cannot create two cohorts with the same name", response_dict.get("error"))
+        assert 'You cannot create two cohorts with the same name' == response_dict.get('error')
 
     def test_create_new_cohort_missing_user_partition_id(self):
         """
@@ -476,9 +441,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         data = {'name': "Cohort missing user_partition_id", 'assignment_type': CourseCohort.MANUAL, 'group_id': 2}
         response_dict = self.put_handler(self.course, data=data, expected_response_code=400)
-        self.assertEqual(
-            "If group_id is specified, user_partition_id must also be specified.", response_dict.get("error")
-        )
+        assert 'If group_id is specified, user_partition_id must also be specified.' == response_dict.get('error')
 
     ############### Tests of updating an existing cohort ###############
 
@@ -490,9 +453,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         updated_name = self.cohort1.name + "_updated"
         data = {'name': updated_name, 'assignment_type': CourseCohort.MANUAL}
         response_dict = self.put_handler(self.course, self.cohort1, data=data)
-        self.assertEqual(updated_name, get_cohort_by_id(self.course.id, self.cohort1.id).name)
-        self.assertEqual(updated_name, response_dict.get("name"))
-        self.assertEqual(CourseCohort.MANUAL, response_dict.get("assignment_type"))
+        assert updated_name == get_cohort_by_id(self.course.id, self.cohort1.id).name
+        assert updated_name == response_dict.get('name')
+        assert CourseCohort.MANUAL == response_dict.get('assignment_type')
 
     def test_update_random_cohort_name(self):
         """
@@ -503,8 +466,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
         response_dict = self.put_handler(self.course, data=data)
 
-        self.assertEqual(cohort_name, response_dict.get("name"))
-        self.assertEqual(CourseCohort.RANDOM, response_dict.get("assignment_type"))
+        assert cohort_name == response_dict.get('name')
+        assert CourseCohort.RANDOM == response_dict.get('assignment_type')
 
         # Update the newly created random cohort
         newly_created_cohort = get_cohort_by_name(self.course.id, cohort_name)
@@ -512,9 +475,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
         response_dict = self.put_handler(self.course, newly_created_cohort, data=data)
 
-        self.assertEqual(cohort_name, get_cohort_by_id(self.course.id, newly_created_cohort.id).name)
-        self.assertEqual(cohort_name, response_dict.get("name"))
-        self.assertEqual(CourseCohort.RANDOM, response_dict.get("assignment_type"))
+        assert cohort_name == get_cohort_by_id(self.course.id, newly_created_cohort.id).name
+        assert cohort_name == response_dict.get('name')
+        assert CourseCohort.RANDOM == response_dict.get('assignment_type')
 
     def test_cannot_update_assignment_type_of_single_random_cohort(self):
         """
@@ -525,23 +488,21 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         data = {'name': cohort_name, 'assignment_type': CourseCohort.RANDOM}
         response_dict = self.put_handler(self.course, data=data)
 
-        self.assertEqual(cohort_name, response_dict.get("name"))
-        self.assertEqual(CourseCohort.RANDOM, response_dict.get("assignment_type"))
+        assert cohort_name == response_dict.get('name')
+        assert CourseCohort.RANDOM == response_dict.get('assignment_type')
 
         # Try to update the assignment type of newly created random cohort
         cohort = get_cohort_by_name(self.course.id, cohort_name)
         data = {'name': cohort_name, 'assignment_type': CourseCohort.MANUAL}
         response_dict = self.put_handler(self.course, cohort, data=data, expected_response_code=400)
-        self.assertEqual(
-            'There must be one cohort to which students can automatically be assigned.', response_dict.get("error")
-        )
+        assert 'There must be one cohort to which students can automatically be assigned.' == response_dict.get('error')
 
     def test_update_cohort_group_id(self):
         """
         Test that it is possible to update the user_partition_id/group_id of an existing cohort.
         """
         self._create_cohorts()
-        self.assertEqual((None, None), get_group_info_for_cohort(self.cohort1))
+        assert (None, None) == get_group_info_for_cohort(self.cohort1)
         data = {
             'name': self.cohort1.name,
             'assignment_type': CourseCohort.MANUAL,
@@ -549,11 +510,11 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'user_partition_id': 3
         }
         response_dict = self.put_handler(self.course, self.cohort1, data=data)
-        self.assertEqual((2, 3), get_group_info_for_cohort(self.cohort1))
-        self.assertEqual(2, response_dict.get("group_id"))
-        self.assertEqual(3, response_dict.get("user_partition_id"))
+        assert (2, 3) == get_group_info_for_cohort(self.cohort1)
+        assert 2 == response_dict.get('group_id')
+        assert 3 == response_dict.get('user_partition_id')
         # Check that the name didn't change.
-        self.assertEqual(self.cohort1.name, response_dict.get("name"))
+        assert self.cohort1.name == response_dict.get('name')
 
     def test_update_cohort_remove_group_id(self):
         """
@@ -561,12 +522,12 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         self._create_cohorts()
         link_cohort_to_partition_group(self.cohort1, 5, 0)
-        self.assertEqual((0, 5), get_group_info_for_cohort(self.cohort1))
+        assert (0, 5) == get_group_info_for_cohort(self.cohort1)
         data = {'name': self.cohort1.name, 'assignment_type': CourseCohort.RANDOM, 'group_id': None}
         response_dict = self.put_handler(self.course, self.cohort1, data=data)
-        self.assertEqual((None, None), get_group_info_for_cohort(self.cohort1))
-        self.assertIsNone(response_dict.get("group_id"))
-        self.assertIsNone(response_dict.get("user_partition_id"))
+        assert (None, None) == get_group_info_for_cohort(self.cohort1)
+        assert response_dict.get('group_id') is None
+        assert response_dict.get('user_partition_id') is None
 
     def test_change_cohort_group_id(self):
         """
@@ -574,7 +535,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         different group_id.
         """
         self._create_cohorts()
-        self.assertEqual((None, None), get_group_info_for_cohort(self.cohort4))
+        assert (None, None) == get_group_info_for_cohort(self.cohort4)
         data = {
             'name': self.cohort4.name,
             'assignment_type': CourseCohort.RANDOM,
@@ -582,7 +543,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'user_partition_id': 3
         }
         self.put_handler(self.course, self.cohort4, data=data)
-        self.assertEqual((2, 3), get_group_info_for_cohort(self.cohort4))
+        assert (2, 3) == get_group_info_for_cohort(self.cohort4)
 
         data = {
             'name': self.cohort4.name,
@@ -591,7 +552,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             'user_partition_id': 3
         }
         self.put_handler(self.course, self.cohort4, data=data)
-        self.assertEqual((1, 3), get_group_info_for_cohort(self.cohort4))
+        assert (1, 3) == get_group_info_for_cohort(self.cohort4)
 
     def test_update_cohort_missing_user_partition_id(self):
         """
@@ -600,9 +561,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         self._create_cohorts()
         data = {'name': self.cohort1.name, 'assignment_type': CourseCohort.RANDOM, 'group_id': 2}
         response_dict = self.put_handler(self.course, self.cohort1, data=data, expected_response_code=400)
-        self.assertEqual(
-            "If group_id is specified, user_partition_id must also be specified.", response_dict.get("error")
-        )
+        assert 'If group_id is specified, user_partition_id must also be specified.' == response_dict.get('error')
 
 
 class UsersInCohortTestCase(CohortViewsTestCase):
@@ -617,13 +576,13 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         """
         request = RequestFactory().get("dummy_url", {"page": requested_page})
         request.user = self.staff_user
-        response = users_in_cohort(request, six.text_type(course.id), cohort.id)
+        response = users_in_cohort(request, str(course.id), cohort.id)
 
         if should_return_bad_request:
-            self.assertEqual(response.status_code, 400)
+            assert response.status_code == 400
             return
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         return json.loads(response.content.decode('utf-8'))
 
     def verify_users_in_cohort_and_response(self, cohort, response_dict, expected_users, expected_page,
@@ -633,21 +592,21 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         users, page number, and total number of pages for a given cohort.  Also
         verify that those users are actually in the given cohort.
         """
-        self.assertTrue(response_dict.get("success"))
-        self.assertEqual(response_dict.get("page"), expected_page)
-        self.assertEqual(response_dict.get("num_pages"), expected_num_pages)
+        assert response_dict.get('success')
+        assert response_dict.get('page') == expected_page
+        assert response_dict.get('num_pages') == expected_num_pages
 
         returned_users = User.objects.filter(username__in=[user.get("username") for user in response_dict.get("users")])
-        self.assertEqual(len(returned_users), len(expected_users))
-        self.assertEqual(set(returned_users), set(expected_users))
-        self.assertTrue(set(returned_users).issubset(cohort.users.all()))
+        assert len(returned_users) == len(expected_users)
+        assert set(returned_users) == set(expected_users)
+        assert set(returned_users).issubset(cohort.users.all())
 
     def test_non_staff(self):
         """
         Verify that non-staff users cannot access `check_users_in_cohort`.
         """
         cohort = CohortFactory(course_id=self.course.id, users=[])
-        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [six.text_type(self.course.id), cohort.id])
+        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [str(self.course.id), cohort.id])
 
     def test_no_users(self):
         """
@@ -742,7 +701,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
     Tests the `add_users_to_cohort` view.
     """
     def setUp(self):
-        super(AddUsersToCohortTestCase, self).setUp()
+        super().setUp()
         self._create_cohorts()
 
     def request_add_users_to_cohort(self, users_string, cohort, course, should_raise_404=False):
@@ -754,13 +713,10 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         request = RequestFactory().post("dummy_url", {"users": users_string})
         request.user = self.staff_user
         if should_raise_404:
-            self.assertRaises(
-                Http404,
-                lambda: add_users_to_cohort(request, six.text_type(course.id), cohort.id)
-            )
+            pytest.raises(Http404, (lambda: add_users_to_cohort(request, str(course.id), cohort.id)))
         else:
-            response = add_users_to_cohort(request, six.text_type(course.id), cohort.id)
-            self.assertEqual(response.status_code, 200)
+            response = add_users_to_cohort(request, str(course.id), cohort.id)
+            assert response.status_code == 200
 
             return json.loads(response.content.decode('utf-8'))
 
@@ -778,41 +734,20 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         'expected_preassigned' is a list of email addresses
         'expected_invalid' is a list of email addresses
         """
-        self.assertTrue(response_dict.get("success"))
-        self.assertEqual(
-            response_dict.get("added"),
-            [
-                {"username": user.username, "email": user.email}
-                for user in expected_added
-            ]
-        )
-        self.assertEqual(
-            response_dict.get("changed"),
-            [
-                {
-                    "username": user.username,
-                    "email": user.email,
-                    "previous_cohort": previous_cohort
-                }
-                for (user, previous_cohort) in expected_changed
-            ]
-        )
-        self.assertEqual(
-            response_dict.get("present"),
-            [username_or_email for (_, username_or_email) in expected_present]
-        )
-        self.assertEqual(response_dict.get("unknown"), expected_unknown)
-        self.assertEqual(response_dict.get("invalid"), expected_invalid)
-        self.assertEqual(response_dict.get("preassigned"), expected_preassigned)
+        assert response_dict.get('success')
+        assert response_dict.get('added') == [{'username': user.username,
+                                               'email': user.email} for user in expected_added]
+        assert response_dict.get('changed') == [{'username': user.username, 'email': user.email,
+                                                 'previous_cohort': previous_cohort} for (user, previous_cohort)
+                                                in expected_changed]
+        assert response_dict.get('present') == [username_or_email for (_, username_or_email) in expected_present]
+        assert response_dict.get('unknown') == expected_unknown
+        assert response_dict.get('invalid') == expected_invalid
+        assert response_dict.get('preassigned') == expected_preassigned
         for user in expected_added + [user for (user, _) in expected_changed + expected_present]:
-            self.assertEqual(
-                CourseUserGroup.objects.get(
-                    course_id=course.id,
-                    group_type=CourseUserGroup.COHORT,
-                    users__id=user.id
-                ),
-                cohort
-            )
+            assert CourseUserGroup.objects.get(course_id=course.id,
+                                               group_type=CourseUserGroup.COHORT,
+                                               users__id=user.id) == cohort
 
     def test_non_staff(self):
         """
@@ -822,7 +757,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             add_users_to_cohort,
             "POST",
-            [six.text_type(self.course.id), cohort.id]
+            [str(self.course.id), cohort.id]
         )
 
     def test_empty(self):
@@ -913,7 +848,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         Verify that non-existent users are not added.
         """
-        usernames = ["unknown_user{}".format(i) for i in range(3)]
+        usernames = [f"unknown_user{i}" for i in range(3)]
         response_dict = self.request_add_users_to_cohort(
             ",".join(usernames),
             self.cohort1,
@@ -984,14 +919,14 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         for c in self.get_handler(self.course)['cohorts']:
             if c['name'] == cohort.name:
                 cohort_listed = True
-                self.assertEqual(expected_count, c['user_count'])
-        self.assertTrue(cohort_listed)
+                assert expected_count == c['user_count']
+        assert cohort_listed
 
     def test_all(self):
         """
         Test all adding conditions together.
         """
-        unknowns = ["unknown_user{}".format(i) for i in range(3)]
+        unknowns = [f"unknown_user{i}" for i in range(3)]
         valid_emails = ["email@example.com", "email2@example.com", "email3@example.com"]
         new_users = self.cohortless_users + self.cohort1_users + self.cohort2_users + self.cohort3_users
         response_dict = self.request_add_users_to_cohort(
@@ -1062,7 +997,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         unknown = "unknown_user"
         response_dict = self.request_add_users_to_cohort(
-            u" {} {}\t{}, \r\n{}".format(
+            " {} {}\t{}, \r\n{}".format(
                 unknown,
                 self.cohort1_users[0].username,
                 self.cohort2_users[0].username,
@@ -1117,7 +1052,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         Verify that an error is raised when trying to add users to a cohort
         which does not belong to the given course.
         """
-        users = [UserFactory(username="user{0}".format(i)) for i in range(3)]
+        users = [UserFactory(username=f"user{i}") for i in range(3)]
         usernames = [user.username for user in users]
         wrong_course_key = CourseLocator("some", "arbitrary", "course")
         wrong_course_cohort = CohortFactory(name="wrong_cohort", course_id=wrong_course_key, users=[])
@@ -1142,8 +1077,8 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         else:
             request = RequestFactory().post("dummy_url")
         request.user = self.staff_user
-        response = remove_user_from_cohort(request, six.text_type(self.course.id), cohort.id)
-        self.assertEqual(response.status_code, 200)
+        response = remove_user_from_cohort(request, str(self.course.id), cohort.id)
+        assert response.status_code == 200
         return json.loads(response.content.decode('utf-8'))
 
     def verify_removed_user_from_cohort(self, username, response_dict, cohort, expected_error_msg=None):
@@ -1153,12 +1088,12 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         verify that the returned error message matches the expected one.
         """
         if expected_error_msg is None:
-            self.assertTrue(response_dict.get("success"))
-            self.assertIsNone(response_dict.get("msg"))
-            self.assertFalse(self._user_in_cohort(username, cohort))
+            assert response_dict.get('success')
+            assert response_dict.get('msg') is None
+            assert not self._user_in_cohort(username, cohort)
         else:
-            self.assertFalse(response_dict.get("success"))
-            self.assertEqual(response_dict.get("msg"), expected_error_msg)
+            assert not response_dict.get('success')
+            assert response_dict.get('msg') == expected_error_msg
 
     def test_non_staff(self):
         """
@@ -1168,7 +1103,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             remove_user_from_cohort,
             "POST",
-            [six.text_type(self.course.id), cohort.id]
+            [str(self.course.id), cohort.id]
         )
 
     def test_no_username_given(self):
@@ -1199,7 +1134,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
             username,
             response_dict,
             cohort,
-            expected_error_msg=u'No user \'{0}\''.format(username)
+            expected_error_msg=f'No user \'{username}\''
         )
 
     def test_can_remove_user_not_in_cohort(self):

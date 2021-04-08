@@ -24,7 +24,7 @@ class TestUserStateService(ModuleStoreTestCase):
         """
         Creating pre-requisites for the test cases.
         """
-        super(TestUserStateService, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         chapter = ItemFactory.create(
@@ -122,4 +122,4 @@ class TestUserStateService(ModuleStoreTestCase):
         params.update(state_params)
         self._create_student_module({'key_1': 'value_1'})
         state = UserStateService().get_state_as_dict(**params)
-        self.assertFalse(state)
+        assert not state

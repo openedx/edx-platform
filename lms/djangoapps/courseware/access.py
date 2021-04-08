@@ -15,13 +15,11 @@ Note: The access control logic in this file does NOT check for enrollment in
 import logging
 from datetime import datetime
 
-import six
 from django.conf import settings  # pylint: disable=unused-import
 from django.contrib.auth.models import AnonymousUser
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
-from six import text_type
 from xblock.core import XBlock
 
 from lms.djangoapps.courseware.access_response import (
@@ -59,14 +57,14 @@ from common.djangoapps.student.roles import (
     OrgStaffRole,
     SupportStaffRole
 )
-from common.djangoapps.util import milestones_helpers as milestones_helpers
+from common.djangoapps.util import milestones_helpers as milestones_helpers  # lint-amnesty, pylint: disable=useless-import-alias
 from common.djangoapps.util.milestones_helpers import (
     any_unfulfilled_milestones,
     get_pre_requisite_courses_not_completed,
     is_prerequisite_courses_enabled
 )
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseDescriptor
-from xmodule.error_module import ErrorDescriptor
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CourseBlock
+from xmodule.error_module import ErrorBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 from xmodule.x_module import XModule
 
@@ -127,7 +125,7 @@ def has_access(user, action, obj, course_key=None):
     type-specific functions below for the known actions for that type.
 
     course_key: A course_key specifying which course run this access is for.
-        Required when accessing anything other than a CourseDescriptor, 'global',
+        Required when accessing anything other than a CourseBlock, 'global',
         or a location with category 'course'
 
     Returns an AccessResponse object.  It is up to the caller to actually
@@ -144,13 +142,13 @@ def has_access(user, action, obj, course_key=None):
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
-    if isinstance(obj, CourseDescriptor):
+    if isinstance(obj, CourseBlock):
         return _has_access_course(user, action, obj)
 
     if isinstance(obj, CourseOverview):
         return _has_access_course(user, action, obj)
 
-    if isinstance(obj, ErrorDescriptor):
+    if isinstance(obj, ErrorBlock):
         return _has_access_error_desc(user, action, obj, course_key)
 
     if isinstance(obj, XModule):
@@ -166,12 +164,12 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
-    if isinstance(obj, six.string_types):
+    if isinstance(obj, str):
         return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
-    raise TypeError(u"Unknown object type in has_access(): '{0}'"
+    raise TypeError("Unknown object type in has_access(): '{}'"
                     .format(type(obj)))
 
 
@@ -195,7 +193,7 @@ def _can_view_courseware_with_prerequisites(user, course):
     Arguments:
         user (User): the user whose course access we are checking.
         course (AType): the course for which we are checking access.
-            where AType is CourseDescriptor, CourseOverview, or any other
+            where AType is CourseBlock, CourseOverview, or any other
             class that represents a course and has the attributes .location
             and .id.
     """
@@ -225,7 +223,7 @@ def _can_load_course_on_mobile(user, course):
 
     Arguments:
         user (User): the user whose course access we are checking.
-        course (CourseDescriptor|CourseOverview): the course for which we are
+        course (CourseBlock|CourseOverview): the course for which we are
             checking access.
 
     Returns:
@@ -246,7 +244,7 @@ def _can_enroll_courselike(user, courselike):
 
     Arguments:
         user (User): The user attempting to enroll.
-        courselike (CourseDescriptor or CourseOverview): The object representing the
+        courselike (CourseBlock or CourseOverview): The object representing the
             course in which the user is trying to enroll.
 
     Returns:
@@ -265,7 +263,7 @@ def _can_enroll_courselike(user, courselike):
         if cea and cea.valid_for_user(user):
             return ACCESS_GRANTED
         elif cea:
-            debug(u"Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
+            debug("Deny: CEA was already consumed by a different user {} and can't be used again by {}".format(
                 cea.user.id,
                 user.id,
             ))
@@ -297,7 +295,7 @@ def _has_access_course(user, action, courselike):
     Arguments:
         user (User): the user whose course access we are checking.
         action (string): The action that is being checked.
-        courselike (CourseDescriptor or CourseOverview): The object
+        courselike (CourseBlock or CourseOverview): The object
             representing the course that the user wants to access.
 
     Valid actions:
@@ -473,7 +471,7 @@ def _has_group_access(descriptor, user, course_key):
                     partitions.append(partition)
             else:
                 log.debug(
-                    u"Skipping partition with ID %s in course %s because it is no longer active",
+                    "Skipping partition with ID %s in course %s because it is no longer active",
                     partition.id, course_key
                 )
         except NoSuchUserPartitionError:
@@ -655,7 +653,7 @@ def _has_access_string(user, action, perm):
         Checks for staff access
         """
         if perm != 'global':
-            debug(u"Deny: invalid permission '%s'", perm)
+            debug("Deny: invalid permission '%s'", perm)
             return ACCESS_DENIED
         return ACCESS_GRANTED if GlobalStaff().has_user(user) else ACCESS_DENIED
 
@@ -687,14 +685,14 @@ def _dispatch(table, action, user, obj):
     """
     if action in table:
         result = table[action]()
-        debug(u"%s user %s, object %s, action %s",
+        debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              text_type(obj.location) if isinstance(obj, XBlock) else str(obj),
+              str(obj.location) if isinstance(obj, XBlock) else str(obj),
               action)
         return result
 
-    raise ValueError(u"Unknown action for object type '{0}': '{1}'".format(
+    raise ValueError("Unknown action for object type '{}': '{}'".format(
         type(obj), action))
 
 
@@ -756,7 +754,7 @@ def _has_access_to_course(user, access_level, course_key):
         return ACCESS_GRANTED
 
     if access_level not in ('staff', 'instructor'):
-        log.debug(u"Error in access._has_access_to_course access_level=%s unknown", access_level)
+        log.debug("Error in access._has_access_to_course access_level=%s unknown", access_level)
         debug("Deny: unknown access level")
         return ACCESS_DENIED
 
@@ -837,7 +835,7 @@ def _can_access_descriptor_with_milestones(user, descriptor, course_key):
     """
     if milestones_helpers.get_course_content_milestones(
         course_key,
-        six.text_type(descriptor.location),
+        str(descriptor.location),
         'requires',
         user.id
     ):
@@ -905,7 +903,7 @@ def is_mobile_available_for_user(user, descriptor):
         mobile_available flag on the course
         Beta User and staff access overrides the mobile_available flag
     Arguments:
-        descriptor (CourseDescriptor|CourseOverview): course or overview of course in question
+        descriptor (CourseBlock|CourseOverview): course or overview of course in question
     """
     return (
         auth.user_has_role(user, CourseBetaTesterRole(descriptor.id))

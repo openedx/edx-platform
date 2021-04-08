@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for the email opt-in list management command. """
 
 
@@ -9,12 +8,9 @@ import tempfile
 from collections import defaultdict
 
 import ddt
-import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from six import text_type
-from six.moves import range
 
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 from openedx.core.djangoapps.user_api.models import UserOrgTag
@@ -31,10 +27,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
     USER_USERNAME = "test_user"
-    USER_FIRST_NAME = u"Ṫëṡẗ"
-    USER_LAST_NAME = u"Űśéŕ"
+    USER_FIRST_NAME = "Ṫëṡẗ"
+    USER_LAST_NAME = "Űśéŕ"
 
-    TEST_ORG = u"téśt_őŕǵ"
+    TEST_ORG = "téśt_őŕǵ"
 
     OUTPUT_FILE_NAME = "test_org_email_opt_in.csv"
     OUTPUT_FIELD_NAMES = [
@@ -50,7 +46,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
     DEFAULT_DATETIME_STR = "2014-12-01 00:00:00"
 
     def setUp(self):
-        super(EmailOptInListTest, self).setUp()
+        super().setUp()
 
         self.user = UserFactory.create(
             username=self.USER_USERNAME,
@@ -217,14 +213,10 @@ class EmailOptInListTest(ModuleStoreTestCase):
         course_ids = []
         for row in output:
             course_id = row['course_id'].strip()
-            # Python3 takes care of the decoding in the csv object
-            # but python 2 doesn't
-            if six.PY2:
-                course_id = course_id.decode('utf-8')
             course_ids.append(course_id)
 
         for course in self.courses:
-            assert text_type(course.id) in course_ids
+            assert str(course.id) in course_ids
 
     # Choose numbers before and after the query interval boundary
     @ddt.data(2, 3, 4, 5, 6, 7, 8, 9)
@@ -243,7 +235,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Expect that every enrollment shows up in the report
         output_emails = [row["email"] for row in output]
         for email in output_emails:
-            self.assertIn(email, output_emails)
+            assert email in output_emails
 
     def test_org_capitalization(self):
         # Lowercase some of the org names in the course IDs
@@ -270,11 +262,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
     @ddt.data(0, 1)
     def test_not_enough_args(self, num_args):
         args = ["dummy"] * num_args
-        if six.PY2:
-            expected_msg_regex = (
-                "^Error: too few arguments$"
-            )
-        elif num_args == 1:
+        if num_args == 1:
             expected_msg_regex = (
                 "^Error: the following arguments are required: ORG_ALIASES$"
             )
@@ -302,12 +290,12 @@ class EmailOptInListTest(ModuleStoreTestCase):
         self._set_opt_in_pref(self.user, self.TEST_ORG, True)
 
         # Remove the user profile, and re-fetch user
-        self.assertTrue(hasattr(self.user, 'profile'))
+        assert hasattr(self.user, 'profile')
         self.user.profile.delete()
         user = User.objects.get(id=self.user.id)
 
         # Test that user do not have profile
-        self.assertFalse(hasattr(user, 'profile'))
+        assert not hasattr(user, 'profile')
 
         output = self._run_command(self.TEST_ORG)
         self._assert_output(output, (user, self.courses[0].id, True))
@@ -395,7 +383,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         output_path = os.path.join(temp_dir_path, self.OUTPUT_FILE_NAME)
         org_list = [org] + other_names
         if only_courses is not None:
-            only_courses = ",".join(text_type(course_id) for course_id in only_courses)
+            only_courses = ",".join(str(course_id) for course_id in only_courses)
 
         command = email_opt_in_list.Command()
 
@@ -413,9 +401,9 @@ class EmailOptInListTest(ModuleStoreTestCase):
         try:
             with open(output_path) as output_file:
                 reader = csv.DictReader(output_file, fieldnames=self.OUTPUT_FIELD_NAMES)
-                rows = [row for row in reader]
-        except IOError:
-            self.fail(u"Could not find or open output file at '{path}'".format(path=output_path))
+                rows = [row for row in reader]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+        except OSError:
+            self.fail(f"Could not find or open output file at '{output_path}'")
 
         # Return the output as a list of dictionaries
         return rows
@@ -437,31 +425,19 @@ class EmailOptInListTest(ModuleStoreTestCase):
             AssertionError
 
         """
-        self.assertEqual(len(output), len(args) + 1)
+        assert len(output) == (len(args) + 1)
 
         # Check the header row
-        self.assertEqual({
-            "user_id": "user_id",
-            "username": "username",
-            "email": "email",
-            "full_name": "full_name",
-            "course_id": "course_id",
-            "is_opted_in_for_email": "is_opted_in_for_email",
-            "preference_set_datetime": "preference_set_datetime"
-        }, output[0])
+        assert {'user_id': 'user_id', 'username': 'username', 'email': 'email', 'full_name': 'full_name',
+                'course_id': 'course_id', 'is_opted_in_for_email': 'is_opted_in_for_email',
+                'preference_set_datetime': 'preference_set_datetime'} == output[0]
 
         # Check data rows
         for user, course_id, opt_in_pref in args:
-            self.assertIn({
-                "user_id": str(user.id),
-                "username": user.username,
-                "email": user.email if six.PY3 else user.email.encode('utf-8'),
-                "full_name": ((user.profile.name if six.PY3 else user.profile.name.encode('utf-8')) if
-                              hasattr(user, 'profile') else ''),
-                "course_id": text_type(course_id) if six.PY3 else text_type(course_id).encode('utf-8'),
-                "is_opted_in_for_email": text_type(opt_in_pref) if six.PY3 else text_type(opt_in_pref).encode('utf-8'),
-                "preference_set_datetime": (
-                    self._latest_pref_set_datetime(self.user)
-                    if kwargs.get("expect_pref_datetime", True)
-                    else self.DEFAULT_DATETIME_STR)
-            }, output[1:])
+            assert {'user_id': str(user.id), 'username': user.username, 'email': user.email,
+                    'full_name': (user.profile.name if hasattr(user, 'profile') else ''),
+                    'course_id': str(course_id),
+                    'is_opted_in_for_email': str(opt_in_pref),
+                    'preference_set_datetime':
+                        (self._latest_pref_set_datetime(self.user) if kwargs.get('expect_pref_datetime', True) else
+                         self.DEFAULT_DATETIME_STR)} in output[1:]

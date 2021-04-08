@@ -19,8 +19,6 @@ invoked each time that changes have been made.
 """
 
 
-import os
-
 ########################## Devstack settings ###################################
 
 from .devstack import *  # pylint: disable=wildcard-import

@@ -13,6 +13,7 @@ from logging import getLogger
 import crum
 from django.conf import settings
 
+from edx_toggles.toggles import SettingToggle
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers_dirs import (
     Theme,
@@ -27,7 +28,7 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 @request_cached()
-def get_template_path(relative_path, **kwargs):
+def get_template_path(relative_path, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     The calculated value is cached for the lifetime of the current request.
     """
@@ -205,7 +206,7 @@ def get_current_theme():
         )
     except ValueError as error:
         # Log exception message and return None, so that open source theme is used instead
-        logger.exception(u'Theme not found in any of the themes dirs. [%s]', error)
+        logger.exception('Theme not found in any of the themes dirs. [%s]', error)
         return None
 
 
@@ -239,7 +240,7 @@ def get_theme_base_dir(theme_dir_name, suppress_error=False):
         return None
 
     raise ValueError(
-        u"Theme '{theme}' not found in any of the following themes dirs, \nTheme dirs: \n{dir}".format(
+        "Theme '{theme}' not found in any of the following themes dirs, \nTheme dirs: \n{dir}".format(
             theme=theme_dir_name,
             dir=get_theme_base_dirs(),
         ))
@@ -315,10 +316,12 @@ def is_comprehensive_theming_enabled():
     Returns:
          (bool): True if comprehensive theming is enabled else False
     """
-    if settings.ENABLE_COMPREHENSIVE_THEMING and current_request_has_associated_site_theme():
+    ENABLE_COMPREHENSIVE_THEMING = SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=False)
+
+    if ENABLE_COMPREHENSIVE_THEMING.is_enabled() and current_request_has_associated_site_theme():
         return True
 
-    return settings.ENABLE_COMPREHENSIVE_THEMING
+    return ENABLE_COMPREHENSIVE_THEMING.is_enabled()
 
 
 def get_config_value_from_site_or_settings(name, site=None, site_config_name=None):

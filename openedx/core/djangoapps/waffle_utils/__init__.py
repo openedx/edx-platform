@@ -7,121 +7,18 @@ import warnings
 from contextlib import contextmanager
 
 from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import WaffleFlag as BaseWaffleFlag
-from edx_toggles.toggles import WaffleFlagNamespace as BaseWaffleFlagNamespace
-from edx_toggles.toggles import WaffleSwitch as BaseWaffleSwitch
-from edx_toggles.toggles import WaffleSwitchNamespace as BaseWaffleSwitchNamespace
+from edx_toggles.toggles import (
+    LegacyWaffleFlag,
+    LegacyWaffleFlagNamespace,
+    LegacyWaffleSwitch,
+    LegacyWaffleSwitchNamespace,
+)
 from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
 
-class WaffleSwitchNamespace(BaseWaffleSwitchNamespace):
-    """
-    Deprecated class: instead, use edx_toggles.toggles.WaffleSwitchNamespace.
-    """
-
-    def __init__(self, name, log_prefix=None):
-        super().__init__(name, log_prefix=log_prefix)
-        warnings.warn(
-            (
-                "Importing WaffleSwitchNamespace from waffle_utils is deprecated. Instead, import from"
-                " edx_toggles.toggles."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitchNamespace[{}]".format(name))
-
-    @contextmanager
-    def override(self, switch_name, active=True):
-        """
-        Deprecated method: instead, use edx_toggles.toggles.testutils.override_waffle_switch.
-        """
-        warnings.warn(
-            (
-                "WaffleSwitchNamespace.override is deprecated. Instead, use"
-                " edx_toggles.toggles.testutils.override_waffle_switch."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute(
-            "deprecated_waffle_utils", "WaffleSwitchNamespace.override"
-        )
-        from edx_toggles.toggles.testutils import override_waffle_switch
-
-        with override_waffle_switch(
-            BaseWaffleSwitch(self, switch_name, module_name=__name__), active
-        ):
-            yield
-
-
-class WaffleSwitch(BaseWaffleSwitch):
-    """
-    Deprecated class: instead, use edx_toggles.toggles.WaffleSwitch.
-    """
-
-    def __init__(self, waffle_namespace, switch_name, module_name=None):
-        super().__init__(waffle_namespace, switch_name, module_name=module_name)
-        warnings.warn(
-            "Importing WaffleSwitch from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleSwitch[{}]".format(self.name))
-
-
-class WaffleFlagNamespace(BaseWaffleFlagNamespace):
-    """
-    Deprecated class: instead, use edx_toggles.toggles.WaffleFlagNamespace.
-    """
-
-    def __init__(self, name, log_prefix=None):
-        super().__init__(name, log_prefix=log_prefix)
-        warnings.warn(
-            "Importing WaffleFlagNamespace from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleFlagNamespace[{}]".format(name))
-
-
-class WaffleFlag(BaseWaffleFlag):
-    """
-    Deprecated class: instead, use edx_toggles.toggles.WaffleFlag.
-    """
-
-    def __init__(self, waffle_namespace, flag_name, module_name=None):
-        super().__init__(waffle_namespace, flag_name, module_name=module_name)
-        warnings.warn(
-            "Importing WaffleFlag from waffle_utils is deprecated. Instead, import from edx_toggles.toggles.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleFlag[{}]".format(self.name))
-
-    @contextmanager
-    def override(self, active=True):
-        """
-        Deprecated method: instead, use edx_toggles.toggles.testutils.override_waffle_flag.
-        """
-        warnings.warn(
-            (
-                "WaffleFlag.override is deprecated. Instead, use"
-                " edx_toggles.toggles.testutils.override_waffle_flag."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        set_custom_attribute("deprecated_waffle_utils", "WaffleFlag.override")
-        from edx_toggles.toggles.testutils import override_waffle_flag
-
-        with override_waffle_flag(self, active):
-            yield
-
-
-class CourseWaffleFlag(BaseWaffleFlag):
+class CourseWaffleFlag(LegacyWaffleFlag):
     """
     Represents a single waffle flag that can be forced on/off for a course. This class should be used instead of
     WaffleFlag when in the context of a course.
@@ -130,15 +27,23 @@ class CourseWaffleFlag(BaseWaffleFlag):
 
     Usage:
 
-       WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='my_namespace')
-       SOME_COURSE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'some_course_feature', __name__)
+       SOME_COURSE_FLAG = CourseWaffleFlag('my_namespace', 'some_course_feature', __name__)
 
     And then we can check this flag in code with::
 
         SOME_COURSE_FLAG.is_enabled(course_key)
 
-    The Django Admin "waffle_utils" section can be used to configure a course override for this same flag (e.g.
-    my_namespace.some_course_feature).
+    To configure, go to "Waffle flag course overrides" under the Django Admin "waffle_utils" section.
+
+        Waffle flag: Set this to the flag name (e.g. my_namespace.some_course_feature).
+        Course id: Set this to the course id (e.g. course-v1:edx+100+Demo)
+        Override choice: (Force on/Force off). "Force on" will enable the waffle flag for all users in a course,
+            overriding any behavior configured on the waffle flag itself. "Force off" will disable the waffle flag
+            for all users in a course, overriding any behavior configured on the waffle flag itself. Requires
+            "Enabled" (see below) to apply.
+        Enabled: This must be marked as enabled in order for the override to be applied. These settings can't be
+            deleted, so instead, you need to disable if it should no longer apply.
+
     """
 
     def _get_course_override_value(self, course_key):
@@ -154,16 +59,14 @@ class CourseWaffleFlag(BaseWaffleFlag):
         # Import is placed here to avoid model import at project startup.
         from .models import WaffleFlagCourseOverrideModel
 
-        cache_key = "{}.{}".format(self.namespaced_flag_name, str(course_key))
-        # pylint: disable=protected-access
-        course_override = self.waffle_namespace._cached_flags.get(cache_key)
+        cache_key = "{}.{}".format(self.name, str(course_key))
+        course_override = self.cached_flags().get(cache_key)
 
         if course_override is None:
             course_override = WaffleFlagCourseOverrideModel.override_value(
-                self.namespaced_flag_name, course_key
+                self.name, course_key
             )
-            # pylint: disable=protected-access
-            self.waffle_namespace._cached_flags[cache_key] = course_override
+            self.cached_flags()[cache_key] = course_override
 
         if course_override == WaffleFlagCourseOverrideModel.ALL_CHOICES.on:
             return True
@@ -188,9 +91,5 @@ class CourseWaffleFlag(BaseWaffleFlag):
             )
         is_enabled_for_course = self._get_course_override_value(course_key)
         if is_enabled_for_course is not None:
-            # pylint: disable=protected-access
-            self.waffle_namespace._monitor_value(
-                self.namespaced_flag_name, is_enabled_for_course
-            )
             return is_enabled_for_course
         return super().is_enabled()

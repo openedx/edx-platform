@@ -1,22 +1,16 @@
 """
 Factories related to student verification.
 """
-
-
-from datetime import timedelta
-
-from django.conf import settings
-from django.utils.timezone import now
 from factory.django import DjangoModelFactory
 
-from lms.djangoapps.verify_student.models import SSOVerification, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
 
 
 class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
     """
     Factory for SoftwareSecurePhotoVerification
     """
-    class Meta(object):
+    class Meta:
         model = SoftwareSecurePhotoVerification
 
     status = 'approved'

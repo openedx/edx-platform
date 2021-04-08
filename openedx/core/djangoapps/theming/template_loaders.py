@@ -17,7 +17,7 @@ class ThemeTemplateLoader(MakoLoader):
     _accepts_engine_in_init = True
 
     def __init__(self, *args):
-        MakoLoader.__init__(self, ThemeFilesystemLoader(*args))
+        MakoLoader.__init__(self, ThemeFilesystemLoader(*args))  # lint-amnesty, pylint: disable=no-value-for-parameter
 
 
 class ThemeFilesystemLoader(FilesystemLoader):
@@ -33,7 +33,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         theme_dirs = self.get_theme_template_sources()
         if isinstance(theme_dirs, list):
             self.dirs = theme_dirs + self.dirs
-        super(ThemeFilesystemLoader, self).__init__(engine, self.dirs)
+        super().__init__(engine, self.dirs)
 
     @staticmethod
     def get_theme_template_sources():

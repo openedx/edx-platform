@@ -8,7 +8,8 @@
         'edx-ui-toolkit/js/utils/constants',
         'text!common/templates/components/tabbed_view.underscore',
         'text!common/templates/components/tab.underscore',
-        'text!common/templates/components/tabpanel.underscore'
+        'text!common/templates/components/tabpanel.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
     ], function(
         Backbone,
         _,
@@ -16,7 +17,8 @@
         Constants,
         tabbedViewTemplate,
         tabTemplate,
-        tabPanelTemplate
+        tabPanelTemplate,
+        HtmlUtils
     ) {
         var getTabPanelId = function(id) {
             return 'tabpanel-' + id;
@@ -64,7 +66,7 @@
             initialize: function(options) {
                 this.router = options.router || null;
                 this.tabs = options.tabs;
-                this.template = _.template(tabbedViewTemplate)({
+                this.template = HtmlUtils.template(tabbedViewTemplate)({
                     viewLabel: this.viewLabel
                 });
                 // Convert each view into a TabPanelView
@@ -82,7 +84,10 @@
             },
             render: function() {
                 var self = this;
-                this.$el.html(this.template);
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template
+                );
                 _.each(this.tabs, function(tabInfo, index) {
                     var $tabEl = $(_.template(tabTemplate)({
                             index: index,

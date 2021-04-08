@@ -63,6 +63,9 @@ If you want to provide learners with new content experiences within courses, opt
    * - **External Graders**
      - Hold, Stable
      - An external grader is a service that receives learner responses to a problem, processes those responses, and returns feedback and a problem grade to the edX platform. You build and deploy an external grader separately from the edX platform. An external grader is particularly useful for software programming courses where learners are asked to submit complex code. See the `external grader documentation`_ for details.
+   * - **TinyMCE (Visual Text/HTML Editor) Plugins**
+     - Trial, Limited
+     - TinyMCE's functionality can be extended with so-called Plugins. Custom TinyMCE plugins can be particularly useful for serving certain content in courses that isn't available yet; they can also be used to facilitate the educator's work. `You can follow this guide to install and enable custom TinyMCE plugins`_.
 
 For a more detailed comparison of content integration options, see `Options for Extending the edX Platform`_ in the *Open edX Developer's Guide*.
 
@@ -72,6 +75,7 @@ For a more detailed comparison of content integration options, see `Options for 
 .. _Options for Extending the edX Platform: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/extending.html
 .. _custom JavaScript application: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html
 .. _external grader documentation: https://edx.readthedocs.io/projects/open-edx-ca/en/latest/exercises_tools/external_graders.html
+.. _You can follow this guide to install and enable custom TinyMCE plugins: extensions/tinymce_plugins.rst
 
 
 
@@ -130,6 +134,9 @@ Here are the different integration points that python plugins can use:
    * - XBlock unit tests (``xblock.test.v0``)
      - Assess, Limited
      - XBlocks can also install test code that will then be run alongside the platform's usual python unit tests. It's unclear how well-supported this is at the moment.
+   * - Pluggable override (``edx_django_utils.plugins.pluggable_override.pluggable_override``)
+     - Trial, Stable
+     - This decorator allows overriding any function or method by pointing to an alternative implementation in settings. Read the |pluggable_override docstring|_ to learn more.
 
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
 .. _Django app plugin documentation: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
@@ -142,6 +149,8 @@ Here are the different integration points that python plugins can use:
 .. _learning_context.py: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/xblock/learning_context/learning_context.py
 .. |UserPartition docstring| replace:: ``UserPartition`` docstring
 .. _UserPartition docstring: https://github.com/edx/edx-platform/blob/f8cc58618a39c9f7b8e9e1001eb2d7a10395797e/common/lib/xmodule/xmodule/partitions/partitions.py#L105-L120
+.. |pluggable_override docstring| replace:: ``pluggable_override`` docstring
+.. _pluggable_override docstring: https://github.com/edx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
 
 Platform Look & Feel
 ====================

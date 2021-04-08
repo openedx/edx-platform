@@ -36,12 +36,12 @@ class LmsBlockMixin(XBlockMixin):
         Copied from lms.djangoapps.lms_xblock.mixin.LmsBlockMixin
         """
         completion_service = self.runtime.service(self, 'completion')
-        if completion_service is None:
-            raise JsonHandlerError(500, u"No completion service found")
+        if completion_service is None:  # lint-amnesty, pylint: disable=no-else-raise
+            raise JsonHandlerError(500, "No completion service found")
         elif not completion_service.completion_tracking_enabled():
-            raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
+            raise JsonHandlerError(404, "Completion tracking is not enabled and API calls are unexpected")
         if not completion_service.can_mark_block_complete_on_view(self):
-            raise JsonHandlerError(400, u"Block not configured for completion on view.")
+            raise JsonHandlerError(400, "Block not configured for completion on view.")
         self.runtime.publish(self, "completion", data)
         return {'result': 'ok'}
 

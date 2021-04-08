@@ -68,7 +68,7 @@ django-storages
 django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
-djangorestframework==3.9.4
+djangorestframework
 edx-ace
 edx-analytics-data-api-client
 edx-api-doc-tools
@@ -78,9 +78,10 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=3.8.0             # Utilities for cache, monitoring, and plugins; 3.8.0+ for set_custom_attribute method
+edx-django-utils>=3.16.0            # Utilities for cache, monitoring, and plugins; 3.16.0+ for the `pluggable_override`
 edx-drf-extensions
 edx-enterprise
+edx-event-routing-backends
 edx-milestones
 edx-organizations
 edx-proctoring>=2.0.1
@@ -118,7 +119,6 @@ openedx-calc                        # Library supporting mathematical calculatio
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo<4.0.0                        # Used to communicate with Neo4j, which is used internally for modulestore inspection
 PyContracts
 pycountry
 pycryptodomex

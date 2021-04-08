@@ -14,6 +14,7 @@ OAUTH2_TOKEN_ERROR_MALFORMED = 'token_malformed'
 OAUTH2_TOKEN_ERROR_NONEXISTENT = 'token_nonexistent'
 OAUTH2_TOKEN_ERROR_NOT_PROVIDED = 'token_not_provided'
 OAUTH2_USER_NOT_ACTIVE_ERROR = 'user_not_active'
+OAUTH2_USER_DISABLED_ERROR = 'user_is_disabled'
 
 
 logger = logging.getLogger(__name__)
@@ -42,7 +43,7 @@ class BearerAuthentication(BaseAuthentication):
         set_custom_attribute("BearerAuthentication", "Failed")  # default value
         auth = get_authorization_header(request).split()
 
-        if len(auth) == 1:
+        if len(auth) == 1:  # lint-amnesty, pylint: disable=no-else-raise
             raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_NOT_PROVIDED,
                 'developer_message': 'Invalid token header. No credentials provided.'})
@@ -74,12 +75,12 @@ class BearerAuthentication(BaseAuthentication):
         try:
             token = self.get_access_token(access_token)
         except AuthenticationFailed as exc:
-            raise AuthenticationFailed({
+            raise AuthenticationFailed({  # lint-amnesty, pylint: disable=raise-missing-from
                 u'error_code': OAUTH2_TOKEN_ERROR,
                 u'developer_message': exc.detail
             })
 
-        if not token:
+        if not token:  # lint-amnesty, pylint: disable=no-else-raise
             raise AuthenticationFailed({
                 'error_code': OAUTH2_TOKEN_ERROR_NONEXISTENT,
                 'developer_message': 'The provided access token does not match any valid tokens.'
@@ -91,8 +92,15 @@ class BearerAuthentication(BaseAuthentication):
             })
         else:
             user = token.user
+            has_application = dot_models.Application.objects.filter(user_id=user.id)
+            if not user.has_usable_password() and not has_application:
+                msg = 'User disabled by admin: %s' % user.get_username()
+                raise AuthenticationFailed({
+                    'error_code': OAUTH2_USER_DISABLED_ERROR,
+                    'developer_message': msg})
+
             # Check to make sure the users have activated their account (by confirming their email)
-            if not self.allow_inactive_users and not user.is_active:
+            if not self.allow_inactive_users and not user.is_active:  # lint-amnesty, pylint: disable=no-else-raise
                 set_custom_attribute("BearerAuthentication_user_active", False)
                 msg = 'User inactive or deleted: %s' % user.get_username()
                 raise AuthenticationFailed({

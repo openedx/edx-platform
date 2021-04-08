@@ -26,7 +26,7 @@ class Command(BaseCommand):
     """
     help = dedent(__doc__).strip()
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
 
         errors = []
 
@@ -48,18 +48,18 @@ class Command(BaseCommand):
 
         # Verify that the MigrateVerifiedTrackCohortsSetting has all required fields
         if not old_course_key:
-            raise CommandError(u"No old_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError("No old_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
         if not rerun_course_key:
-            raise CommandError(u"No rerun_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError("No rerun_course_key set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
         if not audit_cohort_names:
-            raise CommandError(u"No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
+            raise CommandError("No audit_cohort_names set for MigrateVerifiedTrackCohortsSetting with ID: '%s'"
                                % verified_track_cohorts_setting.id)
 
-        print(u"Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" %
+        print("Running for MigrateVerifiedTrackCohortsSetting with old_course_key='%s' and rerun_course_key='%s'" %
               (verified_track_cohorts_setting.old_course_key, verified_track_cohorts_setting.rerun_course_key))
 
         # Get the CourseUserGroup IDs for the audit course names from the old course
@@ -71,7 +71,7 @@ class Command(BaseCommand):
 
         if not audit_course_user_group_ids:
             raise CommandError(
-                u"No Audit CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
+                "No Audit CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
                 % (old_course_key, CourseUserGroup.COHORT, audit_cohort_names)
             )
 
@@ -83,7 +83,7 @@ class Command(BaseCommand):
 
         if not random_audit_course_user_group_ids:
             raise CommandError(
-                u"No Audit CourseCohorts found for course_user_group_ids='%s' with assignment_type='%s"
+                "No Audit CourseCohorts found for course_user_group_ids='%s' with assignment_type='%s"
                 % (audit_course_user_group_ids, CourseCohort.RANDOM)
             )
 
@@ -95,7 +95,7 @@ class Command(BaseCommand):
 
         if not random_audit_course_user_group_partition_groups:
             raise CommandError(
-                u"No Audit CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
+                "No Audit CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
                 % random_audit_course_user_group_ids
             )
 
@@ -103,10 +103,10 @@ class Command(BaseCommand):
         try:
             verified_track_cohorted_course = VerifiedTrackCohortedCourse.objects.get(course_key=old_course_key)
         except VerifiedTrackCohortedCourse.DoesNotExist:
-            raise CommandError(u"No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)
+            raise CommandError("No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not verified_track_cohorted_course.enabled:
-            raise CommandError(u"VerifiedTrackCohortedCourse not enabled for course: '%s'" % old_course_key)
+            raise CommandError("VerifiedTrackCohortedCourse not enabled for course: '%s'" % old_course_key)
 
         # Get the single CourseUserGroupPartitionGroup for the verified_track
         # based on the verified_track name for the old course
@@ -117,8 +117,8 @@ class Command(BaseCommand):
                 name=verified_track_cohorted_course.verified_cohort_name
             )
         except CourseUserGroup.DoesNotExist:
-            raise CommandError(
-                u"No Verified CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
+            raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+                "No Verified CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
                 % (old_course_key, CourseUserGroup.COHORT, verified_track_cohorted_course.verified_cohort_name)
             )
 
@@ -127,8 +127,8 @@ class Command(BaseCommand):
                 course_user_group_id=verified_course_user_group.id
             )
         except CourseUserGroupPartitionGroup.DoesNotExist:
-            raise CommandError(
-                u"No Verified CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
+            raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+                "No Verified CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
                 % random_audit_course_user_group_ids
             )
 
@@ -139,7 +139,7 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.AUDIT
             )
         except CourseMode.DoesNotExist:
-            raise CommandError(u"Audit CourseMode is not defined for course: '%s'" % rerun_course_key)
+            raise CommandError("Audit CourseMode is not defined for course: '%s'" % rerun_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         try:
             CourseMode.objects.get(
@@ -147,11 +147,11 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.VERIFIED
             )
         except CourseMode.DoesNotExist:
-            raise CommandError(u"Verified CourseMode is not defined for course: '%s'" % rerun_course_key)
+            raise CommandError("Verified CourseMode is not defined for course: '%s'" % rerun_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
 
         items = module_store.get_items(rerun_course_key)
         if not items:
-            raise CommandError(u"Items for Course with key '%s' not found." % rerun_course_key)
+            raise CommandError("Items for Course with key '%s' not found." % rerun_course_key)
 
         items_to_update = []
 
@@ -175,7 +175,7 @@ class Command(BaseCommand):
                     )
                     if (audit_partition_group_access
                             and audit_course_user_group_partition_group.group_id in audit_partition_group_access):
-                        print(u"Queueing XBlock at location: '%s' for Audit Content Group update " % item.location)
+                        print("Queueing XBlock at location: '%s' for Audit Content Group update " % item.location)
                         set_audit_enrollment_track = True
 
                 # Check the partition and group IDs for the verified course group, if it exists in
@@ -192,11 +192,11 @@ class Command(BaseCommand):
                     # This only needs to be checked for this partition_group once
                     if non_verified_track_access_groups:
                         errors.append(
-                            u"Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
+                            "Non audit/verified cohorted content group set for xblock, location '%s' with IDs '%s'"
                             % (item.location, non_verified_track_access_groups)
                         )
                     if verified_course_user_group_partition_group.group_id in verified_partition_group_access:
-                        print(u"Queueing XBlock at location: '%s' for Verified Content Group update " % item.location)
+                        print("Queueing XBlock at location: '%s' for Verified Content Group update " % item.location)
                         set_verified_enrollment_track = True
 
                 # Add the enrollment track ids to a group access array
@@ -217,7 +217,7 @@ class Command(BaseCommand):
                         item.group_access = {ENROLLMENT_TRACK_PARTITION_ID: enrollment_track_group_access}
                         items_to_update.append(item)
                     else:
-                        errors.append(u"XBlock '%s' with location '%s' needs access changes, but is a draft"
+                        errors.append("XBlock '%s' with location '%s' needs access changes, but is a draft"
                                       % (item.display_name, item.location))
 
         partitions_to_delete = random_audit_course_user_group_partition_groups
@@ -228,12 +228,12 @@ class Command(BaseCommand):
             for item in items_to_update:
                 module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
                 module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
-                print(u"Updated and published XBlock at location: '%s'" % item.location)
+                print("Updated and published XBlock at location: '%s'" % item.location)
 
         # Check if we should delete any partition groups if there are no errors.
         # If there are errors, none of the xblock items will have been updated,
         # so this section will throw errors for each partition in use
-        if partitions_to_delete and not errors:
+        if partitions_to_delete and not errors:  # lint-amnesty, pylint: disable=too-many-nested-blocks
             partition_service = PartitionService(rerun_course_key)
             course = partition_service.get_course()
             for partition_to_delete in partitions_to_delete:
@@ -249,7 +249,7 @@ class Command(BaseCommand):
                     usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
                     used = group_id in usages[partition.id]
                     if used:
-                        errors.append(u"Content group '%s' is in use and cannot be deleted."
+                        errors.append("Content group '%s' is in use and cannot be deleted."
                                       % partition_to_delete.group_id)
 
                     # If there are not errors, proceed to update the course and user_partitions
@@ -270,11 +270,11 @@ class Command(BaseCommand):
         # If there are any errors, join them together and raise the CommandError
         if errors:
             raise CommandError(
-                (u"Error for MigrateVerifiedTrackCohortsSetting with ID='%s'\n" % verified_track_cohorts_setting.id) +
+                ("Error for MigrateVerifiedTrackCohortsSetting with ID='%s'\n" % verified_track_cohorts_setting.id) +
                 "\t\n".join(errors)
             )
 
-        print(u"Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id)
+        print("Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id)
 
     def _latest_settings(self):
         """

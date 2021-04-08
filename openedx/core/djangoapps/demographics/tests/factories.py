@@ -12,5 +12,5 @@ class UserDemographicsFactory(factory.django.DjangoModelFactory):
     UserDemographics Factory
     """
 
-    class Meta(object):
+    class Meta:
         model = UserDemographics

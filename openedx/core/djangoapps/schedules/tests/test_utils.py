@@ -5,10 +5,9 @@ Tests for schedules utils
 import datetime
 
 import ddt
-from common.djangoapps.course_modes.models import CourseMode
-from mock import patch
 from pytz import utc
 
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
@@ -20,29 +19,25 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 @ddt.ddt
 @skip_unless_lms
-class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
-    def create_schedule(self, offset=0):
-        self.config = ScheduleConfigFactory(create_schedules=True)
-
-        site_patch = patch('openedx.core.djangoapps.schedules.signals.get_current_site', return_value=self.config.site)
-        self.addCleanup(site_patch.stop)
-        site_patch.start()
+class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+    def create_schedule(self, offset=0):  # lint-amnesty, pylint: disable=missing-function-docstring
+        self.config = ScheduleConfigFactory()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
         start = datetime.datetime.now(utc) - datetime.timedelta(days=100)
-        self.course = CourseFactory.create(start=start, self_paced=True)
+        self.course = CourseFactory.create(start=start, self_paced=True)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
-        self.enrollment = CourseEnrollmentFactory(
+        self.enrollment = CourseEnrollmentFactory(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
             course_id=self.course.id,
             mode=CourseMode.AUDIT,
         )
         self.enrollment.created = start + datetime.timedelta(days=offset)
         self.enrollment.save()
 
-        self.schedule = self.enrollment.schedule
+        self.schedule = self.enrollment.schedule  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.schedule.start_date = self.enrollment.created
         self.schedule.save()
 
-        self.user = self.enrollment.user
+        self.user = self.enrollment.user  # lint-amnesty, pylint: disable=attribute-defined-outside-init
 
     def test_reset_to_now(self):
         self.create_schedule()
@@ -52,7 +47,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
 
         self.schedule.refresh_from_db()
-        self.assertGreater(self.schedule.start_date, original_start)
+        assert self.schedule.start_date > original_start
 
     @ddt.data(
         (-1, 0),  # enrolled before course started (will reset to start date)
@@ -67,7 +62,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
             reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
         self.schedule.refresh_from_db()
-        self.assertEqual(self.schedule.start_date.replace(microsecond=0), expected_start.replace(microsecond=0))
+        assert self.schedule.start_date.replace(microsecond=0) == expected_start.replace(microsecond=0)
 
     def test_safe_without_schedule(self):
         """ Just ensure that we don't raise exceptions or create any schedules """
@@ -77,4 +72,4 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         reset_self_paced_schedule(self.user, self.course.id, use_availability_date=False)
         reset_self_paced_schedule(self.user, self.course.id, use_availability_date=True)
 
-        self.assertEqual(Schedule.objects.count(), 0)
+        assert Schedule.objects.count() == 0

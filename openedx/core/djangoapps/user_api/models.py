@@ -3,7 +3,7 @@ Django ORM model specifications for the User API application
 """
 
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.signals import post_delete, post_save, pre_save
@@ -29,7 +29,10 @@ from common.djangoapps.student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import (
+    emit_settings_changed_event,
+    get_changed_fields_dict,
+)
 
 
 class RetirementStateError(Exception):
@@ -42,12 +45,12 @@ class UserPreference(models.Model):
 
     .. no_pii: Stores arbitrary key/value pairs, currently none are PII. If that changes, update this annotation.
     """
-    KEY_REGEX = u"[-_a-zA-Z0-9]+"
+    KEY_REGEX = "[-_a-zA-Z0-9]+"
     user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
 
-    class Meta(object):
+    class Meta:
         unique_together = ("user", "key")
 
     @staticmethod
@@ -58,7 +61,7 @@ class UserPreference(models.Model):
 
         Returns: Set of (preference type, value) pairs for each of the user's preferences
         """
-        return dict([(pref.key, pref.value) for pref in user.preferences.all()])
+        return {pref.key: pref.value for pref in user.preferences.all()}
 
     @classmethod
     def get_value(cls, user, preference_key, default=None):
@@ -118,9 +121,14 @@ def post_save_callback(sender, **kwargs):
     """
 
     user_preference = kwargs["instance"]
-    emit_setting_changed_event(
-        user_preference.user, sender._meta.db_table, user_preference.key,
-        user_preference._old_value, user_preference.value  # pylint: disable=protected-access
+    emit_settings_changed_event(
+        user_preference.user, sender._meta.db_table,
+        {
+            user_preference.key: (
+                user_preference._old_value,  # pylint: disable=protected-access
+                user_preference.value
+            )
+        }
     )
     user_preference._old_value = None  # pylint: disable=protected-access
 
@@ -131,8 +139,10 @@ def post_delete_callback(sender, **kwargs):
     Event changes to user preferences.
     """
     user_preference = kwargs["instance"]
-    emit_setting_changed_event(
-        user_preference.user, sender._meta.db_table, user_preference.key, user_preference.value, None
+    emit_settings_changed_event(
+        user_preference.user, sender._meta.db_table, {
+            user_preference.key: (user_preference.value, None)
+        }
     )
 
 
@@ -148,7 +158,7 @@ class UserCourseTag(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta(object):
+    class Meta:
         unique_together = ("user", "course_id", "key")
 
 
@@ -167,7 +177,7 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):
     org = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
 
-    class Meta(object):
+    class Meta:
         unique_together = ("user", "org", "key")
 
 
@@ -185,9 +195,9 @@ class RetirementState(models.Model):
     required = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{} (step {})'.format(self.state_name, self.state_execution_order)
+        return f'{self.state_name} (step {self.state_execution_order})'
 
-    class Meta(object):
+    class Meta:
         ordering = ('state_execution_order',)
 
     @classmethod
@@ -222,12 +232,12 @@ class UserRetirementPartnerReportingStatus(TimeStampedModel):
     original_name = models.CharField(max_length=255, blank=True, db_index=True)
     is_being_processed = models.BooleanField(default=False)
 
-    class Meta(object):
+    class Meta:
         verbose_name = 'User Retirement Reporting Status'
         verbose_name_plural = 'User Retirement Reporting Statuses'
 
     def __str__(self):
-        return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
+        return 'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
             self.user,
             self.is_being_processed
         )
@@ -244,7 +254,7 @@ class UserRetirementRequest(TimeStampedModel):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    class Meta(object):
+    class Meta:
         verbose_name = 'User Retirement Request'
         verbose_name_plural = 'User Retirement Requests'
 
@@ -254,7 +264,7 @@ class UserRetirementRequest(TimeStampedModel):
         Creates a UserRetirementRequest for the specified user.
         """
         if cls.has_user_requested_retirement(user):
-            raise RetirementStateError(u'User {} already has a retirement request row!'.format(user))
+            raise RetirementStateError(f'User {user} already has a retirement request row!')
         return cls.objects.create(user=user)
 
     @classmethod
@@ -265,10 +275,9 @@ class UserRetirementRequest(TimeStampedModel):
         return cls.objects.filter(user=user).exists()
 
     def __str__(self):
-        return u'User: {} Requested: {}'.format(self.user.id, self.created)
+        return f'User: {self.user.id} Requested: {self.created}'
 
 
-@python_2_unicode_compatible
 class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
@@ -287,7 +296,7 @@ class UserRetirementStatus(TimeStampedModel):
     last_state = models.ForeignKey(RetirementState, blank=True, related_name='last_state', on_delete=models.CASCADE)
     responses = models.TextField()
 
-    class Meta(object):
+    class Meta:
         verbose_name = 'User Retirement Status'
         verbose_name_plural = 'User Retirement Statuses'
 
@@ -298,17 +307,15 @@ class UserRetirementStatus(TimeStampedModel):
         dead_end_states = list(RetirementState.get_dead_end_state_names_list())
         states = list(RetirementState.get_state_names_list())
         if self.current_state in dead_end_states:
-            raise RetirementStateError(u'RetirementStatus: Unable to move user from {}'.format(self.current_state))
+            raise RetirementStateError(f'RetirementStatus: Unable to move user from {self.current_state}')
 
         try:
             new_state_index = states.index(new_state)
             if new_state_index <= states.index(self.current_state.state_name):
                 raise ValueError()
         except ValueError:
-            err = u'{} does not exist or is an eariler state than current state {}'.format(
-                new_state, self.current_state
-            )
-            raise RetirementStateError(err)
+            err = f'{new_state} does not exist or is an eariler state than current state {self.current_state}'
+            raise RetirementStateError(err)  # lint-amnesty, pylint: disable=raise-missing-from
 
     def _validate_update_data(self, data):
         """
@@ -320,13 +327,11 @@ class UserRetirementStatus(TimeStampedModel):
 
         for required_key in required_keys:
             if required_key not in data:
-                raise RetirementStateError(u'RetirementStatus: Required key {} missing from update'.format(
-                    required_key
-                ))
+                raise RetirementStateError(f'RetirementStatus: Required key {required_key} missing from update')
 
         for key in data:
             if key not in known_keys:
-                raise RetirementStateError(u'RetirementStatus: Unknown key {} in update'.format(key))
+                raise RetirementStateError(f'RetirementStatus: Unknown key {key} in update')
 
     @classmethod
     def create_retirement(cls, user):
@@ -337,10 +342,10 @@ class UserRetirementStatus(TimeStampedModel):
         try:
             pending = RetirementState.objects.all().order_by('state_execution_order')[0]
         except IndexError:
-            raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')
+            raise RetirementStateError('Default state does not exist! Populate retirement states to retire users.')  # lint-amnesty, pylint: disable=raise-missing-from
 
         if cls.objects.filter(user=user).exists():
-            raise RetirementStateError(u'User {} already has a retirement status row!'.format(user))
+            raise RetirementStateError(f'User {user} already has a retirement status row!')
 
         retired_username = get_retired_username_by_username(user.username)
         retired_email = get_retired_email_by_email(user.email)
@@ -356,7 +361,7 @@ class UserRetirementStatus(TimeStampedModel):
             retired_email=retired_email,
             current_state=pending,
             last_state=pending,
-            responses=u'Created in state {} by create_retirement'.format(pending)
+            responses=f'Created in state {pending} by create_retirement'
         )
 
     def update_state(self, update):
@@ -373,7 +378,7 @@ class UserRetirementStatus(TimeStampedModel):
         old_state = self.current_state
         self.current_state = RetirementState.objects.get(state_name=update['new_state'])
         self.last_state = old_state
-        self.responses += u"\n Moved from {} to {}:\n{}\n".format(old_state, self.current_state, update['response'])
+        self.responses += "\n Moved from {} to {}:\n{}\n".format(old_state, self.current_state, update['response'])
         self.save()
 
     @classmethod
@@ -401,19 +406,19 @@ class UserRetirementStatus(TimeStampedModel):
                 break
 
         if retirement is None:
-            raise UserRetirementStatus.DoesNotExist(u'{} does not have an exact match in UserRetirementStatus. '
-                                                    u'{} similar rows found.'.format(username, len(retirements)))
+            raise UserRetirementStatus.DoesNotExist('{} does not have an exact match in UserRetirementStatus. '
+                                                    '{} similar rows found.'.format(username, len(retirements)))
 
         state = retirement.current_state
 
         if state.required or state.state_name.endswith('_COMPLETE'):
-            raise RetirementStateError(u'{} is in {}, not a valid state to perform retirement '
-                                       u'actions on.'.format(retirement, state.state_name))
+            raise RetirementStateError('{} is in {}, not a valid state to perform retirement '
+                                       'actions on.'.format(retirement, state.state_name))
 
         return retirement
 
     def __str__(self):
-        return u'User: {} State: {} Last Updated: {}'.format(self.user.id, self.current_state, self.modified)
+        return f'User: {self.user.id} State: {self.current_state} Last Updated: {self.modified}'
 
 
 @receiver(models.signals.post_delete, sender=UserRetirementStatus)

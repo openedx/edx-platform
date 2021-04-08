@@ -4,12 +4,10 @@
 from copy import deepcopy
 import json
 
+from unittest.mock import MagicMock, patch
 import ddt
 from django.urls import reverse
 from django.test.utils import override_settings
-from mock import MagicMock, patch
-import six
-from six.moves import range
 
 from openedx.core.djangoapps.zendesk_proxy.v0.views import ZENDESK_REQUESTS_PER_HOUR
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -34,7 +32,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 'message': "Help! I'm trapped in a unit test factory and I can't get out!",
             }
         }
-        return super(ZendeskProxyTestCase, self).setUp()
+        return super().setUp()
 
     def test_post(self):
         with patch('requests.post', return_value=MagicMock(status_code=201)) as mock_post:
@@ -46,33 +44,23 @@ class ZendeskProxyTestCase(ApiTestCase):
             )
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
-            self.assertEqual(mock_args, ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',))
-            six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
-            self.assertEqual(
-                mock_kwargs['headers'],
-                {
-                    'content-type': 'application/json',
-                    'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
-                }
-            )
-            self.assertEqual(
-                json.loads(mock_kwargs['data']),
-                {
-                    'ticket': {
-                        'comment': {
-                            'body': "Help! I'm trapped in a unit test factory and I can't get out!",
-                            'uploads': None,
-                        },
-                        'custom_fields': None,
-                        'requester': {
-                            'email': 'JohnQStudent@example.com',
-                            'name': 'John Q. Student',
-                        },
+            assert mock_args == ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',)
+            self.assertCountEqual(mock_kwargs.keys(), ['headers', 'data'])
+            assert mock_kwargs['headers'] == {
+                'content-type': 'application/json', 'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
+            }
+            assert json.loads(mock_kwargs['data']) == {
+                'ticket':
+                    {
+                        'comment':
+                            {
+                                'body': "Help! I'm trapped in a unit test factory and I can't get out!", 'uploads': None
+                            }, 'custom_fields': None,
+                        'requester': {'email': 'JohnQStudent@example.com', 'name': 'John Q. Student'},
                         'subject': 'Python Unit Test Help Request',
-                        'tags': ['python_unit_test'],
-                    },
-                }
-            )
+                        'tags': ['python_unit_test']
+                    }
+            }
 
     @ddt.data('name', 'tags', 'email')
     def test_bad_request(self, key_to_delete):
@@ -103,4 +91,4 @@ class ZendeskProxyTestCase(ApiTestCase):
         for _ in range(ZENDESK_REQUESTS_PER_HOUR):
             self.request_without_auth('post', self.url)
         response = self.request_without_auth('post', self.url)
-        self.assertEqual(response.status_code, 429)
+        assert response.status_code == 429

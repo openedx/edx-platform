@@ -17,7 +17,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from ..oauth2_retirement_utils import retire_dot_oauth2_models
 
 
-class RetireDOTModelsTest(TestCase):
+class RetireDOTModelsTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def test_delete_dot_models(self):
         user = UserFactory.create()
@@ -47,4 +47,4 @@ class RetireDOTModelsTest(TestCase):
         query_sets = [applications, access_tokens, refresh_tokens, grants]
 
         for query_set in query_sets:
-            self.assertFalse(query_set.exists())
+            assert not query_set.exists()

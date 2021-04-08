@@ -17,7 +17,7 @@ class TestAdminView(TestCase):
     Tests of the admin view
     """
     def setUp(self):
-        super(TestAdminView, self).setUp()
+        super(TestAdminView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
         self.client = Client()
 
     def test_admin_view_loads_for_is_staff(self):

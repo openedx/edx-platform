@@ -9,7 +9,6 @@ from tempfile import NamedTemporaryFile
 from django.core.files.uploadedfile import UploadedFile
 import piexif
 from PIL import Image
-from six.moves import range
 
 
 @contextmanager

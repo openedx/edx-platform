@@ -8,10 +8,11 @@
         'jquery',
         'underscore',
         'gettext',
-        'backbone'
+        'backbone',
+        'edx-ui-toolkit/js/utils/html-utils'
     ],
 
-        function($, _, gettext, Backbone) {
+        function($, _, gettext, Backbone, HtmlUtils) {
             return Backbone.View.extend({
                 el: '#white-listed-students',
                 message_div: 'div.white-listed-students > div.message',
@@ -32,7 +33,7 @@
 
                 render: function() {
                     var template = this.loadTemplate('certificate-white-list');
-                    this.$el.html(template({certificates: this.collection.models}));
+                    this.$el.html(HtmlUtils.HTML(template({certificates: this.collection.models})).toString());
                     if (!this.active_certificate || this.collection.isEmpty()) {
                         this.$('#generate-exception-certificates').attr('disabled', 'disabled');
                     } else {
@@ -79,7 +80,13 @@
 
                 escapeAndShowMessage: function(message) {
                     $(this.message_div + '>p').remove();
-                    $(this.message_div).removeClass('hidden').append('<p>' + _.escape(message) + '</p>').focus();
+                    // xss-lint: disable=javascript-jquery-append
+                    $(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<p>'),
+                        _.escape(message),
+                        HtmlUtils.HTML('</p>')
+                    ))
+                    .focus();
                     $(this.message_div).fadeOut(6000, 'linear');
                 },
 

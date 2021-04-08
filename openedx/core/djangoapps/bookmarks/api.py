@@ -1,9 +1,6 @@
 """
 Bookmarks Python API.
 """
-
-
-import six
 from django.conf import settings
 from eventtracking import tracker
 
@@ -19,7 +16,7 @@ class BookmarksLimitReachedError(Exception):
     """
     if try to create new bookmark when max limit of bookmarks already reached
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 def get_bookmark(user, usage_key, fields=None):
@@ -159,6 +156,35 @@ def delete_bookmark(user, usage_key):
     _track_event('edx.bookmark.removed', bookmark)
 
 
+def delete_bookmarks(usage_key):
+    """
+    Delete all bookmarks for usage_key.
+
+    Arguments:
+        usage_key (UsageKey): The usage_key of the bookmarks.
+    """
+    units_keys = []
+
+    if usage_key.block_type == 'vertical':
+        units_keys.append(usage_key)
+    else:
+        # NOTE: Get all children for deleted block
+        descriptor = modulestore().get_item(usage_key)
+        for child in descriptor.get_children():
+            if usage_key.block_type == 'chapter':
+                units_keys += [unit.location for unit in child.get_children()]
+            else:
+                units_keys.append(child.location)
+
+    bookmarks = Bookmark.objects.filter(usage_key__in=units_keys)
+
+    # Emit removed bookmard event
+    for bookmark in bookmarks:
+        _track_event('edx.bookmark.removed', bookmark)
+
+    bookmarks.delete()
+
+
 def _track_event(event_name, bookmark):
     """
     Emit events for a bookmark.
@@ -170,9 +196,9 @@ def _track_event(event_name, bookmark):
     tracker.emit(
         event_name,
         {
-            'course_id': six.text_type(bookmark.course_key),
+            'course_id': str(bookmark.course_key),
             'bookmark_id': bookmark.resource_id,
             'component_type': bookmark.usage_key.block_type,
-            'component_usage_id': six.text_type(bookmark.usage_key),
+            'component_usage_id': str(bookmark.usage_key),
         }
     )

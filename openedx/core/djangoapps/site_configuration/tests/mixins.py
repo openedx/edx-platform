@@ -6,12 +6,12 @@ Mixins for TestCase classes that need to account for multiple sites
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 
 
-class SiteMixin(object):
+class SiteMixin:
     """
     Mixin for setting up Site framework models
     """
     def setUp(self):
-        super(SiteMixin, self).setUp()
+        super().setUp()
 
         self.site = SiteFactory.create()
         site_config = {

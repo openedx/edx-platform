@@ -5,10 +5,10 @@ Tests for schedules tasks
 
 import datetime
 from unittest import skipUnless
+from unittest.mock import DEFAULT, Mock, patch
 
 import ddt
 from django.conf import settings
-from mock import DEFAULT, Mock, patch
 
 from openedx.core.djangoapps.schedules.resolvers import DEFAULT_NUM_BINS
 from openedx.core.djangoapps.schedules.tasks import BinnedScheduleMessageBaseTask
@@ -21,9 +21,9 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):
+class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(TestBinnedScheduleMessageBaseTask, self).setUp()
+        super().setUp()
 
         self.site = SiteFactory.create()
         self.schedule_config = ScheduleConfigFactory.create(site=self.site)
@@ -43,7 +43,7 @@ class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):
                 day_offset=2
             )
             patches['log_info'].assert_called_once_with(
-                u'Message queuing disabled for site %s', self.site.domain)
+                'Message queuing disabled for site %s', self.site.domain)
             send.apply_async.assert_not_called()
 
     @ddt.data(0, 2, -3)
@@ -64,7 +64,7 @@ class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):
             target_date = current_date.replace(hour=0, minute=0, second=0, microsecond=0) + \
                 datetime.timedelta(day_offset)
             patches['log_info'].assert_any_call(
-                u'Target date = %s', target_date.isoformat())
+                'Target date = %s', target_date.isoformat())
             assert send.call_count == DEFAULT_NUM_BINS
 
     @ddt.data(True, False)

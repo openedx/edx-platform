@@ -2,8 +2,8 @@
     'use strict';
     define([
         'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
-        'js/edxnotes/views/tab_view'
-    ], function(gettext, _, NoteGroupView, TabPanelView, TabView) {
+        'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
+    ], function(gettext, _, NoteGroupView, TabPanelView, TabView, HtmlUtils) {
         var view = 'Location in Course';
         var CourseStructureView = TabView.extend({
             PanelConstructor: TabPanelView.extend({
@@ -31,7 +31,7 @@
                         }, this);
                         container.appendChild(chapterView.render().el);
                     }, this);
-                    this.$el.append(container);
+                    this.$el.append(HtmlUtils.HTML(container).toString());
                     return this;
                 },
 

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from unittest import TestCase
 
 from pytz import utc
-
+import pytest
 from xmodule.block_metadata_utils import (
     display_name_with_default,
     display_name_with_default_escaped,
@@ -44,7 +44,7 @@ class CourseMetadataUtilsTestCase(TestCase):
         """
         Set up module store testing capabilities and initialize test courses.
         """
-        super(CourseMetadataUtilsTestCase, self).setUp()
+        super().setUp()
 
         mongo_builder = MongoModulestoreBuilder()
         split_builder = VersioningModulestoreBuilder()
@@ -70,7 +70,7 @@ class CourseMetadataUtilsTestCase(TestCase):
                     user_id=-3,  # -3 refers to a "testing user"
                     fields={
                         "start": _NEXT_WEEK,
-                        "display_name": "Intro to <html>"
+                        "display_name": "Intro to <div>html</div>"
                     }
                 )
 
@@ -105,7 +105,7 @@ class CourseMetadataUtilsTestCase(TestCase):
             else:
                 raise ValueError("Invalid format string :" + format_string)
 
-        def noop_gettext(text):
+        def noop_gettext(text):  # lint-amnesty, pylint: disable=unused-variable
             """Dummy implementation of gettext, so we don't need Django."""
             return text
 
@@ -136,13 +136,13 @@ class CourseMetadataUtilsTestCase(TestCase):
                 # Test course with no display name.
                 TestScenario((self.demo_course,), "Empty"),
                 # Test course with a display name that contains characters that need escaping.
-                TestScenario((self.html_course,), "Intro to &lt;html&gt;"),
+                TestScenario((self.html_course,), "Intro to html"),
             ]),
             FunctionTest(display_name_with_default, [
                 # Test course with no display name.
                 TestScenario((self.demo_course,), "Empty"),
                 # Test course with a display name that contains characters that need escaping.
-                TestScenario((self.html_course,), "Intro to <html>"),
+                TestScenario((self.html_course,), "Intro to <div>html</div>"),
             ]),
             FunctionTest(number_for_course_location, [
                 TestScenario((self.demo_course.location,), "DemoX.1"),
@@ -179,10 +179,10 @@ class CourseMetadataUtilsTestCase(TestCase):
         for function_test in function_tests:
             for scenario in function_test.scenarios:
                 actual_return = function_test.function(*scenario.arguments)
-                self.assertEqual(actual_return, scenario.expected_return)
+                assert actual_return == scenario.expected_return
 
         # Even though we don't care about testing mock_strftime_localized,
         # we still need to test it with a bad format string in order to
         # satisfy the coverage checker.
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             mock_strftime_localized(test_datetime, 'BAD_FORMAT_SPECIFIER')

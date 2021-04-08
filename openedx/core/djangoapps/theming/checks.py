@@ -5,13 +5,13 @@ Settings validations for the theming app
 
 import os
 
-import six
 from django.conf import settings
 from django.core.checks import Error, Tags, register
+from edx_toggles.toggles import SettingToggle
 
 
 @register(Tags.compatibility)
-def check_comprehensive_theme_settings(app_configs, **kwargs):
+def check_comprehensive_theme_settings(app_configs, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Checks the comprehensive theming theme directory settings.
 
@@ -24,7 +24,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):
     Returns:
         List of any Errors.
     """
-    if not getattr(settings, "ENABLE_COMPREHENSIVE_THEMING"):
+    if not SettingToggle("ENABLE_COMPREHENSIVE_THEMING", default=False).is_enabled():
         # Only perform checks when comprehensive theming is enabled.
         return []
 
@@ -54,7 +54,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):
                     id='openedx.core.djangoapps.theming.E004',
                 )
             )
-        if not all([isinstance(theme_dir, six.string_types) for theme_dir in theme_dirs]):
+        if not all(isinstance(theme_dir, str) for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain only strings.",
@@ -62,7 +62,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):
                     id='openedx.core.djangoapps.theming.E005',
                 )
             )
-        if not all([theme_dir.startswith("/") for theme_dir in theme_dirs]):
+        if not all(theme_dir.startswith("/") for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain only absolute paths to themes dirs.",
@@ -70,7 +70,7 @@ def check_comprehensive_theme_settings(app_configs, **kwargs):
                     id='openedx.core.djangoapps.theming.E006',
                 )
             )
-        if not all([os.path.isdir(theme_dir) for theme_dir in theme_dirs]):
+        if not all(os.path.isdir(theme_dir) for theme_dir in theme_dirs):
             errors.append(
                 Error(
                     "COMPREHENSIVE_THEME_DIRS must contain valid paths.",

@@ -29,6 +29,25 @@ def get_current_site_configuration():
         return None
 
 
+def get_current_site_configuration_values(default=None):
+    """
+    Returns `SiteConfiguration.site_values` for current site.
+    Args:
+        default (dict): default value (`{}` if not specified) to return if site configuration is not available.
+    Returns:
+        (dict) Site Configuration value for the current site or default
+    """
+    if default is None:
+        default = {}
+
+    site_configuration = get_current_site_configuration()
+
+    if site_configuration:
+        return site_configuration.site_values
+    else:
+        return default
+
+
 def is_site_configuration_enabled():
     """
     Returns True is there is SiteConfiguration instance associated with the current site and it is enabled, otherwise
@@ -97,7 +116,7 @@ def get_configuration_dict(name, default=None):
     return output
 
 
-def get_value(val_name, default=None, **kwargs):
+def get_value(val_name, default=None, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Return configuration value for the key specified as name argument.
 
@@ -230,6 +249,6 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     separator = kwargs.get("separator", " | ")
     crumbs = [c for c in crumbs if c is not None]
     if crumbs:
-        return u'{}{}{}'.format(separator.join(crumbs), separator, platform_name)
+        return '{}{}{}'.format(separator.join(crumbs), separator, platform_name)
     else:
         return platform_name

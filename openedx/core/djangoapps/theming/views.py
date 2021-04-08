@@ -74,12 +74,12 @@ def set_user_preview_site_theme(request, preview_site_theme):
             set_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY, preview_site_theme_name)
             PageLevelMessages.register_success_message(
                 request,
-                _(u'Site theme changed to {site_theme}').format(site_theme=preview_site_theme_name)
+                _('Site theme changed to {site_theme}').format(site_theme=preview_site_theme_name)
             )
         else:
             PageLevelMessages.register_error_message(
                 request,
-                _(u'Theme {site_theme} does not exist').format(site_theme=preview_site_theme_name)
+                _('Theme {site_theme} does not exist').format(site_theme=preview_site_theme_name)
             )
     else:
         delete_user_preference(request.user, PREVIEW_SITE_THEME_PREFERENCE_KEY)
@@ -91,7 +91,7 @@ class ThemingAdministrationFragmentView(EdxFragmentView):
     Fragment view to allow a user to administer theming.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         """
         Renders the theming administration view as a fragment.
         """
@@ -105,10 +105,10 @@ class ThemingAdministrationFragmentView(EdxFragmentView):
         """
         if not user_can_preview_themes(request.user):
             raise Http404
-        return super(ThemingAdministrationFragmentView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     @method_decorator(login_required)
-    def post(self, request, **kwargs):
+    def post(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Accept requests to update the theme preview.
         """

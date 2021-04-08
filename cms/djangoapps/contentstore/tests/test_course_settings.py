@@ -7,10 +7,10 @@ import copy
 import datetime
 import json
 import unittest
+from unittest import mock
+from unittest.mock import Mock, patch
 
 import ddt
-import mock
-import six
 from crum import set_current_request
 from django.conf import settings
 from django.test import RequestFactory
@@ -18,7 +18,6 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
-from mock import Mock, patch
 from pytz import UTC
 
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
@@ -31,11 +30,11 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from cms.djangoapps.models.settings.waffle import MATERIAL_RECOMPUTE_ONLY_FLAG
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.djangoapps.models.course_details import CourseDetails
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import milestones_helpers
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -100,7 +99,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super(CourseAdvanceSettingViewTest, self).setUp()
+        super().setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
 
@@ -204,7 +203,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                self.assertEqual(dt1, dt2, msg=u"{} != {} at {}".format(dt1, dt2, context))
+                self.assertEqual(dt1, dt2, msg=f"{dt1} != {dt2} at {context}")
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -253,7 +252,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         # update pre requisite courses with a new course keys
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
         pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
-        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), six.text_type(pre_requisite_course2.id)]
+        pre_requisite_course_keys = [str(pre_requisite_course.id), str(pre_requisite_course2.id)]
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         self.client.ajax_post(url, course_detail_json)
 
@@ -283,7 +282,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
         # update pre requisite courses one valid and one invalid key
         pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
-        pre_requisite_course_keys = [six.text_type(pre_requisite_course.id), 'invalid_key']
+        pre_requisite_course_keys = [str(pre_requisite_course.id), 'invalid_key']
         course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
         response = self.client.ajax_post(url, course_detail_json)
         self.assertEqual(400, response.status_code)
@@ -564,10 +563,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': six.text_type(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': six.text_type(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (
@@ -687,8 +686,8 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': six.text_type(self.course.id),
-                    'user_id': six.text_type(self.user.id),
+                    'course_id': str(self.course.id),
+                    'user_id': str(self.user.id),
                     'grading_policy_hash': policy_hash,
                     'event_transaction_id': 'mockUUID',
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
@@ -725,10 +724,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': six.text_type(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': six.text_type(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2, grading_policy_3)
@@ -802,10 +801,10 @@ class CourseGradingTest(CourseTestCase):
             mock.call(
                 GRADING_POLICY_CHANGED_EVENT_TYPE,
                 {
-                    'course_id': six.text_type(self.course.id),
+                    'course_id': str(self.course.id),
                     'event_transaction_type': 'edx.grades.grading_policy_changed',
                     'grading_policy_hash': policy_hash,
-                    'user_id': six.text_type(self.user.id),
+                    'user_id': str(self.user.id),
                     'event_transaction_id': 'mockUUID',
                 }
             ) for policy_hash in (grading_policy_1, grading_policy_2)
@@ -895,15 +894,15 @@ class CourseGradingTest(CourseTestCase):
         Test setting and getting section grades via the grade as url
         """
         grade_type_url = self.setup_test_set_get_section_grader_ajax()
-        response = self.client.ajax_post(grade_type_url, {'graderType': u'Homework'})
+        response = self.client.ajax_post(grade_type_url, {'graderType': 'Homework'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), u'Homework')
+        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), 'Homework')
         # and unset
-        response = self.client.ajax_post(grade_type_url, {'graderType': u'notgraded'})
+        response = self.client.ajax_post(grade_type_url, {'graderType': 'notgraded'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), u'notgraded')
+        self.assertEqual(json.loads(response.content.decode('utf-8')).get('graderType'), 'notgraded')
 
     def _grading_policy_hash_for_course(self):
         return hash_grading_policy(modulestore().get_course(self.course.id).grading_policy)
@@ -916,7 +915,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
 
     def setUp(self):
-        super(CourseMetadataEditingTest, self).setUp()
+        super().setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
@@ -1175,8 +1174,8 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(len(errors), 3)
         self.assertFalse(test_model)
 
-        error_keys = set([error_obj['model']['display_name'] for error_obj in errors])
-        test_keys = set(['Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'])
+        error_keys = {error_obj['model']['display_name'] for error_obj in errors}
+        test_keys = {'Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'}
         self.assertEqual(error_keys, test_keys)
 
         # try fresh fetch to ensure no update happened
@@ -1350,8 +1349,10 @@ class CourseMetadataEditingTest(CourseTestCase):
         if include_blank_email:
             json_data["proctoring_escalation_email"] = {"value": ""}
 
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict({"enable_proctored_exams": True}, course, self.user)
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
-            self.course,
+            course,
             json_data,
             user=self.user
         )
@@ -1391,7 +1392,11 @@ class CourseMetadataEditingTest(CourseTestCase):
     )
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
         course = CourseFactory.create()
-        CourseMetadata.update_from_dict({"proctoring_provider": 'proctortrack'}, course, self.user)
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": True},
+            course,
+            self.user
+        )
         did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
             course,
             {
@@ -1426,6 +1431,78 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(len(errors), 0)
         self.assertIn('proctoring_provider', test_model)
         self.assertIn('proctoring_escalation_email', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disable_proctoring_with_no_escalation_email(self):
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "proctoring_escalation_email": '', "enable_proctored_exams": True},
+            course,
+            self.user
+        )
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                "enable_proctored_exams": {"value": False},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('enable_proctored_exams', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disable_proctoring_and_change_escalation_email(self):
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "proctoring_provider": {"value": "proctortrack"},
+                "proctoring_escalation_email": {"value": ""},
+                "enable_proctored_exams": {"value": False},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
+        self.assertIn('enable_proctored_exams', test_model)
+
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'proctortrack',
+            'proctortrack': {}
+        }
+    )
+    def test_validate_update_disabled_proctoring_and_unset_escalation_email(self):
+        course = CourseFactory.create()
+        CourseMetadata.update_from_dict(
+            {"proctoring_provider": 'proctortrack', "enable_proctored_exams": False},
+            course,
+            self.user
+        )
+        did_validate, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            course,
+            {
+                "proctoring_escalation_email": {"value": ""},
+            },
+            user=self.user
+        )
+        self.assertTrue(did_validate)
+        self.assertEqual(len(errors), 0)
+        self.assertIn('proctoring_provider', test_model)
+        self.assertIn('proctoring_escalation_email', test_model)
+        self.assertIn('enable_proctored_exams', test_model)
 
     def test_create_zendesk_tickets_present_for_edx_staff(self):
         """
@@ -1527,7 +1604,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
 
     def setUp(self):
         """Compute the url to use in tests"""
-        super(CourseGraderUpdatesTest, self).setUp()
+        super().setUp()
         self.url = get_url(self.course.id, 'grading_handler')
         self.starting_graders = CourseGradingModel(self.course).graders
 
@@ -1625,9 +1702,9 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         """
         Initialize course used to test enrollment fields.
         """
-        super(CourseEnrollmentEndFieldTest, self).setUp()
+        super().setUp()
         self.course = CourseFactory.create(org='edX', number='dummy', display_name='Marketing Site Course')
-        self.course_details_url = reverse_course_url('settings_handler', six.text_type(self.course.id))
+        self.course_details_url = reverse_course_url('settings_handler', str(self.course.id))
 
     def _get_course_details_response(self, global_staff):
         """

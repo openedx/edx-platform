@@ -49,7 +49,7 @@ class ContentHighlightSchedule(ScheduleFactory):
     A ScheduleFactory that creates a Schedule set up for a course highlights email.
     """
     start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=pytz.UTC)
-    experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule', experience_type=ScheduleExperience.EXPERIENCES.course_updates)
+    experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule', experience_type=ScheduleExperience.EXPERIENCES.course_updates)  # lint-amnesty, pylint: disable=line-too-long
 
 
 class Command(BaseCommand):
@@ -72,7 +72,7 @@ class Command(BaseCommand):
             start=datetime.datetime.today() - datetime.timedelta(days=30),
             end=datetime.datetime.today() + datetime.timedelta(days=30),
             number=factory.Sequence('schedules_test_course_{}'.format),
-            display_name=factory.Sequence(u'Schedules Test Course {}'.format),
+            display_name=factory.Sequence('Schedules Test Course {}'.format),
         )
         XMODULE_FACTORY_LOCK.disable()
         course_overview = CourseOverview.load_from_module_store(course.id)

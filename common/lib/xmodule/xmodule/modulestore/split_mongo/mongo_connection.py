@@ -6,6 +6,7 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import datetime
 import logging
 import math
+import pickle
 import re
 import zlib
 from contextlib import contextmanager
@@ -13,13 +14,10 @@ from time import time
 
 import pymongo
 import pytz
-import six
-from six.moves import cPickle as pickle
 from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
@@ -54,7 +52,7 @@ def round_power_2(value):
     return math.pow(2, math.ceil(math.log(value, 2)))
 
 
-class Tagger(object):
+class Tagger:
     """
     An object used by :class:`QueryTimer` to allow timed code blocks
     to add measurements and tags to the timer.
@@ -95,12 +93,12 @@ class Tagger(object):
             '{}:{}'.format(name, round_power_2(size))
             for name, size in self.measures
         ] + [
-            '{}:{}'.format(name, value)
+            f'{name}:{value}'
             for name, value in self.added_tags
         ]
 
 
-class QueryTimer(object):
+class QueryTimer:
     """
     An object that allows timing a block of code while also recording measurements
     about that code.
@@ -128,15 +126,15 @@ class QueryTimer(object):
             course_context: The course which the query is being made for.
         """
         tagger = Tagger(self._sample_rate)
-        metric_name = "{}.{}".format(self._metric_base, metric_name)
+        metric_name = f"{self._metric_base}.{metric_name}"
 
-        start = time()
+        start = time()  # lint-amnesty, pylint: disable=unused-variable
         try:
             yield tagger
         finally:
-            end = time()
+            end = time()  # lint-amnesty, pylint: disable=unused-variable
             tags = tagger.tags
-            tags.append('course:{}'.format(course_context))
+            tags.append(f'course:{course_context}')
 
 
 TIMER = QueryTimer(__name__, 0.01)
@@ -188,14 +186,14 @@ def structure_to_mongo(structure, course_context=None):
 
         check('BlockKey', structure['root'])
         check('dict(BlockKey: BlockData)', structure['blocks'])
-        for block in six.itervalues(structure['blocks']):
+        for block in structure['blocks'].values():
             if 'children' in block.fields:
                 check('list(BlockKey)', block.fields['children'])
 
         new_structure = dict(structure)
         new_structure['blocks'] = []
 
-        for block_key, block in six.iteritems(structure['blocks']):
+        for block_key, block in structure['blocks'].items():
             new_block = dict(block.to_storable())
             new_block.setdefault('block_type', block_key.type)
             new_block['block_id'] = block_key.id
@@ -204,7 +202,7 @@ def structure_to_mongo(structure, course_context=None):
         return new_structure
 
 
-class CourseStructureCache(object):
+class CourseStructureCache:
     """
     Wrapper around django cache object to cache course structure objects.
     The course structures are pickled and compressed when cached.
@@ -240,11 +238,8 @@ class CourseStructureCache(object):
                 pickled_data = zlib.decompress(compressed_pickled_data)
                 tagger.measure('uncompressed_size', len(pickled_data))
 
-                if six.PY2:
-                    return pickle.loads(pickled_data)
-                else:
-                    return pickle.loads(pickled_data, encoding='latin-1')
-            except Exception:
+                return pickle.loads(pickled_data, encoding='latin-1')
+            except Exception:  # lint-amnesty, pylint: disable=broad-except
                 # The cached data is corrupt in some way, get rid of it.
                 log.warning("CourseStructureCache: Bad data in cache for %s", course_context)
                 self.cache.delete(key)
@@ -267,13 +262,13 @@ class CourseStructureCache(object):
             self.cache.set(key, compressed_pickled_data, None)
 
 
-class MongoConnection(object):
+class MongoConnection:
     """
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
     """
     def __init__(
         self, db, collection, host, port=27017, tz_aware=True, user=None, password=None,
-        asset_collection=None, retry_wait_time=0.1, **kwargs
+        asset_collection=None, retry_wait_time=0.1, **kwargs  # lint-amnesty, pylint: disable=unused-argument
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
@@ -301,7 +296,7 @@ class MongoConnection(object):
             self.database.client.admin.command('ismaster')
             return True
         except pymongo.errors.ConnectionFailure:
-            raise HeartbeatFailure("Can't connect to {}".format(self.database.name), 'mongo')
+            raise HeartbeatFailure(f"Can't connect to {self.database.name}", 'mongo')  # lint-amnesty, pylint: disable=raise-missing-from
 
     def get_structure(self, key, course_context=None):
         """
@@ -323,7 +318,7 @@ class MongoConnection(object):
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
-                            six.text_type(key)
+                            str(key)
                         )
                         return None
                     tagger_find_one.measure("blocks", len(doc['blocks']))
@@ -432,7 +427,7 @@ class MongoConnection(object):
         with TIMER.timer("get_course_index", key):
             if ignore_case:
                 query = {
-                    key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
+                    key_attr: re.compile('^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
                     for key_attr in ('org', 'course', 'run')
                 }
             else:
@@ -468,11 +463,11 @@ class MongoConnection(object):
                 query['$or'] = courses_queries
             else:
                 if branch is not None:
-                    query['versions.{}'.format(branch)] = {'$exists': True}
+                    query[f'versions.{branch}'] = {'$exists': True}
 
                 if search_targets:
-                    for key, value in six.iteritems(search_targets):
-                        query['search_targets.{}'.format(key)] = value
+                    for key, value in search_targets.items():
+                        query[f'search_targets.{key}'] = value
 
                 if org_target:
                     query['org'] = org_target
@@ -486,7 +481,7 @@ class MongoConnection(object):
         courses_queries = []
         query = {}
         if branch:
-            query = {'versions.{}'.format(branch): {'$exists': True}}
+            query = {f'versions.{branch}': {'$exists': True}}
 
         for course_key in course_keys:
             course_query = {

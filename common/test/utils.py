@@ -7,7 +7,6 @@ import functools
 import sys
 from contextlib import contextmanager
 
-import pytest
 from django.dispatch import Signal
 from markupsafe import escape
 from mock import Mock, patch
@@ -21,11 +20,11 @@ def nostderr():
     """
     savestderr = sys.stderr
 
-    class Devnull(object):
+    class Devnull:
         """ /dev/null incarnation as output-stream-like object """
         def write(self, _):
             """ Write method - just does nothing"""
-            pass
+            pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
     sys.stderr = Devnull()
     try:
@@ -34,7 +33,7 @@ def nostderr():
         sys.stderr = savestderr
 
 
-class XssTestMixin(object):
+class XssTestMixin:
     """
     Mixin for testing XSS vulnerabilities.
     """
@@ -62,7 +61,7 @@ def disable_signal(module, signal):
     return patch.object(module, signal, new=Signal())
 
 
-class MockSignalHandlerMixin(object):
+class MockSignalHandlerMixin:
     """Mixin for testing sending of signals."""
 
     @contextmanager
@@ -88,19 +87,19 @@ class MockSignalHandlerMixin(object):
         with patch.object(module, signal, new=Signal()) as mock_signal:
             def handler(*args, **kwargs):  # pylint: disable=unused-argument
                 """No-op signal handler."""
-                pass
+                pass  # lint-amnesty, pylint: disable=unnecessary-pass
             mock_handler = Mock(spec=handler)
             mock_signal.connect(mock_handler)
             yield
-            self.assertTrue(mock_handler.called)
+            assert mock_handler.called
             mock_args, mock_kwargs = mock_handler.call_args
             if 'exclude_args' in kwargs:
                 for key in kwargs['exclude_args']:
-                    self.assertIn(key, mock_kwargs)
+                    assert key in mock_kwargs
                     del mock_kwargs[key]
                 del kwargs['exclude_args']
-            self.assertEqual(mock_args, args)
-            self.assertEqual(mock_kwargs, dict(kwargs, signal=mock_signal))
+            assert mock_args == args
+            assert mock_kwargs == dict(kwargs, signal=mock_signal)
 
 
 @contextmanager
@@ -116,12 +115,12 @@ def skip_signal(signal, **kwargs):
         signal.connect(**kwargs)
 
 
-class MockS3BotoMixin(object):
+class MockS3BotoMixin:
     """
     TestCase mixin that mocks the S3BotoStorage save method and s3 connection.
     """
     def setUp(self):
-        super(MockS3BotoMixin, self).setUp()
+        super().setUp()
         self._mocked_connection = patch('boto.connect_s3', return_value=Mock())
         self.mocked_connection = self._mocked_connection.start()
 
@@ -131,16 +130,16 @@ class MockS3BotoMixin(object):
     def tearDown(self):
         self._mocked_connection.stop()
         self.patcher.stop()
-        super(MockS3BotoMixin, self).tearDown()
+        super().tearDown()
 
 
-class reprwrapper(object):
+class reprwrapper:
     """
     Wrapper class for functions that need a normalized string representation.
     """
     def __init__(self, func):
         self._func = func
-        self.repr = u'Func: {}'.format(func.__name__)
+        self.repr = f'Func: {func.__name__}'
         functools.update_wrapper(self, func)
 
     def __call__(self, *args, **kw):
@@ -158,13 +157,3 @@ def normalize_repr(func):
     between worker processes.
     """
     return reprwrapper(func)
-
-
-# Decorator for skipping tests that are not ready to be run with Python 3.x.
-# While we expect many tests to fail with Python 3.x as we transition, this
-# is specifically for tests that rely on external or large scale fixes. It can
-# be added to individual tests or test classes.
-py2_only = pytest.mark.skipif(
-    sys.version_info > (3, 0),
-    reason="This test can only be run with Python 2.7, currently"
-)

@@ -7,10 +7,11 @@ import json
 
 from crum import get_current_request
 from django.conf import settings
+from django.core.cache import cache
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
-from edx_toggles.toggles import WaffleFlag
+from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
@@ -22,22 +23,37 @@ from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 
-ENTERPRISE_HEADER_LINKS = WaffleFlag('enterprise', 'enterprise_header_links', __name__)
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
 
 
-def get_data_consent_share_cache_key(user_id, course_id):
+def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):
     """
-        Returns cache key for data sharing consent needed against user_id and course_id
+        Returns cache key for data sharing consent needed against user_id, course_id and enterprise_customer_uuid
     """
+    cache_key_params = dict(
+        type='data_sharing_consent_needed',
+        user_id=user_id,
+        course_id=course_id,
+    )
 
-    return get_cache_key(type='data_sharing_consent_needed', user_id=user_id, course_id=course_id)
+    if enterprise_customer_uuid:
+        cache_key_params['enterprise_customer_uuid'] = enterprise_customer_uuid
+
+    return get_cache_key(**cache_key_params)
 
 
-def clear_data_consent_share_cache(user_id, course_id):
+def get_is_enterprise_cache_key(user_id):
+    """
+        Returns cache key for the enterprise learner validation method needed against user_id.
+    """
+    return get_cache_key(type='is_enterprise_learner', user_id=user_id)
+
+
+def clear_data_consent_share_cache(user_id, course_id, enterprise_customer_uuid):
     """
         clears data_sharing_consent_needed cache
     """
-    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id)
+    consent_cache_key = get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid)
     TieredCache.delete_all_tiers(consent_cache_key)
 
 
@@ -144,7 +160,7 @@ def enterprise_fields_only(fields):
 
 def update_third_party_auth_context_for_enterprise(request, context, enterprise_customer=None):
     """
-    Return updated context of third party auth with modified for enterprise.
+    Return updated context of third party auth with modified data for the given enterprise customer.
 
     Arguments:
         request (HttpRequest): The request for the logistration page.
@@ -157,10 +173,10 @@ def update_third_party_auth_context_for_enterprise(request, context, enterprise_
     """
     if context['data']['third_party_auth']['errorMessage']:
         context['data']['third_party_auth']['errorMessage'] = Text(_(
-            u'We are sorry, you are not authorized to access {platform_name} via this channel. '
-            u'Please contact your learning administrator or manager in order to access {platform_name}.'
-            u'{line_break}{line_break}'
-            u'Error Details:{line_break}{error_message}')
+            'We are sorry, you are not authorized to access {platform_name} via this channel. '
+            'Please contact your learning administrator or manager in order to access {platform_name}.'
+            '{line_break}{line_break}'
+            'Error Details:{line_break}{error_message}')
         ).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
             error_message=context['data']['third_party_auth']['errorMessage'],
@@ -270,16 +286,15 @@ def _user_has_social_auth_record(user, enterprise_customer):
     """
     Return True if a `UserSocialAuth` record exists for `user` False otherwise.
     """
-    if enterprise_customer:
-        identity_provider = third_party_auth.provider.Registry.get(
-            provider_id=enterprise_customer['identity_provider'],
-        )
-        if identity_provider:
-            return UserSocialAuth.objects.select_related('user').filter(
-                provider=identity_provider.backend_name,
-                user=user
-            ).exists()
-
+    provider_backend_names = []
+    if enterprise_customer and enterprise_customer['identity_providers']:
+        for idp in enterprise_customer['identity_providers']:
+            identity_provider = third_party_auth.provider.Registry.get(
+                provider_id=idp['provider_id']
+            )
+            provider_backend_names.append(identity_provider.backend_name)
+        return UserSocialAuth.objects.select_related('user').\
+            filter(provider__in=provider_backend_names, user=user).exists()
     return False
 
 
@@ -393,7 +408,7 @@ def get_enterprise_learner_generic_name(request):
 
 def is_enterprise_learner(user):
     """
-    Check if the given user belongs to an enterprise.
+    Check if the given user belongs to an enterprise. Cache the value if an enterprise learner is found.
 
     Arguments:
         user (User): Django User object.
@@ -401,7 +416,15 @@ def is_enterprise_learner(user):
     Returns:
         (bool): True if given user is an enterprise learner.
     """
-    return EnterpriseCustomerUser.objects.filter(user_id=user.id).exists()
+    cached_is_enterprise_key = get_is_enterprise_cache_key(user.id)
+    if cache.get(cached_is_enterprise_key):
+        return True
+
+    if EnterpriseCustomerUser.objects.filter(user_id=user.id).exists():
+        # Cache the enterprise user for one hour.
+        cache.set(cached_is_enterprise_key, True, 3600)
+        return True
+    return False
 
 
 def get_enterprise_slug_login_url():

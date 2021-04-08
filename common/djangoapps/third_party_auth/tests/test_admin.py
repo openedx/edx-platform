@@ -2,9 +2,6 @@
 Tests third_party_auth admin views
 """
 
-
-import unittest
-
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import models
@@ -56,13 +53,13 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Get the provider instance with active flag
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), 1)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == 1
+        assert providers[pcount].id == provider1.id
 
         # Edit the provider via the admin edit link
         admin = OAuth2ProviderConfigAdmin(provider1, AdminSite())
-        update_url = reverse('admin:{}_{}_add'.format(admin.model._meta.app_label, admin.model._meta.model_name))
-        update_url += "?source={}".format(provider1.pk)
+        update_url = reverse(f'admin:{admin.model._meta.app_label}_{admin.model._meta.model_name}_add')
+        update_url += f"?source={provider1.pk}"
 
         # Remove the icon_image from the POST data, to simulate unchanged icon_image
         post_data = models.model_to_dict(provider1)
@@ -77,14 +74,14 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
 
         # Post the edit form: expecting redirect
         response = self.client.post(update_url, post_data)
-        self.assertEqual(response.status_code, 302)
+        assert response.status_code == 302
 
         # Editing the existing provider creates a new provider instance
         providers = OAuth2ProviderConfig.objects.all()
-        self.assertEqual(len(providers), pcount + 2)
-        self.assertEqual(providers[pcount].id, provider1.id)
+        assert len(providers) == (pcount + 2)
+        assert providers[pcount].id == provider1.id
         provider2 = providers[pcount + 1]
 
         # Ensure the icon_image was preserved on the new provider instance
-        self.assertEqual(provider2.icon_image, provider1.icon_image)
-        self.assertEqual(provider2.name, post_data['name'])
+        assert provider2.icon_image == provider1.icon_image
+        assert provider2.name == post_data['name']

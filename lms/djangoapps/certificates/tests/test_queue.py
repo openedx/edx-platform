@@ -1,19 +1,17 @@
-# -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
 
 
 import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
 
 import ddt
 import freezegun
 import pytz
-import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 from testfixtures import LogCapture
 
@@ -23,7 +21,9 @@ from testfixtures import LogCapture
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
+from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     ExampleCertificate,
@@ -34,7 +34,6 @@ from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -45,7 +44,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
 
     def setUp(self):
-        super(XQueueCertInterfaceAddCertificateTest, self).setUp()
+        super().setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
         self.enrollment = CourseEnrollmentFactory(
@@ -66,10 +65,10 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user, self.course.id)
 
         # Verify that the task was sent to the queue with the correct callback URL
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
-        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+        assert 'https://edx.org/update_certificate?key=' in actual_header['lms_callback_url']
 
     def test_no_create_action_in_queue_for_html_view_certs(self):
         """
@@ -80,10 +79,10 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user, self.course.id, generate_pdf=False)
 
         # Verify that add_cert method does not add message to queue
-        self.assertFalse(mock_send.called)
+        assert not mock_send.called
         certificate = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.course.id)
-        self.assertEqual(certificate.status, CertificateStatuses.downloadable)
-        self.assertIsNotNone(certificate.verify_uuid)
+        assert certificate.status == CertificateStatuses.downloadable
+        assert certificate.verify_uuid is not None
 
     @ddt.data('honor', 'audit')
     @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
@@ -93,7 +92,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             id=self.course.id
         )
         mock_send = self.add_cert_to_queue(mode)
-        if CourseMode.is_eligible_for_certificate(mode):
+        if modes_api.is_eligible_for_certificate(mode):
             self.assert_certificate_generated(mock_send, mode, template_name)
         else:
             self.assert_ineligible_certificate_generated(mock_send, mode)
@@ -136,9 +135,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
         certificate = GeneratedCertificate.certificate_for_student(self.user_2, self.course.id)
-        self.assertIsNotNone(certificate)
-        self.assertEqual(certificate.mode, 'audit')
-        self.assertEqual(certificate.status, status)
+        assert certificate is not None
+        assert certificate.mode == 'audit'
+        assert certificate.status == status
 
     def add_cert_to_queue(self, mode):
         """
@@ -165,17 +164,17 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         template type.
         """
         # Verify that the task was sent to the queue with the correct callback URL
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
         __, kwargs = mock_send.call_args_list[0]
 
         actual_header = json.loads(kwargs['header'])
-        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+        assert 'https://edx.org/update_certificate?key=' in actual_header['lms_callback_url']
 
         body = json.loads(kwargs['body'])
-        self.assertIn(expected_template_name, body['template_pdf'])
+        assert expected_template_name in body['template_pdf']
 
         certificate = GeneratedCertificate.eligible_certificates.get(user=self.user_2, course_id=self.course.id)
-        self.assertEqual(certificate.mode, expected_mode)
+        assert certificate.mode == expected_mode
 
     def assert_ineligible_certificate_generated(self, mock_send, expected_mode):
         """
@@ -183,15 +182,15 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         correct mode.
         """
         # Ensure the certificate was not generated
-        self.assertFalse(mock_send.called)
+        assert not mock_send.called
 
         certificate = GeneratedCertificate.objects.get(
             user=self.user_2,
             course_id=self.course.id
         )
 
-        self.assertIn(certificate.status, (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing))
-        self.assertEqual(certificate.mode, expected_mode)
+        assert certificate.status in (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing)
+        assert certificate.mode == expected_mode
 
     @ddt.data(
         (CertificateStatuses.restricted, False),
@@ -216,9 +215,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         ):
             mock_send = self.add_cert_to_queue('verified')
             if should_generate:
-                self.assertTrue(mock_send.called)
+                assert mock_send.called
             else:
-                self.assertFalse(mock_send.called)
+                assert not mock_send.called
 
     @ddt.data(
         # Eligible and should stay that way
@@ -287,18 +286,15 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
 
-        self.assertEqual(
-            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status,
-            expected_status
-        )
+        assert GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status == expected_status
 
     def test_regen_cert_with_pdf_certificate(self):
         """
-        Test that regenerating PDF certifcate log warning message and certificate
+        Test that regenerating a PDF certificate logs a warning message and the certificate
         status remains unchanged.
         """
         download_url = 'http://www.example.com/certificate.pdf'
-        # Create an existing verifed enrollment and certificate
+        # Create an existing verified enrollment and certificate
         CourseEnrollmentFactory(
             user=self.user_2,
             course_id=self.course.id,
@@ -314,15 +310,15 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             download_url=download_url
         )
 
-        self._assert_pdf_cert_generation_dicontinued_logs(download_url)
+        self._assert_pdf_cert_generation_discontinued_logs(download_url)
 
     def test_add_cert_with_existing_pdf_certificate(self):
         """
-        Test that add certifcate for existing PDF certificate log warning
-        message and certificate status remains unchanged.
+        Test that adding a certificate for existing PDF certificates logs a  warning
+        message and the certificate status remains unchanged.
         """
         download_url = 'http://www.example.com/certificate.pdf'
-        # Create an existing verifed enrollment and certificate
+        # Create an existing verified enrollment and certificate
         CourseEnrollmentFactory(
             user=self.user_2,
             course_id=self.course.id,
@@ -338,9 +334,9 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             download_url=download_url
         )
 
-        self._assert_pdf_cert_generation_dicontinued_logs(download_url, add_cert=True)
+        self._assert_pdf_cert_generation_discontinued_logs(download_url, add_cert=True)
 
-    def _assert_pdf_cert_generation_dicontinued_logs(self, download_url, add_cert=False):
+    def _assert_pdf_cert_generation_discontinued_logs(self, download_url, add_cert=False):
         """Assert PDF certificate generation discontinued logs."""
         with LogCapture(LOGGER.name) as log:
             if add_cert:
@@ -352,14 +348,14 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
                     LOGGER.name,
                     'WARNING',
                     (
-                        u"PDF certificate generation discontinued, canceling "
-                        u"PDF certificate generation for student {student_id} "
-                        u"in course '{course_id}' "
-                        u"with status '{status}' "
-                        u"and download_url '{download_url}'."
+                        "PDF certificate generation discontinued, canceling "
+                        "PDF certificate generation for student {student_id} "
+                        "in course '{course_id}' "
+                        "with status '{status}' "
+                        "and download_url '{download_url}'."
                     ).format(
                         student_id=self.user_2.id,
-                        course_id=six.text_type(self.course.id),
+                        course_id=str(self.course.id),
                         status=CertificateStatuses.downloadable,
                         download_url=download_url
                     )
@@ -378,7 +374,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
     ERROR_MSG = 'Kaboom!'
 
     def setUp(self):
-        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()
+        super().setUp()
         self.xqueue = XQueueCertInterface()
 
     def test_add_example_cert(self):
@@ -390,7 +386,7 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
         self._assert_queue_task(mock_send, cert)
 
         # Verify the certificate status
-        self.assertEqual(cert.status, ExampleCertificate.STATUS_STARTED)
+        assert cert.status == ExampleCertificate.STATUS_STARTED
 
     def test_add_example_cert_error(self):
         cert = self._create_example_cert()
@@ -398,8 +394,8 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
             self.xqueue.add_example_cert(cert)
 
         # Verify the error status of the certificate
-        self.assertEqual(cert.status, ExampleCertificate.STATUS_ERROR)
-        self.assertIn(self.ERROR_MSG, cert.error_reason)
+        assert cert.status == ExampleCertificate.STATUS_ERROR
+        assert self.ERROR_MSG in cert.error_reason
 
     def _create_example_cert(self):
         """Create an example certificate. """
@@ -421,24 +417,24 @@ class XQueueCertInterfaceExampleCertificateTest(TestCase):
         """Check that the task was added to the queue. """
         expected_header = {
             'lms_key': cert.access_key,
-            'lms_callback_url': 'https://edx.org/update_example_certificate?key={key}'.format(key=cert.uuid),
+            'lms_callback_url': f'https://edx.org/update_example_certificate?key={cert.uuid}',
             'queue_name': 'certificates'
         }
 
         expected_body = {
             'action': 'create',
             'username': cert.uuid,
-            'name': u'John Doë',
-            'course_id': six.text_type(self.COURSE_KEY),
+            'name': 'John Doë',
+            'course_id': str(self.COURSE_KEY),
             'template_pdf': 'test.pdf',
             'example_certificate': True
         }
 
-        self.assertTrue(mock_send.called)
+        assert mock_send.called
 
         __, kwargs = mock_send.call_args_list[0]
         actual_header = json.loads(kwargs['header'])
         actual_body = json.loads(kwargs['body'])
 
-        self.assertEqual(expected_header, actual_header)
-        self.assertEqual(expected_body, actual_body)
+        assert expected_header == actual_header
+        assert expected_body == actual_body

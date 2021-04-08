@@ -12,11 +12,10 @@ from django.utils.translation import get_language_bidi
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from lms.djangoapps.courseware.tabs import DatesTab
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
-from lms.djangoapps.course_home_api.utils import get_microfrontend_url
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
 
@@ -26,7 +25,7 @@ class CourseDatesFragmentView(EdxFragmentView):
     """
     template_name = 'course_experience/course-dates-fragment.html'
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Render the course dates fragment.
         """
@@ -36,7 +35,7 @@ class CourseDatesFragmentView(EdxFragmentView):
 
         dates_tab_enabled = DatesTab.is_enabled(course, request.user)
         if course_home_mfe_dates_tab_is_active(course_key):
-            dates_tab_link = get_microfrontend_url(course_key=course.id, view_name='dates')
+            dates_tab_link = get_learning_mfe_home_url(course_key=course.id, view_name='dates')
         else:
             dates_tab_link = reverse('dates', args=[course.id])
 
@@ -68,7 +67,7 @@ class CourseDatesFragmentMobileView(CourseDatesFragmentView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             raise Http404
-        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)
+        return super(CourseDatesFragmentMobileView, self).get(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def css_dependencies(self):
         """

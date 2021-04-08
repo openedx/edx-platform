@@ -20,8 +20,10 @@
     define(['jquery',
         'underscore',
         'backbone',
-        'text!templates/components/card/card.underscore'],
-        function($, _, Backbone, cardTemplate) {
+        'text!templates/components/card/card.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ],
+        function($, _, Backbone, cardTemplate, HtmlUtils) {
             var CardView = Backbone.View.extend({
                 tagName: 'li',
 
@@ -46,7 +48,7 @@
                     this.render();
                 },
 
-                template: _.template(cardTemplate),
+                template: HtmlUtils.template(cardTemplate),
 
                 switchOnConfiguration: function(square_result, list_result) {
                     return this.callIfFunction(this.configuration) === 'square_card' ?
@@ -77,16 +79,19 @@
                     if (description.length > maxLength) {
                         description = description.substring(0, maxLength).trim() + '...';
                     }
-                    this.$el.html(this.template({
-                        pennant: this.callIfFunction(this.pennant),
-                        title: this.callIfFunction(this.title),
-                        description: description,
-                        action_class: this.callIfFunction(this.actionClass),
-                        action_url: this.callIfFunction(this.actionUrl),
-                        action_content: this.callIfFunction(this.actionContent),
-                        configuration: this.callIfFunction(this.configuration),
-                        srInfo: this.srInfo
-                    }));
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        this.template({
+                            pennant: this.callIfFunction(this.pennant),
+                            title: this.callIfFunction(this.title),
+                            description: description,
+                            action_class: this.callIfFunction(this.actionClass),
+                            action_url: this.callIfFunction(this.actionUrl),
+                            action_content: this.callIfFunction(this.actionContent),
+                            configuration: this.callIfFunction(this.configuration),
+                            srInfo: this.srInfo
+                        })
+                    );
                     var detailsEl = this.$el.find('.card-meta');
                     _.each(this.callIfFunction(this.details), function(detail) {
                         // Call setElement to rebind event handlers

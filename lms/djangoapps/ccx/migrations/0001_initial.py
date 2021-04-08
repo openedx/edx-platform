@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.conf import settings
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -19,7 +16,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('location', UsageKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
-                ('value', models.TextField(default=u'null')),
+                ('value', models.TextField(default='null')),
             ],
         ),
         migrations.CreateModel(
@@ -38,6 +35,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='ccxfieldoverride',
-            unique_together=set([('ccx', 'location', 'field')]),
+            unique_together={('ccx', 'location', 'field')},
         ),
     ]

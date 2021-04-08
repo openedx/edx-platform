@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Generates fake XML for asset metadata.
@@ -11,7 +10,6 @@ from datetime import datetime, timedelta
 
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from xmodule.assetstore import AssetMetadata
 
@@ -24,8 +22,8 @@ except ImportError:
 ASSET_XSD_FILE = 'assets.xsd'
 
 # Characters used in name generation below.
-NAME_CHARS = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
-NAME_CHARS_W_UNICODE = NAME_CHARS + u'àĚŘǅΦШΩΣӔ'
+NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-'
+NAME_CHARS_W_UNICODE = NAME_CHARS + 'àĚŘǅΦШΩΣӔ'
 
 
 def coin_flip():
@@ -54,7 +52,7 @@ def filename():
     """
     Fake a filename.
     """
-    fname = u''
+    fname = ''
     for __ in range(random.randint(10, 30)):
         fname += random.choice(NAME_CHARS_W_UNICODE)
     fname += random.choice(('.jpg', '.pdf', '.png', '.txt'))
@@ -65,7 +63,7 @@ def pathname():
     """
     Fake a pathname.
     """
-    pname = u''
+    pname = ''
     for __ in range(random.randint(2, 3)):
         for __ in range(random.randint(5, 10)):
             pname += random.choice(NAME_CHARS)
@@ -113,7 +111,7 @@ def versions():
         """
         Version string.
         """
-        return 'v{}.0'.format(ver)
+        return f'v{ver}.0'
     return (ver_str(curr_ver), ver_str(prev_ver))
 
 
@@ -195,13 +193,13 @@ def validate_xml(xsd_filename, xml_filename):
     """
     Validate a generated XML file against the XSD.
     """
-    with open(xsd_filename, 'r') as f:
+    with open(xsd_filename) as f:
         schema_root = etree.XML(f.read())
 
     schema = etree.XMLSchema(schema_root)
     xmlparser = etree.XMLParser(schema=schema)
 
-    with open(xml_filename, 'r') as f:
+    with open(xml_filename) as f:
         etree.fromstring(f.read(), xmlparser)
 
 if click is not None:

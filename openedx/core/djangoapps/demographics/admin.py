@@ -15,7 +15,7 @@ class UserDemographicsAdmin(admin.ModelAdmin):
     readonly_fields = ('user',)
     search_fields = ('id', 'user__username')
 
-    class Meta(object):
+    class Meta:
         model = UserDemographics
 
 

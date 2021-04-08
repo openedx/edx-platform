@@ -6,10 +6,8 @@ Python tests for the Survey workflows
 from collections import OrderedDict
 from copy import deepcopy
 
-import six
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
-from six.moves import range
 
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -26,7 +24,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
 
     @classmethod
     def setUpClass(cls):
-        super(SurveyViewsTests, cls).setUpClass()
+        super().setUpClass()
         cls.test_survey_name = 'TestSurvey'
         cls.course = CourseFactory.create(
             display_name='<script>alert("XSS")</script>',
@@ -45,20 +43,20 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         """
         Set up the test data used in the specific tests
         """
-        super(SurveyViewsTests, self).setUp()
+        super().setUp()
 
         self.test_form = '<input name="field1"></input>'
         self.survey = SurveyForm.create(self.test_survey_name, self.test_form)
 
         self.student_answers = OrderedDict({
-            u'field1': u'value1',
-            u'field2': u'value2',
+            'field1': 'value1',
+            'field2': 'value2',
         })
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
             email, password = self.STUDENT_INFO[i]
-            username = 'u{0}'.format(i)
+            username = f'u{i}'
             self.create_account(username, email, password)
             self.activate_user(email)
 
@@ -81,12 +79,12 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             resp = self.client.get(
                 reverse(
                     view_name,
-                    kwargs={'course_id': six.text_type(course.id)}
+                    kwargs={'course_id': str(course.id)}
                 )
             )
             self.assertRedirects(
                 resp,
-                reverse('course_survey', kwargs={'course_id': six.text_type(course.id)})
+                reverse('course_survey', kwargs={'course_id': str(course.id)})
             )
 
     def _assert_no_redirect(self, course):
@@ -98,10 +96,10 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             resp = self.client.get(
                 reverse(
                     view_name,
-                    kwargs={'course_id': six.text_type(course.id)}
+                    kwargs={'course_id': str(course.id)}
                 )
             )
-            self.assertEqual(resp.status_code, 200)
+            assert resp.status_code == 200
 
     def test_visiting_course_without_survey(self):
         """
@@ -125,10 +123,10 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         resp = self.client.get(
             reverse(
                 'openedx.course_experience.course_home',
-                kwargs={'course_id': six.text_type(self.course.id)}
+                kwargs={'course_id': str(self.course.id)}
             )
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
     def test_visiting_course_with_existing_answers(self):
         """
@@ -138,7 +136,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
             self.postback_url,
             self.student_answers
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         self._assert_no_redirect(self.course)
 
@@ -150,13 +148,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         resp = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': six.text_type(self.course.id)}
+                kwargs={'course_id': str(self.course.id)}
             )
         )
 
-        self.assertEqual(resp.status_code, 200)
-        expected = u'<input type="hidden" name="course_id" value="{course_id}" />'.format(
-            course_id=six.text_type(self.course.id)
+        assert resp.status_code == 200
+        expected = '<input type="hidden" name="course_id" value="{course_id}" />'.format(
+            course_id=str(self.course.id)
         )
 
         self.assertContains(resp, expected)
@@ -168,14 +166,14 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
 
         answers = deepcopy(self.student_answers)
         answers.update({
-            'course_id': six.text_type(self.course.id)
+            'course_id': str(self.course.id)
         })
 
         resp = self.client.post(
             self.postback_url,
             answers
         )
-        self.assertEqual(resp.status_code, 200)
+        assert resp.status_code == 200
 
         self._assert_no_redirect(self.course)
 
@@ -186,7 +184,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         )
 
         for answer_obj in answer_objs:
-            self.assertEqual(answer_obj.course_key, self.course.id)
+            assert answer_obj.course_key == self.course.id
 
     def test_visiting_course_with_bogus_survey(self):
         """
@@ -202,13 +200,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         resp = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': six.text_type(self.course_with_bogus_survey.id)}
+                kwargs={'course_id': str(self.course_with_bogus_survey.id)}
             )
         )
         course_home_path = 'openedx.course_experience.course_home'
         self.assertRedirects(
             resp,
-            reverse(course_home_path, kwargs={'course_id': six.text_type(self.course_with_bogus_survey.id)})
+            reverse(course_home_path, kwargs={'course_id': str(self.course_with_bogus_survey.id)})
         )
 
     def test_visiting_survey_with_no_course_survey(self):
@@ -219,13 +217,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         resp = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': six.text_type(self.course_without_survey.id)}
+                kwargs={'course_id': str(self.course_without_survey.id)}
             )
         )
         course_home_path = 'openedx.course_experience.course_home'
         self.assertRedirects(
             resp,
-            reverse(course_home_path, kwargs={'course_id': six.text_type(self.course_without_survey.id)})
+            reverse(course_home_path, kwargs={'course_id': str(self.course_without_survey.id)})
         )
 
     def test_survey_xss(self):
@@ -233,7 +231,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
         response = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': six.text_type(self.course.id)}
+                kwargs={'course_id': str(self.course.id)}
             )
         )
         self.assert_no_xss(response, '<script>alert("XSS")</script>')

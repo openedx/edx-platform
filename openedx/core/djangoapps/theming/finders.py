@@ -24,13 +24,12 @@ from collections import OrderedDict
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
-from django.utils import six
 
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.theming.storage import ThemeStorage
 
 
-class ThemeFilesFinder(BaseFinder):
+class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-method
     """
     A static files finder that looks in the directory of each theme as
     specified in the source_dir attribute.
@@ -55,13 +54,13 @@ class ThemeFilesFinder(BaseFinder):
             if theme.theme_dir_name not in self.themes:
                 self.themes.append(theme.theme_dir_name)
 
-        super(ThemeFilesFinder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def list(self, ignore_patterns):
         """
         List all files in all app storages.
         """
-        for storage in six.itervalues(self.storages):
+        for storage in self.storages.values():
             if storage.exists(''):  # check if storage location exists
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage

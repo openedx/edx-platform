@@ -2,16 +2,15 @@
 Test signal handlers for completion.
 """
 
-
 from datetime import datetime
+from unittest.mock import patch
 
 import ddt
-import six
+import pytest
 from completion import handlers
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionSetUpMixin
 from django.test import TestCase
-from mock import patch
 from pytz import utc
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -47,7 +46,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = True
 
     def setUp(self):
-        super(ScorableCompletionHandlerTestCase, self).setUp()
+        super().setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
@@ -63,8 +62,8 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.context_key),
-            usage_id=six.text_type(block_key),
+            course_id=str(self.context_key),
+            usage_id=str(block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
             modified=datetime.utcnow().replace(tzinfo=utc),
@@ -85,7 +84,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=self.block_key,
         )
-        self.assertEqual(completion.completion, expected_completion)
+        assert completion.completion == expected_completion
 
     @XBlock.register_temp_plugin(CustomScorableBlock, 'custom_scorable')
     def test_handler_skips_custom_block(self):
@@ -96,7 +95,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=custom_block_key,
         )
-        self.assertFalse(completion.exists())
+        assert not completion.exists()
 
     @XBlock.register_temp_plugin(ExcludedScorableBlock, 'excluded_scorable')
     def test_handler_skips_excluded_block(self):
@@ -107,7 +106,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=excluded_block_key,
         )
-        self.assertFalse(completion.exists())
+        assert not completion.exists()
 
     def test_handler_skips_discussion_block(self):
         discussion_block_key = self.context_key.make_usage_key(block_type='discussion', block_id='blue')
@@ -117,15 +116,15 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=discussion_block_key,
         )
-        self.assertFalse(completion.exists())
+        assert not completion.exists()
 
     def test_signal_calls_handler(self):
         with patch('completion.handlers.BlockCompletion.objects.submit_completion') as mock_handler:
             grades_signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(
                 sender=self,
                 user_id=self.user.id,
-                course_id=six.text_type(self.context_key),
-                usage_id=six.text_type(self.block_key),
+                course_id=str(self.context_key),
+                usage_id=str(self.block_key),
                 weighted_earned=0.0,
                 weighted_possible=3.0,
                 modified=datetime.utcnow().replace(tzinfo=utc),
@@ -143,21 +142,21 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = False
 
     def setUp(self):
-        super(DisabledCompletionHandlerTestCase, self).setUp()
+        super().setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):
         handlers.scorable_block_completion(
             sender=self,
             user_id=self.user.id,
-            course_id=six.text_type(self.context_key),
-            usage_id=six.text_type(self.block_key),
+            course_id=str(self.context_key),
+            usage_id=str(self.block_key),
             weighted_earned=0.0,
             weighted_possible=3.0,
             modified=datetime.utcnow().replace(tzinfo=utc),
             score_db_table='submissions',
         )
-        with self.assertRaises(BlockCompletion.DoesNotExist):
+        with pytest.raises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(
                 user=self.user,
                 context_key=self.context_key,

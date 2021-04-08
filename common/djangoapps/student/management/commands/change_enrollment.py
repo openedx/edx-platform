@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, User
@@ -19,10 +18,10 @@ class RollbackException(Exception):
     """
     Exception raised explicitly to cause a database transaction rollback.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     help = """
     Changes the enrollment status for students that meet
@@ -77,7 +76,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError('Invalid or non-existant course id {}'.format(options['course_id']))
+            raise CommandError('Invalid or non-existant course id {}'.format(options['course_id']))  # lint-amnesty, pylint: disable=raise-missing-from
 
         if not options['username'] and not options['email']:
             raise CommandError('You must include usernames (-u) or emails (-e) to select users to update')
@@ -98,7 +97,7 @@ class Command(BaseCommand):
 
         self.report(error_users, success_users)
 
-    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users, enrollment_attrs=None):
+    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users, enrollment_attrs=None):  # lint-amnesty, pylint: disable=line-too-long
         """ Update enrollments for a specific user identifier (email or username). """
         users = options[identifier].split(",")
 
@@ -155,4 +154,4 @@ class Command(BaseCommand):
         if len(error_users) > 0:
             logger.info('The following %i user(s) not saved:', len(error_users))
             for user, error in error_users:
-                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, text_type(error))
+                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, str(error))

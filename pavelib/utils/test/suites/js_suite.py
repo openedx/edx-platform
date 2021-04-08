@@ -68,8 +68,8 @@ class JsTestSubSuite(TestSuite):
         except ValueError:
             self.test_conf_file = Env.KARMA_CONFIG_FILES[0]
 
-        self.coverage_report = self.report_dir / 'coverage-{suite}.xml'.format(suite=self.test_id)
-        self.xunit_report = self.report_dir / 'javascript_xunit-{suite}.xml'.format(suite=self.test_id)
+        self.coverage_report = self.report_dir / f'coverage-{self.test_id}.xml'
+        self.xunit_report = self.report_dir / f'javascript_xunit-{self.test_id}.xml'
 
     @property
     def cmd(self):
@@ -77,24 +77,24 @@ class JsTestSubSuite(TestSuite):
         Run the tests using karma runner.
         """
         cmd = [
-            "nodejs",
+            "node",
             "--max_old_space_size=4096",
             "node_modules/.bin/karma",
             "start",
             self.test_conf_file,
             "--single-run={}".format('false' if self.mode == 'dev' else 'true'),
             "--capture-timeout=60000",
-            "--junitreportpath={}".format(self.xunit_report),
-            "--browsers={}".format(Env.KARMA_BROWSER),
+            f"--junitreportpath={self.xunit_report}",
+            f"--browsers={Env.KARMA_BROWSER}",
         ]
 
         if self.port:
-            cmd.append("--port={}".format(self.port))
+            cmd.append(f"--port={self.port}")
 
         if self.run_under_coverage:
             cmd.extend([
                 "--coverage",
-                "--coveragereportpath={}".format(self.coverage_report),
+                f"--coveragereportpath={self.coverage_report}",
             ])
 
         return cmd

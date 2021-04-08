@@ -8,15 +8,11 @@ import os.path
 import posixpath
 import re
 
+from urllib.parse import unquote, urldefrag, urlsplit  # pylint: disable=import-error
 from django.conf import settings
 from django.contrib.staticfiles.finders import find
-from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
+from django.contrib.staticfiles.storage import ManifestFilesMixin, StaticFilesStorage
 from django.utils._os import safe_join
-from django.utils.six.moves.urllib.parse import (  # pylint: disable=no-name-in-module, import-error
-    unquote,
-    urldefrag,
-    urlsplit
-)
 from pipeline.storage import PipelineMixin
 
 from openedx.core.djangoapps.theming.helpers import (
@@ -28,7 +24,7 @@ from openedx.core.djangoapps.theming.helpers import (
 )
 
 
-class ThemeMixin(object):
+class ThemeMixin:
     """
     Comprehensive theme aware Static files storage.
     """
@@ -41,7 +37,7 @@ class ThemeMixin(object):
     def __init__(self, **kwargs):
 
         self.prefix = kwargs.pop('prefix', None)
-        super(ThemeMixin, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def url(self, name):
         """
@@ -70,7 +66,7 @@ class ThemeMixin(object):
         if prefix and self.themed(name, prefix):
             name = os.path.join(prefix, name)
 
-        return super(ThemeMixin, self).url(name)
+        return super().url(name)
 
     def themed(self, name, theme):
         """
@@ -110,10 +106,10 @@ class ThemeStorage(ThemeMixin, StaticFilesStorage):
     pass
 
 
-class ThemeCachedFilesMixin(CachedFilesMixin):
+class ThemeManifestFilesMixin(ManifestFilesMixin):
     """
-    Comprehensive theme aware CachedFilesMixin.
-    Main purpose of subclassing CachedFilesMixin is to override the following methods.
+    Comprehensive theme aware ManifestFilesMixin.
+    Main purpose of subclassing ManifestFilesMixin is to override the following methods.
     1 - _url
     2 - url_converter
 
@@ -177,11 +173,11 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
         See the class docstring for more info.
         """
         processed_asset_name = self._processed_asset_name(name)
-        return super(ThemeCachedFilesMixin, self)._url(hashed_name_func, processed_asset_name, force, hashed_files)
+        return super()._url(hashed_name_func, processed_asset_name, force, hashed_files)
 
     def url_converter(self, name, hashed_files, template=None):
         """
-        This is an override of url_converter from CachedFilesMixin.
+        This is an override of url_converter from ManifestFilesMixin.
         It changes one line near the end of the method (see the NOTE) in order
         to return absolute urls instead of relative urls.  This behavior is
         necessary for theme overrides, as we get 404 on assets with relative
@@ -287,10 +283,9 @@ class ThemePipelineMixin(PipelineMixin):
                 paths[output_file] = (self, output_file)
                 yield output_file, output_file, True
 
-        super_class = super(ThemePipelineMixin, self)
+        super_class = super()
         if hasattr(super_class, 'post_process'):
-            for name, hashed_name, processed in super_class.post_process(paths.copy(), dry_run, **options):
-                yield name, hashed_name, processed
+            yield from super_class.post_process(paths.copy(), dry_run, **options)
 
     @staticmethod
     def get_themed_packages(prefix, packages):

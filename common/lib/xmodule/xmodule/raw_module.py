@@ -1,10 +1,11 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 import re
 
 from lxml import etree
 from xblock.fields import Scope, String
-from xmodule.editing_module import XMLEditingDescriptor
-from xmodule.xml_module import XmlDescriptor
+from xmodule.editing_module import XMLEditingDescriptor  # pylint: disable=unused-import
+from xmodule.xml_module import XmlDescriptor  # pylint: disable=unused-import
 
 from .exceptions import SerializationError
 
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 PRE_TAG_REGEX = re.compile(r'<pre\b[^>]*>(?:(?=([^<]+))\1|<(?!pre\b[^>]*>))*?</pre>')
 
 
-class RawMixin(object):
+class RawMixin:
     """
     Common code between RawDescriptor and XBlocks converted from XModules.
     """
@@ -22,7 +23,7 @@ class RawMixin(object):
     data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
         try:
             data = etree.tostring(xml_object, pretty_print=True, encoding='unicode')
             pre_tag_data = []
@@ -39,7 +40,7 @@ class RawMixin(object):
         except etree.XMLSyntaxError:
             return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return an Element if we've kept the import OLX, or None otherwise.
         """
@@ -67,13 +68,13 @@ class RawMixin(object):
             lines = self.data.split('\n')
             line, offset = err.position
             msg = (
-                u"Unable to create xml for module {loc}. "
-                u"Context: '{context}'"
+                "Unable to create xml for module {loc}. "
+                "Context: '{context}'"
             ).format(
                 context=lines[line - 1][offset - 40:offset + 40],
                 loc=self.location,
             )
-            raise SerializationError(self.location, msg)
+            raise SerializationError(self.location, msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
@@ -91,22 +92,14 @@ class RawMixin(object):
             node.remove(child)
         # Get attributes, if any, via normal parse_xml.
         try:
-            block = super(RawMixin, cls).parse_xml_new_runtime(node, runtime, keys)
+            block = super().parse_xml_new_runtime(node, runtime, keys)
         except AttributeError:
-            block = super(RawMixin, cls).parse_xml(node, runtime, keys, id_generator=None)
+            block = super().parse_xml(node, runtime, keys, id_generator=None)
         block.data = data_field_value
         return block
 
 
-class RawDescriptor(RawMixin, XmlDescriptor, XMLEditingDescriptor):
-    """
-    Module that provides a raw editing view of its data and children.  It
-    requires that the definition xml is valid.
-    """
-    pass
-
-
-class EmptyDataRawMixin(object):
+class EmptyDataRawMixin:
     """
     Common code between EmptyDataRawDescriptor and XBlocks converted from XModules.
     """
@@ -115,20 +108,12 @@ class EmptyDataRawMixin(object):
     data = String(default='', scope=Scope.content)
 
     @classmethod
-    def definition_from_xml(cls, xml_object, system):
+    def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=unused-argument
         if len(xml_object) == 0 and len(list(xml_object.items())) == 0:
             return {'data': ''}, []
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
-    def definition_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):  # lint-amnesty, pylint: disable=unused-argument
         if self.data:
             return etree.fromstring(self.data)
         return etree.Element(self.category)
-
-
-class EmptyDataRawDescriptor(EmptyDataRawMixin, XmlDescriptor, XMLEditingDescriptor):
-    """
-    Version of RawDescriptor for modules which may have no XML data,
-    but use XMLEditingDescriptor for import/export handling.
-    """
-    pass

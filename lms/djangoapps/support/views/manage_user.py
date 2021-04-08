@@ -11,12 +11,13 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 
-from common.djangoapps.student.models import UserPasswordToggleHistory
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.models import UserPasswordToggleHistory
+from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
 from openedx.core.djangoapps.user_authn.utils import generate_password
-from common.djangoapps.util.json_request import JsonResponse
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 
 
 class ManageUserSupportView(View):
@@ -73,6 +74,7 @@ class ManageUserDetailView(GenericAPIView):
             UserPasswordToggleHistory.objects.create(
                 user=user, comment=comment, created_by=request.user, disabled=True
             )
+            retire_dot_oauth2_models(request.user)
         else:
             user.set_password(generate_password(length=25))
             UserPasswordToggleHistory.objects.create(

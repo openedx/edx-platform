@@ -40,11 +40,11 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
             direct = not field_object.auto_created or field_object.concrete
             if direct and hasattr(field_object, 'Empty'):
                 for suffix in ('', '_exact'):
-                    key = '{}{}'.format(field_object.name, suffix)
+                    key = f'{field_object.name}{suffix}'
                     if key in kwargs and kwargs[key] is None:
                         kwargs[key] = field_object.Empty
 
-        return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
+        return super()._filter_or_exclude(*args, **kwargs)
 
 
 class OpaqueKeyField(opaque_keys.edx.django.models.OpaqueKeyField):
@@ -61,7 +61,7 @@ class OpaqueKeyField(opaque_keys.edx.django.models.OpaqueKeyField):
     def __init__(self, *args, **kwargs):
         warnings.warn("openedx.core.djangoapps.xmodule_django.models.OpaqueKeyField is deprecated. "
                       "Please use opaque_keys.edx.django.models.OpaqueKeyField instead.", stacklevel=2)
-        super(OpaqueKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class CourseKeyField(opaque_keys.edx.django.models.CourseKeyField):
@@ -71,7 +71,7 @@ class CourseKeyField(opaque_keys.edx.django.models.CourseKeyField):
     def __init__(self, *args, **kwargs):
         warnings.warn("openedx.core.djangoapps.xmodule_django.models.LocationKeyField is deprecated. "
                       "Please use opaque_keys.edx.django.models.UsageKeyField instead.", stacklevel=2)
-        super(CourseKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UsageKeyField(opaque_keys.edx.django.models.UsageKeyField):
@@ -81,7 +81,7 @@ class UsageKeyField(opaque_keys.edx.django.models.UsageKeyField):
     def __init__(self, *args, **kwargs):
         warnings.warn("openedx.core.djangoapps.xmodule_django.models.UsageKeyField is deprecated. "
                       "Please use opaque_keys.edx.django.models.UsageKeyField instead.", stacklevel=2)
-        super(UsageKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UsageKeyWithRunField(opaque_keys.edx.django.models.UsageKeyField):
@@ -90,7 +90,7 @@ class UsageKeyWithRunField(opaque_keys.edx.django.models.UsageKeyField):
     missing `run` values, for old Mongo courses.
     """
     def to_python(self, value):
-        value = super(UsageKeyWithRunField, self).to_python(value)
+        value = super().to_python(value)
         if value is not None and value.run is None:
             value = value.replace(course_key=modulestore().fill_in_run(value.course_key))
         return value
@@ -103,4 +103,4 @@ class BlockTypeKeyField(opaque_keys.edx.django.models.BlockTypeKeyField):
     def __init__(self, *args, **kwargs):
         warnings.warn("openedx.core.djangoapps.xmodule_django.models.BlockTypeKeyField is deprecated. "
                       "Please use opaque_keys.edx.django.models.BlockTypeKeyField instead.", stacklevel=2)
-        super(BlockTypeKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

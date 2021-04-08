@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring
 """
 Programmatic integration point for User API Accounts sub-application
@@ -7,14 +6,12 @@ Programmatic integration point for User API Accounts sub-application
 
 import datetime
 
-import six
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
-from six import text_type  # pylint: disable=ungrouped-imports
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
     AccountRecovery,
@@ -23,7 +20,7 @@ from common.djangoapps.student.models import (
     email_exists_or_retired,
     username_exists_or_retired
 )
-from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
@@ -161,12 +158,12 @@ def update_account_settings(requesting_user, update, username=None):
         _update_state_if_needed(update, user_profile)
 
     except PreferenceValidationError as err:
-        raise AccountValidationError(err.preference_errors)
+        raise AccountValidationError(err.preference_errors)  # lint-amnesty, pylint: disable=raise-missing-from
     except (AccountUpdateError, AccountValidationError) as err:
         raise err
     except Exception as err:
-        raise AccountUpdateError(
-            u"Error thrown when saving account updates: '{}'".format(text_type(err))
+        raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
+            "Error thrown when saving account updates: '{}'".format(str(err))
         )
 
     _send_email_change_requests_if_needed(update, user)
@@ -176,15 +173,15 @@ def _validate_read_only_fields(user, data, field_errors):
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(data.keys()).intersection(
         # Remove email since it is handled separately below when checking for changing_email.
-        (set(AccountUserSerializer.get_read_only_fields()) - set(["email"])) |
+        (set(AccountUserSerializer.get_read_only_fields()) - {"email"}) |
         set(AccountLegacyProfileSerializer.get_read_only_fields() or set()) |
         get_enterprise_readonly_account_fields(user)
     )
 
     for read_only_field in read_only_fields:
         field_errors[read_only_field] = {
-            "developer_message": u"This field is not editable via this API",
-            "user_message": _(u"The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
+            "developer_message": "This field is not editable via this API",
+            "user_message": _("The '{field_name}' field cannot be edited.").format(field_name=read_only_field)
         }
         del data[read_only_field]
 
@@ -196,15 +193,15 @@ def _validate_email_change(user, data, field_errors):
         return
 
     if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
-        raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
+        raise AccountUpdateError("Email address changes have been disabled by the site operators.")
 
     new_email = data["email"]
     try:
         student_views.validate_new_email(user, new_email)
     except ValueError as err:
         field_errors["email"] = {
-            "developer_message": u"Error thrown from validate_new_email: '{}'".format(text_type(err)),
-            "user_message": text_type(err)
+            "developer_message": "Error thrown from validate_new_email: '{}'".format(str(err)),
+            "user_message": str(err)
         }
         return
 
@@ -225,8 +222,8 @@ def _validate_secondary_email(user, data, field_errors):
         student_views.validate_secondary_email(user, secondary_email)
     except ValueError as err:
         field_errors["secondary_email"] = {
-            "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
-            "user_message": text_type(err)
+            "developer_message": "Error thrown from validate_secondary_email: '{}'".format(str(err)),
+            "user_message": str(err)
         }
     else:
         # Don't process with sending email to given new email, if it is already associated with
@@ -247,7 +244,7 @@ def _validate_name_change(user_profile, data, field_errors):
         validate_name(data['name'])
     except ValidationError as err:
         field_errors["name"] = {
-            "developer_message": u"Error thrown from validate_name: '{}'".format(err.message),
+            "developer_message": f"Error thrown from validate_name: '{err.message}'",
             "user_message": err.message
         }
         return None
@@ -270,12 +267,15 @@ def _update_preferences_if_needed(data, requesting_user, user):
 def _notify_language_proficiencies_update_if_needed(data, user, user_profile, old_language_proficiencies):
     if "language_proficiencies" in data:
         new_language_proficiencies = data["language_proficiencies"]
-        emit_setting_changed_event(
+        emit_settings_changed_event(
             user=user,
             db_table=user_profile.language_proficiencies.model._meta.db_table,
-            setting_name="language_proficiencies",
-            old_value=old_language_proficiencies,
-            new_value=new_language_proficiencies,
+            changed_fields={
+                "language_proficiencies": (
+                    old_language_proficiencies,
+                    new_language_proficiencies,
+                )
+            }
         )
 
 
@@ -307,7 +307,7 @@ def _store_old_name_if_needed(old_name, user_profile, requesting_user):
             meta['old_names'] = []
         meta['old_names'].append([
             old_name,
-            u"Name change requested through account API by {0}".format(requesting_user.username),
+            f"Name change requested through account API by {requesting_user.username}",
             datetime.datetime.now(UTC).isoformat()
         ])
         user_profile.set_meta(meta)
@@ -320,9 +320,9 @@ def _send_email_change_requests_if_needed(data, user):
         try:
             student_views.do_email_change_request(user, new_email)
         except ValueError as err:
-            raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
-                user_message=text_type(err)
+            raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
+                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                user_message=str(err)
             )
 
     new_secondary_email = data.get("secondary_email")
@@ -334,9 +334,9 @@ def _send_email_change_requests_if_needed(data, user):
                 secondary_email_change_request=True,
             )
         except ValueError as err:
-            raise AccountUpdateError(
-                u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
-                user_message=text_type(err)
+            raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
+                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                user_message=str(err)
             )
 
 
@@ -456,7 +456,7 @@ def _get_user_and_profile(username):
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        raise errors.UserNotFound()
+        raise errors.UserNotFound()  # lint-amnesty, pylint: disable=raise-missing-from
 
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
@@ -477,7 +477,7 @@ def _validate(validation_func, err, *args):
     try:
         validation_func(*args)
     except err as validation_err:
-        return text_type(validation_err)
+        return str(validation_err)
     return ''
 
 
@@ -496,7 +496,7 @@ def _validate_username(username):
     """
     try:
         _validate_unicode(username)
-        _validate_type(username, six.string_types, accounts.USERNAME_BAD_TYPE_MSG)
+        _validate_type(username, str, accounts.USERNAME_BAD_TYPE_MSG)
         _validate_length(
             username,
             accounts.USERNAME_MIN_LENGTH,
@@ -508,7 +508,7 @@ def _validate_username(username):
             # message by convention.
             validate_username(username)
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as username_err:
-        raise errors.AccountUsernameInvalid(text_type(username_err))
+        raise errors.AccountUsernameInvalid(str(username_err))
     except ValidationError as validation_err:
         raise errors.AccountUsernameInvalid(validation_err.message)
 
@@ -528,12 +528,12 @@ def _validate_email(email):
     """
     try:
         _validate_unicode(email)
-        _validate_type(email, six.string_types, accounts.EMAIL_BAD_TYPE_MSG)
+        _validate_type(email, str, accounts.EMAIL_BAD_TYPE_MSG)
         _validate_length(email, accounts.EMAIL_MIN_LENGTH, accounts.EMAIL_MAX_LENGTH, accounts.EMAIL_BAD_LENGTH_MSG)
         validate_email.message = accounts.EMAIL_INVALID_MSG.format(email=email)
         validate_email(email)
     except (UnicodeError, errors.AccountDataBadType, errors.AccountDataBadLength) as invalid_email_err:
-        raise errors.AccountEmailInvalid(text_type(invalid_email_err))
+        raise errors.AccountEmailInvalid(str(invalid_email_err))
     except ValidationError as validation_err:
         raise errors.AccountEmailInvalid(validation_err.message)
 
@@ -570,11 +570,11 @@ def _validate_password(password, username=None, email=None):
 
     """
     try:
-        _validate_type(password, six.string_types, accounts.PASSWORD_BAD_TYPE_MSG)
+        _validate_type(password, str, accounts.PASSWORD_BAD_TYPE_MSG)
         temp_user = User(username=username, email=email) if username else None
         validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
-        raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
+        raise errors.AccountPasswordInvalid(str(invalid_password_err))
     except ValidationError as validation_err:
         raise errors.AccountPasswordInvalid(' '.join(validation_err.messages))
 
@@ -586,7 +586,7 @@ def _validate_country(country):
     :return: None
 
     """
-    if country == '' or country == '--':
+    if country == '' or country == '--':  # lint-amnesty, pylint: disable=consider-using-in
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
 
@@ -598,7 +598,7 @@ def _validate_username_doesnt_exist(username):
     :raises: errors.AccountUsernameAlreadyExists
     """
     if username is not None and username_exists_or_retired(username):
-        raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))
+        raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def _validate_email_doesnt_exist(email):
@@ -609,7 +609,7 @@ def _validate_email_doesnt_exist(email):
     :raises: errors.AccountEmailAlreadyExists
     """
     if email is not None and email_exists_or_retired(email):
-        raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
+        raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))  # lint-amnesty, pylint: disable=translation-of-non-string
 
 
 def _validate_secondary_email_doesnt_exist(email):
@@ -643,10 +643,10 @@ def _validate_password_works_with_username(password, username=None):
     :raises: errors.AccountPasswordInvalid
     """
     if password == username:
-        raise errors.AccountPasswordInvalid(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)
+        raise errors.AccountPasswordInvalid(accounts.PASSWORD_CANT_EQUAL_USERNAME_MSG)  # lint-amnesty, pylint: disable=no-member
 
 
-def _validate_type(data, type, err):
+def _validate_type(data, type, err):  # lint-amnesty, pylint: disable=redefined-builtin
     """Checks whether the input data is of type. If not,
     throws a generic error message.
 
@@ -661,7 +661,7 @@ def _validate_type(data, type, err):
         raise errors.AccountDataBadType(err)
 
 
-def _validate_length(data, min, max, err):
+def _validate_length(data, min, max, err):  # lint-amnesty, pylint: disable=redefined-builtin
     """Validate that the data's length is less than or equal to max,
     and greater than or equal to min.
 
@@ -677,7 +677,7 @@ def _validate_length(data, min, max, err):
         raise errors.AccountDataBadLength(err)
 
 
-def _validate_unicode(data, err=u"Input not valid unicode"):
+def _validate_unicode(data, err="Input not valid unicode"):
     """Checks whether the input data is valid unicode or not.
 
     :param data: The data to check for unicode validity.
@@ -687,9 +687,9 @@ def _validate_unicode(data, err=u"Input not valid unicode"):
 
     """
     try:
-        if not isinstance(data, str) and not isinstance(data, six.text_type):
+        if not isinstance(data, str) and not isinstance(data, str):
             raise UnicodeError(err)
         # In some cases we pass the above, but it's still inappropriate utf-8.
-        six.text_type(data)
+        str(data)
     except UnicodeError:
-        raise UnicodeError(err)
+        raise UnicodeError(err)  # lint-amnesty, pylint: disable=raise-missing-from

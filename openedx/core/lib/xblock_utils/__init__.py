@@ -15,10 +15,11 @@ import six
 import webpack_loader.utils
 from contracts import contract
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
 from django.utils.html import escape
+from edx_django_utils.plugins import pluggable_override
 from lxml import etree, html
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
@@ -30,10 +31,13 @@ from xblock.scorable import ScorableXBlockMixin
 
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from xmodule.seq_module import SequenceModule
+from xmodule.seq_module import SequenceBlock
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.vertical_block import VerticalBlock
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, XModule, XModuleDescriptor, shim_xmodule_js
+from xmodule.x_module import (
+    PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW,
+    XModule, XModuleDescriptor, shim_xmodule_js,
+)
 
 log = logging.getLogger(__name__)
 
@@ -110,6 +114,9 @@ def wrap_xblock(
         )
     ]
 
+    if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
+        css_classes.append('is-hidden')
+
     if isinstance(block, (XModule, XModuleDescriptor)) or getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
@@ -117,9 +124,6 @@ def wrap_xblock(
         elif view == STUDIO_VIEW:
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
-
-        if getattr(block, 'HIDDEN', False):
-            css_classes.append('is-hidden')
 
         css_classes.append('xmodule_' + markupsafe.escape(class_name))
 
@@ -316,7 +320,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     definition of the xmodule, and a link to view the module in Studio
     if it is a Studio edited, mongo stored course.
 
-    Does nothing if module is a SequenceModule.
+    Does nothing if module is a SequenceBlock.
     """
     if context and context.get('hide_staff_markup', False):
         # If hide_staff_markup is passed, don't add the markup
@@ -325,7 +329,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         return frag
 
-    if isinstance(block, SequenceModule) or getattr(block, 'HIDDEN', False):
+    if isinstance(block, SequenceBlock) or getattr(block, 'HIDDEN', False):
         return frag
 
     block_id = block.location
@@ -435,7 +439,7 @@ def get_course_update_items(course_updates, provided_index=0):
         try:
             course_html_parsed = html.fromstring(course_updates.data)
         except (etree.XMLSyntaxError, etree.ParserError):
-            log.error("Cannot parse: " + course_updates.data)
+            log.error("Cannot parse: " + course_updates.data)  # lint-amnesty, pylint: disable=logging-not-lazy
             escaped = escape(course_updates.data)
             # xss-lint: disable=python-concat-html
             course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
@@ -551,3 +555,13 @@ def hash_resource(resource):
         else:
             md5.update(repr(data).encode('utf-8'))
     return md5.hexdigest()
+
+
+@pluggable_override('OVERRIDE_GET_UNIT_ICON')
+def get_icon(block):
+    """
+    A function that returns the CSS class representing an icon to use for this particular
+    XBlock (in the courseware navigation bar). Mostly used for Vertical/Unit XBlocks.
+    It can be overridden by setting `GET_UNIT_ICON_IMPL` to an alternative implementation.
+    """
+    return block.get_icon_class()

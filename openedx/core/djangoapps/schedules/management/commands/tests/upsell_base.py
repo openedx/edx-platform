@@ -6,19 +6,19 @@ Base file for testing schedules with upsell
 import datetime
 import itertools
 from collections import namedtuple
+from unittest.mock import PropertyMock, patch
 
 import ddt
 from edx_ace.message import Message
 from edx_ace.utils.date import serialize
 from freezegun import freeze_time
-from mock import PropertyMock, patch
 
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleUpsellTestMixin(object):
+class ScheduleUpsellTestMixin:  # lint-amnesty, pylint: disable=missing-class-docstring
     UpsellTestCase = namedtuple('UpsellTestCase', 'set_deadline, deadline_offset, expect_upsell')
 
     def _setup_schedule_and_dates(self, set_deadline=True, deadline_offset=7):
@@ -49,7 +49,7 @@ class ScheduleUpsellTestMixin(object):
                 site_id=self.site_config.site.id, target_day_str=serialize(target_day), day_offset=offset,
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))
-        self.assertEqual(len(sent_messages), 1)
+        assert len(sent_messages) == 1
         return Message.from_string(sent_messages[0])
 
     def _contains_upsell(self, message):
@@ -83,7 +83,7 @@ class ScheduleUpsellTestMixin(object):
 
         found_upsell = self._contains_upsell(message)
         expect_upsell = enable_config and testcase.expect_upsell
-        self.assertEqual(found_upsell, expect_upsell)
+        assert found_upsell == expect_upsell
 
     @ddt.data('es', 'es-es', 'es-419')
     def test_upsell_translated(self, course_language):
@@ -96,7 +96,4 @@ class ScheduleUpsellTestMixin(object):
             mock_course_language.return_value = course_language
             message = self._send_message_task(schedule, offset, target_day)
 
-        self.assertEqual(
-            message.context['user_schedule_upgrade_deadline_time'],
-            u'8 de agosto de 2017',
-        )
+        assert message.context['user_schedule_upgrade_deadline_time'] == '8 de agosto de 2017'

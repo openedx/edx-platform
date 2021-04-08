@@ -3,7 +3,6 @@ Management command for compiling sass.
 """
 
 
-import six
 from django.core.management import BaseCommand, CommandError
 from paver.easy import call_task
 
@@ -111,7 +110,7 @@ class Command(BaseCommand):
             )
 
         if "all" in given_themes:
-            themes = list(six.itervalues(available_themes))
+            themes = list(available_themes.values())
         elif "no" in given_themes:
             themes = []
         else:

@@ -25,7 +25,7 @@ class ContentGroupTestCase(ModuleStoreTestCase):
     and a non-cohorted user with no special access.
     """
     def setUp(self):
-        super(ContentGroupTestCase, self).setUp()
+        super().setUp()
 
         self.course = CourseFactory.create(
             org='org', number='number', run='run',
@@ -144,7 +144,7 @@ class TestConditionalContent(ModuleStoreTestCase):
                             -> vertical (Group B)
                                 -> problem
         """
-        super(TestConditionalContent, self).setUp()
+        super().setUp()
 
         # Create user partitions
         self.user_partition_group_a = 0
@@ -190,13 +190,13 @@ class TestConditionalContent(ModuleStoreTestCase):
         UserCourseTagFactory(
             user=self.student_a,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
+            key=f'xblock.partition_service.partition_{self.partition.id}',
             value=str(self.user_partition_group_a)
         )
         UserCourseTagFactory(
             user=self.student_b,
             course_id=self.course.id,
-            key='xblock.partition_service.partition_{0}'.format(self.partition.id),
+            key=f'xblock.partition_service.partition_{self.partition.id}',
             value=str(self.user_partition_group_b)
         )
 

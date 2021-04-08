@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Test site_configuration middleware.
 """
@@ -23,7 +22,7 @@ class SessionCookieDomainTests(TestCase):
     """
 
     def setUp(self):
-        super(SessionCookieDomainTests, self).setUp()
+        super().setUp()
         # Create a test client, and log it in so that it will save some session
         # data.
         self.user = UserFactory.create()
@@ -48,8 +47,8 @@ class SessionCookieDomainTests(TestCase):
         Test sessionid cookie when no override is set
         """
         response = self.client.get('/')
-        self.assertNotIn('test_site.localhost', str(response.cookies['sessionid']))
-        self.assertNotIn('Domain', str(response.cookies['sessionid']))
+        assert 'test_site.localhost' not in str(response.cookies['sessionid'])
+        assert 'Domain' not in str(response.cookies['sessionid'])
 
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
@@ -62,7 +61,7 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
     """
 
     def setUp(self):
-        super(SessionCookieDomainSiteConfigurationOverrideTests, self).setUp()
+        super().setUp()
         # Create a test client, and log it in so that it will save some session data.
         self.user = UserFactory.create()
         self.user.set_password('password')
@@ -85,4 +84,4 @@ class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
         Makes sure that the cookie being set is for the overridden domain
         """
         response = self.client.get('/', HTTP_HOST=self.site.domain)
-        self.assertIn(self.site.domain, str(response.cookies['sessionid']))
+        assert self.site.domain in str(response.cookies['sessionid'])

@@ -4,7 +4,7 @@ Tests for the create_or_update_site_configuration management command.
 
 import codecs
 import json
-
+import pytest
 import ddt
 from django.contrib.sites.models import Site
 from django.core.management import call_command, CommandError
@@ -22,7 +22,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
     command = 'create_or_update_site_configuration'
 
     def setUp(self):
-        super(CreateOrUpdateSiteConfigurationTest, self).setUp()
+        super().setUp()
         self.site_id = 1
         self.site_id_arg = ['--site-id', str(self.site_id)]
         self.json_file_path = Path(__file__).parent / "fixtures/config1.json"
@@ -43,7 +43,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         """
         Assert that the site configuration for the fixture site does not exist.
         """
-        with self.assertRaises(SiteConfiguration.DoesNotExist):
+        with pytest.raises(SiteConfiguration.DoesNotExist):
             SiteConfiguration.objects.get(site=self.site)
 
     def get_site_configuration(self):
@@ -62,16 +62,16 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         """
         Verify the error on the command with no arguments.
         """
-        with self.assertRaises(CommandError) as error:
+        with pytest.raises(CommandError) as error:
             call_command(self.command)
-        self.assertIn('Error: one of the arguments --site-id domain is required', str(error.exception))
+        assert 'Error: one of the arguments --site-id domain is required' in str(error.value)
 
     def test_site_created_when_site_id_non_existent(self):
         """
         Verify that a new site is created  when given a site ID that doesn't exist.
         """
         non_existent_site_id = 999
-        with self.assertRaises(Site.DoesNotExist):
+        with pytest.raises(Site.DoesNotExist):
             Site.objects.get(id=non_existent_site_id)
 
         call_command(self.command, '--site-id', non_existent_site_id)
@@ -82,7 +82,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         Verify that a new site is created when given a domain name that does not have an existing site..
         """
         domain = 'nonexistent.com'
-        with self.assertRaises(Site.DoesNotExist):
+        with pytest.raises(Site.DoesNotExist):
             Site.objects.get(domain=domain)
         call_command(self.command, domain)
         Site.objects.get(domain=domain)
@@ -91,10 +91,10 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         """
         Verify that an error is thrown when both site_id and the domain name are provided.
         """
-        with self.assertRaises(CommandError) as error:
+        with pytest.raises(CommandError) as error:
             call_command(self.command, 'domain.com', '--site-id', '1')
 
-        self.assertIn('not allowed with argument', str(error.exception))
+        assert 'not allowed with argument' in str(error.value)
 
     def test_site_configuration_created_when_non_existent(self):
         """
@@ -104,16 +104,16 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
 
         call_command(self.command, *self.site_id_arg)
         site_configuration = SiteConfiguration.objects.get(site=self.site)
-        self.assertFalse(site_configuration.site_values)
-        self.assertFalse(site_configuration.enabled)
+        assert not site_configuration.site_values
+        assert not site_configuration.enabled
 
     def test_both_enabled_disabled_flags(self):
         """
         Verify the error on providing both the --enabled and --disabled flags.
         """
-        with self.assertRaises(CommandError) as error:
+        with pytest.raises(CommandError) as error:
             call_command(self.command, '--enabled', '--disabled', *self.site_id_arg)
-        self.assertIn('argument --disabled: not allowed with argument --enabled', str(error.exception))
+        assert 'argument --disabled: not allowed with argument --enabled' in str(error.value)
 
     @ddt.data(('enabled', True),
               ('disabled', False))
@@ -123,10 +123,10 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         Verify that the SiteConfiguration instance is enabled/disabled as per the flag used.
         """
         self.assert_site_configuration_does_not_exist()
-        call_command(self.command, '--{}'.format(flag), *self.site_id_arg)
+        call_command(self.command, f'--{flag}', *self.site_id_arg)
         site_configuration = SiteConfiguration.objects.get(site=self.site)
-        self.assertFalse(site_configuration.site_values)
-        self.assertEqual(enabled, site_configuration.enabled)
+        assert not site_configuration.site_values
+        assert enabled == site_configuration.enabled
 
     def test_site_configuration_created_with_parameters(self):
         """
@@ -144,7 +144,7 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         self.assert_site_configuration_does_not_exist()
         call_command(self.command, '-f', str(self.json_file_path.abspath()), *self.site_id_arg)
         site_configuration = self.get_site_configuration()
-        self.assertEqual(site_configuration.site_values, {'ABC': 123, 'XYZ': '789'})
+        assert site_configuration.site_values == {'ABC': 123, 'XYZ': '789'}
 
     @ddt.data(True, False)
     def test_site_configuration_updated_with_parameters(self, enabled):
@@ -154,11 +154,9 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         self.create_fixture_site_configuration(enabled)
         call_command(self.command, '--configuration', json.dumps(self.input_configuration), *self.site_id_arg)
         site_configuration = self.get_site_configuration()
-        self.assertEqual(
-            site_configuration.site_values,
-            {'ABC': 123, 'B': 'b', 'FEATURE_FLAG': True, 'SERVICE_URL': 'https://foo.bar'}
-        )
-        self.assertEqual(site_configuration.enabled, enabled)
+        assert site_configuration.site_values ==\
+               {'ABC': 123, 'B': 'b', 'FEATURE_FLAG': True, 'SERVICE_URL': 'https://foo.bar'}
+        assert site_configuration.enabled == enabled
 
     @ddt.data(True, False)
     def test_site_configuration_updated_from_json_file(self, enabled):
@@ -171,5 +169,5 @@ class CreateOrUpdateSiteConfigurationTest(TestCase):
         expected_site_configuration = {'ABC': 'abc', 'B': 'b'}
         with codecs.open(self.json_file_path, encoding='utf-8') as f:
             expected_site_configuration.update(json.load(f))
-        self.assertEqual(site_configuration.site_values, expected_site_configuration)
-        self.assertEqual(site_configuration.enabled, enabled)
+        assert site_configuration.site_values == expected_site_configuration
+        assert site_configuration.enabled == enabled

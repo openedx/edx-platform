@@ -33,7 +33,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(MicrobachelorsExternalIDTest, cls).setUpClass()
+        super().setUpClass()
 
         cls.course_list = []
         cls.user = UserFactory.create()
@@ -47,7 +47,7 @@ class MicrobachelorsExternalIDTest(ModuleStoreTestCase, CacheIsolationTestCase):
         )
 
     def setUp(self):
-        super(MicrobachelorsExternalIDTest, self).setUp()
+        super().setUp()
         RequestCache.clear_all_namespaces()
         self.program = self._create_cached_program()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)

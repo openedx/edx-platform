@@ -4,8 +4,6 @@
 import json
 import unittest
 
-import six
-
 from django.test.client import Client
 from django.urls import reverse
 
@@ -19,7 +17,7 @@ class CeleryConfigTest(unittest.TestCase):
         """
         Create a django test client
         """
-        super(CeleryConfigTest, self).setUp()
+        super().setUp()
         self.client = Client()
         self.ping_url = reverse('status.service.celery.ping')
 
@@ -33,20 +31,20 @@ class CeleryConfigTest(unittest.TestCase):
         response = self.client.get(self.ping_url)
 
         # HTTP response should be successful
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         # Expect to get a JSON-serialized dict with
         # task and time information
         result_dict = json.loads(response.content.decode('utf-8'))
 
         # Was it successful?
-        self.assertTrue(result_dict['success'])
+        assert result_dict['success']
 
         # We should get a "pong" message back
-        self.assertEqual(result_dict['value'], "pong")
+        assert result_dict['value'] == 'pong'
 
         # We don't know the other dict values exactly,
         # but we can assert that they take the right form
-        self.assertIsInstance(result_dict['task_id'], six.text_type)
-        self.assertIsInstance(result_dict['time'], float)
-        self.assertGreater(result_dict['time'], 0.0)
+        assert isinstance(result_dict['task_id'], str)
+        assert isinstance(result_dict['time'], float)
+        assert result_dict['time'] > 0.0

@@ -7,20 +7,19 @@ import datetime
 import logging
 from collections import namedtuple
 from copy import deepcopy
+from unittest.mock import Mock, patch
 
 import attr
 import ddt
 import pytz
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models import Max
 from edx_ace.channel import ChannelMap, ChannelType
 from edx_ace.test_utils import StubPolicy, patch_policies
 from edx_ace.utils.date import serialize
 from freezegun import freeze_time
-from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
-from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -83,7 +82,7 @@ ExperienceTest = namedtuple('ExperienceTest', 'experience offset email_sent')
 
 @ddt.ddt
 @freeze_time('2017-08-01 00:00:00', tz_offset=0, tick=True)
-class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
+class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     __test__ = False
 
@@ -93,7 +92,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
     consolidates_emails_for_learner = False
 
     def setUp(self):
-        super(ScheduleSendEmailTestMixin, self).setUp()
+        super().setUp()
 
         site = SiteFactory.create()
         self.site_config = SiteConfigurationFactory.create(site=site)
@@ -119,7 +118,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         num_bins = self.task.num_bins
         return max_user_id + num_bins - (max_user_id % num_bins)
 
-    def _get_dates(self, offset=None):
+    def _get_dates(self, offset=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         current_day = _get_datetime_beginning_of_day(datetime.datetime.now(pytz.UTC))
         offset = offset or self.expected_offsets[0]
         target_day = current_day + datetime.timedelta(days=offset)
@@ -131,10 +130,10 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     def _get_template_overrides(self):
         templates_override = deepcopy(settings.TEMPLATES)
-        templates_override[0]['OPTIONS']['string_if_invalid'] = u"TEMPLATE WARNING - MISSING VARIABLE [%s]"
+        templates_override[0]['OPTIONS']['string_if_invalid'] = "TEMPLATE WARNING - MISSING VARIABLE [%s]"
         return templates_override
 
-    def _schedule_factory(self, offset=None, **factory_kwargs):
+    def _schedule_factory(self, offset=None, **factory_kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
         _, _, target_day, upgrade_deadline = self._get_dates(offset=offset)
         factory_kwargs.setdefault('start_date', target_day)
         factory_kwargs.setdefault('upgrade_deadline', upgrade_deadline)
@@ -164,7 +163,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             ScheduleConfigFactory.create(**schedule_config_kwargs)
 
     def test_command_task_binding(self):
-        self.assertEqual(self.command.async_send_task, self.task)
+        assert self.command.async_send_task == self.task
 
     def test_handle(self):
         with patch.object(self.command, 'async_send_task') as mock_send:
@@ -192,14 +191,14 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             (self.site_config.site.id, serialize(target_day), offset, self.task.num_bins - 1, None),
             retry=False,
         )
-        self.assertFalse(mock_ace.send.called)
+        assert not mock_ace.send.called
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
     @patch.object(resolvers, 'set_custom_attribute')
     def test_schedule_bin(self, schedule_count, mock_attribute, mock_ace):
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
-            current_day, offset, target_day, upgrade_deadline = self._get_dates()
+            current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
             schedules = [
                 self._schedule_factory() for _ in range(schedule_count)
             ]
@@ -209,7 +208,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             target_day_str = serialize(target_day)
 
             for b in range(self.task.num_bins):
-                LOG.debug(u'Checking bin %d', b)
+                LOG.debug('Checking bin %d', b)
                 expected_queries = NUM_QUERIES_SITE_SCHEDULES
                 if b in bins_in_use:
                     if is_first_match:
@@ -228,15 +227,15 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
                 num_schedules = mock_attribute.call_args[0][1]
                 if b in bins_in_use:
-                    self.assertGreater(num_schedules, 0)
+                    assert num_schedules > 0
                 else:
-                    self.assertEqual(num_schedules, 0)
+                    assert num_schedules == 0
 
-            self.assertEqual(mock_schedule_send.apply_async.call_count, schedule_count)
-            self.assertFalse(mock_ace.send.called)
+            assert mock_schedule_send.apply_async.call_count == schedule_count
+            assert not mock_ace.send.called
 
     def test_no_course_overview(self):
-        current_day, offset, target_day, upgrade_deadline = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
         # Don't use CourseEnrollmentFactory since it creates a course overview
         enrollment = CourseEnrollment.objects.create(
             course_id=CourseKey.from_string('edX/toy/Not_2012_Fall'),
@@ -259,7 +258,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         # This happens 'transparently' because django generates an inner-join between
         # enrollment and course_overview, and thus will skip any rows where course_overview
         # is null.
-        self.assertEqual(mock_schedule_send.apply_async.call_count, 0)
+        assert mock_schedule_send.apply_async.call_count == 0
 
     @ddt.data(True, False)
     @patch.object(tasks, 'ace')
@@ -272,13 +271,13 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
         }
         self._update_schedule_config(schedule_config_kwargs)
 
-        mock_message.from_string.return_value.recipient.username = user.username
+        mock_message.from_string.return_value.recipient.lms_user_id = user.id
         mock_msg = Mock()
         self.deliver_task(self.site_config.site.id, mock_msg)
         if is_enabled:
-            self.assertTrue(mock_ace.send.called)
+            assert mock_ace.send.called
         else:
-            self.assertFalse(mock_ace.send.called)
+            assert not mock_ace.send.called
 
     @ddt.data(True, False)
     def test_enqueue_config(self, is_enabled):
@@ -293,9 +292,9 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             self.task.enqueue(self.site_config.site, current_datetime, 3)
 
         if is_enabled:
-            self.assertTrue(mock_apply_async.called)
+            assert mock_apply_async.called
         else:
-            self.assertFalse(mock_apply_async.called)
+            assert not mock_apply_async.called
 
     @patch.object(tasks, 'ace')
     @ddt.data(
@@ -318,7 +317,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
         user1 = UserFactory.create(id=self._next_user_id())
         user2 = UserFactory.create(id=user1.id + self.task.num_bins)
-        current_day, offset, target_day, upgrade_deadline = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
 
         self._schedule_factory(
             enrollment__course__org=filtered_org,
@@ -338,13 +337,13 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                 site_id=this_config.site.id, target_day_str=serialize(target_day), day_offset=offset, bin_num=0
             ))
 
-        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_message_count)
-        self.assertFalse(mock_ace.send.called)
+        assert mock_schedule_send.apply_async.call_count == expected_message_count
+        assert not mock_ace.send.called
 
     @ddt.data(True, False)
     def test_course_end(self, has_course_ended):
         user1 = UserFactory.create(id=self._next_user_id())
-        current_day, offset, target_day, upgrade_deadline = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
 
         end_date_offset = -2 if has_course_ended else 2
         self._schedule_factory(
@@ -359,19 +358,19 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             ))
 
         if has_course_ended:
-            self.assertFalse(mock_schedule_send.apply_async.called)
+            assert not mock_schedule_send.apply_async.called
         else:
-            self.assertTrue(mock_schedule_send.apply_async.called)
+            assert mock_schedule_send.apply_async.called
 
     @patch.object(tasks, 'ace')
     def test_multiple_target_schedules(self, mock_ace):
         user = UserFactory.create()
-        current_day, offset, target_day, upgrade_deadline = self._get_dates()
+        current_day, offset, target_day, upgrade_deadline = self._get_dates()  # lint-amnesty, pylint: disable=unused-variable
         num_courses = 3
         for course_index in range(num_courses):
             self._schedule_factory(
                 enrollment__user=user,
-                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+                enrollment__course__id=CourseKey.from_string(f'edX/toy/course{course_index}')
             )
 
         # 2 queries per course, one for the course opt out and one for the course modes
@@ -386,8 +385,8 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                 ))
 
         expected_call_count = 1 if self.consolidates_emails_for_learner else num_courses
-        self.assertEqual(mock_schedule_send.apply_async.call_count, expected_call_count)
-        self.assertFalse(mock_ace.send.called)
+        assert mock_schedule_send.apply_async.call_count == expected_call_count
+        assert not mock_ace.send.called
 
     @ddt.data(
         1, 10
@@ -397,15 +396,15 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
             self._assert_template_for_offset(offset, message_count)
             self.clear_caches()
 
-    def _assert_template_for_offset(self, offset, message_count):
-        current_day, offset, target_day, upgrade_deadline = self._get_dates(offset)
+    def _assert_template_for_offset(self, offset, message_count):  # lint-amnesty, pylint: disable=missing-function-docstring
+        current_day, offset, target_day, upgrade_deadline = self._get_dates(offset)  # lint-amnesty, pylint: disable=unused-variable
 
         user = UserFactory.create()
         for course_index in range(message_count):
             self._schedule_factory(
                 offset=offset,
                 enrollment__user=user,
-                enrollment__course__id=CourseKey.from_string('edX/toy/course{}'.format(course_index))
+                enrollment__course__id=CourseKey.from_string(f'edX/toy/course{course_index}')
             )
 
         patch_policies(self, [StubPolicy([ChannelType.PUSH])])
@@ -438,25 +437,25 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                         bin_num=self._calculate_bin_for_user(user),
                     ))
             num_expected_messages = 1 if self.consolidates_emails_for_learner else message_count
-            self.assertEqual(len(sent_messages), num_expected_messages)
+            assert len(sent_messages) == num_expected_messages
 
             with self.assertNumQueries(NUM_QUERIES_PER_MESSAGE_DELIVERY):
                 with patch('openedx.core.djangoapps.schedules.tasks.segment.track') as mock_segment_track:
                     with patch('edx_ace.channel.channels', return_value=channel_map):
                         self.deliver_task(*sent_messages[0])
-                        self.assertEqual(mock_segment_track.call_count, 1)
+                        assert mock_segment_track.call_count == 1
 
-            self.assertEqual(mock_channel.deliver.call_count, 1)
+            assert mock_channel.deliver.call_count == 1
             for (_name, (_msg, email), _kwargs) in mock_channel.deliver.mock_calls:
                 for template in attr.astuple(email):
-                    self.assertNotIn("TEMPLATE WARNING", template)
-                    self.assertNotIn("{{", template)
-                    self.assertNotIn("}}", template)
+                    assert 'TEMPLATE WARNING' not in template
+                    assert '{{' not in template
+                    assert '}}' not in template
 
             return mock_channel.deliver.mock_calls
 
-    def _check_if_email_sent_for_experience(self, test_config):
-        current_day, offset, target_day, _ = self._get_dates(offset=test_config.offset)
+    def _check_if_email_sent_for_experience(self, test_config):  # lint-amnesty, pylint: disable=missing-function-docstring
+        current_day, offset, target_day, _ = self._get_dates(offset=test_config.offset)  # lint-amnesty, pylint: disable=unused-variable
 
         kwargs = {
             'offset': offset
@@ -473,11 +472,11 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                 bin_num=self._calculate_bin_for_user(schedule.enrollment.user),
             ))
 
-            self.assertEqual(mock_ace.send.called, test_config.email_sent)
+            assert mock_ace.send.called == test_config.email_sent
 
     @with_comprehensive_theme('red-theme')
     def test_templates_with_theme(self):
         calls_to_deliver = self._assert_template_for_offset(self.expected_offsets[0], 1)
 
         _name, (_msg, email), _kwargs = calls_to_deliver[0]
-        self.assertIn('TEST RED THEME MARKER', email.body_html)
+        assert 'TEST RED THEME MARKER' in email.body_html

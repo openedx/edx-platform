@@ -54,9 +54,11 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-wiki.git@0.1.1#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki
+-e git+https://github.com/openedx/olxcleaner.git@63279318de9d0ceca8488c11f5187e38c1139241#egg=olxcleaner
 git+https://github.com/edx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
+-e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2
 
 # This is a temporary fork until https://github.com/brutasse/django-ratelimit-backend/pull/50 is merged
 # back into the upstream code.
@@ -69,8 +71,7 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
 
-
 # Third Party XBlocks
 
-git+https://github.com/open-craft/xblock-poll@1efd04bd6e16252a20e39a7516f9b69a000ace24#egg=xblock-poll==1.10.0
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.2.10#egg=xblock-drag-and-drop-v2==2.2.10
+git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.4#egg=xblock-drag-and-drop-v2==2.3.4

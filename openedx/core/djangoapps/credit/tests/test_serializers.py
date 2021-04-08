@@ -1,9 +1,7 @@
 """ Tests for Credit API serializers. """
 
-
-import six
+import pytest
 from django.test import TestCase
-from django.test.utils import override_settings
 from rest_framework.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.credit import serializers, signature
@@ -40,7 +38,7 @@ class CreditEligibilitySerializerTests(TestCase):
         eligibility = CreditEligibilityFactory(username=user.username)
         serializer = serializers.CreditEligibilitySerializer(eligibility)
         expected = {
-            'course_key': six.text_type(eligibility.course.course_key),
+            'course_key': str(eligibility.course.course_key),
             'deadline': eligibility.deadline.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'username': user.username,
         }
@@ -57,8 +55,8 @@ class CreditProviderCallbackSerializerTests(TestCase):
         provider_id = 'asu'
 
         serializer = serializers.CreditProviderCallbackSerializer()
-        with self.assertRaises(PermissionDenied):
-            serializer._check_keys_exist_for_provider(secret_key, provider_id)
+        with pytest.raises(PermissionDenied):
+            serializer._check_keys_exist_for_provider(secret_key, provider_id)  # lint-amnesty, pylint: disable=protected-access
 
     def test_check_keys_exist_for_provider_list_no_keys(self):
         """
@@ -71,8 +69,8 @@ class CreditProviderCallbackSerializerTests(TestCase):
         provider_id = 'asu'
 
         serializer = serializers.CreditProviderCallbackSerializer()
-        with self.assertRaises(PermissionDenied):
-            serializer._check_keys_exist_for_provider(secret_key, provider_id)
+        with pytest.raises(PermissionDenied):
+            serializer._check_keys_exist_for_provider(secret_key, provider_id)  # lint-amnesty, pylint: disable=protected-access
 
     def test_check_keys_exist_for_provider_list_with_key_present(self):
         """
@@ -84,7 +82,7 @@ class CreditProviderCallbackSerializerTests(TestCase):
         provider_id = 'asu'
 
         serializer = serializers.CreditProviderCallbackSerializer()
-        result = serializer._check_keys_exist_for_provider(secret_key, provider_id)
+        result = serializer._check_keys_exist_for_provider(secret_key, provider_id)  # lint-amnesty, pylint: disable=assignment-from-no-return, protected-access
         # No return value, so we expect successful execution to return None
         assert result is None
 
@@ -101,9 +99,9 @@ class CreditProviderCallbackSerializerTests(TestCase):
         serializer = serializers.CreditProviderCallbackSerializer(
             data={'signature': sig}
         )
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             # The first arg here is key we have (that doesn't match the sig)
-            serializer._compare_signatures('abcd1234', provider.provider_id)
+            serializer._compare_signatures('abcd1234', provider.provider_id)  # lint-amnesty, pylint: disable=protected-access
 
     def test_compare_signatures_list_key(self):
         """
@@ -120,9 +118,9 @@ class CreditProviderCallbackSerializerTests(TestCase):
             data={'signature': sig}
         )
 
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             # The first arg here is the list of keys he have (that dont matcht the sig)
-            serializer._compare_signatures(
+            serializer._compare_signatures(  # lint-amnesty, pylint: disable=protected-access
                 ['abcd1234', 'xyz789'],
                 provider.provider_id
             )

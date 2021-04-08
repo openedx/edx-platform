@@ -1,16 +1,18 @@
-# encoding: utf-8
 """
 Tests of verify_student views.
 """
 
+import base64
+import codecs
+import urllib
 from datetime import timedelta
+from unittest import mock
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import ddt
 import httpretty
-import mock
 import simplejson as json
-import six
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
@@ -19,27 +21,27 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.timezone import now
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
-from six.moves import zip
 from waffle.testutils import override_switch
 
-from common.test.utils import MockS3BotoMixin, XssTestMixin
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from common.test.utils import MockS3BotoMixin, XssTestMixin
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.ssencrypt import encrypt_and_encode, rsa_encrypt
+from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.verify_student.tests import TestVerificationBase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -54,6 +56,43 @@ render_mock = Mock(side_effect=mock_render_to_response)
 
 PAYMENT_DATA_KEYS = {'payment_processor_name', 'payment_page_url', 'payment_form_data'}
 
+RSA_PUBLIC_KEY = b"""-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1hLVjP0oV0Uy/+jQ+Upz
+c+eYc4Pyflb/WpfgYATggkoQdnsdplmvPtQr85+utgqKPxOh+PvYGW8QNUzjLIu4
+5/GlmvBa82i1jRMgEAxGI95bz7j9DtH+7mnj+06zR5xHwT49jK0zMs5MjMaz5WRq
+BUNkz7dxWzDrYJZQx230sPp6upy1Y5H5O8SnJVdghsh8sNciS4Bo4ZONQ3giBwxz
+h5svjspz1MIsOoShjbAdfG+4VX7sVwYlw2rnQeRsMH5/xpnNeqtScyOMoz0N9UDG
+dtRMNGa2MihAg7zh7/zckbUrtf+o5wQtlCJL1Kdj4EjshqYvCxzWnSM+MaYAjb3M
+EQIDAQAB
+-----END PUBLIC KEY-----"""
+RSA_PRIVATE_KEY = b"""-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA1hLVjP0oV0Uy/+jQ+Upzc+eYc4Pyflb/WpfgYATggkoQdnsd
+plmvPtQr85+utgqKPxOh+PvYGW8QNUzjLIu45/GlmvBa82i1jRMgEAxGI95bz7j9
+DtH+7mnj+06zR5xHwT49jK0zMs5MjMaz5WRqBUNkz7dxWzDrYJZQx230sPp6upy1
+Y5H5O8SnJVdghsh8sNciS4Bo4ZONQ3giBwxzh5svjspz1MIsOoShjbAdfG+4VX7s
+VwYlw2rnQeRsMH5/xpnNeqtScyOMoz0N9UDGdtRMNGa2MihAg7zh7/zckbUrtf+o
+5wQtlCJL1Kdj4EjshqYvCxzWnSM+MaYAjb3MEQIDAQABAoIBAQCviuA87fdfoOoS
+OerrEacc20QDLaby/QoGUtZ2RmmHzY40af7FQ3PWFIw6Ca5trrTwxnuivXnWWWG0
+I2mCRM0Kvfgr1n7ubOW7WnyHTFlT3mnxK2Ov/HmNLZ36nO2cgkXA6/Xy3rBGMC9L
+nUE1kSLzT/Fh965ntfS9zmVNNBhb6no0rVkGx5nK3vTI6kUmaa0m+E7KL/HweO4c
+JodhN8CX4gpxSrkuwJ7IHEPYspqc0jInMYKLmD3d2g3BiOctjzFmaj3lV5AUlujW
+z7/LVe5WAEaaxjwaMvwqrJLv9ogxWU3etJf22+Yy7r5gbPtqpqJrCZ5+WpGnUHws
+3mMGP2QBAoGBAOc3pzLFgGUREVPSFQlJ06QFtfKYqg9fFHJCgWu/2B2aVZc2aO/t
+Zhuoz+AgOdzsw+CWv7K0FH9sUkffk2VKPzwwwufLK3avD9gI0bhmBAYvdhS6A3nO
+YM3W+lvmaJtFL00K6kdd+CzgRnBS9cZ70WbcbtqjdXI6+mV1WdGUTLhBAoGBAO0E
+xhD4z+GjubSgfHYEZPgRJPqyUIfDH+5UmFGpr6zlvNN/depaGxsbhW8t/V6xkxsG
+MCgic7GLMihEiUMx1+/snVs5bBUx7OT9API0d+vStHCFlTTe6aTdmiduFD4PbDsq
+6E4DElVRqZhpIYusdDh7Z3fO2hm5ad4FfMlx65/RAoGAPYEfV7ETs06z9kEG2X6q
+7pGaUZrsecRH8xDfzmKswUshg2S0y0WyCJ+CFFNeMPdGL4LKIWYnobGVvYqqcaIr
+af5qijAQMrTkmQnXh56TaXXMijzk2czdEUQjOrjykIL5zxudMDi94GoUMqLOv+qF
+zD/MuRoMDsPDgaOSrd4t/kECgYEAzwBNT8NOIz3P0Z4cNSJPYIvwpPaY+IkE2SyO
+vzuYj0Mx7/Ew9ZTueXVGyzv6PfqOhJqZ8mNscZIlIyAAVWwxsHwRTfvPlo882xzP
+97i1R4OFTYSNNFi+69sSZ/9utGjZ2K73pjJuj487tD2VK5xZAH9edTd2KeNSP7LB
+MlpJNBECgYAmIswPdldm+G8SJd5j9O2fcDVTURjKAoSXCv2j4gEZzzfudpLWNHYu
+l8N6+LEIVTMAytPk+/bImHvGHKZkCz5rEMSuYJWOmqKI92rUtI6fz5DUb3XSbrwT
+3W+sdGFUK3GH1NAX71VxbAlFVLUetcMwai1+wXmGkRw6A7YezVFnhw==
+-----END RSA PRIVATE KEY-----"""
+
 
 def _mock_payment_processors():
     """
@@ -63,7 +102,7 @@ def _mock_payment_processors():
     """
     httpretty.register_uri(
         httpretty.GET,
-        "{}/payment/processors/".format(TEST_API_URL),
+        f"{TEST_API_URL}/payment/processors/",
         body=json.dumps(['foo', 'bar']),
         content_type="application/json",
     )
@@ -76,7 +115,7 @@ class StartView(TestCase):
     """
 
     def start_url(self, course_id=""):
-        return "/verify_student/{0}".format(six.moves.urllib.parse.quote(course_id))
+        return "/verify_student/{}".format(urllib.parse.quote(course_id))
 
     def test_start_new_verification(self):
         """
@@ -87,7 +126,7 @@ class StartView(TestCase):
         self.client.login(username="rusty", password="test")
 
     def must_be_logged_in(self):
-        self.assertHttpForbidden(self.client.get(self.start_url()))
+        self.assertHttpForbidden(self.client.get(self.start_url()))  # lint-amnesty, pylint: disable=no-member
 
 
 @ddt.ddt
@@ -110,10 +149,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TestPayAndVerifyView, self).setUp()
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
     @ddt.data(
         ("verified", "verify_student_start_flow"),
@@ -152,7 +191,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
         checkout_page = configuration.basket_checkout_page
         checkout_page += "?utm_source=test"
-        httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
+        httpretty.register_uri(httpretty.GET, f"{TEST_PUBLIC_URL_ROOT}{checkout_page}")
 
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
@@ -161,7 +200,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
         with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
             response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = '{}{}&sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+        expected_page = f'{TEST_PUBLIC_URL_ROOT}{checkout_page}&sku={sku}'
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
@@ -547,8 +586,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         course = self._create_course("verified")
         response = self._get_page(url_name, course.id, expected_status_code=302)
 
-        original_url = reverse(url_name, kwargs={'course_id': six.text_type(course.id)})
-        login_url = u"{login_url}?next={original_url}".format(
+        original_url = reverse(url_name, kwargs={'course_id': str(course.id)})
+        login_url = "{login_url}?next={original_url}".format(
             login_url=reverse('signin_user'),
             original_url=original_url
         )
@@ -647,7 +686,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         # Expect that the expiration date is set
         response = self._get_page(payment_flow, course.id)
         data = self._get_page_data(response)
-        self.assertEqual(data['verification_deadline'], six.text_type(deadline))
+        assert data['verification_deadline'] == str(deadline)
 
     def test_course_mode_expired(self):
         deadline = now() + timedelta(days=-360)
@@ -707,17 +746,17 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         self.assertNotContains(response, "Verification is no longer available")
 
         data = self._get_page_data(response)
-        self.assertEqual(data['message_key'], PayAndVerifyView.VERIFY_NOW_MSG)
+        assert data['message_key'] == PayAndVerifyView.VERIFY_NOW_MSG
 
         # Check that the mode selected is expired verified mode not the credit mode
         # because the direct enrollment to the credit mode is not allowed.
-        self.assertEqual(data['course_mode_slug'], "verified")
+        assert data['course_mode_slug'] == 'verified'
 
         # Check that the verification deadline (rather than the upgrade deadline) is displayed
         if verification_deadline is not None:
-            self.assertEqual(data["verification_deadline"], six.text_type(verification_deadline))
+            assert data['verification_deadline'] == str(verification_deadline)
         else:
-            self.assertEqual(data["verification_deadline"], "")
+            assert data['verification_deadline'] == ''
 
     def test_course_mode_not_expired_verification_deadline_passed(self):
         course = self._create_course("verified")
@@ -814,7 +853,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
             attempt.system_error("Error!")
 
         if status == "expired":
-            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+            days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]  # lint-amnesty, pylint: disable=unused-variable
             attempt.expiration_date = now() - timedelta(days=1)
             attempt.save()
 
@@ -846,7 +885,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         """Set the contribution amount pre-filled in a session var. """
         session = self.client.session
         session["donation_for_course"] = {
-            six.text_type(course_id): amount
+            str(course_id): amount
         }
         session.save()
 
@@ -854,79 +893,71 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
     @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False, assert_headers=False):
         """Retrieve one of the verification pages. """
-        url = reverse(url_name, kwargs={"course_id": six.text_type(course_key)})
+        url = reverse(url_name, kwargs={"course_id": str(course_key)})
 
         if skip_first_step:
             url += "?skip-first-step=1"
 
         _mock_payment_processors()
         response = self.client.get(url)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
 
         if assert_headers:
             # ensure the mock api call was made.  NOTE: the following line
             # approximates the check - if the headers were empty it means
             # there was no last request.
-            self.assertNotEqual(httpretty.last_request().headers, {})
+            assert httpretty.last_request().headers != {}
         return response
 
     def _assert_displayed_mode(self, response, expected_mode):
         """Check whether a course mode is displayed. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['course_mode_slug'], expected_mode)
+        assert response_dict['course_mode_slug'] == expected_mode
 
     def _assert_steps_displayed(self, response, expected_steps, expected_current_step):
         """Check whether steps in the flow are displayed to the user. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['current_step'], expected_current_step)
-        self.assertEqual(expected_steps, [
-            step['name'] for step in
-            response_dict['display_steps']
-        ])
+        assert response_dict['current_step'] == expected_current_step
+        assert expected_steps == [step['name'] for step in response_dict['display_steps']]
 
     def _assert_messaging(self, response, expected_message):
         """Check the messaging on the page. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['message_key'], expected_message)
+        assert response_dict['message_key'] == expected_message
 
     def _assert_requirements_displayed(self, response, requirements):
         """Check that requirements are displayed on the page. """
         response_dict = self._get_page_data(response)
-        for req, displayed in six.iteritems(response_dict['requirements']):
+        for req, displayed in response_dict['requirements'].items():
             if req in requirements:
-                self.assertTrue(displayed, msg=u"Expected '{req}' requirement to be displayed".format(req=req))
+                assert displayed, f"Expected '{req}' requirement to be displayed"
             else:
-                self.assertFalse(displayed, msg=u"Expected '{req}' requirement to be hidden".format(req=req))
+                assert not displayed, f"Expected '{req}' requirement to be hidden"
 
     def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['course_key'], course_key)
-        self.assertEqual(response_dict['course_name'], display_name)
-        self.assertEqual(response_dict['courseware_url'], url)
+        assert response_dict['course_key'] == course_key
+        assert response_dict['course_name'] == display_name
+        assert response_dict['courseware_url'] == url
 
     def _assert_user_details(self, response, full_name):
         """Check the user detail information on the page. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['full_name'], full_name)
+        assert response_dict['full_name'] == full_name
 
     def _assert_contribution_amount(self, response, expected_amount):
         """Check the pre-filled contribution amount. """
         response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['contribution_amount'], expected_amount)
+        assert response_dict['contribution_amount'] == expected_amount
 
     def _get_page_data(self, response):
         """Retrieve the data attributes rendered on the page. """
         soup = BeautifulSoup(markup=response.content, features="lxml")
         pay_and_verify_div = soup.find(id="pay-and-verify-container")
 
-        self.assertIsNot(
-            pay_and_verify_div, None,
-            msg=(
-                "Could not load pay and verify flow data.  "
-                "Maybe this isn't the pay and verify page?"
-            )
-        )
+        assert pay_and_verify_div is not None,\
+            "Could not load pay and verify flow data.  Maybe this isn't the pay and verify page?"
 
         return {
             'full_name': pay_and_verify_div['data-full-name'],
@@ -945,7 +976,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _assert_upgrade_session_flag(self, is_upgrade):
         """Check that the session flag for attempting an upgrade is set. """
-        self.assertEqual(self.client.session.get('attempting_upgrade'), is_upgrade)
+        assert self.client.session.get('attempting_upgrade') == is_upgrade
 
     def _assert_redirects_to_dashboard(self, response):
         """Check that the page redirects to the student dashboard. """
@@ -953,26 +984,25 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
     def _assert_redirects_to_start_flow(self, response, course_id):
         """Check that the page redirects to the start of the payment/verification flow. """
-        url = reverse('verify_student_start_flow', kwargs={'course_id': six.text_type(course_id)})
+        url = reverse('verify_student_start_flow', kwargs={'course_id': str(course_id)})
         with mock_payment_processors():
             self.assertRedirects(response, url)
 
     def _assert_redirects_to_verify_start(self, response, course_id, status_code=302):
         """Check that the page redirects to the "verify later" part of the flow. """
-        url = reverse('verify_student_verify_now', kwargs={'course_id': six.text_type(course_id)})
-        with mock_payment_processors():
-            self.assertRedirects(response, url, status_code)
+        url = IDVerificationService.get_verify_location(course_id=course_id)
+        self.assertRedirects(response, url, status_code, fetch_redirect_response=False)
 
     def _assert_redirects_to_upgrade(self, response, course_id):
         """Check that the page redirects to the "upgrade" part of the flow. """
-        url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': six.text_type(course_id)})
+        url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': str(course_id)})
         with mock_payment_processors():
             self.assertRedirects(response, url)
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_course_upgrade_page_with_unicode_and_special_values_in_display_name(self, payment_flow):
         """Check the course information on the page. """
-        mode_display_name = u"Introduction à l'astrophysique"
+        mode_display_name = "Introduction à l'astrophysique"
         course = CourseFactory.create(display_name=mode_display_name)
         for course_mode in [CourseMode.DEFAULT_MODE_SLUG, "verified"]:
             min_price = (self.MIN_PRICE if course_mode != CourseMode.DEFAULT_MODE_SLUG else 0)
@@ -986,7 +1016,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
         self._enroll(course.id)
         response_dict = self._get_page_data(self._get_page(payment_flow, course.id))
 
-        self.assertEqual(response_dict['course_name'], mode_display_name)
+        assert response_dict['course_name'] == mode_display_name
 
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_processors_api(self, payment_flow):
@@ -1002,10 +1032,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin, Tes
 
         # make the server request
         response = self._get_page(payment_flow, course.id, assert_headers=True)
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
 
-class CheckoutTestMixin(object):
+class CheckoutTestMixin:
     """
     Mixin implementing test methods that should behave identically regardless
     of which backend is used (currently only the ecommerce service).  Subclasses
@@ -1020,7 +1050,7 @@ class CheckoutTestMixin(object):
 
     def setUp(self):
         """ Create a user and course. """
-        super(CheckoutTestMixin, self).setUp()
+        super().setUp()
 
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
@@ -1044,25 +1074,25 @@ class CheckoutTestMixin(object):
         """
         post_params.setdefault('processor', '')
         response = self.client.post(reverse('verify_student_create_order'), post_params)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
         if expected_status_code == 200:
             # ensure we called checkout at all
-            self.assertTrue(patched_create_order.called)
+            assert patched_create_order.called
             # ensure checkout args were correct
             args = self._get_checkout_args(patched_create_order)
-            self.assertEqual(args['user'], self.user)
-            self.assertEqual(args['course_key'], expected_course_key)
-            self.assertEqual(args['course_mode'].slug, expected_mode_slug)
+            assert args['user'] == self.user
+            assert args['course_key'] == expected_course_key
+            assert args['course_mode'].slug == expected_mode_slug
             # ensure response data was correct
             data = json.loads(response.content.decode('utf-8'))
-            self.assertEqual(set(data.keys()), PAYMENT_DATA_KEYS)
+            assert set(data.keys()) == PAYMENT_DATA_KEYS
         else:
-            self.assertFalse(patched_create_order.called)
+            assert not patched_create_order.called
 
     def test_create_order(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': 100,
         }
         self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
@@ -1072,7 +1102,7 @@ class CheckoutTestMixin(object):
         course = CourseFactory.create()
         CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'professional')
 
     def test_create_order_no_id_professional(self, patched_create_order):
@@ -1080,7 +1110,7 @@ class CheckoutTestMixin(object):
         course = CourseFactory.create()
         CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
     def test_create_order_for_multiple_paid_modes(self, patched_create_order):
@@ -1089,14 +1119,14 @@ class CheckoutTestMixin(object):
         CourseModeFactory.create(mode_slug="no-id-professional", course_id=course.id, min_price=10, sku=self.make_sku())
         CourseModeFactory.create(mode_slug="professional", course_id=course.id, min_price=10, sku=self.make_sku())
         # Create an order for a prof ed course
-        params = {'course_id': six.text_type(course.id)}
+        params = {'course_id': str(course.id)}
         # TODO jsa - is this the intended behavior?
         self._assert_checked_out(params, patched_create_order, course.id, 'no-id-professional')
 
     def test_create_order_bad_donation_amount(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': '99.9'
         }
         self._assert_checked_out(params, patched_create_order, None, None, expected_status_code=400)
@@ -1104,7 +1134,7 @@ class CheckoutTestMixin(object):
     def test_create_order_good_donation_amount(self, patched_create_order):
         # Create an order
         params = {
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'contribution': '100.0'
         }
         self._assert_checked_out(params, patched_create_order, self.course.id, 'verified')
@@ -1117,18 +1147,18 @@ class CheckoutTestMixin(object):
         expected_payment_data['payment_form_data'].update({'foo': 'bar'})
         patched_create_order.return_value = expected_payment_data
         # there is no 'processor' parameter in the post payload, so the response should only contain payment form data.
-        params = {'course_id': six.text_type(self.course.id), 'contribution': 100}
+        params = {'course_id': str(self.course.id), 'contribution': 100}
         response = self.client.post(reverse('verify_student_create_order'), params)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(patched_create_order.called)
+        assert response.status_code == 200
+        assert patched_create_order.called
         # ensure checkout args were correct
         args = self._get_checkout_args(patched_create_order)
-        self.assertEqual(args['user'], self.user)
-        self.assertEqual(args['course_key'], self.course.id)
-        self.assertEqual(args['course_mode'].slug, 'verified')
+        assert args['user'] == self.user
+        assert args['course_key'] == self.course.id
+        assert args['course_mode'].slug == 'verified'
         # ensure response data was correct
         data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(data, {'foo': 'bar'})
+        assert data == {'foo': 'bar'}
 
 
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
@@ -1142,7 +1172,7 @@ class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
 
     def make_sku(self):
         """ Checkout is handled by the ecommerce service when the course mode's sku is nonempty. """
-        return six.text_type(uuid4().hex)
+        return str(uuid4().hex)
 
     def _get_checkout_args(self, patched_create_order):
         """ Assuming patched_create_order was called, return a mapping containing the call arguments."""
@@ -1168,7 +1198,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
         # mock out the payment processors endpoint
         httpretty.register_uri(
             httpretty.POST,
-            "{}/baskets/".format(TEST_API_URL),
+            f"{TEST_API_URL}/baskets/",
             body=json.dumps({'payment_data': expected_payment_data}),
             content_type="application/json",
         )
@@ -1183,16 +1213,13 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
             )
 
             # Verify that an audit message was logged
-            self.assertTrue(mock_audit_log.called)
+            assert mock_audit_log.called
 
         # Check the api call
-        self.assertEqual(json.loads(httpretty.last_request().body.decode('utf-8')), {
-            'products': [{'sku': 'test-sku'}],
-            'checkout': True,
-            'payment_processor_name': 'test-processor',
-        })
+        assert json.loads(httpretty.last_request().body.decode('utf-8')) ==\
+               {'products': [{'sku': 'test-sku'}], 'checkout': True, 'payment_processor_name': 'test-processor'}
         # Check the response
-        self.assertEqual(actual_payment_data, expected_payment_data)
+        assert actual_payment_data == expected_payment_data
 
 
 @ddt.ddt
@@ -1203,14 +1230,15 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     """
     USERNAME = "test_user"
     PASSWORD = "test_password"
-    IMAGE_DATA = "abcd,1234"
-    FULL_NAME = u"Ḟüḷḷ Ṅäṁë"
+    IMAGE_DATA = "data:image/png;base64,1234"
+    FULL_NAME = "Ḟüḷḷ Ṅäṁë"
+    EXPERIMENT_NAME = "test-experiment"
 
     def setUp(self):
-        super(TestSubmitPhotosForVerification, self).setUp()
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(result, msg="Could not log in")
+        assert result, 'Could not log in'
 
     def test_submit_photos(self):
         # Submit the photos
@@ -1221,7 +1249,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
 
         # Verify that the attempt is created in the database
         attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
-        self.assertEqual(attempt.status, "submitted")
+        assert attempt.status == 'submitted'
 
         # Verify that the user's name wasn't changed
         self._assert_user_name(self.user.profile.name)
@@ -1259,14 +1287,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
             "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
             "FACE_IMAGE_AES_KEY": "f82400259e3b4f88821cd89838758292",
-            "RSA_PUBLIC_KEY": (
-                "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDkgtz3fQdiXshy/RfOHkoHlhx/"
-                "SSPZ+nNyE9JZXtwhlzsXjnu+e9GOuJzgh4kUqo73ePIG5FxVU+mnacvufq2cu1SOx"
-                "lRYGyBK7qDf9Ym67I5gmmcNhbzdKcluAuDCPmQ4ecKpICQQldrDQ9HWDxwjbbcqpVB"
-                "PYWkE1KrtypGThmcehLmabf6SPq1CTAGlXsHgUtbWCwV6mqR8yScV0nRLln0djLDm9d"
-                "L8tIVFFVpAfBaYYh2Cm5EExQZjxyfjWd8P5H+8/l0pmK2jP7Hc0wuXJemIZbsdm+DSD"
-                "FhCGY3AILGkMwr068dGRxfBtBy/U9U5W+nStvkDdMrSgQezS5+V test@example.com"
-            ),
+            "RSA_PUBLIC_KEY": RSA_PUBLIC_KEY,
             "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
             "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
             "S3_BUCKET": "test.example.com",
@@ -1295,7 +1316,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         reverification_data = self._get_post_data()
 
         # Verify that the initial attempt sent the same ID photo as the reverification attempt
-        self.assertEqual(initial_data["PhotoIDKey"], reverification_data["PhotoIDKey"])
+        assert initial_data['PhotoIDKey'] == reverification_data['PhotoIDKey']
 
         # Submit a new face photo and photo id for verification
         self._submit_photos(
@@ -1305,7 +1326,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         two_photo_reverification_data = self._get_post_data()
 
         # Verify that the initial attempt sent a new ID photo for the reverification attempt
-        self.assertNotEqual(initial_data["PhotoIDKey"], two_photo_reverification_data["PhotoIDKey"])
+        assert initial_data['PhotoIDKey'] != two_photo_reverification_data['PhotoIDKey']
 
     @ddt.data('face_image', 'photo_id_image')
     def test_invalid_image_data(self, invalid_param):
@@ -1315,7 +1336,23 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         }
         params[invalid_param] = ""
         response = self._submit_photos(expected_status_code=400, **params)
-        self.assertEqual(response.content.decode('utf-8'), "Image data is not valid.")
+        assert response.content.decode('utf-8') == 'Image data is not valid.'
+
+    @ddt.data(
+        ('data:image/png;base64,1234', 200),
+        ('data:image/jpeg;base64,1234', 200),
+        ('data:image/webp;base64,1234', 200),
+        ('data:application/pdf;base64,1234', 400),
+        ('data:text/html;base64,1234', 400),
+        ('invalid_image_data', 400),
+    )
+    @ddt.unpack
+    def test_validate_media_type(self, image_data, status_code):
+        params = {
+            'face_image': image_data,
+            'photo_id_image': image_data,
+        }
+        self._submit_photos(expected_status_code=status_code, **params)
 
     def test_invalid_name(self):
         response = self._submit_photos(
@@ -1324,7 +1361,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             full_name="",
             expected_status_code=400
         )
-        self.assertEqual(response.content.decode('utf-8'), "Name must be at least 1 character long.")
+        assert response.content.decode('utf-8') == 'Name must be at least 1 character long.'
 
     def test_missing_required_param(self):
         # Missing face image parameter
@@ -1332,16 +1369,14 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
             'photo_id_image': self.IMAGE_DATA
         }
         response = self._submit_photos(expected_status_code=400, **params)
-        self.assertEqual(response.content.decode('utf-8'), "Missing required parameter face_image")
+        assert response.content.decode('utf-8') == 'Missing required parameter face_image'
 
     def test_no_photo_id_and_no_initial_verification(self):
         # Submit face image data, but not photo ID data.
         # Since the user doesn't have an initial verification attempt, this should fail
         response = self._submit_photos(expected_status_code=400, face_image=self.IMAGE_DATA)
-        self.assertEqual(
-            response.content.decode('utf-8'),
-            "Photo ID image is required if the user does not have an initial verification attempt."
-        )
+        assert response.content.decode('utf-8') ==\
+               'Photo ID image is required if the user does not have an initial verification attempt.'
 
         # Create the initial verification attempt with some dummy
         # value set for field 'photo_id_key'
@@ -1356,14 +1391,37 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         # Now the request should succeed
         self._submit_photos(face_image=self.IMAGE_DATA)
 
-    #
-    def _submit_photos(self, face_image=None, photo_id_image=None, full_name=None, expected_status_code=200):
+    @patch('lms.djangoapps.verify_student.views.segment.track')
+    def test_experiment_name_param(self, mock_segment_track):
+        # Submit the photos
+        self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            experiment_name=self.EXPERIMENT_NAME
+        )
+
+        # Verify that the attempt is created in the database
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        assert attempt.status == 'submitted'
+
+        # assert that segment tracking has been called with experiment name
+        data = {
+            "attempt_id": attempt.id,
+            "experiment_name": self.EXPERIMENT_NAME
+        }
+        mock_segment_track.assert_any_call(self.user.id, "edx.bi.experiment.verification.attempt", data)
+
+    def _submit_photos(
+        self, face_image=None, photo_id_image=None,
+        full_name=None, experiment_name=None, expected_status_code=200
+    ):
         """Submit photos for verification.
 
         Keyword Arguments:
             face_image (str): The base-64 encoded face image data.
             photo_id_image (str): The base-64 encoded ID image data.
             full_name (unicode): The full name of the user, if the user is changing it.
+            experiment_name (str): Name of A/B experiment associated with attempt
             expected_status_code (int): The expected response status code.
 
         Returns:
@@ -1382,9 +1440,12 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         if full_name is not None:
             params['full_name'] = full_name
 
+        if experiment_name is not None:
+            params['experiment_name'] = experiment_name
+
         with self.immediate_on_commit():
             response = self.client.post(url, params)
-        self.assertEqual(response.status_code, expected_status_code)
+        assert response.status_code == expected_status_code
 
         return response
 
@@ -1394,11 +1455,11 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
-            self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual('Thank you for submitting your photos!', mail.outbox[0].subject)
+            assert len(mail.outbox) == 1
+            assert 'Thank you for submitting your photos!' == mail.outbox[0].subject
         else:
             # Verify that photo submission confirmation email was not sent
-            self.assertEqual(len(mail.outbox), 0)
+            assert len(mail.outbox) == 0
 
     def _assert_user_name(self, full_name):
         """Check the user's name.
@@ -1413,7 +1474,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         request = RequestFactory().get('/url')
         request.user = self.user
         account_settings = get_account_settings(request)[0]
-        self.assertEqual(account_settings['name'], full_name)
+        assert account_settings['name'] == full_name
 
     def _get_post_data(self):
         """Retrieve POST data from the last request. """
@@ -1427,7 +1488,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     """
 
     def setUp(self):
-        super(TestPhotoVerificationResultsCallback, self).setUp()
+        super().setUp()
 
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
@@ -1446,19 +1507,20 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         """
         return True
 
-    def _assert_verification_approved_email(self):
+    def _assert_verification_approved_email(self, expiration_date):
         """Check that a verification approved email was sent."""
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(email.subject, 'Your édX ID verification was approved!')
-        self.assertIn('Your édX ID verification photos have been approved', email.body)
+        assert email.subject == 'Your édX ID verification was approved!'
+        assert 'Your édX ID verification photos have been approved' in email.body
+        assert expiration_date.strftime("%m/%d/%Y") in email.body
 
     def _assert_verification_denied_email(self):
         """Check that a verification approved email was sent."""
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        self.assertEqual(email.subject, 'Your édX Verification Has Been Denied')
-        self.assertIn('The photos you submitted for ID verification were not accepted', email.body)
+        assert email.subject == 'Your édX Verification Has Been Denied'
+        assert 'The photos you submitted for ID verification were not accepted' in email.body
 
     def test_invalid_json(self):
         """
@@ -1542,7 +1604,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('sailthru.sailthru_client.SailthruClient.send')
-    def test_passed_status_template(self, _mock_sailthru_send, _mock_log_error):
+    @patch('lms.djangoapps.verify_student.views.segment.track')
+    def test_passed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
         """
         Test for verification passed.
         """
@@ -1570,11 +1633,18 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         old_verification = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk)
-        self.assertEqual(attempt.status, u'approved')
-        self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
-        self.assertIsNone(old_verification.expiry_email_date)
-        self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self._assert_verification_approved_email()
+        assert attempt.status == 'approved'
+        assert attempt.expiration_datetime.date() == expiration_datetime.date()
+        assert old_verification.expiry_email_date is None
+        assert response.content.decode('utf-8') == 'OK!'
+        self._assert_verification_approved_email(expiration_datetime.date())
+
+        # assert that segment tracking has been called with result
+        data = {
+            "attempt_id": attempt.id,
+            "result": "PASS"
+        }
+        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1582,7 +1652,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('sailthru.sailthru_client.SailthruClient.send')
-    def test_first_time_verification(self, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
+    @patch('lms.djangoapps.verify_student.views.segment.track')
+    def test_first_time_verification(self, mock_segment_track, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
         """
         Test for verification passed if the learner does not have any previous verification
         """
@@ -1605,10 +1676,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         )
 
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        self.assertEqual(attempt.status, u'approved')
-        self.assertEqual(attempt.expiration_datetime.date(), expiration_datetime.date())
-        self.assertEqual(response.content.decode('utf-8'), 'OK!')
-        self._assert_verification_approved_email()
+        assert attempt.status == 'approved'
+        assert attempt.expiration_datetime.date() == expiration_datetime.date()
+        assert response.content.decode('utf-8') == 'OK!'
+        self._assert_verification_approved_email(expiration_datetime.date())
+
+        # assert that segment tracking has been called with result
+        data = {
+            "attempt_id": attempt.id,
+            "result": "PASS"
+        }
+        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1616,7 +1694,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
     @patch('sailthru.sailthru_client.SailthruClient.send')
-    def test_failed_status_template(self, _mock_sailthru_send, _mock_log_error):
+    @patch('lms.djangoapps.verify_student.views.segment.track')
+    def test_failed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
         """
         Test for failed verification.
         """
@@ -1635,17 +1714,25 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        self.assertEqual(attempt.status, u'denied')
-        self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
-        self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
-        self.assertEqual(response.content.decode('utf-8'), 'OK!')
+        assert attempt.status == 'denied'
+        assert attempt.error_code == "Your photo doesn't meet standards."
+        assert attempt.error_msg == '[{"photoIdReasons": ["Not provided"]}]'
+        assert response.content.decode('utf-8') == 'OK!'
         self._assert_verification_denied_email()
+
+        # assert that segment tracking has been called with result
+        data = {
+            "attempt_id": attempt.id,
+            "result": "FAIL"
+        }
+        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    def test_system_fail_result(self):
+    @patch('lms.djangoapps.verify_student.views.segment.track')
+    def test_system_fail_result(self, mock_segment_track):
         """
         Test for software secure result system failure.
         """
@@ -1662,10 +1749,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
             HTTP_DATE='testdate'
         )
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
-        self.assertEqual(attempt.status, u'must_retry')
-        self.assertEqual(attempt.error_code, u'You must retry the verification.')
-        self.assertEqual(attempt.error_msg, u'"Memory overflow"')
-        self.assertEqual(response.content.decode('utf-8'), 'OK!')
+        assert attempt.status == 'must_retry'
+        assert attempt.error_code == 'You must retry the verification.'
+        assert attempt.error_msg == '"Memory overflow"'
+        assert response.content.decode('utf-8') == 'OK!'
+
+        # assert that segment tracking has been called with result
+        data = {
+            "attempt_id": attempt.id,
+            "result": "SYSTEM FAIL"
+        }
+        mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1704,22 +1798,22 @@ class TestReverifyView(TestVerificationBase):
     PASSWORD = "detachment-2702"
 
     def setUp(self):
-        super(TestReverifyView, self).setUp()
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.assertTrue(success, msg="Could not log in")
+        assert success, 'Could not log in'
 
     def test_reverify_view_can_do_initial_verification(self):
         """
         Test that a User can use re-verify link for initial verification.
         """
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_denied(self):
         # User has a denied attempt, so can re-verify
         attempt = self.create_and_submit_attempt_for_user(self.user)
         attempt.deny("error")
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_expired(self):
         # User has a verification attempt, but it's expired
@@ -1731,7 +1825,7 @@ class TestReverifyView(TestVerificationBase):
         attempt.save()
 
         # Allow the student to re-verify
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_can_reverify_pending(self):
         """ Test that the user can still re-verify even if the previous photo
@@ -1746,7 +1840,7 @@ class TestReverifyView(TestVerificationBase):
         self.create_and_submit_attempt_for_user(self.user)
 
         # Can re-verify because an attempt has already been submitted.
-        self._assert_can_reverify()
+        self._assert_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved
@@ -1754,7 +1848,7 @@ class TestReverifyView(TestVerificationBase):
         attempt.approve()
 
         # Cannot re-verify because the user is already verified.
-        self._assert_cannot_reverify()
+        self._assert_reverify()
 
     @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
     def test_reverify_view_can_reverify_approved_expired_soon(self):
@@ -1768,25 +1862,224 @@ class TestReverifyView(TestVerificationBase):
         attempt.approve()
 
         # Can re-verify because verification is set to expired soon.
-        self._assert_can_reverify()
+        self._assert_reverify()
 
-    def _get_reverify_page(self):
-        """
-        Retrieve the re-verification page and return the response.
-        """
+    def _assert_reverify(self):
         url = reverse("verify_student_reverify")
-        return self.client.get(url)
+        response = self.client.get(url)
+        verification_start_url = IDVerificationService.get_verify_location()
+        self.assertRedirects(response, verification_start_url, fetch_redirect_response=False)
 
-    def _assert_can_reverify(self):
-        """
-        Check that the re-verification flow is rendered.
-        """
-        response = self._get_reverify_page()
-        self.assertContains(response, "reverify-container")
 
-    def _assert_cannot_reverify(self):
+@override_settings(
+    VERIFY_STUDENT={
+        "SOFTWARE_SECURE": {
+            "API_URL": "https://verify.example.com/submit/",
+            "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
+            "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
+            "FACE_IMAGE_AES_KEY": "f82400259e3b4f88821cd89838758292",
+            "RSA_PUBLIC_KEY": RSA_PUBLIC_KEY,
+            "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
+            "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
+            "CERT_VERIFICATION_PATH": False,
+        },
+        "DAYS_GOOD_FOR": 10,
+        "STORAGE_CLASS": 'storages.backends.s3boto.S3BotoStorage',
+        "STORAGE_KWARGS": {
+            'bucket': 'test-idv',
+        },
+    },
+)
+class TestPhotoURLView(TestVerificationBase):
+    """
+    Tests for the photo url view.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        self.user = AdminFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        assert login_success
+        self.attempt = SoftwareSecurePhotoVerification(
+            status="submitted",
+            user=self.user
+        )
+        self.attempt.save()
+        self.receipt_id = self.attempt.receipt_id
+
+    def test_photo_url_view_returns_data(self):
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert response.data['EdX-ID'] == self.receipt_id
+        assert response.data['PhotoID'] == 'https://{bucket}/photo_id/{receipt_id}'\
+            .format(bucket=settings.AWS_S3_CUSTOM_DOMAIN, receipt_id=self.receipt_id)
+        assert response.data['UserPhoto'] == 'https://{bucket}/face/{receipt_id}'\
+            .format(bucket=settings.AWS_S3_CUSTOM_DOMAIN, receipt_id=self.receipt_id)
+
+    def test_photo_url_view_returns_404_if_invalid_receipt_id(self):
+        url = reverse('verification_photo_urls',
+                      kwargs={'receipt_id': '00000000-0000-0000-0000-000000000000'})
+        response = self.client.get(url)
+        assert response.status_code == 404
+
+    def test_403_for_non_staff(self):
+        self.user = UserFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        assert login_success
+        url = reverse('verification_photo_urls', kwargs={'receipt_id': str(self.receipt_id)})
+        response = self.client.get(url)
+        assert response.status_code == 403
+
+
+@override_settings(
+    VERIFY_STUDENT={
+        "SOFTWARE_SECURE": {
+            "API_URL": "https://verify.example.com/submit/",
+            "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
+            "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
+            "FACE_IMAGE_AES_KEY": b'32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae',
+            "RSA_PUBLIC_KEY": RSA_PUBLIC_KEY,
+            "RSA_PRIVATE_KEY": RSA_PRIVATE_KEY,
+            "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
+            "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
+            "S3_BUCKET": "test-idv",
+            "CERT_VERIFICATION_PATH": False,
+        },
+        "DAYS_GOOD_FOR": 10,
+        "STORAGE_CLASS": 'storages.backends.s3boto.S3BotoStorage',
+        "STORAGE_KWARGS": {
+            'bucket': 'test-idv',
+        },
+    }
+)
+@ddt.ddt
+class TestDecodeImageViews(MockS3BotoMixin, TestVerificationBase):
+    """
+    Test for both face and photo id image decoding views
+    """
+
+    IMAGE_DATA = "abcd,1234"
+
+    def setUp(self):
+        super().setUp()
+        self.user = AdminFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        assert login_success
+
+    def _mock_submit_images(self):
         """
-        Check that the user is blocked from re-verifying.
+        Mocks submitting images for IDV and saving to S3
         """
-        response = self._get_reverify_page()
-        self.assertContains(response, "reverify-blocked")
+        # create an attempt with a submitted status, and create a photo_id_key to use
+        # for decryption
+        attempt = SoftwareSecurePhotoVerification(
+            status="submitted",
+            user=self.user
+        )
+        rsa_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
+        rsa_encrypted_aes_key = rsa_encrypt(
+            codecs.decode(
+                settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"],
+                "hex"
+            ),
+            rsa_key_str
+        )
+        attempt.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
+
+        attempt.save()
+
+    def _decode_image(self, receipt_id, img_type):
+        """
+        Test function used to call decoding endpoint
+        Arg:
+            receipt_id(str): receipt ID for endpoint url
+            img_type(str): 'face' or 'photo_id', used to determine which endpoint to use
+        """
+        url_name = 'verification_decrypt_face_image'
+        if img_type == 'photo_id':
+            url_name = 'verification_decrypt_photo_id_image'
+        url = reverse(url_name, kwargs={'receipt_id': str(receipt_id)})
+
+        response = self.client.get(url)
+
+        return response
+
+    @ddt.data("face", "photo_id")
+    @patch.object(SoftwareSecurePhotoVerification, '_get_image_from_storage')
+    def test_download_image_response(self, img_type, _mock_get_storage):
+        _mock_get_storage.return_value = encrypt_and_encode(
+            b'\xd7m\xf8',
+            codecs.decode(settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"], "hex")
+        )
+        # upload 'images'
+        self._mock_submit_images()
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        receipt_id = attempt.receipt_id
+
+        #mock downloading and decrypting images
+        response = self._decode_image(receipt_id, img_type)
+        assert response.status_code == 200
+        assert response.content == base64.b64decode(self.IMAGE_DATA.split(',')[1])
+
+    @ddt.data("face", "photo_id")
+    def test_403_for_non_staff(self, img_type):
+        self.user = UserFactory()
+        login_success = self.client.login(username=self.user.username, password='test')
+        assert login_success
+
+        self._mock_submit_images()
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        receipt_id = attempt.receipt_id
+
+        # mock downloading and decrypting images
+        response = self._decode_image(receipt_id, img_type)
+        assert response.status_code == 403
+
+    @override_settings(
+        VERIFY_STUDENT={
+            "SOFTWARE_SECURE": {
+                "API_URL": "https://verify.example.com/submit/",
+                "API_ACCESS_KEY": "dcf291b5572942f99adaab4c2090c006",
+                "API_SECRET_KEY": "c392efdcc0354c5f922dc39844ec0dc7",
+                "FACE_IMAGE_AES_KEY": b'32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae',
+                "RSA_PUBLIC_KEY": RSA_PUBLIC_KEY,
+                "AWS_ACCESS_KEY": "c987c7efe35c403caa821f7328febfa1",
+                "AWS_SECRET_KEY": "fc595fc657c04437bb23495d8fe64881",
+                "S3_BUCKET": "test-idv",
+                "CERT_VERIFICATION_PATH": False,
+            },
+            "DAYS_GOOD_FOR": 10,
+        }
+    )
+    @ddt.data("face", "photo_id")
+    def test_403_for_non_staging(self, img_type):
+        self._mock_submit_images()
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        receipt_id = attempt.receipt_id
+
+        # mock downloading and decrypting images
+        response = self._decode_image(receipt_id, img_type)
+        assert response.status_code == 403
+
+    @ddt.data("face", "photo_id")
+    def test_404_if_invalid_receipt_id(self, img_type):
+        response = self._decode_image('00000000-0000-0000-0000-000000000000', img_type)
+        assert response.status_code == 404
+
+    @ddt.data("face", "photo_id")
+    @patch.object(SoftwareSecurePhotoVerification, '_get_image_from_storage')
+    def test_404_for_decryption_error(self, img_type, _mock_get_storage):
+        _mock_get_storage.return_value = None
+        # create verification with no img data
+        attempt = SoftwareSecurePhotoVerification(
+            status="submitted",
+            user=self.user
+        )
+        attempt.save()
+        receipt_id = attempt.receipt_id
+
+        # mock downloading and decrypting images
+        response = self._decode_image(receipt_id, img_type)
+        assert response.status_code == 404

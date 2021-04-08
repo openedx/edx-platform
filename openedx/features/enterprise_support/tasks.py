@@ -5,7 +5,8 @@ Tasks for Enterprise.
 
 import logging
 
-from celery import task
+from celery import shared_task
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from enterprise.models import EnterpriseCourseEnrollment
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache
@@ -13,7 +14,8 @@ from openedx.features.enterprise_support.utils import clear_data_consent_share_c
 log = logging.getLogger('edx.celery.task')
 
 
-@task(name=u'openedx.features.enterprise_support.tasks.clear_enterprise_customer_data_consent_share_cache')
+@shared_task(name='openedx.features.enterprise_support.tasks.clear_enterprise_customer_data_consent_share_cache')
+@set_code_owner_attribute
 def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid):
     """
         clears data_sharing_consent_needed cache for whole enterprise
@@ -23,7 +25,7 @@ def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid)
     )
     count = enterprise_course_enrollments.count()
     log.info(
-        u'Stated Clearing {count} data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
+        'Stated Clearing {count} data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
             count=count,
             uuid=enterprise_customer_uuid,
         )
@@ -31,8 +33,9 @@ def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid)
     for enrollment in enterprise_course_enrollments:
         clear_data_consent_share_cache(
             enrollment.enterprise_customer_user.user_id,
-            enrollment.course_id
+            enrollment.course_id,
+            enterprise_customer_uuid,
         )
-    log.info(u'Ended Clearing data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
+    log.info('Ended Clearing data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
         uuid=enterprise_customer_uuid,
     ))

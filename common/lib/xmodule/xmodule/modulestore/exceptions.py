@@ -15,14 +15,14 @@ class MultipleCourseBlocksFound(Exception):
     """
     Raise this exception when Iterating over the course blocks return multiple course blocks.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class MultipleLibraryBlocksFound(Exception):
     """
     Raise this exception when Iterating over the library blocks return multiple library blocks.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class InsufficientSpecificationError(Exception):
@@ -47,7 +47,7 @@ class ReferentialIntegrityError(Exception):
     xblock points to a nonexistent child (which probably raises ItemNotFoundError instead depending
     on context).
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 class DuplicateItemError(Exception):
@@ -55,7 +55,7 @@ class DuplicateItemError(Exception):
     Attempted to create an item which already exists.
     """
     def __init__(self, element_id, store=None, collection=None):
-        super(DuplicateItemError, self).__init__()
+        super().__init__()
         self.element_id = element_id
         self.store = store
         self.collection = collection
@@ -77,7 +77,7 @@ class VersionConflictError(Exception):
     The caller asked for either draft or published head and gave a version which conflicted with it.
     """
     def __init__(self, requestedLocation, currentHeadVersionGuid):
-        super(VersionConflictError, self).__init__(u'Requested {}, but current head is {}'.format(
+        super().__init__('Requested {}, but current head is {}'.format(
             requestedLocation,
             currentHeadVersionGuid
         ))
@@ -91,8 +91,8 @@ class DuplicateCourseError(Exception):
         """
         existing_entry will have the who, when, and other properties of the existing entry
         """
-        super(DuplicateCourseError, self).__init__(
-            u'Cannot create course {}, which duplicates {}'.format(course_id, existing_entry)
+        super().__init__(
+            f'Cannot create course {course_id}, which duplicates {existing_entry}'
         )
         self.course_id = course_id
         self.existing_entry = existing_entry
@@ -103,6 +103,24 @@ class InvalidBranchSetting(Exception):
     Raised when the process' branch setting did not match the required setting for the attempted operation on a store.
     """
     def __init__(self, expected_setting, actual_setting):
-        super(InvalidBranchSetting, self).__init__(u"Invalid branch: expected {} but got {}".format(expected_setting, actual_setting))
+        super().__init__(f"Invalid branch: expected {expected_setting} but got {actual_setting}")  # lint-amnesty, pylint: disable=line-too-long, super-with-arguments
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting
+
+
+class InvalidProctoringProvider(Exception):
+    """
+    Error with selected proctoring provider raised when the provided is unknown.
+    """
+
+    def __init__(self, proctoring_provider, available_providers):
+        super().__init__()
+        self.proctoring_provider = proctoring_provider
+        self.available_providers = available_providers
+
+    def __str__(self, *args, **kwargs):
+        """
+        Print details about error
+        """
+        return f"The selected proctoring provider, {self.proctoring_provider}, is not a valid provider. " \
+               f"Please select from one of {self.available_providers}."

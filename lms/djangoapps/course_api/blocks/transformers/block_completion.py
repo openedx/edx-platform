@@ -45,6 +45,17 @@ class BlockCompletionTransformer(BlockStructureTransformer):
     def collect(cls, block_structure):
         block_structure.request_xblock_fields('completion_mode')
 
+    @staticmethod
+    def _is_block_excluded(block_structure, block_key):
+        """
+        Checks whether block's completion method is of `EXCLUDED` type.
+        """
+        completion_mode = block_structure.get_xblock_field(
+            block_key, 'completion_mode'
+        )
+
+        return completion_mode == CompletionMode.EXCLUDED
+
     def mark_complete(self, complete_course_blocks, latest_complete_block_key, block_key, block_structure):
         """
         Helper function to mark a block as 'complete' as dictated by
@@ -58,14 +69,13 @@ class BlockCompletionTransformer(BlockStructureTransformer):
         """
         if block_key in complete_course_blocks:
             block_structure.override_xblock_field(block_key, self.COMPLETE, True)
-            if block_key == latest_complete_block_key:
+            if str(block_key) == str(latest_complete_block_key):
                 block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
 
         children = block_structure.get_children(block_key)
-        non_discussion_children = (child_key for child_key in children
-                                   if block_structure.get_xblock_field(child_key, 'category') != 'discussion')
         all_children_complete = all(block_structure.get_xblock_field(child_key, self.COMPLETE)
-                                    for child_key in non_discussion_children)
+                                    for child_key in children
+                                    if not self._is_block_excluded(block_structure, child_key))
 
         if children and all_children_complete:
             block_structure.override_xblock_field(block_key, self.COMPLETE, True)

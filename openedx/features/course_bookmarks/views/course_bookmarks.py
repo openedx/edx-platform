@@ -3,7 +3,6 @@ Views to show a course's bookmarks.
 """
 
 
-import six
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.template.context_processors import csrf
@@ -43,7 +42,7 @@ class CourseBookmarksView(View):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
 
         # Render the bookmarks list as a fragment
         bookmarks_fragment = CourseBookmarksFragmentView().render_to_fragment(request, course_id=course_id)
@@ -66,7 +65,7 @@ class CourseBookmarksFragmentView(EdxFragmentView):
     Fragment view that shows a user's bookmarks for a course.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders the user's course bookmarks as a fragment.
         """

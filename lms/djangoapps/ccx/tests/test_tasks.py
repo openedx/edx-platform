@@ -4,23 +4,22 @@ Tests for celery tasks defined in tasks module
 
 
 import contextlib
+from unittest import mock
 
-import mock
-import six
 from ccx_keys.locator import CCXLocator
 
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.roles import CourseCcxCoachRole
-from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @contextlib.contextmanager
-def mock_signal_receiver(signal):
+def mock_signal_receiver(signal):  # lint-amnesty, pylint: disable=missing-function-docstring
     receiver = mock.Mock()
     signal.connect(receiver)
     yield receiver
@@ -39,7 +38,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Set up tests
         """
-        super(TestSendCCXCoursePublished, self).setUp()
+        super().setUp()
         course = self.course = CourseFactory.create(org="edX", course="999", display_name="Run 666")
         course2 = self.course2 = CourseFactory.create(org="edX", course="999a", display_name="Run 667")
         coach = AdminFactory.create()
@@ -54,7 +53,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         Call the function under test
         """
-        send_ccx_course_published(six.text_type(course_key))
+        send_ccx_course_published(str(course_key))
 
     def test_signal_not_sent_for_ccx(self):
         """
@@ -63,7 +62,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
             self.call_fut(course_key)
-            self.assertEqual(receiver.call_count, 0)
+            assert receiver.call_count == 0
 
     def test_signal_sent_for_ccx(self):
         """
@@ -73,7 +72,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
             self.call_fut(self.course.id)
-            self.assertEqual(receiver.call_count, 3)
+            assert receiver.call_count == 3
 
     def test_course_overview_cached(self):
         """
@@ -81,9 +80,9 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         """
         course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
         overview = CourseOverview.objects.filter(id=course_key)
-        self.assertEqual(len(overview), 0)
+        assert len(overview) == 0
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
             self.call_fut(self.course.id)
-            self.assertEqual(receiver.call_count, 3)
+            assert receiver.call_count == 3
             overview = CourseOverview.objects.filter(id=course_key)
-            self.assertEqual(len(overview), 1)
+            assert len(overview) == 1

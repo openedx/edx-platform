@@ -5,13 +5,12 @@ Test the sync_hubspot_contacts management command
 
 import json
 from datetime import timedelta
+from io import StringIO
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.six import StringIO
-from mock import patch
-from six.moves import range
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.user_api.management.commands.sync_hubspot_contacts import Command as sync_command
@@ -28,7 +27,7 @@ class TestHubspotSyncCommand(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestHubspotSyncCommand, cls).setUpClass()
+        super().setUpClass()
         cls.site_config = SiteConfigurationFactory()
         cls.hubspot_site_config = SiteConfigurationFactory.create(
             site_values={'HUBSPOT_API_KEY': 'test_key'}
@@ -38,15 +37,15 @@ class TestHubspotSyncCommand(TestCase):
         cls._create_users(cls.site_config)
 
     @classmethod
-    def _create_users(cls, site_conf):
+    def _create_users(cls, site_conf):  # lint-amnesty, pylint: disable=missing-function-docstring
         # Create some test users
         for i in range(1, 20):
             profile_meta = {
-                "first_name": "First Name{0}".format(i),
-                "last_name": "Last Name{0}".format(i),
-                "company": "Company{0}".format(i),
-                "title": "Title{0}".format(i),
-                "state": "State{0}".format(i),
+                "first_name": f"First Name{i}",
+                "last_name": f"Last Name{i}",
+                "company": f"Company{i}",
+                "title": f"Title{i}",
+                "state": f"State{i}",
                 "country": "US",
             }
             loe = UserProfile.LEVEL_OF_EDUCATION_CHOICES[0][0]
@@ -69,7 +68,7 @@ class TestHubspotSyncCommand(TestCase):
         sync_site = patch.object(sync_command, '_sync_site')
         mock_sync_site = sync_site.start()
         call_command('sync_hubspot_contacts')
-        self.assertFalse(mock_sync_site.called, "_sync_site should not be called")
+        assert not mock_sync_site.called, '_sync_site should not be called'
         sync_site.stop()
         # put values back
         self.hubspot_site_config.site_values = orig_values
@@ -84,8 +83,9 @@ class TestHubspotSyncCommand(TestCase):
         out = StringIO()
         call_command('sync_hubspot_contacts', '--initial-sync-days=7', '--batch-size=2', stdout=out)
         output = out.getvalue()
-        self.assertIn('Successfully synced users', output)
-        self.assertEqual(mock_sync_with_hubspot.call_count, 4)  # 4 requests of batch (2, 2, 2, 1), total 7 contacts
+        assert 'Successfully synced users' in output
+        assert mock_sync_with_hubspot.call_count == 4
+        # 4 requests of batch (2, 2, 2, 1), total 7 contacts
         sync_with_hubspot.stop()
 
     def test_command_without_initial_sync_days(self):
@@ -97,6 +97,6 @@ class TestHubspotSyncCommand(TestCase):
         out = StringIO()
         call_command('sync_hubspot_contacts', '--batch-size=3', stdout=out)
         output = out.getvalue()
-        self.assertIn('Successfully synced users', output)
-        self.assertEqual(mock_sync_with_hubspot.call_count, 1)
+        assert 'Successfully synced users' in output
+        assert mock_sync_with_hubspot.call_count == 1
         sync_with_hubspot.stop()

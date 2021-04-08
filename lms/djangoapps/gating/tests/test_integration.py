@@ -4,19 +4,19 @@ Integration tests for gated content.
 
 
 import ddt
-from completion import waffle as completion_waffle
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from crum import set_current_request
 from edx_django_utils.cache import RequestCache
 from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -31,11 +31,11 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGatedContent, cls).setUpClass()
+        super().setUpClass()
         cls.set_up_course()
 
     def setUp(self):
-        super(TestGatedContent, self).setUp()
+        super().setUp()
         self.setup_gating_milestone(50, 100)
         self.non_staff_user = UserFactory()
         self.staff_user = UserFactory(is_staff=True, is_superuser=True)
@@ -146,19 +146,16 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         RequestCache.clear_all_namespaces()
 
         # access to gating content (seq1) remains constant
-        self.assertTrue(bool(has_access(user, 'load', self.seq1, self.course.id)))
+        assert bool(has_access(user, 'load', self.seq1, self.course.id))
 
         # access to gated content (seq2) remains constant, access is prevented in SeqModule loading
-        self.assertTrue(bool(has_access(user, 'load', self.seq2, self.course.id)))
+        assert bool(has_access(user, 'load', self.seq2, self.course.id))
 
     def assert_user_has_prereq_milestone(self, user, expected_has_milestone):
         """
         Verifies whether or not the user has the prereq milestone
         """
-        self.assertEqual(
-            milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone),
-            expected_has_milestone,
-        )
+        assert milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone) == expected_has_milestone
 
     def assert_course_grade(self, user, expected_percent):
         """
@@ -169,9 +166,9 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         """
         course_grade = CourseGradeFactory().read(user, self.course)
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
-            self.assertIn(prob.location, course_grade.problem_scores)
+            assert prob.location in course_grade.problem_scores
 
-        self.assertEqual(course_grade.percent, expected_percent)
+        assert course_grade.percent == expected_percent
 
     def test_gated_for_nonstaff(self):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
@@ -182,7 +179,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         self.assert_access_to_gated_content(self.staff_user)
 
     def test_gated_content_always_in_grades(self):
-        with override_waffle_switch(completion_waffle.ENABLE_COMPLETION_TRACKING_SWITCH, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             # start with a grade from a non-gated subsection
             answer_problem(self.course, self.request, self.prob3, 10, 10)
 
@@ -204,7 +201,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     def test_ungating_when_fulfilled(self, earned, max_possible, result):
         self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
         self.assert_access_to_gated_content(self.non_staff_user)
-        with override_waffle_switch(completion_waffle.ENABLE_COMPLETION_TRACKING_SWITCH, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             answer_problem(self.course, self.request, self.gating_prob1, earned, max_possible)
 
             self.assert_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=result)

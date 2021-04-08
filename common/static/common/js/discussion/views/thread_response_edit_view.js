@@ -43,8 +43,11 @@
             ThreadResponseEditView.prototype.render = function() {
                 var context = $.extend({mode: this.options.mode, startHeader: this.options.startHeader},
                     this.model.attributes);
-                this.template = _.template($('#thread-response-edit-template').html());
-                this.$el.html(this.template(context));
+                this.template = edx.HtmlUtils.template($('#thread-response-edit-template').html());
+                edx.HtmlUtils.setHtml(
+                    this.$el,
+                    this.template(context)
+                );
                 this.delegateEvents();
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');
                 return this;

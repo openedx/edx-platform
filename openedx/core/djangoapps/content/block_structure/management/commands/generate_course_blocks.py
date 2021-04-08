@@ -5,15 +5,12 @@ Command to load course blocks.
 
 import logging
 
-import six
 from django.core.management.base import BaseCommand
-import six
-from six import text_type
 
 import openedx.core.djangoapps.content.block_structure.api as api
 import openedx.core.djangoapps.content.block_structure.store as store
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
-from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
+from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     parse_course_keys,
@@ -30,8 +27,8 @@ class Command(BaseCommand):
         $ ./manage.py lms generate_course_blocks --all_courses --settings=devstack
         $ ./manage.py lms generate_course_blocks 'edX/DemoX/Demo_Course' --settings=devstack
     """
-    args = u'<course_id course_id ...>'
-    help = u'Generates and stores course blocks for one or more courses.'
+    args = '<course_id course_id ...>'
+    help = 'Generates and stores course blocks for one or more courses.'
 
     def add_arguments(self, parser):
         """
@@ -41,46 +38,46 @@ class Command(BaseCommand):
             '--courses',
             dest='courses',
             nargs='+',
-            help=u'Generate course blocks for the list of courses provided.',
+            help='Generate course blocks for the list of courses provided.',
         )
         parser.add_argument(
             '--all_courses',
-            help=u'Generate course blocks for all courses, given the requested start and end indices.',
+            help='Generate course blocks for all courses, given the requested start and end indices.',
             action='store_true',
             default=False,
         )
         parser.add_argument(
             '--enqueue_task',
-            help=u'Enqueue the tasks for asynchronous computation.',
+            help='Enqueue the tasks for asynchronous computation.',
             action='store_true',
             default=False,
         )
         parser.add_argument(
             '--routing_key',
             dest='routing_key',
-            help=u'Routing key to use for asynchronous computation.',
+            help='Routing key to use for asynchronous computation.',
         )
         parser.add_argument(
             '--force_update',
-            help=u'Force update of the course blocks for the requested courses.',
+            help='Force update of the course blocks for the requested courses.',
             action='store_true',
             default=False,
         )
         parser.add_argument(
             '--start_index',
-            help=u'Starting index of course list.',
+            help='Starting index of course list.',
             default=0,
             type=int,
         )
         parser.add_argument(
             '--end_index',
-            help=u'Ending index of course list.',
+            help='Ending index of course list.',
             default=0,
             type=int,
         )
         parser.add_argument(
             '--with_storage',
-            help=u'Store the course blocks in Storage, overriding value of the storage_backing_for_cache waffle switch',
+            help='Store the course blocks in Storage, overriding value of the storage_backing_for_cache waffle switch',
             action='store_true',
             default=False,
         )
@@ -102,9 +99,9 @@ class Command(BaseCommand):
 
         self._set_log_levels(options)
 
-        log.critical(u'BlockStructure: STARTED generating Course Blocks for %d courses.', len(course_keys))
+        log.critical('BlockStructure: STARTED generating Course Blocks for %d courses.', len(course_keys))
         self._generate_course_blocks(options, course_keys)
-        log.critical(u'BlockStructure: FINISHED generating Course Blocks for %d courses.', len(course_keys))
+        log.critical('BlockStructure: FINISHED generating Course Blocks for %d courses.', len(course_keys))
 
     def _set_log_levels(self, options):
         """
@@ -133,16 +130,16 @@ class Command(BaseCommand):
         Generates course blocks for the given course_keys per the given options.
         """
         if options.get('with_storage'):
-            waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
+            enable_storage_backing_for_cache_in_request()
 
         for course_key in course_keys:
             try:
                 self._generate_for_course(options, course_key)
             except Exception as ex:  # pylint: disable=broad-except
                 log.exception(
-                    u'BlockStructure: An error occurred while generating course blocks for %s: %s',
-                    six.text_type(course_key),
-                    text_type(ex),
+                    'BlockStructure: An error occurred while generating course blocks for %s: %s',
+                    str(course_key),
+                    str(ex),
                 )
 
     def _generate_for_course(self, options, course_key):
@@ -153,12 +150,12 @@ class Command(BaseCommand):
             action = tasks.update_course_in_cache_v2 if options.get('force_update') else tasks.get_course_in_cache_v2
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
             result = action.apply_async(
-                kwargs=dict(course_id=six.text_type(course_key), with_storage=options.get('with_storage')),
+                kwargs=dict(course_id=str(course_key), with_storage=options.get('with_storage')),
                 **task_options
             )
-            log.info(u'BlockStructure: ENQUEUED generating for course: %s, task_id: %s.', course_key, result.id)
+            log.info('BlockStructure: ENQUEUED generating for course: %s, task_id: %s.', course_key, result.id)
         else:
-            log.info(u'BlockStructure: STARTED generating for course: %s.', course_key)
+            log.info('BlockStructure: STARTED generating for course: %s.', course_key)
             action = api.update_course_in_cache if options.get('force_update') else api.get_course_in_cache
             action(course_key)
-            log.info(u'BlockStructure: FINISHED generating for course: %s.', course_key)
+            log.info('BlockStructure: FINISHED generating for course: %s.', course_key)

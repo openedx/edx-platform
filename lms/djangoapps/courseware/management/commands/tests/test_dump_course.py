@@ -1,18 +1,14 @@
-# coding=utf-8
-
 """
 Tests for Django management commands
 """
 
 
 import json
-from six import StringIO
+from io import StringIO
 
 import factory
-import six
 from django.conf import settings
 from django.core.management import call_command
-from six import text_type
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -42,7 +38,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(CommandsTestBase, cls).setUpClass()
+        super().setUpClass()
         cls.test_course_key = modulestore().make_course_key("edX", "simple", "2012_Fall")
         cls.loaded_courses = cls.load_courses()
 
@@ -59,7 +55,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             org=unique_org,
             course='simple',
             run="run",
-            display_name=u'2012_Fáĺĺ',
+            display_name='2012_Fáĺĺ',
             modulestore=store
         )
 
@@ -88,12 +84,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
         dumped_courses = output.strip().split('\n')
-        course_ids = {text_type(course_id) for course_id in self.loaded_courses}
+        course_ids = {str(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
-        self.assertEqual(course_ids, dumped_ids)
+        assert course_ids == dumped_ids
 
     def test_correct_course_structure_metadata(self):
-        course_id = text_type(self.test_course_key)
+        course_id = str(self.test_course_key)
         args = [course_id]
         kwargs = {'modulestore': 'default'}
 
@@ -103,10 +99,10 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.fail(exception)
 
         dump = json.loads(output)
-        self.assertGreater(len(list(dump.values())), 0)
+        assert len(list(dump.values())) > 0
 
     def test_dump_course_structure(self):
-        args = [text_type(self.test_course_key)]
+        args = [str(self.test_course_key)]
         kwargs = {'modulestore': 'default'}
         output = self.call_command('dump_course_structure', *args, **kwargs)
 
@@ -114,79 +110,78 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         # check that all elements in the course structure have metadata,
         # but not inherited metadata:
-        for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertNotIn('inherited_metadata', element)
+        for element in dump.values():
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' not in element
 
         # Check a few elements in the course dump
         test_course_key = self.test_course_key
-        parent_id = text_type(test_course_key.make_usage_key('chapter', 'Overview'))
-        self.assertEqual(dump[parent_id]['category'], 'chapter')
-        self.assertEqual(len(dump[parent_id]['children']), 3)
+        parent_id = str(test_course_key.make_usage_key('chapter', 'Overview'))
+        assert dump[parent_id]['category'] == 'chapter'
+        assert len(dump[parent_id]['children']) == 3
 
         child_id = dump[parent_id]['children'][1]
-        self.assertEqual(dump[child_id]['category'], 'videosequence')
-        self.assertEqual(len(dump[child_id]['children']), 2)
+        assert dump[child_id]['category'] == 'videosequence'
+        assert len(dump[child_id]['children']) == 2
 
-        video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
-        self.assertEqual(dump[video_id]['category'], 'video')
+        video_id = str(test_course_key.make_usage_key('video', 'Welcome'))
+        assert dump[video_id]['category'] == 'video'
         video_metadata = dump[video_id]['metadata']
         video_metadata.pop('edx_video_id', None)
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(
             list(video_metadata.keys()),
             ['youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
-        self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
+        assert 'youtube_id_1_0' in dump[video_id]['metadata']
 
         # Check if there are the right number of elements
 
-        self.assertEqual(len(dump), 17)
+        assert len(dump) == 17
 
     def test_dump_inherited_course_structure(self):
-        args = [text_type(self.test_course_key)]
+        args = [str(self.test_course_key)]
         kwargs = {'modulestore': 'default', 'inherited': True}
         output = self.call_command('dump_course_structure', *args, **kwargs)
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertIn('inherited_metadata', element)
+        for element in dump.values():
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' in element
             # ... but does not contain inherited metadata containing a default value:
-            self.assertNotIn('due', element['inherited_metadata'])
+            assert 'due' not in element['inherited_metadata']
 
     def test_dump_inherited_course_structure_with_defaults(self):
-        args = [text_type(self.test_course_key)]
+        args = [str(self.test_course_key)]
         kwargs = {'modulestore': 'default', 'inherited': True, 'inherited_defaults': True}
         output = self.call_command('dump_course_structure', *args, **kwargs)
         dump = json.loads(output)
         # check that all elements in the course structure have inherited metadata,
         # and that it contains a particular value as well:
-        for element in six.itervalues(dump):
-            self.assertIn('metadata', element)
-            self.assertIn('children', element)
-            self.assertIn('category', element)
-            self.assertIn('inherited_metadata', element)
+        for element in dump.values():
+            assert 'metadata' in element
+            assert 'children' in element
+            assert 'category' in element
+            assert 'inherited_metadata' in element
             # ... and contains inherited metadata containing a default value:
-            self.assertIsNone(element['inherited_metadata']['due'])
+            assert element['inherited_metadata']['due'] is None
 
     def test_export_discussion_ids(self):
-        output = self.call_command('dump_course_structure', text_type(self.course.id))
+        output = self.call_command('dump_course_structure', str(self.course.id))
         dump = json.loads(output)
-        dumped_id = dump[text_type(self.discussion.location)]['metadata']['discussion_id']
-        self.assertEqual(dumped_id, self.discussion.discussion_id)
+        dumped_id = dump[str(self.discussion.location)]['metadata']['discussion_id']
+        assert dumped_id == self.discussion.discussion_id
 
     def test_export_discussion_id_custom_id(self):
-        output = self.call_command('dump_course_structure', text_type(self.test_course_key))
+        output = self.call_command('dump_course_structure', str(self.test_course_key))
         dump = json.loads(output)
-        discussion_key = text_type(self.test_course_key.make_usage_key('discussion', 'custom_id'))
-        dumped_id = dump[text_type(discussion_key)]['metadata']['discussion_id']
-        self.assertEqual(dumped_id, "custom")
+        discussion_key = str(self.test_course_key.make_usage_key('discussion', 'custom_id'))
+        dumped_id = dump[str(discussion_key)]['metadata']['discussion_id']
+        assert dumped_id == 'custom'
 
     def check_export_file(self, tar_file):  # pylint: disable=missing-function-docstring
         names = tar_file.getnames()
@@ -198,7 +193,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         assert_in = self.assertIn
         assert_in('edX-simple-2012_Fall', names)
-        assert_in('edX-simple-2012_Fall/policies/{}/policy.json'.format(self.url_name), names)
+        assert_in(f'edX-simple-2012_Fall/policies/{self.url_name}/policy.json', names)
         assert_in('edX-simple-2012_Fall/html/toylab.html', names)
         assert_in('edX-simple-2012_Fall/videosequence/A_simple_sequence.xml', names)
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)

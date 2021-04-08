@@ -17,7 +17,7 @@ class TestThemeFinders(TestCase):
     """
 
     def setUp(self):
-        super(TestThemeFinders, self).setUp()
+        super().setUp()
         self.finder = ThemeFilesFinder()
 
     def test_find_first_themed_asset(self):
@@ -28,7 +28,7 @@ class TestThemeFinders(TestCase):
         asset = "test-theme/images/logo.png"
         match = self.finder.find(asset)
 
-        self.assertEqual(match, themes_dir / "test-theme" / "lms" / "static" / "images" / "logo.png")
+        assert match == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
 
     def test_find_all_themed_asset(self):
         """
@@ -40,9 +40,9 @@ class TestThemeFinders(TestCase):
         matches = self.finder.find(asset, all=True)
 
         # Make sure only first match was returned
-        self.assertEqual(1, len(matches))
+        assert 1 == len(matches)
 
-        self.assertEqual(matches[0], themes_dir / "test-theme" / "lms" / "static" / "images" / "logo.png")
+        assert matches[0] == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
 
     def test_find_in_theme(self):
         """
@@ -53,4 +53,4 @@ class TestThemeFinders(TestCase):
         asset = "images/logo.png"
         match = self.finder.find_in_theme("test-theme", asset)
 
-        self.assertEqual(match, themes_dir / "test-theme" / "lms" / "static" / "images" / "logo.png")
+        assert match == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')

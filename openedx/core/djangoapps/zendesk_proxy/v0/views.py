@@ -18,8 +18,8 @@ class ZendeskProxyThrottle(SimpleRateThrottle):
     Custom throttle rates for this particular endpoint's use case.
     """
     def __init__(self):
-        self.rate = '{}/hour'.format(ZENDESK_REQUESTS_PER_HOUR)
-        super(ZendeskProxyThrottle, self).__init__()
+        self.rate = f'{ZENDESK_REQUESTS_PER_HOUR}/hour'
+        super().__init__()
 
     def get_cache_key(self, request, view):
         """

@@ -11,8 +11,7 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
-from organizations.models import Organization
-import six
+from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
 
@@ -84,7 +83,7 @@ class ContentLibrary(models.Model):
         return LibraryLocatorV2(org=self.org.short_name, slug=self.slug)
 
     def __str__(self):
-        return "ContentLibrary ({})".format(six.text_type(self.library_key))
+        return "ContentLibrary ({})".format(str(self.library_key))
 
 
 class ContentLibraryPermission(models.Model):
@@ -113,7 +112,7 @@ class ContentLibraryPermission(models.Model):
             ('library', 'group'),
         ]
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
         """
         Validate any constraints on the model.
 
@@ -127,4 +126,4 @@ class ContentLibraryPermission(models.Model):
 
     def __str__(self):
         who = self.user.username if self.user else self.group.name
-        return "ContentLibraryPermission ({} for {})".format(self.access_level, who)
+        return f"ContentLibraryPermission ({self.access_level} for {who})"

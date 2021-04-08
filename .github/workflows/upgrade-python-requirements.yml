@@ -1,0 +1,58 @@
+name: Upgrade Requirements
+
+on:
+  schedule:
+    # will start the job at 2 every tuesday (UTC)
+    - cron: "0 2 * * 2"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Target branch to create requirements PR against"
+        required: true
+        default: 'master'
+
+jobs:
+  upgrade_requirements:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+
+    steps:
+      - name: setup target branch
+        run: echo "target_branch=$(if ['${{ github.event.inputs.branch }}' = '']; then echo 'master'; else echo '${{ github.event.inputs.branch }}'; fi)" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v1
+        with:
+          ref: ${{ env.target_branch }}
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install pip
+        run: pip install -r requirements/pip.txt
+
+      - name: make upgrade
+        run: |
+          cd $GITHUB_WORKSPACE
+          make upgrade
+
+      - name: setup testeng-ci
+        run: |
+          git clone https://github.com/edx/testeng-ci.git
+          cd $GITHUB_WORKSPACE/testeng-ci
+          pip install -r requirements/base.txt
+      - name: create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
+          GITHUB_USER_EMAIL: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
+        run: |
+          cd $GITHUB_WORKSPACE/testeng-ci
+          python -m jenkins.pull_request_creator --repo-root=$GITHUB_WORKSPACE \
+          --target-branch="${{ env.target_branch }}" --base-branch-name="upgrade-python-requirements" \
+          --commit-message="chore: Updating Python Requirements" --pr-title="Python Requirements Update" \
+          --pr-body="Python requirements update.Please review the [changelogs](https://openedx.atlassian.net/wiki/spaces/TE/pages/1001521320/Python+Package+Changelogs) for the upgraded packages." \
+          --user-reviewers="" --team-reviewers="arbi-bom" --delete-old-pull-requests

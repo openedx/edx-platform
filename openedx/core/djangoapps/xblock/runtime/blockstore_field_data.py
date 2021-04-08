@@ -26,7 +26,7 @@ CHILDREN_INCLUDES = Sentinel('CHILDREN_INCLUDES')  # Key for a pseudo-field that
 MAX_DEFINITIONS_LOADED = 100  # How many of the most recently used XBlocks' field data to keep in memory at max.
 
 
-class BlockInstanceUniqueKey(object):
+class BlockInstanceUniqueKey:
     """
     An empty object used as a unique key for each XBlock instance, see
     get_weak_key_for_block() and BlockstoreFieldData._get_active_block(). Every
@@ -70,7 +70,7 @@ def get_olx_hash_for_definition_key(def_key):
     for entry in files_list:
         if entry.path == def_key.olx_path:
             return entry.hash_digest
-    raise NoSuchDefinition("Could not load OLX file for key {}".format(def_key))
+    raise NoSuchDefinition(f"Could not load OLX file for key {def_key}")
 
 
 class BlockstoreFieldData(FieldData):
@@ -103,7 +103,7 @@ class BlockstoreFieldData(FieldData):
         # (see _get_active_block()) and the value is an ActiveBlock object
         # (which holds olx_hash and changed_fields)
         self.active_blocks = WeakKeyDictionary()
-        super(BlockstoreFieldData, self).__init__()
+        super().__init__()
 
     def _getfield(self, block, name):
         """
@@ -125,7 +125,7 @@ class BlockstoreFieldData(FieldData):
         if name == CHILDREN_INCLUDES:
             return  # This is a pseudo-field used in conjunction with BlockstoreChildrenData
         field = self._getfield(block, name)
-        if field.scope in (Scope.children, Scope.parent):
+        if field.scope in (Scope.children, Scope.parent):  # lint-amnesty, pylint: disable=no-else-raise
             # This field data store is focused on definition-level field data, and children/parent is mostly
             # relevant at the usage level. Scope.parent doesn't even seem to be used?
             raise NotImplementedError("Setting Scope.children/parent is not supported by BlockstoreFieldData.")
@@ -134,7 +134,7 @@ class BlockstoreFieldData(FieldData):
                 raise InvalidScopeError("BlockstoreFieldData only supports UserScope.NONE fields")
             if field.scope.block not in (BlockScope.DEFINITION, BlockScope.USAGE):
                 raise InvalidScopeError(
-                    "BlockstoreFieldData does not support BlockScope.{} fields".format(field.scope.block)
+                    f"BlockstoreFieldData does not support BlockScope.{field.scope.block} fields"
                 )
             # There is also BlockScope.TYPE but we don't need to support that;
             # it's mostly relevant as Scope.preferences(UserScope.ONE, BlockScope.TYPE)
@@ -250,7 +250,7 @@ class BlockstoreFieldData(FieldData):
         as long as they're not in use.
         """
         olx_hashes = set(self.loaded_definitions.keys())
-        olx_hashes_needed = set(entry.olx_hash for entry in self.active_blocks.values())
+        olx_hashes_needed = {entry.olx_hash for entry in self.active_blocks.values()}
 
         olx_hashes_safe_to_delete = olx_hashes - olx_hashes_needed
 
@@ -278,7 +278,7 @@ class BlockstoreChildrenData(FieldData):
         """
         # The data store that holds Scope.usage and Scope.definition data:
         self.authored_data_store = blockstore_field_data
-        super(BlockstoreChildrenData, self).__init__()
+        super().__init__()
 
     def _check_field(self, block, name):  # pylint: disable=unused-argument
         """

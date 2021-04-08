@@ -29,11 +29,11 @@ def parse_xblock_include(include_node):
     # Where "source" and "usage" are optional.
     if include_node.tag != 'xblock-include':
         # xss-lint: disable=python-wrap-html
-        raise BundleFormatException("Expected an <xblock-include /> XML node, but got <{}>".format(include_node.tag))
+        raise BundleFormatException(f"Expected an <xblock-include /> XML node, but got <{include_node.tag}>")
     try:
         definition_path = include_node.attrib['definition']
     except KeyError:
-        raise BundleFormatException("<xblock-include> is missing the required definition=\"...\" attribute")
+        raise BundleFormatException("<xblock-include> is missing the required definition=\"...\" attribute")  # lint-amnesty, pylint: disable=raise-missing-from
     usage_hint = include_node.attrib.get("usage", None)
     link_id = include_node.attrib.get("source", None)
     # This is pointing to another definition in the same bundle. It looks like:
@@ -41,7 +41,7 @@ def parse_xblock_include(include_node):
     try:
         block_type, definition_id = definition_path.split("/")
     except ValueError:
-        raise BundleFormatException("Invalid definition attribute: {}".format(definition_path))
+        raise BundleFormatException(f"Invalid definition attribute: {definition_path}")  # lint-amnesty, pylint: disable=raise-missing-from
     return XBlockInclude(link_id=link_id, block_type=block_type, definition_id=definition_id, usage_hint=usage_hint)
 
 
@@ -69,18 +69,18 @@ def definition_for_include(parsed_include, parent_definition_key):
         try:
             link = links[parsed_include.link_id]
         except KeyError:
-            raise BundleFormatException("Link not found: {}".format(parsed_include.link_id))
+            raise BundleFormatException(f"Link not found: {parsed_include.link_id}")  # lint-amnesty, pylint: disable=raise-missing-from
         return BundleDefinitionLocator(
             bundle_uuid=link.bundle_uuid,
             block_type=parsed_include.block_type,
-            olx_path="{}/{}/definition.xml".format(parsed_include.block_type, parsed_include.definition_id),
+            olx_path=f"{parsed_include.block_type}/{parsed_include.definition_id}/definition.xml",
             bundle_version=link.version,
         )
     else:
         return BundleDefinitionLocator(
             bundle_uuid=parent_definition_key.bundle_uuid,
             block_type=parsed_include.block_type,
-            olx_path="{}/{}/definition.xml".format(parsed_include.block_type, parsed_include.definition_id),
+            olx_path=f"{parsed_include.block_type}/{parsed_include.definition_id}/definition.xml",
             bundle_version=parent_definition_key.bundle_version,
             draft_name=parent_definition_key.draft_name,
         )

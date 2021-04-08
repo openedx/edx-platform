@@ -57,24 +57,24 @@ class TestWelcomeMessageView(BaseCourseUpdatesTestCase):
         self.create_course_update('Second Update', date='January 1, 2017')
         self.create_course_update('Retroactive Update', date='January 1, 2010')
         response = self.client.get(url_generator(self.course))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'Second Update')
         self.assertContains(response, 'Dismiss')
 
     @ddt.data(welcome_message_url, latest_update_url)
     def test_empty_message(self, url_generator):
         response = self.client.get(url_generator(self.course))
-        self.assertEqual(response.status_code, 204)
+        assert response.status_code == 204
 
     def test_dismiss_welcome_message(self):
         # Latest update is dimssed in JS and has no server/backend component.
         self.create_course_update('First Update')
 
         response = self.client.get(welcome_message_url(self.course))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         self.assertContains(response, 'First Update')
 
         self.client.post(dismiss_message_url(self.course))
         response = self.client.get(welcome_message_url(self.course))
-        self.assertNotIn('First Update', response)
-        self.assertEqual(response.status_code, 204)
+        assert 'First Update' not in response
+        assert response.status_code == 204

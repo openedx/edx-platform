@@ -1,13 +1,11 @@
 """
 Receivers of signals sent from django-user-tasks
 """
-
-
 import logging
+from urllib.parse import urljoin
 
 from django.dispatch import receiver
 from django.urls import reverse
-from six.moves.urllib.parse import urljoin
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped
 
@@ -33,7 +31,6 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         None
     """
     status = kwargs['status']
-
     # Only send email when the entire task is complete, should only send when
     # a chain / chord / etc completes, not on sub-tasks.
     if status.parent is None:
@@ -47,8 +44,10 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
                 reverse('usertaskstatus-detail', args=[status.uuid])
             )
 
+        user_email = status.user.email
+        task_name = status.name.lower()
         try:
             # Need to str state_text here because it is a proxy object and won't serialize correctly
-            send_task_complete_email.delay(status.name.lower(), str(status.state_text), status.user.email, detail_url)
+            send_task_complete_email.delay(task_name, str(status.state_text), user_email, detail_url)
         except Exception:  # pylint: disable=broad-except
             LOGGER.exception("Unable to queue send_task_complete_email")

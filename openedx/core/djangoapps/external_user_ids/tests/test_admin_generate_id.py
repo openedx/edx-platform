@@ -1,7 +1,7 @@
-# """
-# Test the logic behind the Generate External IDs tools in Admin
-# """
-import mock
+"""
+Test the logic behind the Generate External IDs tools in Admin
+"""
+from unittest import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 from common.djangoapps.student.tests.factories import UserFactory
@@ -18,7 +18,7 @@ class TestGenerateExternalIds(TestCase):
     Test generating ExternalIDs for Users.
     """
     def setUp(self):
-        super(TestGenerateExternalIds, self).setUp()
+        super().setUp()
         self.users = UserFactory.create_batch(10)
         self.user_id_list = [user.id for user in self.users]
         self.external_id_admin = ExternalIdAdmin(ExternalId, AdminSite())

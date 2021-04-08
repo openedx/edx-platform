@@ -24,7 +24,7 @@ Note: we're using old-style syntax for attrs because we need to support Python
 TODO: Validate all datetimes to be UTC.
 """
 import logging
-from datetime import datetime, timezone
+from datetime import datetime  # lint-amnesty, pylint: disable=unused-import
 from enum import Enum
 from typing import Dict, List, Optional, Set
 
@@ -47,7 +47,23 @@ class ObjectDoesNotExist(Exception):
     Imitating Django model conventions, we put a subclass of this in some of our
     data classes to indicate when something is not found.
     """
-    pass
+    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+@attr.s(frozen=True)
+class ContentErrorData:
+    """
+    A human-readable description of something wrong with the content, to ease
+    the debugging of content issues–especially ones where content had to be
+    skipped because it was somehow malformed. The messages should be
+    comprehensible to course teams and support staff.
+
+    Errors can refer to things that are not anywhere in the outline, such as
+    when things don't show up where we expect then to be and we omit them from
+    the outline (unknown tag types, sequences where we expect sections, etc.)
+    """
+    message = attr.ib(type=str)
+    usage_key = attr.ib(type=Optional[UsageKey], default=None)
 
 
 @attr.s(frozen=True)
@@ -59,13 +75,26 @@ class VisibilityData:
     # lets you define a Sequence that is reachable by direct URL but not shown
     # in Course navigation. It was used for things like supplementary tutorials
     # that were not considered a part of the normal course path.
-    hide_from_toc = attr.ib(type=bool)
+    hide_from_toc = attr.ib(type=bool, default=False)
 
     # Restrict visibility to course staff, regardless of start date. This is
     # often used to hide content that either still being built out, or is a
     # scratch space of content that will eventually be copied over to other
     # sequences.
-    visible_to_staff_only = attr.ib(type=bool)
+    visible_to_staff_only = attr.ib(type=bool, default=False)
+
+
+@attr.s(frozen=True)
+class ExamData:
+    """
+    XBlock attributes that describe exams
+    """
+    is_practice_exam = attr.ib(type=bool, default=False)
+    is_proctored_enabled = attr.ib(type=bool, default=False)
+    is_time_limited = attr.ib(type=bool, default=False)
+
+    def __bool__(self):
+        return self.is_practice_exam or self.is_proctored_enabled or self.is_time_limited
 
 
 @attr.s(frozen=True)
@@ -80,9 +109,9 @@ class CourseLearningSequenceData:
     """
     usage_key = attr.ib(type=UsageKey)
     title = attr.ib(type=str)
-    visibility = attr.ib(type=VisibilityData)
-
-    inaccessible_after_due = attr.ib(type=bool, default=True)
+    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
+    exam = attr.ib(type=ExamData, default=ExamData())
+    inaccessible_after_due = attr.ib(type=bool, default=False)
 
 
 @attr.s(frozen=True)
@@ -147,12 +176,15 @@ class CourseOutlineData:
 
     course_visibility = attr.ib(validator=attr.validators.in_(CourseVisibility))
 
+    # Entrance Exam ID
+    entrance_exam_id = attr.ib(type=str)
+
     def __attrs_post_init__(self):
         """Post-init hook that validates and inits the `sequences` field."""
         sequences = {}
         for section in self.sections:
             for seq in section.sequences:
-                if seq.usage_key in sequences:
+                if seq.usage_key in sequences:  # lint-amnesty, pylint: disable=no-else-raise
                     raise ValueError(
                         "Sequence {} appears in more than one Section."
                         .format(seq.usage_key)
@@ -204,7 +236,7 @@ class CourseOutlineData:
         )
 
     @days_early_for_beta.validator
-    def validate_days_early_for_beta(self, attribute, value):
+    def validate_days_early_for_beta(self, attribute, value):  # lint-amnesty, pylint: disable=unused-argument
         """
         Ensure that days_early_for_beta isn't negative.
         """
@@ -239,6 +271,14 @@ class ScheduleData:
     course_end = attr.ib(type=Optional[datetime])
     sections = attr.ib(type=Dict[UsageKey, ScheduleItemData])
     sequences = attr.ib(type=Dict[UsageKey, ScheduleItemData])
+
+
+@attr.s(frozen=True)
+class SpecialExamAttemptData:
+    """
+    Overall special exam attempt data.
+    """
+    sequences = attr.ib(type=Dict[UsageKey, Dict])
 
 
 @attr.s(frozen=True)
@@ -288,3 +328,4 @@ class UserCourseOutlineDetailsData:
     """
     outline = attr.ib(type=UserCourseOutlineData)
     schedule = attr.ib(type=ScheduleData)
+    special_exam_attempts = attr.ib(type=SpecialExamAttemptData)

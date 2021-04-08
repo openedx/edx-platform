@@ -12,14 +12,14 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 
 class ScheduleExperienceFactory(factory.DjangoModelFactory):
-    class Meta(object):
+    class Meta:
         model = models.ScheduleExperience
 
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
-class ScheduleFactory(factory.DjangoModelFactory):
-    class Meta(object):
+class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = models.Schedule
 
     start_date = factory.Faker('future_datetime', tzinfo=pytz.UTC)
@@ -28,16 +28,14 @@ class ScheduleFactory(factory.DjangoModelFactory):
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
-class ScheduleConfigFactory(factory.DjangoModelFactory):
-    class Meta(object):
+class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta:
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
-    create_schedules = True
     enqueue_recurring_nudge = True
     deliver_recurring_nudge = True
     enqueue_upgrade_reminder = True
     deliver_upgrade_reminder = True
     enqueue_course_update = True
     deliver_course_update = True
-    hold_back_ratio = 0

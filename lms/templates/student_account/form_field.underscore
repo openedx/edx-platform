@@ -75,7 +75,7 @@
             </div>
         <% } %>
     <% } else if (type === 'plaintext' ) { %>
-            <span class="plaintext-field"><%= HtmlUtils.HTML(label) %></span>
+            <span class="plaintext-field honor_tos_combined"><%= HtmlUtils.HTML(label) %></span>
             <input id="<%- form %>-<%- name %>"
                type="hidden"
                name="<%- name %>"
@@ -136,7 +136,9 @@
         <button type="button" class="login-help field-link"><i class="fa fa-caret-right" /><%- gettext("Need help signing in?") %></button>
         <div id="login-help" style="display:none">
             <button type="button" class="field-link form-toggle" data-type="password-reset"><%- gettext("Forgot my password") %></button>
-            <span><a class="field-link" href="https://support.edx.org/hc/en-us/sections/115004153367-Solve-a-Sign-in-Problem"><%- gettext("Other sign-in issues") %></a></span>
+            <% if ( loginIssueSupportLink ) { %>
+                <span><a class="field-link" href="<%- loginIssueSupportLink %>"><%- gettext("Other sign-in issues") %></a></span>
+            <% } %>
         </div>
         <button type="button" class="enterprise-login field-link"><%- gettext("Sign in with your company or school") %></button>
     <% } %>
@@ -144,7 +146,9 @@
         <button type="button" class="reset-help field-link" ><i class="fa fa-caret-right" /><%- gettext("Need other help signing in?") %></button>
         <div id="reset-help" style="display:none">
             <button type="button" class="field-link form-toggle" data-type="register"><%- gettext("Create an account") %></button>
-            <span><a  class="field-link" href="https://support.edx.org/hc/en-us/sections/115004153367-Solve-a-Sign-in-Problem"><%- gettext("Other sign-in issues") %></a></span>
+            <% if ( loginIssueSupportLink ) { %>
+                <span><a  class="field-link" href="<%- loginIssueSupportLink %>"><%- gettext("Other sign-in issues") %></a></span>
+            <% } %>
         </div>
     <% } %>
 </div>

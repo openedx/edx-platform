@@ -1,23 +1,28 @@
 """
-Module for generating certificate for a user
+Tasks that generate a course certificate for a user
 """
-
 
 from logging import getLogger
 
-from celery import task
+from celery import shared_task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
+from lms.djangoapps.certificates.generation import (
+    generate_course_certificate,
+    generate_user_certificates
+)
 from lms.djangoapps.verify_student.services import IDVerificationService
 
-from .api import generate_user_certificates
+log = getLogger(__name__)
+User = get_user_model()
+CERTIFICATE_DELAY_SECONDS = 2
 
-logger = getLogger(__name__)
 
-
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
+@shared_task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
+@set_code_owner_attribute
 def generate_certificate(self, **kwargs):
     """
     Generates a certificate for a single user.
@@ -31,19 +36,29 @@ def generate_certificate(self, **kwargs):
             that the actual verification status is as expected before
             generating a certificate, in the off chance that the database
             has not yet updated with the user's new verification status.
+        - v2_certificate: A flag indicating whether to generate a v2 course certificate
+        - generation_mode: Only used when emitting an event for V2 certificates. Options are "self" (implying the user
+            generated the cert themself) and "batch" for everything else.
     """
     original_kwargs = kwargs.copy()
     student = User.objects.get(id=kwargs.pop('student'))
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     expected_verification_status = kwargs.pop('expected_verification_status', None)
+    v2_certificate = kwargs.pop('v2_certificate', False)
+    generation_mode = kwargs.pop('generation_mode', 'batch')
+
+    if v2_certificate:
+        generate_course_certificate(user=student, course_key=course_key, generation_mode=generation_mode)
+        return
+
     if expected_verification_status:
         actual_verification_status = IDVerificationService.user_status(student)
         actual_verification_status = actual_verification_status['status']
         if expected_verification_status != actual_verification_status:
-            logger.warning(
-                u'Expected verification status {expected} '
-                u'differs from actual verification status {actual} '
-                u'for user {user} in course {course}'.format(
+            log.warning(
+                'Expected verification status {expected} '
+                'differs from actual verification status {actual} '
+                'for user {user} in course {course}'.format(
                     expected=expected_verification_status,
                     actual=actual_verification_status,
                     user=student.id,

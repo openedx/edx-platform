@@ -15,28 +15,28 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <div class="footer-content-primary">
       <div class="colophon">
-        <p>&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+        <p>&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} <a href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
       </div>
 
         <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
             % if is_marketing_link_set('TOS'):
               <li class="nav-item nav-peripheral-tos">
-                <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+                <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
               </li>
             % endif
             % if is_marketing_link_set('PRIVACY'):
               <li class="nav-item nav-peripheral-pp">
-                <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+                <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
               </li>
             % endif
             % if waffle().is_enabled(ENABLE_ACCESSIBILITY_POLICY_PAGE):
               <li class="nav-item nav-peripheral-aar">
-                <a data-rel="edx.org" href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
+                <a href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
               </li>
             %endif
             <li class="nav-item">
-              <a data-rel="edx.org" id="lms-link" href="${settings.LMS_ROOT_URL}">${_("LMS")}</a>
+              <a id="lms-link" href="${settings.LMS_ROOT_URL}">${_("LMS")}</a>
             </li>
           </ol>
         </nav>
@@ -48,7 +48,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <p>
           ## Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
           ${Text(_("edX, Open edX, and the edX and Open edX logos are registered trademarks of {link_start}edX Inc.{link_end}")).format(
-            link_start=HTML(u"<a data-rel='edx.org' href='https://www.edx.org/'>"),
+            link_start=HTML(u"<a href='https://www.edx.org/'>"),
             link_end=HTML(u"</a>")
           )}
         </p>
@@ -56,7 +56,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       <div class="footer-about-openedx">
         <a href="https://open.edx.org" title="${_("Powered by Open edX")}">
-          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/open-edx-logo-tag.png">
         </a>
       </div>
     </div>

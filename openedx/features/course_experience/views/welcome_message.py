@@ -1,4 +1,4 @@
-"""
+"""  # lint-amnesty, pylint: disable=cyclic-import
 View logic for handling course welcome messages.
 """
 
@@ -23,7 +23,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
     A fragment that displays a course's welcome message.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Renders the welcome message fragment for the specified course.
 

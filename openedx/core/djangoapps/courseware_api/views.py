@@ -4,11 +4,10 @@ Course API Views
 
 import json
 
-from babel.numbers import get_currency_symbol
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
-from django.conf import settings
 from django.urls import reverse
+from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
@@ -20,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -28,30 +28,34 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.access_response import (
     CoursewareMicrofrontendDisabledAccessError,
 )
+from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access, get_course_by_id
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import REDIRECT_TO_COURSEWARE_MICROFRONTEND, course_exit_page_is_active
-from lms.djangoapps.courseware.utils import can_show_verified_upgrade
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible, course_exit_page_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_duration_limits.access import (
-    get_user_course_expiration_date, generate_course_expired_message
-)
-from openedx.features.discounts.utils import generate_offer_html
+from openedx.features.course_duration_limits.access import get_access_expiration_data
+from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import (
-    CourseEnrollment, CourseEnrollmentCelebration, LinkedInAddToProfileConfiguration
+    CourseEnrollment,
+    CourseEnrollmentCelebration,
+    LinkedInAddToProfileConfiguration,
+    UserCelebration
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from .serializers import CourseInfoSerializer
+from .utils import serialize_upgrade_info
 
 
 class CoursewareMeta:
@@ -65,47 +69,42 @@ class CoursewareMeta:
             username or self.request.user.username,
             course_key,
         )
+        # We must compute course load access *before* setting up masquerading,
+        # else course staff (who are not enrolled) will not be able view
+        # their course from the perspective of a learner.
+        self.load_access = check_course_access(
+            self.overview,
+            self.request.user,
+            'load',
+            check_if_enrolled=True,
+            check_survey_complete=False,
+            check_if_authenticated=True,
+        )
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
             course_key,
             staff_access=self.original_user_is_staff,
         )
+        self.request.user = self.effective_user
         self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
-                                                                 select_related=['celebration'])
+                                                                 select_related=['celebration', 'user__celebration'])
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
 
     def is_microfrontend_enabled_for_user(self):
         """
-        This method is the "opposite" of _redirect_to_learning_mfe in
-        lms/djangoapps/courseware/views/index.py. But not exactly...
-
-        1. It needs to respect the global
-           ENABLE_COURSEWARE_MICROFRONTEND feature flag and redirect users
-           out of the MFE experience if it's turned off.
-        2. It needs to redirect for old Mongo courses.
-        3. It does NOT need to worry about exams - the MFE will handle
-           those on its own. As of this writing, it will redirect back to
-           the LMS experience, but that may change soon.
-        4. Finally, it needs to redirect users who are bucketed out of
-           the MFE experience, but who aren't staff. Staff are allowed to
-           stay.
+        Can this user see the MFE for this course?
         """
-        # REDIRECT: feature disabled globally
-        if not settings.FEATURES.get('ENABLE_COURSEWARE_MICROFRONTEND'):
-            return False
-        # REDIRECT: Old Mongo courses, until removed from platform
-        if self.course_key.deprecated:
-            return False
-        # REDIRECT: If the user isn't staff, redirect if they're bucketed into the old LMS experience.
-        if not self.original_user_is_staff and not REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(self.course_key):
-            return False
-        # STAY: If the user has made it past all the above, they're good to stay!
-        return True
+        return courseware_mfe_is_visible(
+            course_key=self.course_key,
+            is_global_staff=self.original_user_is_global_staff,
+            is_course_staff=self.original_user_is_staff
+        )
 
     @property
     def enrollment(self):
@@ -121,14 +120,12 @@ class CoursewareMeta:
         return {'mode': mode, 'is_active': is_active}
 
     @property
-    def course_expired_message(self):
-        # TODO: TNL-7185 Legacy: Refactor to return the expiration date and format the message in the MFE
-        return generate_course_expired_message(self.effective_user, self.overview)
+    def access_expiration(self):
+        return get_access_expiration_data(self.effective_user, self.overview)
 
     @property
-    def offer_html(self):
-        # TODO: TNL-7185 Legacy: Refactor to return the offer data and format the message in the MFE
-        return generate_offer_html(self.effective_user, self.overview)
+    def offer(self):
+        return generate_offer_data(self.effective_user, self.overview)
 
     @property
     def content_type_gating_enabled(self):
@@ -147,21 +144,18 @@ class CoursewareMeta:
         return course.license
 
     @property
-    def can_load_courseware(self):
-        access_response = check_course_access(
-            self.overview,
-            self.effective_user,
-            'load',
-            check_if_enrolled=True,
-            check_survey_complete=False,
-            check_if_authenticated=True,
-        ).to_json()
+    def can_load_courseware(self) -> dict:
+        """
+        Can the user load this course in the learning micro-frontend?
+
+        Return a JSON-friendly access response.
+        """
         # Only check whether the MFE is enabled if the user would otherwise be allowed to see it
         # This means that if the user was denied access, they'll see a meaningful message first if
         # there is one.
-        if access_response and not self.is_microfrontend_enabled_for_user():
+        if self.load_access and not self.is_microfrontend_enabled_for_user():
             return CoursewareMicrofrontendDisabledAccessError().to_json()
-        return access_response
+        return self.load_access.to_json()
 
     @property
     def tabs(self):
@@ -170,8 +164,9 @@ class CoursewareMeta:
         """
         tabs = []
         for priority, tab in enumerate(get_course_tab_list(self.effective_user, self.overview)):
+            title = tab.title or tab.get('name', '')
             tabs.append({
-                'title': tab.title or tab.get('name', ''),
+                'title': _(title),  # pylint: disable=translation-of-non-string
                 'slug': tab.tab_id,
                 'priority': priority,
                 'type': tab.type,
@@ -184,18 +179,7 @@ class CoursewareMeta:
         """
         Return verified mode information, or None.
         """
-        if not can_show_verified_upgrade(self.effective_user, self.enrollment_object):
-            return None
-
-        mode = CourseMode.verified_mode_for_course(self.course_key)
-        return {
-            'access_expiration_date': get_user_course_expiration_date(self.effective_user, self.overview),
-            'price': mode.min_price,
-            'currency': mode.currency.upper(),
-            'currency_symbol': get_currency_symbol(mode.currency.upper()),
-            'sku': mode.sku,
-            'upgrade_url': verified_upgrade_deadline_link(self.effective_user, self.overview),
-        }
+        return serialize_upgrade_info(self.effective_user, self.overview, self.enrollment_object)
 
     @property
     def notes(self):
@@ -212,8 +196,12 @@ class CoursewareMeta:
         """
         Returns a list of celebrations that should be performed.
         """
+        browser_timezone = self.request.query_params.get('browser_timezone', None)
         return {
             'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
+            'streak_length_to_celebrate': UserCelebration.perform_streak_updates(
+                self.effective_user, self.course_key, browser_timezone
+            ),
         }
 
     @property
@@ -251,9 +239,20 @@ class CoursewareMeta:
         if self.enrollment_object and self.enrollment_object.mode in CourseMode.VERIFIED_MODES:
             verification_status = IDVerificationService.user_status(self.effective_user)['status']
             if verification_status == 'must_reverify':
-                return IDVerificationService.get_verify_location('verify_student_reverify')
+                return IDVerificationService.get_verify_location()
             else:
-                return IDVerificationService.get_verify_location('verify_student_verify_now', self.course_key)
+                return IDVerificationService.get_verify_location(self.course_key)
+
+    @property
+    def verification_status(self):
+        """
+        Returns a String of the verification status of learner.
+        """
+        if self.enrollment_object and self.enrollment_object.mode in CourseMode.VERIFIED_MODES:
+            return IDVerificationService.user_status(self.effective_user)['status']
+        # I know this looks weird (and is), but this is just so it is inline with what the
+        # IDVerificationService.user_status method would return before a verification was created
+        return 'none'
 
     @property
     def linkedin_add_to_profile_url(self):
@@ -281,6 +280,43 @@ class CoursewareMeta:
                 self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
 
+    @property
+    def related_programs(self):
+        """
+        Returns related program data if the effective_user is enrolled.
+        Note: related programs can be None depending on the course.
+        """
+        if self.effective_user.is_anonymous:
+            return
+
+        meter = ProgramProgressMeter(self.request.site, self.effective_user)
+        inverted_programs = meter.invert_programs()
+        related_programs = inverted_programs.get(str(self.course_key))
+
+        if related_programs is None:
+            return
+
+        related_progress = meter.progress(programs=related_programs)
+        progress_by_program = {
+            progress['uuid']: progress for progress in related_progress
+        }
+
+        programs = [{
+            'progress': progress_by_program[program['uuid']],
+            'title': program['title'],
+            'slug': program['type_attrs']['slug'],
+            'url': program['detail_url'],
+            'uuid': program['uuid']
+        } for program in related_programs]
+
+        return programs
+
+    @property
+    def user_timezone(self):
+        """Returns the user's timezone setting (may be None)"""
+        user_timezone_locale = user_timezone_locale_prefs(self.request)
+        return user_timezone_locale['user_timezone']
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -296,9 +332,17 @@ class CoursewareInformation(RetrieveAPIView):
 
         Body consists of the following fields:
 
+        * access_expiration: An object detailing when access to this course will expire
+            * expiration_date: (str) When the access expires, in ISO 8601 notation
+            * masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
+            * upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
+            * upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
         * effort: A textual description of the weekly hours of effort expected
             in the course.
         * end: Date the course ends, in ISO 8601 notation
+        * enrollment: Enrollment status of authenticated user
+            * mode: `audit`, `verified`, etc
+            * is_active: boolean
         * enrollment_end: Date enrollment ends, in ISO 8601 notation
         * enrollment_start: Date enrollment begins, in ISO 8601 notation
         * id: A unique identifier of the course; a serialized representation
@@ -309,7 +353,25 @@ class CoursewareInformation(RetrieveAPIView):
                 * uri: The location of the image
         * name: Name of the course
         * number: Catalog number of the course
+        * offer: An object detailing upgrade discount information
+            * code: (str) Checkout code
+            * expiration_date: (str) Expiration of offer, in ISO 8601 notation
+            * original_price: (str) Full upgrade price without checkout code; includes currency symbol
+            * discounted_price: (str) Upgrade price with checkout code; includes currency symbol
+            * percentage: (int) Amount of discount
+            * upgrade_url: (str) Checkout URL
         * org: Name of the organization that owns the course
+        * related_programs: A list of objects that contains program data related to the given course including:
+            * progress: An object containing program progress:
+                * complete: (int) Number of complete courses in the program (a course is completed if the user has
+                    earned a certificate for any of the nested course runs)
+                * in_progress: (int) Number of courses in the program that are in progress (a course is in progress if
+                    the user has enrolled in any of the nested course runs)
+                * not_started: (int) Number of courses in the program that have not been started
+            * slug: (str) The program type
+            * title: (str) The title of the program
+            * url: (str) The link to the program's landing page
+            * uuid: (str) A unique identifier of the program
         * short_description: A textual description of the course
         * start: Date the course begins, in ISO 8601 notation
         * start_display: Readably formatted start of the course
@@ -319,9 +381,7 @@ class CoursewareInformation(RetrieveAPIView):
             * `"empty"`: no start date is specified
         * pacing: Course pacing. Possible values: instructor, self
         * tabs: Course tabs
-        * enrollment: Enrollment status of authenticated user
-            * mode: `audit`, `verified`, etc
-            * is_active: boolean
+        * user_timezone: User's chosen timezone setting (or null for browser default)
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
@@ -351,6 +411,7 @@ class CoursewareInformation(RetrieveAPIView):
 
     authentication_classes = (
         JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
@@ -380,6 +441,20 @@ class CoursewareInformation(RetrieveAPIView):
         context = super().get_serializer_context()
         context['requested_fields'] = self.request.GET.get('requested_fields', None)
         return context
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        """
+        Return the final response, exposing the 'Date' header for computing relative time to the dates in the data.
+
+        Important dates such as 'access_expiration' are enforced server-side based on correct time; client-side clocks
+        are frequently substantially far off which could lead to inaccurate messaging and incorrect expectations.
+        Therefore, any messaging about those dates should be based on the server time and preferably in relative terms
+        (time remaining); the 'Date' header is a straightforward and generalizable way for client-side code to get this
+        reference.
+        """
+        response = super().finalize_response(request, response, *args, **kwargs)
+        # Adding this header should be moved to global middleware, not just this endpoint
+        return expose_header('Date', response)
 
 
 class SequenceMetadata(DeveloperErrorViewMixin, APIView):
@@ -411,21 +486,34 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    def get(self, request, usage_key_string, *args, **kwargs):
+    def get(self, request, usage_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return response to a GET request.
         """
         try:
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError:
-            raise NotFound("Invalid usage key: '{}'.".format(usage_key_string))
+            raise NotFound(f"Invalid usage key: '{usage_key_string}'.")  # lint-amnesty, pylint: disable=raise-missing-from
+
+        _, request.user = setup_masquerade(
+            request,
+            usage_key.course_key,
+            staff_access=has_access(request.user, 'staff', usage_key.course_key),
+            reset_masquerade_data=True,
+        )
 
         sequence, _ = get_module_by_usage_id(
             self.request,
             str(usage_key.course_key),
             str(usage_key),
-            disable_staff_debug_info=True)
-        return Response(json.loads(sequence.handle_ajax('metadata', None)))
+            disable_staff_debug_info=True,
+            will_recheck_access=True)
+
+        view = STUDENT_VIEW
+        if request.user.is_anonymous:
+            view = PUBLIC_VIEW
+
+        return Response(json.loads(sequence.handle_ajax('metadata', None, view=view)))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):
@@ -462,7 +550,7 @@ class Resume(DeveloperErrorViewMixin, APIView):
     )
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request, course_key_string, *args, **kwargs):
+    def get(self, request, course_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Return response to a GET request.
         """
@@ -511,12 +599,13 @@ class Celebration(DeveloperErrorViewMixin, APIView):
 
     authentication_classes = (
         JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (IsAuthenticated, )
     http_method_names = ['post']
 
-    def post(self, request, course_key_string, *args, **kwargs):
+    def post(self, request, course_key_string, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Handle a POST request.
         """

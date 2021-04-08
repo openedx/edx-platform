@@ -7,7 +7,6 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 from opaque_keys.edx.django.models import CourseKeyField
-from six import text_type
 
 from config_models.models import ConfigurationModel
 from openedx.core.lib.cache_utils import request_cached
@@ -20,7 +19,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
 
     .. no_pii:
     """
-    OVERRIDE_CHOICES = Choices((u'on', _(u'Force On')), (u'off', _(u'Force Off')))
+    OVERRIDE_CHOICES = Choices(('on', _('Force On')), ('off', _('Force Off')))
     ALL_CHOICES = OVERRIDE_CHOICES + Choices('unset')
 
     KEY_FIELDS = ('waffle_flag', 'course_id')
@@ -56,11 +55,11 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
             return effective.override_choice
         return cls.ALL_CHOICES.unset
 
-    class Meta(object):
+    class Meta:
         app_label = "waffle_utils"
         verbose_name = 'Waffle flag course override'
         verbose_name_plural = 'Waffle flag course overrides'
 
     def __str__(self):
         enabled_label = "Enabled" if self.enabled else "Not Enabled"
-        return u"Course '{}': Persistent Grades {}".format(text_type(self.course_id), enabled_label)
+        return "Course '{}': Persistent Grades {}".format(str(self.course_id), enabled_label)

@@ -3,7 +3,6 @@ Serializers for Course Blocks related return objects.
 """
 
 
-import six
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
@@ -12,13 +11,13 @@ from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTrans
 
 from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.block_counts import BlockCountsTransformer
+from .transformers.extra_fields import ExtraFieldsTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 from .transformers.navigation import BlockNavigationTransformer
 from .transformers.student_view import StudentViewTransformer
-from .transformers.extra_fields import ExtraFieldsTransformer
 
 
-class SupportedFieldType(object):
+class SupportedFieldType:
     """
     Metadata about fields supported by different transformers
     """
@@ -46,12 +45,15 @@ class SupportedFieldType(object):
 SUPPORTED_FIELDS = [
     SupportedFieldType('category', requested_field_name='type'),
     SupportedFieldType('display_name', default_value=''),
+    SupportedFieldType('effort_activities'),
+    SupportedFieldType('effort_time'),
     SupportedFieldType('graded'),
     SupportedFieldType('format'),
     SupportedFieldType('start'),
     SupportedFieldType('due'),
     SupportedFieldType('contains_gated_content'),
     SupportedFieldType('has_score'),
+    SupportedFieldType('has_scheduled_content'),
     SupportedFieldType('weight'),
     SupportedFieldType('show_correctness'),
     # 'student_view_data'
@@ -77,11 +79,9 @@ SUPPORTED_FIELDS = [
         VisibilityTransformer,
         requested_field_name='visible_to_staff_only',
     ),
-    SupportedFieldType(
-        BlockCompletionTransformer.COMPLETION,
-        BlockCompletionTransformer,
-        'completion'
-    ),
+    SupportedFieldType(BlockCompletionTransformer.COMPLETION, BlockCompletionTransformer),
+    SupportedFieldType(BlockCompletionTransformer.COMPLETE),
+    SupportedFieldType(BlockCompletionTransformer.RESUME_BLOCK),
 
     *[SupportedFieldType(field_name) for field_name in ExtraFieldsTransformer.get_requested_extra_fields()],
 ]
@@ -95,6 +95,7 @@ FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT = [
     "student_view_url",
     "student_view_multi_device",
     "lms_web_url",
+    "legacy_web_url",
     "type",
     "id",
     "block_counts",
@@ -127,7 +128,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
 
         return value if (value is not None) else default
 
-    def to_representation(self, block_key):
+    def to_representation(self, block_key):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Return a serializable representation of the requested block
         """
@@ -137,17 +138,23 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         authorization_denial_reason = block_structure.get_xblock_field(block_key, 'authorization_denial_reason')
         authorization_denial_message = block_structure.get_xblock_field(block_key, 'authorization_denial_message')
 
+        jump_to_courseware_url = reverse(
+            'jump_to',
+            kwargs={
+                'course_id': str(block_key.course_key),
+                'location': str(block_key),
+            },
+            request=self.context['request'],
+        )
+
         data = {
-            'id': six.text_type(block_key),
-            'block_id': six.text_type(block_key.block_id),
-            'lms_web_url': reverse(
-                'jump_to',
-                kwargs={'course_id': six.text_type(block_key.course_key), 'location': six.text_type(block_key)},
-                request=self.context['request'],
-            ),
+            'id': str(block_key),
+            'block_id': str(block_key.block_id),
+            'lms_web_url': jump_to_courseware_url,
+            'legacy_web_url': jump_to_courseware_url + '?experience=legacy',
             'student_view_url': reverse(
                 'render_xblock',
-                kwargs={'usage_key_string': six.text_type(block_key)},
+                kwargs={'usage_key_string': str(block_key)},
                 request=self.context['request'],
             ),
         }
@@ -155,7 +162,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if settings.FEATURES.get("ENABLE_LTI_PROVIDER") and 'lti_url' in self.context['requested_fields']:
             data['lti_url'] = reverse(
                 'lti_provider_launch',
-                kwargs={'course_id': six.text_type(block_key.course_key), 'usage_id': six.text_type(block_key)},
+                kwargs={'course_id': str(block_key.course_key), 'usage_id': str(block_key)},
                 request=self.context['request'],
             )
 
@@ -175,7 +182,7 @@ class BlockSerializer(serializers.Serializer):  # pylint: disable=abstract-metho
         if 'children' in self.context['requested_fields']:
             children = block_structure.get_children(block_key)
             if children:
-                data['children'] = [six.text_type(child) for child in children]
+                data['children'] = [str(child) for child in children]
 
         if authorization_denial_reason and authorization_denial_message:
             data['authorization_denial_reason'] = authorization_denial_reason
@@ -202,6 +209,6 @@ class BlockDictSerializer(serializers.Serializer):  # pylint: disable=abstract-m
         Serialize to a dictionary of blocks keyed by the block's usage_key.
         """
         return {
-            six.text_type(block_key): BlockSerializer(block_key, context=self.context).data
+            str(block_key): BlockSerializer(block_key, context=self.context).data
             for block_key in structure
         }

@@ -8,8 +8,8 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -77,7 +77,7 @@ class ProctoringExamSettingsTestMixin():
         response = self.make_request(course_id=course_id)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data == {
-            'detail': 'Course with course_id {} does not exist.'.format(course_id)
+            'detail': f'Course with course_id {course_id} does not exist.'
         }
 
 
@@ -256,10 +256,8 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         self.assertDictEqual(response.data, {
             'detail': [{
-                'proctoring_provider': (
-                    '[\"The selected proctoring provider, notvalidprovider, is not a valid provider. '
-                    'Please select from one of [\'test_proctoring_provider\'].\"]'
-                )
+                'proctoring_provider': "The selected proctoring provider, notvalidprovider, is not a valid provider. "
+                                       "Please select from one of ['test_proctoring_provider']."
             }]
         })
 

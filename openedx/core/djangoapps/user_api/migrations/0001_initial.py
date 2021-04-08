@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import django.core.validators
 import django.utils.timezone
 import model_utils.fields
@@ -42,21 +39,21 @@ class Migration(migrations.Migration):
             name='UserPreference',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('key', models.CharField(db_index=True, max_length=255, validators=[django.core.validators.RegexValidator(u'[-_a-zA-Z0-9]+')])),
+                ('key', models.CharField(db_index=True, max_length=255, validators=[django.core.validators.RegexValidator('[-_a-zA-Z0-9]+')])),
                 ('value', models.TextField()),
                 ('user', models.ForeignKey(related_name='preferences', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(
             name='userpreference',
-            unique_together=set([('user', 'key')]),
+            unique_together={('user', 'key')},
         ),
         migrations.AlterUniqueTogether(
             name='userorgtag',
-            unique_together=set([('user', 'org', 'key')]),
+            unique_together={('user', 'org', 'key')},
         ),
         migrations.AlterUniqueTogether(
             name='usercoursetag',
-            unique_together=set([('user', 'course_id', 'key')]),
+            unique_together={('user', 'course_id', 'key')},
         ),
     ]

@@ -5,7 +5,6 @@ Module for checking permissions with the comment_client backend
 
 import logging
 
-import six
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from opaque_keys.edx.keys import CourseKey
 
@@ -19,7 +18,7 @@ from openedx.core.djangoapps.django_comment_common.utils import get_course_discu
 from openedx.core.lib.cache_utils import request_cached
 
 
-def has_permission(user, permission, course_id=None):
+def has_permission(user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     assert isinstance(course_id, (type(None), CourseKey))
     request_cache_dict = DEFAULT_REQUEST_CACHE.data
     cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(
@@ -104,7 +103,7 @@ def _check_condition(user, condition, content):
         try:
             commentable_id = content['commentable_id']
             request_cache_dict = DEFAULT_REQUEST_CACHE.data
-            cache_key = u"django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
+            cache_key = f"django_comment_client.check_team_member.{user.id}.{commentable_id}"
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
             team = get_team(commentable_id)
@@ -138,7 +137,7 @@ def _check_conditions_permissions(user, permissions, course_id, content, user_gr
     """
 
     def test(user, per, operator="or"):
-        if isinstance(per, six.string_types):
+        if isinstance(per, str):
             if per in CONDITIONS:
                 return _check_condition(user, per, content)
             if 'group_' in per:

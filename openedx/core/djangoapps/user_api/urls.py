@@ -4,7 +4,8 @@ Defines the URL routes for this app.
 
 
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import include, url
+from rest_framework import routers
 
 from ..profile_images.views import ProfileImageView
 from .accounts.views import (
@@ -17,6 +18,8 @@ from .accounts.views import (
     LMSAccountRetirementView,
     UsernameReplacementView
 )
+from . import views as user_api_views
+from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView, IDVerificationStatusDetailsView
 
@@ -70,6 +73,10 @@ RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
     'post': 'post',
 })
 
+USER_API_ROUTER = routers.DefaultRouter()
+USER_API_ROUTER.register(r'users', user_api_views.UserViewSet)
+USER_API_ROUTER.register(r'user_prefs', user_api_views.UserPreferenceViewSet)
+
 urlpatterns = [
     url(
         r'^v1/me$',
@@ -82,17 +89,17 @@ urlpatterns = [
         name='accounts_detail_api'
     ),
     url(
-        r'^v1/accounts/{}$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}$',
         ACCOUNT_DETAIL,
         name='accounts_api'
     ),
     url(
-        r'^v1/accounts/{}/image$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}/image$',
         ProfileImageView.as_view(),
         name='accounts_profile_image_api'
     ),
     url(
-        r'^v1/accounts/{}/deactivate/$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}/deactivate/$',
         AccountDeactivationView.as_view(),
         name='accounts_deactivation'
     ),
@@ -102,17 +109,17 @@ urlpatterns = [
         name='deactivate_logout'
     ),
     url(
-        r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}/verification_status/$',
         IDVerificationStatusView.as_view(),
         name='verification_status'
     ),
     url(
-        r'^v1/accounts/{}/verifications/$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}/verifications/$',
         IDVerificationStatusDetailsView.as_view(),
         name='verification_details'
     ),
     url(
-        r'^v1/accounts/{}/retirement_status/$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/accounts/{settings.USERNAME_PATTERN}/retirement_status/$',
         RETIREMENT_RETRIEVE,
         name='accounts_retirement_retrieve'
     ),
@@ -162,13 +169,40 @@ urlpatterns = [
         name='username_replacement'
     ),
     url(
-        r'^v1/preferences/{}$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/preferences/{settings.USERNAME_PATTERN}$',
         PreferencesView.as_view(),
         name='preferences_api'
     ),
     url(
-        r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(settings.USERNAME_PATTERN),
+        fr'^v1/preferences/{settings.USERNAME_PATTERN}/(?P<preference_key>[a-zA-Z0-9_]+)$',
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
+    ),
+    # Moved from user_api/legacy_urls.py
+    url(r'^v1/', include(USER_API_ROUTER.urls)),
+
+    # Moved from user_api/legacy_urls.py
+    url(
+        fr'^v1/preferences/(?P<pref_key>{UserPreference.KEY_REGEX})/users/$',
+        user_api_views.PreferenceUsersListView.as_view()
+    ),
+
+    # Moved from user_api/legacy_urls.py
+    url(
+        r'^v1/forum_roles/(?P<name>[a-zA-Z]+)/users/$',
+        user_api_views.ForumRoleUsersListView.as_view()
+    ),
+
+    # Moved from user_api/legacy_urls.py
+    url(
+        r'^v1/preferences/email_opt_in/$',
+        user_api_views.UpdateEmailOptInPreference.as_view(),
+        name="preferences_email_opt_in"
+    ),
+
+    # Moved from user_api/legacy_urls.py
+    url(
+        r'^v1/preferences/time_zones/$',
+        user_api_views.CountryTimeZoneListView.as_view(),
     ),
 ]

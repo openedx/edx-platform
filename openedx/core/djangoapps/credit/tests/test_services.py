@@ -4,7 +4,6 @@ Tests for the Credit xBlock service
 
 
 import ddt
-import six
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.api.eligibility import set_credit_requirements
@@ -22,7 +21,7 @@ class CreditServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super(CreditServiceTests, self).setUp()
+        super().setUp()
 
         self.service = CreditService()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
@@ -43,7 +42,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         Makes sure that get_credit_state returns None if user_id cannot be found
         """
 
-        self.assertIsNone(self.service.get_credit_state(0, self.course.id))
+        assert self.service.get_credit_state(0, self.course.id) is None
 
     def test_user_not_enrolled(self):
         """
@@ -51,7 +50,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         in the test course
         """
 
-        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+        assert self.service.get_credit_state(self.user.id, self.course.id) is None
 
     def test_inactive_enrollment(self):
         """
@@ -63,7 +62,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         enrollment.is_active = False
         enrollment.save()
 
-        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+        assert self.service.get_credit_state(self.user.id, self.course.id) is None
 
     def test_not_credit_course(self):
         """
@@ -77,8 +76,8 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.credit_course.save()
 
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
-        self.assertIsNotNone(credit_state)
-        self.assertFalse(credit_state['is_credit_course'])
+        assert credit_state is not None
+        assert not credit_state['is_credit_course']
 
     def test_no_profile_name(self):
         """
@@ -90,14 +89,14 @@ class CreditServiceTests(ModuleStoreTestCase):
         profile = UserProfile.objects.get(user_id=self.user.id)
         profile.delete()
 
-        self.assertIsNone(self.service.get_credit_state(self.user.id, self.course.id))
+        assert self.service.get_credit_state(self.user.id, self.course.id) is None
 
     def test_get_and_set_credit_state(self):
         """
         Happy path through the service
         """
 
-        self.assertTrue(self.service.is_credit_course(self.course.id))
+        assert self.service.is_credit_course(self.course.id)
 
         self.enroll()
 
@@ -126,19 +125,19 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
 
-        self.assertIsNotNone(credit_state)
-        self.assertTrue(credit_state['is_credit_course'])
-        self.assertEqual(credit_state['enrollment_mode'], 'verified')
-        self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
-        self.assertEqual(len(credit_state['credit_requirement_status']), 1)
-        self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
-        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
+        assert credit_state is not None
+        assert credit_state['is_credit_course']
+        assert credit_state['enrollment_mode'] == 'verified'
+        assert credit_state['profile_fullname'] == 'Foo Bar'
+        assert len(credit_state['credit_requirement_status']) == 1
+        assert credit_state['credit_requirement_status'][0]['name'] == 'grade'
+        assert credit_state['credit_requirement_status'][0]['status'] == 'satisfied'
 
     def test_remove_credit_requirement_status(self):
         """
         Happy path when deleting the requirement status.
         """
-        self.assertTrue(self.service.is_credit_course(self.course.id))
+        assert self.service.is_credit_course(self.course.id)
 
         self.enroll()
 
@@ -167,7 +166,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         # now the status should be "satisfied" when looking at the credit_requirement_status list
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
-        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], "satisfied")
+        assert credit_state['credit_requirement_status'][0]['status'] == 'satisfied'
 
         # remove the requirement status.
         self.service.remove_credit_requirement_status(
@@ -179,7 +178,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         # now the status should be None when looking at the credit_requirement_status list
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
-        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], None)
+        assert credit_state['credit_requirement_status'][0]['status'] is None
 
     def test_invalid_user(self):
         """
@@ -202,22 +201,22 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
 
         # mark the grade as satisfied
-        retval = self.service.set_credit_requirement_status(
+        retval = self.service.set_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             self.user.id,
             self.course.id,
             'grade',
             'grade'
         )
-        self.assertIsNone(retval)
+        assert retval is None
 
         # remove the requirement status with the invalid user id
-        retval = self.service.remove_credit_requirement_status(
+        retval = self.service.remove_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             0,
             self.course.id,
             'grade',
             'grade'
         )
-        self.assertIsNone(retval)
+        assert retval is None
 
     def test_remove_status_non_credit(self):
         """
@@ -227,7 +226,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         no_credit_course = CourseFactory.create(org='NoCredit', number='NoCredit', display_name='Demo_Course')
 
-        self.assertFalse(self.service.is_credit_course(no_credit_course.id))
+        assert not self.service.is_credit_course(no_credit_course.id)
 
         self.enroll(no_credit_course.id)
 
@@ -241,9 +240,9 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         credit_state = self.service.get_credit_state(self.user.id, no_credit_course.id)
 
-        self.assertIsNotNone(credit_state)
-        self.assertFalse(credit_state['is_credit_course'])
-        self.assertEqual(len(credit_state['credit_requirement_status']), 0)
+        assert credit_state is not None
+        assert not credit_state['is_credit_course']
+        assert len(credit_state['credit_requirement_status']) == 0
 
     def test_course_name(self):
         """
@@ -254,12 +253,12 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         # make sure it is not returned by default
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
-        self.assertNotIn('course_name', credit_state)
+        assert 'course_name' not in credit_state
 
         # now make sure it is in there when we pass in the flag
         credit_state = self.service.get_credit_state(self.user.id, self.course.id, return_course_info=True)
-        self.assertIn('course_name', credit_state)
-        self.assertEqual(credit_state['course_name'], self.course.display_name)
+        assert 'course_name' in credit_state
+        assert credit_state['course_name'] == self.course.display_name
 
     def test_set_status_non_credit(self):
         """
@@ -269,7 +268,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         no_credit_course = CourseFactory.create(org='NoCredit', number='NoCredit', display_name='Demo_Course')
 
-        self.assertFalse(self.service.is_credit_course(no_credit_course.id))
+        assert not self.service.is_credit_course(no_credit_course.id)
 
         self.enroll(no_credit_course.id)
 
@@ -283,9 +282,9 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         credit_state = self.service.get_credit_state(self.user.id, no_credit_course.id)
 
-        self.assertIsNotNone(credit_state)
-        self.assertFalse(credit_state['is_credit_course'])
-        self.assertEqual(len(credit_state['credit_requirement_status']), 0)
+        assert credit_state is not None
+        assert not credit_state['is_credit_course']
+        assert len(credit_state['credit_requirement_status']) == 0
 
     @ddt.data(
         CourseMode.AUDIT,
@@ -323,11 +322,11 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
         # Verify credit requirement status for user in the course should be None.
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
-        self.assertIsNotNone(credit_state)
-        self.assertEqual(credit_state['enrollment_mode'], mode)
-        self.assertEqual(len(credit_state['credit_requirement_status']), 1)
-        self.assertIsNone(credit_state['credit_requirement_status'][0]['status'])
-        self.assertIsNone(credit_state['credit_requirement_status'][0]['status_date'])
+        assert credit_state is not None
+        assert credit_state['enrollment_mode'] == mode
+        assert len(credit_state['credit_requirement_status']) == 1
+        assert credit_state['credit_requirement_status'][0]['status'] is None
+        assert credit_state['credit_requirement_status'][0]['status_date'] is None
 
     def test_bad_user(self):
         """
@@ -350,13 +349,13 @@ class CreditServiceTests(ModuleStoreTestCase):
         )
 
         # mark the grade as satisfied
-        retval = self.service.set_credit_requirement_status(
+        retval = self.service.set_credit_requirement_status(  # lint-amnesty, pylint: disable=assignment-from-none
             0,
             self.course.id,
             'grade',
             'grade'
         )
-        self.assertIsNone(retval)
+        assert retval is None
 
     def test_course_id_string(self):
         """
@@ -383,16 +382,16 @@ class CreditServiceTests(ModuleStoreTestCase):
         # mark the grade as satisfied
         self.service.set_credit_requirement_status(
             self.user.id,
-            six.text_type(self.course.id),
+            str(self.course.id),
             'grade',
             'grade'
         )
 
-        credit_state = self.service.get_credit_state(self.user.id, six.text_type(self.course.id))
+        credit_state = self.service.get_credit_state(self.user.id, str(self.course.id))
 
-        self.assertIsNotNone(credit_state)
-        self.assertEqual(credit_state['enrollment_mode'], 'verified')
-        self.assertEqual(credit_state['profile_fullname'], 'Foo Bar')
-        self.assertEqual(len(credit_state['credit_requirement_status']), 1)
-        self.assertEqual(credit_state['credit_requirement_status'][0]['name'], 'grade')
-        self.assertEqual(credit_state['credit_requirement_status'][0]['status'], 'satisfied')
+        assert credit_state is not None
+        assert credit_state['enrollment_mode'] == 'verified'
+        assert credit_state['profile_fullname'] == 'Foo Bar'
+        assert len(credit_state['credit_requirement_status']) == 1
+        assert credit_state['credit_requirement_status'][0]['name'] == 'grade'
+        assert credit_state['credit_requirement_status'][0]['status'] == 'satisfied'

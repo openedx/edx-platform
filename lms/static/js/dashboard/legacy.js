@@ -106,7 +106,7 @@
              } else {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
                                                    '{certNameLong} track of {courseName} ({courseNumber})?');
-                 diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed,' +
+                 diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed, ' +
                      'so you will not receive a refund.');
              }
 

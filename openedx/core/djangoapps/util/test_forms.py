@@ -3,7 +3,7 @@ Mixins for testing forms.
 """
 
 
-class FormTestMixin(object):
+class FormTestMixin:
     """A mixin for testing forms"""
     def get_form(self, expected_valid):
         """
@@ -11,7 +11,7 @@ class FormTestMixin(object):
         thereof) according to expected_valid
         """
         form = self.FORM_CLASS(self.form_data, initial=getattr(self, 'initial', None))
-        self.assertEqual(form.is_valid(), expected_valid)
+        assert form.is_valid() == expected_valid
         return form
 
     def assert_error(self, expected_field, expected_message):
@@ -21,7 +21,7 @@ class FormTestMixin(object):
         message
         """
         form = self.get_form(expected_valid=False)
-        self.assertEqual(form.errors, {expected_field: [expected_message]})
+        assert form.errors == {expected_field: [expected_message]}
 
     def assert_valid(self, expected_cleaned_data):
         """
@@ -36,4 +36,4 @@ class FormTestMixin(object):
         that the given field in the cleaned data has the expected value
         """
         form = self.get_form(expected_valid=True)
-        self.assertEqual(form.cleaned_data[field], expected_value)
+        assert form.cleaned_data[field] == expected_value

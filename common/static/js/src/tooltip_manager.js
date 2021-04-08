@@ -8,7 +8,7 @@
         if (!this.tooltip.length) {
             this.tooltip = $('<div />', {
                 class: this.className
-            }).appendTo(this.element);
+            }).appendTo(this.element); // xss-lint: disable=javascript-jquery-insert-into-target
         }
 
         this.hide();
@@ -58,7 +58,7 @@
             pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height() / 2;
             var tooltipText = $(element).attr('data-tooltip');
             this.tooltip
-                .html(tooltipText)
+                .text(tooltipText)
                 .css(this.getCoords(pageX, pageY));
         },
 

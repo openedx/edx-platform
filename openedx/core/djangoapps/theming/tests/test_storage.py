@@ -4,11 +4,11 @@ Tests for comprehensive theme static files storage classes.
 
 
 import re
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
 from django.test import TestCase, override_settings
-from mock import patch
 
 from openedx.core.djangoapps.theming.helpers import Theme, get_theme_base_dir, get_theme_base_dirs
 from openedx.core.djangoapps.theming.storage import ThemeStorage
@@ -23,7 +23,7 @@ class TestStorageLMS(TestCase):
     """
 
     def setUp(self):
-        super(TestStorageLMS, self).setUp()
+        super().setUp()
         self.themes_dir = get_theme_base_dirs()[0]
         self.enabled_theme = "red-theme"
         self.system_dir = settings.REPO_ROOT / "lms"
@@ -40,7 +40,7 @@ class TestStorageLMS(TestCase):
         """
         Verify storage returns True on themed assets
         """
-        self.assertEqual(is_themed, self.storage.themed(asset, self.enabled_theme))
+        assert is_themed == self.storage.themed(asset, self.enabled_theme)
 
     @override_settings(DEBUG=True)
     @ddt.data(
@@ -61,7 +61,7 @@ class TestStorageLMS(TestCase):
             asset_url = re.sub(r"(\.\w+)(\.png|\.ico)$", r"\g<2>", asset_url)
             expected_url = self.storage.base_url + self.enabled_theme + "/" + asset
 
-            self.assertEqual(asset_url, expected_url)
+            assert asset_url == expected_url
 
     @override_settings(DEBUG=True)
     @ddt.data(
@@ -80,4 +80,4 @@ class TestStorageLMS(TestCase):
             returned_path = self.storage.path(asset)
             expected_path = self.themes_dir / self.enabled_theme / "lms/static/" / asset
 
-            self.assertEqual(expected_path, returned_path)
+            assert expected_path == returned_path
