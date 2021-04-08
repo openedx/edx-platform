@@ -832,6 +832,7 @@ XBLOCK_MIXINS = (
     EditInfoMixin,
     AuthoringMixin,
 )
+XBLOCK_EXTRA_MIXINS = ()
 
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
