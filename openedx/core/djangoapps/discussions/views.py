@@ -61,7 +61,7 @@ class DiscussionsConfigurationView(APIView):
                 'provider_type',
             ]
 
-        def to_internal_value(self, data):
+        def to_internal_value(self, data: dict) -> dict:
             """
             Transform the *incoming* primitive data into a native value.
             """
@@ -74,7 +74,7 @@ class DiscussionsConfigurationView(APIView):
             }
             return payload
 
-        def to_representation(self, instance) -> dict:
+        def to_representation(self, instance: DiscussionsConfiguration) -> dict:
             """
             Serialize data into a dictionary, to be used as a response
             """
@@ -101,7 +101,7 @@ class DiscussionsConfigurationView(APIView):
             })
             return payload
 
-        def update(self, instance, validated_data):
+        def update(self, instance: DiscussionsConfiguration, validated_data: dict) -> DiscussionsConfiguration:
             """
             Update and save an existing instance
             """
@@ -130,7 +130,7 @@ class DiscussionsConfigurationView(APIView):
             return instance
 
     # pylint: disable=redefined-builtin
-    def get(self, request, course_key_string, **_kwargs) -> Response:
+    def get(self, request, course_key_string: str, **_kwargs) -> Response:
         """
         Handle HTTP/GET requests
         """
@@ -139,7 +139,7 @@ class DiscussionsConfigurationView(APIView):
         serializer = self.Serializer(configuration)
         return Response(serializer.data)
 
-    def post(self, request, course_key_string, **_kwargs) -> Response:
+    def post(self, request, course_key_string: str, **_kwargs) -> Response:
         """
         Handle HTTP/POST requests
 
