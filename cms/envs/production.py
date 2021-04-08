@@ -537,7 +537,6 @@ SYSTEM_WIDE_ROLE_CLASSES = ENV_TOKENS.get('SYSTEM_WIDE_ROLE_CLASSES') or SYSTEM_
 
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.PRODUCTION)
 
-########################## Derive Any Derived Settings  #######################
+########################## Derive Any Derived Settings #######################
 
 derive_settings(__name__)
-
