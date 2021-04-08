@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
@@ -75,12 +76,28 @@ class Webinar(TimeStampedModel):
         return self.title
 
     def clean(self):
-        if self.start_time > self.end_time:
-            raise ValidationError({'start_time': _('End date must be greater than start date')})
+        """
+        Adding custom validation on start & end time and banner size
+        """
+        super().clean()
+
+        errors = {}
+        if self.start_time and self.start_time < now():
+            errors['start_time'] = _('Start date should be in future')
+
+        if self.end_time and self.end_time < now():
+            errors['end_time'] = _('End date should be in future')
+
+        if self.start_time and self.end_time and self.start_time > self.end_time:
+            errors['start_time'] = _('End date must be greater than start date')
+
         if self.banner:
-            error = validate_file_size(self.banner, BANNER_MAX_SIZE)
-            if error:
-                raise ValidationError({'banner': error})
+            error_message = validate_file_size(self.banner, BANNER_MAX_SIZE)
+            if error_message:
+                errors['banner'] = error_message
+
+        if errors:
+            raise ValidationError(errors)
 
 
 class WebinarRegistration(TimeStampedModel):
