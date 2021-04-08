@@ -117,7 +117,7 @@ def courseware_mfe_first_section_celebration_is_active(course_key):
     )
 
 
-# .. toggle_name: COURSE_DEFAULT_INVITE_ONLY
+# .. toggle_name: COURSES_INVITE_ONLY
 # .. toggle_implementation: SettingToggle
 # .. toggle_type: feature_flag
 # .. toggle_default: False
@@ -128,5 +128,5 @@ def courseware_mfe_first_section_celebration_is_active(course_key):
 # .. toggle_expiration_date: None
 # .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
 # .. toggle_status: unsupported
-def is_course_default_invite_only_enabled():
-    return SettingToggle("COURSE_DEFAULT_INVITE_ONLY", default=False).is_enabled()
+def is_courses_default_invite_only_enabled():
+    return SettingToggle("COURSES_INVITE_ONLY", default=False).is_enabled()
