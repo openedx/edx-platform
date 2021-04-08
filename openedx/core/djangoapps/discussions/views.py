@@ -41,6 +41,31 @@ class LtiSerializer(serializers.ModelSerializer):
             'version',
         ]
 
+    def to_internal_value(self, data: dict) -> dict:
+        """
+        Transform the incoming primitive data into a native value
+        """
+        data = data or {}
+        payload = {
+            key: value
+            for key, value in data.items()
+            if key in self.Meta.fields
+        }
+        return payload
+
+    def update(self, instance: LtiConfiguration, validated_data: dict) -> LtiConfiguration:
+        """
+        Create/update a model-backed instance
+        """
+        instance = instance or LtiConfiguration()
+        instance.config_store = LtiConfiguration.CONFIG_ON_DB
+        if validated_data:
+            for key, value in validated_data.items():
+                if key in self.Meta.fields:
+                    setattr(instance, key, value)
+            instance.save()
+        return instance
+
 
 @view_auth_classes()
 class DiscussionsConfigurationView(APIView):
@@ -114,19 +139,24 @@ class DiscussionsConfigurationView(APIView):
                 value = validated_data.get(key)
                 if value is not None:
                     setattr(instance, key, value)
+            instance = self._update_lti(instance, validated_data)
+            instance.save()
+            return instance
+
+        def _update_lti(self, instance: DiscussionsConfiguration, validated_data: dict) -> DiscussionsConfiguration:
+            """
+            Update LtiConfiguration
+            """
             lti_configuration_data = validated_data.get('lti_configuration')
             if lti_configuration_data:
-                lti_key = lti_configuration_data.get('lti_1p1_client_key')
-                lti_secret = lti_configuration_data.get('lti_1p1_client_secret')
-                lti_url = lti_configuration_data.get('lti_1p1_launch_url')
-                lti_configuration = instance.lti_configuration or LtiConfiguration()
-                lti_configuration.config_store = LtiConfiguration.CONFIG_ON_DB
-                lti_configuration.lti_1p1_client_key = lti_key
-                lti_configuration.lti_1p1_client_secret = lti_secret
-                lti_configuration.lti_1p1_launch_url = lti_url
-                lti_configuration.save()
-                instance.lti_configuration = lti_configuration
-            instance.save()
+                instance.lti_configuration = instance.lti_configuration or LtiConfiguration()
+                lti_configuration = LtiSerializer(
+                    instance.lti_configuration,
+                    data=lti_configuration_data,
+                    partial=True,
+                )
+                if lti_configuration.is_valid(raise_exception=True):
+                    lti_configuration.save()
             return instance
 
     # pylint: disable=redefined-builtin
