@@ -12,8 +12,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.bulk_email.models import Optout
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher, UsernameDecryptionException
+from openedx.core.lib.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ import logging
 from django.db import migrations
 from django.http import Http404
 
-from lms.djangoapps.courseware.courses import get_course_by_id
+from openedx.core.lib.courses import get_course_by_id
 
 log = logging.getLogger(__name__)
 

@@ -11,7 +11,6 @@ from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.tabs import (
     CourseInfoTab,
     CoursewareTab,
@@ -25,6 +24,7 @@ from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFa
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory

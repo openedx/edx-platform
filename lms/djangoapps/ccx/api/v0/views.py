@@ -28,6 +28,7 @@ from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import SignalHandler
 
 from .paginators import CCXAPIPagination
@@ -70,7 +71,7 @@ def get_valid_course(course_id, is_ccx=False, advanced_course_check=False):
 
     if not is_ccx:
         try:
-            course_object = courses.get_course_by_id(course_key)
+            course_object = get_course_by_id(course_key)
         except Http404:
             log.info('Master Course with ID "%s" not found', course_id)
             return None, None, 'course_id_does_not_exist', status.HTTP_404_NOT_FOUND

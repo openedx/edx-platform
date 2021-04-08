@@ -14,7 +14,6 @@ from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 
-from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.course_groups.cohorts import (
     CourseCohort,
     get_course_cohorts,
@@ -23,6 +22,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)

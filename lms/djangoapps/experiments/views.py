@@ -22,6 +22,7 @@ from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -107,7 +108,7 @@ class UserMetaDataView(APIView):  # lint-amnesty, pylint: disable=missing-class-
             return JsonResponse({'message': message}, status=404)
 
         try:
-            course = courses.get_course_by_id(CourseKey.from_string(course_id))
+            course = get_course_by_id(CourseKey.from_string(course_id))
         except Http404:
             message = "Provided course is not found"
             return JsonResponse({'message': message}, status=404)
