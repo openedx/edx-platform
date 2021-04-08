@@ -905,6 +905,18 @@ FEATURES = {
     # .. toggle_creation_date: 2021-01-27
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
     'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
+
+    # .. toggle_name: FEATURES['ENABLE_BULK_USER_RETIREMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable bulk user retirement through REST API. This is disabled by
+    #   default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-11
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
+    'ENABLE_BULK_USER_RETIREMENT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -3068,6 +3080,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Bulk User Retirement
+    'lms.djangoapps.bulk_user_retirement',
 
     # management of user-triggered async tasks (course import/export, etc.)
     # This is only used by Studio, but is being added here because the

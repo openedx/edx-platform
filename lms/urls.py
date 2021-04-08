@@ -998,3 +998,9 @@ urlpatterns += [
 urlpatterns += [
     url(r'^api/course_experience/', include('openedx.features.course_experience.api.v1.urls')),
 ]
+
+# Bulk User Retirement API urls
+if settings.FEATURES.get('ENABLE_BULK_USER_RETIREMENT'):
+    urlpatterns += [
+        url(r'', include('lms.djangoapps.bulk_user_retirement.urls')),
+    ]
