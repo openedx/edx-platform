@@ -132,7 +132,8 @@ def check_and_send_email_to_course_learners():
             item.save()
         elif course_overview.end_date:
             remaining_days = get_date_diff_in_days(course_overview.end_date)
-            if remaining_days <= 10 and item.status == 0:
+
+            if remaining_days <= settings.COURSE_PROGRESS_REMINDER_EMAIL_DAYS and item.status == 0:
                 log.info("Sending course reminder email to :{}, for:{}".format(data.get("email"),
                                                                                data.get("course_name")))
                 send_reminder_email.delay(data, text_type(item.course_id))

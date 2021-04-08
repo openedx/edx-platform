@@ -934,6 +934,11 @@ MAINTENANCE_BANNER_TEXT = ENV_TOKENS.get('MAINTENANCE_BANNER_TEXT', None)
 ########################## limiting dashboard courses ######################
 DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 
+
+########################## Set Course Progress Reminder Email Days #######################
+
+COURSE_PROGRESS_REMINDER_EMAIL_DAYS = ENV_TOKENS.get('COURSE_PROGRESS_REMINDER_EMAIL_DAYS', 10)
+
 ############################### Plugin Settings ###############################
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
