@@ -1637,6 +1637,7 @@ ALLOWED_DJANGO_SETTINGS_OVERRIDE = [
     'DEFAULT_FROM_EMAIL', 'BULK_EMAIL_DEFAULT_FROM_EMAIL',
     'ECOMMERCE_API_URL', 'FEATURES', 'MKTG_URLS',
     'CREDENTIALS_INTERNAL_SERVICE_URL', 'CREDENTIALS_PUBLIC_SERVICE_URL',
+    'REGISTRATION_EXTRA_FIELDS',
 ]
 
 ENABLE_SUBSCRIPTIONS_ON_RUNTIME_SWITCH = 'enable_subscriptions'
@@ -2880,6 +2881,7 @@ REGISTRATION_FIELD_ORDER = [
     "country",
     "gender",
     "year_of_birth",
+    "phone_number",
     "level_of_education",
     "specialty",
     "profession"

@@ -315,6 +315,7 @@ class RegistrationFormFactory(object):
         "terms_of_service",
         "profession",
         "specialty",
+        "phone_number",
     ]
 
     def _is_field_visible(self, field_name):
@@ -1024,6 +1025,24 @@ class RegistrationFormFactory(object):
             error_messages={
                 "required": error_msg
             },
+        )
+
+    def _add_phone_number_field(self, form_desc, required=False):
+        """
+        Add a Phone Number field to a form description.
+
+        Arguments:
+            form_desc (str): A form description
+            required (bool): Whether this field is required; defaults to False
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Phone Number
+        first_name_label = _(u"Phone Number")
+
+        form_desc.add_field(
+            "phone_number",
+            label=first_name_label,
+            required=required
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
