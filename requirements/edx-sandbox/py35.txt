@@ -11,7 +11,7 @@ chem==1.2.0               # via -r requirements/edx-sandbox/py35.in
 click==7.1.2              # via -r requirements/edx-sandbox/shared.txt, nltk
 cryptography==3.2.1       # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt
 cycler==0.10.0            # via matplotlib
-decorator==5.0.5          # via networkx
+decorator==5.0.6          # via networkx
 joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt, nltk
 kiwisolver==1.1.0         # via -c requirements/edx-sandbox/../constraints.txt, matplotlib
 lxml==4.5.0               # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.txt

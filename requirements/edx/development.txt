@@ -56,7 +56,7 @@ cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requi
 cssselect==1.1.0          # via -r requirements/edx/testing.txt, pyquery
 cssutils==2.2.0           # via -r requirements/edx/testing.txt, pynliner
 ddt==1.4.2                # via -r requirements/edx/testing.txt, xblock-drag-and-drop-v2, xblock-poll
-decorator==5.0.5          # via -r requirements/edx/testing.txt, pycontracts
+decorator==5.0.6          # via -r requirements/edx/testing.txt, pycontracts
 defusedxml==0.7.1         # via -r requirements/edx/testing.txt, djangorestframework-xml, ora2, python3-openid, python3-saml, safe-lxml, social-auth-core
 diff-cover==4.0.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 distlib==0.3.1            # via -r requirements/edx/testing.txt, virtualenv
@@ -99,13 +99,13 @@ django==2.2.20            # via -c https://raw.githubusercontent.com/edx/edx-lin
 djangorestframework-xml==2.0.0  # via -r requirements/edx/testing.txt, edx-enterprise
 djangorestframework==3.12.4  # via -r requirements/edx/testing.txt, django-config-models, django-user-tasks, drf-jwt, drf-yasg, edx-api-doc-tools, edx-completion, edx-drf-extensions, edx-enterprise, edx-organizations, edx-proctoring, edx-submissions, ora2, rest-condition, super-csv
 docopt==0.6.2             # via -r requirements/edx/testing.txt, xmodule
-docutils==0.17            # via -r requirements/edx/testing.txt, botocore, m2r, sphinx
+docutils==0.16            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, -r requirements/edx/testing.txt, botocore, m2r, sphinx
 drf-jwt==1.19.0           # via -r requirements/edx/testing.txt, edx-drf-extensions
 drf-yasg==1.20.0          # via -r requirements/edx/testing.txt, edx-api-doc-tools
 edx-ace==1.1.0            # via -r requirements/edx/testing.txt
 edx-analytics-data-api-client==0.17.0  # via -r requirements/edx/testing.txt
 edx-api-doc-tools==1.4.0  # via -r requirements/edx/testing.txt
-edx-bulk-grades==0.8.7    # via -r requirements/edx/testing.txt, staff-graded-xblock
+edx-bulk-grades==0.8.8    # via -r requirements/edx/testing.txt, staff-graded-xblock
 edx-ccx-keys==1.2.0       # via -r requirements/edx/testing.txt
 edx-celeryutils==1.0.0    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==4.0.3     # via -r requirements/edx/testing.txt
