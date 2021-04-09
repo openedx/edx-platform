@@ -73,8 +73,6 @@ FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
 ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
-    +
-    ['wiki']  # Adding wiki here as it is not an xblock.
 )
 
 
