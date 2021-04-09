@@ -9,6 +9,7 @@ class CourseGradeSerializer(serializers.Serializer):
     """
     Serializer for course grade
     """
+    letter_grade = serializers.CharField()
     percent = serializers.FloatField()
     is_passing = serializers.BooleanField(source='passed')
 

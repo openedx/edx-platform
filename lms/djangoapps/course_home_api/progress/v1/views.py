@@ -49,8 +49,10 @@ class ProgressTabView(RetrieveAPIView):
             incomplete_count: (float) number of incomplete units
             locked_count: (float) number of units where contains_gated_content is True
         course_grade: Object containing the following fields:
-            percent: (float) the user's total graded percent in the course
             is_passing: (bool) whether the user's grade is above the passing grade cutoff
+            letter_grade: (str) the user's letter grade based on the set grade range.
+                                If user is passing, value may be 'A', 'B', 'C', 'D', 'Pass', otherwise none
+            percent: (float) the user's total graded percent in the course
         section_scores: List of serialized Chapters. Each Chapter has the following fields:
             display_name: (str) a str of what the name of the Chapter is for displaying on the site
             subsections: List of serialized Subsections, each has the following fields:
