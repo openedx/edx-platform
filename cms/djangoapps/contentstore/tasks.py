@@ -64,7 +64,7 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml, export_librar
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 from .outlines import update_outline_from_modulestore
-from .toggles import course_import_olx_validation_is_enabled
+from .utils import course_import_olx_validation_is_enabled
 
 User = get_user_model()
 
@@ -691,7 +691,7 @@ def validate_course_olx(courselike_key, course_dir, status):
         return olx_is_valid
     try:
         __, errorstore, __ = olxcleaner.validate(
-            course_dir,
+            filename=course_dir,
             steps=settings.COURSE_OLX_VALIDATION_STAGE,
             ignore=settings.COURSE_OLX_VALIDATION_IGNORE_LIST,
             allowed_xblocks=ALL_ALLOWED_XBLOCKS

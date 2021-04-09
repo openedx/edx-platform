@@ -357,7 +357,8 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
-
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
     # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False

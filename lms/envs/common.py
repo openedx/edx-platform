@@ -65,7 +65,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-
 ENABLE_JASMINE = False
 
 LMS_ROOT_URL = 'https://localhost:18000'
@@ -322,6 +321,8 @@ FEATURES = {
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
 
     # .. toggle_name: FEATURES['DISABLE_HONOR_CERTIFICATES']
     # .. toggle_implementation: DjangoSetting
