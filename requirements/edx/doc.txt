@@ -11,7 +11,7 @@ chardet==4.0.0            # via requests
 click==7.1.2              # via code-annotations
 code-annotations==1.1.1   # via -r requirements/edx/doc.in
 django==2.2.20            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, code-annotations
-docutils==0.17            # via sphinx
+docutils==0.16            # via -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt, sphinx
 edx-sphinx-theme==2.1.0   # via -r requirements/edx/doc.in
 gitdb==4.0.7              # via gitpython
 gitpython==3.1.14         # via -r requirements/edx/doc.in
