@@ -18,7 +18,6 @@ from cms.envs.devstack import (  # lint-amnesty, pylint: disable=unused-import
     UPDATE_SEARCH_INDEX_JOB_QUEUE,
 )
 
-
 # Turn on all the boolean feature flags, so that conditionally included
 # API endpoints will be found.
 for key, value in FEATURES.items():
