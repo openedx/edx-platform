@@ -20,8 +20,6 @@ def _send_webinar_cancellation_emails(webinar_title, webinar_description, webina
     Returns:
         None
     """
-    print(recipient_emails)
-
     context = {
         'webinar_title': webinar_title,
         'webinar_description': webinar_description,
