@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-01-06 21:04+0000\n"
-"PO-Revision-Date: 2021-01-06 21:04:14.982920\n"
+"POT-Creation-Date: 2021-04-08 16:21+0000\n"
+"PO-Revision-Date: 2021-04-08 16:21:23.649627\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.9.0\n"
+"Generated-By: Babel 2.8.1\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -2522,8 +2522,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
+msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2620,8 +2619,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"Enter true or false. If true, the course appears in the list of new courses,"
+" and a New! badge temporarily appears next to the course image."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2982,7 +2981,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
+"Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
 
@@ -5384,6 +5383,25 @@ msgstr ""
 msgid "Course goal updated successfully."
 msgstr ""
 
+#: lms/djangoapps/course_info/models.py
+#: cms/templates/widgets/tabs-aggregator.html
+#: lms/templates/courseware/static_tab.html
+#: lms/templates/courseware/tab-view.html
+msgid "name"
+msgstr ""
+
+#: lms/djangoapps/course_info/models.py
+msgid "sequence"
+msgstr ""
+
+#: lms/djangoapps/course_info/models.py
+msgid "Mostrar"
+msgstr ""
+
+#: lms/djangoapps/course_info/models.py
+msgid "course"
+msgstr ""
+
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
@@ -5523,12 +5541,12 @@ msgid "Course End"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid ""
-"To earn a certificate, you must complete all requirements before this date."
+msgid "After this date, course content will be archived."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "After this date, course content will be archived."
+msgid ""
+"To earn a certificate, you must complete all requirements before this date."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -6123,8 +6141,8 @@ msgid "Good"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to"
+#, python-format, python-brace-format
+msgid "%(comment_username)s replied to {start_tag}%(thread_title)s{end_tag}:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
@@ -11655,12 +11673,6 @@ msgstr ""
 msgid "Send an email to {email}"
 msgstr ""
 
-#: cms/templates/widgets/tabs-aggregator.html
-#: lms/templates/courseware/static_tab.html
-#: lms/templates/courseware/tab-view.html
-msgid "name"
-msgstr ""
-
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
 msgid "Sign Out"
@@ -11974,6 +11986,10 @@ msgid ""
 "But don't worry—it's flexible so you can learn at your own pace. If you "
 "happen to fall behind on our suggested dates, you'll be able to adjust them "
 "to keep yourself on track."
+msgstr ""
+
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
 msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
@@ -15593,32 +15609,24 @@ msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""
-"Sorry! The photos you submitted for ID verification were not accepted, for "
-"the following reason(s):"
+"¡Lo lamentamos! Las fotos que enviaste para verificar tu identidad no fueron"
+" aceptadas, detalles a continuación:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "The photo(s) of you:"
+msgid "Tu fotografía:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of you:"
+msgid "La fotografía de tu ID:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of your ID:"
+msgid "Otras razones:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "Other Reasons:"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "ID Verification FAQ: {faq_url}"
+msgid "Volver a verificar: {reverify_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
@@ -15639,17 +15647,17 @@ msgid "Your order number is: {order_number}"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Hi {full_name}"
+msgid "Hola {full_name},"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
+msgid "¡Felicitaciones! Tu verificación de identidad fue exitosa."
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Tu verificación es válida durante un año. Esta expirará el "
+"{expiration_datetime}."
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -15662,10 +15670,10 @@ msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the ID verification process has "
-"begun.Check for an email from us in the next few days to confirm whether "
-"your verification was successful.You can also check the status of the "
-"verification process on your dashboard."
+"Hemos recibido su información y el proceso de verificación del ID ha "
+"empezado.Revise si tiene un correo electrónico de nosotros en los próximos "
+"días para confirmar si su verificación fue exitosa.También puede revisar el "
+"estado del proceso de verificación en su página de inicio ."
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
