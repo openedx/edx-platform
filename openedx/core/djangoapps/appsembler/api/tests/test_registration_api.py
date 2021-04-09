@@ -7,6 +7,7 @@ These tests adapted from Appsembler enterprise `appsembler_api` tests
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 
 import ddt
@@ -69,6 +70,13 @@ class RegistrationApiViewTests(TestCase):
 
     @ddt.data(True, False, 'True', 'False', 'true', 'false')
     def test_send_activation_email_with_password(self, send_activation_email):
+        """
+        This test makes sure when the API endpoint is called with a password,
+        the send_activation_email parameter is being used properly. Also makes
+        sure when the attribute is True the user remains inactive until the
+        activation is performed through the activation email. It also makes
+        sure the user is automatically activate when the parameter is False.
+        """
         params = {
             'username': 'mr_potato_head',
             'email': 'mr_potato_head@example.com',
@@ -83,10 +91,15 @@ class RegistrationApiViewTests(TestCase):
         with patch('student.views.management.compose_and_send_activation_email', fake_send):
             res = self.client.post(self.url, params)
             self.assertContains(res, 'user_id', status_code=200)
+            new_user = User.objects.get(username=params['username'])
+            assert new_user.is_active != send_activation_email
 
     @ddt.data(True, False, 'True', 'False', 'true', 'false')
     def test_send_activation_email_without_password(self, send_activation_email):
-        """Should not send email. Ignores the `send_activation_email` param
+        """
+        Should not send email. Ignores the `send_activation_email` param. It
+        also makes sure the user remains inactive (is_active=False). The user
+        will be activated after the password is reseted.
         """
         params = {
             'username': 'mr_potato_head',
@@ -98,9 +111,13 @@ class RegistrationApiViewTests(TestCase):
         def fake_send(user, profile, user_registration=None):
             assert False, 'Should not call fake_send when no password'
 
-        with patch('student.views.management.compose_and_send_activation_email', fake_send):
-            res = self.client.post(self.url, params)
-            self.assertContains(res, 'user_id', status_code=200)
+        with patch('openedx.core.djangoapps.user_authn.views.password_reset.get_current_site',
+                   return_value=self.site):
+            with patch('student.views.management.compose_and_send_activation_email', fake_send):
+                res = self.client.post(self.url, params)
+                self.assertContains(res, 'user_id', status_code=200)
+                new_user = User.objects.get(username=params['username'])
+                assert new_user.is_active == False
 
     @ddt.data('username', 'name')
     def test_missing_field(self, field):
