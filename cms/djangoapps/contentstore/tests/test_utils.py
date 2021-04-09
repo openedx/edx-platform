@@ -7,6 +7,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+
 from mock import Mock, mock, patch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
@@ -667,7 +668,7 @@ class ValidateCourseOlxTests(CourseTestCase):
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertTrue(mock_olxcleaner_validate.called)
             patched_log.exception.assert_called_once_with(
-                f'Course import {self.course.id}: CourseOlx Could not be validated')
+                f'Course import {self.course.id}: CourseOlx could not be validated')
 
     def test_no_errors(self, mock_olxcleaner_validate):
         """
@@ -689,7 +690,7 @@ class ValidateCourseOlxTests(CourseTestCase):
     def test_creates_artifact(self, mock_report_errors, mock_report_error_summary, mock_olxcleaner_validate):
         """
         Tests olx validation in case of errors.
-        Verify that in case of olx validation errors, course import does not fail & errors
+        Verify that in case of olx validation errors, course import does fail & errors
         are logged in task artifact.
         """
         errors = [Mock(description='DuplicateURLNameError', level_val=3)]
@@ -703,9 +704,10 @@ class ValidateCourseOlxTests(CourseTestCase):
         mock_report_error_summary.return_value = [f'Errors: {len(errors)}']
 
         with patch(self.LOGGER) as patched_log:
-            self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
+            self.assertFalse(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             patched_log.error.assert_called_once_with(
-                f'Course import {self.course.id}: CourseOlx validation failed')
+                f'Course import {self.course.id}: CourseOlx validation failed.')
+
         task_artifact = UserTaskArtifact.objects.filter(status=self.status, name='OLX_VALIDATION_ERROR').first()
         self.assertIsNotNone(task_artifact)
 

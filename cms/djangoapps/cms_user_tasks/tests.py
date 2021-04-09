@@ -2,6 +2,7 @@
 Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
+import json
 import logging
 from unittest import mock
 from uuid import uuid4
@@ -12,9 +13,12 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
+
+from cms.djangoapps.contentstore.toggles import BYPASS_OLX_FAILURE
 
 from .signals import user_task_stopped
 
@@ -149,6 +153,10 @@ class TestUserTaskStopped(APITestCase):
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
             total_steps=5)
+        cls.olx_validations = {
+            'errors': ["ERROR DuplicateURLNameError: foo bar", "ERROR MissingFile: foo bar"],
+            'warnings': ["WARNING TagMismatch"],
+        }
 
     def setUp(self):
         super().setUp()
@@ -180,6 +188,65 @@ class TestUserTaskStopped(APITestCase):
         self.assertEqual(msg.subject, subject)
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
+
+    def test_email_sent_with_olx_validations(self):
+        """
+        Tests that email is sent with olx validation errors.
+        """
+        self.status.fail('Olx validation failed.')
+
+        __ = UserTaskArtifact.objects.create(
+            status=self.status,
+            name="OLX_VALIDATION_ERROR",
+            text=json.dumps(self.olx_validations)
+        )
+        user_task_stopped.send(sender=UserTaskStatus, status=self.status)
+        subject = "{platform_name} {studio_name}: Task Status Update".format(
+            platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
+        )
+        body_fragments = [
+            f"Your {self.status.name.lower()} task has completed with the status '{self.status.state}'",
+            "Sign in to view the details of your task or download any files created.",
+            "Here are some validations we found with your course content.",
+            "Errors:",
+            *self.olx_validations['errors'],
+            *self.olx_validations['warnings']
+        ]
+
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.subject, subject)
+        for fragment in body_fragments:
+            self.assertIn(fragment, msg.body)
+
+    @override_waffle_flag(BYPASS_OLX_FAILURE, active=True)
+    def test_email_sent_with_olx_validations_with_bypass_flag(self):
+        """
+        Tests that email does not contain olx validation information
+        when bypass waffle flag is on.
+        """
+        __ = UserTaskArtifact.objects.create(
+            status=self.status,
+            name="OLX_VALIDATION_ERROR",
+            text=json.dumps(self.olx_validations)
+        )
+        subject = "{platform_name} {studio_name}: Task Status Update".format(
+            platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
+        )
+        body_fragments = [
+            f"Your {self.status.name.lower()} task has completed with the status",
+            "Sign in to view the details of your task or download any files created.",
+        ]
+
+        user_task_stopped.send(sender=UserTaskStatus, status=self.status)
+
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.subject, subject)
+        for fragment in body_fragments:
+            self.assertIn(fragment, msg.body)
+
+        self.assertNotIn("Here are some validations we found with your course content.", msg.body)
 
     def test_email_not_sent_for_child(self):
         """

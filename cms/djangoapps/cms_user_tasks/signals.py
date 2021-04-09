@@ -9,6 +9,9 @@ from django.urls import reverse
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped
 
+from cms.djangoapps.contentstore.toggles import bypass_olx_failure_enabled
+from cms.djangoapps.contentstore.utils import course_import_olx_validation_is_enabled
+
 from .tasks import send_task_complete_email
 
 LOGGER = logging.getLogger(__name__)
@@ -30,6 +33,19 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
     Returns:
         None
     """
+    def get_olx_validation_from_artifact():
+        """
+        Get olx validation error if available for current task.
+        Returns:
+            olx validation string or None.
+        """
+        if not course_import_olx_validation_is_enabled():
+            return None
+
+        artifact = UserTaskArtifact.objects.filter(status=status, name="OLX_VALIDATION_ERROR").first()
+        if artifact and not bypass_olx_failure_enabled():
+            return artifact.text
+
     status = kwargs['status']
     # Only send email when the entire task is complete, should only send when
     # a chain / chord / etc completes, not on sub-tasks.
@@ -46,8 +62,9 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
 
         user_email = status.user.email
         task_name = status.name.lower()
+        olx_validation_text = get_olx_validation_from_artifact()
+        task_args = [task_name, str(status.state_text), user_email, detail_url, olx_validation_text]
         try:
-            # Need to str state_text here because it is a proxy object and won't serialize correctly
-            send_task_complete_email.delay(task_name, str(status.state_text), user_email, detail_url)
+            send_task_complete_email.delay(*task_args)
         except Exception:  # pylint: disable=broad-except
             LOGGER.exception("Unable to queue send_task_complete_email")

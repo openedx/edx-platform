@@ -35,9 +35,30 @@ SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
     module_name=__name__
 )
 
+# .. toggle_name: bypass_olx_failure
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables bypassing olx validation failures during course import.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2021-04-15
+# .. toggle_target_removal_date: 2021-05-15
+# .. toggle_tickets: TNL-8214
+BYPASS_OLX_FAILURE = LegacyWaffleFlag(
+    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
+    flag_name='bypass_olx_failure',
+    module_name=__name__
+)
+
 
 def split_library_view_on_dashboard():
     """
     check if data new view for library is enabled on studio dashboard.
     """
     return SPLIT_LIBRARY_ON_DASHBOARD.is_enabled()
+
+
+def bypass_olx_failure_enabled():
+    """
+    Check if bypass is enabled for course olx validation errors.
+    """
+    return BYPASS_OLX_FAILURE.is_enabled()
