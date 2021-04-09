@@ -14,7 +14,6 @@ from web_fragments.fragment import Fragment
 
 from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.library_content_module import LibraryContentBlock
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -83,14 +82,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         # pylint: disable=no-member
         for child in child_blocks:
-
-            # Check access for regular question
-            child_has_access_error = getattr(child, 'has_access_error', False)
-
-            # Check access for randomized library question
-            if isinstance(child, LibraryContentBlock):
-                child_has_access_error = child.has_gated_content
-
+            child_has_access_error = self.block_has_access_error(child)
             if context.get('hide_access_error_blocks') and child_has_access_error:
                 continue
             child_block_context = copy(child_context)
@@ -138,6 +130,23 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.initialize_js('VerticalStudentView')
 
         return fragment
+
+    def block_has_access_error(self, block):
+        """
+        Returns whether has_access_error is True for the given block (itself or any child)
+        """
+        # Check its access attribute (regular question will have it set)
+        has_access_error = getattr(block, 'has_access_error', False)
+        if has_access_error:
+            return True
+
+        # Check child nodes if they exist (e.g. randomized library question aka LibraryContentBlock)
+        for child in block.get_children():
+            has_access_error = getattr(child, 'has_access_error', False)
+            if has_access_error:
+                return True
+            has_access_error = self.block_has_access_error(child)
+        return has_access_error
 
     def student_view(self, context):
         """
