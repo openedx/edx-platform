@@ -18,9 +18,6 @@ as they are for non-optimized devstack. Instead, update_assets must be
 invoked each time that changes have been made.
 """
 
-
-import os  # lint-amnesty, pylint: disable=unused-import
-
 ########################## Devstack settings ###################################
 
 from .devstack import *  # pylint: disable=wildcard-import
