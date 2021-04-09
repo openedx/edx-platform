@@ -1,18 +1,20 @@
+"""
+A command for sending reminder emails to students who have not completed graded modules
+"""
 from datetime import datetime, timedelta
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-
 from submissions.models import Submission
-from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
 
-from philu_commands.helpers import generate_course_structure
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.philu_courseware.helpers import get_nth_chapter_link
-from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.onboarding.helpers import get_email_pref_on_demand_course, get_user_anonymous_id
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.ondemand_email_preferences.helpers import get_my_account_link
+from openedx.features.philu_courseware.helpers import get_nth_chapter_link
+from philu_commands.helpers import generate_course_structure
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
 
@@ -23,6 +25,11 @@ ORA_ASSESSMENT_BLOCK = 'openassessment'
 
 
 class Command(BaseCommand):
+    """
+    A command to send reminder emails to those users who haven't completed the scheduled graded module for 10 days.
+    This email will not be sent for those module which don't have at-least one graded sub-section.
+    """
+
     help = """
         Send reminder emails to those users who haven't completed the scheduled graded module for 10 days.
         This email will not be sent for those module which don't have at-least one graded sub-section.
@@ -59,7 +66,7 @@ class Command(BaseCommand):
 
                 try:
                     anonymous_user = get_user_anonymous_id(user, course.id)
-                except Exception as error:
+                except Exception as error:  # pylint: disable=broad-except
                     log.info(error)
                     continue
 
@@ -88,7 +95,7 @@ class Command(BaseCommand):
 
                 latest_submission = response_submissions.first()
 
-                if len(response_submissions) == 0:
+                if response_submissions:
                     if has_inactivity_threshold_reached(enrollment.created.date(), today):
                         send_reminder_email(user, course, course_deadline)
                     continue
@@ -127,6 +134,15 @@ def get_suggested_course_deadline(enrollment_date, chapters):
 
 
 def get_graded_ora_count(oras_block):
+    """
+    Total no of graded ORAs
+
+    Args:
+        oras_block (list): List of ORAs
+
+    Returns:
+        int: No of graded ORAs
+    """
     graded_ora_count = 0
 
     for ora in oras_block:
@@ -137,6 +153,15 @@ def get_graded_ora_count(oras_block):
 
 
 def get_all_ora_blocks(course_struct):
+    """
+    Get all ORA is a course
+
+    Args:
+        course_struct (dict): Course structure dict
+
+    Returns:
+        List: List of ORAs units
+    """
     ora_blocks = []
 
     for block in course_struct['blocks'].itervalues():
@@ -147,6 +172,15 @@ def get_all_ora_blocks(course_struct):
 
 
 def get_last_module_ora(course_blocks):
+    """
+    Get a list of last module ORAs
+
+    Args:
+        course_blocks (dict): Course blocks dict
+
+    Returns:
+        List: List of ORAs units
+    """
     last_module_oras = []
 
     for block in course_blocks.itervalues():
@@ -171,6 +205,7 @@ def get_last_module_ora(course_blocks):
 
 
 def check_for_last_module_submission(oras_list, anonymous_user):
+    # pylint: disable=useless-else-on-loop
     for ora in oras_list:
         try:
             Submission.objects.get(

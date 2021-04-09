@@ -1,9 +1,11 @@
+"""
+A command to get all enrolled user(s) of given course(s) and add them to respective nodebb group
+"""
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
 from nodebb.helpers import get_community_id
 from nodebb.tasks import task_join_group_on_nodebb
@@ -13,6 +15,10 @@ log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to get all enrolled user(s) of given course(s) and add them to respective nodebb group
+    """
+
     help = 'Get all enrolled user(s) of given course(s) and add them to respective nodebb group.'
 
     def add_arguments(self, parser):

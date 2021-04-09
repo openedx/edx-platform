@@ -1,19 +1,23 @@
 """
 Django management command to archive course community on nodeBB.
 """
-from pytz import utc
-from logging import getLogger
 from datetime import datetime, timedelta
+from logging import getLogger
 
 from django.core.management.base import BaseCommand
+from pytz import utc
+
 from lms.djangoapps.branding import get_visible_courses
 from nodebb.helpers import archive_course_community
-
 
 log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to archive course communities on NodeBB
+    """
+
     help = """
     This command picks all courses that end in the past 24 hours and archives the course discussion community for
     it in nodebb (which archives all mini communities)

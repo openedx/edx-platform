@@ -1,11 +1,20 @@
+"""
+A command to update organization metric prompts and sync updates with mailchimp
+"""
+from logging import getLogger
+
 from django.core.management.base import BaseCommand
+
+from lms.djangoapps.onboarding.helpers import (
+    get_current_utc_date,
+    its_been_year,
+    its_been_year_month,
+    its_been_year_six_month,
+    its_been_year_three_month
+)
 from lms.djangoapps.onboarding.models import OrganizationMetricUpdatePrompt
-from lms.djangoapps.onboarding.helpers import get_current_utc_date, its_been_year, its_been_year_month, \
-    its_been_year_three_month, its_been_year_six_month
 from mailchimp_pipeline.signals.handlers import sync_metric_update_prompt_with_mail_chimp
 
-
-from logging import getLogger
 log = getLogger(__name__)
 
 
@@ -27,6 +36,10 @@ def is_prompt_values_are_same(prompt, year, year_month, year_three_month, year_s
 
 
 class Command(BaseCommand):
+    """
+    A command to update organization metric prompts and sync updates with mailchimp
+    """
+
     help = """
     Update Organization Metric Prompts.
     And sync the updates with mailchimp

@@ -1,3 +1,6 @@
+"""
+All test cases for management command `sync_users_with_nodebb`
+"""
 from __future__ import unicode_literals
 
 from django.core.management import call_command
@@ -19,8 +22,9 @@ GET_METHOD = 'GET'
 
 class NodeBBSync(TestCase):
     """
-        Tests for `sync_users_with_nodebb` command.
+    Tests for `sync_users_with_nodebb` command.
     """
+
     nodebb_data = {
         'website': '',
         'last_name': 'Test',
@@ -78,12 +82,13 @@ class NodeBBSync(TestCase):
                                                             ])
         self.assertEqual(self.mocked_pynodebb_request_func.call_count, 5)
 
-    @patch('lms.djangoapps.onboarding.models.UserExtendedProfile.unattended_surveys', return_value=[])
+    @patch('lms.djangoapps.onboarding.models.UserExtendedProfile.unattended_surveys')
     def test_sync_users_with_nodebb_command_without_attended_survey(self, mocked_func_of_model):
         """
         This test case is responsible for testing and the user creation and updating the onboarding survey status
         on nodebb if it doesn't have attended any onboarding surveys.
         """
+        mocked_func_of_model.return_value = []
         self.mocked_pynodebb_request_func.return_value = [HTTP_SUCCESS, []]
         call_command('sync_users_with_nodebb')
         self.mocked_pynodebb_request_func.assert_has_calls([call(POST_METHOD, self.nodebb_api_urls['get_users_data']),

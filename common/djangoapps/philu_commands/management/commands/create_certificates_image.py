@@ -1,3 +1,6 @@
+"""
+A command to create and upload certificate images to s3
+"""
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
@@ -7,6 +10,10 @@ from openedx.features.student_certificates.tasks import task_create_certificate_
 
 
 class Command(BaseCommand):
+    """
+    A command to create and upload certificate images to s3
+    """
+
     help = 'Create and upload(to s3) image(s) of specific certificate(s)'
 
     def add_arguments(self, parser):
@@ -29,11 +36,13 @@ class Command(BaseCommand):
 
         if opt_after:
             after_date = datetime.strptime(opt_after, '%d/%m/%Y')
-            certificates = GeneratedCertificate.objects.filter(created_date__gte=after_date)
+            certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+                created_date__gte=after_date
+            )
         elif opt_uuid:
-            certificates = GeneratedCertificate.objects.filter(verify_uuid__in=opt_uuid)
+            certificates = GeneratedCertificate.objects.filter(verify_uuid__in=opt_uuid)  # pylint: disable=no-member
         else:
-            certificates = GeneratedCertificate.objects.all()
+            certificates = GeneratedCertificate.objects.all()  # pylint: disable=no-member
 
         for certificate in certificates:
             task_create_certificate_img_and_upload_to_s3.delay(verify_uuid=certificate.verify_uuid)

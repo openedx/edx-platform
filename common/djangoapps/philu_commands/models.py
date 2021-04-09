@@ -11,3 +11,6 @@ class CreationFailedUsers(models.Model):
     email = models.EmailField(blank=False)
     is_created = models.BooleanField(default=False)
     is_activated = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return 'CreationFailedUsers: {email}'.format(email=self.email)

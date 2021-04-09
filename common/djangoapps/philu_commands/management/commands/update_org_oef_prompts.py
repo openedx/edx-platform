@@ -1,14 +1,23 @@
+"""
+Command to update organization OEF prompts
+"""
+from logging import getLogger
+
 from django.core.management.base import BaseCommand
+
 from lms.djangoapps.onboarding.helpers import get_current_utc_date, its_been_year
 from oef.models import OrganizationOefUpdatePrompt
 
-from logging import getLogger
 log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to update organization OEF prompts.
+    """
+
     help = """
-    Update Organization Oef Prompts.
+    Update Organization OEF Prompts.
     """
 
     def handle(self, *args, **options):

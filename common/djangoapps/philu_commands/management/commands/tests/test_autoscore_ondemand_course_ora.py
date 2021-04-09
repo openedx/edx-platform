@@ -5,9 +5,9 @@ import factory
 import mock
 import pytest
 from django.core.management import call_command
-
 from openassessment.workflow import api as workflow_api
 from openassessment.workflow.models import AssessmentWorkflow
+
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.features.assessment.tests.factories import SubmissionFactory
 from student.tests.factories import CourseEnrollmentFactory

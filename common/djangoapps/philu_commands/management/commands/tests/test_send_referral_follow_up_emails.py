@@ -1,3 +1,6 @@
+"""
+All test cases for management command `send_referral_follow_up_email`
+"""
 from __future__ import unicode_literals
 
 from datetime import timedelta

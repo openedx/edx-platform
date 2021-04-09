@@ -1,3 +1,7 @@
+"""
+A command to send follow-up referral email to all those contacts which are at least 3 days old, are not registered
+on our platform, and have not received follow-up email.
+"""
 from datetime import timedelta
 
 from django.contrib.auth.models import User
@@ -12,6 +16,11 @@ DAYS_TO_SEND_FOLLOW_UP_EMAIL = 3
 
 
 class Command(BaseCommand):
+    """
+    A command to send follow-up referral email to all those contacts which are at least 3 days old, are not registered
+    on our platform, and have not received follow-up email.
+    """
+
     help = """
     Send follow-up referral email to all those contacts which are at least 3 days old, are not registered on our
     platform, and have not received follow-up email.
