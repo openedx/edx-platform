@@ -21,11 +21,9 @@ from common.djangoapps.student.api import is_user_enrolled_in_course
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task as _can_generate_certificate_task,
-    generate_allowlist_certificate_task as _generate_allowlist_certificate_task,
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
     is_using_certificate_allowlist as _is_using_certificate_allowlist,
-    is_using_certificate_allowlist_and_is_on_allowlist as _is_using_certificate_allowlist_and_is_on_allowlist,
     regenerate_user_certificates as _regenerate_user_certificates
 )
 from lms.djangoapps.certificates.models import (
@@ -62,7 +60,7 @@ def is_passing_status(cert_status):
     return CertificateStatuses.is_passing_status(cert_status)
 
 
-def format_certificate_for_user(username, cert):
+def _format_certificate_for_user(username, cert):
     """
     Helper function to serialize an user certificate.
 
@@ -122,7 +120,7 @@ def get_certificates_for_user(username):
     certs = []
     # Checks if certificates are not None before adding them to list
     for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id"):
-        formatted_cert = format_certificate_for_user(username, cert)
+        formatted_cert = _format_certificate_for_user(username, cert)
         if formatted_cert:
             certs.append(formatted_cert)
     return certs
@@ -148,7 +146,7 @@ def get_certificate_for_user(username, course_key, format_results=True):
         return None
 
     if format_results:
-        return format_certificate_for_user(username, cert)
+        return _format_certificate_for_user(username, cert)
     else:
         return cert
 
@@ -170,7 +168,7 @@ def get_certificates_for_user_by_course_keys(user, course_keys):
         user=user, course_id__in=course_keys
     )
     return {
-        cert.course_id: format_certificate_for_user(user.username, cert)
+        cert.course_id: _format_certificate_for_user(user.username, cert)
         for cert in certs
     }
 
@@ -205,10 +203,6 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
 def regenerate_user_certificates(student, course_key, course=None,
                                  forced_grade=None, template_file=None, insecure=False):
     return _regenerate_user_certificates(student, course_key, course, forced_grade, template_file, insecure)
-
-
-def generate_allowlist_certificate_task(user, course_key):
-    return _generate_allowlist_certificate_task(user, course_key)
 
 
 def can_generate_certificate_task(user, course_key):
@@ -464,7 +458,7 @@ def get_certificate_template(course_key, mode, language):
             mode=mode,
             course_key=course_key
         )
-        template = get_language_specific_template_or_default(language, org_mode_and_key_templates)
+        template = _get_language_specific_template_or_default(language, org_mode_and_key_templates)
 
     # since no template matched that course_key, only consider templates with empty course_key
     empty_course_key_templates = active_templates.filter(course_key=CourseKeyField.Empty)
@@ -473,23 +467,23 @@ def get_certificate_template(course_key, mode, language):
             organization_id=org_id,
             mode=mode
         )
-        template = get_language_specific_template_or_default(language, org_and_mode_templates)
+        template = _get_language_specific_template_or_default(language, org_and_mode_templates)
     if not template and org_id:  # get template by only org
         org_templates = empty_course_key_templates.filter(
             organization_id=org_id,
             mode=None
         )
-        template = get_language_specific_template_or_default(language, org_templates)
+        template = _get_language_specific_template_or_default(language, org_templates)
     if not template and mode:  # get template by only mode
         mode_templates = empty_course_key_templates.filter(
             organization_id=None,
             mode=mode
         )
-        template = get_language_specific_template_or_default(language, mode_templates)
+        template = _get_language_specific_template_or_default(language, mode_templates)
     return template if template else None
 
 
-def get_language_specific_template_or_default(language, templates):
+def _get_language_specific_template_or_default(language, templates):
     """
     Returns templates that match passed in language.
     Returns default templates If no language matches, or language passed is None
@@ -498,22 +492,22 @@ def get_language_specific_template_or_default(language, templates):
 
     language_or_default_templates = list(templates.filter(Q(language=two_letter_language)
                                                           | Q(language=None) | Q(language='')))
-    language_specific_template = get_language_specific_template(two_letter_language,
-                                                                language_or_default_templates)
+    language_specific_template = _get_language_specific_template(two_letter_language,
+                                                                 language_or_default_templates)
     if language_specific_template:
         return language_specific_template
     else:
-        return get_all_languages_or_default_template(language_or_default_templates)
+        return _get_all_languages_or_default_template(language_or_default_templates)
 
 
-def get_language_specific_template(language, templates):
+def _get_language_specific_template(language, templates):
     for template in templates:
         if template.language == language:
             return template
     return None
 
 
-def get_all_languages_or_default_template(templates):
+def _get_all_languages_or_default_template(templates):
     """
     Returns the first template that isn't language specific
     """
@@ -586,15 +580,6 @@ def get_certificate_footer_context():
         data.update({'company_about_url': about})
 
     return data
-
-
-def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-    """
-    Return True if both:
-    1) the course run is using the allowlist, and
-    2) if the user is on the allowlist for this course run
-    """
-    return _is_using_certificate_allowlist_and_is_on_allowlist(user, course_key)
 
 
 def get_allowlisted_users(course_key):
