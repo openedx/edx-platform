@@ -19,7 +19,8 @@ class WebinarAdmin(admin.ModelAdmin):
     list_display = ('title', 'start_time', 'presenter', 'status',)
     list_filter = ('start_time', 'status', 'language',)
     search_fields = ('title',)
-    readonly_fields = ('created_by', 'modified_by',)
+    raw_id_fields = ('presenter', 'co_hosts', 'panelists')
+    readonly_fields = ('created_by', 'modified_by', 'status',)
     filter_horizontal = ('co_hosts', 'panelists',)
 
     def save_model(self, request, obj, form, change):
