@@ -19,6 +19,7 @@ def plugin_settings(settings):
         'openedx.core.djangoapps.appsembler.sites',
         'openedx.core.djangoapps.appsembler.html_certificates',
         'openedx.core.djangoapps.appsembler.api',
+        'openedx.core.djangoapps.appsembler.auth.apps.AppsemblerAuthConfig',
     ]
 
     # insert at beginning because it needs to be earlier in the list than various

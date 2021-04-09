@@ -20,6 +20,8 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.models import SiteTheme
 from student.models import UserProfile
 
+from openedx.core.djangoapps.appsembler.auth.models import TrustedApplication
+
 LOG = logging.getLogger(__name__)
 
 
@@ -74,7 +76,7 @@ class Command(BaseCommand):
             service_name=service_name,
             site_name="" if site_name == "edx" else "-{}".format(site_name)
         )
-        app, _ = Application.objects.update_or_create(
+        app, created = Application.objects.update_or_create(
             client_id=client_id,
             defaults={
                 "user": service_user,
@@ -99,6 +101,11 @@ class Command(BaseCommand):
             access.save()
         else:
             ApplicationAccess.objects.create(application_id=app.id, scopes=default_scopes)
+
+        if created:
+            LOG.info('Adding {app} oauth2 application as trusted application'.format(
+                app=app))
+            TrustedApplication.objects.get_or_create(application=app)
 
     def _create_sites(self, site_domain, theme_dir_name, site_configuration):
         """
