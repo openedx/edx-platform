@@ -85,7 +85,8 @@ from openedx.features.course_experience.course_tools import HttpMethod
         </div>
         <aside class="page-content-secondary course-sidebar">
             % if show_proctoring_info_panel:
-                <div class="proctoring-info-panel" data-course-id="${course_key}"></div>
+                <div class="proctoring-info-panel"
+                     data-course-id="${course_key}" data-username="${username}"></div>
             % endif
             % if has_goal_permission:
                 <div class="section section-goals ${'' if current_goal else 'hidden'}">
