@@ -13,6 +13,19 @@ from model_utils.models import TimeStampedModel
 from openedx.adg.lms.applications.helpers import validate_file_size
 
 from .constants import ALLOWED_BANNER_EXTENSIONS, BANNER_MAX_SIZE
+from .helpers import send_cancellation_emails_for_given_webinars
+
+
+class WebinarQuerySet(models.QuerySet):
+    """
+    Custom QuerySet that does not allow Webinars to be deleted from the database, instead marks the status of the
+    deleted Webinars as `Cancelled`
+    """
+
+    def delete(self):
+        cancelled_upcoming_webinars = self.filter(status=Webinar.UPCOMING)
+        send_cancellation_emails_for_given_webinars(cancelled_upcoming_webinars)
+        self.update(status=Webinar.CANCELLED)
 
 
 class Webinar(TimeStampedModel):
@@ -69,6 +82,8 @@ class Webinar(TimeStampedModel):
         related_name='webinar_modified_by',
     )
 
+    objects = WebinarQuerySet.as_manager()
+
     class Meta:
         app_label = 'webinars'
 
@@ -98,6 +113,21 @@ class Webinar(TimeStampedModel):
 
         if errors:
             raise ValidationError(errors)
+
+    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
+        if self.status == Webinar.UPCOMING:
+            send_cancellation_emails_for_given_webinars([self])
+        self.status = self.CANCELLED
+        self.save()
+
+
+class CancelledWebinar(Webinar):
+    """
+    A proxy model to represent a Cancelled Webinar
+    """
+
+    class Meta:
+        proxy = True
 
 
 class WebinarRegistration(TimeStampedModel):
