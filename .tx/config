@@ -66,3 +66,15 @@ file_filter = conf/locale/<lang>/LC_MESSAGES/edx_proctoring_proctortrack.po
 source_file = conf/locale/en/LC_MESSAGES/edx_proctoring_proctortrack.po
 source_lang = en
 type = PO
+
+[open-edx-releases.release-lilac]
+file_filter = conf/locale/<lang>/LC_MESSAGES/django.po
+source_file = conf/locale/en/LC_MESSAGES/django.po
+source_lang = en
+type = PO
+
+[open-edx-releases.release-lilac-js]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs.po
+source_lang = en
+type = PO
