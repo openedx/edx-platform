@@ -130,7 +130,7 @@ def get_login_session_form(request):
 @require_http_methods(['GET'])
 @ratelimit(
     key='openedx.core.djangoapps.util.ratelimit.real_ip',
-    rate=settings.LOGISTRATION_RATELIMIT_RATE,
+    rate=settings.LOGIN_AND_REGISTER_FORM_RATELIMIT,
     method='GET',
     block=True
 )
