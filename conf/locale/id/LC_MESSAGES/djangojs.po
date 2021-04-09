@@ -1,95 +1,82 @@
-# #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Ahmad Sofyan <asofyan@niskala.net>, 2013-2014
-# Al Firdaus, 2014
-# Al Firdaus, 2014
-# anton mailnesia <anton@mailnesia.com>, 2018
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
-# Ahmad Sofyan <asofyan@niskala.net>, 2013
-# samdon <chdono@netravisi.com>, 2014
-# cholif yulian <cholifyulian123@gmail.com>, 2015
-# Dean Jay Mathew <djaymathew@gmail.com>, 2015
-# Fazhar Restu <budaknewbie@gmail.com>, 2016
-# fizdoonk, 2013
-# hafizhuddin amin, 2013
-# hafizhuddin amin, 2013
-# ichs <ichsansp@outlook.com>, 2014
-# ichs <ichsansp@outlook.com>, 2014
-# Linggih Saputro <ligand@live.com>, 2015
-# Muhammad Adeel Khan <adeel@edx.org>, 2019
-# Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2016
-# Nanang Riyadi, 2015
-# Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2015
-# Sarina Canelake <sarina@edx.org>, 2014
-# Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2018
-# Sony Wiliyanto <sonywiliyanto@hotmail.com>, 2015
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
-# stefanny tan <stefannysik@me.com>, 2016
-# Waheed Ahmed <waheed@edx.org>, 2019
-# #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Ahmad Sofyan <asofyan@niskala.net>, 2014
-# Al Firdaus, 2014
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
-# Ahmad Sofyan <asofyan@niskala.net>, 2013
-# fizdoonk, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
 # Copyright (C) 2020 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2019
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
-#
-# #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
-# Translators:
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
-# cbt admin <wongxndeso@gmail.com>, 2016
-# cholif yulian <cholifyulian123@gmail.com>, 2015
-# Eka Y Saputra <ekajogja@ymail.com>, 2014
-# erdi tama <erditama@gmail.com>, 2016
-# Lucki Haryadi <suryaharyadi@gmail.com>, 2016
-# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
-# Zainab Amir <zamir@edx.org>, 2019
-# #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)
 # Copyright (C) 2020 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2020.
 #
 # Translators:
-# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
-# cholif yulian <cholifyulian123@gmail.com>, 2015
-# Dean Jay Mathew <djaymathew@gmail.com>, 2015
-# Mardiyanto Saahi, 2016
-# Ni'mah Hanfiah <hanifah.nimah@gmail.com>, 2018
+# Muhammad Adeel Khan <adeel@edx.org>, 2020
+# Aldiantoro Nugroho <kriwil@gmail.com>, 2020
+# Ni'mah Hanfiah <hanifah.nimah@gmail.com>, 2020
+# dedy prasetya, 2020
+# Untag Pranata <untag@unzypsoft.com>, 2020
+# Dede Hamzah <dehamzah@gmail.com>, 2020
+# anton mailnesia <anton@mailnesia.com>, 2020
+# Nanang Riyadi, 2020
+# Sony Wiliyanto <sonywiliyanto@hotmail.com>, 2020
+# Dean Jay Mathew <djaymathew@gmail.com>, 2020
+# Lucki Haryadi <suryaharyadi@gmail.com>, 2020
+# Zainab Amir <zamir@edx.org>, 2020
+# Fazhar Restu <budaknewbie@gmail.com>, 2020
+# erdi tama <erditama@gmail.com>, 2020
+# Muhammad Herdiansyah <herdiansyah@openmailbox.org>, 2020
+# Eka Y Saputra <ekajogja@ymail.com>, 2020
+# Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2020
+# Ahmad Sofyan <asofyan@niskala.net>, 2020
+# hafizhuddin amin, 2020
+# Al Firdaus, 2020
+# Anggun Dewara, 2020
+# samdon <chdono@netravisi.com>, 2020
+# Linggih Saputro <ligand@live.com>, 2020
+# cholif yulian <cholifyulian123@gmail.com>, 2020
+# Mardiyanto Saahi, 2020
+# El Greshard <elgreshard@gmail.com>, 2020
+# stefanny tan <stefannysik@me.com>, 2020
+# Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2020
+# Sari Rahmawati <kusuma.rahmawati@gmail.com>, 2020
+# Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2020
+# Imron ras <ombak147@gmail.com>, 2020
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020
+# iyoet . <iyoet@greentux.us.to>, 2020
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: edx-platform\n"
+"Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-04-27 09:11+0000\n"
-"PO-Revision-Date: 2020-04-27 09:13+0000\n"
-"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
-"Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
+"POT-Creation-Date: 2020-06-02 20:40+0000\n"
+"PO-Revision-Date: 2020-05-28 18:04+0000\n"
+"Last-Translator: iyoet . <iyoet@greentux.us.to>, 2020\n"
+"Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -110,10 +97,26 @@ msgstr "Menyimpan"
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/certificate-editor.underscore
+#: cms/templates/js/content-group-editor.underscore
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-settings-learning-fields.underscore
+#: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-editor.underscore
+#: cms/templates/js/video-transcripts.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Delete"
 msgstr "Hapus"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/certificates/views/signatory_editor.js
@@ -144,7 +147,7 @@ msgstr "Hapus"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "Cancel"
-msgstr "Batal"
+msgstr "Batalkan"
 
 #. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
@@ -152,7 +155,7 @@ msgstr "Batal"
 msgid "Uploading"
 msgstr "Mengunggah"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/active_video_upload.js
@@ -161,13 +164,13 @@ msgstr "Mengunggah"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/image-modal.underscore
 #: common/static/common/templates/discussion/templates.underscore
+#: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Tutup"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
@@ -185,7 +188,7 @@ msgstr "Nama"
 msgid "Choose File"
 msgstr "Pilih Berkas"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
@@ -196,7 +199,7 @@ msgstr "Pilih Berkas"
 msgid "OK"
 msgstr "OK"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/course_video_settings.js
@@ -237,7 +240,7 @@ msgstr "Anda yakin?"
 msgid "Upload File"
 msgstr "Unggah Berkas"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
@@ -258,7 +261,7 @@ msgstr "Unggah Berkas"
 msgid "Save"
 msgstr "Simpan"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -286,7 +289,7 @@ msgstr "Perubahan Anda telah disimpan."
 #: cms/static/js/views/xblock_validation.js
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Warning"
-msgstr ""
+msgstr "Peringatan"
 
 #. Translators: This message will be added to the front of messages of type
 #. error,
@@ -354,52 +357,6 @@ msgstr "Komentar"
 msgid "Reply to Annotation"
 msgstr "Balas Catatan"
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded, results hidden)"
-msgid_plural "{num_points} points possible (graded, results hidden)"
-msgstr[0] ""
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded, results hidden)"
-msgid_plural "{num_points} points possible (ungraded, results hidden)"
-msgstr[0] "{num_points} poin yang diperoleh (tidak dinilai)"
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded)"
-msgid_plural "{num_points} points possible (graded)"
-msgstr[0] ""
-
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded)"
-msgid_plural "{num_points} points possible (ungraded)"
-msgstr[0] "{num_points} poin yang diperoleh (tidak dinilai)"
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (graded)"
-msgid_plural "{earned}/{possible} points (graded)"
-msgstr[0] ""
-
-#. Translators: {earned} is the number of points earned. {possible} is the
-#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
-#. points will always be at least 1. We pluralize based on the total number of
-#. points (example: 0/1 point; 1/2 points);
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (ungraded)"
-msgid_plural "{earned}/{possible} points (ungraded)"
-msgstr[0] ""
-
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr "Penilaian masih dalam proses. Refresh untuk melihat hasil penilaian."
@@ -449,11 +406,6 @@ msgstr "Permasalahan ini telah direset"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
 msgstr "submisi dibatalkan"
-
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
-msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -660,7 +612,7 @@ msgstr "Hapus format"
 msgid "Code block"
 msgstr "Blok kode"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -770,7 +722,7 @@ msgstr "Hapus baris"
 msgid "Delete table"
 msgstr "Hapus tabel"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -811,9 +763,19 @@ msgstr "Properti dokumen"
 msgid "Edit HTML"
 msgstr "Edit HTML"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/certificate-details.underscore
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/course_info_update.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/partition-group-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/signatory-details.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
 msgstr "Edit"
 
@@ -901,7 +863,7 @@ msgstr "Format"
 msgid "Formats"
 msgstr "Format"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1196,7 +1158,7 @@ msgstr "Gabungkan sel"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
-msgstr "Middle"
+msgstr "Tengah"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1210,7 +1172,7 @@ msgstr "Dokumen baru"
 msgid "New window"
 msgstr "Window baru"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1302,7 +1264,7 @@ msgstr "Pra"
 msgid "Prev"
 msgstr "Sebelumnya"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js lms/static/js/customwmd.js
@@ -1340,7 +1302,7 @@ msgstr "Replace all"
 msgid "Replace with"
 msgstr "Replace with"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1448,7 +1410,7 @@ msgstr "Source code"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
-msgstr "Source"
+msgstr "Sumber"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1560,11 +1522,15 @@ msgstr ""
 "URL anda seperti tautan eksternal. Apakah anda ingin menambahkan prefiks "
 "http:// ?"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
-msgstr "Judul"
+msgstr "Titel"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1620,7 +1586,7 @@ msgstr "Perataan V"
 msgid "Vertical space"
 msgstr "Ruang vertikal"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -1862,21 +1828,6 @@ msgstr "Video berakhir"
 msgid "Video position"
 msgstr "Posisi video"
 
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s hour"
-msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s jam"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s minute"
-msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s menit"
-
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-msgid "%(value)s second"
-msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s detik"
-
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
@@ -2037,6 +1988,7 @@ msgid "Your request could not be processed. Refresh the page and try again."
 msgstr "Permintaan Anda tidak dapat diproses. Refresh halaman dan coba lagi."
 
 #: common/static/common/js/discussion/utils.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "…"
 msgstr "…"
 
@@ -2047,16 +1999,6 @@ msgstr "Beberapa gambar dalam post ini telah dihilangkan"
 #: common/static/common/js/discussion/utils.js
 msgid "image omitted"
 msgstr "gambar dihilangkan"
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "there is currently {numVotes} vote"
-msgid_plural "there are currently {numVotes} votes"
-msgstr[0] "saat ini terdapat {numVotes} vote"
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "{numVotes} Vote"
-msgid_plural "{numVotes} Votes"
-msgstr[0] "{numVotes} vote"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
@@ -2201,23 +2143,8 @@ msgstr ""
 "Respon tambahan tidak dapat dimuat. Refresh halaman ini dan coba lagi."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} other response"
-msgid_plural "{numResponses} other responses"
-msgstr[0] "{numResponses} respon lain"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} response"
-msgid_plural "{numResponses} responses"
-msgstr[0] "{numResponses} respon"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
 msgstr "Lihat semua tanggapan"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "Showing first response"
-msgid_plural "Showing first {numResponses} responses"
-msgstr[0] "Menampilkan {numResponses} respon pertama"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2236,6 +2163,7 @@ msgid "Your post will be discarded."
 msgstr "Posting anda akan di hapus"
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "anonymous"
 msgstr "anonim"
 
@@ -2308,50 +2236,20 @@ msgid "about a minute"
 msgstr "sekitar satu menit"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d menit"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
 msgstr "sekitar satu jam"
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "about %d hour"
-msgid_plural "about %d hours"
-msgstr[0] "sekitar %d jam"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
 msgstr "satu hari"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d hari"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
 msgstr "sekitar sebulan"
 
 #: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d bulan"
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
 msgstr "sekitar setahun"
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d tahun"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
@@ -2432,9 +2330,9 @@ msgid "Not specific to a course"
 msgstr "Tidak spesifik untuk kursus tertentu"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "Topic"
-msgstr "Topik"
+#: lms/static/js/instructor_dashboard/util.js
+msgid "Subject"
+msgstr "Judul"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
@@ -2470,14 +2368,6 @@ msgid "Masters"
 msgstr "Master"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "Verifikasi Foto"
 
@@ -2486,38 +2376,26 @@ msgid "Proctoring"
 msgstr "Proctoring"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr "Lainnya"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr "Ada yang bisa kami bantu, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Details"
 msgstr "Detil"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "The more you tell us, the more quickly and helpfully we can respond!"
-msgstr "Semakin lengkap informasimu, semakin cepat dan tepat respon kami!"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Create Support Ticket"
-msgstr ""
+msgid "What can we help you with, {username}?"
+msgstr "Ada yang bisa kami bantu, {username}?"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr "Masuk ke {platform} supaya kami dapat membantumu lebih baik."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid ""
-"If you are unable to access your account contact us via email using {email}."
-msgstr "Jika Anda tidak dapat masuk, hubungi kami melalui email ke {email}."
+#: lms/templates/student_account/form_field.underscore
+msgid "Need help logging in?"
+msgstr "Butuh bantuan untuk masuk?"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2528,8 +2406,8 @@ msgstr ""
 "permintaan Anda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid "Select a topic for your support request."
-msgstr ""
+msgid "Select a subject for your support request."
+msgstr "Berikan judul untuk permintaan dukungan Anda."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
@@ -2550,17 +2428,11 @@ msgstr "Cari dalam Help Center {platform}"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
-msgstr "Menuju Dashboard"
+msgstr "Menuju Kontrol panel"
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to {platform} Home"
 msgstr "Menuju Beranda {platform}"
-
-#: lms/djangoapps/support/static/support/jsx/success.jsx
-msgid ""
-"Thank you for submitting a request! We appreciate your patience while we "
-"work to review your request."
-msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
 msgid "Cancel upload"
@@ -2691,30 +2563,13 @@ msgstr "Aktivitas Terakhir %(date)s"
 msgid "Remove this team member?"
 msgstr "Keluarkan anggota tim ini?"
 
-#: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
-msgid ""
-"This learner will be removed from the team,allowing another learner to take "
-"the available spot."
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
 msgstr "Hapus tim ini?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid ""
-"Deleting a team is permanent and cannot be undone.All members are removed "
-"from the team, and team discussions can no longer be accessed."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "Tim \"{team}\" telah berhasil dihapus."
-
-#: lms/djangoapps/teams/static/teams/js/views/manage.js
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Manage"
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2726,16 +2581,6 @@ msgstr "Anda saat ini belum menjadi anggota tim apapun."
 msgid "and others"
 msgstr "dan lainnya"
 
-#. Translators: 'date' is a placeholder for a fuzzy,
-#. * relative timestamp (see: http://momentjs.com/)
-#: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity {date}"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View {span_start} {team_name} {span_end}"
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "An error occurred. Try again."
@@ -2746,33 +2591,14 @@ msgid "Leave this team?"
 msgstr "Keluar dari tim ini?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
-msgid ""
-"If you leave, you can no longer post in this team's discussions.Your place "
-"will be available to another learner."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Confirm"
 msgstr "Konfirmasi"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team in this team set."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "Tim ini telah penuh."
-
-#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "Cannot join instructor managed team"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid " Member"
-msgid_plural " Members"
-msgstr[0] ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2787,10 +2613,7 @@ msgid "Topics"
 msgstr "Topik"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Teams"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Jelajahi"
 
@@ -2860,23 +2683,6 @@ msgid "Search teams"
 msgstr "Cari tim"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams you belong to and all public teams in your course, organized "
-"by topic. Join an open public team to collaborate with other learners who "
-"are interested in the same topic as you are."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams you belong to and all public teams in your course, organized "
-"by topic."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "See all teams you belong to."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Semua Topik"
@@ -2894,13 +2700,8 @@ msgid "The team \"{team}\" could not be found."
 msgstr "Tim \"{team}\" tidak dapat ditemukan"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "{team_count} Team"
-msgid_plural "{team_count} Teams"
-msgstr[0] ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgid "Topic"
+msgstr "Topik"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
@@ -2992,12 +2793,6 @@ msgstr "URL"
 #: lms/static/js/Markdown.Editor.js
 msgid "Please provide a valid URL."
 msgstr "Mohon berikan URL yang valid."
-
-#. Translators: 'errorCount' is the number of errors found in the form.
-#: lms/static/js/Markdown.Editor.js
-msgid "%(errorCount)s error found in form."
-msgid_plural "%(errorCount)s errors found in form."
-msgstr[0] "Ditemukan %(errorCount)s error dalam form."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -3138,8 +2933,8 @@ msgid ""
 "Student username/email field is required and can not be empty. Kindly fill "
 "in username/email and then press \"Add to Exception List\" button."
 msgstr ""
-"Username/email siswa harus diisi. Silakan isi username/email lalu klik "
-"tombol \"Tambahkan ke Daftar Eksepsi\"."
+"Nama pengguna/email harus diisi. Silakan isi username/email lalu klik tombol"
+" \"Tambahkan ke Daftar Eksepsi\"."
 
 #: lms/static/js/certificates/models/certificate_invalidation.js
 msgid ""
@@ -3289,6 +3084,7 @@ msgid "HTML preview of post"
 msgstr "Pratinjau HTML post ini"
 
 #: lms/static/js/customwmd.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
 msgstr "Pertanyaan atau ide Anda (wajib diisi)"
 
@@ -3352,12 +3148,6 @@ msgid ""
 msgstr ""
 "Sistem Error sehingga tidak dapat menentukan apakah Anda dapat menerima "
 "refund. Coba kembali."
-
-#: lms/static/js/discovery/views/search_form.js
-#, javascript-format
-msgid "Viewing %s course"
-msgid_plural "Viewing %s courses"
-msgstr[0] "Melihat %s kursus"
 
 #: lms/static/js/discovery/views/search_form.js
 #, javascript-format
@@ -3545,34 +3335,8 @@ msgid "Enter a username or email."
 msgstr "Masukkan nama pengguna atau email."
 
 #: lms/static/js/groups/views/cohort_editor.js
-msgid "{numUsersAdded} learner has been added to this cohort. "
-msgid_plural "{numUsersAdded} learners have been added to this cohort. "
-msgstr[0] "{numUsersAdded} pembelajar telah ditambahkan ke kohort ini."
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numMoved} learner was moved from {prevCohort}"
-msgid_plural "{numMoved} learners were moved from {prevCohort}"
-msgstr[0] "{numMoved} pembelajar telah dipindahkan dari {prevCohort}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numPresent} learner was already in the cohort"
-msgid_plural "{numPresent} learners were already in the cohort"
-msgstr[0] "{numPresent} pembelajar terdapat dalam kohort"
-
-#: lms/static/js/groups/views/cohort_editor.js
 msgid "{email}"
 msgstr "{email}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid ""
-"{numPreassigned} learner was pre-assigned for this cohort. This learner will"
-" automatically be added to the cohort when they enroll in the course."
-msgid_plural ""
-"{numPreassigned} learners were pre-assigned for this cohort. These learners "
-"will automatically be added to the cohort when they enroll in the course."
-msgstr[0] ""
-"{numPreassigned} pembelajar telah dimasukkan ke kohort ini. Pembelajar ini "
-"secara otomatis akan ditambahkan ke kohort saat mereka masuk ke kursus."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Unknown username: {user}"
@@ -3581,11 +3345,6 @@ msgstr "Nama pengguna tidak diketahui: {user}"
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Invalid email address: {email}"
 msgstr "Alamat email tidak valid: {email}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "There was an error when trying to add learners:"
-msgid_plural "{numErrors} learners could not be added to this cohort:"
-msgstr[0] "{numErrors} pembelajar tidak dapat ditambahkan dalam kohort ini:"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "View all errors"
@@ -3801,11 +3560,14 @@ msgstr "Tandai kode kepesertaan sebagai tidak digunakan"
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Username"
-msgstr "Pengguna"
+msgstr "Nama Pengguna"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Email"
 
@@ -4328,7 +4090,7 @@ msgstr "Jenis Tugas"
 #. sending email
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
-msgstr "Inputan tugas"
+msgstr "Tugas Masuk"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
@@ -4379,10 +4141,6 @@ msgid ""
 msgstr ""
 "Terjadi kesalahan dalam memuat email Anda. Silakan coba kembali beberapa "
 "saat lagi, dan hubungi dukungan teknis jika permasalahan berlanjut."
-
-#: lms/static/js/instructor_dashboard/util.js
-msgid "Subject"
-msgstr "Judul"
 
 #: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
@@ -4636,34 +4394,6 @@ msgstr ""
 "kunci?{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
-"the above carefully before proceeding. This is an irreversible action, and "
-"{strongStart}you will no longer be able to use the same email on "
-"{platformName}.{strongEnd}"
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or"
-" the data that is deleted."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid ""
-"Once your account is deleted, you cannot use it to take courses on the "
-"{platformName} app, {siteName}, or any other site hosted by {platformName}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"This includes access to {siteName} from your employer’s or university’s "
-"system{additionalSiteSpecificDeletionText}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
 msgstr "Kami sedih Anda pergi "
 
@@ -4695,20 +4425,6 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "A Password is required"
 msgstr "Masukkan kata kunci"
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. {platformName} will not be able to "
-"recover your account or the data that is deleted."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"If you proceed, you will be unable to use this account to take courses on "
-"the {platformName} app, {siteName}, or any other site hosted by "
-"{platformName}."
-msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -4807,10 +4523,6 @@ msgid ""
 "connection."
 msgstr ""
 "Terjadi kesalahan. Coba refresh halaman, atau cek koneksi Internet Anda."
-
-#: lms/static/js/student_account/views/LoginView.js
-msgid "An unexpected error has occurred."
-msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4968,7 +4680,7 @@ msgstr "Jenis Kelamin"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Year of Birth"
-msgstr "Tahun Kelahiran"
+msgstr "Tahun Lahir"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5249,7 +4961,7 @@ msgstr "Validasi Error"
 #: lms/static/js/views/fields.js
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "In Progress"
-msgstr "Dalam Proses"
+msgstr "Sedang Berlangsung"
 
 #: lms/static/js/views/fields.js
 msgid "Placeholder"
@@ -5357,18 +5069,15 @@ msgstr "Buka Semua"
 msgid "Collapse All"
 msgstr "Tutup Semua"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show More"
 msgstr "Tampilkan Lagi"
 
+#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "Show Less"
 msgstr "Tampilkan Lebih Sedikit"
-
-#: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result"
-msgid_plural "{total_results} results"
-msgstr[0] "{total_results} hasil"
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -5473,10 +5182,6 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Studio mengalami kesulitan menyimpan hasil kerja Anda"
 
-#: cms/static/cms/js/xblock/cms.runtime.v1.js
-msgid "OpenAssessment Save Error"
-msgstr ""
-
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
 msgstr "Tautan ini akan dibuka di jendela/tab peramban baru"
@@ -5484,49 +5189,6 @@ msgstr "Tautan ini akan dibuka di jendela/tab peramban baru"
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "Tautan ini akan terbuka di jendela modal"
-
-#: cms/static/js/certificates/models/certificate.js
-msgid "Certificate name is required."
-msgstr ""
-
-#: cms/static/js/certificates/models/certificate.js
-msgid "Signatory field(s) has invalid data."
-msgstr ""
-
-#: cms/static/js/certificates/views/certificate_details.js
-msgid "Edit this certificate?"
-msgstr ""
-
-#: cms/static/js/certificates/views/certificate_details.js
-msgid ""
-"This certificate has already been activated and is live. Are you sure you "
-"want to continue editing?"
-msgstr ""
-
-#: cms/static/js/certificates/views/certificate_details.js
-msgid "Yes, allow edits to the active Certificate"
-msgstr ""
-
-#. Translators: This field pertains to the custom label for a certificate.
-#. Translators: this refers to a collection of certificates.
-#: cms/static/js/certificates/views/certificate_item.js
-#: cms/static/js/certificates/views/certificates_list.js
-msgid "certificate"
-msgstr ""
-
-#: cms/static/js/certificates/views/certificates_list.js
-msgid "Set up your certificate"
-msgstr ""
-
-#. Translators: This line refers to the initial state of the form when no data
-#. has been inserted
-#: cms/static/js/certificates/views/certificates_list.js
-msgid "You have not created any certificates yet."
-msgstr ""
-
-#: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
-msgstr ""
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5540,116 +5202,20 @@ msgstr "Aksi ini tidak bisa dibatalkan."
 msgid "Deleting"
 msgstr "Menghapus"
 
-#: cms/static/js/certificates/views/signatory_editor.js
-msgid "Upload signature image."
-msgstr ""
-
-#: cms/static/js/certificates/views/signatory_editor.js
-msgid "Image must be in PNG format."
-msgstr ""
-
-#: cms/static/js/collections/group.js
-#, javascript-format
-msgid "Group %s"
-msgstr ""
-
-#. Translators: Dictionary used for creation ids that are used in
-#. default group names. For example: A, B, AA in Group A,
-#. Group B, ..., Group AA, etc.
-#: cms/static/js/collections/group.js
-msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "Your export has failed."
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid "Already a course team member"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid ""
-"Are you sure you want to delete {email} from the course team for "
-"“{container}”?"
-msgstr ""
-
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
+#: common/static/common/templates/discussion/templates.underscore
 msgid "Staff"
-msgstr "Pegawai"
+msgstr "Staf"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Admin"
 msgstr "Admin"
 
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Already a library team member"
-msgstr ""
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid ""
-"Are you sure you want to delete {email} from the library “{container}”?"
-msgstr ""
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Library User"
-msgstr ""
-
-#: cms/static/js/factories/settings_advanced.js
-msgid "Hide Deprecated Settings"
-msgstr ""
-
-#: cms/static/js/factories/settings_advanced.js
-msgid "Show Deprecated Settings"
-msgstr ""
-
-#: cms/static/js/factories/textbooks.js
-#: cms/static/js/views/pages/group_configurations.js
-msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error during the upload process."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid ""
-"File format not supported. Please upload a file with a {ext} extension."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new library to our database."
-msgstr ""
-
-#: cms/static/js/features/import/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
 #: cms/static/js/features/import/factories/import.js
 msgid "Your import has failed."
 msgstr "Impor Anda gagal"
-
-#: cms/static/js/features/import/views/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
-#: cms/static/js/features/import/views/import.js
-msgid "Error importing course"
-msgstr ""
 
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
@@ -5668,27 +5234,9 @@ msgid "Course Run:"
 msgstr "Kursus Berjalan:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "(Read-only)"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
-msgid "Re-run Course"
-msgstr ""
-
-#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Tampilkan Live"
-
-#: cms/static/js/maintenance/force_publish_course.js
-msgid "Internal Server Error."
-msgstr ""
-
-#. Translators: This is the status of a video upload that is queued
-#. waiting for other uploads to complete
-#: cms/static/js/models/active_video_upload.js
-msgid "Queued"
-msgstr ""
 
 #. Translators: This is the status of a video upload that has
 #. completed successfully
@@ -5696,34 +5244,9 @@ msgstr ""
 msgid "Upload completed"
 msgstr "Unggah selesai"
 
-#. Translators: This is the status of a video upload that has failed
-#: cms/static/js/models/active_video_upload.js
-msgid "Upload failed"
-msgstr ""
-
-#: cms/static/js/models/chapter.js
-msgid "Chapter name and asset_path are both required"
-msgstr ""
-
-#: cms/static/js/models/chapter.js
-msgid "Chapter name is required"
-msgstr ""
-
-#: cms/static/js/models/chapter.js
-msgid "asset_path is required"
-msgstr ""
-
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr "Anda harus berikan nama"
-
-#: cms/static/js/models/course_update.js
-msgid "Action required: Enter a valid date."
-msgstr ""
-
-#: cms/static/js/models/group.js
-msgid "Group name is required"
-msgstr ""
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group A"
@@ -5733,33 +5256,9 @@ msgstr "Grup A"
 msgid "Group B"
 msgstr "Grup B"
 
-#: cms/static/js/models/group_configuration.js
-msgid "Group Configuration name is required."
-msgstr ""
-
-#: cms/static/js/models/group_configuration.js
-msgid "There must be at least one group."
-msgstr ""
-
-#: cms/static/js/models/group_configuration.js
-msgid "All groups must have a name."
-msgstr ""
-
-#: cms/static/js/models/group_configuration.js
-msgid "All groups must have a unique name."
-msgstr ""
-
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr "Kursus harus memiliki tanggal mulai."
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The course end date must be later than the course start date."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
-msgid "The course start date must be later than the enrollment start date."
-msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
@@ -5771,20 +5270,8 @@ msgid "The enrollment end date cannot be after the course end date."
 msgstr "Tanggal akhir pendaftaran tidak boleh setelah tanggal akhir kursus."
 
 #: cms/static/js/models/settings/course_details.js
-msgid "The certificate available date must be later than the course end date."
-msgstr ""
-
-#: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr "Kunci harus mengandung huruf, angka, _, atau -"
-
-#: cms/static/js/models/settings/course_details.js
-msgid "Please enter an integer between %(min)s and %(max)s."
-msgstr ""
-
-#: cms/static/js/models/settings/course_grader.js
-msgid "The assignment type must have a name."
-msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
@@ -5802,10 +5289,6 @@ msgstr "Mohon masukkan angka integer lebih besar dari 0."
 msgid "Please enter non-negative integer."
 msgstr "Mohon masukkan angka integer non-negatif."
 
-#: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
-msgstr ""
-
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
 msgstr "Waktu tenggang harus ditulis dalam format HH:MM. "
@@ -5815,90 +5298,12 @@ msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
 "Tidak dapat membuat passing grade kurang dari %(minimum_grade_cutoff)s%."
 
-#: cms/static/js/models/textbook.js
-msgid "Textbook name is required"
-msgstr ""
-
-#: cms/static/js/models/textbook.js
-msgid "Please add at least one chapter"
-msgstr ""
-
-#: cms/static/js/models/textbook.js
-msgid "All chapters must have a name and asset"
-msgstr ""
-
-#: cms/static/js/models/uploads.js
-msgid ""
-"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
-"<%= fileExtensions %> to upload."
-msgstr ""
-"Hanya berkas <%= fileTypes %> yang dapat diunggah. Harap pilih berkas dengan"
-" ekstensi <%= fileExtensions %> untuk diunggah."
-
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "atau"
-
-#: cms/static/js/models/xblock_validation.js
-msgid "This unit has validation issues."
-msgstr ""
-
-#: cms/static/js/models/xblock_validation.js
-msgid "This component has validation issues."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Upload Videos"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Drag and drop or {spanStart}browse your computer{spanEnd}."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Maximum file size: {maxFileSize} GB"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Supported file types: {supportedVideoTypes}"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Your video uploads are not complete."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Upload completed for video {fileName}"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Upload failed for video {fileName}"
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid ""
-"{filename} is not in a supported file format. Supported file formats are "
-"{supportedFileFormats}."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid ": video upload complete."
-msgstr ""
-
-#: cms/static/js/views/active_video_upload_list.js
-msgid "Previous Uploads table has been updated."
-msgstr ""
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -5925,22 +5330,9 @@ msgstr "Tanggal Ditambahkan"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Type"
-msgstr "Tipe"
-
-#: cms/static/js/views/assets.js
-msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid ""
-"Please follow the instructions here to upload a file elsewhere and link to "
-"it: {maxFileSizeRedirectUrl}"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Max file size exceeded"
-msgstr ""
+msgstr "Ketik"
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
@@ -5949,24 +5341,11 @@ msgstr "Unggah Berkas Baru"
 
 #: cms/static/js/views/assets.js
 msgid "Load Another File"
-msgstr ""
-
-#: cms/static/js/views/components/add_xblock.js
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Adding"
-msgstr ""
+msgstr "Muat File Lain"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "Anda yakin hendak menghapus pembaruan ini?"
-
-#: cms/static/js/views/course_rerun.js
-msgid "Create Re-run"
-msgstr ""
-
-#: cms/static/js/views/course_rerun.js
-msgid "Processing Re-run Request"
-msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "An error has occurred. Wait a few minutes, and then try again."
@@ -6009,103 +5388,10 @@ msgstr "Transkrip otomatis non aktif."
 msgid "{selectedProvider} credentials saved"
 msgstr "Kredensial {selectedProvider} disimpan"
 
-#: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%= name %>”"
-msgstr "Unggah berkas PDF baru ke “<%= name %>”"
-
-#: cms/static/js/views/edit_chapter.js
-msgid "Please select a PDF file to upload."
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "There has been an error while exporting."
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "Correct failed component"
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "Return to Export"
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid ""
-"Your library could not be exported to XML. There is not enough information "
-"to identify the failed component. Inspect your library to identify any "
-"problematic components and try again."
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "Take me to the main library page"
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid ""
-"Your course could not be exported to XML. There is not enough information to"
-" identify the failed component. Inspect your course to identify any "
-"problematic components and try again."
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "Take me to the main course page"
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "The raw error message is:"
-msgstr ""
-
-#: cms/static/js/views/export.js
-msgid "There has been an error with your export."
-msgstr ""
-
-#. Translators: 'count' is number of groups that the group
-#. configuration contains.
-#: cms/static/js/views/group_configuration_details.js
-msgid "Contains {count} group"
-msgid_plural "Contains {count} groups"
-msgstr[0] ""
-
 #: cms/static/js/views/group_configuration_details.js
 #: cms/static/js/views/partition_group_details.js
 msgid "Not in Use"
 msgstr "Tidak Digunakan"
-
-#. Translators: 'count' is number of units that the group
-#. configuration is used in.
-#. Translators: 'count' is number of locations that the group
-#. configuration is used in.
-#: cms/static/js/views/group_configuration_details.js
-#: cms/static/js/views/partition_group_details.js
-msgid "Used in {count} location"
-msgid_plural "Used in {count} locations"
-msgstr[0] ""
-
-#. Translators: this refers to a collection of groups.
-#: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/group_configurations_list.js
-msgid "group configuration"
-msgstr ""
-
-#: cms/static/js/views/group_configurations_list.js
-msgid "Add your first group configuration"
-msgstr ""
-
-#: cms/static/js/views/group_configurations_list.js
-msgid "You have not created any group configurations yet."
-msgstr ""
-
-#: cms/static/js/views/instructor_info.js
-msgid "Upload instructor image."
-msgstr ""
 
 #: cms/static/js/views/instructor_info.js cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
@@ -6116,133 +5402,26 @@ msgid "All Rights Reserved"
 msgstr "Semua hak cipta"
 
 #: cms/static/js/views/license.js
-msgid "You reserve all rights for your work"
-msgstr ""
-
-#: cms/static/js/views/license.js
-msgid "Creative Commons"
-msgstr ""
-
-#: cms/static/js/views/license.js
-msgid "You waive some rights for your work, such that others can use it too"
-msgstr ""
-
-#: cms/static/js/views/license.js
-msgid "Version"
-msgstr ""
-
-#: cms/static/js/views/license.js
 msgid "Attribution"
 msgstr "Atribusi"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform your copyrighted work "
-"but only if they give credit the way you request. Currently, this option is "
-"required."
-msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
 msgstr "Non-komersial"
 
 #: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform your work - and "
-"derivative works based upon it - but for noncommercial purposes only."
-msgstr ""
-
-#: cms/static/js/views/license.js
 msgid "No Derivatives"
 msgstr "Tidak Ada Derivatif"
-
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to copy, distribute, display and perform only verbatim copies "
-"of your work, not derivative works based upon it. This option is "
-"incompatible with \"Share Alike\"."
-msgstr ""
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
 msgstr "Bagikan Juga"
 
-#: cms/static/js/views/license.js
-msgid ""
-"Allow others to distribute derivative works only under a license identical "
-"to the license that governs your work. This option is incompatible with \"No"
-" Derivatives\"."
-msgstr ""
-
-#. Translators: "item_display_name" is the name of the item to be deleted.
-#: cms/static/js/views/list_item.js
-msgid "Delete this %(item_display_name)s?"
-msgstr ""
-
-#. Translators: "item_display_name" is the name of the item to be deleted.
-#: cms/static/js/views/list_item.js
-msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "There was an error changing the user's role"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Error adding user"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Error removing user"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "A valid email address is required"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "You must enter a valid email address in order to add a new team member"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Return and add email address"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Already a member"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid ""
-"{email} is already on the {container} team. Recheck the email address if you"
-" want to add a new member."
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Return to team listing"
-msgstr ""
-
-#: cms/static/js/views/manage_users_and_roles.js
-msgid "Are you sure you want to restrict {email} access to “{container}”?"
-msgstr ""
-
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "{display_name} Settings"
-msgstr ""
-
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "Publish {display_name}"
-msgstr ""
-
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "Publish all unpublished changes for this {item}?"
-msgstr ""
-
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
-msgstr "Mempublikasikan"
+msgstr "Publikasi"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Highlights for {display_name}"
@@ -6261,46 +5440,17 @@ msgid "Not yet"
 msgstr "Belum"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "All Learners and Staff"
-msgstr ""
-
-#: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
 msgstr "Dasar"
-
-#: cms/static/js/views/modals/course_outline_modals.js
-msgid "Visibility"
-msgstr ""
-
-#. Translators: "title" is the name of the current component being edited.
-#: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: {title}"
-msgstr ""
-
-#: cms/static/js/views/modals/edit_xblock.js
-msgid "Plugins"
-msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "Unit"
 
-#: cms/static/js/views/modals/edit_xblock.js
-msgid "Component"
-msgstr ""
-
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
 msgstr "Pindahkan"
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-msgid "Choose a location to move your component to"
-msgstr ""
-
-#: cms/static/js/views/modals/move_xblock_modal.js
-msgid "Move: {displayName}"
-msgstr ""
 
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
@@ -6315,20 +5465,8 @@ msgid "Change Manually"
 msgstr "Ubah Manual"
 
 #: cms/static/js/views/move_xblock_list.js
-msgid "Sections"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "Subsections"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
 msgid "Units"
 msgstr "Unit"
-
-#: cms/static/js/views/move_xblock_list.js
-msgid "Components"
-msgstr ""
 
 #: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-editor.underscore
@@ -6336,28 +5474,10 @@ msgid "Groups"
 msgstr "Grup"
 
 #: cms/static/js/views/move_xblock_list.js
-msgid "This {parentCategory} has no {childCategory}"
-msgstr ""
-
-#: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
 msgstr "Garis Besar Kursus"
-
-#: cms/static/js/views/paged_container.js
-msgid "Date added"
-msgstr ""
-
-#. Translators: "title" is the name of the current component or unit being
-#. edited.
-#: cms/static/js/views/pages/container.js
-msgid "Editing access for: {title}"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Publishing"
-msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
@@ -6365,124 +5485,6 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 msgid "Discard Changes"
 msgstr "Batalkan Perubahan"
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid ""
-"Are you sure you want to revert to the last published version of the unit? "
-"You cannot undo this action."
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Discarding Changes"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Hiding from Students"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Explicitly Hiding from Students"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Inheriting Student Visibility"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Make Visible to Students"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid ""
-"If the unit was previously published and released to students, any changes "
-"you made to the unit when it was hidden will now be visible to students. Do "
-"you want to proceed?"
-msgstr ""
-
-#: cms/static/js/views/pages/container_subviews.js
-msgid "Making Visible to Students"
-msgstr ""
-
-#: cms/static/js/views/pages/course_outline.js
-msgid "Course Index"
-msgstr ""
-
-#: cms/static/js/views/pages/course_outline.js
-msgid "There were errors reindexing course."
-msgstr ""
-
-#: cms/static/js/views/pages/paged_container.js
-msgid "Hide Previews"
-msgstr ""
-
-#: cms/static/js/views/pages/paged_container.js
-msgid "Show Previews"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} ascending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, filtered by "
-"{assetType}, sorted by {sortName} descending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"ascending"
-msgstr ""
-
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js
-msgid ""
-"Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
-"descending"
-msgstr ""
-
-#. Translators: turns into "25 total" to be used in other sentences, e.g.
-#. "Showing 0-9 out of 25 total".
-#: cms/static/js/views/paging_header.js
-msgid "{totalItems} total"
-msgstr ""
-
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
-#: cms/static/js/views/partition_group_item.js
-#: cms/static/js/views/partition_group_list.js
-msgid "content group"
-msgstr ""
-
-#: cms/static/js/views/partition_group_list.js
-msgid "Add your first content group"
-msgstr ""
-
-#: cms/static/js/views/partition_group_list.js
-msgid "You have not created any content groups yet."
-msgstr ""
-
-#: cms/static/js/views/previous_video_upload.js
-msgid "Are you sure you want to remove this video from the list?"
-msgstr ""
-
-#: cms/static/js/views/previous_video_upload.js
-msgid ""
-"Removing a video from this list does not affect course content. Any content "
-"that uses a previously uploaded video ID continues to display in the course."
-msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -6497,48 +5499,9 @@ msgstr ""
 msgid "Your policy changes have been saved."
 msgstr "Perubahan kebijakan Anda telah disimpan."
 
-#: cms/static/js/views/settings/advanced.js
-msgid ""
-"No validation is performed on policy keys or value pairs. If you are having "
-"difficulties, check your formatting."
-msgstr ""
-
-#: cms/static/js/views/settings/grader.js
-msgid ""
-"For grading to work, you must change all {oldName} subsections to {newName}."
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
-msgid "Course Credit Requirements"
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
-msgid "The minimum grade for course credit is not set."
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
-msgid "Course pacing cannot be changed once a course has started."
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
-msgid "{hours}:{minutes} (current UTC time)"
-msgstr ""
-
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr "Unggah gambar kursus Anda."
-
-#: cms/static/js/views/settings/main.js
-msgid "Upload your banner image."
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
-msgid "Upload your video thumbnail image."
-msgstr ""
-
-#: cms/static/js/views/show_textbook.js
-msgid "Delete “<%- name %>”?"
-msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -6547,15 +5510,6 @@ msgid ""
 msgstr ""
 "Penghapusan buku teks tidak bisa dibatalkan dan sekali terhapus referensi "
 "yang terkait dalam navigasi materi kursus juga akan dihapus."
-
-#: cms/static/js/views/tabs.js
-msgid "Delete Page Confirmation"
-msgstr ""
-
-#: cms/static/js/views/tabs.js
-msgid ""
-"Are you sure you want to delete this page? This action cannot be undone."
-msgstr ""
 
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
@@ -6566,83 +5520,6 @@ msgstr "Unggah"
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
 msgstr "Kami mohon maaf, ada kesalahan"
-
-#: cms/static/js/views/utils/create_course_utils.js
-msgid ""
-"The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
-msgstr ""
-
-#: cms/static/js/views/utils/create_library_utils.js
-msgid ""
-"The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Success! \"{displayName}\" has been moved."
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid ""
-"Move cancelled. \"{sourceDisplayName}\" has been moved back to its original "
-"location."
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Undo move"
-msgstr ""
-
-#: cms/static/js/views/utils/move_xblock_utils.js
-msgid "Take me to the new location"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Duplicating"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Undo moving"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Moving"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this {xblock_type} is permanent and cannot be undone."
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid ""
-"Any content that has listed this content as a prerequisite will also have "
-"access limitations removed."
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this {xblock_type} (and prerequisite)?"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this {xblock_type}"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this {xblock_type}?"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "section"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-msgid "subsection"
-msgstr ""
-
-#: cms/static/js/views/utils/xblock_utils.js
-#: cms/templates/js/container-access.underscore
-msgid "unit"
-msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
@@ -6668,206 +5545,16 @@ msgstr ""
 msgid "Save Changes"
 msgstr "Simpan Perubahan"
 
-#: cms/static/js/views/video/transcripts/file_uploader.js
-msgid "Please select a file in .srt format."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/file_uploader.js
-msgid "Error: Uploading failed."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Import failed."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Replacing failed."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/message_manager.js
-msgid "Error: Choosing failed."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Error: Connection with server failed."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Link types should be unique."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Links should be unique."
-msgstr ""
-
-#: cms/static/js/views/video/transcripts/metadata_videolist.js
-msgid "Incorrect url format."
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid ""
-"Sorry, there was an error parsing the subtitles that you uploaded. Please "
-"check the format and try again."
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-#: cms/static/js/views/video_transcripts.js
-msgid "Are you sure you want to remove this transcript?"
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid ""
-"If you remove this transcript, the transcript will not be available for this"
-" component."
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid "Remove Transcript"
-msgstr ""
-
-#: cms/static/js/views/video/translations_editor.js
-msgid "Upload translation"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Add Thumbnail"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Edit Thumbnail"
-msgstr ""
-
-#. Translators: This is a 2 part text which tells the image requirements.
-#: cms/static/js/views/video_thumbnail.js
-msgid ""
-"{InstructionsSpanStart}{videoImageResoultion}{lineBreak} "
-"{videoImageSupportedFileFormats}{spanEnd}"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Image upload failed"
-msgstr ""
-
-#. Translators: This is a 3 part text which tells the image requirements.
-#: cms/static/js/views/video_thumbnail.js
-msgid ""
-"{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak}"
-" {videoImageSupportedFileFormats}{spanEnd}"
-msgstr ""
-
-#. Translators: message will be like 1280x720 pixels
-#: cms/static/js/views/video_thumbnail.js
-msgid "{maxWidth}x{maxHeight} pixels"
-msgstr ""
-
-#. Translators: message will be like Thumbnail for Arrow.mp4
-#: cms/static/js/views/video_thumbnail.js
-msgid "Thumbnail for {videoName}"
-msgstr ""
-
-#. Translators: message will be like Add Thumbnail - Arrow.mp4
-#: cms/static/js/views/video_thumbnail.js
-msgid "Add Thumbnail - {videoName}"
-msgstr ""
-
-#. Translators: humanizeDuration will be like 10 minutes, an hour and 20
-#. minutes etc
-#: cms/static/js/views/video_thumbnail.js
-msgid "Video duration is {humanizeDuration}"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "minutes"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "minute"
-msgstr ""
-
-#. Translators: message will be like 15 minutes, 1 minute
-#: cms/static/js/views/video_thumbnail.js
-msgid "{minutes} {unit}"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "seconds"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "second"
-msgstr ""
-
-#. Translators: message will be like 20 seconds, 1 second
-#: cms/static/js/views/video_thumbnail.js
-msgid "{seconds} {unit}"
-msgstr ""
-
 #. Translators: `and` will be used to combine both miuntes and seconds like
 #. `13 minutes and 45 seconds`
 #: cms/static/js/views/video_thumbnail.js
 msgid " and "
 msgstr "dan"
 
-#: cms/static/js/views/video_thumbnail.js
-msgid "Video image upload started"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Video image upload completed"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid ""
-"This image file type is not supported. Supported file types are "
-"{supportedFileFormats}."
-msgstr ""
-
-#. Translators: maxFileSizeInMB will be like 2 MB.
-#: cms/static/js/views/video_thumbnail.js
-msgid "The selected image must be smaller than {maxFileSizeInMB}."
-msgstr ""
-
-#. Translators: minFileSizeInKB will be like 2 KB.
-#: cms/static/js/views/video_thumbnail.js
-msgid "The selected image must be larger than {minFileSizeInKB}."
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Could not upload the video image file"
-msgstr ""
-
-#: cms/static/js/views/video_thumbnail.js
-msgid "Image upload failed. "
-msgstr ""
-
-#: cms/static/js/views/video_transcripts.js
-msgid "The file could not be uploaded."
-msgstr ""
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Hide transcripts ({transcriptCount})"
-msgstr ""
-
-#: cms/static/js/views/video_transcripts.js
-msgid "Show transcripts ({transcriptCount})"
-msgstr ""
-
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"This file type is not supported. Supported file type is "
-"{supportedFileFormat}."
-msgstr ""
-
 #: cms/static/js/views/video_transcripts.js
 #: cms/templates/js/video-transcripts.underscore
 msgid "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
 msgstr "{transcriptClientTitle}_{transcriptLanguageCode}.{fileExtension}"
-
-#: cms/static/js/views/video_transcripts.js
-msgid ""
-"If you remove this transcript, the transcript will not be available for any "
-"components that use this video."
-msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
 msgid "Editor"
@@ -6878,21 +5565,13 @@ msgstr "Editor"
 msgid "Settings"
 msgstr "Pengaturan"
 
-#: cms/static/js/views/xblock_outline.js
-msgid "New {component_type}"
-msgstr ""
-
-#: cms/static/js/xblock_asides/structured_tags.js
-msgid "Updating Tags"
-msgstr ""
-
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
 msgstr "Informasi Akun"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
-msgstr "Runtutan Pesanan"
+msgstr "Riwayat Pesanan"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid ""
@@ -6913,8 +5592,15 @@ msgstr "Bantu Terjemahkan ke {beta_language}"
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Actions"
 msgstr "Tindakan"
+
+#: cms/templates/js/course-outline.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Timed Exam"
+msgstr "Ujian Berwaktu"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6980,15 +5666,11 @@ msgstr "Cari"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Response"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "This thread is closed."
-msgstr ""
+msgstr "Berikan Respon"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "Berikan respon:"
 
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -6998,130 +5680,126 @@ msgstr "Kirim"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "diskusi diposting %(time_ago)s oleh %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "pertanyaan diposting %(time_ago)s oleh %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "Sematkan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
-msgstr ""
+msgstr "Dilaporkan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Closed"
-msgstr ""
+msgstr "Tutup"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
+msgstr "Berhubungan dengan: %(courseware_title_linked)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
-msgstr ""
+msgstr "Posting ini  hanya terlihat oleh %(group_name)s."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post is visible to everyone."
-msgstr ""
+msgstr "Posting ini terlihat oleh semua orang"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing post"
-msgstr ""
+msgstr "Mengedit post"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
+"Tambahkan judul yang jelas dan deskriptif supaya peserta berpartisipasi. "
+"(Wajib diisi)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Edit your post below."
-msgstr ""
+msgstr "Edit post Anda di bawah ini."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update post"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
+msgstr "Memperbarui post"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a comment"
-msgstr ""
+msgstr "Tambah komentar"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "ditandai sebagai jawaban %(time_ago)s oleh %(user)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr ""
+msgstr "ditandai sebagai jawaban %(time_ago)s "
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "didukung %(time_ago)s oleh %(user)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
-msgstr ""
+msgstr "didukung %(time_ago)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing response"
-msgstr ""
+msgstr "Mengedit respon"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update response"
-msgstr ""
+msgstr "Memperbarui respon"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "diposting %(time_ago)s oleh %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing comment"
-msgstr ""
+msgstr "Mengedit komentar"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update comment"
-msgstr ""
+msgstr "Memperbarui komentar"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "discussion"
-msgstr ""
+msgstr "diskusi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
-msgstr ""
+msgstr "pertanyaan yang terjawab"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "pertanyaan yang belum dijawab"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
-msgstr ""
+msgstr "Mengikuti"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "Komunitas Asisten-Pengajar"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "{unread_comments_count} new"
-msgstr ""
+msgstr "{unread_comments_count} baru"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7129,70 +5807,72 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+"%(comments_count)s %(span_sr_open)skomentar (%(unread_comments_count)s "
+"komentar belum dibaca)%(span_close)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
+msgstr "%(comments_count)s %(span_sr_open)skomentar %(span_close)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Tambah Pos"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Visible to"
-msgstr ""
+msgstr "Dapat dilihat oleh"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single group."
 msgstr ""
+"Admin, moderator, dan TA diskusi dapat membuat sebuah post terlihat oleh "
+"semua peserta atau satu grup tertentu."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Semua grup"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
-msgstr ""
+msgstr "ikuti posting ini"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously"
-msgstr ""
+msgstr "post secara anonim"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "post anonymously to classmates"
-msgstr ""
+msgstr "post secara anonim untuk teman sekelas Anda"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Error posting your message."
-msgstr ""
+msgstr "Gagal memposting pesan Anda."
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "This post will be visible only to %(group_name)s."
-msgstr ""
+msgstr "Post ini hanya terlihat oleh %(group_name)s."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post will be visible to everyone."
-msgstr ""
+msgstr "Post ini dapat dilihat semua orang."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
-msgstr ""
+msgstr "Area topik"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "(Community TA)"
-msgstr ""
+"Tambahkan post Anda ke topik yang relevan untuk membantu lainnya "
+"menemukannya. (Wajib diisi)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "(Staff)"
-msgstr ""
+msgstr "(Staf)"
 
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
@@ -7200,86 +5880,84 @@ msgid "All Posts"
 msgstr "Semua Post"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "Return to all posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
 msgid "View discussion"
-msgstr ""
+msgstr "Lihat diskusi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Load more"
-msgstr ""
+msgstr "Muat lebih banyak"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Post type"
-msgstr ""
+msgstr "Jenis Post"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
 msgstr ""
+"Pertanyaan menimbulkan isu yang perlu dijaab. Diskusi berbagi ide dan "
+"menginisiasi percakapan. (Wajib diisi)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"
-msgstr ""
+msgstr "Pertanyaan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "Diskusi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
-msgstr ""
+msgstr "Dukung"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unendorse"
-msgstr ""
+msgstr "Batalkan Dukungan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Mark as Answer"
-msgstr ""
+msgstr "Tandai sebagai jawaban"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unmark as Answer"
-msgstr ""
+msgstr "Batalkan tanda sebagai Jawaban"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Follow"
-msgstr ""
+msgstr "Ikuti"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unfollow"
-msgstr ""
+msgstr "Batal Mengikuti"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Vote for this post,"
-msgstr ""
+msgstr "Vote postingan ini,"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report abuse"
-msgstr ""
+msgstr "Laporkan penyalahgunaan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Report"
-msgstr ""
+msgstr "Laporkan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unreport"
-msgstr ""
+msgstr "Batalkan laporan"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pin"
-msgstr ""
+msgstr "Pin"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unpin"
-msgstr ""
+msgstr "Unpin"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Open"
-msgstr ""
+msgstr "Buka"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7358,6 +6036,7 @@ msgid "Course Key"
 msgstr "Kunci Kursus"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Status"
 msgstr "Status"
 
@@ -7393,46 +6072,9 @@ msgstr "Regenerasi sertifikat pengguna"
 msgid "Generate"
 msgstr "Generate"
 
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Generate the user's certificate"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "Current enrollment mode:"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "New enrollment mode:"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "Reason for change:"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "Choose One"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "Explain if other."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-msgid "Submit enrollment change"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-msgid "Username or email address"
-msgstr ""
-
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
 msgstr "ID Kursus"
-
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-msgid "Course Start"
-msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course End"
@@ -7455,16 +6097,8 @@ msgid "Enrollment Mode"
 msgstr "Mode Pendaftaran"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-msgid "Verified mode price"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Reason"
 msgstr "Alasan"
-
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-msgid "Last modified by"
-msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Active"
@@ -7475,137 +6109,14 @@ msgstr "Aktif"
 msgid "N/A"
 msgstr "N/A"
 
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-msgid "Change Enrollment"
-msgstr ""
-
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Date Joined"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Password Status"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Toggle Account Password (Usable/Unusable)"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Your team could not be created."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Your team could not be updated."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid ""
-"Enter information to describe your team. You cannot change these details "
-"after you create the team."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Optional Characteristics"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid ""
-"Help other learners decide whether to join your team by specifying some "
-"characteristics for your team. Choose carefully, because fewer people might "
-"be interested in joining your team if it seems too restrictive."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Create team."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Update team."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Cancel team creating."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-msgid "Cancel team updating."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-msgid "Instructor tools"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-msgid "Delete Team"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-msgid "Edit Membership"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "View Current Team Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Download Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Assign Team Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Upload Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Error assigning team memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
-msgid "Are you having trouble finding a team to join?"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
-msgid "Join Team"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "Team Details"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "You are a member of this team."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "Team member profiles"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "Team capacity"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "Leave Team"
-msgstr ""
+msgstr "Tanggal Bergabung"
 
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "Donasi"
-
-#: lms/templates/api_admin/catalog-error.underscore
-msgid ""
-"There was an error retrieving preview results for this catalog. Please check"
-" that your query is correct and try again."
-msgstr ""
-
-#: lms/templates/api_admin/catalog-results.underscore
-msgid "This catalog's courses:"
-msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Start Date"
@@ -7613,79 +6124,23 @@ msgstr "Tanggal Mulai"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Due Date"
-msgstr "Tanggal Berakhir"
-
-#: lms/templates/ccx/schedule.underscore
-msgid "remove all"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-#, python-format
-msgid "toggle chapter %(displayName)s"
-msgstr ""
+msgstr "Batas tanggal terakhir"
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "Bagian"
 
 #: lms/templates/ccx/schedule.underscore
-#, python-format
-msgid "Remove chapter %(chapterDisplayName)s"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "hapus"
-
-#: lms/templates/ccx/schedule.underscore
-#, python-format
-msgid "toggle subsection %(displayName)s"
-msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "Sub-bagian"
 
-#: lms/templates/ccx/schedule.underscore
-#, python-format
-msgid "Remove subsection %(subsectionDisplayName)s"
-msgstr ""
-
-#: lms/templates/ccx/schedule.underscore
-#, python-format
-msgid "Remove unit %(unitName)s"
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"You still need to visit the %(display_name)s website to complete the credit "
-"process."
-msgstr ""
-
-#: lms/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"To finalize course credit, %(display_name)s requires %(platform_name)s "
-"learners to submit a credit request."
-msgstr ""
-
 #: lms/templates/commerce/provider.underscore
 msgid "Get Credit"
 msgstr "Dapatkan kredit"
-
-#: lms/templates/commerce/receipt.underscore
-#, python-format
-msgid ""
-"Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7726,14 +6181,7 @@ msgstr "Tidak ada tanda terima yang tersedia"
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Go to Dashboard"
-msgstr "Menuju dashboard"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
+msgstr "Menuju Kontrol panel"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7873,12 +6321,6 @@ msgid "About You"
 msgstr "Tentang Anda"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
-msgstr ""
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
 msgstr "Alamat email"
 
@@ -7909,30 +6351,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
 msgstr "Pengecualian Massal"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid ""
-"Upload a comma separated values (.csv) file that contains the usernames or "
-"email addresses of learners who have been given exceptions. Include the "
-"username or email address in the first comma separated field. You can "
-"include an optional note describing the reason for the exception in the "
-"second comma separated field."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-msgid "Upload a CSV file"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-msgid "Add to Exception List"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-msgid ""
-"To invalidate a certificate for a particular learner, add the username or "
-"email address below."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
@@ -7986,34 +6404,6 @@ msgstr "Catatan bebas"
 msgid "Generate Exception Certificates"
 msgstr "Buat Sertifikat Pengecualian"
 
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "All users on the Exception list who do not yet have a certificate"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "All users on the Exception list"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "User Email"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Exception Granted"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Certificate Generated"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Remove from List"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-msgid "Divided"
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Learners"
 msgstr "Kelola Peserta"
@@ -8023,18 +6413,6 @@ msgid "Add learners to this cohort"
 msgstr "Tambahkan peserta ke kohort ini"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Note: Learners can be in only one cohort. Adding learners to this group "
-"overrides any previous group assignment."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Enter email addresses and/or usernames, separated by new lines or commas, "
-"for the learners you want to add. *"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "(Required Field)"
 msgstr "(Wajib Diisi)"
@@ -8042,12 +6420,6 @@ msgstr "(Wajib Diisi)"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
 msgstr "contoh johndoe@example.com, JaneDoe, joeydoe@example.com"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"You will not receive notification for emails that bounce, so double-check "
-"your spelling."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add Learners"
@@ -8066,10 +6438,6 @@ msgid "Cohort Name"
 msgstr "Nama Kohort"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Cohort Assignment Method"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
 msgstr "Otomatis"
 
@@ -8078,72 +6446,12 @@ msgid "Manual"
 msgstr "Manual"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid ""
-"There must be one cohort to which students can automatically be assigned."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Associated Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "No Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Select a Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Choose a content group to associate"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
 msgstr "Tidak terpilih"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Deleted Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid ""
-"{screen_reader_start}Warning:{screen_reader_end} The previously selected "
-"content group was deleted. Select another content group."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid ""
-"{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Only the parent course staff of a CCX can create content groups."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Create a content group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#, python-format
-msgid "(contains %(student_count)s student)"
-msgid_plural "(contains %(student_count)s students)"
-msgstr[0] ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-msgid ""
-"Learners are added to this cohort only when you provide their email "
-"addresses or usernames on this page."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "What does this mean?"
 msgstr "Apakah ini maksudnya?"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-msgid "Learners are added to this cohort automatically."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "Select a cohort"
@@ -8166,48 +6474,9 @@ msgstr "Pilih cohort untuk mengatur"
 msgid "View Cohort"
 msgstr "Lihat cohort"
 
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Assign learners to cohorts by uploading a CSV file"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid ""
-"To review learner cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on the "
-"{link_start}Data Download{link_end} page."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/discussions.underscore
-msgid "Specify whether discussion topics are divided"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
-msgid "Course-Wide Discussion Topics"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-course-wide.underscore
-msgid "Select the course-wide discussion topics that you want to divide."
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
 msgid "Content-Specific Discussion Topics"
 msgstr "Berisi-Topik diskusi secara spesifik"
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
-msgid "Specify whether content-specific discussion topics are divided."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
-msgid "Always divide content-specific discussion topics"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
-msgid "Divide the selected content-specific discussion topics"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/divided-discussions-inline.underscore
-msgid "No content-specific discussion topics exist."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -8242,14 +6511,6 @@ msgstr "Anda tidak bisa lagi mengubah sesi."
 #: lms/templates/learner_dashboard/course_card.underscore
 msgid "You can change sessions until {expiration_date}."
 msgstr "Anda dapat mengubah sesi sampai {expiration_date}."
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "Final Grade"
-msgstr "Nilai Akhir"
-
-#: lms/templates/learner_dashboard/course_enroll.underscore
-msgid "for {courseName}"
-msgstr "untuk {courseName}"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
@@ -8330,12 +6591,6 @@ msgstr ""
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
 msgstr "Telusuri Program Baru"
-
-#: lms/templates/learner_dashboard/program_card.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgid_plural "Courses"
-msgstr[0] "Kursus"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 msgid "Completed"
@@ -8474,10 +6729,6 @@ msgstr "Kembalikan Bahasa"
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "Terjadi eror, silakan muat halaman kembali"
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Need help logging in?"
-msgstr "Butuh bantuan untuk masuk?"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -8660,7 +6911,7 @@ msgstr "Jelajahi kursus anda"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
-msgstr "Menuju dashboard"
+msgstr "Menuju Kontrol panel"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Verified Status"
@@ -8689,13 +6940,7 @@ msgstr "Apa yang anda perlukan untuk verifikasi"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Device with Camera"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"You need a device that has a webcam. If you receive a browser prompt for "
-"access to your camera, please make sure to click 'Allow'."
-msgstr ""
+msgstr "Device with Camera"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
@@ -8703,18 +6948,12 @@ msgstr "Identifikasi Photo"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "You need a valid ID that contains your full name and photo."
-msgstr ""
+msgstr "You need a valid ID that contains your full name and photo."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr "Ambil photo anda"
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"When your face is in position, use the Take Photo button {icon} below to "
-"take your photo."
-msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8729,16 +6968,10 @@ msgid "Your entire face fits inside the frame."
 msgstr "Seluruh wajah anda pas kan ke dalam frame"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"To take the photo of your face, click on the camera button {icon}. If you "
-"need to try again, click 'Retake Photo'."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Frequently Asked Questions"
-msgstr "Pertanyaan pertanyaan yang sering diajukan"
+msgstr "Pertanyaan-pertanyaan yang sering diajukan"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8752,6 +6985,8 @@ msgid ""
 "We use your verification photos to confirm your identity and ensure the "
 "validity of your certificate."
 msgstr ""
+"We use your verification photos to confirm your identity and ensure the "
+"validity of your certificate."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8761,57 +6996,13 @@ msgid "What does %(platformName)s do with this photo?"
 msgstr "Apa yang dilakukan %(platformName)s terhadap foto ini?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#, python-format
-msgid ""
-"We securely encrypt your photo and send it to our authorization service for "
-"review. Your photo and information are not saved or visible anywhere on "
-"%(platformName)s after the verification process is complete."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"What if I can't see the camera image, or if I can't see my photo do "
-"determine which side is visible?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"You may be able to complete the image capture procedure without assistance, "
-"but it may take a couple of submission attempts to get the camera "
-"positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches"
-" (30-45 centimeters) from the camera, with your head centered relative to "
-"the computer screen. "
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"If the photos you submit are rejected, try moving the computer or camera "
-"orientation to change the lighting angle.  The most common reason for "
-"rejection is inability to read the text on the ID card."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "What if I have difficulty holding my head in position relative to the "
 "camera?"
 msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid ""
-"If you require assistance with taking either photo for submission, contact "
-"%(platformName)s support for additional suggestions."
-msgstr ""
+"What if I have difficulty holding my head in position relative to the "
+"camera?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8824,16 +7015,6 @@ msgstr "Selanjutnya: %(nextStepTitle)s"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
 msgstr "Ambil photo ID anda"
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Use your webcam to take a photo of your ID."
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID"
-" are all acceptable."
-msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8849,43 +7030,10 @@ msgid "Make sure your ID is well-lit"
 msgstr "Pastikan kartu identitas Anda mendapatkan pencahayaan yang baik"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the Take Photo button {icon} to capture your ID"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the Retake Photo button if you are not pleased with your photo"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a photo ID. Our authorization service confirms your identity by comparing "
-"the photo you take with the photo on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"You may be able to complete the image capture procedure without assistance, "
-"but it may take a couple of submission attempts to get the camera "
-"positioning right.  Optimal camera positioning varies with each computer, "
-"but generally, the best position for a photo of an ID card is 8-12 inches "
-"(20-30 centimeters) from the camera, with the ID card centered relative to "
-"the camera. "
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
 "What if I have difficulty holding my ID in position relative to the camera?"
 msgstr ""
-
-#: lms/templates/verify_student/image_input.underscore
-msgid "Preview of uploaded image"
-msgstr ""
-
-#: lms/templates/verify_student/image_input.underscore
-msgid "Upload an image or capture one with your web or phone camera."
-msgstr ""
+"What if I have difficulty holding my ID in position relative to the camera?"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
@@ -8902,11 +7050,6 @@ msgstr "Pastikan wajah Anda mendapatkan pencahayaan yang baik"
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
 msgstr "Pastikan seluruh wajah anda berada didalam frame"
-
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"Once in position, use the Take Photo button {icon} to capture your photo"
-msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -8936,10 +7079,6 @@ msgstr ""
 "mengirimkannya ke layanan otorisasi kami untuk ditinjau. Foto dan informasi "
 "Anda tidak kami simpan atau ditampilkan di manapun di "
 "%(platformName)ssetelah verifikasi selesai."
-
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Thanks for returning to verify your ID in: {courseName}"
-msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
@@ -8983,22 +7122,11 @@ msgid "You are enrolling in: {courseName}"
 msgstr "Anda mendaftar di: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "You are upgrading your enrollment for: {courseName}"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can now enter your payment information and complete your enrollment."
 msgstr ""
 "Anda sekarang dapat masuk ke informasi pembayaran dan melengkapi pendaftaran"
 " anda"
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these by {date} to qualify to earn a Verified "
-"Certificate."
-msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -9021,12 +7149,6 @@ msgstr ""
 " Anda yang membuat akun ini dan untuk mencegah penyalahgunaan."
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these to qualify to earn a Verified Certificate."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
 msgstr "ID photo terbitan resmi pemerintah"
 
@@ -9036,14 +7158,8 @@ msgid ""
 msgstr "Verifikasi ID tidak dibutuhkan untuk kursus pendidikan profesional"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"All professional education courses are fee-based, and require payment to "
-"complete the enrollment process."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
 msgid "You have already verified your ID!"
-msgstr "Anda telah memverifikasi ID anda"
+msgstr "Anda telah memverifikasi ID Anda"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Your verification status is good until {verificationGoodUntil}."
@@ -9058,15 +7174,6 @@ msgid "Account Not Activated"
 msgstr "Akun Belum Diaktifkan"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid "Upgrade to a Verified Certificate for {courseName}"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid ""
-"Before you upgrade to a certificate track, you must activate your account."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
 msgstr "Periksa email Anda untuk pesan aktivasi."
 
@@ -9079,34 +7186,9 @@ msgid "Verified Certificate for {courseName}"
 msgstr "Sertifikat Terverifikasi untuk {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid ""
-"To receive a certificate, you must also verify your identity before {date}."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
 msgstr ""
 "Untuk mendapatkan sertifikat, Anda harus memverifikasi identitas Anda."
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid ""
-"To verify your identity, you need a webcam and a government-issued photo ID."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid ""
-"Your ID must be a government-issued photo ID that clearly shows your face."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid ""
-"You will use your webcam to take a picture of your face and of your "
-"government-issued photo ID."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -9142,20 +7224,8 @@ msgstr ""
 "%(platformName)s secara periodik untuk memverifikasi identitas Anda."
 
 #: lms/templates/verify_student/reverify_success_step.underscore
-msgid "Identity Verification In Progress"
-msgstr ""
-
-#: lms/templates/verify_student/reverify_success_step.underscore
-msgid ""
-"We have received your information and are verifying your identity. You will "
-"see a message on your dashboard when the verification process is complete "
-"(usually within 1-2 days). In the meantime, you can still access all "
-"available course content."
-msgstr ""
-
-#: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
-msgstr "Kembali ke Dashboard anda"
+msgstr "Kembali ke Kontrol panel anda"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
@@ -9239,6 +7309,10 @@ msgstr "Ambil photo kembali"
 msgid "Take Photo"
 msgstr "Ambil foto"
 
+#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
+msgid "Value"
+msgstr "Nilai"
+
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
 msgstr "Ditandai pada"
@@ -9258,36 +7332,12 @@ msgstr ""
 
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
-msgid "Load next {num_items} result"
-msgid_plural "Load next {num_items} results"
-msgstr[0] ""
-
-#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
-#: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Sorry, no results were found."
 msgstr "Maaf, tidak ada hasil yang ditemukan"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 msgid "Share"
 msgstr "Bagikan"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
 msgid "Find a course"
@@ -9301,40 +7351,9 @@ msgstr "Anda sekarang sedang membagi profil yang terbatas"
 msgid "This learner is currently sharing a limited profile."
 msgstr "Peserta ini membagikan profil yang terbatas."
 
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
-
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
 msgstr "Batasi Akses"
-
-#: cms/templates/js/access-editor.underscore
-msgid ""
-"Select a prerequisite subsection and enter a minimum score percentage and "
-"minimum completion percentage to limit access to this subsection. Allowed "
-"values are 0-100"
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
@@ -9349,17 +7368,8 @@ msgid "Minimum Score:"
 msgstr "Skor minimum"
 
 #: cms/templates/js/access-editor.underscore
-msgid "Minimum Completion:"
-msgstr ""
-
-#: cms/templates/js/access-editor.underscore
 msgid "The minimum score percentage must be a whole number between 0 and 100."
 msgstr "Persentase skor minimum mesti angka diantara 0 dan 100."
-
-#: cms/templates/js/access-editor.underscore
-msgid ""
-"The minimum completion percentage must be a whole number between 0 and 100."
-msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid "Use as a Prerequisite"
@@ -9377,10 +7387,6 @@ msgstr "Unggah yang sedang aktiv"
 msgid "Read More"
 msgstr "Baca Lebih Banyak"
 
-#: cms/templates/js/active-video-upload.underscore
-msgid "details about the failure"
-msgstr ""
-
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
 msgstr "Tambahkan Komponen"
@@ -9394,19 +7400,6 @@ msgstr "%(type)s Komponen Templat Menu"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "Jenis Masalah Umum"
-
-#: cms/templates/js/add-xblock-component-support-legend.underscore
-msgid "Supported"
-msgstr ""
-
-#: cms/templates/js/add-xblock-component-support-legend.underscore
-msgid "Provisional"
-msgstr ""
-
-#: cms/templates/js/add-xblock-component-support-legend.underscore
-#: cms/templates/js/add-xblock-component-support-level.underscore
-msgid "Not Supported"
-msgstr ""
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Fully Supported"
@@ -9499,7 +7492,7 @@ msgstr "Penggantian Judul Kursus"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number"
-msgstr "Nomor Kursus"
+msgstr "Nomer Kursus"
 
 #: cms/templates/js/certificate-details.underscore
 msgid "Course Number Override"
@@ -9578,16 +7571,6 @@ msgstr "Menonaktivkan"
 msgid "component"
 msgstr "komponen"
 
-#: cms/templates/js/container-access.underscore
-msgid "Access to this {blockType} is restricted to: {selectedGroupsLabel}"
-msgstr ""
-
-#: cms/templates/js/container-access.underscore
-msgid ""
-"Access to some content in this {blockType} is restricted to specific groups "
-"of learners."
-msgstr ""
-
 #: cms/templates/js/container-message.underscore
 msgid ""
 "Caution: The last published version of this unit is live. By publishing "
@@ -9617,71 +7600,9 @@ msgstr "Grup konten ini digunakan alam satu atau lebih unit"
 msgid "Cannot delete when in use by a unit"
 msgstr "Tidak bisa menghapus ketika dalam proses penggunaan oleh unit"
 
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Subsection Visibility"
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Show entire subsection"
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Learners see the published subsection and can access its content."
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Hide content after course end date"
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Hide content after due date"
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid ""
-"After the course\\'s end date has passed, learners can no longer access "
-"subsection content. The subsection remains included in grade calculations."
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid ""
-"After the subsection\\'s due date has passed, learners can no longer access "
-"its content. The subsection remains included in grade calculations."
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid "Hide entire subsection"
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-msgid ""
-"Learners do not see the subsection in the course outline. The subsection is "
-"not included in grade calculations."
-msgstr ""
-
-#: cms/templates/js/content-visibility-editor.underscore
-#, python-format
-msgid ""
-"If you select an option other than \"%(hide_label)s\", published units in "
-"this subsection become available to learners unless they are explicitly "
-"hidden."
-msgstr ""
-
-#: cms/templates/js/copy-clipboard-button.underscore
-msgid "Copy Component Location"
-msgstr ""
-
-#: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
-msgstr ""
-
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
 msgstr "Aktif"
-
-#: cms/templates/js/course-highlights-enable.underscore
-msgid "Enable Now"
-msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9702,7 +7623,7 @@ msgstr "Mohon tambahkan gelar instruktur"
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
 msgid "Organization"
-msgstr "Lembaga"
+msgstr "Organisasi"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Organization Name"
@@ -9770,22 +7691,8 @@ msgid "Unpublished changes to content that will release in the future"
 msgstr "Perubahan tidak dipublikasi pada konten akan merelease di masa depan"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Access to this unit is restricted to: {selectedGroupsLabel}"
-msgstr ""
-
-#: cms/templates/js/course-outline.underscore
-msgid ""
-"Access to some content in this unit is restricted to specific groups of "
-"learners"
-msgstr ""
-
-#: cms/templates/js/course-outline.underscore
 msgid "Ungraded"
 msgstr "Tidak dinilai"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Onboarding Exam"
-msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
@@ -9796,10 +7703,6 @@ msgid "Proctored Exam"
 msgstr "Ujian Supervisi"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Timed Exam"
-msgstr "Ujian Terjadwal"
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #, python-format
 msgid "Collapse/Expand this %(xblock_type)s"
@@ -9808,10 +7711,6 @@ msgstr "Runtuh/memperluas ini%(xblock_type)s"
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"
 msgstr "Nama tampilan"
-
-#: cms/templates/js/course-outline.underscore
-msgid "Proctoring Settings"
-msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -9854,14 +7753,6 @@ msgid "Due:"
 msgstr "Jatuh tempo:"
 
 #: cms/templates/js/course-outline.underscore
-msgid "Subsection is hidden after course end date"
-msgstr ""
-
-#: cms/templates/js/course-outline.underscore
-msgid "Subsection is hidden after due date"
-msgstr ""
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Anda belum menambahkan beberapa konten dalam kursus ini"
@@ -9888,14 +7779,6 @@ msgstr "Tekan buang perubahan untuk membuang perubahan Anda."
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Update Settings"
 msgstr "Pengaturan Pembaruan"
-
-#: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
-msgid "Press update settings to update the information for your organization."
-msgstr ""
-
-#: cms/templates/js/course-video-settings-update-settings-footer.underscore
-msgid "Press discard changes to discard changes."
-msgstr ""
 
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 msgid "Press update settings to update course video settings"
@@ -9935,10 +7818,6 @@ msgstr "Tambahkan"
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Press Add to language"
 msgstr "Tekan Tambah ke bahasa"
-
-#: cms/templates/js/course-video-transcript-provider-empty.underscore
-msgid "Automated Transcripts"
-msgstr ""
 
 #: cms/templates/js/course-video-transcript-provider-selected.underscore
 msgid "Transcript Provider"
@@ -10048,20 +7927,12 @@ msgid "Chapter Name"
 msgstr "Nama bab"
 
 #: cms/templates/js/edit-chapter.underscore
-msgid "Chapter {order}"
-msgstr ""
-
-#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr "Menyediakan judul/nama dari bab yang akan digunakan dalam navigasi"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
 msgstr "Aset bab"
-
-#: cms/templates/js/edit-chapter.underscore
-msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
-msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -10102,10 +7973,6 @@ msgstr "Informasi bab"
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "Tambah bab"
-
-#: cms/templates/js/edit-title-button.underscore
-msgid "Edit Title"
-msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -10195,18 +8062,6 @@ msgid "delete group"
 msgstr "Hapus grup"
 
 #: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"Enter 3-5 highlights to include in the email message that learners receive "
-"for this section (250 character limit)."
-msgstr ""
-
-#: cms/templates/js/highlights-editor.underscore
 msgid "Highlight {highlight_index}"
 msgstr "Sorotan {highlight_index}"
 
@@ -10284,18 +8139,6 @@ msgstr "Kosongkan nilai"
 msgid "Download"
 msgstr "Unduh"
 
-#: cms/templates/js/move-xblock-list.underscore
-msgid "{categoryText} in {parentDisplayname}"
-msgstr ""
-
-#: cms/templates/js/move-xblock-list.underscore
-msgid "Current location"
-msgstr ""
-
-#: cms/templates/js/move-xblock-list.underscore
-msgid "Currently selected"
-msgstr ""
-
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
 msgstr "Anda belum menambahkan beberapa texbooks pada kursus ini"
@@ -10303,16 +8146,6 @@ msgstr "Anda belum menambahkan beberapa texbooks pada kursus ini"
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
 msgstr "Tambahkan textbook pertama anda"
-
-#: cms/templates/js/partition-group-details.underscore
-msgid "This group controls access to:"
-msgstr ""
-
-#: cms/templates/js/partition-group-details.underscore
-msgid ""
-"In the {linkStart}Course Outline{linkEnd}, use this group to control access "
-"to a component."
-msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
@@ -10323,28 +8156,12 @@ msgid "Download available encodings (.csv)"
 msgstr "Unduh encoding yang tersedia (.csv)"
 
 #: cms/templates/js/previous-video-upload-list.underscore
-msgid "Thumbnail"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "ID video"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Transcripts"
 msgstr "Transkrip"
-
-#: cms/templates/js/previous-video-upload-list.underscore
-msgid "Video Status"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload.underscore
-msgid "Remove this video"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload.underscore
-msgid "Remove {video_name} video"
-msgstr ""
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
@@ -10388,12 +8205,6 @@ msgstr "Release/penerbitan"
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publishing Status"
 msgstr "Status publikasi"
-
-#: cms/templates/js/publish-xblock.underscore
-msgid ""
-"Draft saved on {lastSavedStart}{editedOn}{lastSavedEnd} by "
-"{editedByStart}{editedBy}{editedByEnd}"
-msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid ""
@@ -10488,32 +8299,6 @@ msgstr ""
 msgid "Show assessment results when subsection is past due"
 msgstr "Tunjukkan hasil penilaian setelah subbagian jatuh tempo"
 
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the course end date has "
-"passed."
-msgstr ""
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the course does not have an end date, learners always see their scores "
-"when they submit answers to assessments."
-msgstr ""
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"Learners do not see whether their answers to assessments were correct or "
-"incorrect, nor the score received, until after the due date for the "
-"subsection has passed."
-msgstr ""
-
-#: cms/templates/js/show-correctness-editor.underscore
-msgid ""
-"If the subsection does not have a due date, learners always see their scores"
-" when they submit answers to assessments."
-msgstr ""
-
 #: cms/templates/js/show-textbook.underscore
 msgid "PDF Chapters"
 msgstr "Bab PDF"
@@ -10594,21 +8379,6 @@ msgstr "Unit Terlihat Oleh"
 msgid "Section Visibility"
 msgstr "Bagian Terlihat Oleh"
 
-#: cms/templates/js/staff-lock-editor.underscore
-msgid ""
-"If the unit was previously published and released to learners, any changes "
-"you made to the unit when it was hidden will now be visible to learners."
-msgstr ""
-
-#: cms/templates/js/staff-lock-editor.underscore
-#, python-format
-msgid ""
-"If you make this %(xblockType)s visible to learners, learners will be able "
-"to see its content after the release date has passed and you have published "
-"the unit. Only units that are explicitly hidden from learners will remain "
-"hidden after you clear this option for the %(xblockType)s."
-msgstr ""
-
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
 msgstr "Peran saat ini"
@@ -10659,7 +8429,7 @@ msgstr ""
 "Gunakan ujian terjadwal untuk membatasi waktu peserta didik dalam "
 "menyelesaikan masalah dalam subseksi ini. Peserta didik harus mengirimkan "
 "jawaban sebelum waktu berakhir. Anda dapat memberikan waktu tambahan untuk "
-"peserta didik melalui Dashboard Instruktur."
+"peserta didik melalui Kontrol panel Instruktur."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Proctored"
@@ -10674,18 +8444,6 @@ msgstr ""
 "Ujian Tersupervisi dijadwalkan dan mereka merekam video dari setiap peserta "
 "didik yang menjalani ujian. Video kemudian ditinjau untuk memastikan bahwa "
 "peserta didik mengikuti semua aturan ujian."
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "Onboarding"
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Use Onboarding to introduce learners to proctoring, verify their identity, "
-"and create an onboarding profile. Learners must complete the onboarding "
-"profile step prior to taking a proctored exam. Profile reviews take 2+ "
-"business days."
-msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
@@ -10718,39 +8476,9 @@ msgstr ""
 msgid "Review Rules"
 msgstr "Ulas Aturan"
 
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Specify any rules or rule exceptions that the proctoring review team should "
-"enforce when reviewing the videos. For example, you could specify that "
-"calculators are allowed. These specified rules are visible to learners "
-"before the learners start the exam, along with the {linkStart}general "
-"proctored exam rules{linkEnd}."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid "General Proctored Exam Rules"
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"Specify any rules or rule exceptions that the proctoring review team should "
-"enforce when reviewing the videos. For example, you could specify that "
-"calculators are allowed. These specified rules are visible to learners "
-"before the learners start the exam."
-msgstr ""
-
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "Account"
 msgstr "Akun"
-
-#: cms/templates/js/transcript-organization-credentials.underscore
-msgid ""
-"This action updates the {provider} information for your entire organization."
-msgstr ""
-
-#: cms/templates/js/transcript-organization-credentials.underscore
-msgid "Enter the account information for your organization."
-msgstr ""
 
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Key"
@@ -10759,32 +8487,6 @@ msgstr "Kunci API"
 #: cms/templates/js/transcript-organization-credentials.underscore
 msgid "API Secret"
 msgstr "Rahasia API"
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid "Unit Access"
-msgstr ""
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid "Restrict access to:"
-msgstr ""
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid "Select a group type"
-msgstr ""
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid "Select one or more groups:"
-msgstr ""
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid "Deleted Group"
-msgstr ""
-
-#: cms/templates/js/unit-access-editor.underscore
-msgid ""
-"This group no longer exists. Choose another group or do not restrict access "
-"to this unit."
-msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
@@ -10820,23 +8522,17 @@ msgstr ""
 "dipilih untuk melihat konten di dalam unit ini. Peserta didik yang tidak "
 "memerlukan verifikasi harap melihat konten ini secara default."
 
-#: cms/templates/js/video-thumbnail.underscore
-msgid ""
-"Recommended image resolution is {imageResolution}, maximum image file size "
-"should be {maxFileSize} and format must be one of {supportedImageFormats}."
-msgstr ""
-
 #: cms/templates/js/video-transcript-upload-status.underscore
 msgid "Read more"
 msgstr "Baca lebih lanjut"
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
-msgstr "Tampilkan transkrip ({totalTranscripts})"
-
-#: cms/templates/js/video-transcripts.underscore
 msgid "No transcript uploaded."
 msgstr "Tidak ada transkrip tersedia."
+
+#: cms/templates/js/video-transcripts.underscore
+msgid "Show transcripts ({totalTranscripts})"
+msgstr "Tampilkan transkrip ({totalTranscripts})"
 
 #: cms/templates/js/xblock-access-editor.underscore
 msgid "Set Access"
@@ -10846,18 +8542,6 @@ msgstr "Atur Akses"
 #, python-format
 msgid "Edit %(display_name)s (required)"
 msgstr "Ubah %(display_name)s (required)"
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"You have done a dry run of force publishing the course. Nothing has changed."
-" Had you run it, the following course versions would have been change."
-msgstr ""
-
-#: cms/templates/js/maintenance/force-published-course-response.underscore
-msgid ""
-"The published branch version, {published}, was reset to the draft branch "
-"version, {draft}."
-msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
@@ -10878,7 +8562,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Default Timed Transcript"
-msgstr "Transkrip waktu Default"
+msgstr "Transkrip Default"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
