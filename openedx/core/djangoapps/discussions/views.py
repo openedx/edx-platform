@@ -1,6 +1,8 @@
 """
 Handle view-logic for the djangoapp
 """
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
@@ -8,8 +10,8 @@ from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsStaff
-from openedx.core.lib.api.view_utils import view_auth_classes
 
 from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
@@ -67,11 +69,15 @@ class LtiSerializer(serializers.ModelSerializer):
         return instance
 
 
-@view_auth_classes()
 class DiscussionsConfigurationView(APIView):
     """
     Handle configuration-related view-logic
     """
+    authentication_classes = (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser
+    )
     permission_classes = (IsStaff,)
 
     class Serializer(serializers.ModelSerializer):
