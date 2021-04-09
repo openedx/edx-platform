@@ -13694,6 +13694,10 @@ msgstr ""
 "ritmo. Si te pierdes las fechas sugeridas, podrás ajustarlas para asegurar "
 "que puedes mantenerte al día."
 
+#: lms/templates/edit_unit_link.html
+msgid "View Unit in Studio"
+msgstr "Ver Unidad en Studio"
+
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
 msgstr "El cambio de tu correo electrónico falló."
