@@ -30,8 +30,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from ..exceptions import AssetNotFoundException, AssetSizeTooLargeException
 from ..utils import reverse_course_url
-from .exception import AssetNotFoundException, AssetSizeTooLargeException
 
 __all__ = ['assets_handler']
 
