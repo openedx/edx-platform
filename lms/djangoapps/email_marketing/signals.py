@@ -13,6 +13,7 @@ from celery.exceptions import TimeoutError as CeleryTimeoutError
 from django.conf import settings
 from django.dispatch import receiver
 from edx_toggles.toggles import LegacyWaffleSwitchNamespace
+from openedx_events.signals.auth.v1 import REGISTER_USER
 from sailthru.sailthru_error import SailthruClientError
 
 from common.djangoapps import third_party_auth
@@ -30,7 +31,6 @@ from lms.djangoapps.email_marketing.tasks import (
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_authn.cookies import CREATE_LOGON_COOKIE
-from openedx.core.djangoapps.user_authn.views.register import REGISTER_USER
 
 from .models import EmailMarketingConfiguration
 
