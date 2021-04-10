@@ -123,7 +123,7 @@ class TestUserPreferenceEvents(UserSettingsEventTestMixin, TestCase):
     Mixin for verifying that user preference events are fired correctly.
     """
     def setUp(self):
-        super(TestUserPreferenceEvents, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.table = "user_api_userpreference"
         self.user = UserFactory.create()
         self.TEST_KEY = "test key"

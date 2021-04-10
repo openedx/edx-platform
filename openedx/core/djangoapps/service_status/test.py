@@ -4,8 +4,6 @@
 import json
 import unittest
 
-import six
-
 from django.test.client import Client
 from django.urls import reverse
 
@@ -19,7 +17,7 @@ class CeleryConfigTest(unittest.TestCase):
         """
         Create a django test client
         """
-        super(CeleryConfigTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.client = Client()
         self.ping_url = reverse('status.service.celery.ping')
 
@@ -47,6 +45,6 @@ class CeleryConfigTest(unittest.TestCase):
 
         # We don't know the other dict values exactly,
         # but we can assert that they take the right form
-        assert isinstance(result_dict['task_id'], six.text_type)
+        assert isinstance(result_dict['task_id'], str)
         assert isinstance(result_dict['time'], float)
         assert result_dict['time'] > 0.0

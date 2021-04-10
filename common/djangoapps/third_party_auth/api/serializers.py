@@ -12,7 +12,7 @@ class UserMappingSerializer(serializers.Serializer):  # pylint: disable=abstract
 
     def __init__(self, *args, **kwargs):
         self.provider = kwargs['context'].get('provider', None)
-        super(UserMappingSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def get_username(self, social_user):
         """ Gets the edx username from a social user """

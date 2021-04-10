@@ -26,4 +26,4 @@ class TestComprehensiveThemeLocale(TestCase):
         """
         test comprehensive theming directory path exist.
         """
-        assert os.path.exists((settings.REPO_ROOT / 'themes/conf/locale'))
+        assert os.path.exists(settings.REPO_ROOT / 'themes/conf/locale')

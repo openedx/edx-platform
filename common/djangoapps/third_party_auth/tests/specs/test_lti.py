@@ -30,7 +30,7 @@ class IntegrationTestLTI(testutil.TestCase):
     """
 
     def setUp(self):
-        super(IntegrationTestLTI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.hostname = 'testserver'
         self.client.defaults['SERVER_NAME'] = self.hostname
         self.url_prefix = f'http://{self.hostname}'

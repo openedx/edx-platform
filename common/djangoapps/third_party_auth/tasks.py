@@ -15,7 +15,6 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
-from six import text_type
 
 from openedx.core.djangolib.markup import Text
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
@@ -123,7 +122,7 @@ def fetch_saml_metadata():
         except etree.XMLSyntaxError as error:
             log.exception(str(error))
             failure_messages.append(
-                u"XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
+                "XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_message=str(error.error_log),  # lint-amnesty, pylint: disable=no-member
                     url=url,
                     entity_ids="\n".join(

@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-import six
 import pytest
 from contracts import new_contract
 from django.test import TestCase
@@ -29,7 +28,7 @@ class RoleAssignmentTest(TestCase):
     """
 
     def setUp(self):
-        super(RoleAssignmentTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Check a staff account because those used to get the Moderator role
         self.staff_user = User.objects.create_user(
             "patty",
@@ -77,7 +76,7 @@ class RoleAssignmentTest(TestCase):
 class CourseDiscussionSettingsTest(ModuleStoreTestCase):
 
     def setUp(self):
-        super(CourseDiscussionSettingsTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
 
     def test_get_course_discussion_settings(self):
@@ -137,4 +136,4 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
             with pytest.raises(ValueError) as value_error:
                 set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
 
-            assert text_type(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)
+            assert str(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)

@@ -1,0 +1,38 @@
+#
+# This file has been frozen for the benefit of Python 2.7 sandboxes, and
+# "make upgrade" no longer updates it.  It can be removed once that
+# version of the sandbox is no longer run in production.  Before removal,
+# the configuration repository needs to be updated to use the new file:
+# https://github.com/edx/configuration/blob/master/playbooks/roles/edxapp/defaults/main.yml#L1628
+# Also, this change needs to be announced and communicated to partners
+# before implementation.
+#
+common/lib/sandbox-packages
+common/lib/symmath
+backports.functools-lru-cache==1.6.1  # via matplotlib
+git+https://github.com/edx/openedx-calc.git@e9b698c85ad1152002bc0868f475f153dce88952#egg=calc==0.4
+cffi==1.13.2
+git+https://github.com/edx/openedx-chem.git@ff4e3a03d3c7610e47a9af08eb648d8aabe2eb18#egg=chem==1.0.0
+cryptography==2.8
+cycler==0.10.0            # via matplotlib
+ipaddress==1.0.23
+kiwisolver==1.1.0         # via matplotlib
+lxml==3.8.0
+markupsafe==1.1.1
+matplotlib==2.2.4
+networkx==1.7
+nltk==3.4.5
+numpy==1.7.2
+pycparser==2.19
+pyparsing==2.2.0
+python-dateutil==2.8.1    # via matplotlib
+pytz==2019.3              # via matplotlib
+random2==1.0.1
+scipy==0.14.0
+singledispatch==3.4.0.3
+six==1.13.0
+subprocess32==3.5.4       # via matplotlib
+sympy==0.7.1
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

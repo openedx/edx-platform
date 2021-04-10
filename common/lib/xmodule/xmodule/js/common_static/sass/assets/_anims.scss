@@ -1,0 +1,162 @@
+// animations & keyframes
+// ====================
+
+// fade in
+@include keyframes(fadeIn) {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+// fade out
+@include keyframes(fadeOut) {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+// ====================
+
+
+// rotate up
+@include keyframes(rotateUp) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-90deg));
+  }
+
+  100% {
+    @include transform(rotate(-180deg));
+  }
+}
+
+// rotate up
+@include keyframes(rotateDown) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(90deg));
+  }
+
+  100% {
+    @include transform(rotate(180deg));
+  }
+}
+
+// rotate clockwise
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// rotate counter-clockwise
+@include keyframes(rotateCCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-180deg));
+  }
+
+  100% {
+    @include transform(rotate(-360deg));
+  }
+}
+
+// bounce in
+@include keyframes(bounceIn) {
+  0% {
+    opacity: 0;
+
+    @include transform(scale(0.3));
+  }
+
+  50% {
+    opacity: 1;
+
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    @include transform(scale(1));
+  }
+}
+
+// bounce out
+@include keyframes(bounceOut) {
+  0% {
+    @include transform(scale(1));
+  }
+
+  50% {
+    opacity: 1;
+
+    @include transform(scale(1.05));
+  }
+
+  100% {
+    opacity: 0;
+
+    @include transform(scale(0.3));
+  }
+}
+
+// ====================
+
+
+// flash
+@include keyframes(flash) {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+// flash - double
+@include keyframes(flashDouble) {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+
+  25%,
+  75% {
+    opacity: 0;
+  }
+}

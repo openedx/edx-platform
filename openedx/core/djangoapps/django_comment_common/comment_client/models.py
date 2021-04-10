@@ -32,13 +32,13 @@ class Model:
             return self.attributes[name]
         except KeyError:
             if self.retrieved or self.id is None:
-                raise AttributeError(u"Field {0} does not exist".format(name))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise AttributeError(f"Field {name} does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
             self.retrieve()
             return self.__getattr__(name)
 
     def __setattr__(self, name, value):
         if name == 'attributes' or name not in self.accessible_fields + self.updatable_fields:
-            super(Model, self).__setattr__(name, value)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().__setattr__(name, value)
         else:
             self.attributes[name] = value
 
@@ -186,6 +186,6 @@ class Model:
             try:
                 return cls.url_with_id(params)
             except KeyError:
-                raise CommentClientRequestError(u"Cannot perform action {0} without id".format(action))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommentClientRequestError(f"Cannot perform action {action} without id")  # lint-amnesty, pylint: disable=raise-missing-from
         else:   # action must be in DEFAULT_ACTIONS_WITHOUT_ID now
             return cls.url_without_id()

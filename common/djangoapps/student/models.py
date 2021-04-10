@@ -52,7 +52,6 @@ from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyFiel
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 from simple_history.models import HistoricalRecords
-from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 

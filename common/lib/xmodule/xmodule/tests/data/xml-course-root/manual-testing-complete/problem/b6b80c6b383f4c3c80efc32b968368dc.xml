@@ -1,0 +1,37 @@
+<problem display_name="Math Expression Input" markdown="null">
+  <p>
+A math expression input problem accepts a line of text representing a mathematical expression from the
+student, and evaluates the input for equivalence to a mathematical expression provided by the 
+grader. Correctness is based on numerical sampling of the symbolic expressions.
+</p>
+  <p>
+The answer is correct if both the student provided response and the grader's mathematical
+expression are equivalent to specified numerical tolerance, over a specified range of values for each
+variable.
+</p>
+  <p>This kind of response checking can handle symbolic expressions, but places an extra burden
+on the problem author to specify the allowed variables in the expression, and the
+numerical ranges over which the variables must be sampled in order to test for correctness.</p>
+  <script type="loncapa/python">
+VoVi = "(R_1*R_2)/R_3"
+</script>
+  <p>Give an equation for the relativistic energy of an object with mass m.  Explicitly indicate multiplication with a <tt>*</tt> symbol.</p>
+  <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
+    <responseparam type="tolerance" default="0.00001"/>
+    <br/>
+    <text>E =</text>
+    <formulaequationinput size="40"/>
+  </formularesponse>
+  <p>The answer to this question is (R_1*R_2)/R_3. </p>
+  <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
+    <responseparam type="tolerance" default="0.00001"/>
+    <formulaequationinput size="40" label="Enter the equation"/>
+  </formularesponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>The mathematical summary of many of the theory of relativity developed by Einstein is that the amount of energy contained in a mass m is the mass time the speed of light squared.</p>
+      <p>As you can see with the formula entry, the answer is \(\frac{R_1*R_2}{R_3}\)</p>
+    </div>
+  </solution>
+</problem>

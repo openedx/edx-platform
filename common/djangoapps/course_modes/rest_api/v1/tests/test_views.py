@@ -12,7 +12,6 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
-from six import text_type
 
 from common.djangoapps.course_modes.rest_api.v1.views import CourseModesView
 from common.djangoapps.course_modes.models import CourseMode
@@ -66,11 +65,7 @@ class CourseModesViewTestBase(AuthAndScopesTestMixin):
         cls.other_mode.delete()
 
     def setUp(self):
-<<<<<<< HEAD:common/djangoapps/course_modes/rest_api/v1/tests/test_views.py
-        super(CourseModesViewTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().setUp()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308:common/djangoapps/course_modes/api/v1/tests/test_views.py
         # overwrite self.student to be a staff member, since only staff
         # should be able to access the course_modes API endpoints.
         # This is needed to make a handful of tests inherited from AuthAndScopesTestMixin pass.

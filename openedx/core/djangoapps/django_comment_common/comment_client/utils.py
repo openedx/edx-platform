@@ -14,13 +14,13 @@ log = logging.getLogger(__name__)
 
 
 def strip_none(dic):
-    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+    return {k: v for k, v in dic.items() if v is not None}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
-    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+    return {k: v for k, v in dic.items() if not _is_blank(v)}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
 
 
 def extract(dic, keys):
@@ -93,7 +93,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
                 data = response.json()
             except ValueError:
                 raise CommentClientError(  # lint-amnesty, pylint: disable=raise-missing-from
-                    u"Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
+                    "Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
                         request_id=request_id,
                         content=response.text[:100]
                     )
@@ -107,7 +107,7 @@ class CommentClientError(Exception):
 
 class CommentClientRequestError(CommentClientError):
     def __init__(self, msg, status_codes=400):
-        super(CommentClientRequestError, self).__init__(msg)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(msg)
         self.status_code = status_codes
 
 

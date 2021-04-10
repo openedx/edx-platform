@@ -6,7 +6,7 @@ allows us to share code between the XModuleMixin and CourseOverview and
 BlockStructure.
 """
 
-from markupsafe import escape
+from markupsafe import Markup
 
 
 def url_name_for_block(block):
@@ -77,6 +77,6 @@ def display_name_with_default_escaped(block):
             Block that is being accessed
     """
     # This escaping is incomplete.  However, rather than switching this to use
-    # markupsafe.escape() and fixing issues, better to put that energy toward
+    # markupsafe.striptags() and fixing issues, better to put that energy toward
     # migrating away from this method altogether.
-    return escape(display_name_with_default(block)).replace('&amp;', '&')
+    return Markup(display_name_with_default(block)).striptags()

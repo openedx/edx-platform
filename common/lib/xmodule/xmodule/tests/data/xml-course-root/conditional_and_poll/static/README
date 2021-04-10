@@ -1,0 +1,5 @@
+Images, handouts, and other statically-served content should go ONLY
+in this directory.
+
+Images for the front page should go in static/images. The frontpage
+banner MUST be named course_image.jpg

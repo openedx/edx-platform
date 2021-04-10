@@ -19,8 +19,12 @@ from common.djangoapps.third_party_auth.tests.specs import base
 class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
     """Integration tests for provider.GoogleOauth2."""
 
+    PROVIDER_NAME = "google"
+    PROVIDER_BACKEND = "google-oauth2"
+    PROVIDER_ID = "oa2-google-oauth2"
+
     def setUp(self):
-        super(GoogleOauth2IntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider = self.configure_google_provider(
             enabled=True,
             visible=True,
@@ -50,7 +54,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
         return self.get_response_data().get('email').split('@')[0]
 
     def assert_redirect_to_provider_looks_correct(self, response):
-        super(GoogleOauth2IntegrationTest, self).assert_redirect_to_provider_looks_correct(response)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().assert_redirect_to_provider_looks_correct(response)
         assert 'google.com' in response['Location']
 
     def test_custom_form(self):

@@ -1230,7 +1230,7 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
     """
     USERNAME = "test_user"
     PASSWORD = "test_password"
-    IMAGE_DATA = "abcd,1234"
+    IMAGE_DATA = "data:image/png;base64,1234"
     FULL_NAME = "Ḟüḷḷ Ṅäṁë"
     EXPERIMENT_NAME = "test-experiment"
 
@@ -1337,6 +1337,22 @@ class TestSubmitPhotosForVerification(MockS3BotoMixin, TestVerificationBase):
         params[invalid_param] = ""
         response = self._submit_photos(expected_status_code=400, **params)
         assert response.content.decode('utf-8') == 'Image data is not valid.'
+
+    @ddt.data(
+        ('data:image/png;base64,1234', 200),
+        ('data:image/jpeg;base64,1234', 200),
+        ('data:image/webp;base64,1234', 200),
+        ('data:application/pdf;base64,1234', 400),
+        ('data:text/html;base64,1234', 400),
+        ('invalid_image_data', 400),
+    )
+    @ddt.unpack
+    def test_validate_media_type(self, image_data, status_code):
+        params = {
+            'face_image': image_data,
+            'photo_id_image': image_data,
+        }
+        self._submit_photos(expected_status_code=status_code, **params)
 
     def test_invalid_name(self):
         response = self._submit_photos(

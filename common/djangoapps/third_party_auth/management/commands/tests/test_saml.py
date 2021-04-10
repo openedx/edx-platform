@@ -56,7 +56,7 @@ class TestSAMLCommand(CacheIsolationTestCase):
         Setup operations for saml configurations. these operations contain
         creation of SAMLConfiguration and SAMLProviderConfig records in database.
         """
-        super(TestSAMLCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.stdout = StringIO()
 

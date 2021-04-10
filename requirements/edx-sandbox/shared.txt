@@ -11,6 +11,6 @@ joblib==0.14.1            # via -c requirements/edx-sandbox/../constraints.txt, 
 lxml==4.5.0               # via -c requirements/edx-sandbox/../constraints.txt, -r requirements/edx-sandbox/shared.in
 nltk==3.5                 # via -r requirements/edx-sandbox/shared.in
 pycparser==2.20           # via cffi
-regex==2021.3.17          # via nltk
+regex==2021.4.4           # via nltk
 six==1.15.0               # via cryptography
 tqdm==4.59.0              # via nltk

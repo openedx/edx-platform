@@ -1,0 +1,895 @@
+<script aria-hidden="true" type="text/template" id="thread-template">
+<article class="discussion-article" data-id="<%- id %>" tabindex="-1">
+    <div class="thread-wrapper">
+        <div class="thread-main-wrapper">
+            <div class="thread-content-wrapper"></div>
+            <div class="post-extended-content">
+                <ol class="responses js-marked-answer-list"></ol>
+            </div>
+        </div>
+        <div class="post-extended-content thread-responses-wrapper">
+            <div class="response-btn-count-wrapper">
+                <% if (!readOnly) { %>
+                <div class="add-response">
+                    <button class="btn btn-outline-primary btn-small add-response-btn">
+                        <%- gettext("Add a Response") %>
+                    </button>
+                </div>
+                <% } %>
+                <div class="response-count"></div>
+            </div>
+            <ol class="responses js-response-list"></ol>
+            <div class="response-pagination"></div>
+            <div class="post-status-closed bottom-post-status" style="display: none">
+              <%- gettext("This thread is closed.") %>
+            </div>
+            <% if (can_create_comment && !readOnly) { %>
+            <form class="discussion-reply-new" data-id="<%- id %>">
+                <h<%- startHeader %> class="add-response"><%- gettext("Add a response:") %></h<%- startHeader %> >
+
+                <ul class="discussion-errors"></ul>
+                <div class="reply-body" data-id="<%- id %>"></div>
+                <div class="reply-post-control">
+                    <button class="btn btn-outline-primary discussion-submit-post control-button"><%- gettext("Submit") %></button>
+                </div>
+            </form>
+            <% } %>
+        </div>
+    </div>
+</article>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-show-template">
+<div class="discussion-post">
+    <header class="post-header">
+        <% if (!readOnly) { %>
+            <div class="post-header-actions">
+                <%= /* xss-lint: disable=underscore-not-escaped */
+                _.template(
+                    $('#forum-actions').html())(
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
+                        readOnly: readOnly
+                    }
+                )
+                %>
+            </div>
+        <% } %>
+        <div class="post-header-content">
+            <h<%- startHeader %> class="post-title"><%- title %></h<%- startHeader%>>
+            <p data-hj-suppress class="posted-details">
+            <%
+            var timeAgoHtml = interpolate(
+                '<span class="timeago" title="%(created_at)s">%(created_at)s</span>',
+                {created_at: created_at},
+                true
+            );
+            var postedTimeAgoMessage;
+            // Using a separate message to ensure proper translation for different languages
+            // thread_type describes the kind of post this is (e.g. "question" or "discussion");
+            // time_ago is how much time has passed since the post was created (e.g. "4 hours ago")
+            if (thread_type === 'discussion') {
+                postedTimeAgoMessage = gettext('discussion posted %(time_ago)s by %(author)s');
+            } else {
+                postedTimeAgoMessage = gettext('question posted %(time_ago)s by %(author)s');
+            }
+            %>
+            <%= /* xss-lint: disable=underscore-not-escaped */
+            interpolate(_.escape(postedTimeAgoMessage), {time_ago: timeAgoHtml, author: author_display}, true) %>
+            </p>
+            <div class="post-labels">
+                <span class="post-label post-label-pinned">
+                    <span class="icon fa fa-thumb-tack" aria-hidden="true"></span><%- gettext("Pinned") %>
+                </span>
+                <span class="post-label post-label-reported">
+                    <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+                </span>
+                <span class="post-label post-label-closed">
+                    <span class="icon fa fa-lock" aria-hidden="true"></span><%- gettext("Closed") %>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="post-body"><%- body %></div>
+    <div class="post-context">
+        <% if (mode === "tab" && obj.courseware_url) { %>
+            <%
+            var courseware_title_linked = interpolate(
+                '<a href="%(courseware_url)s">%(courseware_title)s</a>',
+                {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
+                true
+            );
+            %>
+            <%= /* xss-lint: disable=underscore-not-escaped */
+            interpolate(
+                _.escape(gettext('Related to: %(courseware_title_linked)s')),
+                {courseware_title_linked: courseware_title_linked},
+                true
+            )
+            %>
+        <% } %>
+        <div class="group-visibility-label">
+            <% if (obj.group_name && is_commentable_divided) { %>
+                <%-
+                interpolate(
+                    gettext('This post is visible only to %(group_name)s.'),
+                    {group_name: obj.group_name},
+                    true
+                )
+                %>
+            <% } else { %>
+                <%- gettext('This post is visible to everyone.') %>
+            <% } %>
+        </div>
+    </div>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-edit-template">
+<h<%- startHeader%> class="thread-title"><%- gettext("Editing post") %></h<%- startHeader%>>
+<ul class="post-errors"></ul>
+<div class="forum-edit-post-form-wrapper"></div>
+<div class="post-field">
+    <label class="field-label" for='edit-discussion-forum-title'>
+        <span class="field-label-text"><%- gettext("Title") %></span>
+        <div class="field-help" id="field_help_title">
+            <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
+        </div>
+        <input id='edit-discussion-forum-title' aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" value="<%- title %>">
+    </label>
+</div>
+<div class="post-field">
+    <p class="sr-only field-help" id="edit-post-editor-description"><%- gettext('Edit your post below.') %></p>
+    <div class="edit-post-body" aria-describedby="edit-post-editor-description" name="body"><%- body %></div>
+</div>
+<button type="submit" id="edit-post-submit" class="btn btn-primary submit post-update"><%- gettext("Update post") %></button>
+<button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-response-template">
+<div class="discussion-response"></div>
+<button class="btn-link action-show-comments">
+    <%
+    var fmts = ngettext("Show Comment (%(num_comments)s)", "Show Comments (%(num_comments)s)", comments.length);
+    print(interpolate(fmts, {num_comments: comments.length}, true));
+    %>
+    <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+</button>
+<ol class="comments">
+    <li class="new-comment">
+        <% if (create_sub_comment && !readOnly) { %>
+            <form class="comment-form" data-id="<%- wmdId %>">
+                <ul class="discussion-errors"></ul>
+                <label class="sr" for="add-new-comment-<%- wmdId %>"><%- gettext("Add a comment") %></label>
+                <div class="comment-body" id="add-new-comment-<%- wmdId %>" data-id="<%- wmdId %>"
+                data-placeholder="<%- gettext('Add a comment') %>"></div>
+                <div class="comment-post-control">
+                    <button class="btn btn-primary discussion-submit-comment control-button"><%- gettext("Submit") %></button>
+                </div>
+            </form>
+        <% } %>
+    </li>
+</ol>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-response-show-template">
+<header class="response-header">
+  <div data-hj-suppress class="response-header-content">
+    <%= HtmlUtils.HTML(author_display) %>
+    <p class="posted-details">
+        <span class="timeago" title="<%= HtmlUtils.HTML(created_at) %>"><%= HtmlUtils.HTML(created_at) %></span>
+        <% if (obj.endorsement && obj.endorsed) { %>
+            -
+            <%
+            var fmt = null;
+            if (thread.get("thread_type") == "question") {
+              if (endorsement.username) {
+                // Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                // like "4 hours ago" or "about a month ago"
+                fmt = gettext("marked as answer %(time_ago)s by %(user)s");
+              } else {
+                // Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                // like "4 hours ago" or "about a month ago"
+                fmt = gettext("marked as answer %(time_ago)s");
+              }
+            } else {
+              if (endorsement.username) {
+                // Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                // like "4 hours ago" or "about a month ago"
+                fmt = gettext("endorsed %(time_ago)s by %(user)s");
+              } else {
+                // Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                // like "4 hours ago" or "about a month ago"
+                fmt = gettext("endorsed %(time_ago)s");
+              }
+            }
+            var time_ago = interpolate(
+              '<span class="timeago" title="%(time)s">%(time)s</span>',
+              {time: endorsement.time},
+              true
+            );
+            %>
+            <%= /* xss-lint: disable=underscore-not-escaped */
+                interpolate(fmt, {time_ago: time_ago, user: endorser_display}, true) %>
+        <% } %>
+      </p>
+      <div class="post-labels">
+          <span class="post-label post-label-reported">
+              <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+          </span>
+      </div>
+      </div>
+      <div class="response-header-actions">
+        <%= /* xss-lint: disable=underscore-not-escaped */
+            _.template(
+                $('#forum-actions').html())(
+                {
+                    contentId: cid,
+                    contentType: 'response',
+                    primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
+                    secondaryActions: ['edit', 'delete', 'report'],
+                    readOnly: readOnly
+                }
+            )
+        %>
+      </div>
+</header>
+
+<div class="response-body"><%- body %></div>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-response-edit-template">
+<div class="edit-post-form">
+    <h<%- startHeader %>><%- gettext("Editing response") %></h<%- startHeader %>>
+    <ul class="edit-post-form-errors"></ul>
+      <div class="edit-post-body" name="body" data-id="<%- id %>"><%- body %></div>
+    <button type="submit" id="edit-response-submit"class="btn btn-primary post-update"><%- gettext("Update response") %></button>
+    <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="response-comment-show-template">
+<div class="discussion-comment" id="comment_<%- id %>">
+  <div class="response-body"><%- body %></div>
+  <%= /* xss-lint: disable=underscore-not-escaped */
+      _.template(
+          $('#forum-actions').html())(
+          {
+              contentId: cid,
+              contentType: 'comment',
+              primaryActions: [],
+              secondaryActions: ['edit', 'delete', 'report'],
+              readOnly: readOnly
+          }
+      )
+  %>
+  <p data-hj-suppress class="posted-details">
+    <%
+    var time_ago = interpolate(
+      '<span class="timeago" title="%(time)s">%(time)s</span>',
+      {time: created_at},
+      true
+    );
+    %>
+    <%= /* xss-lint: disable=underscore-not-escaped */
+    interpolate(
+      // Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+      gettext("posted %(time_ago)s by %(author)s"),
+      {time_ago: time_ago, author: author_display},
+      true
+    ) %>
+  </p>
+  <div class="post-labels">
+    <span class="post-label post-label-reported">
+      <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+    </span>
+  </div>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="response-comment-edit-template">
+<div class="edit-post-form" id="comment_<%- id %>">
+    <h<%- startHeader %> ><%- gettext("Editing comment") %></h<%- startHeader%>>
+    <ul class="edit-comment-form-errors"></ul>
+      <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>
+    <button type="submit" id="edit-comment-submit" class="btn btn-primary post-update"><%- gettext("Update comment") %></button>
+    <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-list-item-template">
+<li data-id="<%- id %>" class="forum-nav-thread<% if (!hideReadState && neverRead) { %> never-read<% } %>">
+  <a href="<%- threadUrl %>" class="forum-nav-thread-link">
+    <div class="forum-nav-thread-wrapper-0">
+      <%
+      var icon_class, sr_text;
+      if (thread_type === "discussion") {
+          icon_class = "fa-comments";
+          // Translators: This is a label for a Discussion forum thread
+          sr_text = gettext("discussion");
+      } else if (endorsed) {
+          icon_class = "fa-check-square-o";
+          // Translators: This is a label for a Question forum thread with a marked answer
+          sr_text = gettext("answered question");
+      } else {
+          icon_class = "fa-question";
+          // Translators: This is a label for a Question forum thread without a marked answer
+          sr_text = gettext("unanswered question");
+      }
+      %>
+      <span class="sr"><%= HtmlUtils.HTML(sr_text) %></span>
+      <span class="icon fa <%- icon_class %>" aria-hidden="true"></span>
+    </div><div class="forum-nav-thread-wrapper-1">
+      <span class="forum-nav-thread-title"><%- title %></span>
+      <% if (showThreadPreview){ %>
+        <div class="thread-preview-body"><%- threadPreview %></div>
+      <% } %>
+      <% if(typeof(subscribed) === "undefined") { var subscribed = null; } %>
+      <% if(pinned || subscribed || staff_authored || community_ta_authored) { %>
+        <ul class="forum-nav-thread-labels">
+        <% if (pinned) { %>
+          <li class="post-label post-label-pinned">
+            <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
+            <% // Translators: This is a label for a forum thread that has been pinned %>
+            <%- gettext("Pinned") %>
+          </li>
+        <% } %>
+        <% if (subscribed) { %>
+          <li class="post-label post-label-following">
+            <span class="icon fa fa-star" aria-hidden="true"></span>
+            <% // Translators: This is a label for a forum thread that the user is subscribed to %>
+            <%- gettext("Following") %>
+          </li>
+        <% } %>
+        <% if (staff_authored) { %>
+          <li class="post-label post-label-by-staff">
+            <span class="icon fa fa-user" aria-hidden="true"></span>
+            <% // Translators: This is a label for a forum thread that was authored by a member of the course staff %>
+            <%- gettext("Staff") %>
+          </li>
+        <% } %>
+        <% if (community_ta_authored) { %>
+          <li class="post-label post-label-by-community-ta">
+            <span class="icon fa fa-user" aria-hidden="true"></span>
+            <% // Translators: This is a label for a forum thread that was authored by a community TA %>
+            <%- gettext("Community TA") %>
+          </li>
+        <% } %>
+        </ul>
+      <% } %>
+    </div><div class="forum-nav-thread-wrapper-2">
+      <%
+      // Translators: 'votes_count' is a numerical placeholder for a specific discussion thread; 'span_start' and 'span_end' placeholders refer to HTML markup.  Please translate the word 'votes'.
+      var fmt = ngettext(
+           "%(votes_count)s%(span_start)s vote %(span_end)s",
+           "%(votes_count)s%(span_start)s votes %(span_end)s",
+           votes['up_count']
+      );
+      %>
+      <span class="forum-nav-thread-votes-count">
+      +<%= /* xss-lint: disable=underscore-not-escaped */
+           interpolate(fmt, {
+               votes_count: votes['up_count'],
+               span_start: '<span class="sr">',
+               span_end: '</span>'
+            }, true)
+      %>
+      </span>
+
+      <% if (!hideReadState && !neverRead && unread_comments_count > 0) { %>
+        <span class="forum-nav-thread-unread-comments-count">
+          <%-
+            StringUtils.interpolate(
+              gettext('{unread_comments_count} new'),
+              {unread_comments_count: unread_comments_count}
+            )
+          %>
+        </span>
+      <% } %>
+
+      <span class="forum-nav-thread-comments-count">
+      <%
+      var fmt;
+      // Counts in data do not include the post itself, but the UI should
+      var data = {
+          'span_sr_open': '<span class="sr">',
+          'span_close': '</span>',
+          'unread_comments_count': unread_comments_count + (read ? 0 : 1),
+          'comments_count': comments_count + 1
+      };
+      if (unread_comments_count > 0) {
+          // Translators: 'comments_count' and 'unread_comments_count' are numerical placeholders for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+          fmt = gettext('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s');
+      } else {
+          // Translators: 'comments_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+          fmt = gettext('%(comments_count)s %(span_sr_open)scomments %(span_close)s');
+      }
+      print(interpolate(fmt, data, true));
+      %>
+      </span>
+    </div>
+  </a>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="search-alert-template">
+<div class="search-alert <%- css_class %>" id="search-alert-<%- cid %>">
+    <div class="search-alert-content">
+        <p class="message"><%= HtmlUtils.ensureHtml(messageHtml) %></p>
+    </div>
+
+    <div class="search-alert-controls">
+        <button class="btn-link dismiss control control-dismiss" title="<%- gettext('Close') %>">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="new-post-template">
+<form class="forum-new-post-form">
+    <h<%- startHeader %> class="thread-title"><%- gettext("Add a Post") %></h<%- startHeader %>>
+
+    <% if (mode === 'inline') { %>
+        <button class="btn btn-outline-primary btn-default add-post-cancel">
+            <span class="sr"><%- gettext('Cancel') %></span>
+            <span class="fa fa-close" aria-hidden="true"></span>
+        </button>
+    <% } %>
+    <ul class="post-errors" style="display: none"></ul>
+    <div class="forum-new-post-form-wrapper"></div>
+    <% if (group_options) { %>
+    <div class="post-field group-selector-wrapper <% if (!is_commentable_divided) { print('disabled'); } %>">
+        <label class="field-label">
+            <span class="field-label-text">
+                <% //Translators: This labels the selector for which group of students can view a post %>
+                <%- gettext("Visible to") %>
+            </span>
+            <div class="field-help" id="field_help_visible_to">
+                <%- gettext("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single group.") %>
+            </div>
+            <div class="field-input">
+                <select aria-describedby="field_help_visible_to" class="post-topic field-input js-group-select" name="group_id" <% if (!is_commentable_divided) { print("disabled"); } %>>
+                    <option value=""><%- gettext("All Groups") %></option>
+                    <% _.each(group_options, function(opt) { %>
+                    <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </label>
+    </div>
+    <% } %>
+    <div class="post-field group-visibility" id="wrapper-visibility-message"></div>
+    <div class="post-field">
+        <label class="field-label" for='discussion-forum-title'>
+            <span class="field-label-text"><%- gettext("Title") %></span>
+            <div class="field-help" id="field_help_title">
+                <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
+            </div>
+            <div>
+                <input id='discussion-forum-title' aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
+            </div>
+        </label>
+    </div>
+
+    <div>
+        <span class="field-label-text field-label-text-full" id="new-post-editor-description"><%- gettext('Your question or idea (required)') %></span>
+        <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
+    </div>
+    <div class="post-options">
+        <label for="follow" class="field-label label-inline">
+            <input id="follow" type="checkbox" name="follow" class="field-input input-checkbox" checked>
+            <span class="field-input-label">
+                <span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("follow this post") %>
+            </span>
+        </label>
+        <% if (allow_anonymous) { %>
+        <label for="anonymous" class="field-label label-inline">
+            <input id="anonymous" type="checkbox" name="anonymous" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously") %></span>
+        </label>
+        <% } %>
+        <% if (allow_anonymous_to_peers) { %>
+        <label for="anonymous_to_peers" class="field-label label-inline">
+            <input id="anonymous_to_peers" type="checkbox" name="anonymous_to_peers" class="field-input input-checkbox">
+            <span class="field-input-label"><%- gettext("post anonymously to classmates") %></span>
+        </div>
+        <% } %>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary submit"><%- gettext('Submit') %></button>
+        <button type="button" class="btn btn-outline-primary cancel"><%- gettext('Cancel') %></button>
+    </div>
+</form>
+</script>
+<script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
+<option class="topic-title" data-discussion-id="<%- id %>" data-divided="<%- is_divided %>"><%- text %></option>
+</script>
+<script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
+<optgroup label="<%- text %>">
+    <%= edx.HtmlUtils.ensureHtml(entries) %>
+</optgroup>
+</script>
+<script aria-hidden="true" type="text/template" id="new-post-alert-template">
+<div class="alert alert-error pattern-library-shim" role="alert" aria-labelledby="alert-title-error-<%- alertId %>" tabindex="-1">
+    <span class="icon alert-icon fa fa-warning" aria-hidden="true"></span>
+
+    <div class="alert-message">
+        <h3 class="sr-only alert-title" id="alert-title-error-<%- alertId %>">
+            <%- gettext("Error posting your message.") %>
+        </h3>
+
+        <p class="alert-copy">
+            <%- gettext(message) %>
+        </p>
+    </div>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="new-post-visibility-template">
+<% if (group_name) { %>
+    <%-
+    interpolate(
+        gettext('This post will be visible only to %(group_name)s.'),
+        {group_name: group_name},
+        true
+    )
+    %>
+<% } else { %>
+    <%- gettext('This post will be visible to everyone.') %>
+<% } %>
+</script>
+<script aria-hidden="true" type="text/template" id="topic-template">
+<div class="field-label">
+    <label for="topic" class="field-label-text">
+        <%- gettext("Topic area") %>
+    </label>
+    <div class="field-help" id="field_help_topic_area">
+        <%- gettext("Add your post to a relevant topic to help others find it. (Required)") %>
+    </div>
+</div>
+<div class="field-input">
+    <select id="topic" class="post-topic field-input" aria-describedby="field_help_topic_area wrapper-visibility-message" required>
+        <%= edx.HtmlUtils.ensureHtml(topics_html) %>
+    </select>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="post-user-display-template">
+<% if (username) { %>
+<a href="<%- user_url %>" class="username"><%- username %></a>
+    <% if (is_community_ta) { %>
+    <span class="user-label-community-ta"><%- gettext("(Community TA)") %></span>
+    <% } else if (is_staff) { %>
+    <span class="user-label-staff"><%- gettext("(Staff)") %></span>
+    <% } %>
+<% } else { %>
+    <%- gettext('anonymous') %>
+<% } %>
+</script>
+<script aria-hidden="true" type="text/template" id="inline-discussion-template">
+<section class="discussion inline-discussion" data-discussion-id="<%- discussionId %>">
+    <div class="add_post_btn_container <% if (read_only) { %> is-hidden <% } %>">
+        <button class="btn-link new-post-btn"><%- gettext("Add a Post") %></button>
+    </div>
+
+    <article class="new-post-article is-hidden"></article>
+
+    <div class="inline-discussion-thread-container">
+        <section class="inline-threads" data-discussion-id="<%- discussionId %>">
+        </section>
+
+        <div class="inline-thread">
+            <div class="forum-nav-bar">
+                <button class="btn-link all-posts-btn">
+                    <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+                    <span aria-hidden="true"><%- gettext('All Posts') %></span>
+                    <span class="sr-only"><%- gettext('Return to all posts') %></span>
+                </button>
+            </div>
+            <div class="forum-content">
+            </div>
+        </div>
+    </div>
+</section>
+</script>
+<script aria-hidden="true" type="text/template" id="pagination-template">
+<nav class="discussion-paginator">
+    <ol>
+        <% if (previous) { %>
+            <li class="previous-page"><a class="discussion-pagination" href="<%- previous.url() %>" data-page-number="<%- previous.number %>">&lt; <%- gettext("Previous") %></a></li>
+        <% } %>
+        <% if (first) { %>
+            <li class="first-page"><a class="discussion-pagination" href="<%- first.url() %>" data-page-number="1">1</a></li>
+        <% } %>
+        <% if (leftdots) { %>
+            <li class="previous-ellipses"><%- gettext("…") %></li>
+        <% } %>
+
+        <% _.each(lowPages, function(page) { %>
+            <li class="lower-page"><a class="discussion-pagination" href="<%- page.url() %>" data-page-number="<%- page.number %>"><%- page.number %></a></li>
+        <% }); %>
+        <li class="current-page"><span><%- page %></span></li>
+        <% _.each(highPages, function(page) { %>
+            <li class="higher-page"><a class="discussion-pagination" href="<%- page.url() %>" data-page-number="<%- page.number %>"><%- page.number %></a></li>
+        <% }); %>
+
+        <% if (rightdots) { %>
+            <li class="next-ellipses"><%- gettext("…") %></li>
+        <% } %>
+        <% if (last) { %>
+            <li class="last-page"><a class="discussion-pagination" href="<%- last.url() %>" data-page-number="<%- last.number %>"><%- last.number %></a></li>
+        <% } %>
+        <% if (next) { %>
+            <li class="next-page"><a class="discussion-pagination" href="<%- next.url() %>" data-page-number="<%- next.number %>"><%- gettext("Next") %> &gt;</a></li>
+        <% } %>
+    </ol>
+</nav>
+</script>
+<script aria-hidden="true" type="text/template" id="profile-thread-template">
+<article class="discussion-article" data-id="<%- id %>">
+    <div class="discussion-post">
+        <header>
+            <h3><%- title %></h3>
+            <p class="posted-details">
+                <% if (user) { %>
+                    <a href="<%- user.url %>" class="username"><%- user.username %></a>
+                <% } else { %>
+                    <%- gettext("anonymous") %>
+                <% } %>
+
+                <span class="timeago" title="<%- created_at %>"><%- created_at %></span>
+                <span class="post-status-closed top-post-status" style="display: none">
+                    &bull; <%- gettext("This thread is closed.") %>
+                </span>
+            </p>
+        </header>
+        <div class="post-body"><%= HtmlUtils.HTML(abbreviatedBody) %></div>
+    </div>
+    <div class="post-tools">
+        <a href="<%- permalink %>"><%- gettext("View discussion") %></a>
+    </div>
+
+</article>
+</script>
+<script aria-hidden="true" type="text/template" id="customwmd-prompt-template">
+<h4 id="editor-dialog-title"><%- title %></h4>
+<div role="status" id="wmd-editor-dialog-form-errors" class="sr" tabindex="-1"></div>
+<div>
+    <form class="form">
+        <fieldset class="field-group">
+            <legend class="form-group-hd sr"><%- title %></legend>
+            <div class="field <%- uploadFieldClass %>">
+                <label id="new-url-input-label" for="new-url-input" class="field-label">
+                    <%- urlLabel %></label>
+                <input type="text" id="new-url-input" class="field-input input-text" aria-describedby="new-url-input-help">
+                <% if (imageUploadHandler) { %>
+                    <button id="file-upload-proxy" class="btn btn-primary btn-base form-btn">
+                        <%- chooseFileText %>
+                    </button>
+                    <input type="file" name="file-upload" id="file-upload" style="display:none;"/>
+                <% } %>
+                <div id="new-url-input-field-message" class="field-message has-error" style="display:none">
+                    <span class="field-message-content"><%- urlError %></span>
+                </div>
+                <div id="new-url-input-help" class="field-hint">
+                    <%- urlHelp %>
+                </div>
+            </div>
+            <div class="field">
+                <label for="new-url-desc-input" class="field-label"><%- urlDescLabel %></label>
+                <input type="text" id="new-url-desc-input" class="field-input input-text" required aria-describedby="new-url-desc-input-help">
+                <div id="new-url-desc-input-field-message" class="field-message has-error" style="display:none">
+                    <span class="field-message-content"><%- descError %></span>
+                </div>
+                <div id="new-url-desc-input-help" class="field-hint">
+                    <%- urlDescHelp %>
+                    <% if (urlDescHelpLink) { %>
+                        <a href="<%- urlDescHelpLink['href'] %>">
+                            <%- urlDescHelpLink['text'] %>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+            <div class="field"><% if (imageUploadHandler) { %>
+                <label for="img-is-decorative" class="field-label label-inline">
+                    <input type="checkbox" id="img-is-decorative" class="field-input input-checkbox">
+                    <span class="field-input-label"><%- imageIsDecorativeLabel %></span>
+                </label> <% }
+            %></div>
+        </fieldset>
+        <div class="form-actions">
+            <input type="button" id="new-link-image-ok" class="btn btn-primary form-btn" value="<%- okText %>" />
+            <input type="button" id="new-link-image-cancel" class="btn btn-outline-primary form-btn" value="<%- cancelText %>" >
+        </div>
+    </form>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="nav-loading-template">
+<li class='forum-nav-load-more'>
+    <button class='btn-link forum-nav-load-more-link'>
+        <%- gettext("Load more") %>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+<div class="post-field">
+<fieldset>
+    <legend class="field-label">
+        <span class="field-label-text">
+            <% // Translators: This is the label for a control to select a forum post type %>
+            <%- gettext("Post type") %>
+        </span>
+    </legend>
+    <div class="field-help" id="field_help_post_type">
+        <%- gettext("Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)") %>
+    </div>
+    <div class="field-label">
+        <label for="<%- edx.StringUtils.interpolate(form_id) %>-post-type-question" class="post-type-label">
+            <input aria-describedby="field_help_post_type" type="radio" name="<%- edx.StringUtils.interpolate(form_id) %>-post-type" class="field-input input-radio" id="<%- edx.StringUtils.interpolate(form_id) %>-post-type-question" value="question">
+            <span class="field-input-label">
+                <span class="icon fa fa-question" aria-hidden="true"></span>
+                <% // Translators: This is a forum post type %>
+                <%- gettext("Question") %>
+            </span>
+        </label>
+        <label for="<%- edx.StringUtils.interpolate(form_id) %>-post-type-discussion" class="post-type-label">
+            <input aria-describedby="field_help_post_type" type="radio" name="<%- edx.StringUtils.interpolate(form_id) %>-post-type" class="field-input input-radio" id="<%- edx.StringUtils.interpolate(form_id) %>-post-type-discussion" value="discussion" checked>
+            <span class="field-input-label">
+                <span class="icon fa fa-comments" aria-hidden="true"></span>
+                <% // Translators: This is a forum post type %>
+                <%- gettext("Discussion") %>
+            </span>
+        </label>
+    </div>
+</fieldset>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-endorse">
+<li class="actions-item">
+    <button class="btn-link action-button action-endorse" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Endorse") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Endorse") %></span>
+            <span class="label-checked"><%- gettext("Unendorse") %></span>
+        </span>
+        <span class="action-icon"><span class="icon fa fa-check" aria-hidden="true"></span></span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-answer">
+<li class="actions-item">
+    <button class="btn-link action-button action-answer" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Mark as Answer") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Mark as Answer") %></span>
+            <span class="label-checked"><%- gettext("Unmark as Answer") %></span>
+        </span>
+        <span class="action-icon"><span class="icon fa fa-check" aria-hidden="true"></span></span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-follow">
+<li class="actions-item">
+    <button class="btn-link action-button action-follow" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Follow") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Follow") %></span>
+            <span class="label-checked"><%- gettext("Unfollow") %></span>
+        </span>
+        <span class="action-icon"><span class="icon fa fa-star" aria-hidden="true"></span></span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-vote">
+<li class="actions-item">
+    <span aria-hidden="true" class="display-vote is-hidden" >
+      <span class="vote-count"></span>
+    </span>
+    <button class="btn-link action-button action-vote" role="checkbox" aria-checked="false">
+        <% // Vote counts are populated by JS %>
+        <span class="sr"><%- gettext("Vote for this post,") %>&nbsp;</span>
+        <span class="sr js-sr-vote-count"></span>
+
+        <span class="action-label" aria-hidden="true">
+          <span class="vote-count"></span>
+        </span>
+
+        <span class="action-icon" aria-hidden="true">
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-report">
+<li class="actions-item">
+    <button class="btn-link action-list-item action-report" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Report abuse") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Report") %></span>
+            <span class="label-checked"><%- gettext("Unreport") %></span>
+        </span>
+        <span class="action-icon">
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-pin">
+<li class="actions-item">
+    <button class="btn-link action-list-item action-pin" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Pin") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Pin") %></span>
+            <span class="label-checked"><%- gettext("Unpin") %></span>
+        </span>
+        <span class="action-icon">
+          <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-close">
+<li class="actions-item">
+    <button class="btn-link action-list-item action-close" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Close") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Close") %></span>
+            <span class="label-checked"><%- gettext("Open") %></span>
+        </span>
+        <span class="action-icon">
+          <span class="icon fa fa-lock" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-edit">
+<li class="actions-item">
+    <button class="btn-link action-list-item action-edit">
+        <span class="action-label"><%- gettext("Edit") %></span>
+        <span class="action-icon"><span class="icon fa fa-pencil" aria-hidden="true"></span></span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-action-delete">
+<li class="actions-item">
+    <button class="btn-link action-list-item action-delete">
+        <span class="action-label"><%- gettext("Delete") %></span>
+        <span class="action-icon"><span class="icon fa fa-remove" aria-hidden="true"></span></span>
+    </button>
+</li>
+</script>
+<script aria-hidden="true" type="text/template" id="forum-actions">
+<% if (!readOnly) { %>
+    <ul class="<%- contentType %>-actions-list">
+        <% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>
+        <li class="actions-item is-visible">
+            <div class="more-wrapper">
+                <button class="btn-link action-button action-more" aria-label="<%- gettext('More') %>" aria-haspopup="true" aria-controls="action-menu-<%- contentType %>-<%- contentId %>">
+                    <span class="action-label"><%- gettext('More') %></span>
+                    <span class="action-icon"><span class="icon fa fa-ellipsis-h" aria-hidden="true"></span></span>
+                </button>
+                <div class="actions-dropdown" id="action-menu-<%- contentType %>-<%- contentId %>" aria-expanded="false">
+                  <ul class="actions-dropdown-list">
+                    <% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>
+                  </ul>
+                </div>
+            </div>
+        </li>
+    </ul>
+<% } %>
+</script>
+<script aria-hidden="true" type="text/template" id="alert-popup">
+<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'>
+    <div class='inner-wrapper discussion-alert-wrapper'>
+        <button class='btn close-modal dismiss' title='<%- gettext("Close") %>''>
+            <span class='icon fa fa-times' aria-hidden='true'></span>
+        </button>
+        <header>
+            <h2/></h2>
+            <hr/>
+        </header>
+        <p id='discussion-alert-message'></p>
+        <hr/>
+        <button class='btn dismiss'><%- gettext("OK") %></button>
+    </div>
+</div>
+</script>
+<script aria-hidden="true" type="text/template" id="nav-load-more-link">
+<li class='forum-nav-load-more'>
+    <button class='btn-link forum-nav-load-more-link'>
+        <%- gettext("Load more") %>
+    </button>
+</li>
+</script>

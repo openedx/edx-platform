@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

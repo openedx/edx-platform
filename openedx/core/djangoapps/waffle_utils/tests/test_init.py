@@ -1,6 +1,7 @@
 """
 Tests for waffle utils features.
 """
+# pylint: disable=toggle-missing-annotation
 
 import crum
 import ddt
@@ -11,11 +12,7 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 
-from .. import (
-    CourseWaffleFlag,
-    WaffleFlagNamespace,
-    WaffleSwitchNamespace,
-)
+from .. import CourseWaffleFlag
 from ..models import WaffleFlagCourseOverrideModel
 
 
@@ -33,8 +30,7 @@ class TestCourseWaffleFlag(TestCase):
 
     TEST_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
     TEST_COURSE_2_KEY = CourseKey.from_string("edX/DemoX/Demo_Course_2")
-    TEST_NAMESPACE = WaffleFlagNamespace(NAMESPACE_NAME)
-    TEST_COURSE_FLAG = CourseWaffleFlag(TEST_NAMESPACE, FLAG_NAME, __name__)
+    TEST_COURSE_FLAG = CourseWaffleFlag(NAMESPACE_NAME, FLAG_NAME, __name__)
 
     def setUp(self):
         super().setUp()
@@ -83,7 +79,7 @@ class TestCourseWaffleFlag(TestCase):
         Test flag with undefined waffle flag.
         """
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
@@ -109,7 +105,7 @@ class TestCourseWaffleFlag(TestCase):
         """
         crum.set_current_request(None)
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
@@ -121,20 +117,9 @@ class TestCourseWaffleFlag(TestCase):
         """
         crum.set_current_request(None)
         test_course_flag = CourseWaffleFlag(
-            self.TEST_NAMESPACE,
+            self.NAMESPACE_NAME,
             self.FLAG_NAME,
             __name__,
         )
         with override_flag(self.NAMESPACED_FLAG_NAME, active=True):
             assert test_course_flag.is_enabled(self.TEST_COURSE_KEY) is True
-
-
-class DeprecatedWaffleFlagTests(TestCase):
-    """
-    Tests for the deprecated waffle methods, including override and import paths.
-    """
-
-    def test_waffle_switch_namespace_override(self):
-        namespace = WaffleSwitchNamespace("namespace")
-        with namespace.override("waffle_switch1", True):
-            assert namespace.is_enabled('waffle_switch1')

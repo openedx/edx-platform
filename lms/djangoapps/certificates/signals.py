@@ -12,7 +12,9 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.generation_handler import (
+    can_generate_certificate_task,
     generate_allowlist_certificate_task,
+    generate_certificate_task,
     is_using_certificate_allowlist_and_is_on_allowlist
 )
 from lms.djangoapps.certificates.models import (
@@ -76,10 +78,10 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     Listen for a learner passing a course, send cert generation task,
     downstream signal from COURSE_GRADE_CHANGED
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_id):
-        log.info(f'{course_id} is using allowlist certificates, and the user {user.id} is on its allowlist. Attempt '
-                 f'will be made to generate an allowlist certificate as a passing grade was received.')
-        return generate_allowlist_certificate_task(user, course_id)
+    if can_generate_certificate_task(user, course_id):
+        log.info(f'{course_id} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
+                 f'{user.id} as a passing grade was received.')
+        return generate_certificate_task(user, course_id)
 
     if not auto_certificate_generation_enabled():
         return
@@ -129,11 +131,10 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
     expected_verification_status = IDVerificationService.user_status(user)
     expected_verification_status = expected_verification_status['status']
     for enrollment in user_enrollments:
-        if is_using_certificate_allowlist_and_is_on_allowlist(user, enrollment.course_id):
-            log.info(f'{enrollment.course_id} is using allowlist certificates, and the user {user.id} is on its '
-                     f'allowlist. Attempt will be made to generate an allowlist certificate. Id verification status '
-                     f'is {expected_verification_status}')
-            generate_allowlist_certificate_task(user, enrollment.course_id)
+        if can_generate_certificate_task(user, enrollment.course_id):
+            log.info(f'{enrollment.course_id} is using V2 certificates. Attempt will be made to generate a V2 '
+                     f'certificate for {user.id}. Id verification status is {expected_verification_status}')
+            generate_certificate_task(user, enrollment.course_id)
         elif grade_factory.read(user=user, course=enrollment.course_overview).passed:
             if _fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):
                 message = (
@@ -156,11 +157,10 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
     if the user has moved to the audit track.
     """
     if modes_api.is_eligible_for_certificate(mode):
-        if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-            log.info(f'{course_key} is using allowlist certificates, and the user {user.id} is on its allowlist. '
-                     f'Attempt will be made to generate an allowlist certificate since the enrollment mode is now '
-                     f'{mode}.')
-            generate_allowlist_certificate_task(user, course_key)
+        if can_generate_certificate_task(user, course_key):
+            log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
+                     f'{user.id} since the enrollment mode is now {mode}.')
+            generate_certificate_task(user, course_key)
 
 
 def _fire_ungenerated_certificate_task(user, course_key, expected_verification_status=None):

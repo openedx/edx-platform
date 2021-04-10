@@ -57,11 +57,7 @@ class IPFilterFormTest(TestCase):
     """Test form for adding [black|white]list IP addresses"""
 
     def tearDown(self):
-<<<<<<< HEAD
-        super(IPFilterFormTest, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().tearDown()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache
         # and don't interfere with each other
         cache.clear()
@@ -79,31 +75,13 @@ class IPFilterFormTest(TestCase):
         form.save()
         whitelist = IPFilter.current().whitelist_ips
         blacklist = IPFilter.current().blacklist_ips
-<<<<<<< HEAD
-        for addr in u'127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
-            assert addr.strip() in whitelist
-        for addr in u'18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
-=======
         for addr in '127.0.0.1, 2003:dead:beef:4dad:23:46:bb:101'.split(','):
             assert addr.strip() in whitelist
         for addr in '18.244.1.5, 2002:c0a8:101::42, 18.36.22.1'.split(','):
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
             assert addr.strip() in blacklist
 
         # Network tests
         # ips not in whitelist network
-<<<<<<< HEAD
-        for addr in [u'1.1.0.2', u'1.0.1.0']:
-            assert addr.strip() not in whitelist
-        # ips in whitelist network
-        for addr in [u'1.1.0.1', u'1.0.0.100']:
-            assert addr.strip() in whitelist
-        # ips not in blacklist network
-        for addr in [u'2.0.0.0', u'1.1.0.0']:
-            assert addr.strip() not in blacklist
-        # ips in blacklist network
-        for addr in [u'1.0.100.0', u'1.0.0.10']:
-=======
         for addr in ['1.1.0.2', '1.0.1.0']:
             assert addr.strip() not in whitelist
         # ips in whitelist network
@@ -114,7 +92,6 @@ class IPFilterFormTest(TestCase):
             assert addr.strip() not in blacklist
         # ips in blacklist network
         for addr in ['1.0.100.0', '1.0.0.10']:
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
             assert addr.strip() in blacklist
 
         # Test clearing by adding an empty list is OK too
@@ -137,29 +114,12 @@ class IPFilterFormTest(TestCase):
         form = IPFilterForm(data=form_data)
         assert not form.is_valid()
 
-<<<<<<< HEAD
-        if six.PY2:
-            wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
-                   " Please fix the error(s) and try again."
-        else:
-            wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']" \
-                   " Please fix the error(s) and try again."
-        assert wmsg == form._errors['whitelist'][0]  # pylint: disable=protected-access
-
-        if six.PY2:
-            bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
-                   " Please fix the error(s) and try again."
-        else:
-            bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']" \
-                   " Please fix the error(s) and try again."
-=======
         wmsg = "Invalid IP Address(es): ['.0.0.1', ':dead:beef:::', '1.0.0.0/55']"\
                " Please fix the error(s) and try again."
         assert wmsg == form._errors['whitelist'][0]  # pylint: disable=protected-access
 
         bmsg = "Invalid IP Address(es): ['18.244.*', '999999:c0a8:101::42', '1.0.0.0/']"\
                " Please fix the error(s) and try again."
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         assert bmsg == form._errors['blacklist'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(ValueError, "The IPFilter could not be created because the data didn't validate."):

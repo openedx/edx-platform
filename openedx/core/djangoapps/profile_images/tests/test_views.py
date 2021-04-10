@@ -1,9 +1,11 @@
 """
 Test cases for the HTTP endpoints of the profile image api.
 """
+from contextlib import closing
+from unittest import mock
+from unittest.mock import patch
 
 import pytest
-from contextlib import closing
 import datetime
 from pytz import UTC
 
@@ -11,8 +13,6 @@ from django.urls import reverse
 from django.http import HttpResponse
 
 import ddt
-import mock
-from mock import patch
 from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
@@ -44,7 +44,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
     _view_name = None
 
     def setUp(self):
-        super(ProfileImageEndpointMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         # Ensure that parental controls don't apply to this user
         self.user.profile.year_of_birth = 1980
@@ -62,7 +62,7 @@ class ProfileImageEndpointMixin(UserSettingsEventTestMixin):
         self.reset_tracker()
 
     def tearDown(self):
-        super(ProfileImageEndpointMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
         for name in get_profile_image_names(self.user.username).values():
             self.storage.delete(name)
 
@@ -212,7 +212,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
                 self.url,
                 data,
                 content_type=content_type,
-                HTTP_CONTENT_DISPOSITION='attachment;filename=filename{}'.format(extension),
+                HTTP_CONTENT_DISPOSITION=f'attachment;filename=filename{extension}',
             )
             self.check_response(response, 204)
             self.check_images()
@@ -297,8 +297,8 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -313,8 +313,8 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         response = self.client.post(self.url, {'file': 'not a file'}, format='multipart')
         self.check_response(
             response, 400,
-            expected_developer_message=u"No file provided for profile image",
-            expected_user_message=u"No file provided for profile image",
+            expected_developer_message="No file provided for profile image",
+            expected_user_message="No file provided for profile image",
         )
         self.check_images(False)
         self.check_has_profile_image(False)
@@ -329,13 +329,13 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         with make_image_file() as image_file:
             with mock.patch(
                 'openedx.core.djangoapps.profile_images.views.validate_uploaded_image',
-                side_effect=ImageValidationError(u"test error message")
+                side_effect=ImageValidationError("test error message")
             ):
                 response = self.client.post(self.url, {'file': image_file}, format='multipart')
                 self.check_response(
                     response, 400,
-                    expected_developer_message=u"test error message",
-                    expected_user_message=u"test error message",
+                    expected_developer_message="test error message",
+                    expected_user_message="test error message",
                 )
                 self.check_images(False)
                 self.check_has_profile_image(False)
@@ -348,7 +348,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when upload validation fails, the proper HTTP response and
         messages are returned.
         """
-        image_open.side_effect = [Exception(u"whoops"), None]
+        image_open.side_effect = [Exception("whoops"), None]
         with make_image_file() as image_file:
             with pytest.raises(Exception):
                 self.client.post(self.url, {'file': image_file}, format='multipart')
@@ -367,7 +367,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
     _view_name = "accounts_profile_image_api"
 
     def setUp(self):
-        super(ProfileImageViewDeleteTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         with make_image_file() as image_file:
             create_profile_images(image_file, get_profile_image_names(self.user.username))
             self.check_images()
@@ -447,7 +447,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         Test that when remove validation fails, the proper HTTP response and
         messages are returned.
         """
-        user_profile_save.side_effect = [Exception(u"whoops"), None]
+        user_profile_save.side_effect = [Exception("whoops"), None]
         with pytest.raises(Exception):
             self.client.delete(self.url)
         self.check_images(True)  # thumbnails should remain intact.

@@ -10,11 +10,6 @@ import geoip2.database
 import maxminddb
 import ddt
 import pytest
-<<<<<<< HEAD
-import mock
-from mock import patch, MagicMock
-=======
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -54,11 +49,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-<<<<<<< HEAD
-        super(EmbargoCheckAccessApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().setUp()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
@@ -279,11 +270,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-<<<<<<< HEAD
-        super(EmbargoMessageUrlApiTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().setUp()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         self.course = CourseFactory.create()
 
     @ddt.data(

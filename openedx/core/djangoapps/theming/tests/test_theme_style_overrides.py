@@ -23,7 +23,7 @@ class TestComprehensiveThemeLMS(TestCase):
         """
         Clear static file finders cache and register cleanup methods.
         """
-        super(TestComprehensiveThemeLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
         # Clear the internal staticfiles caches, to get test isolation.
@@ -152,7 +152,7 @@ class TestComprehensiveThemeDisabledLMS(TestCase):
         """
         Clear static file finders cache.
         """
-        super(TestComprehensiveThemeDisabledLMS, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()
@@ -177,7 +177,7 @@ class TestStanfordTheme(TestCase):
         """
         Clear static file finders cache and register cleanup methods.
         """
-        super(TestStanfordTheme, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Clear the internal staticfiles caches, to get test isolation.
         staticfiles.finders.get_finder.cache_clear()

@@ -23,7 +23,6 @@ Modulestore virtual   |          XML physical (draft, published)
 
 
 import json
-import io
 import logging
 import mimetypes
 import os
@@ -31,7 +30,7 @@ import re
 from abc import abstractmethod
 
 import xblock
-from edx_django_utils.monitoring import set_custom_attribute
+from django.utils.translation import ugettext as _
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -40,6 +39,7 @@ from xblock.core import XBlockMixin
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
+from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
@@ -173,9 +173,9 @@ class StaticContentImporter:  # lint-amnesty, pylint: disable=missing-class-docs
         try:
             self.static_content_store.save(content)
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-            msg = f"Error importing {file_subpath}, error={err}"
-            log.exception(msg)
-            set_custom_attribute('course_import_failure', f"Static Content Save Failure: {msg}")
+            msg = f'Error importing {file_subpath}, error={err}'
+            log.exception(f'Course import {self.target_id}: {msg}')
+            monitor_import_failure(self.target_id, 'Updating', exception=err)
 
         return file_subpath, asset_key
 
@@ -234,6 +234,7 @@ class ImportManager:
             create_if_not_present=False, raise_on_failure=False,
             static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
             python_lib_filename='python_lib.zip',
+            status=None
     ):
         self.store = store
         self.user_id = user_id
@@ -258,6 +259,7 @@ class ImportManager:
             xblock_select=store.xblock_select,
             target_course_id=target_id,
         )
+        self.status = status
         self.logger, self.errors = make_error_tracker()
 
     def preflight(self):
@@ -274,7 +276,7 @@ class ImportManager:
         Import all static items into the content store.
         """
         if self.static_content_store is None:
-            log.error(
+            log.warning(
                 f'Course import {self.target_id}: Static content store is None. Skipping static content import.'
             )
             return
@@ -356,11 +358,15 @@ class ImportManager:
                     asset_md.from_xml(asset)
                     all_assets.append(asset_md)
         except OSError:
-            logging.info('No %s file is present with asset metadata.', assets_filename)
+            # file does not exist.
+            logging.info(f'Course import {course_id}: No {assets_filename} file present.')
             return
-        except Exception:  # pylint: disable=W0703
-            logging.exception('Error while parsing asset xml.')
+        except Exception as exc:  # pylint: disable=W0703
+            monitor_import_failure(course_id, 'Updating', exception=exc)
+            logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
+                if self.status:
+                    self.status.fail(_('Error while reading {}. Check file for XML errors.').format(assets_filename))
                 raise
             else:
                 return
@@ -476,8 +482,14 @@ class ImportManager:
                         )
                     except Exception:
                         log.exception(
-                            f'Course import {self.target_id}: failed to import module location {child.location}'
+                            f'Course import {dest_id}: failed to import module location {child.location}'
                         )
+                        if self.status:
+                            self.status.fail(
+                                _('Failed to import module: {} at location: {}').format(
+                                    child.display_name, child.location
+                                )
+                            )
                         raise
 
                     depth_first(child)
@@ -499,9 +511,14 @@ class ImportManager:
                     runtime=courselike.runtime,
                 )
             except Exception:
-                msg = f'failed to import module location {leftover}'
+                msg = f'Course import {dest_id}: failed to import module location {leftover}'
                 log.error(msg)
-                set_custom_attribute('course_import_failure', f"Module Load failure: {msg}")
+                if self.status:
+                    self.status.fail(
+                        _('Failed to import module: {} at location: {}').format(
+                            leftover.display_name, leftover.location
+                        )
+                    )
                 raise
 
     def run_imports(self):
@@ -588,6 +605,10 @@ class CourseImportManager(ImportManager):
                     "Skipping import of course with id, %s, "
                     "since it collides with an existing one", dest_id
                 )
+                if self.status:
+                    self.status.fail(
+                        _('Aborting import because a course with this id: {} already exists.').format(dest_id)
+                    )
                 raise
 
         return dest_id, runtime
@@ -697,6 +718,8 @@ class LibraryImportManager(ImportManager):
                     "Skipping import of Library with id %s, "
                     "since it collides with an existing one", dest_id
                 )
+                if self.status:
+                    self.status.fail(_('Aborting import since a library with this id already exists.'))
                 raise
 
         return dest_id, runtime
@@ -1006,7 +1029,7 @@ def _import_course_draft(
         try:
             _import_module(draft.module)
         except Exception:  # pylint: disable=broad-except
-            logging.exception('while importing draft descriptor %s', draft.module)
+            logging.exception(f'Course import {source_course_id}: while importing draft descriptor {draft.module}')
 
 
 def allowed_metadata_by_category(category):

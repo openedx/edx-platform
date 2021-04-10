@@ -48,7 +48,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
-        super(TpaAPITestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         google = self.configure_google_provider(enabled=True)
         self.configure_facebook_provider(enabled=True)
@@ -133,7 +133,7 @@ class UserViewsMixin:
         assert response.status_code == expect_result
         if expect_result == 200:
             assert 'active' in response.data
-            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
+            self.assertCountEqual(response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         # A server with a valid API key can query any user's list of providers
@@ -149,7 +149,7 @@ class UserViewsMixin:
         assert response.status_code == expect_result
         if expect_result == 200:
             assert 'active' in response.data
-            six.assertCountEqual(self, response.data["active"], self.expected_active(target_user))
+            self.assertCountEqual(response.data["active"], self.expected_active(target_user))
 
     @ddt.data(
         (True, ALICE_USERNAME, 200, True),
@@ -353,7 +353,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         if expect_code == 200:
             for item in ['results', 'count', 'num_pages']:
                 assert item in response.data
-            six.assertCountEqual(self, response.data['results'], expect_result)
+            self.assertCountEqual(response.data['results'], expect_result)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -363,7 +363,7 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
     """
 
     def setUp(self, *args, **kwargs):
-        super(TestThirdPartyAuthUserStatusView, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp(*args, **kwargs)
         self.user = UserFactory.create(password=PASSWORD)
         self.google_provider = self.configure_google_provider(enabled=True, visible=True)
         self.url = reverse('third_party_auth_user_status_api')

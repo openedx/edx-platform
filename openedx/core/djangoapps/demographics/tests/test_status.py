@@ -1,7 +1,7 @@
 """
 Test status utilities
 """
-import mock
+from unittest import mock
 
 from django.conf import settings
 from pytest import mark
@@ -59,7 +59,7 @@ class TestShowDemographics(SharedModuleStoreTestCase):  # lint-amnesty, pylint: 
 @mark.django_db
 class TestShowCallToAction(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def setUp(self):
-        super(TestShowCallToAction, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory()
 
     def test_new_user(self):

@@ -27,7 +27,7 @@ def show_reference_template(request, template):
     e.g. /template/ux/reference/index.html?name=Foo
     """
     try:
-        is_v1 = u'/v1/' in request.path
+        is_v1 = '/v1/' in request.path
         uses_bootstrap = not is_v1
         context = {
             'request': request,

@@ -1,0 +1,48 @@
+<div class="wrapper wrapper-<%- type %> wrapper-<%- type %>-<%- intent %>
+            <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
+            <% if(_.contains(['help', 'mini'], intent)) { %>wrapper-<%- type %>-status<% } %>"
+     id="<%- type %>-<%- intent %>"
+     aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
+     aria-labelledby="<%- type %>-<%- intent %>-title"
+     tabindex="-1"
+     <% if (obj.message) { %>aria-describedby="<%- type %>-<%- intent %>-description" <% } %>
+     <% if (obj.actions) { %>role="dialog"<% } %>
+  >
+  <div class="<%- type %> <%- intent %> <% if(obj.actions) { %>has-actions<% } %>">
+    <% if(obj.icon) { %>
+      <% var iconClass = {"warning": "warning", "confirmation": "check", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog"} %>
+      <span class="feedback-symbol fa fa-<%- iconClass[intent] %>" aria-hidden="true"></span>
+    <% } %>
+
+    <div class="copy">
+      <h2 class="title title-3" id="<%- type %>-<%- intent %>-title"><%- title %></h2>
+      <% if(obj.message) { %><p class="message" id="<%- type %>-<%- intent %>-description"><%- message %></p><% } %>
+    </div>
+
+    <% if(obj.actions) { %>
+    <nav class="nav-actions">
+      <ul>
+        <% if(actions.primary) { %>
+        <li class="nav-item">
+          <button class="action-primary <%- actions.primary.class %>"><%- actions.primary.text %></button>
+        </li>
+        <% } %>
+        <% if(actions.secondary) {
+             _.each(actions.secondary, function(secondary) { %>
+        <li class="nav-item">
+          <button class="action-secondary <%- secondary.class %>"><%- secondary.text %></button>
+        </li>
+        <%   });
+           } %>
+      </ul>
+    </nav>
+    <% } %>
+
+    <% if(obj.closeIcon) { %>
+    <a href="#" rel="view" class="action action-close action-<%- type %>-close">
+      <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+      <span class="label">close <%- type %></span>
+    </a>
+    <% } %>
+  </div>
+</div>

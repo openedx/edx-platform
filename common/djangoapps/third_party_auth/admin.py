@@ -55,7 +55,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         Filter the queryset to exclude the archived records.
         """
-        queryset = super(SAMLProviderConfigAdmin, self).get_queryset(request).exclude(archived=True)  # lint-amnesty, pylint: disable=super-with-arguments
+        queryset = super().get_queryset(request).exclude(archived=True)
         return queryset
 
     def archive_provider_configuration(self, request, queryset):
@@ -80,7 +80,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         Get the actions.
         """
-        actions = super(SAMLProviderConfigAdmin, self).get_actions(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        actions = super().get_actions(request)
         action_delete = {
             'archive_provider_configuration': (
                 SAMLProviderConfigAdmin.archive_provider_configuration,
@@ -127,7 +127,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         Note: This only works if the celery worker and the app worker are using the
         same 'configuration' cache.
         """
-        super(SAMLProviderConfigAdmin, self).save_model(request, obj, form, change)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().save_model(request, obj, form, change)
         fetch_saml_metadata.apply_async((), countdown=2)
 
 admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)

@@ -667,19 +667,27 @@ class Transcript:
                         error_handling=SubRipFile.ERROR_RAISE
                     )
                 except Error as ex:   # Base exception from pysrt
-                    raise TranscriptsGenerationException(str(ex))  # lint-amnesty, pylint: disable=raise-missing-from
+                    raise TranscriptsGenerationException(str(ex)) from ex
 
                 return json.dumps(generate_sjson_from_srt(srt_subs))
 
         if input_format == 'sjson':
+            # If the JSON file content is bytes, try UTF-8, then Latin-1
+            if isinstance(content, bytes):
+                try:
+                    content_str = content.decode('utf-8')
+                except UnicodeDecodeError:
+                    content_str = content.decode('latin-1')
+            else:
+                content_str = content
 
             if output_format == 'txt':
-                text = json.loads(content)['text']
+                text = json.loads(content_str)['text']
                 text_without_none = [line if line else '' for line in text]
                 return html.unescape("\n".join(text_without_none))
 
             elif output_format == 'srt':
-                return generate_srt_from_sjson(json.loads(content), speed=1.0)
+                return generate_srt_from_sjson(json.loads(content_str), speed=1.0)
 
     @staticmethod
     def asset(location, subs_id, lang='en', filename=None):

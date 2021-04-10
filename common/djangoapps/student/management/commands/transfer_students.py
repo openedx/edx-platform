@@ -8,7 +8,6 @@ from textwrap import dedent
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track.management.tracked_command import TrackedCommand

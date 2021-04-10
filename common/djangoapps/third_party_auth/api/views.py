@@ -40,7 +40,7 @@ class ProviderBaseThrottle(throttling.UserRateThrottle):
         Only throttle unprivileged requests.
         """
         if view.is_unprivileged_query(request, view.get_identifier_for_requested_user(request)):
-            return super(ProviderBaseThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().allow_request(request, view)
         return True
 
 
@@ -378,7 +378,7 @@ class UserMappingView(ListAPIView):
         Extra context provided to the serializer class with current provider. We need the provider to
         remove idp_slug from the remote_id if there is any
         """
-        context = super(UserMappingView, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        context = super().get_serializer_context()
         context['provider'] = self.provider
 
         return context

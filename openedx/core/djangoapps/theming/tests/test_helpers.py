@@ -3,11 +3,10 @@ Test helpers for Comprehensive Theming.
 """
 
 
-import six
+from unittest.mock import Mock, patch
 from django.conf import settings
 from django.test import TestCase, override_settings
 from edx_django_utils.cache import RequestCache  # lint-amnesty, pylint: disable=unused-import
-from mock import Mock, patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
@@ -39,7 +38,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        six.assertCountEqual(self, expected_themes, actual_themes)
+        self.assertCountEqual(expected_themes, actual_themes)
 
     @override_settings(COMPREHENSIVE_THEME_DIRS=[settings.TEST_THEME.dirname()])
     def test_get_themes_2(self):
@@ -50,7 +49,7 @@ class TestHelpers(TestCase):
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
-        six.assertCountEqual(self, expected_themes, actual_themes)
+        self.assertCountEqual(expected_themes, actual_themes)
 
     def test_get_value_returns_override(self):
         """

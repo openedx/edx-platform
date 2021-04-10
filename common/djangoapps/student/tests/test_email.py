@@ -15,7 +15,6 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
 from edx_toggles.toggles.testutils import override_waffle_flag
-from six import text_type
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context

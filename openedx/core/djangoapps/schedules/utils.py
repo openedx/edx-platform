@@ -15,11 +15,11 @@ LOG = logging.getLogger(__name__)
 
 # TODO: consider using a LoggerAdapter instead of this mixin:
 # https://docs.python.org/2/library/logging.html#logging.LoggerAdapter
-class PrefixedDebugLoggerMixin(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class PrefixedDebugLoggerMixin:  # lint-amnesty, pylint: disable=missing-class-docstring
     log_prefix = None
 
     def __init__(self, *args, **kwargs):
-        super(PrefixedDebugLoggerMixin, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
         if self.log_prefix is None:
             self.log_prefix = self.__class__.__name__
 

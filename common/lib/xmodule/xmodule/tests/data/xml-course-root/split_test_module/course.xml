@@ -1,0 +1,19 @@
+<course url_name='split_test_course' org='split_test' course='split_test'>
+    <chapter>
+        <sequential>
+            <vertical>
+                <split_test url_name="split1" user_partition_id="0" group_id_to_child='{"0": "i4x://split_test/split_test/vertical/sample_0", "2": "i4x://split_test/split_test/vertical/sample_2"}'>
+                    <vertical url_name="sample_0">
+                        <html>Here is a prompt for group 0, please respond in the discussion.</html>
+                        <discussion for="split test discussion 0" id="split_test_d0" discussion_category="Lectures"/>
+                    </vertical>
+
+                    <vertical url_name="sample_2">
+                        <html>Here is a prompt for group 2, please respond in the discussion.</html>
+                        <discussion for="split test discussion 2" id="split_test_d2" discussion_category="Lectures"/>
+                    </vertical>
+                </split_test>
+            </vertical>
+        </sequential>
+    </chapter>
+</course>

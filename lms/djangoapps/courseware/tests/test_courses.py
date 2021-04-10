@@ -443,3 +443,17 @@ class TestGetCourseAssignments(CompletionWaffleTestMixin, ModuleStoreTestCase):
         assignments = get_course_assignments(course.location.context_key, self.user, None)
         assert len(assignments) == 1
         assert assignments[0].complete
+
+    def test_completion_does_not_count_empty_sequentials(self):
+        """
+        Test that we treat a sequential with no content as incomplete.
+
+        This can happen with unreleased assignments, for example (start date in future).
+        """
+        course = CourseFactory()
+        chapter = ItemFactory(parent=course, category='chapter', graded=True, due=datetime.datetime.now())
+        ItemFactory(parent=chapter, category='sequential')
+
+        assignments = get_course_assignments(course.location.context_key, self.user, None)
+        assert len(assignments) == 1
+        assert not assignments[0].complete

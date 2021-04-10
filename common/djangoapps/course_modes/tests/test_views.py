@@ -12,22 +12,21 @@ import ddt
 import freezegun
 import httpretty
 import pytz
-import six
 from django.conf import settings
 from django.urls import reverse
 
 from common.djangoapps.course_modes.models import CourseMode, Mode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import UrlResetMixin
-from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -43,7 +42,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
-        super(CourseModeViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         now = datetime.now(pytz.utc)
         day = timedelta(days=1)
         tomorrow = now + day
@@ -363,7 +362,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
 
         # Expect that the contribution amount is stored in the user's session
         assert 'donation_for_course' in self.client.session
-        assert six.text_type(self.course.id) in self.client.session['donation_for_course']
+        assert str(self.course.id) in self.client.session['donation_for_course']
 
         actual_amount = self.client.session['donation_for_course'][str(self.course.id)]
         expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
@@ -517,7 +516,7 @@ class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super(TrackSelectionEmbargoTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Create a course and course modes
         self.course = CourseFactory.create()

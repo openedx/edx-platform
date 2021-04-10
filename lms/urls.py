@@ -257,9 +257,9 @@ if settings.WIKI_ENABLED:
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
-        url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
+        url(fr'^courses/{settings.COURSE_ID_PATTERN}/course_wiki/?$',
             course_wiki_views.course_wiki_redirect, name='course_wiki'),
-        url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
+        url(fr'^courses/{settings.COURSE_KEY_REGEX}/wiki/',
             include((wiki_url_patterns, 'course_wiki_do_not_reverse'), namespace='course_wiki_do_not_reverse')),
     ]
 
@@ -315,7 +315,7 @@ urlpatterns += [
     # passed as a 'view' parameter to the URL.
     # Note: This is not an API. Compare this with the xblock_view API above.
     url(
-        r'^xblock/{usage_key_string}$'.format(usage_key_string=settings.USAGE_KEY_PATTERN),
+        fr'^xblock/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.render_xblock,
         name=RENDER_XBLOCK_NAME,
     ),
@@ -665,7 +665,7 @@ urlpatterns += [
 
     # Calendar Sync UI in LMS
     url(
-        r'^courses/{}/'.format(settings.COURSE_ID_PATTERN,),
+        fr'^courses/{settings.COURSE_ID_PATTERN}/',
         include('openedx.features.calendar_sync.urls'),
     ),
 
@@ -779,7 +779,7 @@ urlpatterns += [
 if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
     urlpatterns += [
         url(
-            r'^courses/{}/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$'.format(
+            r'^courses/{}/submission_history/(?P<learner_identifier>[^/]*)/(?P<location>.*?)$'.format(
                 settings.COURSE_ID_PATTERN
             ),
             courseware_views.submission_history,
@@ -913,7 +913,7 @@ urlpatterns += [
 # Custom courses on edX (CCX) URLs
 if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
     urlpatterns += [
-        url(r'^courses/{}/'.format(settings.COURSE_ID_PATTERN),
+        url(fr'^courses/{settings.COURSE_ID_PATTERN}/',
             include('lms.djangoapps.ccx.urls')),
         url(r'^api/ccx/', include(('lms.djangoapps.ccx.api.urls', 'lms.djangoapps.ccx'), namespace='ccx_api')),
     ]
@@ -968,12 +968,6 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             courseware_views.financial_assistance_request,
             name='submit_financial_assistance_request'
         )
-    ]
-
-# Branch.io Text Me The App
-if settings.BRANCH_IO_KEY:
-    urlpatterns += [
-        url(r'^text-me-the-app', student_views.text_me_the_app, name='text_me_the_app'),
     ]
 
 # API docs.

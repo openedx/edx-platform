@@ -5,6 +5,9 @@ Utility functions for third_party_auth
 from uuid import UUID
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from enterprise.models import EnterpriseCustomerUser, EnterpriseCustomerIdentityProvider
+from social_core.pipeline.social_auth import associate_by_email
+
+from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig
 from . import provider
 
 
@@ -92,3 +95,34 @@ def is_enterprise_customer_user(provider_id, user):
 
     return EnterpriseCustomerUser.objects.filter(enterprise_customer=enterprise_idp.enterprise_customer,
                                                  user_id=user.id).exists()
+
+
+def is_oauth_provider(backend_name, **kwargs):
+    """
+    Verify that the third party provider uses oauth
+    """
+    current_provider = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs})
+    if current_provider:
+        return current_provider.provider_id.startswith(OAuth2ProviderConfig.prefix)
+
+    return False
+
+
+def get_associated_user_by_email_response(backend, details, user, *args, **kwargs):
+    """
+    Gets the user associated by the `associate_by_email` social auth method
+    """
+
+    association_response = associate_by_email(backend, details, user, *args, **kwargs)
+
+    if (
+        association_response and
+        association_response.get('user')
+    ):
+        # Only return the user matched by email if their email has been activated.
+        # Otherwise, an illegitimate user can create an account with another user's
+        # email address and the legitimate user would now login to the illegitimate
+        # account.
+        return (association_response, association_response['user'].is_active)
+
+    return (None, False)

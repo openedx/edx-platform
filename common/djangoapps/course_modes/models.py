@@ -6,7 +6,6 @@ Add and create new modes for running courses on this particular LMS
 from collections import defaultdict, namedtuple
 from datetime import timedelta
 import logging
-import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -184,14 +183,14 @@ class CourseMode(models.Model):
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
-    CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
+    CACHE_NAMESPACE = "course_modes.CourseMode.cache."
 
     class Meta:
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
 
     def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=useless-super-delegation
-        super(CourseMode, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         """
@@ -209,7 +208,7 @@ class CourseMode(models.Model):
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
                 _(  # lint-amnesty, pylint: disable=translation-of-non-string
-                    u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(  # lint-amnesty, pylint: disable=line-too-long
+                    "The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(  # lint-amnesty, pylint: disable=line-too-long
                         course_mode=mode_display_name, min_price=min_price_for_mode
                     )
                 )
@@ -222,7 +221,7 @@ class CourseMode(models.Model):
         if self.id is None:
             # If this model has no primary key at save time, it needs to be force-inserted.
             force_insert = True
-        super(CourseMode, self).save(force_insert, force_update, using)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().save(force_insert, force_update, using)
 
     @property
     def slug(self):

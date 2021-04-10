@@ -4,7 +4,6 @@ Test the views served by third_party_auth.
 
 
 import unittest
-import pytest
 
 import ddt
 import pytest
@@ -166,7 +165,7 @@ class IdPRedirectViewTest(SAMLTestCase):
         Test IdPRedirectView.
     """
     def setUp(self):
-        super(IdPRedirectViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.enable_saml()
         self.configure_saml_provider(

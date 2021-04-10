@@ -1340,12 +1340,15 @@ def _course_home_redirect_enabled():
 
 @login_required
 @ensure_valid_course_key
-def submission_history(request, course_id, student_username, location):
+def submission_history(request, course_id, learner_identifier, location):
     """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
     Right now this only works for problems because that's all
     StudentModuleHistory records.
     """
+    found_user_name = get_learner_username(learner_identifier)
+    if not found_user_name:
+        return HttpResponse(escape(_('User does not exist.')))
 
     course_key = CourseKey.from_string(course_id)
 
@@ -1359,15 +1362,15 @@ def submission_history(request, course_id, student_username, location):
 
     # Permission Denied if they don't have staff access and are trying to see
     # somebody else's submission history.
-    if (student_username != request.user.username) and (not staff_access):
+    if (found_user_name != request.user.username) and (not staff_access):
         raise PermissionDenied
 
     user_state_client = DjangoXBlockUserStateClient()
     try:
-        history_entries = list(user_state_client.get_history(student_username, usage_key))
+        history_entries = list(user_state_client.get_history(found_user_name, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
-        return HttpResponse(escape(_('User {username} has never accessed problem {location}').format(
-            username=student_username,
+        return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
+            username=found_user_name,
             location=location
         )))
 
@@ -1375,7 +1378,7 @@ def submission_history(request, course_id, student_username, location):
     # the scores instead, it will have to do.
     csm = StudentModule.objects.filter(
         module_state_key=usage_key,
-        student__username=student_username,
+        student__username=found_user_name,
         course_id=course_key)
 
     scores = BaseStudentModuleHistory.get_history(csm)
@@ -1387,7 +1390,7 @@ def submission_history(request, course_id, student_username, location):
             "%d scores were found, and %d history entries were found. "
             "Matching scores to history entries by date for display.",
             course_id,
-            student_username,
+            found_user_name,
             location,
             len(scores),
             len(history_entries),
@@ -1404,7 +1407,7 @@ def submission_history(request, course_id, student_username, location):
     context = {
         'history_entries': history_entries,
         'scores': scores,
-        'username': student_username,
+        'username': found_user_name,
         'location': location,
         'course_id': str(course_key)
     }
@@ -1577,10 +1580,10 @@ def generate_user_cert(request, course_id):
     if not course:
         return HttpResponseBadRequest(_("Course is not valid"))
 
-    if certs_api.is_using_certificate_allowlist_and_is_on_allowlist(student, course_key):
-        log.info(f'{course_key} is using allowlist certificates, and the user {student.id} is on its allowlist. '
-                 f'Attempt will be made to generate an allowlist certificate.')
-        certs_api.generate_allowlist_certificate_task(student, course_key)
+    if certs_api.can_generate_certificate_task(student, course_key):
+        log.info(f'{course_key} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
+                 f'user {student.id}.')
+        certs_api.generate_certificate_task(student, course_key, 'self')
         return HttpResponse()
 
     if not is_course_passed(student, course):
@@ -2094,3 +2097,10 @@ def get_financial_aid_courses(user):
             )
 
     return financial_aid_courses
+
+
+def get_learner_username(learner_identifier):
+    """ Return the username """
+    learner = User.objects.filter(Q(username=learner_identifier) | Q(email=learner_identifier)).first()
+    if learner:
+        return learner.username

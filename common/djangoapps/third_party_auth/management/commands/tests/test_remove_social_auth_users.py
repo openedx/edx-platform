@@ -36,7 +36,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         cls.command = remove_social_auth_users.Command()
 
     def setUp(self):
-        super(TestRemoveSocialAuthUsersCommand, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.provider_hogwarts = SAMLProviderConfigFactory.create(slug='hogwarts')
         self.provider_durmstrang = SAMLProviderConfigFactory.create(slug='durmstrang')
 

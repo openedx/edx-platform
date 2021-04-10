@@ -2,7 +2,6 @@
 
 import functools
 
-import six
 from django import forms
 from django.contrib import admin
 from django.db.models import F
@@ -40,7 +39,7 @@ def _set_experience(db_name, human_name, modeladmin, request, queryset):  # lint
     )
     modeladmin.message_user(
         request,
-        u"{} schedule(s) were changed to use the {} experience".format(
+        "{} schedule(s) were changed to use the {} experience".format(
             rows_updated,
             human_name,
         )
@@ -51,8 +50,8 @@ def _set_experience(db_name, human_name, modeladmin, request, queryset):  # lint
 experience_actions = []
 for (db_name, human_name) in models.ScheduleExperience.EXPERIENCES:
     partial = functools.partial(_set_experience, db_name, human_name)
-    partial.short_description = u"Convert the selected schedules to the {} experience".format(human_name)
-    partial.__name__ = "set_experience_to_{}".format(db_name)
+    partial.short_description = f"Convert the selected schedules to the {human_name} experience"
+    partial.__name__ = f"set_experience_to_{db_name}"
     experience_actions.append(partial)
 
 
@@ -83,12 +82,12 @@ class CourseIdFilter(admin.SimpleListFilter):
     parameter_name = "course_id"
 
     def __init__(self, request, params, model, model_admin):
-        super(CourseIdFilter, self).__init__(request, params, model, model_admin)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(request, params, model, model_admin)
         self.unused_parameters = params.copy()
         self.unused_parameters.pop(self.parameter_name, None)
 
     def value(self):
-        value = super(CourseIdFilter, self).value()  # lint-amnesty, pylint: disable=super-with-arguments
+        value = super().value()
         if value == "None" or value is None:
             return None
         else:
@@ -96,7 +95,7 @@ class CourseIdFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            (overview.id, six.text_type(overview.id)) for overview in CourseOverview.objects.all().order_by('id')
+            (overview.id, str(overview.id)) for overview in CourseOverview.objects.all().order_by('id')
         )
 
     def queryset(self, request, queryset):
@@ -115,7 +114,7 @@ class CourseIdFilter(admin.SimpleListFilter):
         for lookup, title in self.lookup_choices:
             yield {
                 'selected': self.value() == lookup,
-                'value': six.text_type(lookup),
+                'value': str(lookup),
                 'display': title,
             }
 
@@ -160,7 +159,7 @@ class ScheduleAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=missing-
     course_id.short_description = _('Course ID')
 
     def get_queryset(self, request):
-        qs = super(ScheduleAdmin, self).get_queryset(request)  # lint-amnesty, pylint: disable=super-with-arguments
+        qs = super().get_queryset(request)
         qs = qs.select_related('enrollment', 'enrollment__user')
         return qs
 

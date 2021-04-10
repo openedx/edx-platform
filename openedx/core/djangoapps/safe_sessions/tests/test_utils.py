@@ -4,11 +4,10 @@ Shared test utilities for Safe Sessions tests
 
 
 from contextlib import contextmanager
+from unittest.mock import patch
 
-from mock import patch
 
-
-class TestSafeSessionsLogMixin(object):
+class TestSafeSessionsLogMixin:
     """
     Test Mixin class with helpers for testing log method
     calls in the safe sessions middleware.

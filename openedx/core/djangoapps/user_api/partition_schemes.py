@@ -14,7 +14,7 @@ from xmodule.partitions.partitions import NoSuchUserPartitionGroupError, UserPar
 log = logging.getLogger(__name__)
 
 
-class NotImplementedPartitionScheme(object):
+class NotImplementedPartitionScheme:
     """
     This "scheme" allows previously-defined schemes to be purged, while giving existing
     course data definitions a safe entry point to load.
@@ -30,7 +30,7 @@ class NotImplementedPartitionScheme(object):
         return None
 
 
-class ReturnGroup1PartitionScheme(object):
+class ReturnGroup1PartitionScheme:
     """
     This scheme is needed to allow verification partitions to be killed, see EDUCATOR-199
     """
@@ -43,7 +43,7 @@ class ReturnGroup1PartitionScheme(object):
         return user_partition.get_group(1)
 
 
-class RandomUserPartitionScheme(object):
+class RandomUserPartitionScheme:
     """
     This scheme randomly assigns users into the partition's groups.
     """
@@ -66,7 +66,7 @@ class RandomUserPartitionScheme(object):
             except NoSuchUserPartitionGroupError:
                 # jsa: we can turn off warnings here if this is an expected case.
                 log.warning(
-                    u"group not found in RandomUserPartitionScheme: %r",
+                    "group not found in RandomUserPartitionScheme: %r",
                     {
                         "requested_partition_id": user_partition.id,
                         "requested_group_id": group_id,
@@ -74,7 +74,7 @@ class RandomUserPartitionScheme(object):
                     exc_info=True
                 )
             except ValueError:
-                log.error(u"Bad group_id %r for user: %r", group_id, user)
+                log.error("Bad group_id %r for user: %r", group_id, user)
 
         if group is None and assign and not course_tag_api.BulkCourseTags.is_prefetched(course_key):
             if not user_partition.groups:
@@ -115,4 +115,4 @@ class RandomUserPartitionScheme(object):
         """
         Returns the key to use to look up and save the user's group for a given user partition.
         """
-        return 'xblock.partition_service.partition_{0}'.format(user_partition.id)
+        return f'xblock.partition_service.partition_{user_partition.id}'

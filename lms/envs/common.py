@@ -86,8 +86,6 @@ FEATURES = {
     #   by course staff.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-09-04
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2425
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
 
@@ -111,7 +109,6 @@ FEATURES = {
     #   date.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2012-07-24
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: This will cause ALL courses to be immediately visible.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/17913
     ## DO NOT SET TO True IN THIS FILE
@@ -137,7 +134,6 @@ FEATURES = {
     # .. toggle_description: Add PDF and HTML textbook tabs to the courseware.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-27
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: For consistency in user-experience, keep the value in sync with the setting of the same name
     #   in the CMS.
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/3064
@@ -177,8 +173,6 @@ FEATURES = {
     #   regular expression defined by USERNAME_REGEX_PARTIAL.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2017-06-27
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14729
     'ENABLE_UNICODE_USERNAME': False,
 
@@ -200,9 +194,6 @@ FEATURES = {
     # .. toggle_description: None
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-04-13
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: None
     'ENABLE_MASQUERADE': True,
 
     # .. toggle_name: FEATURES['ENABLE_SYSADMIN_DASHBOARD']
@@ -210,11 +201,10 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
     #   deleting and loading courses, for seeing log of git imports of courseware. Note that some views are noopen_edx
-    # .. toggle_use_cases: open_edx
+    # .. toggle_use_cases: temporary, open_edx
     # .. toggle_creation_date: 2013-12-12
     # .. toggle_target_removal_date: None
     # .. toggle_warnings: This feature is not supported anymore and should have a target removal date.
-    # .. toggle_tickets: None
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     # .. toggle_name: FEATURES['DISABLE_LOGIN_BUTTON']
@@ -224,9 +214,6 @@ FEATURES = {
     #   Change is only at the UI level. Used in systems where login is automatic, eg MIT SSL
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2013-12-03
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: None
     'DISABLE_LOGIN_BUTTON': False,
 
     # .. toggle_name: FEATURES['ENABLE_OAUTH2_PROVIDER']
@@ -238,7 +225,6 @@ FEATURES = {
     # .. toggle_creation_date: 2014-09-09
     # .. toggle_target_removal_date: None
     # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-    # .. toggle_tickets: None
     'ENABLE_OAUTH2_PROVIDER': False,
 
     # .. toggle_name: FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']
@@ -249,8 +235,6 @@ FEATURES = {
     #   https://github.com/edx-solutions/jquery-xblock
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-14
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/2968
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
@@ -258,7 +242,7 @@ FEATURES = {
     # domains
     'ENABLE_CORS_HEADERS': True,
 
-    # Can be turned off iTruerse lists need to be hidden. Effects views and templates.
+    # Can be turned off if course lists need to be hidden. Effects views and templates.
     # .. toggle_name: FEATURES['COURSES_ARE_BROWSABLE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: True
@@ -279,7 +263,6 @@ FEATURES = {
     # .. toggle_creation_date: 2021-03-05
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
-
 
     # .. toggle_name: FEATURES['HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED']
     # .. toggle_implementation: DjangoSetting
@@ -348,8 +331,6 @@ FEATURES = {
     #   allows verified certificates, like courses.edx.org.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2019-05-14
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/PROD-269
     'DISABLE_HONOR_CERTIFICATES': False,  # Toggle to disable honor certificates
 
@@ -377,8 +358,6 @@ FEATURES = {
     #   querystring parameters.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/TE-2545
     'RESTRICT_AUTOMATIC_AUTH': True,
 
@@ -388,9 +367,7 @@ FEATURES = {
     # .. toggle_description: Enable the login micro frontend.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
-    # .. toggle_tickets: None
     'ENABLE_LOGIN_MICROFRONTEND': False,
 
     # .. toggle_name: FEATURES['SKIP_EMAIL_VALIDATION']
@@ -400,9 +377,7 @@ FEATURES = {
     #   Beware, as this leaves the door open to potential spam abuse.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2018-05-07
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: The login MFE domain name should be listed in LOGIN_REDIRECT_WHITELIST.
-    # .. toggle_tickets: None
     'SKIP_EMAIL_VALIDATION': False,
 
     # .. toggle_name: FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE']
@@ -412,7 +387,6 @@ FEATURES = {
     #   cosmetic price is used when there is no registration price associated to the course.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-10-10
-    # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6876
     # .. toggle_warnings: The use case of this feature toggle is uncertain.
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
@@ -487,9 +461,6 @@ FEATURES = {
     #   backends with the AUTHENTICATION_BACKENDS setting.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-09-15
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: None
-    # .. toggle_tickets: None
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # .. toggle_name: FEATURES['ENABLE_MKTG_SITE']
@@ -498,10 +469,8 @@ FEATURES = {
     # .. toggle_description: Toggle to enable alternate urls for marketing links.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2014-03-24
-    # .. toggle_target_removal_date: None
     # .. toggle_warnings: When this is enabled, the MKTG_URLS setting should be defined. The use case of this feature
     #   toggle is uncertain.
-    # .. toggle_tickets: None
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
@@ -899,7 +868,7 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/24908'
     # .. toggle_warnings: Also set settings.AUTHN_MICROFRONTEND_URL for rollout. This temporary feature
-    # toggle does not have a target removal date.
+    #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
@@ -908,7 +877,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: A "work-around" feature toggle meant to help in cases where some file uploads are not
     #   discoverable.  If enabled, will iterate through all possible file key suffixes up to the max for displaying
-    #  file metadata in staff assessments.
+    #   file metadata in staff assessments.
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2020-03-03
     # .. toggle_target_removal_date: None
@@ -956,7 +925,7 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: If true, allows for the deletion of EnterpriseCourseEnrollment records via Django Admin.
-    # .. toggle_use_cases: enterprise
+    # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2021-01-27
     # .. toggle_target_removal_date: None
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
@@ -1343,13 +1312,13 @@ WIKI_ENABLED = True
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': u'usd',
+    'currency': 'usd',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
-    'name': _(u'Honor'),
+    'name': _('Audit'),
     'sku': None,
-    'slug': u'honor',
+    'slug': 'audit',
     'suggested_prices': '',
 }
 
@@ -1366,7 +1335,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 # However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
 # in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
-USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
+USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 
 
 ############################## EVENT TRACKING #################################
@@ -1725,87 +1694,87 @@ LANGUAGE_COOKIE = "openedx-language-preference"
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = [
-    ('en', u'English'),
-    ('rtl', u'Right-to-Left Test Language'),
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
-    ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
+    ('en', 'English'),
+    ('rtl', 'Right-to-Left Test Language'),
+    ('eo', 'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+    ('fake2', 'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
-    ('am', u'አማርኛ'),  # Amharic
-    ('ar', u'العربية'),  # Arabic
-    ('az', u'azərbaycanca'),  # Azerbaijani
-    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
-    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
-    ('bn-in', u'বাংলা (ভারত)'),  # Bengali (India)
-    ('bs', u'bosanski'),  # Bosnian
-    ('ca', u'Català'),  # Catalan
-    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
-    ('cs', u'Čeština'),  # Czech
-    ('cy', u'Cymraeg'),  # Welsh
-    ('da', u'dansk'),  # Danish
-    ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
-    ('el', u'Ελληνικά'),  # Greek
-    ('en-uk', u'English (United Kingdom)'),  # English (United Kingdom)
-    ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
-    ('en@pirate', u'Pirate English'),  # Pirate English
-    ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
-    ('es-ar', u'Español (Argentina)'),  # Spanish (Argentina)
-    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
-    ('es-es', u'Español (España)'),  # Spanish (Spain)
-    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
-    ('es-pe', u'Español (Perú)'),  # Spanish (Peru)
-    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
-    ('eu-es', u'euskara (Espainia)'),  # Basque (Spain)
-    ('fa', u'فارسی'),  # Persian
-    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
-    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
-    ('fil', u'Filipino'),  # Filipino
-    ('fr', u'Français'),  # French
-    ('gl', u'Galego'),  # Galician
-    ('gu', u'ગુજરાતી'),  # Gujarati
-    ('he', u'עברית'),  # Hebrew
-    ('hi', u'हिन्दी'),  # Hindi
-    ('hr', u'hrvatski'),  # Croatian
-    ('hu', u'magyar'),  # Hungarian
-    ('hy-am', u'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
-    ('id', u'Bahasa Indonesia'),  # Indonesian
-    ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
-    ('ja-jp', u'日本語 (日本)'),  # Japanese (Japan)
-    ('kk-kz', u'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
-    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
-    ('kn', u'ಕನ್ನಡ'),  # Kannada
-    ('ko-kr', u'한국어 (대한민국)'),  # Korean (Korea)
-    ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
-    ('ml', u'മലയാളം'),  # Malayalam
-    ('mn', u'Монгол хэл'),  # Mongolian
-    ('mr', u'मराठी'),  # Marathi
-    ('ms', u'Bahasa Melayu'),  # Malay
-    ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
-    ('ne', u'नेपाली'),  # Nepali
-    ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
-    ('or', u'ଓଡ଼ିଆ'),  # Oriya
-    ('pl', u'Polski'),  # Polish
-    ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
-    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
-    ('ro', u'română'),  # Romanian
-    ('ru', u'Русский'),  # Russian
-    ('si', u'සිංහල'),  # Sinhala
-    ('sk', u'Slovenčina'),  # Slovak
-    ('sl', u'Slovenščina'),  # Slovenian
-    ('sq', u'shqip'),  # Albanian
-    ('sr', u'Српски'),  # Serbian
-    ('sv', u'svenska'),  # Swedish
-    ('sw', u'Kiswahili'),  # Swahili
-    ('ta', u'தமிழ்'),  # Tamil
-    ('te', u'తెలుగు'),  # Telugu
-    ('th', u'ไทย'),  # Thai
-    ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
-    ('uk', u'Українська'),  # Ukranian
-    ('ur', u'اردو'),  # Urdu
-    ('vi', u'Tiếng Việt'),  # Vietnamese
-    ('uz', u'Ўзбек'),  # Uzbek
-    ('zh-cn', u'中文 (简体)'),  # Chinese (China)
-    ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
-    ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
+    ('am', 'አማርኛ'),  # Amharic
+    ('ar', 'العربية'),  # Arabic
+    ('az', 'azərbaycanca'),  # Azerbaijani
+    ('bg-bg', 'български (България)'),  # Bulgarian (Bulgaria)
+    ('bn-bd', 'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('bn-in', 'বাংলা (ভারত)'),  # Bengali (India)
+    ('bs', 'bosanski'),  # Bosnian
+    ('ca', 'Català'),  # Catalan
+    ('ca@valencia', 'Català (València)'),  # Catalan (Valencia)
+    ('cs', 'Čeština'),  # Czech
+    ('cy', 'Cymraeg'),  # Welsh
+    ('da', 'dansk'),  # Danish
+    ('de-de', 'Deutsch (Deutschland)'),  # German (Germany)
+    ('el', 'Ελληνικά'),  # Greek
+    ('en-uk', 'English (United Kingdom)'),  # English (United Kingdom)
+    ('en@lolcat', 'LOLCAT English'),  # LOLCAT English
+    ('en@pirate', 'Pirate English'),  # Pirate English
+    ('es-419', 'Español (Latinoamérica)'),  # Spanish (Latin America)
+    ('es-ar', 'Español (Argentina)'),  # Spanish (Argentina)
+    ('es-ec', 'Español (Ecuador)'),  # Spanish (Ecuador)
+    ('es-es', 'Español (España)'),  # Spanish (Spain)
+    ('es-mx', 'Español (México)'),  # Spanish (Mexico)
+    ('es-pe', 'Español (Perú)'),  # Spanish (Peru)
+    ('et-ee', 'Eesti (Eesti)'),  # Estonian (Estonia)
+    ('eu-es', 'euskara (Espainia)'),  # Basque (Spain)
+    ('fa', 'فارسی'),  # Persian
+    ('fa-ir', 'فارسی (ایران)'),  # Persian (Iran)
+    ('fi-fi', 'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fil', 'Filipino'),  # Filipino
+    ('fr', 'Français'),  # French
+    ('gl', 'Galego'),  # Galician
+    ('gu', 'ગુજરાતી'),  # Gujarati
+    ('he', 'עברית'),  # Hebrew
+    ('hi', 'हिन्दी'),  # Hindi
+    ('hr', 'hrvatski'),  # Croatian
+    ('hu', 'magyar'),  # Hungarian
+    ('hy-am', 'Հայերեն (Հայաստան)'),  # Armenian (Armenia)
+    ('id', 'Bahasa Indonesia'),  # Indonesian
+    ('it-it', 'Italiano (Italia)'),  # Italian (Italy)
+    ('ja-jp', '日本語 (日本)'),  # Japanese (Japan)
+    ('kk-kz', 'қазақ тілі (Қазақстан)'),  # Kazakh (Kazakhstan)
+    ('km-kh', 'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('kn', 'ಕನ್ನಡ'),  # Kannada
+    ('ko-kr', '한국어 (대한민국)'),  # Korean (Korea)
+    ('lt-lt', 'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
+    ('ml', 'മലയാളം'),  # Malayalam
+    ('mn', 'Монгол хэл'),  # Mongolian
+    ('mr', 'मराठी'),  # Marathi
+    ('ms', 'Bahasa Melayu'),  # Malay
+    ('nb', 'Norsk bokmål'),  # Norwegian Bokmål
+    ('ne', 'नेपाली'),  # Nepali
+    ('nl-nl', 'Nederlands (Nederland)'),  # Dutch (Netherlands)
+    ('or', 'ଓଡ଼ିଆ'),  # Oriya
+    ('pl', 'Polski'),  # Polish
+    ('pt-br', 'Português (Brasil)'),  # Portuguese (Brazil)
+    ('pt-pt', 'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ro', 'română'),  # Romanian
+    ('ru', 'Русский'),  # Russian
+    ('si', 'සිංහල'),  # Sinhala
+    ('sk', 'Slovenčina'),  # Slovak
+    ('sl', 'Slovenščina'),  # Slovenian
+    ('sq', 'shqip'),  # Albanian
+    ('sr', 'Српски'),  # Serbian
+    ('sv', 'svenska'),  # Swedish
+    ('sw', 'Kiswahili'),  # Swahili
+    ('ta', 'தமிழ்'),  # Tamil
+    ('te', 'తెలుగు'),  # Telugu
+    ('th', 'ไทย'),  # Thai
+    ('tr-tr', 'Türkçe (Türkiye)'),  # Turkish (Turkey)
+    ('uk', 'Українська'),  # Ukranian
+    ('ur', 'اردو'),  # Urdu
+    ('vi', 'Tiếng Việt'),  # Vietnamese
+    ('uz', 'Ўзбек'),  # Uzbek
+    ('zh-cn', '中文 (简体)'),  # Chinese (China)
+    ('zh-hk', '中文 (香港)'),  # Chinese (Hong Kong)
+    ('zh-tw', '中文 (台灣)'),  # Chinese (Taiwan)
 ]
 
 LANGUAGE_DICT = dict(LANGUAGES)
@@ -2699,20 +2668,22 @@ HEARTBEAT_CELERY_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 # .. setting_default: dict of settings
 # .. setting_description: Stores all the settings used by block structures and block structure
 #   related tasks. See BLOCK_STRUCTURES_SETTINGS[XXX] documentation for details of each setting.
-#   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
+#   For more information, check https://github.com/edx/edx-platform/pull/13388.
 BLOCK_STRUCTURES_SETTINGS = dict(
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['COURSE_PUBLISH_TASK_DELAY']
     # .. setting_default: 30
     # .. setting_description: Delay, in seconds, after a new edit of a course is published before
     #   updating the block structures cache. This is needed for a better chance at getting
     #   the latest changes when there are secondary reads in sharded mongoDB clusters.
-    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
+    #   For more information, check https://github.com/edx/edx-platform/pull/13388 and
+    #   https://github.com/edx/edx-platform/pull/14571.
     COURSE_PUBLISH_TASK_DELAY=30,
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY']
     # .. setting_default: 30
     # .. setting_description: Delay, in seconds, between retry attempts if a block structure task
-    #   fails. For more information, check https://openedx.atlassian.net/browse/TNL-5041.
+    #   fails. For more information, check https://github.com/edx/edx-platform/pull/13388 and
+    #   https://github.com/edx/edx-platform/pull/14571.
     TASK_DEFAULT_RETRY_DELAY=30,
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES']
@@ -2720,7 +2691,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # .. setting_description: Maximum number of retries per block structure task.
     #   If the maximum number of retries is exceeded, then you can attempt to either manually run
     #   the celery task, or wait for it to be triggered again.
-    #   For more information, check https://openedx.atlassian.net/browse/TNL-5041.
+    #   For more information, check https://github.com/edx/edx-platform/pull/13388 and
+    #   https://github.com/edx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
 
     # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
@@ -2735,7 +2707,9 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2018-03-22
     # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://openedx.atlassian.net/browse/EDUCATOR-499
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14571,
+    #   https://github.com/edx/edx-platform/pull/17760,
+    #   https://openedx.atlassian.net/browse/DEPR-146
     PRUNING_ACTIVE=False,
 )
 
@@ -3161,6 +3135,7 @@ REST_FRAMEWORK = {
 }
 
 REGISTRATION_VALIDATION_RATELIMIT = '30/7d'
+REGISTRATION_RATELIMIT = '60/7d'
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',
@@ -3246,28 +3221,28 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Facebook advertises in your language.
         "title": _("Facebook"),
         "icon": "fa-facebook-square",
-        "action": _(u"Like {platform_name} on Facebook")
+        "action": _("Like {platform_name} on Facebook")
     },
     "twitter": {
         # Translators: This is the website name of www.twitter.com.  Please
         # translate this the way that Twitter advertises in your language.
         "title": _("Twitter"),
         "icon": "fa-twitter-square",
-        "action": _(u"Follow {platform_name} on Twitter")
+        "action": _("Follow {platform_name} on Twitter")
     },
     "linkedin": {
         # Translators: This is the website name of www.linkedin.com.  Please
         # translate this the way that LinkedIn advertises in your language.
         "title": _("LinkedIn"),
         "icon": "fa-linkedin-square",
-        "action": _(u"Follow {platform_name} on LinkedIn")
+        "action": _("Follow {platform_name} on LinkedIn")
     },
     "instagram": {
         # Translators: This is the website name of www.instagram.com.  Please
         # translate this the way that Instagram advertises in your language.
         "title": _("Instagram"),
         "icon": "fa-instagram",
-        "action": _(u"Follow {platform_name} on Instagram")
+        "action": _("Follow {platform_name} on Instagram")
     },
     "tumblr": {
         # Translators: This is the website name of www.tumblr.com.  Please
@@ -3286,7 +3261,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that Reddit advertises in your language.
         "title": _("Reddit"),
         "icon": "fa-reddit-square",
-        "action": _(u"Subscribe to the {platform_name} subreddit"),
+        "action": _("Subscribe to the {platform_name} subreddit"),
     },
     "vk": {
         # Translators: This is the website name of https://vk.com.  Please
@@ -3305,7 +3280,7 @@ SOCIAL_MEDIA_FOOTER_DISPLAY = {
         # translate this the way that YouTube advertises in your language.
         "title": _("Youtube"),
         "icon": "fa-youtube-square",
-        "action": _(u"Subscribe to the {platform_name} YouTube channel")
+        "action": _("Subscribe to the {platform_name} YouTube channel")
     }
 }
 
@@ -3367,11 +3342,16 @@ LOGIN_REDIRECT_WHITELIST = []
 
 ###################### Registration ##################################
 
-# For each of the fields, give one of the following values:
-# - 'required': to display the field, and make it mandatory
-# - 'optional': to display the field, and make it non-mandatory
-# - 'hidden': to not display the field
-
+# .. setting_name: REGISTRATION_EXTRA_FIELDS
+# .. setting_default: {'confirm_email': 'hidden', 'level_of_education': 'optional', 'gender': 'optional',
+#   'year_of_birth': 'optional', 'mailing_address': 'optional', 'goals': 'optional', 'honor_code': 'required',
+#   'terms_of_service': 'hidden', 'city': 'hidden', 'country': 'hidden'}
+# .. setting_description: The signup form may contain extra fields that are presented to every user. For every field, we
+#   can specifiy whether it should be "required": to display the field, and make it mandatory; "optional": to display
+#   the field, and make it non-mandatory; "hidden": to not display the field.
+#   When the terms of service are not visible and agreement to the honor code is required (the default), the signup page
+#   includes a paragraph that links to the honor code page (defined my MKTG_URLS["HONOR"]). This page might not be
+#   available for all Open edX platforms. In such cases, the "honor_code" registration field should be "hidden".
 REGISTRATION_EXTRA_FIELDS = {
     'confirm_email': 'required',
     'confirm_password': 'required',
@@ -3578,192 +3558,192 @@ VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
 # Note that this is used as the set of choices to the `code` field of the
 # `LanguageProficiency` model.
 ALL_LANGUAGES = [
-    [u"aa", u"Afar"],
-    [u"ab", u"Abkhazian"],
-    [u"af", u"Afrikaans"],
-    [u"ak", u"Akan"],
-    [u"sq", u"Albanian"],
-    [u"am", u"Amharic"],
-    [u"ar", u"Arabic"],
-    [u"an", u"Aragonese"],
-    [u"hy", u"Armenian"],
-    [u"as", u"Assamese"],
-    [u"av", u"Avaric"],
-    [u"ae", u"Avestan"],
-    [u"ay", u"Aymara"],
-    [u"az", u"Azerbaijani"],
-    [u"ba", u"Bashkir"],
-    [u"bm", u"Bambara"],
-    [u"eu", u"Basque"],
-    [u"be", u"Belarusian"],
-    [u"bn", u"Bengali"],
-    [u"bh", u"Bihari languages"],
-    [u"bi", u"Bislama"],
-    [u"bs", u"Bosnian"],
-    [u"br", u"Breton"],
-    [u"bg", u"Bulgarian"],
-    [u"my", u"Burmese"],
-    [u"ca", u"Catalan"],
-    [u"ch", u"Chamorro"],
-    [u"ce", u"Chechen"],
-    [u"zh", u"Chinese"],
-    [u"zh_HANS", u"Simplified Chinese"],
-    [u"zh_HANT", u"Traditional Chinese"],
-    [u"cu", u"Church Slavic"],
-    [u"cv", u"Chuvash"],
-    [u"kw", u"Cornish"],
-    [u"co", u"Corsican"],
-    [u"cr", u"Cree"],
-    [u"cs", u"Czech"],
-    [u"da", u"Danish"],
-    [u"dv", u"Divehi"],
-    [u"nl", u"Dutch"],
-    [u"dz", u"Dzongkha"],
-    [u"en", u"English"],
-    [u"eo", u"Esperanto"],
-    [u"et", u"Estonian"],
-    [u"ee", u"Ewe"],
-    [u"fo", u"Faroese"],
-    [u"fj", u"Fijian"],
-    [u"fi", u"Finnish"],
-    [u"fr", u"French"],
-    [u"fy", u"Western Frisian"],
-    [u"ff", u"Fulah"],
-    [u"ka", u"Georgian"],
-    [u"de", u"German"],
-    [u"gd", u"Gaelic"],
-    [u"ga", u"Irish"],
-    [u"gl", u"Galician"],
-    [u"gv", u"Manx"],
-    [u"el", u"Greek"],
-    [u"gn", u"Guarani"],
-    [u"gu", u"Gujarati"],
-    [u"ht", u"Haitian"],
-    [u"ha", u"Hausa"],
-    [u"he", u"Hebrew"],
-    [u"hz", u"Herero"],
-    [u"hi", u"Hindi"],
-    [u"ho", u"Hiri Motu"],
-    [u"hr", u"Croatian"],
-    [u"hu", u"Hungarian"],
-    [u"ig", u"Igbo"],
-    [u"is", u"Icelandic"],
-    [u"io", u"Ido"],
-    [u"ii", u"Sichuan Yi"],
-    [u"iu", u"Inuktitut"],
-    [u"ie", u"Interlingue"],
-    [u"ia", u"Interlingua"],
-    [u"id", u"Indonesian"],
-    [u"ik", u"Inupiaq"],
-    [u"it", u"Italian"],
-    [u"jv", u"Javanese"],
-    [u"ja", u"Japanese"],
-    [u"kl", u"Kalaallisut"],
-    [u"kn", u"Kannada"],
-    [u"ks", u"Kashmiri"],
-    [u"kr", u"Kanuri"],
-    [u"kk", u"Kazakh"],
-    [u"km", u"Central Khmer"],
-    [u"ki", u"Kikuyu"],
-    [u"rw", u"Kinyarwanda"],
-    [u"ky", u"Kirghiz"],
-    [u"kv", u"Komi"],
-    [u"kg", u"Kongo"],
-    [u"ko", u"Korean"],
-    [u"kj", u"Kuanyama"],
-    [u"ku", u"Kurdish"],
-    [u"lo", u"Lao"],
-    [u"la", u"Latin"],
-    [u"lv", u"Latvian"],
-    [u"li", u"Limburgan"],
-    [u"ln", u"Lingala"],
-    [u"lt", u"Lithuanian"],
-    [u"lb", u"Luxembourgish"],
-    [u"lu", u"Luba-Katanga"],
-    [u"lg", u"Ganda"],
-    [u"mk", u"Macedonian"],
-    [u"mh", u"Marshallese"],
-    [u"ml", u"Malayalam"],
-    [u"mi", u"Maori"],
-    [u"mr", u"Marathi"],
-    [u"ms", u"Malay"],
-    [u"mg", u"Malagasy"],
-    [u"mt", u"Maltese"],
-    [u"mn", u"Mongolian"],
-    [u"na", u"Nauru"],
-    [u"nv", u"Navajo"],
-    [u"nr", u"Ndebele, South"],
-    [u"nd", u"Ndebele, North"],
-    [u"ng", u"Ndonga"],
-    [u"ne", u"Nepali"],
-    [u"nn", u"Norwegian Nynorsk"],
-    [u"nb", u"Bokmål, Norwegian"],
-    [u"no", u"Norwegian"],
-    [u"ny", u"Chichewa"],
-    [u"oc", u"Occitan"],
-    [u"oj", u"Ojibwa"],
-    [u"or", u"Oriya"],
-    [u"om", u"Oromo"],
-    [u"os", u"Ossetian"],
-    [u"pa", u"Panjabi"],
-    [u"fa", u"Persian"],
-    [u"pi", u"Pali"],
-    [u"pl", u"Polish"],
-    [u"pt", u"Portuguese"],
-    [u"ps", u"Pushto"],
-    [u"qu", u"Quechua"],
-    [u"rm", u"Romansh"],
-    [u"ro", u"Romanian"],
-    [u"rn", u"Rundi"],
-    [u"ru", u"Russian"],
-    [u"sg", u"Sango"],
-    [u"sa", u"Sanskrit"],
-    [u"si", u"Sinhala"],
-    [u"sk", u"Slovak"],
-    [u"sl", u"Slovenian"],
-    [u"se", u"Northern Sami"],
-    [u"sm", u"Samoan"],
-    [u"sn", u"Shona"],
-    [u"sd", u"Sindhi"],
-    [u"so", u"Somali"],
-    [u"st", u"Sotho, Southern"],
-    [u"es", u"Spanish"],
-    [u"sc", u"Sardinian"],
-    [u"sr", u"Serbian"],
-    [u"ss", u"Swati"],
-    [u"su", u"Sundanese"],
-    [u"sw", u"Swahili"],
-    [u"sv", u"Swedish"],
-    [u"ty", u"Tahitian"],
-    [u"ta", u"Tamil"],
-    [u"tt", u"Tatar"],
-    [u"te", u"Telugu"],
-    [u"tg", u"Tajik"],
-    [u"tl", u"Tagalog"],
-    [u"th", u"Thai"],
-    [u"bo", u"Tibetan"],
-    [u"ti", u"Tigrinya"],
-    [u"to", u"Tonga (Tonga Islands)"],
-    [u"tn", u"Tswana"],
-    [u"ts", u"Tsonga"],
-    [u"tk", u"Turkmen"],
-    [u"tr", u"Turkish"],
-    [u"tw", u"Twi"],
-    [u"ug", u"Uighur"],
-    [u"uk", u"Ukrainian"],
-    [u"ur", u"Urdu"],
-    [u"uz", u"Uzbek"],
-    [u"ve", u"Venda"],
-    [u"vi", u"Vietnamese"],
-    [u"vo", u"Volapük"],
-    [u"cy", u"Welsh"],
-    [u"wa", u"Walloon"],
-    [u"wo", u"Wolof"],
-    [u"xh", u"Xhosa"],
-    [u"yi", u"Yiddish"],
-    [u"yo", u"Yoruba"],
-    [u"za", u"Zhuang"],
-    [u"zu", u"Zulu"]
+    ["aa", "Afar"],
+    ["ab", "Abkhazian"],
+    ["af", "Afrikaans"],
+    ["ak", "Akan"],
+    ["sq", "Albanian"],
+    ["am", "Amharic"],
+    ["ar", "Arabic"],
+    ["an", "Aragonese"],
+    ["hy", "Armenian"],
+    ["as", "Assamese"],
+    ["av", "Avaric"],
+    ["ae", "Avestan"],
+    ["ay", "Aymara"],
+    ["az", "Azerbaijani"],
+    ["ba", "Bashkir"],
+    ["bm", "Bambara"],
+    ["eu", "Basque"],
+    ["be", "Belarusian"],
+    ["bn", "Bengali"],
+    ["bh", "Bihari languages"],
+    ["bi", "Bislama"],
+    ["bs", "Bosnian"],
+    ["br", "Breton"],
+    ["bg", "Bulgarian"],
+    ["my", "Burmese"],
+    ["ca", "Catalan"],
+    ["ch", "Chamorro"],
+    ["ce", "Chechen"],
+    ["zh", "Chinese"],
+    ["zh_HANS", "Simplified Chinese"],
+    ["zh_HANT", "Traditional Chinese"],
+    ["cu", "Church Slavic"],
+    ["cv", "Chuvash"],
+    ["kw", "Cornish"],
+    ["co", "Corsican"],
+    ["cr", "Cree"],
+    ["cs", "Czech"],
+    ["da", "Danish"],
+    ["dv", "Divehi"],
+    ["nl", "Dutch"],
+    ["dz", "Dzongkha"],
+    ["en", "English"],
+    ["eo", "Esperanto"],
+    ["et", "Estonian"],
+    ["ee", "Ewe"],
+    ["fo", "Faroese"],
+    ["fj", "Fijian"],
+    ["fi", "Finnish"],
+    ["fr", "French"],
+    ["fy", "Western Frisian"],
+    ["ff", "Fulah"],
+    ["ka", "Georgian"],
+    ["de", "German"],
+    ["gd", "Gaelic"],
+    ["ga", "Irish"],
+    ["gl", "Galician"],
+    ["gv", "Manx"],
+    ["el", "Greek"],
+    ["gn", "Guarani"],
+    ["gu", "Gujarati"],
+    ["ht", "Haitian"],
+    ["ha", "Hausa"],
+    ["he", "Hebrew"],
+    ["hz", "Herero"],
+    ["hi", "Hindi"],
+    ["ho", "Hiri Motu"],
+    ["hr", "Croatian"],
+    ["hu", "Hungarian"],
+    ["ig", "Igbo"],
+    ["is", "Icelandic"],
+    ["io", "Ido"],
+    ["ii", "Sichuan Yi"],
+    ["iu", "Inuktitut"],
+    ["ie", "Interlingue"],
+    ["ia", "Interlingua"],
+    ["id", "Indonesian"],
+    ["ik", "Inupiaq"],
+    ["it", "Italian"],
+    ["jv", "Javanese"],
+    ["ja", "Japanese"],
+    ["kl", "Kalaallisut"],
+    ["kn", "Kannada"],
+    ["ks", "Kashmiri"],
+    ["kr", "Kanuri"],
+    ["kk", "Kazakh"],
+    ["km", "Central Khmer"],
+    ["ki", "Kikuyu"],
+    ["rw", "Kinyarwanda"],
+    ["ky", "Kirghiz"],
+    ["kv", "Komi"],
+    ["kg", "Kongo"],
+    ["ko", "Korean"],
+    ["kj", "Kuanyama"],
+    ["ku", "Kurdish"],
+    ["lo", "Lao"],
+    ["la", "Latin"],
+    ["lv", "Latvian"],
+    ["li", "Limburgan"],
+    ["ln", "Lingala"],
+    ["lt", "Lithuanian"],
+    ["lb", "Luxembourgish"],
+    ["lu", "Luba-Katanga"],
+    ["lg", "Ganda"],
+    ["mk", "Macedonian"],
+    ["mh", "Marshallese"],
+    ["ml", "Malayalam"],
+    ["mi", "Maori"],
+    ["mr", "Marathi"],
+    ["ms", "Malay"],
+    ["mg", "Malagasy"],
+    ["mt", "Maltese"],
+    ["mn", "Mongolian"],
+    ["na", "Nauru"],
+    ["nv", "Navajo"],
+    ["nr", "Ndebele, South"],
+    ["nd", "Ndebele, North"],
+    ["ng", "Ndonga"],
+    ["ne", "Nepali"],
+    ["nn", "Norwegian Nynorsk"],
+    ["nb", "Bokmål, Norwegian"],
+    ["no", "Norwegian"],
+    ["ny", "Chichewa"],
+    ["oc", "Occitan"],
+    ["oj", "Ojibwa"],
+    ["or", "Oriya"],
+    ["om", "Oromo"],
+    ["os", "Ossetian"],
+    ["pa", "Panjabi"],
+    ["fa", "Persian"],
+    ["pi", "Pali"],
+    ["pl", "Polish"],
+    ["pt", "Portuguese"],
+    ["ps", "Pushto"],
+    ["qu", "Quechua"],
+    ["rm", "Romansh"],
+    ["ro", "Romanian"],
+    ["rn", "Rundi"],
+    ["ru", "Russian"],
+    ["sg", "Sango"],
+    ["sa", "Sanskrit"],
+    ["si", "Sinhala"],
+    ["sk", "Slovak"],
+    ["sl", "Slovenian"],
+    ["se", "Northern Sami"],
+    ["sm", "Samoan"],
+    ["sn", "Shona"],
+    ["sd", "Sindhi"],
+    ["so", "Somali"],
+    ["st", "Sotho, Southern"],
+    ["es", "Spanish"],
+    ["sc", "Sardinian"],
+    ["sr", "Serbian"],
+    ["ss", "Swati"],
+    ["su", "Sundanese"],
+    ["sw", "Swahili"],
+    ["sv", "Swedish"],
+    ["ty", "Tahitian"],
+    ["ta", "Tamil"],
+    ["tt", "Tatar"],
+    ["te", "Telugu"],
+    ["tg", "Tajik"],
+    ["tl", "Tagalog"],
+    ["th", "Thai"],
+    ["bo", "Tibetan"],
+    ["ti", "Tigrinya"],
+    ["to", "Tonga (Tonga Islands)"],
+    ["tn", "Tswana"],
+    ["ts", "Tsonga"],
+    ["tk", "Turkmen"],
+    ["tr", "Turkish"],
+    ["tw", "Twi"],
+    ["ug", "Uighur"],
+    ["uk", "Ukrainian"],
+    ["ur", "Urdu"],
+    ["uz", "Uzbek"],
+    ["ve", "Venda"],
+    ["vi", "Vietnamese"],
+    ["vo", "Volapük"],
+    ["cy", "Welsh"],
+    ["wa", "Walloon"],
+    ["wo", "Wolof"],
+    ["xh", "Xhosa"],
+    ["yi", "Yiddish"],
+    ["yo", "Yoruba"],
+    ["za", "Zhuang"],
+    ["zu", "Zulu"]
 ]
 
 
@@ -3981,7 +3961,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
-COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
+COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
@@ -4312,17 +4292,17 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
 # which are not provided by the Enterprise service. These settings provide base values
 # for those features.
 
-ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
+ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _('Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    u'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
-    u'{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
-    u'programs to help you advance your knowledge and career. '
-    u'{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
-    u'{privacy_policy_link_end} from {enterprise_name}.'
+    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    'programs to help you advance your knowledge and career. '
+    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    '{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_PROXY_LOGIN_WELCOME_TEMPLATE = _(
-    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
-    u'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
+    '{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}{platform_name}{end_bold} '
+    'to offer you high-quality learning opportunities from the world\'s best institutions and universities.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {

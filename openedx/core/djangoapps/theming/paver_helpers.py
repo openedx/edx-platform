@@ -30,8 +30,8 @@ def get_theme_paths(themes, theme_dirs):
         theme_base_dirs = get_theme_base_dirs(theme, theme_dirs)
         if not theme_base_dirs:
             print((
-                u"\033[91m\nSkipping '{theme}': \n"
-                u"Theme ({theme}) not found in any of the theme dirs ({theme_dirs}). \033[00m".format(
+                "\033[91m\nSkipping '{theme}': \n"
+                "Theme ({theme}) not found in any of the theme dirs ({theme_dirs}). \033[00m".format(
                     theme=theme,
                     theme_dirs=", ".join(theme_dirs)
                 ),

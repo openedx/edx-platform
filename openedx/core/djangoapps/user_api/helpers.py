@@ -10,7 +10,6 @@ import traceback
 from collections import defaultdict
 from functools import wraps
 
-import six
 from django import forms
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -57,9 +56,9 @@ def intercept_errors(api_error, ignore_errors=None):
                 for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
                         msg = (
-                            u"A handled error occurred when calling '{func_name}' "
-                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
-                            u"{exception}"
+                            "A handled error occurred when calling '{func_name}' "
+                            "with arguments '{args}' and keyword arguments '{kwargs}': "
+                            "{exception}"
                         ).format(
                             func_name=func.__name__,
                             args=args,
@@ -73,9 +72,9 @@ def intercept_errors(api_error, ignore_errors=None):
 
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
-                    u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
-                    u"{exception}"
+                    "An unexpected error occurred when calling '{func_name}' "
+                    "with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
+                    "{exception}"
                 ).format(
                     func_name=func.__name__,
                     args=args,
@@ -93,7 +92,7 @@ class InvalidFieldError(Exception):
     """The provided field definition is not valid. """
 
 
-class FormDescription(object):
+class FormDescription:
     """Generate a JSON representation of a form. """
 
     ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden"]
@@ -135,10 +134,10 @@ class FormDescription(object):
         self._field_overrides = defaultdict(dict)
 
     def add_field(
-            self, name, label=u"", field_type=u"text", default=u"",
-            placeholder=u"", instructions=u"", required=True, restrictions=None,
+            self, name, label="", field_type="text", default="",
+            placeholder="", instructions="", required=True, restrictions=None,
             options=None, include_default_option=False, error_messages=None,
-            supplementalLink=u"", supplementalText=u""
+            supplementalLink="", supplementalText=""
     ):
         """Add a field to the form description.
 
@@ -190,7 +189,7 @@ class FormDescription(object):
 
         """
         if field_type not in self.ALLOWED_TYPES:
-            msg = u"Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
+            msg = "Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
                 field_type=field_type,
                 allowed=", ".join(self.ALLOWED_TYPES)
             )
@@ -240,14 +239,11 @@ class FormDescription(object):
 
         if restrictions is not None:
             allowed_restrictions = self.ALLOWED_RESTRICTIONS.get(field_type, [])
-            for key, val in six.iteritems(restrictions):
+            for key, val in restrictions.items():
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
-                        restriction=key,
-                        field_type=field_type
-                    )
+                    msg = f"Restriction '{key}' is not allowed for field type '{field_type}'"
                     raise InvalidFieldError(msg)
 
         if error_messages is not None:
@@ -337,7 +333,7 @@ class FormDescription(object):
 
         self._field_overrides[field_name].update({
             property_name: property_value
-            for property_name, property_value in six.iteritems(kwargs)
+            for property_name, property_value in kwargs.items()
             if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
@@ -353,7 +349,7 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
         """
         if isinstance(obj, Promise):
             return force_text(obj)
-        super(LocalizedJSONEncoder, self).default(obj)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().default(obj)
 
 
 def serializer_is_dirty(preference_serializer):

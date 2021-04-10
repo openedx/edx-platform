@@ -4,7 +4,6 @@ Tests of the openedx.features.discounts.utils module.
 from unittest.mock import patch, Mock
 
 import ddt
-import six
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from django.utils.translation import override as override_lang

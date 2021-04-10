@@ -4,15 +4,13 @@ Utility methods for the account settings.
 
 
 import re
+from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from six import text_type
-from six.moves import range  # lint-amnesty, pylint: disable=unused-import
-from six.moves.urllib.parse import urlparse  # pylint: disable=import-error
 
 from common.djangoapps.third_party_auth.config.waffle import ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -63,7 +61,7 @@ def format_social_link(platform_name, new_social_link):
         return None
 
     # For security purposes, always build up the url rather than using input from user.
-    return 'https://www.{}{}'.format(url_stub, username)
+    return f'https://www.{url_stub}{username}'
 
 
 def _get_username_from_social_link(platform_name, new_social_link):
@@ -173,10 +171,10 @@ def retrieve_last_sitewide_block_completed(user):
     if not (lms_root and item):
         return
 
-    return u"{lms_root}/courses/{course_key}/jump_to/{location}".format(
+    return "{lms_root}/courses/{course_key}/jump_to/{location}".format(
         lms_root=lms_root,
-        course_key=text_type(item.location.course_key),
-        location=text_type(item.location),
+        course_key=str(item.location.course_key),
+        location=str(item.location),
     )
 
 

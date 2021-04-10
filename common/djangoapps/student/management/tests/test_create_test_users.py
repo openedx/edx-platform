@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
-from six import text_type
 
 from common.djangoapps.student.helpers import AccountValidationError
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment

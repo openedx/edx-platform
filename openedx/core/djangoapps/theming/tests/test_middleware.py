@@ -24,7 +24,7 @@ class TestCurrentSiteThemeMiddleware(TestCase):
         """
         Initialize middleware and related objects
         """
-        super(TestCurrentSiteThemeMiddleware, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.site_theme_middleware = CurrentSiteThemeMiddleware()
         self.user = UserFactory.create()
@@ -34,7 +34,7 @@ class TestCurrentSiteThemeMiddleware(TestCase):
         Returns a mock GET request.
         """
         if qs_theme:
-            test_url = "{}?site_theme={}".format(TEST_URL, qs_theme)
+            test_url = f"{TEST_URL}?site_theme={qs_theme}"
         else:
             test_url = TEST_URL
 

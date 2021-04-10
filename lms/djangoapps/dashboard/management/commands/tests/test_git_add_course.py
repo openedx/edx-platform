@@ -9,7 +9,6 @@ import unittest
 from uuid import uuid4
 
 import pytest
-import six
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError

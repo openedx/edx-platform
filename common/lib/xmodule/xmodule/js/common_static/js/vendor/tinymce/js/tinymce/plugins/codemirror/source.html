@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--Necessary to set encoding when running on CloudFront CDN. -->
+<meta charset="UTF-8">
+<script>
+
+/**
+ * source.html
+ *
+ * Copyright 2013-2014 Web Power, www.webpower.nl
+ * @author Arjan Haverkamp
+ */
+
+// Global vars:
+var codemirror,  // CodeMirror instance
+        chr = 0,     // Unused utf-8 character, placeholder for cursor
+        isMac = /macintosh|mac os/i.test(navigator.userAgent),
+        CMsettings,  // CodeMirror settings
+        messageHandler,
+        parentOrigin,
+        postToParent;
+
+messageHandler = function (event) {
+    if (event.origin !== parentOrigin) {
+        return;
+    }
+
+    var cleanup = function () {
+        window.removeEventListener("message", messageHandler);
+        postToParent({type: "closeWindow"});
+    };
+    if (event.data.type === "init") {
+        start(event.data.content);
+    }
+    else if (event.data.type == "save") {
+        submit();
+        cleanup();
+    }
+    else if (event.data.type == "cancel") {
+        cleanup();
+    }
+};
+
+postToParent = function(data) {
+    parent.postMessage(data, parentOrigin);
+};
+
+window.addEventListener("message", messageHandler);
+
+function inArray(key, arr) {
+    "use strict";
+    arr = '|' + arr.join('|') + '|';
+    return arr.indexOf('|' + key + '|') != -1;
+}
+
+(function () { // Initialise (before load)
+    "use strict";
+
+    var getParamByName = function (name) {
+        var match = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    };
+
+    // Getting this as a query parameter is very ugly, but the JS and CSS needs
+    // to be added to the head as the page is being rendered. Therefore it isn't possible
+    // to use postMessage APIs to get the setting value. And we can't hardcode the value in here
+    // because we need the baseURL, which is only added to server-side templated files.
+    var codemirrorPath = getParamByName("CodeMirrorPath");
+    parentOrigin = getParamByName("ParentOrigin");
+
+    CMsettings = {
+        path: codemirrorPath,
+        indentOnInit: false,
+        config: {// Default config
+            mode: 'htmlmixed',
+            lineNumbers: true,
+            lineWrapping: true,
+            indentUnit: 1,
+            tabSize: 1,
+            matchBrackets: true,
+            styleActiveLine: true
+        },
+        jsFiles: [// Default JS files
+// MODIFIED FOR EDX VENDOR FILE LOCATIONS.
+            'codemirror-compressed.js',
+//			'addon/edit/matchbrackets.js', Chose not to enable
+//			'mode/xml/xml.js', In compressed
+//			'mode/javascript/javascript.js', In compressed
+//			'mode/css/css.js', In compressed
+//			'mode/htmlmixed/htmlmixed.js', In compressed
+//          'addon/dialog/dialog.js', In compressed
+//			'addon/search/searchcursor.js', In compressed
+//			'addon/search/search.js', In compressed
+//			'addon/selection/active-line.js' Chose not to enable
+        ],
+        cssFiles: [
+            'CodeMirror/codemirror.css'
+//            'CodeMirror/addons/dialog/dialog.css' In compressed
+        ]
+    };
+
+    // Add trailing slash to path
+    if (!/\/$/.test(CMsettings.path)) {
+        CMsettings.path += '/';
+    }
+
+    // Write stylesheets
+    for (var i = 0; i < CMsettings.cssFiles.length; i++) {
+        document.write('<li' + 'nk rel="stylesheet" type="text/css" href="' + CMsettings.path + CMsettings.cssFiles[i] + '" />');
+    }
+
+    // Write JS source files
+    for (var j = 0; j < CMsettings.jsFiles.length; j++) {
+        document.write('<scr' + 'ipt type="text/javascript" src="' + CMsettings.path + CMsettings.jsFiles[j] + '"></scr' + 'ipt>');
+    }
+
+    window.onload = function () {
+        postToParent({type: "init"});
+    };
+
+}());
+
+function start(html) {// Initialise (on load)
+    "use strict";
+
+    if (typeof(window.CodeMirror) !== 'function') {
+        alert('CodeMirror not found in "' + CMsettings.path + '", aborting...');
+        return;
+    }
+
+    // Create legend for keyboard shortcuts for find & replace:
+// Disabled by EDX.
+//	var head = parent.document.querySelectorAll('.mce-foot')[0],
+//		div = parent.document.createElement('div'),
+//		td1 = '<td style="font-size:11px;background:#777;color:#fff;padding:0 4px">',
+//		td2 = '<td style="font-size:11px;padding-right:5px">';
+//	div.innerHTML = '<table cellspacing="0" cellpadding="0" style="border-spacing:4px"><tr>' + td1 + (isMac ? '&#8984;-F' : 'Ctrl-F</td>') + td2 + tinymce.translate('Start search') + '</td>' + td1 + (isMac ? '&#8984;-G' : 'Ctrl-G') + '</td>' + td2 + tinymce.translate('Find next') + '</td>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Find previous') + '</td></tr>' + '<tr>' + td1 + (isMac ? '&#8984;-Alt-F' : 'Shift-Ctrl-F') + '</td>' + td2 + tinymce.translate('Replace') + '</td>' + td1 + (isMac ? 'Shift-&#8984;-Alt-F' : 'Shift-Ctrl-R') +'</td>' + td2 + tinymce.translate('Replace all') + '</td></tr></table>';
+//	div.style.position = 'absolute';
+//	div.style.left = div.style.bottom = '5px';
+//	head.appendChild(div);
+
+    // Set CodeMirror cursor to same position as cursor was in TinyMCE:
+    html = html.replace(/<span\s+class="CmCaReT"([^>]*)>([^<]*)<\/span>/gm, String.fromCharCode(chr));
+
+    CodeMirror.defineInitHook(function (inst) {
+
+        // Move cursor to correct position:
+        inst.focus();
+        var cursor = inst.getSearchCursor(String.fromCharCode(chr), false);
+        if (cursor.findNext()) {
+            inst.setCursor(cursor.to());
+            cursor.replace('');
+        }
+
+        // Indent all code, if so requested:
+        if (CMsettings.indentOnInit) {
+            var last = inst.lineCount();
+            inst.operation(function () {
+                for (var i = 0; i < last; ++i) {
+                    inst.indentLine(i);
+                }
+            });
+        }
+    });
+
+    CMsettings.config.value = html;
+
+    // Instantiante CodeMirror:
+    codemirror = CodeMirror(document.body, CMsettings.config);
+    codemirror.isDirty = false;
+    codemirror.on('change', function (inst) {
+        inst.isDirty = true;
+    });
+}
+
+function findDepth(haystack, needle) {
+    "use strict";
+
+    var idx = haystack.indexOf(needle), depth = 0, x;
+    for (x = idx; x >= 0; x--) {
+        switch (haystack.charAt(x)) {
+            case '<':
+                depth--;
+                break;
+            case '>':
+                depth++;
+                break;
+        }
+    }
+    return depth;
+}
+
+// This function is called by plugin.js, when user clicks 'Ok' button
+function submit() {
+    "use strict";
+
+    var cc = '&#x0;', isDirty = codemirror.isDirty, doc = codemirror.doc;
+
+    if (doc.somethingSelected()) {
+        // Clear selection:
+        doc.setCursor(doc.getCursor());
+    }
+
+    // Insert cursor placeholder (&#x0;)
+    doc.replaceSelection(cc);
+
+    var pos = codemirror.getCursor(),
+            curLineHTML = doc.getLine(pos.line);
+
+    if (findDepth(curLineHTML, cc) !== 0) {
+        // Cursor is inside a <tag>, don't set cursor:
+        curLineHTML = curLineHTML.replace(cc, '');
+        doc.setLine(pos.line, curLineHTML);
+    }
+
+    postToParent(
+            {
+                type: "setText",
+                text: codemirror.getValue().replace(cc, '<span id="CmCaReT"></span>'),
+                isDirty: isDirty
+            }
+    );
+}
+
+</script>
+<style type="text/css">
+
+    body {
+        margin: 0;
+    }
+
+    .CodeMirror {
+        height: 100%;
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    .CodeMirror-activeline-background {
+        background: #e8f2ff !important;
+    }
+
+</style>
+</head>
+<body></body>
+</html>

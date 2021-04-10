@@ -1,13 +1,9 @@
 """
 Middleware to identify the country of origin of page requests.
-
 Middleware adds `country_code` in session.
-
 Usage:
-
 # To enable the Geoinfo feature on a per-view basis, use:
 decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
-
 """
 import logging
 import geoip2.database
@@ -27,7 +23,6 @@ class CountryMiddleware(MiddlewareMixin):
     def process_request(self, request):
         """
         Identify the country by IP address.
-
         Store country code in session.
         """
         new_ip_address = get_client_ip(request)[0]
@@ -46,5 +41,5 @@ class CountryMiddleware(MiddlewareMixin):
 
             request.session['country_code'] = country_code
             request.session['ip_address'] = new_ip_address
-            log.debug(u'Country code for IP: %s is set to %s', new_ip_address, country_code)
+            log.debug('Country code for IP: %s is set to %s', new_ip_address, country_code)
             reader.close()

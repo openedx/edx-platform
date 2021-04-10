@@ -6,10 +6,11 @@ Tests for programs celery tasks.
 import json
 import logging
 from datetime import datetime, timedelta
+from unittest import mock
+
 import pytest
 import ddt
 import httpretty
-import mock
 import pytz
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
@@ -125,7 +126,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     """
 
     def setUp(self):
-        super(AwardProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.create_credentials_config()
         self.student = UserFactory.create(username='test-student')
         self.site = SiteFactory()
@@ -228,7 +229,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the task is aborted if any relevant api configs are
         disabled.
         """
-        getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
+        getattr(self, f'create_{disabled_config_type}_config')(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
             with pytest.raises(MaxRetriesExceededError):
                 tasks.award_program_certificates.delay(self.student.username).get()
@@ -348,7 +349,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            u'Failed to award certificate for program {uuid} to user {username}.'.format(
+            'Failed to award certificate for program {uuid} to user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )
@@ -512,7 +513,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
 
     def setUp(self):
-        super(AwardCourseCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.available_date = datetime.now(pytz.UTC) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
@@ -663,7 +664,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
     """
 
     def setUp(self):
-        super(RevokeProgramCertificatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.student = UserFactory.create(username='test-student')
         self.course_key = 'course-v1:testX+test101+2T2020'
@@ -724,7 +725,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         Checks that the task is aborted if any relevant api configs are
         disabled.
         """
-        getattr(self, 'create_{}_config'.format(disabled_config_type))(**{disabled_config_attribute: False})
+        getattr(self, f'create_{disabled_config_type}_config')(**{disabled_config_attribute: False})
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
             with pytest.raises(MaxRetriesExceededError):
                 tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
@@ -802,7 +803,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         assert mock_revoke_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
-            u'Failed to revoke certificate for program {uuid} of user {username}.'.format(
+            'Failed to revoke certificate for program {uuid} of user {username}.'.format(
                 uuid=1,
                 username=self.student.username)
         )

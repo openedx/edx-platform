@@ -1,0 +1,13 @@
+<problem>
+  <multiplechoiceresponse>
+    <p>This is a multiple choice version of the question.</p>
+    <label>What company do you work for?</label>
+    <description>Hint: It's not Microsoft. </description>
+    <choicegroup type="MultipleChoice">
+      <choice correct="false">Enron</choice>
+      <choice correct="false">Microsoft</choice>
+      <choice correct="true">edX</choice>
+      <choice correct="false">J. C. Penney</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+</problem>

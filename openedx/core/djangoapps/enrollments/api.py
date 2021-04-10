@@ -266,7 +266,7 @@ def update_enrollment(
         validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
     enrollment = _data_api().update_course_enrollment(username, course_id, mode=mode, is_active=is_active)
     if enrollment is None:  # lint-amnesty, pylint: disable=no-else-raise
-        msg = u"Course Enrollment not found for user {user} in course {course}".format(user=username, course=course_id)
+        msg = f"Course Enrollment not found for user {username} in course {course_id}"
         log.warning(msg)
         raise errors.EnrollmentNotFoundError(msg)
     else:
@@ -338,8 +338,8 @@ def get_course_enrollment_details(course_id, include_expired=False):
         cache.set(cache_key, course_enrollment_details, cache_time_out)
     except Exception:
         # Catch any unexpected errors during caching.
-        log.exception(u"Error occurred while caching course enrollment details for course %s", course_id)
-        raise errors.CourseEnrollmentError(u"An unexpected error occurred while retrieving course enrollment details.")  # lint-amnesty, pylint: disable=raise-missing-from
+        log.exception("Error occurred while caching course enrollment details for course %s", course_id)
+        raise errors.CourseEnrollmentError("An unexpected error occurred while retrieving course enrollment details.")  # lint-amnesty, pylint: disable=raise-missing-from
 
     return course_enrollment_details
 
@@ -547,5 +547,5 @@ def _data_api():
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
-        log.exception(u"Could not load module at '{path}'".format(path=api_path))
+        log.exception(f"Could not load module at '{api_path}'")
         raise errors.EnrollmentApiLoadError(api_path)  # lint-amnesty, pylint: disable=raise-missing-from

@@ -287,6 +287,24 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         assert len(mail.outbox) == (1 + len(self.staff))
         assert len([e.to[0] for e in mail.outbox]) == len([self.instructor.email] + [s.email for s in self.staff])
 
+    @override_settings(DEFAULT_FROM_EMAIL='test@example.com', EMAIL_USE_DEFAULT_FROM_FOR_BULK=True)
+    def test_email_from_address(self):
+        """
+        Make sure the from_address should be the DEFAULT_FROM_EMAIL when corresponding flag is enabled.
+        """
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["staff"]',
+            'subject': 'test subject for staff',
+            'message': 'test message for subject'
+        }
+        self.client.post(self.send_mail_url, test_email)
+        from_email = mail.outbox[0].from_email
+        self.assertEqual(
+            from_email,
+            'test@example.com'
+        )
+
     def test_send_to_cohort(self):
         """
         Make sure email sent to a cohort goes there.

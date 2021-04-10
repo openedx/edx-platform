@@ -2,7 +2,7 @@
 
 
 import datetime
-import pytest
+from unittest import mock
 
 import ddt
 import pytest
@@ -17,10 +17,7 @@ from common.djangoapps.third_party_auth import pipeline, provider
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from lms.djangoapps.verify_student.models import SSOVerification
-from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.third_party_auth import pipeline, provider
-from common.djangoapps.third_party_auth.tests import testutil
-from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
 User = social_models.DjangoStorage.user.user_model()  # pylint: disable=invalid-name
@@ -31,7 +28,7 @@ class TestCase(testutil.TestCase, test.TestCase):
     """Base test case."""
 
     def setUp(self):
-        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.enabled_provider = self.configure_google_provider(enabled=True)
 
 
@@ -39,7 +36,7 @@ class GetAuthenticatedUserTestCase(TestCase):
     """Tests for get_authenticated_user."""
 
     def setUp(self):
-        super(GetAuthenticatedUserTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
     def get_by_username(self, username):
@@ -79,7 +76,7 @@ class GetProviderUserStatesTestCase(TestCase):
     """Tests generation of ProviderUserStates."""
 
     def setUp(self):
-        super(GetProviderUserStatesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.configure_google_provider(enabled=False)
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
 
@@ -218,7 +215,7 @@ class TestPipelineUtilityFunctions(TestCase):
     Test some of the isolated utility functions in the pipeline
     """
     def setUp(self):
-        super(TestPipelineUtilityFunctions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(username='username', password='password')
         self.social_auth = social_models.UserSocialAuth.objects.create(
             user=self.user,
@@ -306,7 +303,7 @@ class EnsureUserInformationTestCase(TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = social_models.DjangoStorage.user.create_user(
             username='username',
             password='password',
@@ -386,7 +383,7 @@ class UserDetailsForceSyncTestCase(TestCase):
     """Tests to ensure learner profile data is properly synced if the provider requires it."""
 
     def setUp(self):
-        super(UserDetailsForceSyncTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.old_email = self.user.email
         self.old_username = self.user.username
@@ -490,7 +487,7 @@ class SetIDVerificationStatusTestCase(TestCase):
     """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
 
     def setUp(self):
-        super(SetIDVerificationStatusTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create()
         self.provider_class_name = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
         self.provider_slug = 'default'

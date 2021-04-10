@@ -1,9 +1,7 @@
 """
 Test cases for catalog_integrations command.
 """
-
 import pytest
-from django.test import TestCase  # lint-amnesty, pylint: disable=unused-import
 from django.core.management import call_command, CommandError
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase

@@ -7,7 +7,7 @@ from edx_toggles.toggles import LegacyWaffleSwitch
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import EventTestMixin
-from lms.djangoapps.certificates.generation import generate_allowlist_certificate
+from lms.djangoapps.certificates.generation import generate_course_certificate
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,17 +22,17 @@ AUTO_GENERATION_SWITCH_NAME = f'{AUTO_GENERATION_NAMESPACE}.{AUTO_GENERATION_NAM
 AUTO_GENERATION_SWITCH = LegacyWaffleSwitch(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
 
 
-class AllowlistTests(EventTestMixin, ModuleStoreTestCase):
+class CertificateTests(EventTestMixin, ModuleStoreTestCase):
     """
-    Tests for generating allowlist certificates
+    Tests for certificate generation
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp('lms.djangoapps.certificates.utils.tracker')
 
-    def test_allowlist_generation(self):
+    def test_generation(self):
         """
-        Test allowlist certificate generation
+        Test certificate generation
         """
         # Create user, a course run, and an enrollment
         u = UserFactory()
@@ -44,11 +44,12 @@ class AllowlistTests(EventTestMixin, ModuleStoreTestCase):
             is_active=True,
             mode="verified",
         )
+        gen_mode = 'batch'
 
         certs = GeneratedCertificate.objects.filter(user=u, course_id=key)
         assert len(certs) == 0
 
-        generated_cert = generate_allowlist_certificate(u, key)
+        generated_cert = generate_course_certificate(u, key, gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
 
         certs = GeneratedCertificate.objects.filter(user=u, course_id=key)
@@ -61,5 +62,5 @@ class AllowlistTests(EventTestMixin, ModuleStoreTestCase):
             certificate_id=generated_cert.verify_uuid,
             enrollment_mode=generated_cert.mode,
             certificate_url='',
-            generation_mode='batch'
+            generation_mode=gen_mode
         )

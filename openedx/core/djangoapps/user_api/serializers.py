@@ -34,7 +34,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         """
         return UserPreference.get_all_preferences(user)
 
-    class Meta(object):
+    class Meta:
         model = User
         # This list is the minimal set required by the notification service
         fields = ("id", "url", "email", "name", "username", "preferences")
@@ -49,7 +49,7 @@ class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):
     """
     user = UserSerializer()
 
-    class Meta(object):
+    class Meta:
         model = UserPreference
         depth = 1
         fields = ('user', 'key', 'value', 'url')
@@ -61,13 +61,13 @@ class RawUserPreferenceSerializer(serializers.ModelSerializer):
     """
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
-    class Meta(object):
+    class Meta:
         model = UserPreference
         depth = 1
         fields = ('user', 'key', 'value', 'url')
 
 
-class ReadOnlyFieldsSerializerMixin(object):
+class ReadOnlyFieldsSerializerMixin:
     """
     Mixin for use with Serializers that provides a method
     `get_read_only_fields`, which returns a tuple of all read-only

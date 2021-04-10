@@ -4,6 +4,7 @@
 
 import unittest
 from unittest.mock import Mock
+import dateutil.parser
 
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.field_data import DictFieldData
@@ -386,6 +387,7 @@ class TestSerialize(unittest.TestCase):
         assert serialize_field(['foo', 'bar']) == '["foo", "bar"]'
         assert serialize_field("2012-12-31T23:59:59Z") == '2012-12-31T23:59:59Z'
         assert serialize_field("1 day 12 hours 59 minutes 59 seconds") == '1 day 12 hours 59 minutes 59 seconds'
+        assert serialize_field(dateutil.parser.parse('2012-12-31T23:59:59Z')) == '2012-12-31T23:59:59+00:00'
 
 
 class TestDeserialize(unittest.TestCase):

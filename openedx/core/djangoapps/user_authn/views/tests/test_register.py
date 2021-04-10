@@ -1632,6 +1632,38 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
             response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
             assert response.status_code == 403
 
+    @override_settings(
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'registration_proxy',
+            }
+        }
+    )
+    def test_rate_limiting_registration_view(self):
+        """
+        Confirm rate limits work as expected for registration
+        end point.
+        Note that drf's rate limiting makes use of the default cache
+        to enforce limits; that's why this test needs a "real"
+        default cache (as opposed to the usual-for-tests DummyCache)
+        """
+        payload = {
+            "email": 'email',
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+
+        for _ in range(int(settings.REGISTRATION_RATELIMIT.split('/')[0])):
+            response = self.client.post(self.url, payload)
+            assert response.status_code != 403
+
+        response = self.client.post(self.url, payload)
+        assert response.status_code == 403
+        cache.clear()
+
     def _assert_fields_match(self, actual_field, expected_field):
         """
         Assert that the actual field and the expected field values match.

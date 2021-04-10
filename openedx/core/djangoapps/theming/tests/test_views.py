@@ -25,7 +25,7 @@ class TestThemingViews(TestCase):
         """
         Initialize middleware and related objects
         """
-        super(TestThemingViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.site_theme_middleware = CurrentSiteThemeMiddleware()
         self.user = UserFactory.create()
@@ -89,7 +89,7 @@ class TestThemingViews(TestCase):
         assert response.status_code == 200
         self.assertContains(
             response,
-            u'<option value="{theme_name}" selected=selected>'.format(theme_name=TEST_THEME_NAME)
+            f'<option value="{TEST_THEME_NAME}" selected=selected>'
         )
 
         # Request to reset the theme
@@ -106,5 +106,5 @@ class TestThemingViews(TestCase):
         assert response.status_code == 200
         self.assertContains(
             response,
-            u'<option value="{theme_name}">'.format(theme_name=TEST_THEME_NAME)
+            f'<option value="{TEST_THEME_NAME}">'
         )

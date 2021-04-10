@@ -8,7 +8,6 @@ from itertools import chain
 from urllib.parse import quote
 
 from django.conf import settings
-from django.urls import reverse  # lint-amnesty, pylint: disable=unused-import
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 

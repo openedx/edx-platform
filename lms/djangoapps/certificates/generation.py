@@ -25,46 +25,55 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-def generate_allowlist_certificate(user, course_key):
+def generate_course_certificate(user, course_key, generation_mode):
     """
-    Generate an allowlist certificate for this user, in this course run. This method should be called from a task.
+    Generate a course certificate for this user, in this course run. If the certificate has a passing status, also emit
+    a certificate event.
+
+    Note that the certificate could be either an allowlist certificate or a "regular" course certificate; the content
+    will be the same either way.
+
+    Args:
+        user: user for whom to generate a certificate
+        course_key: course run key for which to generate a certificate
+        generation_mode: Used when emitting an events. Options are "self" (implying the user generated the cert
+            themself) and "batch" for everything else.
     """
     cert = _generate_certificate(user, course_key)
 
     if CertificateStatuses.is_passing_status(cert.status):
-        # Emit a certificate event. Note that the two options for generation_mode are "self" (implying the user
-        # generated the cert themself) and "batch" for everything else.
+        # Emit a certificate event
         event_data = {
             'user_id': user.id,
             'course_id': str(course_key),
             'certificate_id': cert.verify_uuid,
             'enrollment_mode': cert.mode,
-            'generation_mode': 'batch'
+            'generation_mode': generation_mode
         }
         emit_certificate_event(event_name='created', user=user, course_id=course_key, event_data=event_data)
 
     return cert
 
 
-def _generate_certificate(user, course_id):
+def _generate_certificate(user, course_key):
     """
     Generate a certificate for this user, in this course run.
     """
     profile = UserProfile.objects.get(user=user)
     profile_name = profile.name
 
-    course = modulestore().get_course(course_id, depth=0)
+    course = modulestore().get_course(course_key, depth=0)
     course_grade = CourseGradeFactory().read(user, course)
-    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
     key = make_hashkey(random.random())
     uuid = uuid4().hex
 
     cert, created = GeneratedCertificate.objects.update_or_create(
         user=user,
-        course_id=course_id,
+        course_id=course_key,
         defaults={
             'user': user,
-            'course_id': course_id,
+            'course_id': course_key,
             'mode': enrollment_mode,
             'name': profile_name,
             'status': CertificateStatuses.downloadable,
@@ -79,13 +88,7 @@ def _generate_certificate(user, course_id):
         created_msg = 'Certificate was created.'
     else:
         created_msg = 'Certificate already existed and was updated.'
-    log.info(
-        'Generated certificate with status {status} for {user} : {course}. {created_msg}'.format(
-            status=cert.status,
-            user=cert.user.id,
-            course=cert.course_id,
-            created_msg=created_msg
-        ))
+    log.info(f'Generated certificate with status {cert.status} for {user.id} : {course_key}. {created_msg}')
     return cert
 
 

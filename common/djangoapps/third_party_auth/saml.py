@@ -12,7 +12,6 @@ from django.http import Http404
 from django.utils.functional import cached_property
 from django_countries import countries
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
-from six import text_type
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
 from social_core.exceptions import AuthForbidden
 
@@ -83,18 +82,18 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             config["sp"].update(self.get_idp_setting(idp, "SP_EXTRA", {}))
             return config
         else:
-            return super(SAMLAuthBackend, self).generate_saml_config()  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().generate_saml_config()
 
     def get_user_id(self, details, response):
         """
         Calling the parent function and handling the exception properly.
         """
         try:
-            return super(SAMLAuthBackend, self).get_user_id(details, response)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super().get_user_id(details, response)
         except KeyError as ex:
             log.warning(
-                u'[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
-                u'Provider: {idp_name}, Message: {message}'.format(
+                '[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
+                'Provider: {idp_name}, Message: {message}'.format(
                     message=ex.message,  # lint-amnesty, pylint: disable=no-member
                     idp_name=response.get('idp_name')
                 )
@@ -127,7 +126,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
             log.error('[THIRD_PARTY_AUTH] SAML authentication is not enabled')
             raise Http404
 
-        return super(SAMLAuthBackend, self).auth_url()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().auth_url()
 
     def disconnect(self, *args, **kwargs):
         """
@@ -136,7 +135,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         from openedx.features.enterprise_support.api import unlink_enterprise_user_from_idp
         user = kwargs.get('user', None)
         unlink_enterprise_user_from_idp(self.strategy.request, user, self.name)
-        return super(SAMLAuthBackend, self).disconnect(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().disconnect(*args, **kwargs)
 
     def _check_entitlements(self, idp, attributes):
         """
@@ -165,7 +164,7 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         """
         # We only override this method so that we can add extra debugging when debug_mode is True
         # Note that auth_inst is instantiated just for the current HTTP request, then is destroyed
-        auth_inst = super(SAMLAuthBackend, self)._create_saml_auth(idp)  # lint-amnesty, pylint: disable=super-with-arguments
+        auth_inst = super()._create_saml_auth(idp)
         from .models import SAMLProviderConfig
         if SAMLProviderConfig.current(idp.name).debug_mode:
 
@@ -207,7 +206,7 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         Overrides `get_user_details` from the base class; retrieves those details,
         then updates the dict with values from whatever additional fields are desired.
         """
-        details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
+        details = super().get_user_details(attributes)
         extra_field_definitions = self.conf.get('extra_field_definitions', [])
         details.update({
             field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
@@ -492,7 +491,7 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         of the info we need to do that, or if the request triggers an exception, then fail nicely by
         returning the basic user details we're able to extract from just the SAML response.
         """
-        basic_details = super(SapSuccessFactorsIdentityProvider, self).get_user_details(attributes)  # lint-amnesty, pylint: disable=super-with-arguments
+        basic_details = super().get_user_details(attributes)
         if self.invalid_configuration():
             return basic_details
         user_id = basic_details['username']

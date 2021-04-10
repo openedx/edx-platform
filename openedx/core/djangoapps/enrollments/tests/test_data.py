@@ -43,7 +43,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
 
     def setUp(self):
         """Create a course and user, then log in. """
-        super(EnrollmentDataTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
@@ -206,7 +206,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self._create_course_modes(course_modes)
 
         # Try to get an enrollment before it exists.
-        result = data.get_course_enrollment(self.user.username, six.text_type(self.course.id))
+        result = data.get_course_enrollment(self.user.username, str(self.course.id))
         assert result is None
 
         # Create the original enrollment.
@@ -217,7 +217,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             True
         )
         # Get the enrollment and compare it to the original.
-        result = data.get_course_enrollment(self.user.username, six.text_type(self.course.id))
+        result = data.get_course_enrollment(self.user.username, str(self.course.id))
         assert self.user.username == result['user']
         assert enrollment == result
 
@@ -289,8 +289,8 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             }
         ]
 
-        data.add_or_update_enrollment_attr(self.user.username, six.text_type(self.course.id), enrollment_attributes)
-        enrollment_attr = data.get_enrollment_attributes(self.user.username, six.text_type(self.course.id))
+        data.add_or_update_enrollment_attr(self.user.username, str(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, str(self.course.id))
         assert enrollment_attr[0] == enrollment_attributes[0]
 
         enrollment_attributes = [
@@ -301,8 +301,8 @@ class EnrollmentDataTest(ModuleStoreTestCase):
             }
         ]
 
-        data.add_or_update_enrollment_attr(self.user.username, six.text_type(self.course.id), enrollment_attributes)
-        enrollment_attr = data.get_enrollment_attributes(self.user.username, six.text_type(self.course.id))
+        data.add_or_update_enrollment_attr(self.user.username, str(self.course.id), enrollment_attributes)
+        enrollment_attr = data.get_enrollment_attributes(self.user.username, str(self.course.id))
         assert enrollment_attr[0] == enrollment_attributes[0]
 
     def test_non_existent_course(self):

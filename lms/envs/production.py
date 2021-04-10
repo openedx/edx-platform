@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 This is the default template for our main set of AWS servers.
 
@@ -43,7 +41,7 @@ def get_env_setting(setting):
     try:
         return os.environ[setting]
     except KeyError:
-        error_msg = u"Set the %s env variable" % setting
+        error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 ################################ ALWAYS THE SAME ##############################
@@ -135,11 +133,11 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 
 QUEUE_VARIANT = CONFIG_PREFIX.lower()
 
-CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
+CELERY_DEFAULT_EXCHANGE = f'edx.{QUEUE_VARIANT}core'
 
-HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
-DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
-HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
+HIGH_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.high'
+DEFAULT_PRIORITY_QUEUE = f'edx.{QUEUE_VARIANT}core.default'
+HIGH_MEM_QUEUE = f'edx.{QUEUE_VARIANT}core.high_mem'
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
@@ -360,7 +358,7 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get(
     "SSL_AUTH_DN_FORMAT_STRING",
-    u"/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
 # Video Caching. Pairing country codes with CDN URLs.
@@ -534,11 +532,11 @@ CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")
 CELERY_BROKER_USER = AUTH_TOKENS.get("CELERY_BROKER_USER", "")
 CELERY_BROKER_PASSWORD = AUTH_TOKENS.get("CELERY_BROKER_PASSWORD", "")
 
-BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
-                                            CELERY_BROKER_USER,
-                                            CELERY_BROKER_PASSWORD,
-                                            CELERY_BROKER_HOSTNAME,
-                                            CELERY_BROKER_VHOST)
+BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
+                                       CELERY_BROKER_USER,
+                                       CELERY_BROKER_PASSWORD,
+                                       CELERY_BROKER_HOSTNAME,
+                                       CELERY_BROKER_VHOST)
 BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 BROKER_TRANSPORT_OPTIONS = {
@@ -614,6 +612,8 @@ RESET_PASSWORD_API_RATELIMIT = ENV_TOKENS.get('RESET_PASSWORD_API_RATELIMIT', RE
 REGISTRATION_VALIDATION_RATELIMIT = ENV_TOKENS.get(
     'REGISTRATION_VALIDATION_RATELIMIT', REGISTRATION_VALIDATION_RATELIMIT
 )
+
+REGISTRATION_RATELIMIT = ENV_TOKENS.get('REGISTRATION_RATELIMIT', REGISTRATION_RATELIMIT)
 
 #### PASSWORD POLICY SETTINGS #####
 AUTH_PASSWORD_VALIDATORS = ENV_TOKENS.get("AUTH_PASSWORD_VALIDATORS", AUTH_PASSWORD_VALIDATORS)
@@ -978,8 +978,8 @@ derive_settings(__name__)
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
                                                       COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
-COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
-                                                      COMPLETION_BY_VIEWING_DELAY_MS)
+COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
+                                                COMPLETION_BY_VIEWING_DELAY_MS)
 
 ################# Settings for brand logos. #################
 LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)

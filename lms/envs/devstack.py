@@ -34,9 +34,9 @@ SITE_NAME = LMS_BASE
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
+LMS_ROOT_URL = f'http://{LMS_BASE}'
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
-ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
+ENTERPRISE_API_URL = f'{LMS_INTERNAL_ROOT_URL}/enterprise/api/v1/'
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
     'http://localhost:18150/logout/',  # credentials
@@ -277,10 +277,10 @@ LOGIN_REDIRECT_WHITELIST = [
 ###################### JWTs ######################
 JWT_AUTH.update({
     'JWT_AUDIENCE': 'lms-key',
-    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+    'JWT_ISSUER': f'{LMS_ROOT_URL}/oauth2',
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
-        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
+        'ISSUER': f'{LMS_ROOT_URL}/oauth2',
         'SECRET_KEY': 'lms-secret',
     }],
     'JWT_SECRET_KEY': 'lms-secret',
@@ -379,7 +379,7 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 COURSE_CATALOG_URL_ROOT = 'http://edx.devstack.discovery:18381'
-COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
+COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", SYSTEM_WIDE_ROLE_CLASSES)
 SYSTEM_WIDE_ROLE_CLASSES.append(

@@ -10,7 +10,6 @@ from contextlib import contextmanager
 from unittest import mock
 
 import django.test
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
@@ -24,6 +23,8 @@ from common.djangoapps.third_party_auth.models import (
     SAMLProviderConfig
 )
 from common.djangoapps.third_party_auth.models import cache as config_cache
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin
+from openedx.core.storage import OverwriteStorage
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES
@@ -62,11 +63,11 @@ class ThirdPartyAuthTestMixin:
         patch.start()
         self.addCleanup(patch.stop)
 
-        super(ThirdPartyAuthTestMixin, self).setUp(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp(*args, **kwargs)
 
     def tearDown(self):
         config_cache.clear()
-        super(ThirdPartyAuthTestMixin, self).tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().tearDown()
 
     def enable_saml(self, **kwargs):
         """ Enable SAML support (via SAMLConfiguration, not for any particular provider) """
@@ -182,7 +183,7 @@ class TestCase(ThirdPartyAuthTestMixin, CacheIsolationMixin, django.test.TestCas
     """Base class for auth test cases."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super(TestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Explicitly set a server name that is compatible with all our providers:
         # (The SAML lib we use doesn't like the default 'testserver' as a domain)
         self.hostname = 'example.none'
@@ -211,7 +212,7 @@ class SAMLTestCase(TestCase):
         if 'public_key' not in kwargs:
             kwargs['public_key'] = self._get_public_key()
         kwargs.setdefault('entity_id', "https://saml.example.none")
-        super(SAMLTestCase, self).enable_saml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().enable_saml(**kwargs)
 
 
 @contextmanager

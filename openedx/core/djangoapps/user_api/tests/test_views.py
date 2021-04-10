@@ -3,11 +3,10 @@
 
 import json  # lint-amnesty, pylint: disable=unused-import
 from unittest import skipUnless  # lint-amnesty, pylint: disable=unused-import
+from unittest import mock  # lint-amnesty, pylint: disable=unused-import
 import pytest
 import ddt
 import httpretty  # lint-amnesty, pylint: disable=unused-import
-import mock  # lint-amnesty, pylint: disable=unused-import
-import six
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, unused-import
 from django.core import mail  # lint-amnesty, pylint: disable=unused-import
@@ -17,8 +16,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, common_timezones_set  # lint-amnesty, pylint: disable=unused-import
-from six import text_type
-from six.moves import range
 from social_django.models import Partial, UserSocialAuth  # lint-amnesty, pylint: disable=unused-import
 
 from openedx.core.djangoapps.django_comment_common import models
@@ -90,9 +87,8 @@ class UserAPITestCase(ApiTestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        six.assertCountEqual(self, list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
-        six.assertCountEqual(
-            self,
+        self.assertCountEqual(list(user.keys()), ["email", "id", "name", "username", "preferences", "url"])
+        self.assertCountEqual(
             list(user["preferences"].items()),
             [(pref.key, pref.value) for pref in self.prefs if pref.user.id == user["id"]]  # lint-amnesty, pylint: disable=no-member
         )
@@ -102,7 +98,7 @@ class UserAPITestCase(ApiTestCase):
         """
         Assert that the given preference is acknowledged by the system
         """
-        six.assertCountEqual(self, list(pref.keys()), ["user", "key", "value", "url"])
+        self.assertCountEqual(list(pref.keys()), ["user", "key", "value", "url"])
         self.assertSelfReferential(pref)
         self.assertUserIsValid(pref["user"])
 
@@ -124,7 +120,7 @@ class EmptyUserTestCase(UserAPITestCase):
 class EmptyRoleTestCase(UserAPITestCase):
     """Test that the endpoint supports empty result sets"""
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + str(course_id)
 
     def test_get_list_empty(self):
         """Test that the endpoint properly returns empty result sets"""
@@ -140,11 +136,11 @@ class UserApiTestCase(UserAPITestCase):
     Generalized test case class for specific implementations below
     """
     def setUp(self):
-        super(UserApiTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.users = [
             UserFactory.create(
-                email="test{0}@test.org".format(i),
-                profile__name=u"Test {0}".format(i)
+                email=f"test{i}@test.org",
+                profile__name=f"Test {i}"
             )
             for i in range(5)
         ]
@@ -161,10 +157,10 @@ class RoleTestCase(UserApiTestCase):
     Test cases covering Role-related views and their behaviors
     """
     course_id = CourseKey.from_string("org/course/run")
-    LIST_URI = ROLE_LIST_URI + "?course_id=" + six.text_type(course_id)
+    LIST_URI = ROLE_LIST_URI + "?course_id=" + str(course_id)
 
     def setUp(self):
-        super(RoleTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         (role, _) = models.Role.objects.get_or_create(
             name=models.FORUM_ROLE_MODERATOR,
             course_id=self.course_id
@@ -222,7 +218,7 @@ class RoleTestCase(UserApiTestCase):
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={
             "page_size": 3,
-            "course_id": text_type(self.course_id),
+            "course_id": str(self.course_id),
         })
         assert first_page['count'] == 5
         first_page_next_uri = first_page["next"]
@@ -253,7 +249,7 @@ class UserViewSetTest(UserApiTestCase):
     LIST_URI = USER_LIST_URI
 
     def setUp(self):
-        super(UserViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.detail_uri = self.get_uri_for_user(self.users[0])
 
     # List view tests
@@ -362,7 +358,7 @@ class UserPreferenceViewSetTest(CacheIsolationTestCase, UserApiTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(UserPreferenceViewSetTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.detail_uri = self.get_uri_for_pref(self.prefs[0])
 
     # List view tests
@@ -555,30 +551,30 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(UpdateEmailOptInTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
         cls.url = reverse("preferences_email_opt_in")
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(UpdateEmailOptInTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
     @ddt.data(
-        (u"True", u"True"),
-        (u"true", u"True"),
-        (u"TrUe", u"True"),
-        (u"Banana", u"False"),
-        (u"strawberries", u"False"),
-        (u"False", u"False"),
+        ("True", "True"),
+        ("true", "True"),
+        ("TrUe", "True"),
+        ("Banana", "False"),
+        ("strawberries", "False"),
+        ("False", "False"),
     )
     @ddt.unpack
     def test_update_email_opt_in(self, opt, result):
         """Tests the email opt in preference"""
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": six.text_type(self.course.id),
+            "course_id": str(self.course.id),
             "email_opt_in": opt
         })
         self.assertHttpOK(response)
@@ -597,9 +593,9 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """Tests the email opt in preference"""
         params = {}
         if use_course_id:
-            params["course_id"] = six.text_type(self.course.id)
+            params["course_id"] = str(self.course.id)
         if use_opt_in:
-            params["email_opt_in"] = u"True"
+            params["email_opt_in"] = "True"
 
         response = self.client.post(self.url, params)
         self.assertHttpBadRequest(response)
@@ -610,14 +606,14 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         self.user.save()
         # Register, which should trigger an activation email
         response = self.client.post(self.url, {
-            "course_id": six.text_type(self.course.id),
-            "email_opt_in": u"True"
+            "course_id": str(self.course.id),
+            "email_opt_in": "True"
         })
         self.assertHttpOK(response)
         preference = UserOrgTag.objects.get(
             user=self.user, org=self.course.id.org, key="email-optin"
         )
-        assert preference.value == u'True'
+        assert preference.value == 'True'
 
     def test_update_email_opt_in_anonymous_user(self):
         """
@@ -626,8 +622,8 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         self.client.logout()
         response = self.client.post(self.url, {
-            "course_id": six.text_type(self.course.id),
-            "email_opt_in": u"True"
+            "course_id": str(self.course.id),
+            "email_opt_in": "True"
         })
         assert response.status_code == 403
 
@@ -638,7 +634,7 @@ class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
         """
         response = self.client.post(self.url, {
             "course_id": 'invalid',
-            "email_opt_in": u"True"
+            "email_opt_in": "True"
         })
         self.assertHttpBadRequest(response)
         with pytest.raises(UserOrgTag.DoesNotExist):

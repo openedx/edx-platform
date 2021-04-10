@@ -2,6 +2,7 @@
 
 
 import re
+from unittest.mock import Mock, patch
 
 from django.contrib.sites.models import Site
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -11,9 +12,7 @@ from common.djangoapps.third_party_auth import provider
 from common.djangoapps.third_party_auth.tests import testutil
 from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-from common.djangoapps.third_party_auth import provider
-from common.djangoapps.third_party_auth.tests import testutil
-from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
+
 SITE_DOMAIN_A = 'professionalx.example.com'
 SITE_DOMAIN_B = 'somethingelse.example.com'
 

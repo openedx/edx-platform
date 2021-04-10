@@ -34,7 +34,6 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     .. toggle_use_cases: temporary
     .. toggle_creation_date: 2016-08-26
     .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/13329
     """
     # this field overrides course-specific settings to enable the feature for all courses

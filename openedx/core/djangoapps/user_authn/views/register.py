@@ -47,7 +47,6 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     get_email_validation_error,
     get_name_validation_error,
     get_password_validation_error,
-    get_confirm_password_validation_error,
     get_username_existence_validation_error,
     get_username_validation_error
 )
@@ -106,7 +105,6 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-# .. toggle_tickets: None
 REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
     waffle_namespace=LegacyWaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
@@ -493,6 +491,7 @@ class RegistrationView(APIView):
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
+    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
     def post(self, request):
         """Create the user's account.
 
@@ -511,6 +510,10 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
+        should_be_rate_limited = getattr(request, 'limited', False)
+        if should_be_rate_limited:
+            return JsonResponse({'error_code': 'forbidden-request'}, status=403)
+
         if is_require_third_party_auth_enabled() and not pipeline.running(request):
             # if request is not running a third-party auth pipeline
             return HttpResponseForbidden(
@@ -746,11 +749,6 @@ class RegistrationValidationView(APIView):
         password = request.data.get('password')
         return get_password_validation_error(password, username, email)
 
-    def confirm_password_handler(self, request):
-        password = request.data.get('password')
-        confirm_password = request.data.get('confirm_password')
-        return get_confirm_password_validation_error(confirm_password, password)
-
     def country_handler(self, request):
         country = request.data.get('country')
         return get_country_validation_error(country)
@@ -761,7 +759,6 @@ class RegistrationValidationView(APIView):
         "email": email_handler,
         "confirm_email": confirm_email_handler,
         "password": password_handler,
-        "confirm_password": confirm_password_handler,
         "country": country_handler
     }
 
@@ -780,7 +777,6 @@ class RegistrationValidationView(APIView):
             "email": "mslm@gmail.com",
             "confirm_email": "mslm@gmail.com",
             "password": "password123",
-            "confirm_password": "password123",
             "country": "PK"
         }
         ```

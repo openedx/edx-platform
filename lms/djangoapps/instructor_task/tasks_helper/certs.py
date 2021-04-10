@@ -12,10 +12,10 @@ from django.db.models import Q
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import (
-    generate_allowlist_certificate_task,
+    can_generate_certificate_task,
+    generate_certificate_task,
     generate_user_certificates,
-    get_allowlisted_users,
-    is_using_certificate_allowlist_and_is_on_allowlist
+    get_allowlisted_users
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
@@ -89,10 +89,10 @@ def generate_students_certificates(
     # Generate certificate for each student
     for student in students_require_certs:
         task_progress.attempted += 1
-        if is_using_certificate_allowlist_and_is_on_allowlist(student, course_id):
-            log.info(f'{course_id} is using allowlist certificates, and the user {student.id} is on its allowlist. '
-                     f'Attempt will be made to generate an allowlist certificate.')
-            generate_allowlist_certificate_task(student, course_id)
+        if can_generate_certificate_task(student, course_id):
+            log.info(f'{course_id} is using V2 certificates. Attempt will be made to generate a V2 certificate '
+                     f'for user {student.id}.')
+            generate_certificate_task(student, course_id)
         else:
             log.info(f'Attempt will be made to generate a certificate for user {student.id} in {course_id}.')
             generate_user_certificates(

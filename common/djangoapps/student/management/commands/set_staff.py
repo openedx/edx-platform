@@ -4,7 +4,6 @@ import re
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand
-from six import text_type
 
 
 class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring

@@ -34,7 +34,7 @@ from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory  # pylint: disable=unused-import
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG

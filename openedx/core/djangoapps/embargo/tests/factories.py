@@ -15,11 +15,7 @@ class CountryFactory(DjangoModelFactory):
 
 
 class RestrictedCourseFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-<<<<<<< HEAD
-    class Meta(object):
-=======
     class Meta:
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         model = RestrictedCourse
 
     @factory.lazy_attribute
@@ -28,11 +24,7 @@ class RestrictedCourseFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 
 
 class CountryAccessRuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-<<<<<<< HEAD
-    class Meta(object):
-=======
     class Meta:
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         model = CountryAccessRule
 
     country = factory.SubFactory(CountryFactory)

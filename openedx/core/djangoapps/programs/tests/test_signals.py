@@ -3,7 +3,8 @@ This module contains tests for programs-related signals and signal handlers.
 """
 import datetime
 
-import mock
+from unittest import mock
+
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -102,7 +103,7 @@ class CertChangedReceiverTest(TestCase):
     """
 
     def setUp(self):
-        super(CertChangedReceiverTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=TEST_USERNAME)
 
     @property

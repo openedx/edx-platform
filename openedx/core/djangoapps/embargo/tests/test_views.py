@@ -47,11 +47,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-<<<<<<< HEAD
-        super(CourseAccessMessageViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().setUp()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
 
     @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
@@ -99,11 +95,7 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-<<<<<<< HEAD
-        super(CheckCourseAccessViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-=======
         super().setUp()
->>>>>>> 5d7cd3d278cf9ff593e20b4eebd5aad1249d3308
         self.url = reverse('api_embargo:v1_course_access')
         user = UserFactory(is_staff=True)
         self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access

@@ -587,6 +587,7 @@ class JSInput(InputTypeBase):
         - allow-popups
         - allow-forms
         - allow-pointer-lock
+        - allow-downloads
 
     This in turn means that the iframe cannot directly access the top-level
     window elements.

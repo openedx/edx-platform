@@ -8,7 +8,6 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-import six
 from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag

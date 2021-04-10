@@ -7,7 +7,6 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-import six
 from django.conf import settings
 from django.urls import reverse
 from pytz import UTC, timezone
@@ -91,7 +90,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
         """
         Create a test course.
         """
-        super(AdminCourseModeFormTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.course = CourseFactory.create()
         CourseOverview.load_from_module_store(self.course.id)
 

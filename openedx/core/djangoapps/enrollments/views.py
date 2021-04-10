@@ -7,8 +7,6 @@ consist primarily of authentication, request validation, and serialization.
 
 import logging
 
-from six import text_type
-
 from common.djangoapps.course_modes.models import CourseMode
 from django.core.exceptions import ObjectDoesNotExist, ValidationError  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
@@ -99,7 +97,7 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
             self.rate = self.get_rate()
             self.num_requests, self.duration = self.parse_rate(self.rate)
 
-        return self.has_api_key_permissions(request) or super(EnrollmentUserThrottle, self).allow_request(request, view)  # lint-amnesty, pylint: disable=super-with-arguments
+        return self.has_api_key_permissions(request) or super().allow_request(request, view)
 
 
 @can_disable_rate_limit
@@ -747,9 +745,9 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 try:
                     enterprise_api_client.post_enterprise_course_enrollment(username, str(course_id), None)
                 except EnterpriseApiException as error:
-                    log.exception(u"An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
-                                  u"for user [%s] in course run [%s]", username, course_id)
-                    raise CourseEnrollmentError(text_type(error))  # lint-amnesty, pylint: disable=raise-missing-from
+                    log.exception("An unexpected error occurred while creating the new EnterpriseCourseEnrollment "
+                                  "for user [%s] in course run [%s]", username, course_id)
+                    raise CourseEnrollmentError(str(error))  # lint-amnesty, pylint: disable=raise-missing-from
                 kwargs = {
                     'username': username,
                     'course_id': str(course_id),

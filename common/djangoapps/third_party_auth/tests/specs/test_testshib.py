@@ -29,10 +29,6 @@ from common.djangoapps.third_party_auth.tests import testutil, utils
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerFactory
-from common.djangoapps.third_party_auth import pipeline
-from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
-from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
-from common.djangoapps.third_party_auth.tests import testutil, utils
 
 from .base import IntegrationTestMixin
 
@@ -57,7 +53,7 @@ class SamlIntegrationTestUtilities:
     USER_USERNAME = "myself"
 
     def setUp(self):
-        super(SamlIntegrationTestUtilities, self).setUp()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        super().setUp()  # lint-amnesty, pylint: disable=no-member, super-with-arguments
         self.enable_saml(  # lint-amnesty, pylint: disable=no-member
             private_key=self._get_private_key(),  # lint-amnesty, pylint: disable=no-member
             public_key=self._get_public_key(),  # lint-amnesty, pylint: disable=no-member
@@ -161,7 +157,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
         'id': 'id_value',
         'firstName': 'firstName_value',
         'idp_name': 'testshib',
-        'attributes': {u'urn:oid:0.9.2342.19200300.100.1.1': [u'myself'], 'name_id': '1'},
+        'attributes': {'urn:oid:0.9.2342.19200300.100.1.1': ['myself'], 'name_id': '1'},
         'session_index': '1',
     }
 
@@ -312,7 +308,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
 
             expected_next_url = "/dashboard"
             (msg, action_type, idp_name, request_data, next_url, xml), _kwargs = mock_log.call_args_list[0]
-            assert msg.startswith(u'SAML login %s')
+            assert msg.startswith('SAML login %s')
             assert action_type == 'request'
             assert idp_name == self.PROVIDER_IDP_SLUG
             self.assertDictContainsSubset(
@@ -323,7 +319,7 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             assert '<samlp:AuthnRequest' in xml
 
             (msg, action_type, idp_name, response_data, next_url, xml), _kwargs = mock_log.call_args_list[1]
-            assert msg.startswith(u'SAML login %s')
+            assert msg.startswith('SAML login %s')
             assert action_type == 'response'
             assert idp_name == self.PROVIDER_IDP_SLUG
             self.assertDictContainsSubset({"RelayState": idp_name}, response_data)
@@ -392,7 +388,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         """
         Mock out HTTP calls to various endpoints using httpretty.
         """
-        super(SuccessFactorsIntegrationTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         # Mock the call to the SAP SuccessFactors assertion endpoint
         SAPSF_ASSERTION_URL = 'http://successfactors.com/oauth/idp'

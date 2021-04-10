@@ -149,14 +149,14 @@ def create_course_enrollment(username, course_id, mode, is_active):
         enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
-        raise CourseNotFoundError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseNotFoundError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except EnrollmentClosedError as err:
-        raise CourseEnrollmentClosedError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentClosedError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except CourseFullError as err:
-        raise CourseEnrollmentFullError(text_type(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentFullError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
     except AlreadyEnrolledError as err:
         enrollment = get_course_enrollment(username, course_id)
-        raise CourseEnrollmentExistsError(text_type(err), enrollment)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CourseEnrollmentExistsError(str(err), enrollment)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):
@@ -256,7 +256,7 @@ def unenroll_user_from_all_courses(username):
         for enrollment in enrollments:
             _update_enrollment(enrollment, is_active=False)
 
-    return set([str(enrollment.course_id.org) for enrollment in enrollments])  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+    return {str(enrollment.course_id.org) for enrollment in enrollments}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
 
 
 def _get_user(username):

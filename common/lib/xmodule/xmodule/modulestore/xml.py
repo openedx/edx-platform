@@ -2,7 +2,6 @@
 
 import glob
 import hashlib
-import io
 import itertools
 import json
 import logging
@@ -14,7 +13,6 @@ from contextlib import contextmanager
 from importlib import import_module
 
 from django.utils.encoding import python_2_unicode_compatible
-from edx_django_utils.monitoring import set_custom_attribute
 from fs.osfs import OSFS
 from lazy import lazy
 from lxml import etree
@@ -25,6 +23,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore
 
+from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.error_module import ErrorBlock
 from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
@@ -377,13 +376,11 @@ class XMLModuleStore(ModuleStoreReadBase):
         try:
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
-            msg = "ERROR: Failed to load courselike '{}': {}".format(
-                course_dir.encode("utf-8"), str(exc)
-            )
-            set_custom_attribute('course_import_failure', f"Courselike load failure: {msg}")
+            msg = f'Course import {target_course_id}: ERROR: Failed to load courselike "{course_dir}": {str(exc)}'
             log.exception(msg)
             errorlog.tracker(msg)
             self.errored_courses[course_dir] = errorlog
+            monitor_import_failure(target_course_id, 'Updating', exception=exc)
 
         if course_descriptor is None:
             pass

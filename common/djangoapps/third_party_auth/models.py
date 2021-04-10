@@ -60,7 +60,7 @@ def clean_json(value, of_type):
     try:
         value_python = json.loads(value)
     except ValueError as err:
-        raise ValidationError(u"Invalid JSON: {}".format(err))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ValidationError(f"Invalid JSON: {err}")  # lint-amnesty, pylint: disable=raise-missing-from
     if not isinstance(value_python, of_type):
         raise ValidationError(f"Expected a JSON {of_type}")
     return json.dumps(value_python, indent=4)
@@ -74,7 +74,7 @@ def clean_username(username=''):
 class AuthNotConfigured(SocialAuthBaseException):
     """ Exception when SAMLProviderData or other required info is missing """
     def __init__(self, provider_name):
-        super(AuthNotConfigured, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.provider_name = provider_name
 
     def __str__(self):
@@ -224,7 +224,7 @@ class ProviderConfig(ConfigurationModel):
 
     def clean(self):
         """ Ensure that at most `icon_class` or `icon_image` is set """
-        super(ProviderConfig, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().clean()
         if bool(self.icon_class) and bool(self.icon_image):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
 
@@ -379,7 +379,7 @@ class OAuth2ProviderConfig(ProviderConfig):
 
     def clean(self):
         """ Standardize and validate fields """
-        super(OAuth2ProviderConfig, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().clean()
         self.other_settings = clean_json(self.other_settings, dict)
 
     def get_setting(self, name):
@@ -459,9 +459,9 @@ class SAMLConfiguration(ConfigurationModel):
     )
     is_public = models.BooleanField(
         default=False,
-        verbose_name=u"Allow customers to see and use this SAML configuration",
+        verbose_name="Allow customers to see and use this SAML configuration",
         help_text=(
-            u"When checked, customers will be able to choose this SAML Configuration "
+            "When checked, customers will be able to choose this SAML Configuration "
             "in the admin portal."
         ),
     )
@@ -483,7 +483,7 @@ class SAMLConfiguration(ConfigurationModel):
 
     def clean(self):
         """ Standardize and validate fields """
-        super(SAMLConfiguration, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().clean()
         self.org_info_str = clean_json(self.org_info_str, dict)
         self.other_config_str = clean_json(self.other_config_str, dict)
 
@@ -629,7 +629,7 @@ class SAMLProviderConfig(ProviderConfig):
     country = models.CharField(
         max_length=128,
         help_text=(
-            u'URN of SAML attribute containing the user`s country.',
+            'URN of SAML attribute containing the user`s country.',
         ),
         blank=True,
     )
@@ -686,7 +686,7 @@ class SAMLProviderConfig(ProviderConfig):
 
     def clean(self):
         """ Standardize and validate fields """
-        super(SAMLProviderConfig, self).clean()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().clean()
         self.other_settings = clean_json(self.other_settings, dict)
 
     class Meta:

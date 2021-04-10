@@ -1,0 +1,62 @@
+<problem><style media="all" type="text/css"/>
+<text><h2>Paying Off Credit Card Debt</h2>
+<p> Each month, a credit
+      card statement will come with the option for you to pay a
+      minimum amount of your charge, usually 2% of the balance due.
+      However, the credit card company earns money by charging
+      interest on the balance that you don't pay. So even if you
+      pay credit card payments on time, interest is still accruing
+      on the outstanding balance.</p>
+<p >Say you've made a
+      $5,000 purchase on a credit card with 18% annual interest
+      rate and 2% minimum monthly payment rate. After a year, how
+      much is the remaining balance? Use the following
+      equations.</p>
+<blockquote>
+<p><strong>Minimum monthly payment</strong>
+= (Minimum monthly payment rate) x (Balance)<br/>
+        (Minimum monthly payment gets split into interest paid and
+        principal paid)<br/>
+<strong>Interest Paid</strong> = (Annual interest rate) / (12
+        months) x (Balance)<br/>
+<strong>Principal paid</strong> = (Minimum monthly payment) -
+        (Interest paid)<br/>
+<strong>Remaining balance</strong> = Balance - (Principal
+        paid)</p>
+</blockquote>
+<p >For month 1, compute the minimum monthly payment by taking 2% of the balance.</p>
+<blockquote xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<p><strong>Minimum monthly payment</strong>
+= .02 x $5000 = $100</p>
+<p>We can't simply deduct this from the balance because
+        there is compounding interest. Of this $100 monthly
+        payment, compute how much will go to paying off interest
+        and how much will go to paying off the principal. Remember
+        that it's the annual interest rate that is given, so we
+        need to divide it by 12 to get the monthly interest
+        rate.</p>
+<p><strong>Interest paid</strong> = .18/12 x $5000 =
+        $75<br/>
+<strong>Principal paid</strong> = $100 - $75 = $25</p>
+<p>The remaining balance at the end of the first month will
+        be the principal paid this month subtracted from the
+        balance at the start of the month.</p>
+<p><strong>Remaining balance</strong> = $5000 - $25 =
+        $4975</p>
+</blockquote>
+<p xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:x="urn:schemas-microsoft-com:office:excel">For month 2, we
+      repeat the same steps.</p>
+<blockquote xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<p><strong>Minimum monthly payment</strong>
+= .02 x $4975 = $99.50<br/>
+<strong>Interest Paid</strong> = .18/12 x $4975 =
+        $74.63<br/>
+<strong>Principal Paid</strong> = $99.50 - $74.63 =
+        $24.87<br/>
+<strong>Remaining Balance</strong> = $4975 - $24.87 =
+        $4950.13</p>
+</blockquote>
+<p xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:x="urn:schemas-microsoft-com:office:excel">After 12 months, the
+      total amount paid is $1167.55, leaving an outstanding balance
+      of $4708.10. Pretty depressing!</p>
+</text></problem>

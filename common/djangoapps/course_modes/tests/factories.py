@@ -4,7 +4,6 @@ Factories for course mode models.
 
 
 import random
-import six
 
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory
@@ -17,7 +16,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 
 # Factories are self documenting
 class CourseModeFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta(object):
+    class Meta:
         model = CourseMode
 
     mode_slug = CourseMode.DEFAULT_MODE_SLUG

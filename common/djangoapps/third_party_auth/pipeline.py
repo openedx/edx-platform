@@ -79,7 +79,6 @@ from django.urls import reverse
 from edx_django_utils.monitoring import set_custom_attribute
 from social_core.exceptions import AuthException
 from social_core.pipeline import partial
-from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
 from common.djangoapps import third_party_auth
@@ -90,10 +89,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import is_multiple_sso_accounts_association_to_saml_user_enabled
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
-from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.third_party_auth.utils import (
+    get_associated_user_by_email_response,
     get_user_from_email,
     is_enterprise_customer_user,
+    is_oauth_provider,
     is_saml_provider,
     user_exists,
 )
@@ -135,9 +136,6 @@ AUTH_ENTRY_REGISTER_API = 'register_api'
 # URL specified with this setting, rather than to the built-in
 # registration/login form/logic.
 AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
-
-# If authn MFE is enabled, the redirect should be to MFE instead of FE
-BASE_URL = settings.AUTHN_MICROFRONTEND_URL if should_redirect_to_authn_microfrontend() else ''
 
 
 def is_api(auth_entry):
@@ -574,11 +572,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
     # invariants have been violated and future misbehavior is likely.
     def dispatch_to_login():
         """Redirects to the login page."""
-        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN])
 
     def dispatch_to_register():
         """Redirects to the registration page."""
-        return redirect(BASE_URL + AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
     def should_force_account_creation():
         """ For some third party providers, we auto-create user accounts """
@@ -739,16 +737,30 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
     if auth_entry == AUTH_ENTRY_LOGIN_API:
         # Temporary custom attribute to help ensure there is no usage.
         set_custom_attribute('deprecated_auth_entry_login_api', True)
-        association_response = associate_by_email(backend, details, user, *args, **kwargs)
-        if (
-            association_response and
-            association_response.get('user') and
-            association_response['user'].is_active
-        ):
-            # Only return the user matched by email if their email has been activated.
-            # Otherwise, an illegitimate user can create an account with another user's
-            # email address and the legitimate user would now login to the illegitimate
-            # account.
+
+        association_response, user_is_active = get_associated_user_by_email_response(
+            backend, details, user, *args, **kwargs)
+
+        if user_is_active:
+            return association_response
+
+
+@partial.partial
+def associate_by_email_if_oauth(auth_entry, backend, details, user, strategy, *args, **kwargs):
+    """
+    This pipeline step associates the current social auth with the user with the
+    same email address in the database.  It defers to the social library's associate_by_email
+    implementation, which verifies that only a single database user is associated with the email.
+
+    This association is done ONLY if the user entered the pipeline belongs to Oauth provider and
+    `ENABLE_REQUIRE_THIRD_PARTY_AUTH` is enabled.
+    """
+
+    if is_require_third_party_auth_enabled() and is_oauth_provider(backend.name, **kwargs):
+        association_response, user_is_active = get_associated_user_by_email_response(
+            backend, details, user, *args, **kwargs)
+
+        if user_is_active:
             return association_response
 
 
@@ -777,9 +789,9 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         try:
             enterprise_customer_user = is_enterprise_customer_user(current_provider.provider_id, current_user)
             logger.info(
-                u'[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
-                u'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
-                u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                '[Multiple_SSO_SAML_Accounts_Association_to_User] Enterprise user verification:'
+                'User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                ' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                     email=current_user.email,
                     user_id=current_user.id,
                     provider_id=current_provider.provider_id,
@@ -790,27 +802,14 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
             if enterprise_customer_user:
                 # this is python social auth pipeline default method to automatically associate social accounts
                 # if the email already matches a user account.
-                association_response = associate_by_email(backend, details, user, *args, **kwargs)
+                association_response, user_is_active = get_associated_user_by_email_response(
+                    backend, details, user, *args, **kwargs)
 
-                if (
-                    association_response and
-                    association_response.get('user') and
-                    association_response['user'].is_active
-                ):
-                    # Only return the user matched by email if their email has been activated.
-                    # Otherwise, an illegitimate user can create an account with another user's
-                    # email address and the legitimate user would now login to the illegitimate
-                    # account.
-                    return association_response
-                elif (
-                    association_response and
-                    association_response.get('user') and
-                    not association_response['user'].is_active
-                ):
+                if not user_is_active:
                     logger.info(
-                        u'[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
-                        u' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
-                        u' is_enterprise_customer_user: {enterprise_customer_user}'.format(
+                        '[Multiple_SSO_SAML_Accounts_Association_to_User] User association account is not'
+                        ' active: User Email: {email}, User ID: {user_id}, Provider ID: {provider_id},'
+                        ' is_enterprise_customer_user: {enterprise_customer_user}'.format(
                             email=current_user.email,
                             user_id=current_user.id,
                             provider_id=current_provider.provider_id,
@@ -818,6 +817,8 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                         )
                     )
                     return None
+
+                return association_response
 
         except Exception as ex:  # pylint: disable=broad-except
             logger.exception('[Multiple_SSO_SAML_Accounts_Association_to_User] Error in'
