@@ -1,12 +1,13 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import logging
 
-from celery import shared_task
+import six
+from celery import task
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
-from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range  # pylint: disable=ungrouped-imports
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
@@ -25,7 +26,7 @@ def chunks(sequence, chunk_size):
     return (sequence[index: index + chunk_size] for index in range(0, len(sequence), chunk_size))
 
 
-def _task_options(routing_key):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _task_options(routing_key):
     task_options = {}
     if getattr(settings, 'HIGH_MEM_QUEUE', None):
         task_options['routing_key'] = settings.HIGH_MEM_QUEUE
@@ -34,7 +35,7 @@ def _task_options(routing_key):  # lint-amnesty, pylint: disable=missing-functio
     return task_options
 
 
-def enqueue_async_course_overview_update_tasks(  # lint-amnesty, pylint: disable=missing-function-docstring
+def enqueue_async_course_overview_update_tasks(
         course_ids,
         all_courses=False,
         force_update=False,
@@ -47,7 +48,7 @@ def enqueue_async_course_overview_update_tasks(  # lint-amnesty, pylint: disable
         course_keys = [CourseKey.from_string(id) for id in course_ids]
 
     for course_key_group in chunks(course_keys, chunk_size):
-        course_key_strings = [str(key) for key in course_key_group]
+        course_key_strings = [six.text_type(key) for key in course_key_group]
 
         options = _task_options(routing_key)
         async_course_overview_update.apply_async(
@@ -57,8 +58,7 @@ def enqueue_async_course_overview_update_tasks(  # lint-amnesty, pylint: disable
         )
 
 
-@shared_task(base=LoggedPersistOnFailureTask)
-@set_code_owner_attribute
+@task(base=LoggedPersistOnFailureTask)
 def async_course_overview_update(*args, **kwargs):
     course_keys = [CourseKey.from_string(arg) for arg in args]
     CourseOverview.update_select_courses(course_keys, force_update=kwargs['force_update'])

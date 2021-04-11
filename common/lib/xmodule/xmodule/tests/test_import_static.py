@@ -4,8 +4,8 @@ Tests that check that we ignore the appropriate files when importing courses.
 
 
 import unittest
-from unittest.mock import Mock
 
+from mock import Mock
 from opaque_keys.edx.locator import CourseLocator
 
 from xmodule.modulestore.tests.utils import (
@@ -26,7 +26,7 @@ class IgnoredFilesTestCase(unittest.TestCase):
     dict_list = [DOT_FILES_DICT, TILDA_FILES_DICT]
 
     def setUp(self):
-        super().setUp()
+        super(IgnoredFilesTestCase, self).setUp()
         for dictionary in self.dict_list:
             self.addCleanup(remove_temp_files_from_list, list(dictionary.keys()), self.course_dir / "static")
             add_temp_files_from_dict(dictionary, self.course_dir / "static")
@@ -47,10 +47,10 @@ class IgnoredFilesTestCase(unittest.TestCase):
         static_content_importer.import_static_content_directory()
         saved_static_content = [call[0][0] for call in content_store.save.call_args_list]
         name_val = {sc.name: sc.data for sc in saved_static_content}
-        assert 'example.txt' in name_val
-        assert '.example.txt' in name_val
-        assert b'GREEN' in name_val['example.txt']
-        assert b'BLUE' in name_val['.example.txt']
-        assert '._example.txt' not in name_val
-        assert '.DS_Store' not in name_val
-        assert 'example.txt~' not in name_val
+        self.assertIn("example.txt", name_val)
+        self.assertIn(".example.txt", name_val)
+        self.assertIn(b"GREEN", name_val["example.txt"])
+        self.assertIn(b"BLUE", name_val[".example.txt"])
+        self.assertNotIn("._example.txt", name_val)
+        self.assertNotIn(".DS_Store", name_val)
+        self.assertNotIn("example.txt~", name_val)

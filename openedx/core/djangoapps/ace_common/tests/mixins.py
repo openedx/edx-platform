@@ -2,17 +2,17 @@
 
 
 import uuid
-from unittest.mock import patch
-from urllib.parse import parse_qs, urlparse
 
 from django.http import HttpRequest
 from edx_ace import Message, Recipient
+from mock import patch
+from six.moves.urllib.parse import parse_qs, urlparse  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-class QueryStringAssertionMixin:
+class QueryStringAssertionMixin(object):
 
     def assert_query_string_equal(self, expected_qs, actual_qs):
         """
@@ -44,7 +44,7 @@ class QueryStringAssertionMixin:
             if expected_component == 'query':
                 self.assert_query_string_equal(expected_value, parsed_url.query)
             else:
-                assert expected_value == getattr(parsed_url, expected_component)
+                self.assertEqual(expected_value, getattr(parsed_url, expected_component))
 
     def assert_query_string_parameters_equal(self, url, **kwargs):
         """
@@ -61,13 +61,13 @@ class QueryStringAssertionMixin:
         parsed_url = urlparse(url)
         parsed_qs = parse_qs(parsed_url.query)
         for expected_key, expected_value in kwargs.items():
-            assert parsed_qs[expected_key] == [str(expected_value)]
+            self.assertEqual(parsed_qs[expected_key], [str(expected_value)])
 
 
-class EmailTemplateTagMixin:
+class EmailTemplateTagMixin(object):
 
     def setUp(self):
-        super().setUp()
+        super(EmailTemplateTagMixin, self).setUp()
 
         patcher = patch('openedx.core.djangoapps.ace_common.templatetags.ace.get_current_request')
         self.mock_get_current_request = patcher.start()
@@ -82,7 +82,7 @@ class EmailTemplateTagMixin:
         self.message = Message(
             app_label='test_app_label',
             name='test_name',
-            recipient=Recipient(lms_user_id=123),
+            recipient=Recipient(username='test_user'),
             context={},
             send_uuid=uuid.uuid4(),
         )

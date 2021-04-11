@@ -14,7 +14,7 @@ class CCXAPIPagination(DefaultPagination):
         """
         Annotate the response with pagination information.
         """
-        response = super().get_paginated_response(data)
+        response = super(CCXAPIPagination, self).get_paginated_response(data)
 
         # Add the current page to the response.
         response.data["current_page"] = self.page.number

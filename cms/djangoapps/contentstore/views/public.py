@@ -59,7 +59,7 @@ def howitworks(request):
         return render_to_response('howitworks.html', {})
 
 
-@waffle_switch(f'{waffle.WAFFLE_NAMESPACE}.{waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE}')
+@waffle_switch('{}.{}'.format(waffle.WAFFLE_NAMESPACE, waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE))
 def accessibility(request):
     """
     Display the accessibility accommodation form.

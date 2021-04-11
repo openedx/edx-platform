@@ -4,11 +4,10 @@ Test for course API
 
 from datetime import datetime, timedelta
 from hashlib import md5
-from unittest import mock
 
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
+import mock
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
@@ -30,15 +29,15 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseApiTestMixin, cls).setUpClass()
         cls.request_factory = APIRequestFactory()
         CourseOverview.get_all_courses()  # seed the CourseOverview table
 
-    def verify_course(self, course, course_id='edX/toy/2012_Fall'):
+    def verify_course(self, course, course_id=u'edX/toy/2012_Fall'):
         """
         Ensure that the returned course is the course we just created
         """
-        assert course_id == str(course.id)
+        self.assertEqual(course_id, str(course.id))
 
 
 class CourseDetailTestMixin(CourseApiTestMixin):
@@ -65,9 +64,9 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestGetCourseDetail, cls).setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
         cls.honor_user = cls.create_user('honor', is_staff=False)
         cls.staff_user = cls.create_user('staff', is_staff=True)
 
@@ -76,20 +75,20 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
         self.verify_course(course)
 
     def test_get_nonexistent_course(self):
-        course_key = CourseKey.from_string('edX/toy/nope')
-        with pytest.raises(Http404):
+        course_key = CourseKey.from_string(u'edX/toy/nope')
+        with self.assertRaises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, course_key)
 
     def test_hidden_course_for_honor(self):
-        with pytest.raises(Http404):
+        with self.assertRaises(Http404):
             self._make_api_call(self.honor_user, self.honor_user, self.hidden_course.id)
 
     def test_hidden_course_for_staff(self):
         course = self._make_api_call(self.staff_user, self.staff_user, self.hidden_course.id)
-        self.verify_course(course, course_id='edX/hidden/2012_Fall')
+        self.verify_course(course, course_id=u'edX/hidden/2012_Fall')
 
     def test_hidden_course_for_staff_as_honor(self):
-        with pytest.raises(Http404):
+        with self.assertRaises(Http404):
             self._make_api_call(self.staff_user, self.honor_user, self.hidden_course.id)
 
 
@@ -112,7 +111,7 @@ class CourseListTestMixin(CourseApiTestMixin):
         """
         Verify that there is one course, and that it has the expected format.
         """
-        assert len(courses) == 1
+        self.assertEqual(len(courses), 1)
         self.verify_course(courses[0])
 
 
@@ -124,14 +123,14 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestGetCourseList, cls).setUpClass()
         cls.course = cls.create_course()
         cls.staff_user = cls.create_user("staff", is_staff=True)
         cls.honor_user = cls.create_user("honor", is_staff=False)
 
     def test_as_staff(self):
         courses = self._make_api_call(self.staff_user, self.staff_user)
-        assert len(courses) == 1
+        self.assertEqual(len(courses), 1)
         self.verify_courses(courses)
 
     def test_for_honor_user_as_staff(self):
@@ -143,7 +142,7 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
         self.verify_courses(courses)
 
     def test_for_staff_user_as_honor(self):
-        with pytest.raises(PermissionDenied):
+        with self.assertRaises(PermissionDenied):
             self._make_api_call(self.honor_user, self.staff_user)
 
     def test_as_anonymous(self):
@@ -153,7 +152,7 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
 
     def test_for_honor_user_as_anonymous(self):
         anonuser = AnonymousUser()
-        with pytest.raises(PermissionDenied):
+        with self.assertRaises(PermissionDenied):
             self._make_api_call(anonuser, self.staff_user)
 
 
@@ -165,7 +164,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super().setUp()
+        super(TestGetCourseListMultipleCourses, self).setUp()
         self.course = self.create_course(mobile_available=False)
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)
@@ -173,7 +172,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     def test_multiple_courses(self):
         self.create_course(course='second')
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        assert len(courses) == 2
+        self.assertEqual(len(courses), 2)
 
     def test_filter_by_org(self):
         """Verify that courses are filtered by the provided org key."""
@@ -182,16 +181,20 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
             org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
-        assert alternate_course.org != self.course.org
+        self.assertNotEqual(alternate_course.org, self.course.org)
 
         # No filtering.
         unfiltered_courses = self._make_api_call(self.staff_user, self.staff_user)
         for org in [self.course.org, alternate_course.org]:
-            assert any(((course.org == org) for course in unfiltered_courses))
+            self.assertTrue(
+                any(course.org == org for course in unfiltered_courses)
+            )
 
         # With filtering.
         filtered_courses = self._make_api_call(self.staff_user, self.staff_user, org=self.course.org)
-        assert all(((course.org == self.course.org) for course in filtered_courses))
+        self.assertTrue(
+            all(course.org == self.course.org for course in filtered_courses)
+        )
 
     def test_filter(self):
         # Create a second course to be filtered out of queries.
@@ -204,8 +207,11 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         ]
         for filter_, expected_courses in test_cases:
             filtered_courses = self._make_api_call(self.staff_user, self.staff_user, filter_=filter_)
-            assert {course.id for course in filtered_courses} == {course.id for course in expected_courses},\
-                f'testing course_api.api.list_courses with filter_={filter_}'
+            self.assertEqual(
+                {course.id for course in filtered_courses},
+                {course.id for course in expected_courses},
+                u"testing course_api.api.list_courses with filter_={}".format(filter_),
+            )
 
 
 class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
@@ -217,18 +223,18 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestGetCourseListExtras, cls).setUpClass()
         cls.staff_user = cls.create_user("staff", is_staff=True)
         cls.honor_user = cls.create_user("honor", is_staff=False)
 
     def test_no_courses(self):
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        assert len(list(courses)) == 0
+        self.assertEqual(len(list(courses)), 0)
 
     def test_hidden_course_for_honor(self):
         self.create_course(visible_to_staff_only=True)
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        assert len(list(courses)) == 0
+        self.assertEqual(len(list(courses)), 0)
 
     def test_hidden_course_for_staff(self):
         self.create_course(visible_to_staff_only=True)

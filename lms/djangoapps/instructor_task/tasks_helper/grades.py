@@ -3,35 +3,37 @@ Functionality for generating grade reports.
 """
 
 import logging
-import re
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from itertools import chain
 from time import time
 
+import re
+import six
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
-from six.moves import zip_longest
+from six import text_type
+from six.moves import zip, zip_longest
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import BulkRoleCache
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.grades.api import context as grades_context
-from lms.djangoapps.grades.api import prefetch_course_and_subsection_grades
+from lms.djangoapps.grades.api import (
+    CourseGradeFactory,
+    context as grades_context,
+    prefetch_course_and_subsection_grades,
+)
 from lms.djangoapps.instructor_analytics.basic import list_problem_responses
 from lms.djangoapps.instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.instructor_task.config.waffle import (
     course_grade_report_verified_only,
     optimize_get_learners_switch_enabled,
-    problem_grade_report_verified_only
+    problem_grade_report_verified_only,
 )
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -39,10 +41,11 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.split_test_module import get_split_user_partitions
-
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
 
@@ -68,7 +71,7 @@ def _flatten(iterable):
     return list(chain.from_iterable(iterable))
 
 
-class GradeReportBase:
+class GradeReportBase(object):
     """
     Base class for grade reports (ProblemGradeReport and CourseGradeReport).
     """
@@ -88,14 +91,14 @@ class GradeReportBase:
         Updates the status on the celery task to the given message.
         Also logs the update.
         """
-        fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+        fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
         task_info_string = fmt.format(
             task_id=context.task_id,
             entry_id=context.entry_id,
             course_id=context.course_id,
             task_input=context.task_input
         )
-        TASK_LOG.info('%s, Task type: %s, %s, %s', task_info_string, context.action_name,
+        TASK_LOG.info(u'%s, Task type: %s, %s, %s', task_info_string, context.action_name,
                       message, context.task_progress.state)
 
     def _handle_empty_generator(self, generator, default):
@@ -116,7 +119,8 @@ class GradeReportBase:
         else:
             TASK_LOG.info('GradeReport: Generator is not empty')
             yield first_iteration_output
-            yield from generator
+            for element in generator:
+                yield element
 
     def _batch_users(self, context):
         """
@@ -196,7 +200,7 @@ class GradeReportBase:
         context.update_status(message)
 
 
-class _CourseGradeReportContext:
+class _CourseGradeReportContext(object):
     """
     Internal class that provides a common context to use for a single grade
     report.  When a report is parallelized across multiple processes,
@@ -206,10 +210,10 @@ class _CourseGradeReportContext:
 
     def __init__(self, _xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
         self.task_info_string = (
-            'Task: {task_id}, '
-            'InstructorTask ID: {entry_id}, '
-            'Course: {course_id}, '
-            'Input: {task_input}'
+            u'Task: {task_id}, '
+            u'InstructorTask ID: {entry_id}, '
+            u'Course: {course_id}, '
+            u'Input: {task_input}'
         ).format(
             task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
             entry_id=_entry_id,
@@ -249,24 +253,24 @@ class _CourseGradeReportContext:
         """
         grading_cxt = grades_context.grading_context(self.course, self.course_structure)
         graded_assignments_map = OrderedDict()
-        for assignment_type_name, subsection_infos in grading_cxt['all_graded_subsections_by_type'].items():
+        for assignment_type_name, subsection_infos in six.iteritems(grading_cxt['all_graded_subsections_by_type']):
             graded_subsections_map = OrderedDict()
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 subsection = subsection_info['subsection_block']
-                header_name = "{assignment_type} {subsection_index}: {subsection_name}".format(
+                header_name = u"{assignment_type} {subsection_index}: {subsection_name}".format(
                     assignment_type=assignment_type_name,
                     subsection_index=subsection_index,
                     subsection_name=subsection.display_name,
                 )
                 graded_subsections_map[subsection.location] = header_name
 
-            average_header = f"{assignment_type_name}"
+            average_header = u"{assignment_type}".format(assignment_type=assignment_type_name)
 
             # Use separate subsection and average columns only if
             # there's more than one subsection.
             separate_subsection_avg_headers = len(subsection_infos) > 1
             if separate_subsection_avg_headers:
-                average_header += " (Avg)"
+                average_header += u" (Avg)"
 
             graded_assignments_map[assignment_type_name] = {
                 'subsection_headers': graded_subsections_map,
@@ -281,11 +285,11 @@ class _CourseGradeReportContext:
         Updates the status on the celery task to the given message.
         Also logs the update.
         """
-        TASK_LOG.info('%s, Task type: %s, %s', self.task_info_string, self.action_name, message)
+        TASK_LOG.info(u'%s, Task type: %s, %s', self.task_info_string, self.action_name, message)
         return self.task_progress.update_task_state(extra_meta={'step': message})
 
 
-class _ProblemGradeReportContext:
+class _ProblemGradeReportContext(object):
     """
     Internal class that provides a common context to use for a single problem
     grade report.  When a report is parallelized across multiple processes,
@@ -327,7 +331,7 @@ class _ProblemGradeReportContext:
         """
         scorable_blocks_map = OrderedDict()
         grading_context = grades_context.grading_context_for_course(self.course)
-        for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].items():
+        for assignment_type_name, subsection_infos in six.iteritems(grading_context['all_graded_subsections_by_type']):
             for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
                 for scorable_block in subsection_info['scored_descendants']:
                     header_name = (
@@ -356,7 +360,7 @@ class _ProblemGradeReportContext:
         return self.task_progress.update_task_state(extra_meta={'step': message})
 
 
-class _CertificateBulkContext:
+class _CertificateBulkContext(object):
     def __init__(self, context, users):
         certificate_whitelist = CertificateWhitelist.objects.filter(course_id=context.course_id, whitelist=True)
         self.whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
@@ -367,7 +371,7 @@ class _CertificateBulkContext:
         }
 
 
-class _TeamBulkContext:  # lint-amnesty, pylint: disable=missing-class-docstring
+class _TeamBulkContext(object):
     def __init__(self, context, users):
         self.enabled = context.teams_enabled
         if self.enabled:
@@ -380,13 +384,13 @@ class _TeamBulkContext:  # lint-amnesty, pylint: disable=missing-class-docstring
             self.teams_by_user = {}
 
 
-class _EnrollmentBulkContext:
+class _EnrollmentBulkContext(object):
     def __init__(self, context, users):
         CourseEnrollment.bulk_fetch_enrollment_states(users, context.course_id)
         self.verified_users = set(IDVerificationService.get_verified_user_ids(users))
 
 
-class _CourseGradeBulkContext:  # lint-amnesty, pylint: disable=missing-class-docstring
+class _CourseGradeBulkContext(object):
     def __init__(self, context, users):
         self.certs = _CertificateBulkContext(context, users)
         self.teams = _TeamBulkContext(context, users)
@@ -397,7 +401,7 @@ class _CourseGradeBulkContext:  # lint-amnesty, pylint: disable=missing-class-do
         BulkCourseTags.prefetch(context.course_id, users)
 
 
-class CourseGradeReport:
+class CourseGradeReport(object):
     """
     Class to encapsulate functionality related to generating Grade Reports.
     """
@@ -411,24 +415,24 @@ class CourseGradeReport:
         """
         with modulestore().bulk_operations(course_id):
             context = _CourseGradeReportContext(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name)
-            return CourseGradeReport()._generate(context)  # lint-amnesty, pylint: disable=protected-access
+            return CourseGradeReport()._generate(context)
 
     def _generate(self, context):
         """
         Internal method for generating a grade report for the given context.
         """
-        context.update_status('Starting grades')
+        context.update_status(u'Starting grades')
         success_headers = self._success_headers(context)
         error_headers = self._error_headers()
         batched_rows = self._batched_rows(context)
 
-        context.update_status('Compiling grades')
+        context.update_status(u'Compiling grades')
         success_rows, error_rows = self._compile(context, batched_rows)
 
-        context.update_status('Uploading grades')
+        context.update_status(u'Uploading grades')
         self._upload(context, success_headers, success_rows, error_headers, error_rows)
 
-        return context.update_status('Completed grades')
+        return context.update_status(u'Completed grades')
 
     def _success_headers(self, context):
         """
@@ -438,7 +442,7 @@ class CourseGradeReport:
             ["Student ID", "Email", "Username"] +
             self._grades_header(context) +
             (['Cohort Name'] if context.cohorts_enabled else []) +
-            [f'Experiment Group ({partition.name})' for partition in context.course_experiments] +
+            [u'Experiment Group ({})'.format(partition.name) for partition in context.course_experiments] +
             (['Team Name'] if context.teams_enabled else []) +
             ['Enrollment Track', 'Verification Status'] +
             ['Certificate Eligible', 'Certificate Delivered', 'Certificate Type'] +
@@ -492,9 +496,9 @@ class CourseGradeReport:
         """
         graded_assignments = context.graded_assignments
         grades_header = ["Grade"]
-        for assignment_info in graded_assignments.values():
+        for assignment_info in six.itervalues(graded_assignments):
             if assignment_info['separate_subsection_avg_headers']:
-                grades_header.extend(assignment_info['subsection_headers'].values())
+                grades_header.extend(six.itervalues(assignment_info['subsection_headers']))
             grades_header.append(assignment_info['average_header'])
         return grades_header
 
@@ -515,10 +519,10 @@ class CourseGradeReport:
                 verified_only (boolean): is a boolean when True, returns only verified enrollees.
             """
             if optimize_get_learners_switch_enabled():
-                TASK_LOG.info('%s, Creating Course Grade with optimization', task_log_message)
+                TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
                 return users_for_course_v2(course_id, verified_only=verified_only)
 
-            TASK_LOG.info('%s, Creating Course Grade without optimization', task_log_message)
+            TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
             return users_for_course(course_id, verified_only=verified_only)
 
         def users_for_course(course_id, verified_only=False):
@@ -561,7 +565,7 @@ class CourseGradeReport:
                 ).select_related('profile')
                 yield users
         course_id = context.course_id
-        task_log_message = f'{context.task_info_string}, Task type: {context.action_name}'
+        task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
         return get_enrolled_learners_for_course(course_id=course_id, verified_only=context.report_for_verified_only)
 
     def _user_grades(self, course_grade, context):
@@ -570,7 +574,7 @@ class CourseGradeReport:
         to the headers for this report.
         """
         grade_results = []
-        for _, assignment_info in context.graded_assignments.items():
+        for _, assignment_info in six.iteritems(context.graded_assignments):
             subsection_grades, subsection_grades_results = self._user_subsection_grades(
                 course_grade,
                 assignment_info['subsection_headers'],
@@ -595,12 +599,12 @@ class CourseGradeReport:
             if subsection_grade.attempted_graded or subsection_grade.override:
                 grade_result = subsection_grade.percent_graded
             else:
-                grade_result = 'Not Attempted'
+                grade_result = u'Not Attempted'
             grade_results.append([grade_result])
             subsection_grades.append(subsection_grade)
         return subsection_grades, grade_results
 
-    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _user_assignment_average(self, course_grade, subsection_grades, assignment_info):
         if assignment_info['separate_subsection_avg_headers']:
             if assignment_info['grader']:
                 if course_grade.attempted:
@@ -687,7 +691,7 @@ class CourseGradeReport:
             ):
                 if not course_grade:
                     # An empty gradeset means we failed to grade a student.
-                    error_rows.append([user.id, user.username, str(error)])
+                    error_rows.append([user.id, user.username, text_type(error)])
                 else:
                     success_rows.append(
                         [user.id, user.email, user.username] +
@@ -770,7 +774,7 @@ class ProblemGradeReport(GradeReportBase):
         ):
             context.task_progress.attempted += 1
             if not course_grade:
-                err_msg = str(error)
+                err_msg = text_type(error)
                 # There was an error grading this student.
                 if not err_msg:
                     err_msg = 'Unknown error'
@@ -814,7 +818,7 @@ class ProblemGradeReport(GradeReportBase):
             get_cache(CourseEnrollment.MODE_CACHE_NAMESPACE).clear()
 
 
-class ProblemResponses:
+class ProblemResponses(object):
     """
     Class to encapsulate functionality related to generating Problem Responses Reports.
     """
@@ -858,7 +862,8 @@ class ProblemResponses:
 
         for block in course_blocks.get_children(root):
             name = course_blocks.get_xblock_field(block, 'display_name') or block.block_type
-            yield from cls._build_problem_list(course_blocks, block, path + [name])
+            for result in cls._build_problem_list(course_blocks, block, path + [name]):
+                yield result
 
     @classmethod
     def _build_student_data(
@@ -892,12 +897,10 @@ class ProblemResponses:
         store = modulestore()
         user_state_client = DjangoXBlockUserStateClient()
 
-        # Each user's generated report data may contain different fields, so we use an OrderedDict to prevent
-        # duplication of keys while preserving the order the XBlock provides the keys in.
-        student_data_keys = OrderedDict()
+        student_data_keys = set()
 
         with store.bulk_operations(course_key):
-            for usage_key in usage_keys:  # lint-amnesty, pylint: disable=too-many-nested-blocks
+            for usage_key in usage_keys:
                 if max_count is not None and max_count <= 0:
                     break
                 course_blocks = get_course_blocks(user, usage_key)
@@ -941,15 +944,7 @@ class ProblemResponses:
                             for user_state in user_states:
                                 user_response = response.copy()
                                 user_response.update(user_state)
-
-                                # Respect the column order as returned by the xblock, if any.
-                                if isinstance(user_state, OrderedDict):
-                                    user_state_keys = user_state.keys()
-                                else:
-                                    user_state_keys = sorted(user_state.keys())
-                                for key in user_state_keys:
-                                    student_data_keys[key] = 1
-
+                                student_data_keys = student_data_keys.union(list(user_state.keys()))
                                 responses.append(user_response)
                         else:
                             responses.append(response)
@@ -966,7 +961,7 @@ class ProblemResponses:
         # finally end with the more machine friendly block_key and state.
         student_data_keys_list = (
             ['username', 'title', 'location'] +
-            list(student_data_keys.keys()) +
+            sorted(student_data_keys) +
             ['block_key', 'state']
         )
 

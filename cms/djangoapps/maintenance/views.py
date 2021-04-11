@@ -5,6 +5,7 @@ Views for the maintenance app.
 
 import logging
 
+import six
 from django.core.validators import ValidationError
 from django.db import transaction
 from django.urls import reverse, reverse_lazy
@@ -15,13 +16,14 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.util.views import require_global_staff
 from openedx.features.announcements.forms import AnnouncementForm
 from openedx.features.announcements.models import Announcement
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.views import require_global_staff
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -82,7 +84,7 @@ class MaintenanceBaseView(View):
     template = 'maintenance/container.html'
 
     def __init__(self, view=None):
-        super().__init__()
+        super(MaintenanceBaseView, self).__init__()
         self.context = {
             'view': view if view else '',
             'form_data': {},
@@ -140,7 +142,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
     """
 
     def __init__(self):
-        super().__init__(MAINTENANCE_VIEWS['force_publish_course'])
+        super(ForcePublishCourseView, self).__init__(MAINTENANCE_VIEWS['force_publish_course'])
         self.context.update({
             'current_versions': [],
             'updated_versions': [],
@@ -155,8 +157,8 @@ class ForcePublishCourseView(MaintenanceBaseView):
         Returns a dict containing unicoded values of draft and published draft versions.
         """
         return {
-            'draft-branch': str(versions['draft-branch']),
-            'published-branch': str(versions['published-branch'])
+            'draft-branch': six.text_type(versions['draft-branch']),
+            'published-branch': six.text_type(versions['published-branch'])
         }
 
     @transaction.atomic
@@ -186,10 +188,10 @@ class ForcePublishCourseView(MaintenanceBaseView):
             self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['invalid_course_key']
         except ItemNotFoundError as exc:
             self.context['error'] = True
-            self.context['msg'] = str(exc)
+            self.context['msg'] = text_type(exc)
         except ValidationError as exc:
             self.context['error'] = True
-            self.context['msg'] = str(exc)
+            self.context['msg'] = text_type(exc)
 
         if self.context['error']:
             return self.render_response()
@@ -198,7 +200,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if not hasattr(source_store, 'force_publish_course'):
             self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
             log.warning(
-                'Force publishing course is not supported with old mongo courses. \
+                u'Force publishing course is not supported with old mongo courses. \
                 %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
@@ -212,7 +214,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
         if current_versions['published-branch'] == current_versions['draft-branch']:
             self.context['msg'] = _('Course is already in published state.')
             log.warning(
-                'Course is already in published state. %s attempted to force publish the course %s.',
+                u'Course is already in published state. %s attempted to force publish the course %s.',
                 request.user,
                 course_id,
                 exc_info=True
@@ -221,7 +223,7 @@ class ForcePublishCourseView(MaintenanceBaseView):
 
         self.context['current_versions'] = current_versions
         log.info(
-            '%s dry ran force publish the course %s.',
+            u'%s dry ran force publish the course %s.',
             request.user,
             course_id,
             exc_info=True
@@ -236,7 +238,7 @@ class AnnouncementBaseView(View):
 
     @method_decorator(require_global_staff)
     def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+        return super(AnnouncementBaseView, self).dispatch(request, *args, **kwargs)
 
 
 class AnnouncementIndexView(ListView, MaintenanceBaseView):
@@ -249,10 +251,10 @@ class AnnouncementIndexView(ListView, MaintenanceBaseView):
     paginate_by = 8
 
     def __init__(self):
-        super().__init__(MAINTENANCE_VIEWS['announcement_index'])
+        super(AnnouncementIndexView, self).__init__(MAINTENANCE_VIEWS['announcement_index'])
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(AnnouncementIndexView, self).get_context_data(**kwargs)
         context['view'] = MAINTENANCE_VIEWS['announcement_index']
         return context
 
@@ -272,7 +274,7 @@ class AnnouncementEditView(UpdateView, AnnouncementBaseView):
     template_name = '/maintenance/_announcement_edit.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(AnnouncementEditView, self).get_context_data(**kwargs)
         context['action_url'] = reverse('maintenance:announcement_edit', kwargs={'pk': context['announcement'].pk})
         return context
 
@@ -287,7 +289,7 @@ class AnnouncementCreateView(CreateView, AnnouncementBaseView):
     template_name = '/maintenance/_announcement_edit.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(AnnouncementCreateView, self).get_context_data(**kwargs)
         context['action_url'] = reverse('maintenance:announcement_create')
         return context
 

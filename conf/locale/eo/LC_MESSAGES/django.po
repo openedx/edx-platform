@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:52+0000\n"
-"PO-Revision-Date: 2020-11-22 20:52:49.849863\n"
+"POT-Creation-Date: 2020-10-25 20:51+0000\n"
+"PO-Revision-Date: 2020-10-25 20:51:22.874682\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7837,6 +7837,15 @@ msgid "Total number of users"
 msgstr "Tötäl nümßér öf üsérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr "émäïl Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "Çréäté Ûsér Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -7907,6 +7916,14 @@ msgid "Enrollment information for all courses"
 msgstr ""
 "Énröllmént ïnförmätïön för äll çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr "rölé Ⱡ'σяєм ι#"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
+msgstr "füll_nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -8108,52 +8125,6 @@ msgstr ""
 "Thé nümßér öf séçönds tö déläý/tïméöüt wäït tö gét çöökïé välüés fröm "
 "säïlthrü. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr "{platform_name} Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr "Çöürsé Stäff Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr "Stüdént Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr "Stäff Ⱡ'σяєм ιρѕ#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr "Ûséd Régïsträtïön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr "Çrédït Çärd - Ìndïvïdüäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr ""
-"mänüällý énrölléd ßý üsérnämé: {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr "Mänüällý Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr "Dätä Ìntégrïtý Érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "TBD Ⱡ'σяєм#"
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
 "Cannot override subsection grade: subsection is not available for target "
@@ -9434,10 +9405,6 @@ msgstr ""
 "Fïnd ïnförmätïön rélätéd tö ä léärnér's prögräm énröllménts Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "üsér_süppört_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -9461,50 +9428,6 @@ msgstr "Ûsér Énäßléd Süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σłσ�
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
 msgstr "Ûsér Dïsäßléd Süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr "Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "Çöürsé ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr "Ûsér nöt föünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr ""
-"Çöürsé {course_id} nöt päst thé réfünd wïndöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr ""
-"Nö ördér föünd för {user} ïn çöürsé {course_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr "Ûnénrölléd {user} fröm {course_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr ""
-"Réfündéd {cost} för ördér ïd {order_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/djangoapps/survey/utils.py
 msgid "You must complete a survey"
@@ -9970,643 +9893,6 @@ msgstr ""
 "Tö äççéss thïs çöürsé vïsït ït änd régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "üsérnämé Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_support_url"
-msgstr "üsér_süppört_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_detail_url"
-msgstr "üsér_détäïl_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Usable"
-msgstr "Ûsäßlé Ⱡ'σяєм ιρѕυ#"
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Unusable"
-msgstr "Ûnüsäßlé Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#, python-format
-msgid ""
-"Please finish your registration and fill out the registration form making "
-"sure to use %(email_address)s in the Email field:"
-msgstr ""
-"Pléäsé fïnïsh ýöür régïsträtïön änd fïll öüt thé régïsträtïön förm mäkïng "
-"süré tö üsé %(email_address)s ïn thé Émäïl fïéld: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-msgid "Finish Your Registration"
-msgstr "Fïnïsh Ýöür Régïsträtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid ""
-"Once you have registered and activated your account, you will see "
-"%(course_name)s listed on your dashboard."
-msgstr ""
-"Önçé ýöü hävé régïstéréd änd äçtïvätéd ýöür äççöünt, ýöü wïll séé "
-"%(course_name)s lïstéd ön ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-msgid ""
-"Once you have registered and activated your account, you will be able to "
-"access this course:"
-msgstr ""
-"Önçé ýöü hävé régïstéréd änd äçtïvätéd ýöür äççöünt, ýöü wïll ßé äßlé tö "
-"äççéss thïs çöürsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid "You can then enroll in %(course_name)s."
-msgstr ""
-"Ýöü çän thén énröll ïn %(course_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-msgid "Dear student,"
-msgstr "Déär stüdént, Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid "To access this course visit %(course_url)s and login."
-msgstr ""
-"Tö äççéss thïs çöürsé vïsït %(course_url)s änd lögïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid ""
-"To access this course visit %(course_about_url)s and register for this "
-"course."
-msgstr ""
-"Tö äççéss thïs çöürsé vïsït %(course_about_url)s änd régïstér för thïs "
-"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid ""
-"To finish your registration, please visit %(registration_url)s and fill out "
-"the registration form making sure to use %(email_address)s in the Email "
-"field."
-msgstr ""
-"Tö fïnïsh ýöür régïsträtïön, pléäsé vïsït %(registration_url)s änd fïll öüt "
-"thé régïsträtïön förm mäkïng süré tö üsé %(email_address)s ïn thé Émäïl "
-"fïéld. Ⱡ'σяєм ιρ#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid ""
-"Once you have registered and activated your account, visit "
-"%(course_about_url)s to join this course."
-msgstr ""
-"Önçé ýöü hävé régïstéréd änd äçtïvätéd ýöür äççöünt, vïsït "
-"%(course_about_url)s tö jöïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/subject.txt
-#, python-format
-msgid "You have been invited to register for %(course_name)s"
-msgstr ""
-"Ýöü hävé ßéén ïnvïtéd tö régïstér för %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/subject.txt
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/subject.txt
-#, python-format
-msgid "You have been unenrolled from %(course_name)s"
-msgstr ""
-"Ýöü hävé ßéén ünénrölléd fröm %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
-#, python-format
-msgid ""
-"You have been unenrolled from the course %(course_name)s by a member of the "
-"course staff. Please disregard the invitation previously sent."
-msgstr ""
-"Ýöü hävé ßéén ünénrölléd fröm thé çöürsé %(course_name)s ßý ä mémßér öf thé "
-"çöürsé stäff. Pléäsé dïsrégärd thé ïnvïtätïön prévïöüslý sént. Ⱡ'σяєм#"
-
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
-msgid "Dear Student,"
-msgstr "Déär Stüdént, Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
-#, python-format
-msgid ""
-"\n"
-"                    You have been unenrolled from %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Ýöü hävé ßéén ünénrölléd fröm %(course_name)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
-#, python-format
-msgid ""
-"You have been unenrolled from %(course_name)s at %(site_name)s by a member "
-"of the course staff. This course will no longer appear on your %(site_name)s"
-" dashboard."
-msgstr ""
-"Ýöü hävé ßéén ünénrölléd fröm %(course_name)s ät %(site_name)s ßý ä mémßér "
-"öf thé çöürsé stäff. Thïs çöürsé wïll nö löngér äppéär ön ýöür %(site_name)s"
-" däshßöärd. Ⱡ'#"
-
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
-msgid "Your other courses have not been affected."
-msgstr ""
-"Ýöür öthér çöürsés hävé nöt ßéén äfféçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
-#, python-format
-msgid "This email was automatically sent from %(site_name)s to %(full_name)s"
-msgstr ""
-"Thïs émäïl wäs äütömätïçällý sént fröm %(site_name)s tö %(full_name)s Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
-#, python-format
-msgid ""
-"\n"
-"                    You have been enrolled in %(course_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Ýöü hävé ßéén énrölléd ïn %(course_name)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
-#, python-format
-msgid ""
-"You have been enrolled in %(course_name)s at %(site_name)s by a member of "
-"the course staff. This course will now appear on your %(site_name)s "
-"dashboard."
-msgstr ""
-"Ýöü hävé ßéén énrölléd ïn %(course_name)s ät %(site_name)s ßý ä mémßér öf "
-"thé çöürsé stäff. Thïs çöürsé wïll nöw äppéär ön ýöür %(site_name)s "
-"däshßöärd. Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
-msgid "Access the Course Materials Now"
-msgstr "Àççéss thé Çöürsé Mätérïäls Nöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
-#, python-format
-msgid ""
-"You have been removed as a beta tester for %(course_name)s at %(site_name)s"
-msgstr ""
-"Ýöü hävé ßéén rémövéd äs ä ßétä téstér för %(course_name)s ät %(site_name)s "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
-#, python-format
-msgid ""
-"You have been removed as a beta tester for %(course_name)s at %(site_name)s "
-"by a member of the course staff."
-msgstr ""
-"Ýöü hävé ßéén rémövéd äs ä ßétä téstér för %(course_name)s ät %(site_name)s "
-"ßý ä mémßér öf thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
-msgid ""
-"This course will remain on your dashboard, but you will no longer be part of"
-" the beta testing group."
-msgstr ""
-"Thïs çöürsé wïll rémäïn ön ýöür däshßöärd, ßüt ýöü wïll nö löngér ßé pärt öf"
-" thé ßétä téstïng gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
-#, python-format
-msgid ""
-"You have been removed as a beta tester for %(course_name)s at %(site_name)s "
-"by a member of the course staff. This course will remain on your dashboard, "
-"but you will no longer be part of the beta testing group."
-msgstr ""
-"Ýöü hävé ßéén rémövéd äs ä ßétä téstér för %(course_name)s ät %(site_name)s "
-"ßý ä mémßér öf thé çöürsé stäff. Thïs çöürsé wïll rémäïn ön ýöür däshßöärd, "
-"ßüt ýöü wïll nö löngér ßé pärt öf thé ßétä téstïng gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
-" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂#"
-
-#: lms/templates/instructor/edx_ace/removebetatester/email/subject.txt
-#, python-format
-msgid "You have been removed from a beta test for %(course_name)s"
-msgstr ""
-"Ýöü hävé ßéén rémövéd fröm ä ßétä tést för %(course_name)s Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/logout.html
-msgid "Signed Out"
-msgstr "Sïgnéd Öüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/logout.html
-msgid "You have signed out."
-msgstr "Ýöü hävé sïgnéd öüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/logout.html
-#, python-brace-format
-msgid ""
-"{start_anchor}Click here{end_anchor} to delete your single signed on (SSO) "
-"session."
-msgstr ""
-"{start_anchor}Çlïçk héré{end_anchor} tö délété ýöür sïnglé sïgnéd ön (SSÖ) "
-"séssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/logout.html
-msgid "We are signing you in."
-msgstr "Wé äré sïgnïng ýöü ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/logout.html
-msgid ""
-"\n"
-"                  This may take a minute. If you are not redirected, go to the home page.\n"
-"                "
-msgstr ""
-"\n"
-"                  Thïs mäý täké ä mïnüté. Ìf ýöü äré nöt rédïréçtéd, gö tö thé hömé pägé.\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/logout.html
-#, python-brace-format
-msgid ""
-"If you are not redirected within 5 seconds, {start_anchor}click here to go "
-"to the home page{end_anchor}."
-msgstr ""
-"Ìf ýöü äré nöt rédïréçtéd wïthïn 5 séçönds, {start_anchor}çlïçk héré tö gö "
-"tö thé hömé pägé{end_anchor}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html
-msgid "Skip to main content"
-msgstr "Skïp tö mäïn çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/oauth2_provider/authorize.html
-msgid "Authorize"
-msgstr "Àüthörïzé Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/oauth2_provider/authorize.html
-msgid ""
-"The above application requests the following permissions from your account:"
-msgstr ""
-"Thé äßövé äpplïçätïön réqüésts thé föllöwïng pérmïssïöns fröm ýöür äççöünt: "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/verify_student/views.py
-msgid "Take photo"
-msgstr "Täké phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/oauth2_provider/authorize.html
-msgid ""
-"These permissions will be granted for data from your courses associated with"
-" the following content providers:"
-msgstr ""
-"Thésé pérmïssïöns wïll ßé gräntéd för dätä fröm ýöür çöürsés ässöçïätéd wïth"
-" thé föllöwïng çöntént prövïdérs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/oauth2_provider/authorize.html
-msgid ""
-"Please click the 'Allow' button to grant these permissions to the above "
-"application. Otherwise, to withhold these permissions, please click the "
-"'Cancel' button."
-msgstr ""
-"Pléäsé çlïçk thé 'Àllöw' ßüttön tö gränt thésé pérmïssïöns tö thé äßövé "
-"äpplïçätïön. Öthérwïsé, tö wïthhöld thésé pérmïssïöns, pléäsé çlïçk thé "
-"'Çänçél' ßüttön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
-"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
-"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
-"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
-" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
-
-#: lms/templates/oauth2_provider/authorize.html
-msgid "Allow"
-msgstr "Àllöw Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/oauth2_provider/authorize.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Érrör Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-msgid "ID Verification Approved"
-msgstr "ÌD Vérïfïçätïön Àpprövéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
-#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
-#, python-format
-msgid "Hello %(full_name)s,"
-msgstr "Héllö %(full_name)s, Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification photos have been approved."
-msgstr ""
-"Ýöür %(platform_name)s ÌD vérïfïçätïön phötös hävé ßéén äpprövéd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#, python-format
-msgid ""
-"Your approval status remains valid for two years, and it will expire "
-"%(expiration_datetime)s."
-msgstr ""
-"Ýöür äppröväl stätüs rémäïns välïd för twö ýéärs, änd ït wïll éxpïré "
-"%(expiration_datetime)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-msgid "Enjoy your studies,"
-msgstr "Énjöý ýöür stüdïés, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "The %(platform_name)s Team "
-msgstr "Thé %(platform_name)s Téäm  Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "Hello %(full_name)s, "
-msgstr "Héllö %(full_name)s,  Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/subject.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification was approved!"
-msgstr ""
-"Ýöür %(platform_name)s ÌD vérïfïçätïön wäs äpprövéd! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-msgid "Expired ID Verification"
-msgstr "Éxpïréd ÌD Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "Your %(platform_name)s ID verification has expired. "
-msgstr ""
-"Ýöür %(platform_name)s ÌD vérïfïçätïön häs éxpïréd.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-msgid ""
-"You must have a valid ID verification to take proctored exams and qualify "
-"for certificates."
-msgstr ""
-"Ýöü müst hävé ä välïd ÌD vérïfïçätïön tö täké pröçtöréd éxäms änd qüälïfý "
-"för çértïfïçätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-msgid ""
-"Follow the link below to submit your photos and renew your ID verification."
-msgstr ""
-"Föllöw thé lïnk ßélöw tö süßmït ýöür phötös änd rénéw ýöür ÌD vérïfïçätïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-msgid "You can also do this from your dashboard."
-msgstr ""
-"Ýöü çän älsö dö thïs fröm ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "Resubmit Verification : %(lms_verification_link)s "
-msgstr ""
-"Résüßmït Vérïfïçätïön : %(lms_verification_link)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#, python-format
-msgid "ID verification FAQ : %(help_center_link)s "
-msgstr ""
-"ÌD vérïfïçätïön FÀQ : %(help_center_link)s  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕ#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Thänk ýöü, Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
-#, python-format
-msgid "Your %(platform_name)s Verification has Expired"
-msgstr ""
-"Ýöür %(platform_name)s Vérïfïçätïön häs Éxpïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тє#"
-
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-msgid "ID Verification Submitted"
-msgstr "ÌD Vérïfïçätïön Süßmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid ""
-"Thank you for submitting your photos for identity verification with "
-"%(platform_name)s. "
-msgstr ""
-"Thänk ýöü för süßmïttïng ýöür phötös för ïdéntïtý vérïfïçätïön wïth "
-"%(platform_name)s.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-msgid ""
-"We have received your photos and they will be reviewed within 3-5 days."
-msgstr ""
-"Wé hävé réçéïvéd ýöür phötös änd théý wïll ßé révïéwéd wïthïn 3-5 däýs. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "You may check the status on your dashboard: %(dashboard_link)s "
-msgstr ""
-"Ýöü mäý çhéçk thé stätüs ön ýöür däshßöärd: %(dashboard_link)s  Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-msgid "Best regards,"
-msgstr "Bést régärds, Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-#, python-format
-msgid ""
-"\n"
-"                    You have been invited to be a beta tester for %(course_name)s at %(site_name)s\n"
-"                "
-msgstr ""
-"\n"
-"                    Ýöü hävé ßéén ïnvïtéd tö ßé ä ßétä téstér för %(course_name)s ät %(site_name)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-msgid "The invitation has been sent by a member of the course staff."
-msgstr ""
-"Thé ïnvïtätïön häs ßéén sént ßý ä mémßér öf thé çöürsé stäff. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-msgid "To start accessing course materials, please visit:"
-msgstr ""
-"Tö stärt äççéssïng çöürsé mätérïäls, pléäsé vïsït: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-msgid "To enroll in this course and begin the beta test:"
-msgstr ""
-"Tö énröll ïn thïs çöürsé änd ßégïn thé ßétä tést: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-#, python-format
-msgid "Visit %(course_name)s"
-msgstr "Vïsït %(course_name)s Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-#, python-format
-msgid ""
-"Visit %(site_name)s\n"
-"                "
-msgstr ""
-"Vïsït %(site_name)s\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
-#, python-format
-msgid ""
-"This email was automatically sent from %(site_name)s to %(email_address)s"
-msgstr ""
-"Thïs émäïl wäs äütömätïçällý sént fröm %(site_name)s tö %(email_address)s "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
-#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
-#, python-format
-msgid "Dear %(full_name)s"
-msgstr "Déär %(full_name)s Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#, python-format
-msgid ""
-"You have been invited to be a beta tester for %(course_name)s at "
-"%(site_name)s by a member of the course staff."
-msgstr ""
-"Ýöü hävé ßéén ïnvïtéd tö ßé ä ßétä téstér för %(course_name)s ät "
-"%(site_name)s ßý ä mémßér öf thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕ#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
-#, python-format
-msgid "To start accessing course materials, please visit %(course_url)s"
-msgstr ""
-"Tö stärt äççéssïng çöürsé mätérïäls, pléäsé vïsït %(course_url)s Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#, python-format
-msgid ""
-"Visit %(course_about_url)s to enroll in this course and begin the beta test."
-msgstr ""
-"Vïsït %(course_about_url)s tö énröll ïn thïs çöürsé änd ßégïn thé ßétä tést."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
-#, python-format
-msgid "Visit %(site_name)s to enroll in this course and begin the beta test."
-msgstr ""
-"Vïsït %(site_name)s tö énröll ïn thïs çöürsé änd ßégïn thé ßétä tést. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/addbetatester/email/subject.txt
-#, python-format
-msgid "You have been invited to a beta test for %(course_name)s"
-msgstr ""
-"Ýöü hävé ßéén ïnvïtéd tö ä ßétä tést för %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#, python-format
-msgid "You have been invited to %(course_name)s"
-msgstr ""
-"Ýöü hävé ßéén ïnvïtéd tö %(course_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
-#, python-format
-msgid ""
-"You have been invited to join %(course_name)s at %(site_name)s by a member "
-"of the course staff."
-msgstr ""
-"Ýöü hävé ßéén ïnvïtéd tö jöïn %(course_name)s ät %(site_name)s ßý ä mémßér "
-"öf thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-msgid "To access this course click on the button below and login:"
-msgstr ""
-"Tö äççéss thïs çöürsé çlïçk ön thé ßüttön ßélöw änd lögïn: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
-msgid "To access this course visit it and register:"
-msgstr ""
-"Tö äççéss thïs çöürsé vïsït ït änd régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
 #: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
 #, python-format
 msgid ""
@@ -10947,11 +10233,11 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for two years, and it will expire "
-"%(expiration_datetime)s."
+"Your approval status remains valid for one year, and it will expire "
+"%(expiry_date)s."
 msgstr ""
-"Ýöür äppröväl stätüs rémäïns välïd för twö ýéärs, änd ït wïll éxpïré "
-"%(expiration_datetime)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Ýöür äppröväl stätüs rémäïns välïd för öné ýéär, änd ït wïll éxpïré "
+"%(expiry_date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -11067,9 +10353,9 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 3-5 days."
+"We have received your photos and they will be reviewed within 5-7 days."
 msgstr ""
-"Wé hävé réçéïvéd ýöür phötös änd théý wïll ßé révïéwéd wïthïn 3-5 däýs. "
+"Wé hävé réçéïvéd ýöür phötös änd théý wïll ßé révïéwéd wïthïn 5-7 däýs. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
@@ -11991,40 +11277,6 @@ msgstr ""
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
 msgid "Learning Sequences"
 msgstr "Léärnïng Séqüénçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: openedx/core/djangoapps/content_libraries/api.py
-msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-"Çännöt çhängé ör rémövé thé äççéss lévél för thé önlý ädmïn. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
-msgstr ""
-"Ýöü mäý nöt çhängé ä lïßrärý's týpé tö {library_type} ïf ït stïll häs "
-"ünpüßlïshéd çhängés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You can only set a library to {library_type} if all existing blocks are of "
-"that type. Found incompatible block {block_id} with type {block_type}."
-msgstr ""
-"Ýöü çän önlý sét ä lïßrärý tö {library_type} ïf äll éxïstïng ßlöçks äré öf "
-"thät týpé. Föünd ïnçömpätïßlé ßlöçk {block_id} wïth týpé {block_type}. "
-"Ⱡ'σяєм ιρѕυм #"
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"Block type \"{block_type}\" is not compatible with library type "
-"\"{library_type}\"."
-msgstr ""
-"Blöçk týpé \"{block_type}\" ïs nöt çömpätïßlé wïth lïßrärý týpé "
-"\"{library_type}\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/content_libraries/api.py
 msgid "Cannot change or remove the access level for the only admin."
@@ -13295,7 +12547,6 @@ msgid "Success"
 msgstr "Süççéss Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/user_api/admin.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
@@ -13558,16 +12809,6 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢#"
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-"Tö prötéçt ýöür äççöünt, ït’s ßéén témpörärïlý löçkéd. Trý ägäïn ïn {locked_out_period} mïnütés.\n"
-"Tö ßé ön thé säfé sïdé, ýöü çän rését ýöür pässwörd {link_start}héré{link_end} ßéföré ýöü trý ägäïn.\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ι#\n"
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Töö mäný fäïléd lögïn ättémpts. Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -13594,18 +12835,6 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #, python-brace-format
 msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
-msgstr ""
-"Émäïl ör pässwörd ïs ïnçörréçt.\n"
-"Ýöü hävé {remaining_attempts} möré sïgn-ïn ättémpts ßéföré ýöür äççöünt ïs témpörärïlý löçkéd.\n"
-"Ìf ýöü{quote}vé förgöttén ýöür pässwörd, çlïçk {link_start}héré{link_end} tö rését.\n"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα#\n"
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
 "As {allowed_domain} user, You must login with your {allowed_domain} "
 "{link_start}{provider} account{link_end}."
 msgstr ""
@@ -13625,6 +12854,10 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -13929,10 +13162,6 @@ msgstr ""
 "Ì ägréé tö thé {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢#"
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
-msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -14294,6 +13523,11 @@ msgstr "Déädlïnés süççéssfüllý rését. Ⱡ'σяєм ιρѕυм ∂σ�
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "Ûpdätés Ⱡ'σяєм ιρѕυм #"
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr "Révïéws Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -15211,10 +14445,10 @@ msgstr "Nö `rölé` spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
-"Ûsér {email} häs régïstéréd ßüt häs nöt ýét äçtïvätéd théïr äççöünt. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Ûsér {email} häs régïstéréd ßüt häs nöt ýét äçtïvätéd hïs/hér äççöünt. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -15952,27 +15186,6 @@ msgid "Unenroll"
 msgstr "Ûnénröll Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/dates_banner.html
-msgid "We've built a suggested schedule to help you stay on track."
-msgstr ""
-"Wé'vé ßüïlt ä süggéstéd sçhédülé tö hélp ýöü stäý ön träçk. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/dates_banner.html
-msgid ""
-"But don't worry—it's flexible so you can learn at your own pace. If you "
-"happen to fall behind on our suggested dates, you'll be able to adjust them "
-"to keep yourself on track."
-msgstr ""
-"Büt dön't wörrý—ït's fléxïßlé sö ýöü çän léärn ät ýöür öwn päçé. Ìf ýöü "
-"häppén tö fäll ßéhïnd ön öür süggéstéd dätés, ýöü'll ßé äßlé tö ädjüst thém "
-"tö kéép ýöürsélf ön träçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα#"
-
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule. "
@@ -15990,36 +15203,11 @@ msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid ""
-" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+" Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
 msgstr ""
-" Dön’t wörrý—ýöü wön’t lösé äný öf thé prögréss ýöü’vé mädé whén ýöü shïft "
+" Dön't wörrý—ýöü wön't lösé äný öf thé prögréss ýöü'vé mädé whén ýöü shïft "
 "ýöür düé dätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/dates_banner.html
-msgid "You are auditing this course,"
-msgstr "Ýöü äré äüdïtïng thïs çöürsé, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/dates_banner.html
-msgid " which means that you are unable to participate in graded assignments."
-msgstr ""
-" whïçh méäns thät ýöü äré ünäßlé tö pärtïçïpäté ïn grädéd ässïgnménts. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/dates_banner.html
-msgid ""
-" It looks like you missed some important deadlines based on our suggested "
-"schedule. To complete graded assignments as part of this course and shift "
-"the past due assignments into the future, you can upgrade today by visiting "
-msgstr ""
-" Ìt lööks lïké ýöü mïsséd sömé ïmpörtänt déädlïnés ßäséd ön öür süggéstéd "
-"sçhédülé. Tö çömplété grädéd ässïgnménts äs pärt öf thïs çöürsé änd shïft "
-"thé päst düé ässïgnménts ïntö thé fütüré, ýöü çän üpgrädé tödäý ßý vïsïtïng"
-"  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -16032,12 +15220,12 @@ msgstr ""
 #: lms/templates/dates_banner.html
 msgid ""
 "To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don’t worry—you won’t lose any of the "
-"progress you’ve made when you shift your due dates."
+"due assignments into the future. Don't worry—you won't lose any of the "
+"progress you've made when you shift your due dates."
 msgstr ""
 "Tö kéép ýöürsélf ön träçk, ýöü çän üpdäté thïs sçhédülé änd shïft thé päst "
-"düé ässïgnménts ïntö thé fütüré. Dön’t wörrý—ýöü wön’t lösé äný öf thé "
-"prögréss ýöü’vé mädé whén ýöü shïft ýöür düé dätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"düé ässïgnménts ïntö thé fütüré. Dön't wörrý—ýöü wön't lösé äný öf thé "
+"prögréss ýöü'vé mädé whén ýöü shïft ýöür düé dätés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
 "łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
 "єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
@@ -16086,6 +15274,16 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢є#"
 
 #: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr "Ûpgrädé tö shïft düé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr ""
+"Grädéd ässïgnménts äré äväïläßlé tö Vérïfïéd Träçk léärnérs. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/dates_banner.html
 msgid ""
 " To complete graded assignments as part of this course, you can upgrade "
 "today."
@@ -16094,16 +15292,25 @@ msgstr ""
 "tödäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
-msgstr "Rését mý déädlïnés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+msgid "We've built a suggested schedule to help you stay on track."
+msgstr ""
+"Wé'vé ßüïlt ä süggéstéd sçhédülé tö hélp ýöü stäý ön träçk. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr "Ûpgrädé tö shïft düé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
-msgstr "Vïéw Ûnït ïn Stüdïö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
+msgstr ""
+"Büt dön't wörrý—ït's fléxïßlé sö ýöü çän léärn ät ýöür öwn päçé. Ìf ýöü "
+"häppén tö fäll ßéhïnd ön öür süggéstéd dätés, ýöü'll ßé äßlé tö ädjüst thém "
+"tö kéép ýöürsélf ön träçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα#"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -16279,7 +15486,7 @@ msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
@@ -16446,7 +15653,6 @@ msgstr ""
 "Théré häs ßéén än érrör ön thé {platform_name} sérvérs Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#: lms/templates/courseware/courseware-error.html
 #: lms/templates/module-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
@@ -16647,6 +15853,7 @@ msgid "Sequence"
 msgstr "Séqüénçé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/courseware/dates.html lms/templates/seq_module.html
+#: lms/templates/vert_module.html
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Completed"
 msgstr "Çömplétéd Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -16871,12 +16078,6 @@ msgid "Git Logs"
 msgstr "Gït Lögs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-"Nöté: Sýsädmïn pänél wïll ßé dépréçätéd ïn thé néxt réléäsé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "Ûsér Mänägémént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -16893,12 +16094,35 @@ msgid "Create user"
 msgstr "Çréäté üsér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr ""
+"Döwnlöäd lïst öf äll üsérs (çsv fïlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr ""
+"Çhéçk änd répäïr éxtérnäl äüthéntïçätïön mäp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
 "Gö tö éäçh ïndïvïdüäl çöürsé's Ìnstrüçtör däshßöärd tö mänägé çöürsé "
 "énröllmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr ""
+"Mänägé çöürsé stäff änd ïnstrüçtörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr ""
+"Döwnlöäd stäff änd ïnstrüçtör lïst (çsv fïlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -19193,14 +18417,6 @@ msgstr "Düé Néxt Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Not yet released"
 msgstr "Nöt ýét réléäséd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
-msgstr ""
-"Wé'ré sörrý, thïs mödülé ïs témpörärïlý ünäväïläßlé. Öür stäff ïs wörkïng tö"
-" fïx ït äs söön äs pössïßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr "Grädéßöök Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -20810,11 +20026,10 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your verification is effective for one year. It will expire on {expiry_date}"
 msgstr ""
-"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön "
-"{expiration_datetime} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Ýöür vérïfïçätïön ïs éfféçtïvé för öné ýéär. Ìt wïll éxpïré ön {expiry_date}"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -21113,14 +20328,6 @@ msgstr "Dïsçövér Néw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Sysadmin"
 msgstr "Sýsädmïn Ⱡ'σяєм ιρѕυм ∂#"
 
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr "Shöppïng Çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
 msgstr "{name} Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -21399,10 +20606,6 @@ msgid "Professional"
 msgstr "Pröféssïönäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr "Éxéçütïvé Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
 msgstr "Mästér's Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -21435,14 +20638,6 @@ msgid "Yes"
 msgstr "Ýés Ⱡ'σяєм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Has the course started?"
-msgstr "Häs thé çöürsé stärtéd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Yes"
-msgstr "Ýés Ⱡ'σяєм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "No"
 msgstr "Nö Ⱡ'σя#"
 
@@ -21606,380 +20801,6 @@ msgstr ""
 "υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
 " ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂є#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid "NOTE"
-msgstr "NÖTÉ Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid ""
-"The generated report is limited to {max_entries} responses. If you expect "
-"more than {max_entries} responses, try generating the report on a chapter-"
-"by-chapter, or problem-by-problem basis, or contact your site administrator "
-"to increase the limit."
-msgstr ""
-"Thé générätéd répört ïs lïmïtéd tö {max_entries} réspönsés. Ìf ýöü éxpéçt "
-"möré thän {max_entries} réspönsés, trý générätïng thé répört ön ä çhäptér-"
-"ßý-çhäptér, ör prößlém-ßý-prößlém ßäsïs, ör çöntäçt ýöür sïté ädmïnïsträtör "
-"tö ïnçréäsé thé lïmït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυg#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
-msgid "Click to list certificates that are issued for this course:"
-msgstr ""
-"Çlïçk tö lïst çértïfïçätés thät äré ïssüéd för thïs çöürsé: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "No"
-msgstr "Nö Ⱡ'σя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Has the course ended?"
-msgstr "Häs thé çöürsé éndéd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Number of sections:"
-msgstr "Nümßér öf séçtïöns: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Grade Cutoffs:"
-msgstr "Grädé Çütöffs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"View detailed Git import logs for this course {link_start}by clicking "
-"here{link_end}."
-msgstr ""
-"Vïéw détäïléd Gït ïmpört lögs för thïs çöürsé {link_start}ßý çlïçkïng "
-"héré{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Course Warnings"
-msgstr "Çöürsé Wärnïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
-msgid ""
-"Click to display the grading configuration for the course. The grading "
-"configuration is the breakdown of graded subsections of the course (such as "
-"exams and problem sets), and can be changed on the 'Grading' page (under "
-"'Settings') in Studio."
-msgstr ""
-"Çlïçk tö dïspläý thé grädïng çönfïgürätïön för thé çöürsé. Thé grädïng "
-"çönfïgürätïön ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé çöürsé (süçh äs "
-"éxäms änd prößlém séts), änd çän ßé çhängéd ön thé 'Grädïng' pägé (ündér "
-"'Séttïngs') ïn Stüdïö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєł#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Grading Configuration"
-msgstr "Grädïng Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Click to download a CSV of anonymized student IDs:"
-msgstr ""
-"Çlïçk tö döwnlöäd ä ÇSV öf änönýmïzéd stüdént ÌDs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Get Student Anonymized IDs CSV"
-msgstr "Gét Stüdént Ànönýmïzéd ÌDs ÇSV Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Reports"
-msgstr "Répörts Ⱡ'σяєм ιρѕυм #"
-
-msgid ""
-"Click to generate a ZIP file that contains all submission texts and "
-"attachments."
-msgstr ""
-"Çlïçk tö généräté ä ZÌP fïlé thät çöntäïns äll süßmïssïön téxts änd "
-"ättäçhménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Generate Submission Files Archive"
-msgstr ""
-"Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Click to generate a ZIP file that contains all submission texts and "
-"attachments."
-msgstr ""
-"Çlïçk tö généräté ä ZÌP fïlé thät çöntäïns äll süßmïssïön téxts änd "
-"ättäçhménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Generate Submission Files Archive"
-msgstr ""
-"Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
-msgid "Reports Available for Download"
-msgstr "Répörts Àväïläßlé för Döwnlöäd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
-msgid ""
-"For large courses, generating some reports can take several hours. When "
-"report generation is complete, a link that includes the date and time of "
-"generation appears in the table below. These reports are generated in the "
-"background, meaning it is OK to navigate away from this page while your "
-"report is generating."
-msgstr ""
-"För lärgé çöürsés, générätïng sömé répörts çän täké sévéräl höürs. Whén "
-"répört générätïön ïs çömplété, ä lïnk thät ïnçlüdés thé däté änd tïmé öf "
-"générätïön äppéärs ïn thé täßlé ßélöw. Thésé répörts äré générätéd ïn thé "
-"ßäçkgröünd, méänïng ït ïs ÖK tö nävïgäté äwäý fröm thïs pägé whïlé ýöür "
-"répört ïs générätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєη#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Please be patient and do not click these buttons multiple times. Clicking "
-"these buttons multiple times will significantly slow the generation process."
-msgstr ""
-"Pléäsé ßé pätïént änd dö nöt çlïçk thésé ßüttöns mültïplé tïmés. Çlïçkïng "
-"thésé ßüttöns mültïplé tïmés wïll sïgnïfïçäntlý slöw thé générätïön pröçéss."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Click to generate a CSV file of all students enrolled in this course, along "
-"with profile information such as email address and username:"
-"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
-"secure, you cannot save or email these links for direct access. Copies of "
-"links expire within 5 minutes.{li_end}{li_start}Report files are deleted 90 "
-"days after generation. If you will need access to old reports, download and "
-"store the files, in accordance with your institution's data security "
-"policies.{li_end}{ul_end}"
-msgstr ""
-"{strong_start}Nöté{strong_end}: {ul_start}{li_start}Tö kéép stüdént dätä "
-"séçüré, ýöü çännöt sävé ör émäïl thésé lïnks för dïréçt äççéss. Çöpïés öf "
-"lïnks éxpïré wïthïn 5 mïnütés.{li_end}{li_start}Répört fïlés äré délétéd 90 "
-"däýs äftér générätïön. Ìf ýöü wïll nééd äççéss tö öld répörts, döwnlöäd änd "
-"störé thé fïlés, ïn äççördänçé wïth ýöür ïnstïtütïön's dätä séçürïtý "
-"pölïçïés.{li_end}{ul_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
-msgid ""
-"The answer distribution report listed below is generated periodically by an "
-"automated background process.         The report is cumulative, so answers "
-"submitted after the process starts are included in a subsequent report."
-"         The report is generated several times per day."
-msgstr ""
-"Thé änswér dïstrïßütïön répört lïstéd ßélöw ïs générätéd pérïödïçällý ßý än "
-"äütömätéd ßäçkgröünd pröçéss.         Thé répört ïs çümülätïvé, sö änswérs "
-"süßmïttéd äftér thé pröçéss stärts äré ïnçlüdéd ïn ä süßséqüént répört."
-"         Thé répört ïs générätéd sévéräl tïmés pér däý. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
-msgid ""
-"{strong_start}Note{strong_end}: {ul_start}{li_start}To keep student data "
-"secure, you cannot save or         email these links for direct access. "
-"Copies of links expire within 5 minutes.{li_end}{li_start}Report files"
-"         are deleted 90 days after generation. If you will need access to "
-"old reports, download and store the files,         in accordance with your "
-"institution's data security policies.{li_end}{ul_end}"
-msgstr ""
-"{strong_start}Nöté{strong_end}: {ul_start}{li_start}Tö kéép stüdént dätä "
-"séçüré, ýöü çännöt sävé ör         émäïl thésé lïnks för dïréçt äççéss. "
-"Çöpïés öf lïnks éxpïré wïthïn 5 mïnütés.{li_end}{li_start}Répört fïlés"
-"         äré délétéd 90 däýs äftér générätïön. Ìf ýöü wïll nééd äççéss tö "
-"öld répörts, döwnlöäd änd störé thé fïlés,         ïn äççördänçé wïth ýöür "
-"ïnstïtütïön's dätä séçürïtý pölïçïés.{li_end}{ul_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Edit Coupon Code"
-msgstr "Édït Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Edit Coupon Code Information"
-msgstr "Édït Çöüpön Çödé Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Code"
-msgstr "Çödé Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "example: A123DS"
-msgstr "éxämplé: À123DS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Percentage Discount"
-msgstr "Pérçéntägé Dïsçöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Expiration Date"
-msgstr "Éxpïrätïön Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Update Coupon Code"
-msgstr "Ûpdäté Çöüpön Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Individual due date extensions"
-msgstr "Ìndïvïdüäl düé däté éxténsïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid ""
-"In this section, you have the ability to grant extensions on specific "
-"subsections to individual students. Please note that the latest date is "
-"always taken; you cannot use this tool to make an assignment due earlier for"
-" a particular student."
-msgstr ""
-"Ìn thïs séçtïön, ýöü hävé thé äßïlïtý tö gränt éxténsïöns ön spéçïfïç "
-"süßséçtïöns tö ïndïvïdüäl stüdénts. Pléäsé nöté thät thé lätést däté ïs "
-"älwäýs täkén; ýöü çännöt üsé thïs tööl tö mäké än ässïgnmént düé éärlïér för"
-" ä pärtïçülär stüdént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт #"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid ""
-"Specify the {platform_name} email address or username of a student here:"
-msgstr ""
-"Spéçïfý thé {platform_name} émäïl äddréss ör üsérnämé öf ä stüdént héré: "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Student Email or Username"
-msgstr "Stüdént Émäïl ör Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Choose the graded subsection:"
-msgstr "Çhöösé thé grädéd süßséçtïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#. Translators: "format_string" is the string MM/DD/YYYY HH:MM, as that is the
-#. format the system requires.
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid ""
-"Specify the extension due date and time (in UTC; please specify "
-"{format_string})."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf äll stüdénts énrölléd ïn thïs çöürsé, älöng "
-"wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd üsérnämé: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download profile information as a CSV"
-msgstr ""
-"Döwnlöäd pröfïlé ïnförmätïön äs ä ÇSV Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Click to generate a CSV file that lists learners who can enroll in the "
-"course but have not yet done so."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé thät lïsts léärnérs whö çän énröll ïn thé "
-"çöürsé ßüt hävé nöt ýét döné sö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download a CSV of learners who can enroll"
-msgstr ""
-"Döwnlöäd ä ÇSV öf léärnérs whö çän énröll Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Click to generate a CSV file of all proctored exam results in this course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf äll pröçtöréd éxäm résülts ïn thïs çöürsé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Generate Proctored Exam Results Report"
-msgstr ""
-"Généräté Pröçtöréd Éxäm Résülts Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Click to generate a CSV file of survey results for this course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf sürvéý résülts för thïs çöürsé. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Generate Survey Results Report"
-msgstr "Généräté Sürvéý Résülts Répört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"Select a problem to generate a CSV file that lists all student answers to "
-"the problem. You also select a section or chapter to include results of all "
-"problems in that section or chapter."
-msgstr ""
-"Séléçt ä prößlém tö généräté ä ÇSV fïlé thät lïsts äll stüdént änswérs tö "
-"thé prößlém. Ýöü älsö séléçt ä séçtïön ör çhäptér tö ïnçlüdé résülts öf äll "
-"prößléms ïn thät séçtïön ör çhäptér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂є#"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Reason for reset"
-msgstr "Réäsön för rését Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/extensions.html
-msgid "Reset due date for student"
-msgstr "Rését düé däté för stüdént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Generate Registration Code Modal"
-msgstr ""
-"Généräté Régïsträtïön Çödé Mödäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Create Enrollment Codes"
-msgstr "Çréäté Énröllmént Çödés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "* Required Information"
-msgstr "* Réqüïréd Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "The organization that purchased enrollments in the course"
-msgstr ""
-"Thé örgänïzätïön thät pürçhäséd énröllménts ïn thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Organization Contact"
-msgstr "Örgänïzätïön Çöntäçt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
@@ -22065,9 +20886,6 @@ msgstr ""
 msgid "Generate Submission Files Archive"
 msgstr ""
 "Généräté Süßmïssïön Fïlés Àrçhïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
-msgid "Enrollment Code"
-msgstr "Énröllmént Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
@@ -22429,26 +21247,6 @@ msgstr ""
 "Çhängé thé stätüs öf än énröllmént çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Course Price"
-msgstr "Çöürsé Prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "Çürrénçý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Set Price"
-msgstr "Sét Prïçé Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
-msgid "Proctortrack Escalation Email:"
-msgstr "Pröçtörträçk Ésçälätïön Émäïl: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
-msgid "Allowance Section"
-msgstr "Àllöwänçé Séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
 #: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
 msgid "Enrollment Code"
 msgstr "Énröllmént Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
@@ -22550,13 +21348,6 @@ msgid ""
 msgstr ""
 "Ìf thïs öptïön ïs {em_start}çhéçkéd{em_end}, üsérs whö hävé nöt énrölléd ïn "
 "ýöür çöürsé wïll ßé äütömätïçällý énrölléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "Çürrénçý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Set Price"
-msgstr "Sét Prïçé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Checking this box has no effect if 'Remove beta testers' is selected."
@@ -22865,319 +21656,6 @@ msgid ""
 msgstr ""
 "Whén ýöü séléçt Sénd Émäïl, ýöür émäïl méssägé ïs äddéd tö thé qüéüé för "
 "séndïng, änd çännöt ßé çänçélléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Allows all learners to work on the problem again."
-msgstr ""
-"Àllöws äll léärnérs tö wörk ön thé prößlém ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
-"updates a learner's score only if it improves in the learner's favor."
-msgstr ""
-"Résçöré süßmïttéd réspönsés. Thé 'Résçöré Önlý Ìf Sçörés Ìmprövé' öptïön "
-"üpdätés ä léärnér's sçöré önlý ïf ït ïmprövés ïn thé léärnér's fävör. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore All Learners' Submissions"
-msgstr ""
-"Résçöré Àll Léärnérs' Süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Only If Scores Improve"
-msgstr "Résçöré Önlý Ìf Sçörés Ìmprövé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show the status for the tasks that you submitted for this problem."
-msgstr ""
-"Shöw thé stätüs för thé täsks thät ýöü süßmïttéd för thïs prößlém. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Note"
-msgstr "Nöté Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid ""
-"Select a problem to generate a CSV         file that lists all student "
-"answers to the problem. You also select a section or chapter to include"
-"         results of all problems in that section or chapter."
-msgstr ""
-"Séléçt ä prößlém tö généräté ä ÇSV         fïlé thät lïsts äll stüdént "
-"änswérs tö thé prößlém. Ýöü älsö séléçt ä séçtïön ör çhäptér tö ïnçlüdé"
-"         résülts öf äll prößléms ïn thät séçtïön ör çhäptér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to display the grading configuration for the                 course. "
-"The grading configuration is the breakdown of graded subsections of the "
-"course                 (such as exams and problem sets), and can be changed "
-"on the 'Grading'                 page (under 'Settings') in Studio."
-msgstr ""
-"Çlïçk tö dïspläý thé grädïng çönfïgürätïön för thé                 çöürsé. "
-"Thé grädïng çönfïgürätïön ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé "
-"çöürsé                 (süçh äs éxäms änd prößlém séts), änd çän ßé çhängéd "
-"ön thé 'Grädïng'                 pägé (ündér 'Séttïngs') ïn Stüdïö. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ η#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Click to download a CSV of                 anonymized student IDs:"
-msgstr ""
-"Çlïçk tö döwnlöäd ä ÇSV öf                 änönýmïzéd stüdént ÌDs: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For large courses, generating some reports can take                 several "
-"hours. When report generation is complete, a                 link that "
-"includes the date and time of generation appears in the table below. These "
-"reports are                 generated in the background, meaning it is OK to"
-" navigate away from this page while your report is                 "
-"generating."
-msgstr ""
-"För lärgé çöürsés, générätïng sömé répörts çän täké                 sévéräl "
-"höürs. Whén répört générätïön ïs çömplété, ä                 lïnk thät "
-"ïnçlüdés thé däté änd tïmé öf générätïön äppéärs ïn thé täßlé ßélöw. Thésé "
-"répörts äré                 générätéd ïn thé ßäçkgröünd, méänïng ït ïs ÖK tö"
-" nävïgäté äwäý fröm thïs pägé whïlé ýöür répört ïs                 "
-"générätïng.#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Please be patient and do not click these buttons                 multiple "
-"times. Clicking these buttons multiple times will significantly slow the "
-"generation                 process."
-msgstr ""
-"Pléäsé ßé pätïént änd dö nöt çlïçk thésé ßüttöns                 mültïplé "
-"tïmés. Çlïçkïng thésé ßüttöns mültïplé tïmés wïll sïgnïfïçäntlý slöw thé "
-"générätïön                 pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
-" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
-"мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
-"łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For smaller courses, click to list                 profile information for "
-"enrolled students directly on this page:"
-msgstr ""
-"För smällér çöürsés, çlïçk tö lïst                 pröfïlé ïnförmätïön för "
-"énrölléd stüdénts dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 all students enrolled in "
-"this course, along with profile information such as email address and"
-"                 username:"
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf                 äll stüdénts énrölléd ïn "
-"thïs çöürsé, älöng wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd"
-"                 üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 that lists learners who can "
-"enroll in the course but have not yet done so."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé                 thät lïsts léärnérs whö çän "
-"énröll ïn thé çöürsé ßüt hävé nöt ýét döné sö. Ⱡ'σяєм ιρѕυм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 of all proctored exam results "
-"in this course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé                 öf äll pröçtöréd éxäm résülts "
-"ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 survey results for this "
-"course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf                 sürvéý résülts för thïs "
-"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 ORA grade report for all currently "
-"enrolled students."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV                 ÖRÀ grädé répört för äll çürréntlý "
-"énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 problem grade report for all "
-"currently enrolled students."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV                 prößlém grädé répört för äll "
-"çürréntlý énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Note"
-msgstr "Nöté Ⱡ'σяєм ι#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid ""
-"Select a problem to generate a CSV         file that lists all student "
-"answers to the problem. You also select a section or chapter to include"
-"         results of all problems in that section or chapter."
-msgstr ""
-"Séléçt ä prößlém tö généräté ä ÇSV         fïlé thät lïsts äll stüdént "
-"änswérs tö thé prößlém. Ýöü älsö séléçt ä séçtïön ör çhäptér tö ïnçlüdé"
-"         résülts öf äll prößléms ïn thät séçtïön ör çhäptér. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to display the grading configuration for the                 course. "
-"The grading configuration is the breakdown of graded subsections of the "
-"course                 (such as exams and problem sets), and can be changed "
-"on the 'Grading'                 page (under 'Settings') in Studio."
-msgstr ""
-"Çlïçk tö dïspläý thé grädïng çönfïgürätïön för thé                 çöürsé. "
-"Thé grädïng çönfïgürätïön ïs thé ßréäkdöwn öf grädéd süßséçtïöns öf thé "
-"çöürsé                 (süçh äs éxäms änd prößlém séts), änd çän ßé çhängéd "
-"ön thé 'Grädïng'                 pägé (ündér 'Séttïngs') ïn Stüdïö. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ η#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Click to download a CSV of                 anonymized student IDs:"
-msgstr ""
-"Çlïçk tö döwnlöäd ä ÇSV öf                 änönýmïzéd stüdént ÌDs: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For large courses, generating some reports can take                 several "
-"hours. When report generation is complete, a                 link that "
-"includes the date and time of generation appears in the table below. These "
-"reports are                 generated in the background, meaning it is OK to"
-" navigate away from this page while your report is                 "
-"generating."
-msgstr ""
-"För lärgé çöürsés, générätïng sömé répörts çän täké                 sévéräl "
-"höürs. Whén répört générätïön ïs çömplété, ä                 lïnk thät "
-"ïnçlüdés thé däté änd tïmé öf générätïön äppéärs ïn thé täßlé ßélöw. Thésé "
-"répörts äré                 générätéd ïn thé ßäçkgröünd, méänïng ït ïs ÖK tö"
-" nävïgäté äwäý fröm thïs pägé whïlé ýöür répört ïs                 "
-"générätïng.#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Please be patient and do not click these buttons                 multiple "
-"times. Clicking these buttons multiple times will significantly slow the "
-"generation                 process."
-msgstr ""
-"Pléäsé ßé pätïént änd dö nöt çlïçk thésé ßüttöns                 mültïplé "
-"tïmés. Çlïçkïng thésé ßüttöns mültïplé tïmés wïll sïgnïfïçäntlý slöw thé "
-"générätïön                 pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
-" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
-"мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
-"łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For smaller courses, click to list                 profile information for "
-"enrolled students directly on this page:"
-msgstr ""
-"För smällér çöürsés, çlïçk tö lïst                 pröfïlé ïnförmätïön för "
-"énrölléd stüdénts dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 all students enrolled in "
-"this course, along with profile information such as email address and"
-"                 username:"
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf                 äll stüdénts énrölléd ïn "
-"thïs çöürsé, älöng wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd"
-"                 üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 that lists learners who can "
-"enroll in the course but have not yet done so."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé                 thät lïsts léärnérs whö çän "
-"énröll ïn thé çöürsé ßüt hävé nöt ýét döné sö. Ⱡ'σяєм ιρѕυм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 of all proctored exam results "
-"in this course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé                 öf äll pröçtöréd éxäm résülts "
-"ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 survey results for this "
-"course."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf                 sürvéý résülts för thïs "
-"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 ORA grade report for all currently "
-"enrolled students."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV                 ÖRÀ grädé répört för äll çürréntlý "
-"énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 problem grade report for all "
-"currently enrolled students."
-msgstr ""
-"Çlïçk tö généräté ä ÇSV                 prößlém grädé répört för äll "
-"çürréntlý énrölléd stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
-#: themes/edx.org/lms/templates/dashboard.html
-msgid "My Courses"
-msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Send Email"
@@ -23256,9 +21734,6 @@ msgstr "Àllöwänçé Séçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
 msgstr "Stüdént Spéçïäl Éxäm Àttémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Available"
-msgstr "Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Review Dashboard"
@@ -24638,6 +23113,16 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "édX Pärtnér Pörtäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+"Wänt tö mäké édX ßéttér för évérýöné? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr "Gét stärtéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""

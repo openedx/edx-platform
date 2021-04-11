@@ -24,7 +24,7 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Test case setup """
-        super().setUp()
+        super(EnrollmentAttributeOverrideViewTest, self).setUp()
 
         self.client = Client()
         user = AdminFactory()
@@ -36,7 +36,7 @@ class EnrollmentAttributeOverrideViewTest(ModuleStoreTestCase):
             self.users.append(UserFactory())
 
         self.course = CourseRunFactory()
-        self.course_id = self.course.get('key')  # lint-amnesty, pylint: disable=no-member
+        self.course_id = self.course.get('key')
         self.csv_data = [
             [self.users[0].id, self.course_id, 'OP_4321'],
             [self.users[1].id, self.course_id, 'OP_8765'],

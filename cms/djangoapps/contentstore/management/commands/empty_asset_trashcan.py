@@ -27,5 +27,5 @@ class Command(BaseCommand):
         else:
             course_ids = [course.id for course in modulestore().get_courses()]
 
-        if query_yes_no("Emptying {} trashcan(s). Confirm?".format(len(course_ids)), default="no"):
+        if query_yes_no(u"Emptying {} trashcan(s). Confirm?".format(len(course_ids)), default="no"):
             empty_asset_trashcan(course_ids)

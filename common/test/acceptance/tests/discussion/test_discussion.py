@@ -7,25 +7,23 @@ from uuid import uuid4
 
 import pytest
 
-from common.test.acceptance.fixtures.course import CourseFixture  # lint-amnesty, pylint: disable=unused-import
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
     Comment,
     Response,
     SingleThreadViewFixture,
     Thread,
-
 )
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionTabSingleThreadPage,
-
 )
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.lib.tests import attr
 
-THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt  # lint-amnesty, pylint: disable=line-too-long
+THREAD_CONTENT_WITH_LATEX = u"""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
                                ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
                                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
                                reprehenderit in voluptate velit sse cillum dolore eu fugiat nulla pariatur.
@@ -96,7 +94,7 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
     SEARCHED_USERNAME = "gizmo"
 
     def setUp(self):
-        super().setUp()
+        super(DiscussionHomePageTest, self).setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
@@ -119,7 +117,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixi
     Tests for the discussion page with multiple threads
     """
     def setUp(self):
-        super().setUp()
+        super(DiscussionTabMultipleThreadTest, self).setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.thread_count = 2
         self.thread_ids = []
@@ -169,15 +167,15 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(DiscussionOpenClosedThreadTest, self).setUp()
 
-        self.thread_id = f"test_thread_{uuid4().hex}"
+        self.thread_id = "test_thread_{}".format(uuid4().hex)
 
-    def setup_user(self, roles=[]):  # lint-amnesty, pylint: disable=dangerous-default-value
+    def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
-        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
-    def setup_view(self, **thread_kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def setup_view(self, **thread_kwargs):
         thread_kwargs.update({'commentable_id': self.discussion_id})
         view = SingleThreadViewFixture(
             Thread(id=self.thread_id, **thread_kwargs)
@@ -185,7 +183,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         view.addResponse(Response(id="response1"))
         view.push()
 
-    def setup_openclosed_thread_page(self, closed=False):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def setup_openclosed_thread_page(self, closed=False):
         self.setup_user(roles=['Moderator'])
         if closed:
             self.setup_view(closed=True)
@@ -227,11 +225,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
     """
-    def setup_user(self, roles=[]):  # lint-amnesty, pylint: disable=dangerous-default-value
+    def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
-        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
-    def setup_view(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def setup_view(self):
         view = SingleThreadViewFixture(Thread(id="response_edit_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response_other_author", user_id="other", thread_id="response_edit_test_thread"),
@@ -262,15 +260,15 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
     """
-    def setup_user(self, roles=[]):  # lint-amnesty, pylint: disable=dangerous-default-value
+    def setup_user(self, roles=[]):
         roles_str = ','.join(roles)
-        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
 
-    def setup_view(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def setup_view(self):
         view = SingleThreadViewFixture(Thread(id="comment_edit_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response1"),
-            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])  # lint-amnesty, pylint: disable=line-too-long
+            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
         view.push()
 
     @attr('a11y')
@@ -323,7 +321,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     SEARCHED_USERNAME = "gizmo"
 
     def setUp(self):
-        super().setUp()
+        super(DiscussionSearchAlertTest, self).setUp()
         CourseFixture(**self.course_info).install()
         # first auto auth call sets up a user that we will search for in some tests
         self.searched_user_id = AutoAuthPage(

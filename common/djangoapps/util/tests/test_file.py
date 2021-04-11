@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for file.py
 """
@@ -6,17 +7,18 @@ Tests for file.py
 import os
 from datetime import datetime
 from io import StringIO
-from unittest.mock import Mock, patch
 
-import pytest
 import ddt
+import six
 from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
 from django.test import TestCase
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pytz import UTC
+from six import text_type
 
 import common.djangoapps.util.file
 from common.djangoapps.util.file import (
@@ -35,11 +37,11 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
     def test_locators(self, course_key):
-        assert course_filename_prefix_generator(course_key) == 'foo_bar_baz'
+        self.assertEqual(course_filename_prefix_generator(course_key), u'foo_bar_baz')
 
     @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
     def test_custom_separator(self, course_key):
-        assert course_filename_prefix_generator(course_key, separator='-') == 'foo-bar-baz'
+        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), u'foo-bar-baz')
 
 
 @ddt.ddt
@@ -50,7 +52,7 @@ class FilenameGeneratorTestCase(TestCase):
     NOW = datetime.strptime('1974-06-22T01:02:03', '%Y-%m-%dT%H:%M:%S').replace(tzinfo=UTC)
 
     def setUp(self):
-        super().setUp()
+        super(FilenameGeneratorTestCase, self).setUp()
         datetime_patcher = patch.object(
             common.djangoapps.util.file, 'datetime',
             Mock(wraps=datetime)
@@ -64,10 +66,15 @@ class FilenameGeneratorTestCase(TestCase):
         """
         Tests that the generator creates names based on course_id, base name, and date.
         """
-        assert 'foo_bar_baz_file_1974-06-22-010203' == course_and_time_based_filename_generator(course_key, 'file')
+        self.assertEqual(
+            u'foo_bar_baz_file_1974-06-22-010203',
+            course_and_time_based_filename_generator(course_key, 'file')
+        )
 
-        assert 'foo_bar_baz_base_name_ø_1974-06-22-010203' ==\
-               course_and_time_based_filename_generator(course_key, ' base` name ø ')
+        self.assertEqual(
+            u'foo_bar_baz_base_name_ø_1974-06-22-010203',
+            course_and_time_based_filename_generator(course_key, ' base` name ø ')
+        )
 
 
 class StoreUploadedFileTestCase(TestCase):
@@ -76,7 +83,7 @@ class StoreUploadedFileTestCase(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(StoreUploadedFileTestCase, self).setUp()
         self.request = Mock(spec=HttpRequest)
         self.file_content = b"test file content"
         self.stored_file_name = None
@@ -84,7 +91,7 @@ class StoreUploadedFileTestCase(TestCase):
         self.default_max_size = 2000000
 
     def tearDown(self):
-        super().tearDown()
+        super(StoreUploadedFileTestCase, self).tearDown()
         if self.file_storage and self.stored_file_name:
             self.file_storage.delete(self.stored_file_name)
 
@@ -92,33 +99,33 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Helper method to verify exception text.
         """
-        assert expected_message == str(error.value)
+        self.assertEqual(expected_message, text_type(error.exception))
 
     def test_error_conditions(self):
         """
         Verifies that exceptions are thrown in the expected cases.
         """
-        with pytest.raises(ValueError) as error:
+        with self.assertRaises(ValueError) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "wrong_key", [".txt", ".csv"], "stored_file", self.default_max_size)
         self.verify_exception("No file uploaded with key 'wrong_key'.", error)
 
-        with pytest.raises(exceptions.PermissionDenied) as error:
+        with self.assertRaises(exceptions.PermissionDenied) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with one of the following extensions: ''.", error)
 
-        with pytest.raises(exceptions.PermissionDenied) as error:
+        with self.assertRaises(exceptions.PermissionDenied) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".bar"], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with the extension '.bar'.", error)
 
-        with pytest.raises(exceptions.PermissionDenied) as error:
+        with self.assertRaises(exceptions.PermissionDenied) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".xxx", ".bar"], "stored_file", self.default_max_size)
         self.verify_exception("The file must end with one of the following extensions: '.xxx', '.bar'.", error)
 
-        with pytest.raises(exceptions.PermissionDenied) as error:
+        with self.assertRaises(exceptions.PermissionDenied) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", 2)
         self.verify_exception("Maximum upload file size is 2 bytes.", error)
@@ -131,7 +138,7 @@ class StoreUploadedFileTestCase(TestCase):
 
         def verify_file_presence(should_exist):
             """ Verify whether or not the stored file, passed to the validator, exists. """
-            assert should_exist == validator_data['storage'].exists(validator_data['filename'])
+            self.assertEqual(should_exist, validator_data["storage"].exists(validator_data["filename"]))
 
         def store_file_data(storage, filename):
             """ Stores file validator data for testing after validation is complete. """
@@ -141,18 +148,18 @@ class StoreUploadedFileTestCase(TestCase):
 
         def exception_validator(storage, filename):
             """ Validation test function that throws an exception """
-            assert 'error_file.csv' == os.path.basename(filename)
+            self.assertEqual("error_file.csv", os.path.basename(filename))
             with storage.open(filename, 'rb') as f:
-                assert self.file_content == f.read()
+                self.assertEqual(self.file_content, f.read())
             store_file_data(storage, filename)
             raise FileValidationException("validation failed")
 
         def success_validator(storage, filename):
             """ Validation test function that is a no-op """
-            assert 'success_file' in os.path.basename(filename)
+            self.assertIn("success_file", os.path.basename(filename))
             store_file_data(storage, filename)
 
-        with pytest.raises(FileValidationException) as error:
+        with self.assertRaises(FileValidationException) as error:
             self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
             store_uploaded_file(
                 self.request, "uploaded_file", [".csv"], "error_file",
@@ -206,15 +213,15 @@ class StoreUploadedFileTestCase(TestCase):
         file_storage, second_stored_file_name = store_uploaded_file(
             self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
         )
-        assert first_stored_file_name != second_stored_file_name
-        assert requested_file_name in second_stored_file_name
+        self.assertNotEqual(first_stored_file_name, second_stored_file_name)
+        self.assertIn(requested_file_name, second_stored_file_name)
         self._verify_successful_upload(file_storage, second_stored_file_name, file_content)
 
     def _verify_successful_upload(self, storage, file_name, expected_content):
         """ Helper method that checks that the stored version of the uploaded file has the correct content """
-        assert storage.exists(file_name)
+        self.assertTrue(storage.exists(file_name))
         with storage.open(file_name, 'rb') as f:
-            assert expected_content == f.read()
+            self.assertEqual(expected_content, f.read())
 
 
 @ddt.ddt
@@ -224,40 +231,54 @@ class TestUniversalNewlineIterator(TestCase):
     """
     @ddt.data(1, 2, 999)
     def test_line_feeds(self, buffer_size):
-        assert [thing.decode('utf-8') for thing
-                in UniversalNewlineIterator(StringIO('foo\nbar\n'), buffer_size=buffer_size)] == ['foo\n', 'bar\n']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar\n'), buffer_size=buffer_size)],
+            ['foo\n', 'bar\n']
+        )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO('foo\rbar\r'), buffer_size=buffer_size)] == ['foo\n', 'bar\n']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\rbar\r'), buffer_size=buffer_size)],
+            ['foo\n', 'bar\n']
+        )
 
     @ddt.data(1, 2, 999)
     def test_carriage_returns_and_line_feeds(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO('foo\r\nbar\r\n'), buffer_size=buffer_size)] == ['foo\n', 'bar\n']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\r\nbar\r\n'), buffer_size=buffer_size)],
+            ['foo\n', 'bar\n']
+        )
 
     @ddt.data(1, 2, 999)
     def test_no_trailing_newline(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO('foo\nbar'), buffer_size=buffer_size)] == ['foo\n', 'bar']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\nbar'), buffer_size=buffer_size)],
+            ['foo\n', 'bar']
+        )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO('foo\n'), buffer_size=buffer_size)] == ['foo\n']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo\n'), buffer_size=buffer_size)],
+            ['foo\n']
+        )
 
     @ddt.data(1, 2, 999)
     def test_only_one_line_no_trailing_newline(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO('foo'), buffer_size=buffer_size)] == ['foo']
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u'foo'), buffer_size=buffer_size)],
+            ['foo']
+        )
 
     @ddt.data(1, 2, 999)
     def test_empty_file(self, buffer_size):
-        assert [thing.decode('utf-8') for thing in
-                UniversalNewlineIterator(StringIO(''), buffer_size=buffer_size)] == []
+        self.assertEqual(
+            [thing.decode('utf-8') for thing in UniversalNewlineIterator(StringIO(u''), buffer_size=buffer_size)],
+            []
+        )
 
     @ddt.data(1, 2, 999)
     def test_unicode_data(self, buffer_size):
-        assert [thing.decode('utf-8') for thing
-                in UniversalNewlineIterator(StringIO('héllø wo®ld'), buffer_size=buffer_size)] == ['héllø wo®ld']
+        self.assertEqual([thing.decode('utf-8') if six.PY3 else thing for thing in
+                          UniversalNewlineIterator(StringIO(u'héllø wo®ld'), buffer_size=buffer_size)], [u'héllø wo®ld'])

@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Migration(migrations.Migration):
 
     dependencies = [
         ('entitlements', '0005_courseentitlementsupportdetail'),
@@ -11,7 +14,7 @@ class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-
         migrations.AddField(
             model_name='courseentitlementsupportdetail',
             name='action',
-            field=models.CharField(default='CREATE', max_length=15, choices=[('REISSUE', 'Re-issue entitlement'), ('CREATE', 'Create new entitlement')]),  # lint-amnesty, pylint: disable=line-too-long
+            field=models.CharField(default='CREATE', max_length=15, choices=[(u'REISSUE', u'Re-issue entitlement'), (u'CREATE', u'Create new entitlement')]),
             preserve_default=False,
         ),
     ]

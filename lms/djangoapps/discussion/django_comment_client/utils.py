@@ -6,17 +6,18 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connection
 from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
-from opaque_keys.edx.keys import CourseKey, UsageKey, i4xEncoder
+from opaque_keys.edx.keys import CourseKey, i4xEncoder, UsageKey
 from pytz import UTC
+from six import text_type
+from six.moves import map
 
-from common.djangoapps.student.models import get_user_by_username_or_email
-from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
@@ -36,6 +37,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
+from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
@@ -54,7 +57,7 @@ def strip_none(dic):
     """
     Returns a dictionary stripped of any keys having values of None
     """
-    return {k: v for k, v in dic.items() if v is not None}
+    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])
 
 
 def strip_blank(dic):
@@ -66,7 +69,7 @@ def strip_blank(dic):
         Determines if the provided value contains no information
         """
         return isinstance(v, str) and len(v.strip()) == 0
-    return {k: v for k, v in dic.items() if not _is_blank(v)}
+    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])
 
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
@@ -76,7 +79,7 @@ def get_role_ids(course_id):
     Returns a dictionary having role names as keys and a list of users as values
     """
     roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
-    return {role.name: list(role.users.values_list('id', flat=True)) for role in roles}
+    return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
 def has_discussion_privileges(user, course_id):
@@ -126,7 +129,7 @@ def has_required_keys(xblock):
     for key in ('discussion_id', 'discussion_category', 'discussion_target'):
         if getattr(xblock, key, None) is None:
             log.debug(
-                "Required key '%s' not in discussion %s, leaving out of category map",
+                u"Required key '%s' not in discussion %s, leaving out of category map",
                 key,
                 xblock.location
             )
@@ -278,7 +281,7 @@ def _filter_unstarted_categories(category_map, course):
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
                     log.debug(
-                        "Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"]
+                        u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"]
                     )
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
@@ -422,7 +425,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
                 # If we've already seen this title, append an incrementing number to disambiguate
                 # the category from other categores sharing the same title in the course discussion UI.
                 dupe_counters[title] += 1
-                title = "{title} ({counter})".format(title=title, counter=dupe_counters[title])
+                title = u"{title} ({counter})".format(title=title, counter=dupe_counters[title])
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
@@ -493,7 +496,8 @@ class JsonResponse(HttpResponse):
         Object constructor, converts data (if provided) to JSON
         """
         content = json.dumps(data, cls=i4xEncoder)
-        super().__init__(content, content_type='application/json; charset=utf-8')
+        super(JsonResponse, self).__init__(content,
+                                           content_type='application/json; charset=utf-8')
 
 
 class JsonError(HttpResponse):
@@ -504,10 +508,11 @@ class JsonError(HttpResponse):
         """
         Object constructor, returns an error response containing the provided exception messages
         """
-        if isinstance(error_messages, str):
+        if isinstance(error_messages, six.string_types):
             error_messages = [error_messages]
         content = json.dumps({'errors': error_messages}, indent=2, ensure_ascii=False)
-        super().__init__(content, content_type='application/json; charset=utf-8', status=status)
+        super(JsonError, self).__init__(content,
+                                        content_type='application/json; charset=utf-8', status=status)
 
 
 class HtmlResponse(HttpResponse):
@@ -518,7 +523,7 @@ class HtmlResponse(HttpResponse):
         """
         Object constructor, brokers provided HTML to caller
         """
-        super().__init__(html, content_type='text/plain')
+        super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
 class ViewNameMiddleware(MiddlewareMixin):
@@ -557,7 +562,7 @@ class QueryCountDebugMiddleware(MiddlewareMixin):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info('%s queries run, total %s seconds', len(connection.queries), total_time)
+            log.info(u'%s queries run, total %s seconds', len(connection.queries), total_time)
         return response
 
 
@@ -682,7 +687,7 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
 
 def permalink(content):
     if isinstance(content['course_id'], CourseKey):
-        course_id = str(content['course_id'])
+        course_id = text_type(content['course_id'])
     else:
         course_id = content['course_id']
     if content['type'] == 'thread':
@@ -697,10 +702,10 @@ def extend_content(content):
     if content.get('user_id'):
         try:
             user = User.objects.get(pk=content['user_id'])
-            roles = {'name': role.name.lower() for role in user.roles.filter(course_id=content['course_id'])}
+            roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
         except User.DoesNotExist:
             log.error(
-                'User ID %s in comment content %s but not in our DB.',
+                u'User ID %s in comment content %s but not in our DB.',
                 content.get('user_id'),
                 content.get('id')
             )
@@ -730,10 +735,10 @@ def add_courseware_context(content_list, course, user, id_map=None):
     for content in content_list:
         commentable_id = content['commentable_id']
         if commentable_id in id_map:
-            location = str(id_map[commentable_id]["location"])
+            location = text_type(id_map[commentable_id]["location"])
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": str(course.id),
+            url = reverse('jump_to', kwargs={"course_id": text_type(course.id),
                           "location": location})
 
             content.update({"courseware_url": url, "courseware_title": title})
@@ -782,7 +787,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
                 log.error(
-                    "User ID %s in endorsement for comment %s but not in our DB.",
+                    u"User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
                     content.get('id')
                 )
@@ -941,7 +946,7 @@ def is_commentable_divided(course_key, commentable_id, course_discussion_setting
         # inline discussions are divided by default
         ans = True
 
-    log.debug("is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
+    log.debug(u"is_commentable_divided(%s, %s) = {%s}", course_key, commentable_id, ans)
     return ans
 
 

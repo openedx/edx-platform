@@ -1,10 +1,10 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import Engine, TemplateDoesNotExist, engines
+from django.template import Engine, engines, TemplateDoesNotExist
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
@@ -14,7 +14,7 @@ from openedx.core.lib.tempdir import mkdtemp_clean
 log = logging.getLogger(__name__)
 
 
-class MakoLoader:
+class MakoLoader(object):
     """
     This is a Django loader object which will load the template as a
     Mako template if the first line is "## mako". It is based off Loader
@@ -70,7 +70,7 @@ class MakoLoader:
             try:
                 template = Engine.get_default().from_string(source)
                 return template
-            except ImproperlyConfigured:  # lint-amnesty, pylint: disable=try-except-raise
+            except ImproperlyConfigured:
                 # Either no DjangoTemplates engine was configured -or- multiple engines
                 # were configured, making the get_default() call above fail.
                 raise
@@ -96,17 +96,17 @@ class MakoLoader:
         self.base_loader.reset()
 
 
-class MakoFilesystemLoader(MakoLoader):  # lint-amnesty, pylint: disable=missing-class-docstring
+class MakoFilesystemLoader(MakoLoader):
     is_usable = True
     _accepts_engine_in_init = True
 
     def __init__(self, *args):
-        MakoLoader.__init__(self, FilesystemLoader(*args))  # lint-amnesty, pylint: disable=no-value-for-parameter
+        MakoLoader.__init__(self, FilesystemLoader(*args))
 
 
-class MakoAppDirectoriesLoader(MakoLoader):  # lint-amnesty, pylint: disable=missing-class-docstring
+class MakoAppDirectoriesLoader(MakoLoader):
     is_usable = True
     _accepts_engine_in_init = True
 
     def __init__(self, *args):
-        MakoLoader.__init__(self, AppDirectoriesLoader(*args))  # lint-amnesty, pylint: disable=no-value-for-parameter
+        MakoLoader.__init__(self, AppDirectoriesLoader(*args))

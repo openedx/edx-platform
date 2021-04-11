@@ -1,10 +1,10 @@
 """ Test the change_enrollment command line script."""
 
 
-from unittest.mock import patch
-
 import ddt
 from django.core.management import call_command
+from mock import patch
+from six import text_type
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 class ChangeEnrollmentTests(SharedModuleStoreTestCase):
     """ Test the enrollment change functionality of the change_enrollment script."""
     def setUp(self):
-        super().setUp()
+        super(ChangeEnrollmentTests, self).setUp()
         self.course = CourseFactory.create()
         self.audit_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -56,14 +56,17 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         user_ids = [u.id for u in self.users]
 
         # Verify users are not in honor mode yet
-        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)) == 0
+        self.assertEqual(
+            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)),
+            0
+        )
 
         noop = " --noop" if noop else ""
 
         # Hack around call_command bugs dealing with required options see:
         # https://stackoverflow.com/questions/32036562/call-command-argument-is-required
         command_args = '--course {course} --to honor --from audit --{method} {user_str}{noop}'.format(
-            course=str(self.course.id),
+            course=text_type(self.course.id),
             noop=noop,
             method=method,
             user_str=user_str
@@ -72,7 +75,10 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
-        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)) == expected_conversions
+        self.assertEqual(
+            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=user_ids)),
+            expected_conversions
+        )
 
         mock_logger.info.assert_called_with(
             'Successfully updated %i out of %i users',
@@ -93,10 +99,13 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         real_user_ids = [u.id for u in self.users]
 
         # Verify users are not in honor mode yet
-        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)) == 0
+        self.assertEqual(
+            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)),
+            0
+        )
 
         command_args = '--course {course} --to honor --from audit --{method} {user_str}'.format(
-            course=str(self.course.id),
+            course=text_type(self.course.id),
             method=method,
             user_str=user_str
         )
@@ -104,7 +113,10 @@ class ChangeEnrollmentTests(SharedModuleStoreTestCase):
         call_command('change_enrollment', *command_args.split(' '))
 
         # Verify correct number of users are now in honor mode
-        assert len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)) == expected_success
+        self.assertEqual(
+            len(CourseEnrollment.objects.filter(mode='honor', user_id__in=real_user_ids)),
+            expected_success
+        )
 
         mock_logger.info.assert_called_with(
             'user: [%s] reason: [%s] %s', fake_user, 'DoesNotExist', 'User matching query does not exist.'

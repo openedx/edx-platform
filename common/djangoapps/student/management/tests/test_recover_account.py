@@ -3,28 +3,20 @@ Test cases for recover account management command
 """
 import re
 from tempfile import NamedTemporaryFile
-import pytest
 import six
 
 from django.core import mail
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command, CommandError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, RequestFactory, override_settings
-
-from edx_toggles.toggles.testutils import override_waffle_flag
+from django.test import TestCase, RequestFactory
 
 from testfixtures import LogCapture
 from common.djangoapps.student.tests.factories import UserFactory
+
 from common.djangoapps.student.models import AccountRecoveryConfiguration
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.user_authn.toggles import REDIRECT_TO_AUTHN_MICROFRONTEND
-
 LOGGER_NAME = 'common.djangoapps.student.management.commands.recover_account'
-FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
-FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
 
 
 class RecoverAccountTests(TestCase):
@@ -35,7 +27,7 @@ class RecoverAccountTests(TestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        super().setUp()
+        super(RecoverAccountTests, self).setUp()
         self.user = UserFactory.create(username='amy', email='amy@edx.com', password='password')
 
     def _write_test_csv(self, csv, lines):
@@ -55,9 +47,9 @@ class RecoverAccountTests(TestCase):
 
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=['amy,amy@edx.com,amy@newemail.com\n'])
-            call_command("recover_account", f"--csv_file_path={csv.name}")
+            call_command("recover_account", "--csv_file_path={}".format(csv.name))
 
-            assert len(mail.outbox) == 1
+            self.assertEqual(len(mail.outbox), 1)
 
         reset_link = re.findall("(http.+pwreset)", mail.outbox[0].body)[0]
         request_params = {'new_password1': 'password1', 'new_password2': 'password1'}
@@ -65,37 +57,19 @@ class RecoverAccountTests(TestCase):
         resp = self.client.post(reset_link, data=request_params)
 
         # Verify the response status code is: 302 with password reset because 302 means success
-        assert resp.status_code == 302
+        self.assertEqual(resp.status_code, 302)
 
-        assert self.client.login(username=self.user.username, password='password1')
+        self.assertTrue(self.client.login(username=self.user.username, password='password1'))
 
         # try to login with previous password
-        assert not self.client.login(username=self.user.username, password='password')
-
-    @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
-    @override_waffle_flag(REDIRECT_TO_AUTHN_MICROFRONTEND, active=True)
-    @skip_unless_lms
-    def test_authn_mfe_url_in_reset_link(self):
-        """
-        send password reset link to learner with authn mfe.
-        :return:
-        """
-
-        with NamedTemporaryFile() as csv:
-            csv = self._write_test_csv(csv, lines=['amy,amy@edx.com,amy@newemail.com\n'])
-            call_command("recover_account", f"--csv_file_path={csv.name}")
-
-            assert len(mail.outbox) == 1
-
-        authn_mfe_url = re.findall(settings.AUTHN_MICROFRONTEND_URL, mail.outbox[0].body)[0]
-        self.assertEqual(authn_mfe_url, settings.AUTHN_MICROFRONTEND_URL)
+        self.assertFalse(self.client.login(username=self.user.username, password='password'))
 
     def test_file_not_found_error(self):
         """
         Test command error raised when csv path is invalid
         :return:
         """
-        with pytest.raises(CommandError):
+        with self.assertRaises(CommandError):
             call_command("recover_account", "--csv_file_path={}".format('test'))
 
     def test_exception_raised(self):
@@ -110,7 +84,7 @@ class RecoverAccountTests(TestCase):
                                'exception was User matching query does not exist.'
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", f"--csv_file_path={csv.name}")
+                call_command("recover_account", "--csv_file_path={}".format(csv.name))
 
                 log.check_present(
                     (LOGGER_NAME, 'ERROR', expected_message)
@@ -126,7 +100,7 @@ class RecoverAccountTests(TestCase):
             expected_message = "Successfully updated ['amy@newemail.com'] accounts. Failed to update [] accounts"
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("recover_account", f"--csv_file_path={csv.name}")
+                call_command("recover_account", "--csv_file_path={}".format(csv.name))
 
                 log.check_present(
                     (LOGGER_NAME, 'INFO', expected_message)
@@ -143,4 +117,4 @@ class RecoverAccountTests(TestCase):
         call_command("recover_account")
 
         email = get_user_model().objects.get(pk=self.user.pk).email
-        assert email == 'amy@newemail.com'
+        self.assertEqual(email, 'amy@newemail.com')

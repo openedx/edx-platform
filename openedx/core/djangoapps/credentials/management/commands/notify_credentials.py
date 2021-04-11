@@ -24,12 +24,13 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from six.moves import range
 
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from lms.djangoapps.certificates.models import CertificateStatuses
-from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
@@ -38,11 +39,11 @@ log = logging.getLogger(__name__)
 
 
 def certstr(cert):
-    return f'{cert.course_id} for user {cert.user.username}'
+    return '{} for user {}'.format(cert.course_id, cert.user.username)
 
 
 def gradestr(grade):
-    return f'{grade.course_id} for user {grade.user_id}'
+    return '{} for user {}'.format(grade.course_id, grade.user_id)
 
 
 def parsetime(timestr):
@@ -98,8 +99,8 @@ class Command(BaseCommand):
             course-v1:edX+RecordsSelfPaced+1 for user 18
     """
     help = (
-        "Simulate certificate/grade changes without actually modifying database "
-        "content. Specifically, trigger the handlers that send data to Credentials."
+        u"Simulate certificate/grade changes without actually modifying database "
+        u"content. Specifically, trigger the handlers that send data to Credentials."
     )
 
     def add_arguments(self, parser):
@@ -161,10 +162,9 @@ class Command(BaseCommand):
             help='Send program award notifications with course notification tasks',
         )
         parser.add_argument(
-            '--user_ids',
+            '--username',
             default=None,
-            nargs='+',
-            help='Run the command for the given user or list of users',
+            help='Run the command for a single user',
         )
 
     def get_args_from_database(self):
@@ -188,8 +188,8 @@ class Command(BaseCommand):
             options['start_date'] = options['end_date'] - timedelta(hours=4)
 
         log.info(
-            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
-            "from=%s, to=%s, notify_programs=%s, user_ids=%s, execution=%s",
+            u"notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds, page_size=%d, "
+            u"from=%s, to=%s, notify_programs=%s, username=%s, execution=%s",
             options['dry_run'],
             options['site'],
             options['delay'],
@@ -197,28 +197,28 @@ class Command(BaseCommand):
             options['start_date'] if options['start_date'] else 'NA',
             options['end_date'] if options['end_date'] else 'NA',
             options['notify_programs'],
-            options['user_ids'],
+            options['username'],
             'auto' if options['auto'] else 'manual',
         )
 
         try:
             site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
         except SiteConfiguration.DoesNotExist:
-            log.error('No site configuration found for site %s', options['site'])
+            log.error(u'No site configuration found for site %s', options['site'])
 
         course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
+        if not (course_keys or options['start_date'] or options['end_date'] or options['username']):
+            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --username)')
 
         certs = get_recently_modified_certificates(
-            course_keys, options['start_date'], options['end_date'], options['user_ids']
+            course_keys, options['start_date'], options['end_date'], options['username']
         )
 
-        users = None
-        if options['user_ids']:
-            users = User.objects.filter(id__in=options['user_ids'])
+        user = None
+        if options['username']:
+            user = User.objects.get(username=options['username'])
         grades = get_recently_modified_grades(
-            course_keys, options['start_date'], options['end_date'], users
+            course_keys, options['start_date'], options['end_date'], user
         )
 
         log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
@@ -249,11 +249,11 @@ class Command(BaseCommand):
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):
-                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
+                log.info(u"Skipping credential changes %d for certificate %s", i, certstr(cert))
                 continue
 
             log.info(
-                "Handling credential changes %d for certificate %s",
+                u"Handling credential changes %d for certificate %s",
                 i, certstr(cert),
             )
 
@@ -279,11 +279,11 @@ class Command(BaseCommand):
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
             if site_config and not site_config.has_org(grade.course_id.org):
-                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
+                log.info(u"Skipping grade changes %d for grade %s", i, gradestr(grade))
                 continue
 
             log.info(
-                "Handling grade changes %d for grade %s",
+                u"Handling grade changes %d for grade %s",
                 i, gradestr(grade),
             )
 
@@ -320,12 +320,12 @@ class Command(BaseCommand):
             courses = []
         course_keys = []
 
-        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
+        log.info(u"%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:
                 course_keys.append(CourseKey.from_string(course_id))
             except InvalidKeyError:
-                log.fatal("%s is not a parseable CourseKey", course_id)
+                log.fatal(u"%s is not a parseable CourseKey", course_id)
                 sys.exit(1)
 
         return course_keys
@@ -339,10 +339,10 @@ class Command(BaseCommand):
         for cert in certs[:ITEMS_TO_SHOW]:
             print("   ", certstr(cert))
         if certs.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
+            print(u"    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
 
         print(grades.count(), "Grades:")
         for grade in grades[:ITEMS_TO_SHOW]:
             print("   ", gradestr(grade))
         if grades.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
+            print(u"    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))

@@ -273,7 +273,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getTitle: function() {
-            return gettext('Enable Course Highlight Emails');
+            return gettext('Enable Weekly Highlight Emails');
         },
 
         getIntroductionMessage: function() {

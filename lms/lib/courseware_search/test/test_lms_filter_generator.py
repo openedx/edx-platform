@@ -1,7 +1,10 @@
 """
 Tests for the lms_filter_generator
 """
-from unittest.mock import Mock, patch
+
+
+import six
+from mock import Mock, patch
 
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
 from common.djangoapps.student.models import CourseEnrollment
@@ -49,7 +52,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super().setUp()
+        super(LmsSearchFilterGeneratorTestCase, self).setUp()
         self.build_courses()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
 
@@ -62,9 +65,9 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
 
-        assert 'start_date' in filter_dictionary
-        assert str(self.courses[0].id) in field_dictionary['course']
-        assert str(self.courses[1].id) in field_dictionary['course']
+        self.assertIn('start_date', filter_dictionary)
+        self.assertIn(six.text_type(self.courses[0].id), field_dictionary['course'])
+        self.assertIn(six.text_type(self.courses[1].id), field_dictionary['course'])
 
     def test_course_id_provided(self):
         """
@@ -72,11 +75,11 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters(
             user=self.user,
-            course_id=str(self.courses[0].id)
+            course_id=six.text_type(self.courses[0].id)
         )
 
-        assert 'start_date' in filter_dictionary
-        assert str(self.courses[0].id) == field_dictionary['course']
+        self.assertIn('start_date', filter_dictionary)
+        self.assertEqual(six.text_type(self.courses[0].id), field_dictionary['course'])
 
     def test_user_not_provided(self):
         """
@@ -84,8 +87,8 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         """
         field_dictionary, filter_dictionary, _ = LmsSearchFilterGenerator.generate_field_filters()
 
-        assert 'start_date' in filter_dictionary
-        assert 0 == len(field_dictionary['course'])
+        self.assertIn('start_date', filter_dictionary)
+        self.assertEqual(0, len(field_dictionary['course']))
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
@@ -96,24 +99,24 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         By default site orgs not belonging to current site org should be excluded.
         """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
-        assert 'org' in exclude_dictionary
+        self.assertIn('org', exclude_dictionary)
         exclude_orgs = exclude_dictionary['org']
-        assert 2 == len(exclude_orgs)
-        assert 'LogistrationX' == exclude_orgs[0]
-        assert 'TestSiteX' == exclude_orgs[1]
+        self.assertEqual(2, len(exclude_orgs))
+        self.assertEqual('LogistrationX', exclude_orgs[0])
+        self.assertEqual('TestSiteX', exclude_orgs[1])
 
     @patch('openedx.core.djangoapps.site_configuration.helpers.get_all_orgs', Mock(return_value=set()))
     def test_no_excludes_with_no_orgs(self):
         """ Test when no org is present - nothing to exclude """
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
-        assert 'org' not in exclude_dictionary
+        self.assertNotIn('org', exclude_dictionary)
 
     @patch('openedx.core.djangoapps.site_configuration.helpers.get_value', Mock(return_value='TestSiteX'))
     def test_excludes_org_within(self):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
-        assert 'org' not in exclude_dictionary
-        assert 'org' in field_dictionary
-        assert ['TestSiteX'] == field_dictionary['org']
+        self.assertNotIn('org', exclude_dictionary)
+        self.assertIn('org', field_dictionary)
+        self.assertEqual(['TestSiteX'], field_dictionary['org'])
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
@@ -121,13 +124,13 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
     )
     def test_excludes_multi_orgs(self):
         _, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
-        assert 'org' in exclude_dictionary
+        self.assertIn('org', exclude_dictionary)
         exclude_orgs = exclude_dictionary['org']
-        assert 4 == len(exclude_orgs)
-        assert 'TestSite1' in exclude_orgs
-        assert 'TestSite2' in exclude_orgs
-        assert 'TestSite3' in exclude_orgs
-        assert 'TestSite4' in exclude_orgs
+        self.assertEqual(4, len(exclude_orgs))
+        self.assertIn('TestSite1', exclude_orgs)
+        self.assertIn('TestSite2', exclude_orgs)
+        self.assertIn('TestSite3', exclude_orgs)
+        self.assertIn('TestSite4', exclude_orgs)
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
@@ -136,6 +139,6 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
     @patch('openedx.core.djangoapps.site_configuration.helpers.get_value', Mock(return_value='TestSite3'))
     def test_excludes_multi_orgs_within(self):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
-        assert 'org' not in exclude_dictionary
-        assert 'org' in field_dictionary
-        assert ['TestSite3'] == field_dictionary['org']
+        self.assertNotIn('org', exclude_dictionary)
+        self.assertIn('org', field_dictionary)
+        self.assertEqual(['TestSite3'], field_dictionary['org'])

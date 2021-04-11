@@ -12,7 +12,7 @@ from lms.djangoapps.utils import _get_key
 
 
 @ddt.ddt
-class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UtilsTests(TestCase):
 
     @ddt.data(
         ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],
@@ -26,4 +26,4 @@ class UtilsTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docst
     )
     @ddt.unpack
     def test_get_key(self, input_key, output_key, key_cls):
-        assert _get_key(input_key, key_cls) == output_key
+        self.assertEqual(_get_key(input_key, key_cls), output_key)

@@ -1,12 +1,13 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import datetime
 import os
 import random
 import unittest
-from unittest import mock
 
+import mock
 import pytest
+import six
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -21,7 +22,7 @@ from xmodule.x_module import XModuleMixin
 @pytest.mark.mongo
 class SplitWMongoCourseBootstrapper(unittest.TestCase):
     """
-    Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.  # lint-amnesty, pylint: disable=line-too-long
+    Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.
     Override _create_course and after invoking the super() _create_course, have it call _create_item for
     each xblock you want in the course.
     This class ensures the db gets created, opened, and cleaned up in addition to creating the course
@@ -37,12 +38,12 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': f'test_xmodule_{os.getpid()}',
+        'db': 'test_xmodule_{}'.format(os.getpid()),
         'collection': 'modulestore'
     }
 
     modulestore_options = {
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin, XModuleMixin)
@@ -52,7 +53,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
 
     def setUp(self):
         self.user_id = random.getrandbits(32)
-        super().setUp()
+        super(SplitWMongoCourseBootstrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
             None,
             self.db_config,
@@ -89,7 +90,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         )
         if not draft:
             self.draft_mongo.publish(location, self.user_id)
-        if isinstance(data, str):
+        if isinstance(data, six.string_types):
             fields = {'data': data}
         else:
             fields = data.copy()
@@ -143,8 +144,8 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         if split:
             # split requires the course to be created separately from creating items
             self.split_mongo.create_course(
-                self.split_course_key.org, self.split_course_key.course, self.split_course_key.run, self.user_id, fields=fields, root_block_id='runid'  # lint-amnesty, pylint: disable=line-too-long
+                self.split_course_key.org, self.split_course_key.course, self.split_course_key.run, self.user_id, fields=fields, root_block_id='runid'
             )
-        old_course = self.draft_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', self.user_id, fields=fields)  # lint-amnesty, pylint: disable=line-too-long
+        old_course = self.draft_mongo.create_course(self.split_course_key.org, 'test_course', 'runid', self.user_id, fields=fields)
         self.old_course_key = old_course.id
         self.runtime = old_course.runtime

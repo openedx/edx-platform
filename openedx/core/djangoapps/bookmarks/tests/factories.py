@@ -13,14 +13,14 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 from ..models import Bookmark, XBlockCache
 
-COURSE_KEY = CourseLocator('edX', 'test_course', 'test')
-LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')
+COURSE_KEY = CourseLocator(u'edX', u'test_course', u'test')
+LOCATION = partial(COURSE_KEY.make_usage_key, u'problem')
 
 
 class BookmarkFactory(DjangoModelFactory):
     """ Simple factory class for generating Bookmark """
 
-    class Meta:
+    class Meta(object):
         model = Bookmark
 
     user = factory.SubFactory(UserFactory)
@@ -36,10 +36,10 @@ class BookmarkFactory(DjangoModelFactory):
 class XBlockCacheFactory(DjangoModelFactory):
     """ Simple factory class for generating XblockCache. """
 
-    class Meta:
+    class Meta(object):
         model = XBlockCache
 
     course_key = COURSE_KEY
-    usage_key = factory.Sequence('4x://edx/100/block/{}'.format)
+    usage_key = factory.Sequence(u'4x://edx/100/block/{0}'.format)
     display_name = ''
     paths = list()

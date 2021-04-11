@@ -25,7 +25,7 @@ class ContentGroupTestCase(ModuleStoreTestCase):
     and a non-cohorted user with no special access.
     """
     def setUp(self):
-        super(ContentGroupTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ContentGroupTestCase, self).setUp()
 
         self.course = CourseFactory.create(
             org='org', number='number', run='run',
@@ -144,7 +144,7 @@ class TestConditionalContent(ModuleStoreTestCase):
                             -> vertical (Group B)
                                 -> problem
         """
-        super(TestConditionalContent, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestConditionalContent, self).setUp()
 
         # Create user partitions
         self.user_partition_group_a = 0

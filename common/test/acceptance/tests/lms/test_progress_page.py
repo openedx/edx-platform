@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS that utilize the
 progress page.
@@ -6,6 +7,7 @@ progress page.
 
 from contextlib import contextmanager
 
+from six.moves import range
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
@@ -34,7 +36,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
     PROBLEM_NAME_2 = 'Test Problem 2'
 
     def setUp(self):
-        super().setUp()
+        super(ProgressPageBaseTest, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
@@ -87,7 +89,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
         Submit the given choice for the problem.
         """
         self.courseware_page.go_to_sequential_position(1)
-        self.problem_page.click_choice(f'choice_choice_{choice}')
+        self.problem_page.click_choice('choice_choice_{}'.format(choice))
         self.problem_page.click_submit()
 
     def _get_section_score(self):
@@ -95,14 +97,14 @@ class ProgressPageBaseTest(UniqueCourseTest):
         Return a list of scores from the progress page.
         """
         self.progress_page.visit()
-        return self.progress_page.section_score(self.SECTION_NAME, self.SUBSECTION_NAME)  # lint-amnesty, pylint: disable=no-member
+        return self.progress_page.section_score(self.SECTION_NAME, self.SUBSECTION_NAME)
 
     def _get_problem_scores(self):
         """
         Return a list of scores from the progress page.
         """
         self.progress_page.visit()
-        return self.progress_page.scores(self.SECTION_NAME, self.SUBSECTION_NAME)  # lint-amnesty, pylint: disable=no-member
+        return self.progress_page.scores(self.SECTION_NAME, self.SUBSECTION_NAME)
 
     @contextmanager
     def _logged_in_session(self, staff=False):
@@ -126,7 +128,7 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
     the progress page
     """
     def setUp(self):
-        super().setUp()
+        super(SubsectionGradingPolicyBase, self).setUp()
         self._set_policy_for_subsection("Homework", 0)
         self._set_policy_for_subsection("Lab", 1)
 
@@ -146,16 +148,16 @@ class SubsectionGradingPolicyBase(ProgressPageBaseTest):
         Asserts that the given problem and section scores, and text,
         appear on the progress page.
         """
-        assert self._get_problem_scores() == problem_scores
-        assert self._get_section_score() == section_score
-        assert self.progress_page.text_on_page(text)  # lint-amnesty, pylint: disable=no-member
+        self.assertEqual(self._get_problem_scores(), problem_scores)
+        self.assertEqual(self._get_section_score(), section_score)
+        self.assertTrue(self.progress_page.text_on_page(text))
 
     def _check_tick_text(self, index, sr_text, label, label_hidden=True):
         """
         Check the label and sr text for a horizontal (X-axis) tick.
         """
-        assert sr_text == self.progress_page.x_tick_sr_text(index)
-        assert [label, ('true' if label_hidden else None)] == self.progress_page.x_tick_label(index)
+        self.assertEqual(sr_text, self.progress_page.x_tick_sr_text(index))
+        self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
 
 
 class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
@@ -188,50 +190,50 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             self.progress_page.a11y_audit.check_for_accessibility_errors()
 
             # Verify that y-Axis labels are aria-hidden
-            assert ['100%', 'true'] == self.progress_page.y_tick_label(0)
-            assert ['0%', 'true'] == self.progress_page.y_tick_label(1)
-            assert ['Pass 50%', 'true'] == self.progress_page.y_tick_label(2)
+            self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
+            self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
+            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))
             # Verify x-Axis labels and sr-text
-            self._check_tick_text(0, ['Homework 1 - Test Subsection 1 - 50% (1/2)'], 'HW 01')
+            self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
 
             # Homeworks 2-10 are checked in the for loop below.
 
             self._check_tick_text(
                 10,
-                ['Homework 11 Unreleased - 0% (?/?)', 'The lowest 2 Homework scores are dropped.'],
-                'HW 11'
+                [u'Homework 11 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
+                u'HW 11'
             )
 
             self._check_tick_text(
                 11,
-                ['Homework 12 Unreleased - 0% (?/?)', 'The lowest 2 Homework scores are dropped.'],
-                'HW 12'
+                [u'Homework 12 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
+                u'HW 12'
             )
 
-            self._check_tick_text(12, ['Homework Average = 5%'], 'HW Avg')
-            self._check_tick_text(13, ['Lab 1 - Lab Subsection - 100% (1/1)'], 'Lab 01')
+            self._check_tick_text(12, [u'Homework Average = 5%'], u'HW Avg')
+            self._check_tick_text(13, [u'Lab 1 - Lab Subsection - 100% (1/1)'], u'Lab 01')
 
             # Labs 2-10 are checked in the for loop below.
 
             self._check_tick_text(
                 23,
-                ['Lab 11 Unreleased - 0% (?/?)', 'The lowest 2 Lab scores are dropped.'],
-                'Lab 11'
+                [u'Lab 11 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
+                u'Lab 11'
             )
             self._check_tick_text(
                 24,
-                ['Lab 12 Unreleased - 0% (?/?)', 'The lowest 2 Lab scores are dropped.'],
-                'Lab 12'
+                [u'Lab 12 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
+                u'Lab 12'
             )
 
-            self._check_tick_text(25, ['Lab Average = 10%'], 'Lab Avg')
-            self._check_tick_text(26, ['Midterm Exam = 0%'], 'Midterm')
-            self._check_tick_text(27, ['Final Exam = 0%'], 'Final')
+            self._check_tick_text(25, [u'Lab Average = 10%'], u'Lab Avg')
+            self._check_tick_text(26, [u'Midterm Exam = 0%'], u'Midterm')
+            self._check_tick_text(27, [u'Final Exam = 0%'], u'Final')
 
             self._check_tick_text(
                 28,
-                ['Homework = 0.75% of a possible 15.00%', 'Lab = 1.50% of a possible 15.00%'],
-                'Total',
+                [u'Homework = 0.75% of a possible 15.00%', u'Lab = 1.50% of a possible 15.00%'],
+                u'Total',
                 False  # The label "Total" should NOT be aria-hidden
             )
 
@@ -240,18 +242,18 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             for i in range(1, 10):
                 self._check_tick_text(
                     i,
-                    ['Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    'HW 0{index}'.format(index=i + 1) if i < 9 else 'HW {index}'.format(index=i + 1)
+                    [u'Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    u'HW 0{index}'.format(index=i + 1) if i < 9 else u'HW {index}'.format(index=i + 1)
                 )
                 self._check_tick_text(
                     i + 13,
-                    ['Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    'Lab 0{index}'.format(index=i + 1) if i < 9 else 'Lab {index}'.format(index=i + 1)
+                    [u'Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    u'Lab 0{index}'.format(index=i + 1) if i < 9 else u'Lab {index}'.format(index=i + 1)
                 )
 
             # Verify the overall score. The first element in the array is the sr-only text, and the
             # second is the total text (including the sr-only text).
-            assert ['Overall Score', 'Overall Score\n2%'] == self.progress_page.graph_overall_score()
+            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())
 
 
 class ProgressPageA11yTest(ProgressPageBaseTest):

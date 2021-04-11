@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=cyclic-import
+"""
 View logic for handling course welcome messages.
 """
 
@@ -13,9 +13,11 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
-from openedx.features.course_experience.course_updates import (
-    dismiss_current_update_for_user, get_current_update_for_user,
-)
+from openedx.core.djangoapps.user_api.course_tag.api import get_course_tag, set_course_tag
+
+from .course_updates import get_ordered_updates
+
+PREFERENCE_KEY = 'view-welcome-message'
 
 
 class WelcomeMessageFragmentView(EdxFragmentView):
@@ -23,7 +25,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
     A fragment that displays a course's welcome message.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the welcome message fragment for the specified course.
 
@@ -44,8 +46,11 @@ class WelcomeMessageFragmentView(EdxFragmentView):
             'welcome_message_html': welcome_message_html,
         }
 
-        html = render_to_string('course_experience/welcome-message-fragment.html', context)
-        return Fragment(html)
+        if get_course_tag(request.user, course_key, PREFERENCE_KEY) == 'False':
+            return None
+        else:
+            html = render_to_string('course_experience/welcome-message-fragment.html', context)
+            return Fragment(html)
 
     @classmethod
     def welcome_message_html(cls, request, course):
@@ -53,7 +58,12 @@ class WelcomeMessageFragmentView(EdxFragmentView):
         Returns the course's welcome message or None if it doesn't have one.
         """
         # Return the course update with the most recent publish date
-        return get_current_update_for_user(request, course)
+        ordered_updates = get_ordered_updates(request, course)
+        content = None
+        if ordered_updates:
+            content = ordered_updates[0]['content']
+
+        return content
 
 
 @ensure_csrf_cookie
@@ -62,6 +72,5 @@ def dismiss_welcome_message(request, course_id):
     Given the course_id in the request, disable displaying the welcome message for the user.
     """
     course_key = CourseKey.from_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-    dismiss_current_update_for_user(request, course)
+    set_course_tag(request.user, course_key, PREFERENCE_KEY, 'False')
     return HttpResponse()

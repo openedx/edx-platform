@@ -6,6 +6,7 @@ edx.org uses an edx footer but other instances use an Open edX footer.
 
 import unittest
 
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -47,7 +48,7 @@ class TestFooter(TestCase):
         Verify that the homepage, when accessed at edx.org, has the edX footer
         """
         resp = self.client.get('/')
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'footer-edx-v3')
 
     def test_openedx_footer(self):
@@ -56,7 +57,7 @@ class TestFooter(TestCase):
         edx.org, has the Open edX footer
         """
         resp = self.client.get('/')
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'footer-openedx')
 
     @with_comprehensive_theme("edx.org")
@@ -66,7 +67,7 @@ class TestFooter(TestCase):
     )
     def test_edx_footer_social_links(self):
         resp = self.client.get('/')
-        for name, url in self.SOCIAL_MEDIA_URLS.items():
+        for name, url in six.iteritems(self.SOCIAL_MEDIA_URLS):
             self.assertContains(resp, url)
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['title'])
             self.assertContains(resp, settings.SOCIAL_MEDIA_FOOTER_DISPLAY[name]['icon'])

@@ -4,11 +4,11 @@ Required in Django 1.9+ due to imports of models in stock Django apps.
 """
 
 
-import sys  # lint-amnesty, pylint: disable=unused-import
+import sys
 import tempfile
 
 from django.utils.translation import ugettext_lazy as _
-from path import Path  # lint-amnesty, pylint: disable=unused-import
+from path import Path
 
 ALL_LANGUAGES = []
 
@@ -60,9 +60,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django_sites_extensions',
-    'lti_consumer',
     'openedx.core.djangoapps.django_comment_common',
-    'openedx.core.djangoapps.discussions',
     'openedx.core.djangoapps.video_config',
     'openedx.core.djangoapps.video_pipeline',
     'openedx.core.djangoapps.bookmarks.apps.BookmarksConfig',

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Models for Student Identity Verification
 
@@ -19,9 +20,10 @@ from datetime import timedelta
 from email.utils import formatdate
 
 import requests
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.db import models, transaction
 from django.urls import reverse
@@ -34,11 +36,9 @@ from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 from lms.djangoapps.verify_student.ssencrypt import (
-    decode_and_decrypt,
     encrypt_and_encode,
     generate_signed_message,
     random_aes_key,
-    rsa_decrypt,
     rsa_encrypt
 )
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
@@ -51,7 +51,7 @@ log = logging.getLogger(__name__)
 
 def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
-    return str(uuid.uuid4())
+    return six.text_type(uuid.uuid4())
 
 
 class VerificationException(Exception):
@@ -81,7 +81,7 @@ def status_before_must_be(*valid_start_statuses):
         def with_status_check(obj, *args, **kwargs):
             if obj.status not in valid_start_statuses:
                 exception_msg = (
-                    "Error calling {} {}: status is '{}', must be one of: {}"
+                    u"Error calling {} {}: status is '{}', must be one of: {}"
                 ).format(func, obj, obj.status, valid_start_statuses)
                 raise VerificationException(exception_msg)
             return func(obj, *args, **kwargs)
@@ -101,7 +101,7 @@ class IDVerificationAttempt(StatusModel):
     .. pii_types: name
     .. pii_retirement: retained
     """
-    STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
+    STATUS = Choices(u'created', u'ready', u'submitted', u'must_retry', u'approved', u'denied')
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     # They can change their name later on, so we want to copy the value here so
@@ -113,7 +113,7 @@ class IDVerificationAttempt(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
-    def expiration_default():  # lint-amnesty, pylint: disable=no-method-argument
+    def expiration_default():
         return now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
 
     # Datetime that the verification will expire.
@@ -124,7 +124,7 @@ class IDVerificationAttempt(StatusModel):
         default=expiration_default
     )
 
-    class Meta:
+    class Meta(object):
         app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
@@ -173,11 +173,11 @@ class ManualVerification(IDVerificationAttempt):
         max_length=255,
         blank=True,
         help_text=(
-            'Specifies the reason for manual verification of the user.'
+            u'Specifies the reason for manual verification of the user.'
         )
     )
 
-    class Meta:
+    class Meta(object):
         app_label = 'verify_student'
 
     def __str__(self):
@@ -203,13 +203,13 @@ class SSOVerification(IDVerificationAttempt):
     .. no_pii:
     """
 
-    OAUTH2 = 'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig'
-    SAML = 'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
-    LTI = 'common.djangoapps.third_party_auth.models.LTIProviderConfig'
+    OAUTH2 = u'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig'
+    SAML = u'common.djangoapps.third_party_auth.models.SAMLProviderConfig'
+    LTI = u'common.djangoapps.third_party_auth.models.LTIProviderConfig'
     IDENTITY_PROVIDER_TYPE_CHOICES = (
-        (OAUTH2, 'OAuth2 Provider'),
-        (SAML, 'SAML Provider'),
-        (LTI, 'LTI Provider'),
+        (OAUTH2, u'OAuth2 Provider'),
+        (SAML, u'SAML Provider'),
+        (LTI, u'LTI Provider'),
     )
 
     identity_provider_type = models.CharField(
@@ -218,17 +218,17 @@ class SSOVerification(IDVerificationAttempt):
         choices=IDENTITY_PROVIDER_TYPE_CHOICES,
         default=SAML,
         help_text=(
-            'Specifies which type of Identity Provider this verification originated from.'
+            u'Specifies which type of Identity Provider this verification originated from.'
         )
     )
 
     identity_provider_slug = models.SlugField(
-        max_length=30, db_index=True, default='default',
+        max_length=30, db_index=True, default=u'default',
         help_text=(
-            'The slug uniquely identifying the Identity Provider this verification originated from.'
+            u'The slug uniquely identifying the Identity Provider this verification originated from.'
         ))
 
-    class Meta:
+    class Meta(object):
         app_label = "verify_student"
 
     def __str__(self):
@@ -245,7 +245,7 @@ class SSOVerification(IDVerificationAttempt):
         """
         Send a signal indicating that this verification was approved.
         """
-        log.info("Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}' SSO.".format(
             user_id=self.user, reviewer=approved_by
         ))
 
@@ -255,7 +255,7 @@ class SSOVerification(IDVerificationAttempt):
             user=self.user
         )
 
-        message = 'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
         log.info(message.format(user=self.user.username))
 
 
@@ -351,7 +351,7 @@ class PhotoVerification(IDVerificationAttempt):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
-    class Meta:
+    class Meta(object):
         app_label = "verify_student"
         abstract = True
         ordering = ['-created_at']
@@ -440,7 +440,7 @@ class PhotoVerification(IDVerificationAttempt):
         if self.status == self.STATUS.approved:
             return
 
-        log.info("Verification for user '{user_id}' approved by '{reviewer}'.".format(
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
             user_id=self.user, reviewer=user_id
         ))
         self.error_msg = ""  # reset, in case this attempt was denied before
@@ -458,7 +458,7 @@ class PhotoVerification(IDVerificationAttempt):
             user=self.user
         )
 
-        message = 'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
+        message = u'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("ready", "must_retry")
@@ -542,7 +542,7 @@ class PhotoVerification(IDVerificationAttempt):
             lets you amend the error message in case there were additional
             details to be made.
         """
-        log.info("Verification for user '{user_id}' denied by '{reviewer}'.".format(
+        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(
             user_id=self.user, reviewer=reviewing_user
         ))
         self.error_msg = error_msg
@@ -647,13 +647,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     # to notify for expired verification is already sent.
     expiry_email_date = models.DateTimeField(null=True, blank=True, db_index=True)
 
-    @property
-    def expiration_datetime(self):
-        """Use expiry_date for older entries if it still exists."""
-        if self.expiry_date:
-            return self.expiry_date
-        return super().expiration_datetime
-
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):
         """Get initial verification for a user with the 'photo_id_key'.
@@ -675,30 +668,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return init_verification.latest('created_at') if init_verification.exists() else None
 
-    @classmethod
-    def get_verification_from_receipt(cls, receipt_id):
-        """Get a verification for a user based on the photo receipt_id
-
-        Arguments:
-            receipt_id(String): receipt ID of the user photo or ID photo
-
-        Return:
-            SoftwareSecurePhotoVerification (object) or None
-        """
-        try:
-            verification = cls.objects.get(receipt_id=receipt_id)
-            return verification
-        except cls.DoesNotExist:
-            return None
-
-    def _save_image_to_storage(self, path, img_data):
-        """
-        Given a path and data, save to S3
-        Separated out for ease of mocking in testing
-        """
-        buff = ContentFile(img_data)
-        self._storage.save(path, buff)
-
     @status_before_must_be("created")
     def upload_face_image(self, img_data):
         """
@@ -719,12 +688,14 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
 
-        aes_key = codecs.decode(aes_key_str, "hex")
-
-        encrypted_data = encrypt_and_encode(img_data, aes_key)
+        if six.PY3:
+            aes_key = codecs.decode(aes_key_str, "hex")
+        else:
+            aes_key = aes_key_str.decode("hex")
 
         path = self._get_path("face")
-        self._save_image_to_storage(path, encrypted_data)
+        buff = ContentFile(encrypt_and_encode(img_data, aes_key))
+        self._storage.save(path, buff)
 
     @status_before_must_be("created")
     def upload_photo_id_image(self, img_data):
@@ -754,67 +725,16 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         # Save this to the storage backend
         path = self._get_path("photo_id")
-        encrypted_data = encrypt_and_encode(img_data, aes_key)
-        self._save_image_to_storage(path, encrypted_data)
+        buff = ContentFile(encrypt_and_encode(img_data, aes_key))
+        self._storage.save(path, buff)
 
         # Update our record fields
-        self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
+        if six.PY3:
+            self.photo_id_key = codecs.encode(rsa_encrypted_aes_key, 'base64').decode('utf-8')
+        else:
+            self.photo_id_key = rsa_encrypted_aes_key.encode('base64')
 
         self.save()
-
-    def _get_image_from_storage(self, path):
-        """
-        Given a path, read data from storage and return
-        Separated for ease of mocking in testing
-        """
-        with self._storage.open(path, mode='rb') as img_file:
-            byte_img_data = img_file.read()
-        return byte_img_data
-
-    @status_before_must_be("must_retry", "submitted", "approved", "denied")
-    def download_face_image(self):
-        """
-        Download the associated face image from storage
-        """
-        if not settings.VERIFY_STUDENT["SOFTWARE_SECURE"].get("RSA_PRIVATE_KEY", None):
-            return None
-        path = self._get_path("face")
-        byte_img_data = self._get_image_from_storage(path)
-
-        aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
-
-        try:
-            aes_key = codecs.decode(aes_key_str, "hex")
-
-            img_bytes = decode_and_decrypt(byte_img_data, aes_key)
-            return img_bytes
-        except Exception as e:  # pylint: disable=broad-except
-            log.exception('Failed to decrypt face image due to an exception: %s', e)
-            return None
-
-    @status_before_must_be("must_retry", "submitted", "approved", "denied")
-    def download_photo_id_image(self):
-        """
-        Download the associated id image from storage
-        """
-        if not settings.VERIFY_STUDENT["SOFTWARE_SECURE"].get("RSA_PRIVATE_KEY", None):
-            return None
-
-        path = self._get_path("photo_id")
-        byte_img_data = self._get_image_from_storage(path)
-
-        try:
-            # decode rsa encrypted aes key from base64
-            rsa_encrypted_aes_key = base64.urlsafe_b64decode(self.photo_id_key.encode('utf-8'))
-
-            # decrypt aes key using rsa private key
-            rsa_private_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PRIVATE_KEY"]
-            decrypted_aes_key = rsa_decrypt(rsa_encrypted_aes_key, rsa_private_key_str)
-            img_bytes = decode_and_decrypt(byte_img_data, decrypted_aes_key)
-            return img_bytes
-        except Exception as e:  # pylint: disable=broad-except
-            log.exception('Failed to decrypt photo id image due to an exception: %s', e)
-            return None
 
     @status_before_must_be("must_retry", "ready", "submitted")
     def submit(self, copy_id_photo_from=None):
@@ -879,7 +799,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             message_groups = json.loads(self.error_msg)
 
             for message_group in message_groups:
-                messages = messages.union(set(*message_group.values()))
+                messages = messages.union(set(*six.itervalues(message_group)))
 
             for message in messages:
                 parsed_error = error_map.get(message)
@@ -887,9 +807,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 if parsed_error:
                     parsed_errors.append(parsed_error)
                 else:
-                    log.debug('Ignoring photo verification error message: %s', message)
+                    log.debug(u'Ignoring photo verification error message: %s', message)
         except Exception:  # pylint: disable=broad-except
-            log.exception('Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
+            log.exception(u'Failed to parse error message for SoftwareSecurePhotoVerification %d', self.pk)
 
         return parsed_errors
 
@@ -1027,7 +947,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         headers, body = self.create_request()
 
         header_txt = "\n".join(
-            f"{h}: {v}" for h, v in sorted(headers.items())
+            u"{}: {}".format(h, v) for h, v in sorted(headers.items())
         )
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False)
 
@@ -1068,7 +988,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         verification = SoftwareSecurePhotoVerification.get_recent_verification(user)
 
-        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:  # lint-amnesty, pylint: disable=line-too-long
+        if verification and verification.expiration_datetime < recently_expired_date and not verification.expiry_email_date:
             expiry_email_date = today - timedelta(days=email_config['RESEND_DAYS'])
             SoftwareSecurePhotoVerification.objects.filter(pk=verification.pk).update(
                 expiry_email_date=expiry_email_date)
@@ -1091,19 +1011,19 @@ class VerificationDeadline(TimeStampedModel):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "verify_student"
 
     course_key = CourseKeyField(
         max_length=255,
         db_index=True,
         unique=True,
-        help_text=ugettext_lazy("The course for which this deadline applies"),
+        help_text=ugettext_lazy(u"The course for which this deadline applies"),
     )
 
     deadline = models.DateTimeField(
         help_text=ugettext_lazy(
-            "The datetime after which users are no longer allowed "
+            u"The datetime after which users are no longer allowed "
             "to submit photos for verification."
         )
     )
@@ -1189,7 +1109,7 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
         to retry_failed_photo_verifications management command
     """
 
-    class Meta:
+    class Meta(object):
         app_label = 'verify_student'
         verbose_name = 'sspv retry student argument'
 
@@ -1200,4 +1120,4 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
     )
 
     def __str__(self):
-        return str(self.arguments)
+        return six.text_type(self.arguments)

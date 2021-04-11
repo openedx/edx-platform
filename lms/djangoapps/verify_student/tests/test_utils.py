@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for verify_student utility functions.
 """
@@ -5,21 +6,21 @@ Tests for verify_student utility functions.
 
 import unittest
 from datetime import timedelta
-from unittest import mock
-from unittest.mock import patch
 
 import ddt
+import mock
 from django.conf import settings
 from django.utils import timezone
+from mock import patch
 from pytest import mark
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.utils import (
     most_recent_verification,
     submit_request_to_ss,
     verification_for_datetime
 )
+from common.djangoapps.student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 10,
@@ -41,12 +42,12 @@ class TestVerifyStudentUtils(unittest.TestCase):
         # No attempts in the query set, so should return None
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(now, query)
-        assert result is None
+        self.assertIs(result, None)
 
         # Should also return None if no deadline specified
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(None, query)
-        assert result is None
+        self.assertIs(result, None)
 
         # Make an attempt
         attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
@@ -55,25 +56,25 @@ class TestVerifyStudentUtils(unittest.TestCase):
         before = attempt.created_at - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before, query)
-        assert result is None
+        self.assertIs(result, None)
 
         # Immediately after the created date, should get the attempt
         after_created = attempt.created_at + timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(after_created, query)
-        assert result == attempt
+        self.assertEqual(result, attempt)
 
         # If no deadline specified, should return first available
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(None, query)
-        assert result == attempt
+        self.assertEqual(result, attempt)
 
         # Immediately before the expiration date, should get the attempt
         expiration = attempt.expiration_datetime + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         before_expiration = expiration - timedelta(seconds=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(before_expiration, query)
-        assert result == attempt
+        self.assertEqual(result, attempt)
 
         # Immediately after the expiration date, should not get the attempt
         attempt.expiration_date = now - timedelta(seconds=1)
@@ -81,7 +82,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
         after = now + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(after, query)
-        assert result is None
+        self.assertIs(result, None)
 
         # Create a second attempt in the same window
         second_attempt = SoftwareSecurePhotoVerification.objects.create(user=user)
@@ -90,7 +91,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
         deadline = second_attempt.created_at + timedelta(days=1)
         query = SoftwareSecurePhotoVerification.objects.filter(user=user)
         result = verification_for_datetime(deadline, query)
-        assert result == second_attempt
+        self.assertEqual(result, second_attempt)
 
     @ddt.data(
         (False, False, False, None, None),
@@ -140,17 +141,17 @@ class TestVerifyStudentUtils(unittest.TestCase):
         )
 
         if not expected_verification:
-            assert most_recent is None
+            self.assertEqual(most_recent, None)
         elif expected_verification == 'photo':
-            assert most_recent == photo_verification
+            self.assertEqual(most_recent, photo_verification)
         elif expected_verification == 'sso':
-            assert most_recent == sso_verification
+            self.assertEqual(most_recent, sso_verification)
         else:
-            assert most_recent == manual_verification
+            self.assertEqual(most_recent, manual_verification)
 
     @mock.patch('lms.djangoapps.verify_student.utils.log')
     @mock.patch(
-        'lms.djangoapps.verify_student.tasks.send_request_to_ss_for_user.delay', mock.Mock(side_effect=Exception('error'))  # lint-amnesty, pylint: disable=line-too-long
+        'lms.djangoapps.verify_student.tasks.send_request_to_ss_for_user.delay', mock.Mock(side_effect=Exception('error'))
     )
     def test_submit_request_to_ss(self, mock_log):
         """Tests that we log appropriate information when celery task creation fails."""
@@ -164,4 +165,4 @@ class TestVerifyStudentUtils(unittest.TestCase):
             user.username,
             'error'
         )
-        assert attempt.status, SoftwareSecurePhotoVerification.STATUS.must_retry
+        self.assertTrue(attempt.status, SoftwareSecurePhotoVerification.STATUS.must_retry)

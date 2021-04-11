@@ -23,7 +23,7 @@ EXPECTED_DEFAULT_EXPIRES_IN = 36000
 class TestOAuthDispatchAPI(TestCase):
     """ Tests for oauth_dispatch's api.py module. """
     def setUp(self):
-        super().setUp()
+        super(TestOAuthDispatchAPI, self).setUp()
         self.adapter = DOTAdapter()
         self.user = UserFactory()
         self.client = self.adapter.create_public_client(
@@ -35,19 +35,19 @@ class TestOAuthDispatchAPI(TestCase):
 
     def _assert_stored_token(self, stored_token_value, expected_token_user, expected_client):
         stored_access_token = AccessToken.objects.get(token=stored_token_value)
-        assert stored_access_token.user.id == expected_token_user.id
-        assert stored_access_token.application.client_id == expected_client.client_id
-        assert stored_access_token.application.user.id == expected_client.user.id
+        self.assertEqual(stored_access_token.user.id, expected_token_user.id)
+        self.assertEqual(stored_access_token.application.client_id, expected_client.client_id)
+        self.assertEqual(stored_access_token.application.user.id, expected_client.user.id)
 
     def test_create_token_success(self):
         token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
-        assert token['access_token']
-        assert token['refresh_token']
+        self.assertTrue(token['access_token'])
+        self.assertTrue(token['refresh_token'])
         self.assertDictContainsSubset(
             {
-                'token_type': 'Bearer',
-                'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                'scope': '',
+                u'token_type': u'Bearer',
+                u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
+                u'scope': u'',
             },
             token,
         )
@@ -63,5 +63,5 @@ class TestOAuthDispatchAPI(TestCase):
         token = api.create_dot_access_token(
             HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
         )
-        self.assertDictContainsSubset({'scope': 'profile'}, token)
-        self.assertDictContainsSubset({'expires_in': expires_in}, token)
+        self.assertDictContainsSubset({u'scope': u'profile'}, token)
+        self.assertDictContainsSubset({u'expires_in': expires_in}, token)

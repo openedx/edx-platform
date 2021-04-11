@@ -26,13 +26,10 @@ locations.
 
     guides
     docstrings/docstrings
-    celery
 
 
 Change History
 **************
-
-* December, 2020: Added documentation about new protocols for writing celery tasks.
 
 * April, 2019: API and repository-specific documentation builds resumed.
 

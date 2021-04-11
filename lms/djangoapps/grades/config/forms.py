@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 class CoursePersistentGradesAdminForm(forms.ModelForm):
     """Input form for subsection grade enabling, allowing us to verify data."""
 
-    class Meta:
+    class Meta(object):
         model = CoursePersistentGradesFlag
         fields = '__all__'
 

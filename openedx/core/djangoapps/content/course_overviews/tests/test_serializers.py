@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 CourseOverviewSerializer tests
 """
@@ -15,7 +16,7 @@ class TestCourseOverviewSerializer(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestCourseOverviewSerializer, self).setUp()
         CourseOverviewFactory.create()
 
     def test_get_course_overview_serializer(self):

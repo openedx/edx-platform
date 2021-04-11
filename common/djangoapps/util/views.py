@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import json
 import logging
 import sys
@@ -14,6 +13,7 @@ from django.views.defaults import server_error
 from django.shortcuts import redirect
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from six.moves import map
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
@@ -38,7 +38,7 @@ def ensure_valid_course_key(view_func):
             try:
                 CourseKey.from_string(course_key)
             except InvalidKeyError:
-                raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+                raise Http404
 
         response = view_func(request, *args, **kwargs)
         return response
@@ -58,7 +58,7 @@ def ensure_valid_usage_key(view_func):
             try:
                 UsageKey.from_string(usage_key)
             except InvalidKeyError:
-                raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+                raise Http404
 
         response = view_func(request, *args, **kwargs)
         return response
@@ -74,7 +74,7 @@ def require_global_staff(func):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden(
-                "Must be {platform_name} staff to perform this action.".format(
+                u"Must be {platform_name} staff to perform this action.".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             )
@@ -138,7 +138,7 @@ def handle_500(template_path, context=None, test_func=None):
             try:
                 return func(request, *args, **kwargs)
             except Exception:  # pylint: disable=broad-except
-                if settings.DEBUG:  # lint-amnesty, pylint: disable=no-else-raise
+                if settings.DEBUG:
                     # In debug mode let django process the 500 errors and display debug info for the developer
                     raise
                 elif test_func is None or test_func(request):
@@ -159,12 +159,12 @@ def calculate(request):
     equation = request.GET['equation']
     try:
         result = calc.evaluator({}, {}, equation)
-    except:  # lint-amnesty, pylint: disable=bare-except
+    except:
         event = {'error': list(map(str, sys.exc_info())),
                  'equation': equation}
         track_views.server_track(request, 'error:calc', event, page='calc')
-        return HttpResponse(json.dumps({'result': 'Invalid syntax'}))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
-    return HttpResponse(json.dumps({'result': str(result)}))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
+        return HttpResponse(json.dumps({'result': 'Invalid syntax'}))
+    return HttpResponse(json.dumps({'result': str(result)}))
 
 
 def info(request):
@@ -196,9 +196,6 @@ def reset_course_deadlines(request):
     """
     Set the start_date of a schedule to today, which in turn will adjust due dates for
     sequentials belonging to a self paced course
-
-    IMPORTANT NOTE: If updates are happening to the logic here, ALSO UPDATE the `reset_course_deadlines`
-    function in openedx/features/course_experience/api/v1/views.py as well.
     """
     course_key = CourseKey.from_string(request.POST.get('course_id'))
     _course_masquerade, user = setup_masquerade(
@@ -213,13 +210,3 @@ def reset_course_deadlines(request):
 
     referrer = request.META.get('HTTP_REFERER')
     return redirect(referrer) if referrer else HttpResponse()
-
-
-def expose_header(header, response):
-    """
-    Add a header name to Access-Control-Expose-Headers to allow client code to access that header's value
-    """
-    exposedHeaders = response.get('Access-Control-Expose-Headers', '')
-    exposedHeaders += f', {header}' if exposedHeaders else header
-    response['Access-Control-Expose-Headers'] = exposedHeaders
-    return response

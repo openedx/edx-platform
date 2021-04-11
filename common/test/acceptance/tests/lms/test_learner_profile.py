@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for Student's Profile Page.
 """
@@ -16,15 +17,15 @@ class LearnerProfileTestMixin(EventsTestMixin):
     Mixin with helper methods for testing learner profile pages.
     """
 
-    PRIVACY_PUBLIC = 'all_users'
-    PRIVACY_PRIVATE = 'private'
+    PRIVACY_PUBLIC = u'all_users'
+    PRIVACY_PRIVATE = u'private'
 
     PUBLIC_PROFILE_FIELDS = ['username', 'country', 'language_proficiencies', 'bio']
     PRIVATE_PROFILE_FIELDS = ['username']
 
     PUBLIC_PROFILE_EDITABLE_FIELDS = ['country', 'language_proficiencies', 'bio']
 
-    USER_SETTINGS_CHANGED_EVENT_NAME = "edx.user.settings.changed"
+    USER_SETTINGS_CHANGED_EVENT_NAME = u"edx.user.settings.changed"
 
     def log_in_as_unique_user(self):
         """
@@ -65,9 +66,9 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
             # Verify the current setting is as expected
             if privacy == self.PRIVACY_PUBLIC:
-                assert profile_page.privacy == 'all_users'
+                self.assertEqual(profile_page.privacy, 'all_users')
             else:
-                assert profile_page.privacy == 'private'
+                self.assertEqual(profile_page.privacy, 'private')
 
             if privacy == self.PRIVACY_PUBLIC:
                 self.set_public_profile_fields_data(profile_page)

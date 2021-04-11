@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -6,13 +5,13 @@ from email.mime.text import MIMEText
 from django.conf import settings
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
-import os  # lint-amnesty, pylint: disable=wrong-import-order
+import os
 import boto3
 
 logger = logging.getLogger(__name__)
 
 
-def calendar_sync_initial_email_content(course_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+def calendar_sync_initial_email_content(course_name):
     subject = _('Sync {course} to your calendar').format(course=course_name)
     body_paragraph_1 = _('Sticking to a schedule is the best way to ensure that you successfully complete your '
                          'self-paced course. This schedule for {course} will help you stay on track!'
@@ -29,7 +28,7 @@ def calendar_sync_initial_email_content(course_name):  # lint-amnesty, pylint: d
     return subject, body
 
 
-def calendar_sync_update_email_content(course_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+def calendar_sync_update_email_content(course_name):
     subject = _('{course} dates have been updated on your calendar').format(course=course_name)
     body_paragraph = _('You have successfully shifted your course schedule and your calendar is up to date.'
                        ).format(course=course_name)
@@ -58,7 +57,7 @@ def prepare_attachments(attachment_data, file_ext=''):
     return attachments
 
 
-def send_email_with_attachment(to_emails, attachment_data, course_name, is_initial):  # lint-amnesty, pylint: disable=missing-function-docstring
+def send_email_with_attachment(to_emails, attachment_data, course_name, is_initial):
     # connect to SES
     client = boto3.client('ses', region_name=settings.AWS_SES_REGION_NAME)
 

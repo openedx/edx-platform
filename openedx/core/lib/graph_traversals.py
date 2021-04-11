@@ -116,7 +116,7 @@ from collections import deque
 def traverse_topologically(
         start_node,
         get_parents,
-        get_children,  # lint-amnesty, pylint: disable=redefined-outer-name
+        get_children,
         filter_func=None,
         yield_descendants_of_unyielded=False,
 ):
@@ -161,7 +161,7 @@ def traverse_topologically(
     )
 
 
-def traverse_pre_order(start_node, get_children, filter_func=None):  # lint-amnesty, pylint: disable=redefined-outer-name
+def traverse_pre_order(start_node, get_children, filter_func=None):
     """
     Generator for yielding nodes of a tree (or directed acyclic graph)
     in a pre-order sort.
@@ -178,7 +178,7 @@ def traverse_pre_order(start_node, get_children, filter_func=None):  # lint-amne
     )
 
 
-def traverse_post_order(start_node, get_children, filter_func=None):  # lint-amnesty, pylint: disable=redefined-outer-name
+def traverse_post_order(start_node, get_children, filter_func=None):
     """
     Generator for yielding nodes of a tree (or directed acyclic graph)
     in a post-order sort.
@@ -192,7 +192,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):  # lint-amn
         An active iterator is needed in order to determine when all
         children are visited and so the node itself should be visited.
         """
-        def __init__(self, node, get_children):  # lint-amnesty, pylint: disable=redefined-outer-name
+        def __init__(self, node, get_children):
             self.node = node
             self.children = iter(get_children(node))
 
@@ -237,7 +237,7 @@ def traverse_post_order(start_node, get_children, filter_func=None):  # lint-amn
 def _traverse_generic(
         start_node,
         get_parents,
-        get_children,  # lint-amnesty, pylint: disable=redefined-outer-name
+        get_children,
         filter_func=None,
         yield_descendants_of_unyielded=False,
 ):
@@ -333,23 +333,3 @@ def _traverse_generic(
             # Keep track of whether or not the node was yielded so we
             # know whether or not to yield its children.
             yield_results[current_node] = should_yield_node
-
-
-def leaf_filter(block):
-    """
-    Filter for traversals to find leaf blocks
-    """
-    return (
-        block.location.block_type not in ('chapter', 'sequential', 'vertical') and
-        len(block.get_children()) == 0
-    )
-
-
-def get_children(parent):
-    """
-    Function for traversals to get the children of a block
-    """
-    if parent.has_children:
-        return parent.get_children()
-    else:
-        return []

@@ -18,7 +18,7 @@ class LmsUtilsTest(ModuleStoreTestCase):
         """
         Setup a dummy course content.
         """
-        super().setUp()
+        super(LmsUtilsTest, self).setUp()
 
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
             self.course = CourseFactory.create()
@@ -50,21 +50,21 @@ class LmsUtilsTest(ModuleStoreTestCase):
         Tests `get_parent_unit` method for the successful result.
         """
         parent = utils.get_parent_unit(self.html_module_1)
-        assert parent.location == self.vertical.location
+        self.assertEqual(parent.location, self.vertical.location)
 
         parent = utils.get_parent_unit(self.child_html_module)
-        assert parent.location == self.vertical_with_container.location
+        self.assertEqual(parent.location, self.vertical_with_container.location)
 
-        assert utils.get_parent_unit(None) is None
-        assert utils.get_parent_unit(self.vertical) is None
-        assert utils.get_parent_unit(self.course) is None
-        assert utils.get_parent_unit(self.chapter) is None
-        assert utils.get_parent_unit(self.sequential) is None
+        self.assertIsNone(utils.get_parent_unit(None))
+        self.assertIsNone(utils.get_parent_unit(self.vertical))
+        self.assertIsNone(utils.get_parent_unit(self.course))
+        self.assertIsNone(utils.get_parent_unit(self.chapter))
+        self.assertIsNone(utils.get_parent_unit(self.sequential))
 
     def test_is_unit(self):
         """
         Tests `is_unit` method for the successful result.
         """
-        assert not utils.is_unit(self.html_module_1)
-        assert not utils.is_unit(self.child_vertical)
-        assert utils.is_unit(self.vertical)
+        self.assertFalse(utils.is_unit(self.html_module_1))
+        self.assertFalse(utils.is_unit(self.child_vertical))
+        self.assertTrue(utils.is_unit(self.vertical))

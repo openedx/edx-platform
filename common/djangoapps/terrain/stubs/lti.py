@@ -15,9 +15,9 @@ import hashlib
 import logging
 import os
 import textwrap
-from unittest import mock
 from uuid import uuid4
 
+import mock
 import oauthlib.oauth1
 import requests
 import six
@@ -245,15 +245,15 @@ class StubLtiHandler(StubHttpRequestHandler):
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         return lti_endpoint in self.path
 
-    def _oauth_sign(self, url, body, content_type='application/x-www-form-urlencoded', method='POST'):
+    def _oauth_sign(self, url, body, content_type=u'application/x-www-form-urlencoded', method=u'POST'):
         """
         Signs request and returns signed Authorization header.
         """
         client_key = self.server.config.get('client_key', self.DEFAULT_CLIENT_KEY)
         client_secret = self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET)
         client = oauthlib.oauth1.Client(
-            client_key=str(client_key),
-            client_secret=str(client_secret)
+            client_key=six.text_type(client_key),
+            client_secret=six.text_type(client_secret)
         )
         headers = {
             # This is needed for body encoding:
@@ -265,17 +265,17 @@ class StubLtiHandler(StubHttpRequestHandler):
         sha1.update(body.encode('utf-8'))
         oauth_body_hash = base64.b64encode(sha1.digest()).decode('utf-8')
         mock_request = mock.Mock(
-            uri=str(six.moves.urllib.parse.unquote(url)),
+            uri=six.text_type(six.moves.urllib.parse.unquote(url)),
             headers=headers,
-            body="",
-            decoded_body="",
-            http_method=str(method),
+            body=u"",
+            decoded_body=u"",
+            http_method=six.text_type(method),
         )
         params = client.get_oauth_params(mock_request)
         mock_request.oauth_params = params
-        mock_request.oauth_params.append(('oauth_body_hash', oauth_body_hash))
+        mock_request.oauth_params.append((u'oauth_body_hash', oauth_body_hash))
         sig = client.get_oauth_signature(mock_request)
-        mock_request.oauth_params.append(('oauth_signature', sig))
+        mock_request.oauth_params.append((u'oauth_signature', sig))
         new_headers = parameters.prepare_headers(mock_request.oauth_params, headers, realm=None)
         return new_headers['Authorization']
 
@@ -295,17 +295,17 @@ class StubLtiHandler(StubHttpRequestHandler):
         Returns `True` if signatures are correct, otherwise `False`.
 
         """
-        client_secret = str(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
+        client_secret = six.text_type(self.server.config.get('client_secret', self.DEFAULT_CLIENT_SECRET))
         host = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
         port = self.server.server_address[1]
         lti_base = self.DEFAULT_LTI_ADDRESS.format(host=host, port=port)
         lti_endpoint = self.server.config.get('lti_endpoint', self.DEFAULT_LTI_ENDPOINT)
         url = lti_base + lti_endpoint
         request = mock.Mock()
-        request.params = [(str(k), str(v)) for k, v in params.items()]
-        request.uri = str(url)
-        request.http_method = 'POST'
-        request.signature = str(client_signature)
+        request.params = [(six.text_type(k), six.text_type(v)) for k, v in params.items()]
+        request.uri = six.text_type(url)
+        request.http_method = u'POST'
+        request.signature = six.text_type(client_signature)
         return signature.verify_hmac_sha1(request, client_secret)
 
 

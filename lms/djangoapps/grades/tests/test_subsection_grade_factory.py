@@ -3,14 +3,13 @@ Tests for the SubsectionGradeFactory class.
 """
 
 
-from unittest.mock import patch
-
 import ddt
 from django.conf import settings
+from mock import patch
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..constants import GradeOverrideFeatureEnum
 from ..models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
@@ -33,30 +32,31 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         """
         Asserts that the given grade object has the expected score.
         """
-        assert (grade.all_total.earned, grade.all_total.possible) == (expected_earned, expected_possible)
-        assert (grade.graded_total.earned, grade.graded_total.possible) == (expected_earned, expected_possible)
+        self.assertEqual(
+            (grade.all_total.earned, grade.all_total.possible),
+            (expected_earned, expected_possible),
+        )
+        self.assertEqual(
+            (grade.graded_total.earned, grade.graded_total.possible),
+            (expected_earned, expected_possible),
+        )
 
     def test_create_zero(self):
         """
         Test that a zero grade is returned.
         """
         grade = self.subsection_grade_factory.create(self.sequence)
-        assert isinstance(grade, ZeroSubsectionGrade)
+        self.assertIsInstance(grade, ZeroSubsectionGrade)
         self.assert_grade(grade, 0.0, 1.0)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL': True})
     def test_update(self):
         """
         Assuming the underlying score reporting methods work,
         test that the score is calculated properly.
         """
         with mock_get_score(1, 2):
-            with patch(
-                'openedx.core.djangoapps.signals.signals.COURSE_ASSESSMENT_GRADE_CHANGED.send'
-            ) as mock_update_grades_signal:
-                grade = self.subsection_grade_factory.update(self.sequence)
+            grade = self.subsection_grade_factory.update(self.sequence)
         self.assert_grade(grade, 1, 2)
-        assert mock_update_grades_signal.called
 
     def test_write_only_if_engaged(self):
         """
@@ -67,12 +67,12 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         with mock_get_score(0, 0, None):
             self.subsection_grade_factory.update(self.sequence)
         # ensure no grades have been persisted
-        assert 0 == len(PersistentSubsectionGrade.objects.all())
+        self.assertEqual(0, len(PersistentSubsectionGrade.objects.all()))
 
         with mock_get_score(0, 0, None):
             self.subsection_grade_factory.update(self.sequence, score_deleted=True)
         # ensure a grade has been persisted
-        assert 1 == len(PersistentSubsectionGrade.objects.all())
+        self.assertEqual(1, len(PersistentSubsectionGrade.objects.all()))
 
     def test_update_if_higher_zero_denominator(self):
         """
@@ -126,7 +126,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 enabled_for_course=course_setting
             ):
                 self.subsection_grade_factory.create(self.sequence)
-        assert mock_read_saved_grade.called == (feature_flag and course_setting)
+        self.assertEqual(mock_read_saved_grade.called, feature_flag and course_setting)
 
     @ddt.data(
         (0, None),
@@ -148,8 +148,8 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
 
         # there should only be one persistent grade
         persistent_grade = PersistentSubsectionGrade.objects.first()
-        assert 2 == persistent_grade.earned_graded
-        assert 3 == persistent_grade.possible_graded
+        self.assertEqual(2, persistent_grade.earned_graded)
+        self.assertEqual(3, persistent_grade.possible_graded)
 
         # Now create the override
         PersistentSubsectionGradeOverride.update_or_create_override(

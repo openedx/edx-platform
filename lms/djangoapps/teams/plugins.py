@@ -24,10 +24,10 @@ class TeamsTab(EnrolledTab):
         """Returns true if the teams feature is enabled in the course.
 
         Args:
-            course (CourseBlock): the course using the feature
+            course (CourseDescriptor): the course using the feature
             user (User): the user interacting with the course
         """
-        if not super().is_enabled(course, user=user):
+        if not super(TeamsTab, cls).is_enabled(course, user=user):
             return False
 
         return is_feature_enabled(course)

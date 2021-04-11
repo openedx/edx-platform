@@ -37,7 +37,7 @@ class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):
         add_course_mode(cls.masters_course, mode_slug='masters', mode_display_name='Masters')
 
     def setUp(self):
-        super(MasqueradeTestBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(MasqueradeTestBase, self).setUp()
         self.course_staff = UserFactory.create()
         CourseStaffRole(self.verified_course.id).add_users(self.course_staff)
         CourseStaffRole(self.masters_course.id).add_users(self.course_staff)

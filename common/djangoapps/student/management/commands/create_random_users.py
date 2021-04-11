@@ -13,14 +13,14 @@ def random_user_data_generator(num_users):
     for _ in range(num_users):
         identification = uuid.uuid4().hex[:8]
         yield {
-            'username': f'user_{identification}',
-            'email': f'email_{identification}@example.com',
+            'username': 'user_{id}'.format(id=identification),
+            'email': 'email_{id}@example.com'.format(id=identification),
             'password': '12345',
-            'name': f'User {identification}',
+            'name': 'User {id}'.format(id=identification),
         }
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = """Create N new users, with random parameters.
 
 Usage: create_random_users.py N [course_id_to_enroll_in].

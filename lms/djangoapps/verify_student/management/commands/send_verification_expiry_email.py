@@ -7,19 +7,22 @@ import logging
 import time
 from datetime import timedelta
 
-from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user, wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
-from django.contrib.sites.models import Site  # lint-amnesty, pylint: disable=wrong-import-order
-from django.core.management.base import BaseCommand, CommandError  # lint-amnesty, pylint: disable=wrong-import-order
-from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-order
-from django.utils.timezone import now  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_ace import ace  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_ace.recipient import Recipient  # lint-amnesty, pylint: disable=wrong-import-order
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
+from django.urls import reverse
+from django.utils.timezone import now
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.query import use_read_replica_if_available
+
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
@@ -88,8 +91,8 @@ class Command(BaseCommand):
         dry_run = options['dry_run']
 
         if default_emails <= 0:
-            raise CommandError('DEFAULT_EMAILS must be a positive integer. If you do not wish to send emails '
-                               'use --dry-run flag instead.')
+            raise CommandError(u'DEFAULT_EMAILS must be a positive integer. If you do not wish to send emails '
+                               u'use --dry-run flag instead.')
 
         end_date = now().replace(hour=0, minute=0, second=0, microsecond=0)
         # If email was sent and user did not re-verify then this date will be used as the criteria for resending email
@@ -118,11 +121,11 @@ class Command(BaseCommand):
 
         total_verification = sspv.count()
         if not total_verification:
-            logger.info("No approved expired entries found in SoftwareSecurePhotoVerification for the "
-                        "date range {} - {}".format(start_date.date(), now().date()))
+            logger.info(u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
+                        u"date range {} - {}".format(start_date.date(), now().date()))
             return
 
-        logger.info("For the date range {} - {}, total Software Secure Photo verification filtered are {}"
+        logger.info(u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
                     .format(start_date.date(), now().date(), total_verification))
 
         batch_verifications = []
@@ -188,8 +191,8 @@ class Command(BaseCommand):
         """
         if email_config['dry_run']:
             logger.info(
-                "This was a dry run, no email was sent. For the actual run email would have been sent "
-                "to {} learner(s)".format(len(batch_verifications))
+                u"This was a dry run, no email was sent. For the actual run email would have been sent "
+                u"to {} learner(s)".format(len(batch_verifications))
             )
             return True
 
@@ -197,7 +200,7 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification',
+            'lms_verification_link': '{}/id-verification'.format(settings.ACCOUNT_MICROFRONTEND_URL),
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 
@@ -210,7 +213,7 @@ class Command(BaseCommand):
                 user = users.get(pk=verification.user_id)
                 with emulate_http_request(site=site, user=user):
                     msg = expiry_email.personalize(
-                        recipient=Recipient(user.id, user.email),
+                        recipient=Recipient(user.username, user.email),
                         language=get_user_preference(user, LANGUAGE_KEY),
                         user_context={
                             'full_name': user.profile.name,

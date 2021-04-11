@@ -3,57 +3,29 @@ Top level API tests. Tests API public contracts only. Do not import/create/mock
 models for this app.
 """
 from datetime import datetime, timezone
-from unittest import TestCase
-from unittest.mock import patch
 
-import pytest
 import attr
-from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
-from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from django.contrib.auth.models import AnonymousUser, User
 from edx_when.api import set_dates_for_course
-from mock import patch
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
+
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
 
-from ...data import (
-    ContentErrorData,
-    CourseLearningSequenceData,
-    CourseOutlineData,
-    CourseSectionData,
-    CourseVisibility,
-    ExamData,
-    VisibilityData,
-
-)
+from ...data import CourseLearningSequenceData, CourseOutlineData, CourseSectionData, CourseVisibility, VisibilityData
 from ..outlines import (
-    get_content_errors,
     get_course_outline,
     get_user_course_outline,
     get_user_course_outline_details,
-    key_supports_outlines,
-    replace_course_outline,
+    replace_course_outline
 )
 from .test_data import generate_sections
-
-
-class OutlineSupportTestCase(TestCase):
-    """
-    Make sure we know what kinds of course-like keys we support for outlines.
-    """
-    def test_supported_types(self):
-        assert key_supports_outlines(CourseKey.from_string("course-v1:edX+100+2021"))
-        assert key_supports_outlines(CourseKey.from_string("ccx-v1:edX+100+2021+ccx@1"))
-
-    def test_unsupported_types(self):
-        assert not key_supports_outlines(CourseKey.from_string("edX/100/2021"))
-        assert not key_supports_outlines(LibraryLocator(org="edX", library="100"))
 
 
 class CourseOutlineTestCase(CacheIsolationTestCase):
@@ -61,9 +33,9 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
     Simple tests around reading and writing CourseOutlineData. No user info.
     """
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Learn+Roundtrip")
-        normal_visibility = VisibilityData(  # lint-amnesty, pylint: disable=unused-variable
+        normal_visibility = VisibilityData(
             hide_from_toc=False,
             visible_to_staff_only=False
         )
@@ -72,7 +44,6 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
             title="Roundtrip Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2015",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 2]),
             self_paced=False,
@@ -82,13 +53,13 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
     def test_deprecated_course_key(self):
         """Don't allow Old Mongo Courses at all."""
         old_course_key = CourseKey.from_string("Org/Course/Run")
-        with pytest.raises(ValueError):
-            outline = get_course_outline(old_course_key)  # lint-amnesty, pylint: disable=unused-variable
+        with self.assertRaises(ValueError):
+            outline = get_course_outline(old_course_key)
 
     def test_simple_roundtrip(self):
         """Happy path for writing/reading-back a course outline."""
-        with pytest.raises(CourseOutlineData.DoesNotExist):
-            course_outline = get_course_outline(self.course_key)  # lint-amnesty, pylint: disable=unused-variable
+        with self.assertRaises(CourseOutlineData.DoesNotExist):
+            course_outline = get_course_outline(self.course_key)
 
         replace_course_outline(self.course_outline)
         outline = get_course_outline(self.course_key)
@@ -97,8 +68,8 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
     def test_empty_course(self):
         """Empty Courses are a common case (when authoring just starts)."""
         empty_outline = attr.evolve(self.course_outline, sections=[])
-        assert not empty_outline.sections
-        assert not empty_outline.sequences
+        self.assertFalse(empty_outline.sections)
+        self.assertFalse(empty_outline.sequences)
         replace_course_outline(empty_outline)
         assert empty_outline == get_course_outline(self.course_key)
 
@@ -138,8 +109,8 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
         # Make sure this new outline is returned instead of the previously
         # cached one.
         with self.assertNumQueries(3):
-            uncached_new_version_outline = get_course_outline(self.course_key)  # lint-amnesty, pylint: disable=unused-variable
-            assert new_version_outline == new_version_outline  # lint-amnesty, pylint: disable=comparison-with-itself
+            uncached_new_version_outline = get_course_outline(self.course_key)
+            assert new_version_outline == new_version_outline
 
 
 class UserCourseOutlineTestCase(CacheIsolationTestCase):
@@ -148,7 +119,7 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
         # Users...
         cls.global_staff = User.objects.create_user(
@@ -167,7 +138,6 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 1, 3]),
             self_paced=False,
@@ -176,9 +146,9 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         replace_course_outline(cls.simple_outline)
 
         # Enroll student in the course
-        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        CourseEnrollment.enroll(user=cls.student, course_key=cls.course_key, mode="audit")
         # Enroll beta tester in the course
-        cls.beta_tester.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
+        CourseEnrollment.enroll(user=cls.beta_tester, course_key=cls.course_key, mode="audit")
 
     def test_simple_outline(self):
         """This outline is the same for everyone."""
@@ -212,295 +182,7 @@ class UserCourseOutlineTestCase(CacheIsolationTestCase):
         assert global_staff_outline_details.outline == global_staff_outline
 
 
-class OutlineProcessorTestCase(CacheIsolationTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-    @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
-        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
-
-        # Users...
-        cls.global_staff = User.objects.create_user(
-            'global_staff', email='gstaff@example.com', is_staff=True
-        )
-        cls.student = User.objects.create_user(
-            'student', email='student@example.com', is_staff=False
-        )
-        cls.beta_tester = BetaTesterFactory(course_key=cls.course_key)
-        cls.anonymous_user = AnonymousUser()
-
-        cls.all_seq_keys = []
-
-    def get_details(self, at_time):
-        staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
-        student_details = get_user_course_outline_details(self.course_key, self.student, at_time)
-        beta_tester_details = get_user_course_outline_details(self.course_key, self.beta_tester, at_time)
-        return staff_details, student_details, beta_tester_details
-
-    @classmethod
-    def set_sequence_keys(cls, keys):
-        cls.all_seq_keys = keys
-
-    def get_sequence_keys(self, exclude=None):  # lint-amnesty, pylint: disable=missing-function-docstring
-        if exclude is None:
-            exclude = []
-        if not isinstance(exclude, list):
-            raise TypeError("`exclude` must be a list of keys to be excluded")
-        return [key for key in self.all_seq_keys if key not in exclude]
-
-
-class ContentGatingTestCase(OutlineProcessorTestCase):
-    """
-    Content Gating specific outline tests
-    """
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        # The UsageKeys we're going to set up for content gating tests.
-        cls.entrance_exam_section_key = cls.course_key.make_usage_key('chapter', 'entrance_exam')
-        cls.entrance_exam_seq_key = cls.course_key.make_usage_key('sequential', 'entrance_exam')
-        cls.open_section_key = cls.course_key.make_usage_key('chapter', 'open')
-        cls.open_seq_key = cls.course_key.make_usage_key('sequential', 'open')
-        cls.gated_section_key = cls.course_key.make_usage_key('chapter', 'gated')
-        cls.gated_seq_key = cls.course_key.make_usage_key('sequential', 'gated')
-
-        cls.set_sequence_keys([
-            cls.entrance_exam_seq_key,
-            cls.open_seq_key,
-            cls.gated_seq_key,
-        ])
-
-        set_dates_for_course(
-            cls.course_key,
-            [
-                (
-                    cls.course_key.make_usage_key('course', 'course'),
-                    {'start': datetime(2020, 5, 10, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.entrance_exam_section_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.entrance_exam_seq_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.open_section_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.open_seq_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.gated_section_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.gated_seq_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-            ]
-        )
-
-        visibility = VisibilityData(
-            hide_from_toc=False,
-            visible_to_staff_only=False
-        )
-        cls.outline = CourseOutlineData(
-            course_key=cls.course_key,
-            title="User Outline Test Course!",
-            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
-            published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=str(cls.entrance_exam_section_key),
-            days_early_for_beta=None,
-            self_paced=False,
-            course_visibility=CourseVisibility.PRIVATE,
-            sections=[
-                CourseSectionData(
-                    usage_key=cls.entrance_exam_section_key,
-                    title="Entrance Exam",
-                    visibility=visibility,
-                    sequences=[
-                        CourseLearningSequenceData(
-                            usage_key=cls.entrance_exam_seq_key,
-                            title='Entrance Exam',
-                            visibility=visibility
-                        ),
-                    ]
-                ),
-                CourseSectionData(
-                    usage_key=cls.open_section_key,
-                    title="Open Section",
-                    visibility=visibility,
-                    sequences=[
-                        CourseLearningSequenceData(
-                            usage_key=cls.open_seq_key,
-                            title='Open Sequence',
-                            visibility=visibility
-                        ),
-                    ]
-                ),
-                CourseSectionData(
-                    usage_key=cls.gated_section_key,
-                    title="Gated Section",
-                    visibility=visibility,
-                    sequences=[
-                        CourseLearningSequenceData(
-                            usage_key=cls.gated_seq_key,
-                            title='Gated Sequence',
-                            visibility=visibility
-                        ),
-                    ]
-                ),
-            ]
-        )
-        replace_course_outline(cls.outline)
-
-        # Enroll student in the course
-        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="verified")
-
-    """
-    Currently returns all, and only, sequences in required content, not just the first.
-    This logic matches the existing transformer. Is this right?
-    """  # lint-amnesty, pylint: disable=pointless-string-statement
-
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.EntranceExamConfiguration.user_can_skip_entrance_exam')  # lint-amnesty, pylint: disable=line-too-long
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.milestones_helpers.get_required_content')  # lint-amnesty, pylint: disable=line-too-long
-    def test_user_can_skip_entrance_exam(self, required_content_mock, user_can_skip_entrance_exam_mock):
-        required_content_mock.return_value = [str(self.entrance_exam_section_key)]
-        user_can_skip_entrance_exam_mock.return_value = True
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 3
-
-        # Student can access all sequences
-        assert len(student_details.outline.accessible_sequences) == 3
-
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.EntranceExamConfiguration.user_can_skip_entrance_exam')  # lint-amnesty, pylint: disable=line-too-long
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.milestones_helpers.get_required_content')  # lint-amnesty, pylint: disable=line-too-long
-    def test_user_can_not_skip_entrance_exam(self, required_content_mock, user_can_skip_entrance_exam_mock):
-        required_content_mock.return_value = [str(self.entrance_exam_section_key)]
-        user_can_skip_entrance_exam_mock.return_value = False
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-        # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 3
-
-        # Student can access only the entrance exam sequence
-        assert len(student_details.outline.accessible_sequences) == 1
-        assert self.entrance_exam_seq_key in student_details.outline.accessible_sequences
-        for key in self.get_sequence_keys(exclude=[self.entrance_exam_seq_key]):
-            assert key not in student_details.outline.accessible_sequences
-
-
-class MilestonesTestCase(OutlineProcessorTestCase):
-    """
-    Milestones specific outline tests
-    """
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        # The UsageKeys we're going to set up for milestone tests.
-        cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
-        cls.open_seq_key = cls.course_key.make_usage_key('sequential', 'open')
-        cls.milestone_required_seq_key = cls.course_key.make_usage_key('sequential', 'milestone_required')
-
-        cls.set_sequence_keys([
-            cls.open_seq_key,
-            cls.milestone_required_seq_key,
-        ])
-
-        set_dates_for_course(
-            cls.course_key,
-            [
-                (
-                    cls.course_key.make_usage_key('course', 'course'),
-                    {'start': datetime(2020, 5, 10, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.section_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.open_seq_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.milestone_required_seq_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-            ]
-        )
-
-        visibility = VisibilityData(
-            hide_from_toc=False,
-            visible_to_staff_only=False
-        )
-        cls.outline = CourseOutlineData(
-            course_key=cls.course_key,
-            title="User Outline Test Course!",
-            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
-            published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
-            days_early_for_beta=None,
-            self_paced=False,
-            course_visibility=CourseVisibility.PRIVATE,
-            sections=[
-                CourseSectionData(
-                    usage_key=cls.section_key,
-                    title="Chapter 1",
-                    visibility=visibility,
-                    sequences=[
-                        CourseLearningSequenceData(
-                            usage_key=cls.open_seq_key,
-                            title='Open Sequence',
-                            visibility=visibility
-                        ),
-                        CourseLearningSequenceData(
-                            usage_key=cls.milestone_required_seq_key,
-                            title='Milestone Required Sequence',
-                            visibility=visibility
-                        ),
-                    ]
-                ),
-            ]
-        )
-        replace_course_outline(cls.outline)
-
-        # Enroll student in the course
-        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
-
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.milestones.milestones_helpers.get_course_content_milestones')  # lint-amnesty, pylint: disable=line-too-long
-    def test_user_can_skip_entrance_exam(self, get_course_content_milestones_mock):
-        # Only return that there are milestones required for the
-        # milestones_required_seq_key usage key
-        def get_milestones_side_effect(_course_key, usage_key, _milestone_type, _user_id):
-            return usage_key == str(self.milestone_required_seq_key)
-
-        get_course_content_milestones_mock.side_effect = get_milestones_side_effect
-
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 2
-
-        # Student can access only the open sequence, but not milestone required sequence
-        assert len(student_details.outline.accessible_sequences) == 1
-        assert self.open_seq_key in student_details.outline.accessible_sequences
-        assert self.milestone_required_seq_key not in student_details.outline.accessible_sequences
-
-
-class ScheduleTestCase(OutlineProcessorTestCase):
+class ScheduleTestCase(CacheIsolationTestCase):
     """
     Schedule-specific Outline tests.
 
@@ -512,7 +194,18 @@ class ScheduleTestCase(OutlineProcessorTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
+        # Users...
+        cls.global_staff = User.objects.create_user(
+            'global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = User.objects.create_user(
+            'student', email='student@example.com', is_staff=False
+        )
+        cls.beta_tester = BetaTesterFactory(course_key=course_key)
+        cls.anonymous_user = AnonymousUser()
+
+        cls.course_key = course_key
 
         # The UsageKeys we're going to set up for date tests.
         cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
@@ -522,13 +215,13 @@ class ScheduleTestCase(OutlineProcessorTestCase):
         cls.seq_inherit_key = cls.course_key.make_usage_key('sequential', 'seq_inherit')
         cls.seq_due_key = cls.course_key.make_usage_key('sequential', 'seq_due')
 
-        cls.set_sequence_keys([
+        cls.all_seq_keys = [
             cls.seq_before_key,
             cls.seq_same_key,
             cls.seq_after_key,
             cls.seq_inherit_key,
             cls.seq_due_key,
-        ])
+        ]
 
         # Set scheduling information into edx-when for a single Section with
         # sequences starting at various times.
@@ -582,9 +275,7 @@ class ScheduleTestCase(OutlineProcessorTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
             days_early_for_beta=None,
-            self_paced=False,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
                 CourseSectionData(
@@ -620,6 +311,7 @@ class ScheduleTestCase(OutlineProcessorTestCase):
                     ]
                 )
             ],
+            self_paced=False,
         )
         replace_course_outline(cls.outline)
 
@@ -629,6 +321,19 @@ class ScheduleTestCase(OutlineProcessorTestCase):
         cls.beta_tester.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
         assert user_has_role(cls.beta_tester, CourseBetaTesterRole(cls.course_key))
         assert cls.outline.days_early_for_beta is None
+
+    def get_details(self, at_time):
+        staff_details = get_user_course_outline_details(self.course_key, self.global_staff, at_time)
+        student_details = get_user_course_outline_details(self.course_key, self.student, at_time)
+        beta_tester_details = get_user_course_outline_details(self.course_key, self.beta_tester, at_time)
+        return staff_details, student_details, beta_tester_details
+
+    def get_sequence_keys(self, exclude=None):
+        if exclude is None:
+            exclude = []
+        if not isinstance(exclude, list):
+            raise TypeError("`exclude` must be a list of keys to be excluded")
+        return [key for key in self.all_seq_keys if key not in exclude]
 
     def test_before_course_starts(self):
         staff_details, student_details, beta_tester_details = self.get_details(
@@ -781,21 +486,27 @@ class ScheduleTestCase(OutlineProcessorTestCase):
         assert len(beta_tester_details.outline.accessible_sequences) == 4
 
 
-class SelfPacedTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
+class SelfPacedCourseOutlineTestCase(CacheIsolationTestCase):
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        # Users...
+        cls.global_staff = User.objects.create_user(
+            'global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = User.objects.create_user(
+            'student', email='student@example.com', is_staff=False
+        )
+
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
 
         # The UsageKeys we're going to set up for date tests.
         cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
-        cls.seq_one_key = cls.course_key.make_usage_key('sequential', 'seq_one_key')
-        cls.seq_two_key = cls.course_key.make_usage_key('sequential', 'seq_two_key')
 
-        cls.set_sequence_keys([
-            cls.seq_one_key,
-            cls.seq_two_key,
-        ])
+        # Sequence with due date
+        cls.seq_due_key = cls.course_key.make_usage_key('sequential', 'seq')
+
+        # Sequence with due date and "inaccessible after due" enabled
+        cls.seq_hide_after_due_key = cls.course_key.make_usage_key('sequential', 'seq_hide_after_due_key')
 
         # Set scheduling information into edx-when for a single Section with
         # two sequences with due date
@@ -813,11 +524,11 @@ class SelfPacedTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disa
                     {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
                 ),
                 (
-                    cls.seq_one_key,
+                    cls.seq_due_key,
                     {'due': datetime(2020, 5, 21, tzinfo=timezone.utc)}
                 ),
                 (
-                    cls.seq_two_key,
+                    cls.seq_hide_after_due_key,
                     {'due': datetime(2020, 5, 21, tzinfo=timezone.utc)}
                 ),
             ]
@@ -831,7 +542,6 @@ class SelfPacedTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disa
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
@@ -841,14 +551,15 @@ class SelfPacedTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disa
                     visibility=visibility,
                     sequences=[
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_one_key,
-                            title='Sequence One',
+                            usage_key=cls.seq_due_key,
+                            title='Due',
                             visibility=visibility
                         ),
                         CourseLearningSequenceData(
-                            usage_key=cls.seq_two_key,
-                            title='Sequence Two',
-                            visibility=visibility
+                            usage_key=cls.seq_hide_after_due_key,
+                            title='Inaccessible after due',
+                            visibility=visibility,
+                            inaccessible_after_due=True
                         ),
                     ],
                 ),
@@ -862,215 +573,36 @@ class SelfPacedTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disa
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
 
     def test_sequences_accessible_after_due(self):
-        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
-
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
+        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)
+        staff_outline = get_user_course_outline_details(self.course_key, self.global_staff, at_time).outline
+        student_outline = get_user_course_outline_details(self.course_key, self.student, at_time).outline
 
         # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 2
+        assert len(staff_outline.accessible_sequences) == 2
 
         # In self-paced course, due date of sequences equals to due date of
         # course, so here student should see all sequences, even if their
         # due dates explicitly were set before end of course
-        assert len(student_details.outline.accessible_sequences) == 2
+        assert len(student_outline.accessible_sequences) == 2
 
 
-class SpecialExamsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
-        # The UsageKeys we're going to set up for date tests.
-        cls.section_key = cls.course_key.make_usage_key('chapter', 'ch1')
-        cls.seq_practice_exam_key = cls.course_key.make_usage_key('sequential', 'seq_practice_exam_key')
-        cls.seq_proctored_exam_key = cls.course_key.make_usage_key('sequential', 'seq_proctored_exam_key')
-        cls.seq_timed_exam_key = cls.course_key.make_usage_key('sequential', 'seq_timed_exam_key')
-        cls.seq_normal_key = cls.course_key.make_usage_key('sequential', 'seq_normal_key')
-
-        cls.set_sequence_keys([
-            cls.seq_practice_exam_key,
-            cls.seq_proctored_exam_key,
-            cls.seq_timed_exam_key,
-            cls.seq_normal_key,
-        ])
-
-        # Set scheduling information into edx-when for a single Section with
-        # two sequences with due date
-        set_dates_for_course(
-            cls.course_key,
-            [
-                (
-                    cls.course_key.make_usage_key('course', 'course'),
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.section_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.seq_practice_exam_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.seq_proctored_exam_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.seq_timed_exam_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-                (
-                    cls.seq_normal_key,
-                    {'start': datetime(2020, 5, 15, tzinfo=timezone.utc)}
-                ),
-            ]
-        )
-        visibility = VisibilityData(
-            hide_from_toc=False,
-            visible_to_staff_only=False
-        )
-        cls.outline = CourseOutlineData(
-            course_key=cls.course_key,
-            title="User Outline Test Course!",
-            published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
-            published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
-            days_early_for_beta=None,
-            course_visibility=CourseVisibility.PRIVATE,
-            sections=[
-                CourseSectionData(
-                    usage_key=cls.section_key,
-                    title="Section",
-                    visibility=visibility,
-                    sequences=[
-                        CourseLearningSequenceData(
-                            usage_key=cls.seq_practice_exam_key,
-                            title='Exam',
-                            visibility=visibility,
-                            exam=ExamData(is_practice_exam=True)
-                        ),
-                        CourseLearningSequenceData(
-                            usage_key=cls.seq_proctored_exam_key,
-                            title='Exam',
-                            visibility=visibility,
-                            exam=ExamData(is_proctored_enabled=True)
-                        ),
-                        CourseLearningSequenceData(
-                            usage_key=cls.seq_timed_exam_key,
-                            title='Exam',
-                            visibility=visibility,
-                            exam=ExamData(is_time_limited=True)
-                        ),
-                        CourseLearningSequenceData(
-                            usage_key=cls.seq_normal_key,
-                            title='Normal',
-                            visibility=visibility
-                        ),
-                    ],
-                ),
-            ],
-            self_paced=True,
-        )
-
-        replace_course_outline(cls.outline)
-
-        # Enroll student in the course
-        cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
-
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
-    def test_special_exams_enabled_all_sequences_visible(self):
-        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
-
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 4
-        assert len(staff_details.outline.sequences) == 4
-
-        # Ensure the exams are all still present
-        assert len(student_details.outline.accessible_sequences) == 4
-        assert len(student_details.outline.sequences) == 4
-
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
-    def test_special_exams_disabled_preserves_exam_sequences(self):
-        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
-
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        # Staff can always access all sequences
-        assert len(staff_details.outline.accessible_sequences) == 4
-        assert len(staff_details.outline.sequences) == 4
-
-        # Ensure the exams have been completely removed
-        assert len(student_details.outline.accessible_sequences) == 4
-        assert len(student_details.outline.sequences) == 4
-        for key in self.get_sequence_keys(exclude=[self.seq_normal_key]):
-            assert key in student_details.outline.accessible_sequences
-            assert key in student_details.outline.sequences
-
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
-    def test_special_exam_attempt_data_in_details(self, mock_get_attempt_status_summary):
-        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
-
-        def get_attempt_status_side_effect(user_id, _course_key, usage_key):
-            """
-            Returns fake data for calls to get_attempt_status_summary for the student
-            """
-            if user_id != self.student.id:
-                raise ProctoredExamNotFoundException
-
-            for sequence_key in self.get_sequence_keys(exclude=[self.seq_normal_key]):
-                if usage_key == str(sequence_key):
-                    num_fake_attempts = mock_get_attempt_status_summary.call_count % len(self.all_seq_keys)  # lint-amnesty, pylint: disable=unused-variable
-                    return {
-                        "summary": {
-                            "usage_key": usage_key
-                        }
-                    }
-
-        mock_get_attempt_status_summary.side_effect = get_attempt_status_side_effect
-
-        _, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        assert len(student_details.special_exam_attempts.sequences) == 3
-        for sequence_key in self.get_sequence_keys(exclude=[self.seq_normal_key]):
-            assert sequence_key in student_details.special_exam_attempts.sequences
-            attempt_summary = student_details.special_exam_attempts.sequences[sequence_key]
-            assert type(attempt_summary) == dict  # lint-amnesty, pylint: disable=unidiomatic-typecheck
-            assert attempt_summary["summary"]["usage_key"] == str(sequence_key)
-
-    @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': False})
-    @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.special_exams.get_attempt_status_summary')
-    def test_special_exam_attempt_data_empty_when_disabled(self, mock_get_attempt_status_summary):
-        at_time = datetime(2020, 5, 22, tzinfo=timezone.utc)  # lint-amnesty, pylint: disable=unused-variable
-
-        _, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
-
-        # Ensure that no calls are made to get_attempt_status_summary and no data in special_exam_attempts
-        assert mock_get_attempt_status_summary.call_count == 0
-        assert len(student_details.special_exam_attempts.sequences) == 0
-
-
-class VisbilityTestCase(OutlineProcessorTestCase):
+class VisbilityTestCase(CacheIsolationTestCase):
     """
     Visibility-related tests.
     """
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        # Users...
+        cls.global_staff = User.objects.create_user(
+            'global_staff', email='gstaff@example.com', is_staff=True
+        )
+        cls.student = User.objects.create_user(
+            'student', email='student@example.com', is_staff=False
+        )
+        cls.anonymous_user = AnonymousUser()
+
+        cls.course_key = CourseKey.from_string("course-v1:OpenEdX+Outline+T1")
 
         # The UsageKeys we're going to set up for date tests.
         cls.normal_section_key = cls.course_key.make_usage_key('chapter', 'normal_section')
@@ -1081,14 +613,6 @@ class VisbilityTestCase(OutlineProcessorTestCase):
         cls.due_in_normal_key = cls.course_key.make_usage_key('sequential', 'due_in_normal')
         cls.normal_in_normal_key = cls.course_key.make_usage_key('sequential', 'normal_in_normal')
         cls.normal_in_staff_key = cls.course_key.make_usage_key('sequential', 'normal_in_staff')
-
-        cls.set_sequence_keys([
-            cls.staff_in_normal_key,
-            cls.hide_in_normal_key,
-            cls.due_in_normal_key,
-            cls.normal_in_normal_key,
-            cls.normal_in_staff_key,
-        ])
 
         v_normal = VisibilityData(
             hide_from_toc=False,
@@ -1108,7 +632,6 @@ class VisbilityTestCase(OutlineProcessorTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             course_visibility=CourseVisibility.PRIVATE,
             sections=[
@@ -1148,20 +671,18 @@ class VisbilityTestCase(OutlineProcessorTestCase):
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="audit")
 
     def test_visibility(self):
-        at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)  # Exact value doesn't matter  # lint-amnesty, pylint: disable=unused-variable
-
-        staff_details, student_details, _ = self.get_details(
-            datetime(2020, 5, 25, tzinfo=timezone.utc)
-        )
+        at_time = datetime(2020, 5, 21, tzinfo=timezone.utc)  # Exact value doesn't matter
+        staff_outline = get_user_course_outline_details(self.course_key, self.global_staff, at_time).outline
+        student_outline = get_user_course_outline_details(self.course_key, self.student, at_time).outline
 
         # Sections visible
-        assert len(staff_details.outline.sections) == 2
-        assert len(student_details.outline.sections) == 1
+        assert len(staff_outline.sections) == 2
+        assert len(student_outline.sections) == 1
 
         # Sequences visible
-        assert len(staff_details.outline.sequences) == 4
-        assert len(student_details.outline.sequences) == 1
-        assert self.normal_in_normal_key in student_details.outline.sequences
+        assert len(staff_outline.sequences) == 4
+        assert len(student_outline.sequences) == 1
+        assert self.normal_in_normal_key in student_outline.sequences
 
 
 class SequentialVisibilityTestCase(CacheIsolationTestCase):
@@ -1172,7 +693,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super(SequentialVisibilityTestCase, cls).setUpTestData()
 
         cls.global_staff = User.objects.create_user('global_staff', email='gstaff@example.com', is_staff=True)
         cls.student = User.objects.create_user('student', email='student@example.com', is_staff=False)
@@ -1194,7 +715,6 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
             title="User Outline Test Course!",
             published_at=datetime(2020, 5, 20, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2020",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [2, 1, 3]),
             self_paced=False,
@@ -1215,11 +735,15 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
             with self.subTest(user=user):
                 user_course_outline = get_user_course_outline(self.course_key, user, self.course_access_time)
 
-                assert len(user_course_outline.sections) == 3
-                assert len(user_course_outline.sequences) == 6
-                assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in
-                            user_course_outline.sequences.values()]),\
-                    'Sequences should be accessible to all users for a public course'
+                self.assertEqual(len(user_course_outline.sections), 3)
+                self.assertEqual(len(user_course_outline.sequences), 6)
+                self.assertTrue(
+                    all([
+                        seq.usage_key in user_course_outline.accessible_sequences
+                        for seq in user_course_outline.sequences.values()
+                    ]),
+                    "Sequences should be accessible to all users for a public course"
+                )
 
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     def test_public_outline_course_outline(self):
@@ -1234,8 +758,8 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
             with self.subTest(user=user):
                 user_course_outline = get_user_course_outline(self.course_key, user, self.course_access_time)
 
-                assert len(user_course_outline.sections) == 3
-                assert len(user_course_outline.sequences) == 6
+                self.assertEqual(len(user_course_outline.sections), 3)
+                self.assertEqual(len(user_course_outline.sequences), 6)
 
                 is_sequence_accessible = [
                     seq.usage_key in user_course_outline.accessible_sequences
@@ -1243,12 +767,16 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert all((not is_accessible) for is_accessible in is_sequence_accessible),\
-                        "Sequences shouldn't be accessible to anonymous or " \
-                        "non-enrolled students for a public_outline course"
+                    self.assertTrue(
+                        all(not is_accessible for is_accessible in is_sequence_accessible),
+                        "Sequences shouldn't be accessible to anonymous or non-enrolled students "
+                        "for a public_outline course"
+                    )
                 else:
-                    assert all(is_sequence_accessible),\
-                        'Sequences should be accessible to enrolled, staff users for a public_outline course'
+                    self.assertTrue(
+                        all(is_sequence_accessible),
+                        "Sequences should be accessible to enrolled, staff users for a public_outline course"
+                    )
 
     @override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=True)
     def test_private_course_outline(self):
@@ -1269,72 +797,15 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                 ]
 
                 if user in [self.anonymous_user, self.unenrolled_student]:
-                    assert (len(user_course_outline.sections) == len(user_course_outline.sequences) == 0),\
-                        'No section of a private course should be visible to anonymous or non-enrolled student'
+                    self.assertTrue(
+                        len(user_course_outline.sections) == len(user_course_outline.sequences) == 0,
+                        "No section of a private course should be visible to anonymous or non-enrolled student"
+                    )
                 else:
                     # Enrolled or Staff User
-                    assert len(user_course_outline.sections) == 3
-                    assert len(user_course_outline.sequences) == 6
-                    assert all(is_sequence_accessible),\
-                        'Sequences should be accessible to enrolled, staff users for a public_outline course'
-
-
-class ContentErrorTestCase(CacheIsolationTestCase):
-    """Test error collection and reporting."""
-
-    def test_errors(self):
-        """
-        Basic tests for writing and retriving errors.
-        """
-        course_key = CourseKey.from_string("course-v1:OpenEdX+Outlines+Errors")
-        outline = CourseOutlineData(
-            course_key=course_key,
-            title="Outline Errors Test Course!",
-            published_at=datetime(2021, 3, 21, tzinfo=timezone.utc),
-            published_version="8ebece4b69dd593d82fe2020",
-            sections=[],
-            self_paced=False,
-            days_early_for_beta=None,
-            entrance_exam_id=None,
-            course_visibility=CourseVisibility.PRIVATE,
-        )
-        usage_key_1 = course_key.make_usage_key('sequential', 'seq1')
-        usage_key_2 = course_key.make_usage_key('sequential', 'seq2')
-        replace_course_outline(
-            outline,
-            content_errors=[
-                # Explicitly set to no usage key.
-                ContentErrorData(message="Content is Hard", usage_key=None),
-
-                # Implicitly set usage key
-                ContentErrorData("Simple Content Error Description"),
-
-                # Multiple copies of the same usage key
-                ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
-                ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
-
-                # Another key
-                ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2)
-            ]
-        )
-        assert outline == get_course_outline(course_key)
-
-        # Ordering is preserved.
-        assert get_content_errors(course_key) == [
-            ContentErrorData(message="Content is Hard", usage_key=None),
-            ContentErrorData(message="Simple Content Error Description", usage_key=None),
-            ContentErrorData(message="Seq1 is wrong", usage_key=usage_key_1),
-            ContentErrorData(message="Seq1 is still wrong", usage_key=usage_key_1),
-            ContentErrorData(message="Seq2 is also wrong", usage_key=usage_key_2),
-        ]
-
-        # Now do it again and make sure updates work as well as inserts
-        replace_course_outline(
-            outline,
-            content_errors=[
-                ContentErrorData(message="Content is Hard", usage_key=None),
-            ]
-        )
-        assert get_content_errors(course_key) == [
-            ContentErrorData(message="Content is Hard", usage_key=None),
-        ]
+                    self.assertEqual(len(user_course_outline.sections), 3)
+                    self.assertEqual(len(user_course_outline.sequences), 6)
+                    self.assertTrue(
+                        all(is_sequence_accessible),
+                        "Sequences should be accessible to enrolled, staff users for a public_outline course"
+                    )

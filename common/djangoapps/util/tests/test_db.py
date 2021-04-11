@@ -4,15 +4,16 @@
 import threading
 import time
 import unittest
-from io import StringIO
 
 import ddt
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import IntegrityError, connection
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.utils.six import StringIO
+from six.moves import range
 
 from common.djangoapps.util.db import enable_named_outer_atomic, generate_int_id, outer_atomic
 
@@ -53,7 +54,7 @@ class TransactionManagersTestCase(TransactionTestCase):
         class RequestThread(threading.Thread):
             """ A thread which runs a dummy view."""
             def __init__(self, delay, **kwargs):
-                super().__init__(**kwargs)
+                super(RequestThread, self).__init__(**kwargs)
                 self.delay = delay
                 self.status = {}
 
@@ -85,11 +86,11 @@ class TransactionManagersTestCase(TransactionTestCase):
         thread2.join()
         thread1.join()
 
-        assert isinstance(thread1.status.get('exception'), exception_class)
-        assert thread1.status.get('created') == created_in_1
+        self.assertIsInstance(thread1.status.get('exception'), exception_class)
+        self.assertEqual(thread1.status.get('created'), created_in_1)
 
-        assert thread2.status.get('exception') is None
-        assert thread2.status.get('created') == created_in_2
+        self.assertIsNone(thread2.status.get('exception'))
+        self.assertEqual(thread2.status.get('created'), created_in_2)
 
     def test_outer_atomic_nesting(self):
         """
@@ -99,21 +100,21 @@ class TransactionManagersTestCase(TransactionTestCase):
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
-        outer_atomic()(do_nothing)()  # pylint: disable=not-callable
+        outer_atomic()(do_nothing)()
 
         with atomic():
-            atomic()(do_nothing)()  # pylint: disable=not-callable
+            atomic()(do_nothing)()
 
         with outer_atomic():
-            atomic()(do_nothing)()  # pylint: disable=not-callable
+            atomic()(do_nothing)()
 
         with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with atomic():
-                outer_atomic()(do_nothing)()  # pylint: disable=not-callable
+                outer_atomic()(do_nothing)()
 
         with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
             with outer_atomic():
-                outer_atomic()(do_nothing)()  # pylint: disable=not-callable
+                outer_atomic()(do_nothing)()
 
     def test_named_outer_atomic_nesting(self):
         """
@@ -123,44 +124,44 @@ class TransactionManagersTestCase(TransactionTestCase):
         if connection.vendor != 'mysql':
             raise unittest.SkipTest('Only works on MySQL.')
 
-        outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
+        outer_atomic(name='abc')(do_nothing)()
 
         with atomic():
-            outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
+            outer_atomic(name='abc')(do_nothing)()
 
         with enable_named_outer_atomic('abc'):
 
-            outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable  # Not nested.
+            outer_atomic(name='abc')(do_nothing)()  # Not nested.
 
             with atomic():
-                outer_atomic(name='pqr')(do_nothing)()  # pylint: disable=not-callable  # Not enabled.
+                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
+                    outer_atomic(name='abc')(do_nothing)()
 
         with enable_named_outer_atomic('abc', 'def'):
 
-            outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable  # Not nested.
+            outer_atomic(name='def')(do_nothing)()  # Not nested.
 
             with atomic():
-                outer_atomic(name='pqr')(do_nothing)()  # pylint: disable=not-callable  # Not enabled.
+                outer_atomic(name='pqr')(do_nothing)()  # Not enabled.
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable
+                    outer_atomic(name='def')(do_nothing)()
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
-                    outer_atomic(name='def')(do_nothing)()  # pylint: disable=not-callable
+                    outer_atomic(name='def')(do_nothing)()
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with atomic():
-                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
+                    outer_atomic(name='abc')(do_nothing)()
 
             with self.assertRaisesRegex(TransactionManagementError, 'Cannot be inside an atomic block.'):
                 with outer_atomic():
-                    outer_atomic(name='abc')(do_nothing)()  # pylint: disable=not-callable
+                    outer_atomic(name='abc')(do_nothing)()
 
 
 @ddt.ddt
@@ -175,7 +176,7 @@ class GenerateIntIdTestCase(TestCase):
         minimum = 1
         maximum = times
         for __ in range(times):
-            assert generate_int_id(minimum, maximum) in list(range(minimum, (maximum + 1)))
+            self.assertIn(generate_int_id(minimum, maximum), list(range(minimum, maximum + 1)))
 
     @ddt.data(10)
     def test_used_ids(self, times):
@@ -188,7 +189,7 @@ class GenerateIntIdTestCase(TestCase):
         used_ids = {2, 4, 6, 8}
         for __ in range(times):
             int_id = generate_int_id(minimum, maximum, used_ids)
-            assert int_id in list(set(range(minimum, (maximum + 1))) - used_ids)
+            self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))
 
 
 class MigrationTests(TestCase):
@@ -197,6 +198,9 @@ class MigrationTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={})
+    @unittest.skip(
+        "Temporary skip for https://openedx.atlassian.net/browse/DEPR-43 where shoppingcart models are to be removed"
+    )
     def test_migrations_are_in_sync(self):
         """
         Tests that the migration files are in sync with the models.
@@ -212,4 +216,4 @@ class MigrationTests(TestCase):
         out = StringIO()
         call_command("makemigrations", dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()
-        assert 'No changes detected' in output
+        self.assertIn("No changes detected", output)

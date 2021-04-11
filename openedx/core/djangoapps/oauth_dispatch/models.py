@@ -34,11 +34,11 @@ class RestrictedApplication(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
 
-    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
+    def __str__(self):
         """
         Return a unicode representation of this object
         """
-        return HTML("<RestrictedApplication '{name}'>").format(
+        return HTML(u"<RestrictedApplication '{name}'>").format(
             name=HTML(self.application.name)
         )
 
@@ -104,7 +104,7 @@ class ApplicationAccess(models.Model):
         return cls.objects.get(application=application).filters
 
     @classmethod
-    def get_filter_values(cls, application, filter_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_filter_values(cls, application, filter_name):
         filters = cls.get_filters(application=application)
         if filters:
             for filter_constraint in filters:
@@ -116,7 +116,7 @@ class ApplicationAccess(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return "{application_name}:{scopes}:{filters}".format(
+        return u"{application_name}:{scopes}:{filters}".format(
             application_name=self.application.name,
             scopes=self.scopes,
             filters=self.filters,
@@ -139,7 +139,7 @@ class ApplicationOrganization(models.Model):
 
     .. no_pii:
     """
-    RELATION_TYPE_CONTENT_ORG = 'content_org'
+    RELATION_TYPE_CONTENT_ORG = u'content_org'
     RELATION_TYPES = (
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )

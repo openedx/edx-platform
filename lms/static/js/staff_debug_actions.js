@@ -1,8 +1,14 @@
 /* globals _ */
 // Build StaffDebug object
 var StaffDebug = (function() {
-    var getURL = function(courseId, action) {
-        return '/courses/' + courseId + '/instructor/api/' + action;
+    /* global getCurrentUrl:true */
+    var getURL = function(action) {
+        var pathname = this.getCurrentUrl();
+        var index = pathname.indexOf('/courseware');
+        if (index <= 0) {
+            index = pathname.indexOf('/', '/courses/'.length);
+        }
+        return pathname.substr(0, index) + '/instructor/api/' + action;
     };
 
     var sanitizeString = function(string) {
@@ -28,21 +34,20 @@ var StaffDebug = (function() {
     };
 
     var doInstructorDashAction = function(action) {
-        var user = getUser(action.locationName);
         var pdata = {
             problem_to_reset: action.location,
-            unique_student_identifier: user,
+            unique_student_identifier: getUser(action.locationName),
             delete_module: action.delete_module,
             only_if_higher: action.only_if_higher,
             score: action.score
         };
         $.ajax({
             type: 'POST',
-            url: getURL(action.courseId, action.method),
+            url: getURL(action.method),
             data: pdata,
             success: function(data) {
                 var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
-                {user: user}
+                {user: data.student}
             );
                 var html = _.template('<p id="idash_msg" class="success">{text}</p>', {interpolate: /\{(.+?)\}/g})(
                 {text: text}
@@ -54,17 +59,14 @@ var StaffDebug = (function() {
             },
             error: function(request, status, error) {
                 var responseJSON;
-                var errorMsg = _.template(action.error_msg, {interpolate: /\{(.+?)\}/g})(
-                {user: user}
-            );
                 try {
-                    responseJSON = $.parseJSON(request.responseText).error;
+                    responseJSON = $.parseJSON(request.responseText);
                 } catch (e) {
                     responseJSON = 'Unknown Error Occurred.';
                 }
                 var text = _.template('{error_msg} {error}', {interpolate: /\{(.+?)\}/g})(
                     {
-                        error_msg: errorMsg,
+                        error_msg: action.error_msg,
                         error: gettext(responseJSON)
                     }
             );
@@ -80,9 +82,8 @@ var StaffDebug = (function() {
         });
     };
 
-    var reset = function(courseId, locname, location) {
+    var reset = function(locname, location) {
         this.doInstructorDashAction({
-            courseId: courseId,
             locationName: locname,
             location: location,
             method: 'reset_student_attempts',
@@ -92,9 +93,8 @@ var StaffDebug = (function() {
         });
     };
 
-    var deleteStudentState = function(courseId, locname, location) {
+    var deleteStudentState = function(locname, location) {
         this.doInstructorDashAction({
-            courseId: courseId,
             locationName: locname,
             location: location,
             method: 'reset_student_attempts',
@@ -104,9 +104,8 @@ var StaffDebug = (function() {
         });
     };
 
-    var rescore = function(courseId, locname, location) {
+    var rescore = function(locname, location) {
         this.doInstructorDashAction({
-            courseId: courseId,
             locationName: locname,
             location: location,
             method: 'rescore_problem',
@@ -116,9 +115,8 @@ var StaffDebug = (function() {
         });
     };
 
-    var rescoreIfHigher = function(courseId, locname, location) {
+    var rescoreIfHigher = function(locname, location) {
         this.doInstructorDashAction({
-            courseId: courseId,
             locationName: locname,
             location: location,
             method: 'rescore_problem',
@@ -128,9 +126,8 @@ var StaffDebug = (function() {
         });
     };
 
-    var overrideScore = function(courseId, locname, location) {
+    var overrideScore = function(locname, location) {
         this.doInstructorDashAction({
-            courseId: courseId,
             locationName: locname,
             location: location,
             method: 'override_problem_score',
@@ -138,6 +135,10 @@ var StaffDebug = (function() {
             error_msg: gettext('Could not override problem score for {user}.'),
             score: getScore(locname)
         });
+    };
+
+    getCurrentUrl = function() {
+        return window.location.pathname;
     };
 
     return {
@@ -149,6 +150,7 @@ var StaffDebug = (function() {
 
         // export for testing
         doInstructorDashAction: doInstructorDashAction,
+        getCurrentUrl: getCurrentUrl,
         getURL: getURL,
         getUser: getUser,
         getScore: getScore,
@@ -158,47 +160,26 @@ var StaffDebug = (function() {
 
 // Register click handlers
 $(document).ready(function() {
-
     var $mainContainer = $('#main');
     $mainContainer.on('click', '.staff-debug-reset', function() {
-        StaffDebug.reset(
-            $(this).parent().data('course-id'),
-            $(this).parent().data('location-name'),
-            $(this).parent().data('location')
-        );
+        StaffDebug.reset($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
     $mainContainer.on('click', '.staff-debug-sdelete', function() {
-        StaffDebug.deleteStudentState(
-            $(this).parent().data('course-id'),
-            $(this).parent().data('location-name'),
-            $(this).parent().data('location')
-        );
+        StaffDebug.deleteStudentState($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
     $mainContainer.on('click', '.staff-debug-rescore', function() {
-        StaffDebug.rescore(
-            $(this).parent().data('course-id'),
-            $(this).parent().data('location-name'),
-            $(this).parent().data('location')
-        );
+        StaffDebug.rescore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
     $mainContainer.on('click', '.staff-debug-rescore-if-higher', function() {
-        StaffDebug.rescoreIfHigher(
-            $(this).parent().data('course-id'),
-            $(this).parent().data('location-name'),
-            $(this).parent().data('location')
-        );
+        StaffDebug.rescoreIfHigher($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
 
     $mainContainer.on('click', '.staff-debug-override-score', function() {
-        StaffDebug.overrideScore(
-            $(this).parent().data('course-id'),
-            $(this).parent().data('location-name'),
-            $(this).parent().data('location')
-        );
+        StaffDebug.overrideScore($(this).parent().data('location-name'), $(this).parent().data('location'));
         return false;
     });
 });

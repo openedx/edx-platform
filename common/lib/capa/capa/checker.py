@@ -19,7 +19,7 @@ logging.basicConfig(format="%(levelname)s %(message)s")
 log = logging.getLogger('capa.checker')
 
 
-class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DemoSystem(object):
     def __init__(self):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
@@ -31,7 +31,7 @@ class DemoSystem(object):  # lint-amnesty, pylint: disable=missing-class-docstri
         return self.lookup.get_template(template_filename).render(**dictionary)
 
 
-def main():  # lint-amnesty, pylint: disable=missing-function-docstring
+def main():
     parser = argparse.ArgumentParser(description='Check Problem Files')
     parser.add_argument("command", choices=['test', 'show'])  # Watch? Render? Open?
     parser.add_argument("files", nargs="+", type=argparse.FileType('r'))
@@ -49,8 +49,8 @@ def main():  # lint-amnesty, pylint: disable=missing-function-docstring
         log.info("Opening {0}".format(problem_file.name))
 
         try:
-            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)  # lint-amnesty, pylint: disable=no-value-for-parameter, unexpected-keyword-arg
-        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
+            problem = LoncapaProblem(problem_file, "fakeid", seed=args.seed, system=system)
+        except Exception as ex:
             log.error("Could not parse file {0}".format(problem_file.name))
             log.exception(ex)
             continue
@@ -70,7 +70,7 @@ def command_show(problem):
     print(problem.get_html())
 
 
-def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-docstring
+def command_test(problem):
     # We're going to trap stdout/stderr from the problems (yes, some print)
     old_stdout, old_stderr = sys.stdout, sys.stderr
     try:
@@ -84,7 +84,7 @@ def command_test(problem):  # lint-amnesty, pylint: disable=missing-function-doc
                             "captured stdout from {0}".format(problem))
         log_captured_output(sys.stderr,
                             "captured stderr from {0}".format(problem))
-    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as e:
         log.exception(e)
     finally:
         sys.stdout, sys.stderr = old_stdout, old_stderr
@@ -135,7 +135,7 @@ def check_that_suggested_answers_work(problem):
             assert(all(result == 'correct'
                        for answer_id, result in real_results.items()))
         except UndefinedVariable as uv_exc:
-            log.error("The variable \"{0}\" specified in the ".format(uv_exc) +  # lint-amnesty, pylint: disable=logging-not-lazy
+            log.error("The variable \"{0}\" specified in the ".format(uv_exc) +
                       "solution isn't recognized (is it a units measure?).")
         except AssertionError:
             log.error("The following generated answers were not accepted for {0}:"
@@ -143,16 +143,16 @@ def check_that_suggested_answers_work(problem):
             for question_id, result in sorted(real_results.items()):
                 if result != 'correct':
                     log.error("  {0} = {1}".format(question_id, real_answers[question_id]))
-        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as ex:
             log.error("Uncaught error in {0}".format(problem))
             log.exception(ex)
 
 
-def log_captured_output(output_stream, stream_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+def log_captured_output(output_stream, stream_name):
     output_stream.seek(0)
     output_text = output_stream.read()
     if output_text:
-        log.info("##### Begin {0} #####\n".format(stream_name) + output_text)  # lint-amnesty, pylint: disable=logging-not-lazy
+        log.info("##### Begin {0} #####\n".format(stream_name) + output_text)
         log.info("##### End {0} #####".format(stream_name))
 
 

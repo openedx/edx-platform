@@ -3,6 +3,7 @@ Views for the course search page.
 """
 
 
+import six
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
@@ -28,14 +29,14 @@ class CourseSearchView(CourseTabView):
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
-    def get(self, request, course_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def get(self, request, course_id, **kwargs):
         """
         Displays the home page for the specified course.
         """
-        return super().get(request, course_id, 'courseware', **kwargs)
+        return super(CourseSearchView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
-        course_id = str(course.id)
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
+        course_id = six.text_type(course.id)
         home_fragment_view = CourseSearchFragmentView()
         return home_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
 
@@ -45,14 +46,14 @@ class CourseSearchFragmentView(EdxFragmentView):
     A fragment to render the home page for a course.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course's home page as a fragment.
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         course_url_name = default_course_url_name(course.id)
-        course_url = reverse(course_url_name, kwargs={'course_id': str(course.id)})
+        course_url = reverse(course_url_name, kwargs={'course_id': six.text_type(course.id)})
 
         # Render the course home fragment
         context = {

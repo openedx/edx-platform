@@ -1,10 +1,8 @@
 """
 Test cases for image processing functions in the profile image package.
 """
-from contextlib import closing
-from unittest import mock
 
-import pytest
+from contextlib import closing
 from itertools import product
 import os
 from tempfile import NamedTemporaryFile
@@ -13,8 +11,10 @@ from django.core.files.uploadedfile import UploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
 import ddt
+import mock
 import piexif
 from PIL import Image
+from six import text_type
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..exceptions import ImageValidationError
@@ -36,7 +36,7 @@ class TestValidateUploadedImage(TestCase):
     Test validate_uploaded_image
     """
     FILE_UPLOAD_BAD_TYPE = (
-        'The file must be one of the following types: {valid_file_types}.'.format(
+        u'The file must be one of the following types: {valid_file_types}.'.format(
             valid_file_types=_get_valid_file_types()
         )
     )
@@ -46,18 +46,18 @@ class TestValidateUploadedImage(TestCase):
         Internal DRY helper.
         """
         if expected_failure_message is not None:
-            with pytest.raises(ImageValidationError) as ctx:
+            with self.assertRaises(ImageValidationError) as ctx:
                 validate_uploaded_image(uploaded_file)
-            assert str(ctx.value) == expected_failure_message
+            self.assertEqual(text_type(ctx.exception), expected_failure_message)
         else:
             validate_uploaded_image(uploaded_file)
-            assert uploaded_file.tell() == 0
+            self.assertEqual(uploaded_file.tell(), 0)
 
     @ddt.data(
-        (99, "The file must be at least 100 bytes in size."),
+        (99, u"The file must be at least 100 bytes in size."),
         (100, ),
         (1024, ),
-        (1025, "The file must be smaller than 1 KB in size."),
+        (1025, u"The file must be smaller than 1 KB in size."),
     )
     @ddt.unpack
     @override_settings(PROFILE_IMAGE_MIN_BYTES=100, PROFILE_IMAGE_MAX_BYTES=1024)
@@ -92,8 +92,8 @@ class TestValidateUploadedImage(TestCase):
         file data.
         """
         file_upload_bad_ext = (
-            'The file name extension for this file does not match '
-            'the file data. The file may be corrupted.'
+            u'The file name extension for this file does not match '
+            u'the file data. The file may be corrupted.'
         )
         # make a bmp, try to fool the function into thinking it's a jpeg
         with make_image_file(extension=".bmp") as bmp_file:
@@ -105,9 +105,9 @@ class TestValidateUploadedImage(TestCase):
                     content_type="image/jpeg",
                     size=os.path.getsize(fake_jpeg_file.name)
                 )
-                with pytest.raises(ImageValidationError) as ctx:
+                with self.assertRaises(ImageValidationError) as ctx:
                     validate_uploaded_image(uploaded_file)
-                assert str(ctx.value) == file_upload_bad_ext
+                self.assertEqual(text_type(ctx.exception), file_upload_bad_ext)
 
     def test_content_type(self):
         """
@@ -115,13 +115,13 @@ class TestValidateUploadedImage(TestCase):
         extension do not match
         """
         file_upload_bad_mimetype = (
-            'The Content-Type header for this file does not match '
-            'the file data. The file may be corrupted.'
+            u'The Content-Type header for this file does not match '
+            u'the file data. The file may be corrupted.'
         )
         with make_uploaded_file(extension=".jpeg", content_type="image/gif") as uploaded_file:
-            with pytest.raises(ImageValidationError) as ctx:
+            with self.assertRaises(ImageValidationError) as ctx:
                 validate_uploaded_image(uploaded_file)
-            assert str(ctx.value) == file_upload_bad_mimetype
+            self.assertEqual(text_type(ctx.exception), file_upload_bad_mimetype)
 
 
 @ddt.ddt
@@ -135,12 +135,12 @@ class TestGenerateProfileImages(TestCase):
         """
         Check that the created object is a JPEG and that it has the expected
         """
-        assert image.format == 'JPEG'
+        self.assertEqual(image.format, 'JPEG')
         if expected_orientation is not None:
-            assert 'exif' in image.info
-            assert _get_exif_orientation(image.info['exif']) == expected_orientation
+            self.assertIn('exif', image.info)
+            self.assertEqual(_get_exif_orientation(image.info['exif']), expected_orientation)
         else:
-            assert _get_exif_orientation(image.info.get('exif', piexif.dump({}))) is None
+            self.assertIsNone(_get_exif_orientation(image.info.get('exif', piexif.dump({}))))
 
     @ddt.data(
         *product(
@@ -168,9 +168,9 @@ class TestGenerateProfileImages(TestCase):
             for name, image_obj in names_and_images:
                 # get the size of the image file and ensure it's square jpeg
                 width, height = image_obj.size
-                assert width == height
+                self.assertEqual(width, height)
                 actual_sizes[width] = name
-            assert requested_sizes == actual_sizes
+            self.assertEqual(requested_sizes, actual_sizes)
 
     def test_jpeg_with_exif_orientation(self):
         requested_images = {10: "ten.jpg", 100: "hunnert.jpg"}
@@ -194,7 +194,10 @@ class TestGenerateProfileImages(TestCase):
             for _, image in self._create_mocked_profile_images(imfile, requested_images):
                 self.check_exif_orientation(image, None)
                 exif = image.info.get('exif', piexif.dump({}))
-                assert _update_exif_orientation(exif, None) == image.info.get('exif', piexif.dump({}))
+                self.assertEqual(
+                    _update_exif_orientation(exif, None),
+                    image.info.get('exif', piexif.dump({}))
+                )
 
     def _create_mocked_profile_images(self, image_file, requested_images):
         """
@@ -212,7 +215,7 @@ class TestGenerateProfileImages(TestCase):
         ):
             create_profile_images(image_file, requested_images)
         names_and_files = [v[0] for v in mock_storage.save.call_args_list]
-        assert len(names_and_files) == len(requested_images)
+        self.assertEqual(len(names_and_files), len(requested_images))
         for name, file_ in names_and_files:
             with closing(Image.open(file_)) as image:
                 yield name, image
@@ -241,5 +244,5 @@ class TestRemoveProfileImages(TestCase):
         ):
             remove_profile_images(requested_sizes)
             deleted_names = [v[0][0] for v in mock_storage.delete.call_args_list]
-            assert list(requested_sizes.values()) == deleted_names
+            self.assertEqual(list(requested_sizes.values()), deleted_names)
             mock_storage.save.reset_mock()

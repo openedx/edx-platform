@@ -36,7 +36,7 @@ class Mako(BaseEngine):
         """
         params = params.copy()
         options = params.pop('OPTIONS').copy()
-        super().__init__(params)
+        super(Mako, self).__init__(params)
         self.context_processors = options.pop('context_processors', [])
         self.namespace = options.pop('namespace', 'main')
 
@@ -45,7 +45,7 @@ class Mako(BaseEngine):
             return Template(template_code)
         except MakoException:
             message = text_error_template().render()
-            raise TemplateSyntaxError(message)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise TemplateSyntaxError(message)
 
     def get_template(self, template_name):
         """
@@ -55,7 +55,7 @@ class Mako(BaseEngine):
         try:
             return Template(lookup_template(self.namespace, template_name), engine=self)
         except TopLevelLookupException:
-            raise TemplateDoesNotExist(template_name)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise TemplateDoesNotExist(template_name)
 
     @cached_property
     def template_context_processors(self):

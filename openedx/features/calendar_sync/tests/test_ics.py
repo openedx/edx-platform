@@ -1,19 +1,19 @@
 """ Tests for the Calendar Sync .ics methods """
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import pytz
 from django.test import RequestFactory, TestCase
 from freezegun import freeze_time
+from mock import patch
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.courses import _Assignment
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.features.calendar_sync import get_calendar_event_id
 from openedx.features.calendar_sync.ics import generate_ics_files_for_user_course
 from openedx.features.calendar_sync.tests.factories import UserCalendarSyncConfigFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestIcsGeneration(TestCase):
@@ -41,7 +41,7 @@ class TestIcsGeneration(TestCase):
 
     def make_assigment(
         self, block_key=None, title=None, url=None, date=None, contains_gated_content=False, complete=False,
-        past_due=False, assignment_type=None, extra_info=None, first_component_block_id=None
+        past_due=False, assignment_type=None, extra_info=None
     ):
         """ Bundles given info into a namedtupled like get_course_assignments returns """
         return _Assignment(
@@ -53,8 +53,7 @@ class TestIcsGeneration(TestCase):
             complete,
             past_due,
             assignment_type,
-            extra_info,
-            first_component_block_id
+            extra_info
         )
 
     def expected_ics(self, *assignments):
@@ -98,7 +97,7 @@ END:VCALENDAR
         generated = [
             file.decode('utf8').replace('\r\n', '\n') for file in sorted(self.generate_ics(*assignments).values())
         ]
-        assert len(generated) == len(assignments)
+        self.assertEqual(len(generated), len(assignments))
         self.assertListEqual(generated, list(self.expected_ics(*assignments)))
 
     def test_generate_ics_for_user_course(self):

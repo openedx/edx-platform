@@ -1,40 +1,23 @@
+# -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
 
-import json
-import unittest
 
-from unittest.mock import Mock
+from mock import Mock
 
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from xmodule.poll_module import PollBlock
+from xmodule.poll_module import PollDescriptor
 
-from . import get_test_system
+from . import LogicTest
 from .test_import import DummySystem
 
 
-class PollBlockTest(unittest.TestCase):
+class PollModuleTest(LogicTest):
     """Logic tests for Poll Xmodule."""
-
+    descriptor_class = PollDescriptor
     raw_field_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},
         'voted': False,
         'poll_answer': ''
     }
-
-    def setUp(self):
-        super().setUp()
-        self.system = get_test_system()
-        usage_key = self.system.course_id.make_usage_key(PollBlock.category, 'test_loc')
-        # ScopeIds has 4 fields: user_id, block_type, def_id, usage_id
-        scope_ids = ScopeIds(1, PollBlock.category, usage_key, usage_key)
-        self.xmodule = PollBlock(
-            self.system, DictFieldData(self.raw_field_data), scope_ids
-        )
-
-    def ajax_request(self, dispatch, data):
-        """Call Xmodule.handle_ajax."""
-        return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
     def test_bad_ajax_request(self):
         # Make sure that answer for incorrect request is error json.
@@ -50,9 +33,9 @@ class PollBlockTest(unittest.TestCase):
         callback = response['callback']
 
         self.assertDictEqual(poll_answers, {'Yes': 1, 'Dont_know': 0, 'No': 1})
-        assert total == 2
+        self.assertEqual(total, 2)
         self.assertDictEqual(callback, {'objectName': 'Conditional'})
-        assert self.xmodule.poll_answer == 'No'
+        self.assertEqual(self.xmodule.poll_answer, 'No')
 
     def test_poll_export_with_unescaped_characters_xml(self):
         """
@@ -69,7 +52,7 @@ class PollBlockTest(unittest.TestCase):
         </poll_question>
         '''
 
-        output = PollBlock.from_xml(sample_poll_xml, module_system, id_generator)
+        output = PollDescriptor.from_xml(sample_poll_xml, module_system, id_generator)
         # Update the answer with invalid character.
         invalid_characters_poll_answer = output.answers[0]
         # Invalid less-than character.
@@ -81,4 +64,4 @@ class PollBlockTest(unittest.TestCase):
         # Extract texts of all children.
         child_texts = xml.xpath('//text()')
         # Last index of child_texts contains text of answer tag.
-        assert child_texts[(- 1)] == '< 18'
+        self.assertEqual(child_texts[-1], '< 18')

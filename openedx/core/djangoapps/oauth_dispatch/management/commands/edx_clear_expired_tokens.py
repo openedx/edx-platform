@@ -17,7 +17,7 @@ from oauth2_provider.settings import oauth2_settings
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = "Clear expired access tokens and refresh tokens for Django OAuth Toolkit"
 
     def add_arguments(self, parser):
@@ -41,8 +41,8 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                             default='',
                             help='Comma-separated list of application IDs for which tokens will NOT be removed')
 
-    def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
-        message = f'Cleaning {query_set.count()} rows from {model.__name__} table'
+    def clear_table_data(self, query_set, batch_size, model, sleep_time):
+        message = 'Cleaning {} rows from {} table'.format(query_set.count(), model.__name__)
         logger.info(message)
         while query_set.exists():
             qs = query_set[:batch_size]
@@ -53,14 +53,14 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             if query_set.exists():
                 sleep(sleep_time)
 
-    def get_expiration_time(self, now):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_expiration_time(self, now):
         refresh_token_expire_seconds = oauth2_settings.REFRESH_TOKEN_EXPIRE_SECONDS
         if not isinstance(refresh_token_expire_seconds, timedelta):
             try:
                 refresh_token_expire_seconds = timedelta(seconds=refresh_token_expire_seconds)
             except TypeError:
                 e = "REFRESH_TOKEN_EXPIRE_SECONDS must be either a timedelta or seconds"
-                raise ImproperlyConfigured(e)  # lint-amnesty, pylint: disable=raise-missing-from
+                raise ImproperlyConfigured(e)
             return now - refresh_token_expire_seconds
 
     def handle(self, *args, **options):

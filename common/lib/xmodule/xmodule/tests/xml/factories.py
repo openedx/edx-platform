@@ -16,7 +16,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 
 
-class XmlImportData:
+class XmlImportData(object):
     """
     Class to capture all of the data needed to actually run an XML import,
     so that the Factories have something to generate
@@ -49,7 +49,7 @@ class XmlImportData:
         return etree.tostring(self._xml_node)
 
     def __repr__(self):
-        return "XmlImportData{!r}".format((
+        return u"XmlImportData{!r}".format((
             self._xml_node, self._xml_string, self.course_id,
             self.default_class, self.policy,
             self.filesystem, self.parent, self.xblock_mixins,
@@ -59,7 +59,7 @@ class XmlImportData:
 
 # Extract all argument names used to construct XmlImportData objects,
 # so that the factory doesn't treat them as XML attributes
-XML_IMPORT_ARGS = inspect.getargspec(XmlImportData.__init__).args  # lint-amnesty, pylint: disable=deprecated-method
+XML_IMPORT_ARGS = inspect.getargspec(XmlImportData.__init__).args
 
 
 class XmlImportFactory(Factory):
@@ -67,7 +67,7 @@ class XmlImportFactory(Factory):
     Factory for generating XmlImportData's, which can hold all the data needed
     to run an XModule XML import
     """
-    class Meta:
+    class Meta(object):
         model = XmlImportData
 
     filesystem = OSFS(mkdtemp())

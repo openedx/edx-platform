@@ -33,6 +33,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import AES
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.padding import PKCS7
+from six import text_type
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +84,10 @@ def generate_aes_iv(key):
     Return the initialization vector Software Secure expects for a given AES
     key (they hash it a couple of times and take a substring).
     """
-    return md5(key + md5(key).hexdigest().encode('utf-8')).hexdigest()[:AES_BLOCK_SIZE_BYTES].encode('utf-8')
+    if six.PY3:
+        return md5(key + md5(key).hexdigest().encode('utf-8')).hexdigest()[:AES_BLOCK_SIZE_BYTES].encode('utf-8')
+    else:
+        return md5(key + md5(key).hexdigest()).hexdigest()[:AES_BLOCK_SIZE_BYTES]
 
 
 def random_aes_key():
@@ -110,9 +114,9 @@ def rsa_encrypt(data, rsa_pub_key_bytes):
     """
     `rsa_pub_key_bytes` is a byte sequence with the public key
     """
-    if isinstance(data, str):
+    if isinstance(data, text_type):
         data = data.encode('utf-8')
-    if isinstance(rsa_pub_key_bytes, str):
+    if isinstance(rsa_pub_key_bytes, text_type):
         rsa_pub_key_bytes = rsa_pub_key_bytes.encode('utf-8')
     if rsa_pub_key_bytes.startswith(b'-----'):
         key = serialization.load_pem_public_key(rsa_pub_key_bytes, backend=default_backend())
@@ -127,9 +131,9 @@ def rsa_decrypt(data, rsa_priv_key_bytes):
     """
     When given some `data` and an RSA private key, decrypt the data
     """
-    if isinstance(data, str):
+    if isinstance(data, text_type):
         data = data.encode('utf-8')
-    if isinstance(rsa_priv_key_bytes, str):
+    if isinstance(rsa_priv_key_bytes, text_type):
         rsa_priv_key_bytes = rsa_priv_key_bytes.encode('utf-8')
     if rsa_priv_key_bytes.startswith(b'-----'):
         key = serialization.load_pem_private_key(rsa_priv_key_bytes, password=None, backend=default_backend())
@@ -153,12 +157,12 @@ def has_valid_signature(method, headers_dict, body_dict, access_key, secret_key)
 
     if post_access_key != access_key:
         log.error("Posted access key does not match ours")
-        log.debug("Their access: %s; Our access: %s", post_access_key, access_key)
+        log.debug(u"Their access: %s; Our access: %s", post_access_key, access_key)
         return False
 
     if post_signature != expected_signature:
         log.error("Posted signature does not match expected")
-        log.debug("Their sig: %s; Expected: %s", post_signature, expected_signature)
+        log.debug(u"Their sig: %s; Expected: %s", post_signature, expected_signature)
         return False
 
     return True
@@ -173,7 +177,7 @@ def generate_signed_message(method, headers_dict, body_dict, access_key, secret_
     # hmac needs a byte string for it's starting key, can't be unicode.
     hashed = hmac.new(secret_key.encode('utf-8'), message.encode('utf-8'), sha256)
     signature = binascii.b2a_base64(hashed.digest()).rstrip(b'\n').decode('utf-8')
-    authorization_header = f"SSI {access_key}:{signature}"
+    authorization_header = u"SSI {}:{}".format(access_key, signature)
 
     message += '\n'
     return message, signature, authorization_header
@@ -217,14 +221,14 @@ def body_string(body_dict, prefix=""):
         if isinstance(value, (list, tuple)):
             for i, arr in enumerate(value):
                 if isinstance(arr, dict):
-                    body_list.append(body_string(arr, f"{key}.{i}."))
+                    body_list.append(body_string(arr, u"{}.{}.".format(key, i)))
                 else:
-                    body_list.append(f"{key}.{i}:{arr}\n")
+                    body_list.append(u"{}.{}:{}\n".format(key, i, arr))
         elif isinstance(value, dict):
             body_list.append(body_string(value, key + ":"))
         else:
             if value is None:
                 value = "null"
-            body_list.append(f"{prefix}{key}:{value}\n")
+            body_list.append(u"{}{}:{}\n".format(prefix, key, value))
 
     return "".join(body_list)  # Note that trailing \n's are important

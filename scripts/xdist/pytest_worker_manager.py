@@ -12,6 +12,7 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 import socket
 from multiprocessing import Pool
+from six.moves import range
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class PytestWorkerManager():
         Spins up workers and generates two .txt files, containing the IP/ arns
         of the new workers.
         """
-        logging.info(f"Spinning up {number_of_workers} workers")
+        logging.info("Spinning up {} workers".format(number_of_workers))
 
         worker_instance_ids = []
         for retry in range(1, self.MAX_RUN_WORKER_RETRIES + 1):
@@ -70,11 +71,11 @@ class PytestWorkerManager():
                 # Handle AWS throttling with an exponential backoff
                 if retry == self.MAX_RUN_WORKER_RETRIES:
                     raise Exception(
-                        f"MAX_RUN_WORKER_RETRIES ({self.MAX_RUN_WORKER_RETRIES}) reached while spinning up workers due to AWS throttling."
+                        "MAX_RUN_WORKER_RETRIES ({}) reached while spinning up workers due to AWS throttling.".format(self.MAX_RUN_WORKER_RETRIES)
                     )
-                logger.info(f"Hit error: {err}. Retrying")
+                logger.info("Hit error: {}. Retrying".format(err))
                 countdown = 2 ** retry
-                logger.info(f"Sleeping for {countdown} seconds")
+                logger.info("Sleeping for {} seconds".format(countdown))
                 time.sleep(countdown)
             else:
                 break
@@ -112,7 +113,7 @@ class PytestWorkerManager():
             raise Exception(
                 "Timed out waiting to spin up all workers."
             )
-        logger.info(f"Successfully booted up {number_of_workers} workers.")
+        logger.info("Successfully booted up {} workers.".format(number_of_workers))
 
         not_ready_ip_addresses = ip_addresses[:]
         logger.info("Checking ssh connection to workers.")
@@ -139,13 +140,13 @@ class PytestWorkerManager():
 
         # Generate .txt files containing IP addresses and instance ids
         ip_list_string = ",".join(ip_addresses)
-        logger.info(f"Worker IP list: {ip_list_string}")
+        logger.info("Worker IP list: {}".format(ip_list_string))
         ip_list_file = open("pytest_worker_ips.txt", "w")
         ip_list_file.write(ip_list_string)
         ip_list_file.close()
 
         worker_instance_id_list_string = ",".join(worker_instance_ids)
-        logger.info(f"Worker Instance Id list: {worker_instance_id_list_string}")
+        logger.info("Worker Instance Id list: {}".format(worker_instance_id_list_string))
         worker_arn_file = open("pytest_worker_instance_ids.txt", "w")
         worker_arn_file.write(worker_instance_id_list_string)
         worker_arn_file.close()

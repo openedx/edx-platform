@@ -10,8 +10,8 @@ class ProgramsConfig(AppConfig):
     """
     Default configuration for the "openedx.core.djangoapps.programs" Django application.
     """
-    name = 'openedx.core.djangoapps.programs'
+    name = u'openedx.core.djangoapps.programs'
 
     def ready(self):
         # noinspection PyUnresolvedReferences
-        from . import signals, tasks  # lint-amnesty, pylint: disable=unused-import, unused-variable
+        from . import signals, tasks  # pylint: disable=unused-variable

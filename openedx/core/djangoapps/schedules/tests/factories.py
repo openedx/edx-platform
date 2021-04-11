@@ -18,7 +18,7 @@ class ScheduleExperienceFactory(factory.DjangoModelFactory):
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
-class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ScheduleFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.Schedule
 
@@ -28,14 +28,16 @@ class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disa
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
-class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ScheduleConfigFactory(factory.DjangoModelFactory):
     class Meta(object):
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
+    create_schedules = True
     enqueue_recurring_nudge = True
     deliver_recurring_nudge = True
     enqueue_upgrade_reminder = True
     deliver_upgrade_reminder = True
     enqueue_course_update = True
     deliver_course_update = True
+    hold_back_ratio = 0

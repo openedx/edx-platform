@@ -4,6 +4,7 @@
 
 
 import logging
+import six
 
 from django.utils.encoding import python_2_unicode_compatible
 from web_fragments.fragment import Fragment
@@ -49,7 +50,7 @@ class LibraryRoot(XBlock):
     has_author_view = True
 
     def __str__(self):
-        return f"Library: {self.display_name}"
+        return u"Library: {}".format(self.display_name)
 
     def author_view(self, context):
         """
@@ -90,7 +91,7 @@ class LibraryRoot(XBlock):
             child = self.runtime.get_block(child_key)
             child_view_name = StudioEditableModule.get_preview_view_name(child)
 
-            if str(child.location) == force_render:
+            if six.text_type(child.location) == force_render:
                 child_context['show_preview'] = True
 
             if child_context['show_preview']:
@@ -100,7 +101,7 @@ class LibraryRoot(XBlock):
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': str(child.location),
+                'id': six.text_type(child.location),
                 'content': rendered_child.content,
             })
 
@@ -119,7 +120,7 @@ class LibraryRoot(XBlock):
     @property
     def display_org_with_default(self):
         """
-        Org display names are not implemented. This just provides API compatibility with CourseBlock.
+        Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
         Always returns the raw 'org' field from the key.
         """
         return self.scope_ids.usage_id.course_key.org
@@ -127,7 +128,7 @@ class LibraryRoot(XBlock):
     @property
     def display_number_with_default(self):
         """
-        Display numbers are not implemented. This just provides API compatibility with CourseBlock.
+        Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
         Always returns the raw 'library' field from the key.
         """
         return self.scope_ids.usage_id.course_key.library

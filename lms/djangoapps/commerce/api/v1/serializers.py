@@ -4,6 +4,7 @@
 from datetime import datetime
 
 import pytz
+import six
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -32,7 +33,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
         except AttributeError:
             return None
 
-    class Meta:
+    class Meta(object):
         model = CourseMode
         fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
         # For disambiguating within the drf-yasg swagger schema
@@ -44,17 +45,17 @@ def validate_course_id(course_id):
     Check that course id is valid and exists in modulestore.
     """
     try:
-        course_key = CourseKey.from_string(str(course_id))
+        course_key = CourseKey.from_string(six.text_type(course_id))
     except InvalidKeyError:
-        raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-            _("{course_id} is not a valid course key.").format(
+        raise serializers.ValidationError(
+            _(u"{course_id} is not a valid course key.").format(
                 course_id=course_id
             )
         )
 
     if not modulestore().has_course(course_key):
         raise serializers.ValidationError(
-            _('Course {course_id} does not exist.').format(
+            _(u'Course {course_id} does not exist.').format(
                 course_id=course_id
             )
         )
@@ -68,7 +69,7 @@ class PossiblyUndefinedDateTimeField(serializers.DateTimeField):
     def to_representation(self, value):
         if value is UNDEFINED:
             return None
-        return super().to_representation(value)
+        return super(PossiblyUndefinedDateTimeField, self).to_representation(value)
 
 
 class CourseSerializer(serializers.Serializer):
@@ -78,7 +79,7 @@ class CourseSerializer(serializers.Serializer):
     verification_deadline = PossiblyUndefinedDateTimeField(format=None, allow_null=True, required=False)
     modes = CourseModeSerializer(many=True)
 
-    class Meta:
+    class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'commerce.Course'
 

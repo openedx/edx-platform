@@ -23,25 +23,25 @@ of the query for traversing StudentModule objects.
 import logging
 from functools import partial
 
-from celery import shared_task
+from celery import task
+from django.conf import settings
 from django.utils.translation import ugettext_noop
-from edx_django_utils.monitoring import set_code_owner_attribute
 
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
-from lms.djangoapps.instructor_task.tasks_helper.enrollments import upload_may_enroll_csv, upload_students_csv
+from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
+    upload_may_enroll_csv,
+    upload_students_csv
+)
 from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport, ProblemGradeReport, ProblemResponses
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
     upload_course_survey_report,
     upload_ora2_data,
     upload_ora2_submission_files,
-    upload_ora2_summary,
-    upload_proctored_exam_results_report,
-    generate_anonymous_ids
+    upload_proctored_exam_results_report
 )
-
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
     delete_problem_module_state,
     override_score_module_state,
@@ -54,8 +54,7 @@ from lms.djangoapps.instructor_task.tasks_helper.runner import run_main_task
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -82,8 +81,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def override_problem_score(entry_id, xmodule_instance_args):
     """
     Overrides a specific learner's score on a problem.
@@ -96,8 +94,7 @@ def override_problem_score(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -119,8 +116,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -142,8 +138,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -164,11 +159,11 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@shared_task(
+@task(
     name='lms.djangoapps.instructor_task.tasks.calculate_problem_responses_csv.v2',
     base=BaseInstructorTask,
+    routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY,
 )
-@set_code_owner_attribute
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
     Compute student answers to a given problem and upload the CSV to
@@ -180,8 +175,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -189,7 +183,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
     TASK_LOG.info(
-        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
@@ -197,8 +191,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
     Generate a CSV for a course containing all students' problem
@@ -207,7 +200,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense phrase that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('problem distribution graded')
     TASK_LOG.info(
-        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
@@ -215,8 +208,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -228,8 +220,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def course_survey_report_csv(entry_id, xmodule_instance_args):
     """
     Compute the survey report for a course and upload the
@@ -241,8 +232,7 @@ def course_survey_report_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     """
     Compute proctored exam results report for a course and upload the
@@ -253,8 +243,7 @@ def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     """
     Compute information about invited students who have not enrolled
@@ -267,8 +256,7 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
 def generate_certificates(entry_id, xmodule_instance_args):
     """
     Grade students and generate certificates.
@@ -276,7 +264,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('certificates generated')
     TASK_LOG.info(
-        "Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
+        u"Task: %s, InstructorTask ID: %s, Task type: %s, Preparing for task execution",
         xmodule_instance_args.get('task_id'), entry_id, action_name
     )
 
@@ -284,8 +272,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def cohort_students(entry_id, xmodule_instance_args):
     """
     Cohort students in bulk, and upload the results.
@@ -297,21 +284,7 @@ def cohort_students(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
-def generate_anonymous_ids_for_course(entry_id, xmodule_instance_args):
-    """
-    Generate a CSV of anonymize IDs for enrolled learner for course.
-    """
-    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
-    # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
-    action_name = ugettext_noop('generate_anonymized_id')
-    task_fn = partial(generate_anonymous_ids, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
-
-
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def export_ora2_data(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2 responses and push it to S3.
@@ -321,8 +294,7 @@ def export_ora2_data(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
+@task(base=BaseInstructorTask)
 def export_ora2_submission_files(entry_id, xmodule_instance_args):
     """
     Download all submission files, generate csv downloads list,
@@ -330,15 +302,4 @@ def export_ora2_submission_files(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('compressed')
     task_fn = partial(upload_ora2_submission_files, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
-
-
-@shared_task(base=BaseInstructorTask)
-@set_code_owner_attribute
-def export_ora2_summary(entry_id, xmodule_instance_args):
-    """
-    Generate a CSV of ora2/student summaries and push it to S3.
-    """
-    action_name = ugettext_noop('generated')
-    task_fn = partial(upload_ora2_summary, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

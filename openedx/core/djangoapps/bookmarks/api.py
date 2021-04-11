@@ -1,6 +1,9 @@
 """
 Bookmarks Python API.
 """
+
+
+import six
 from django.conf import settings
 from eventtracking import tracker
 
@@ -16,7 +19,7 @@ class BookmarksLimitReachedError(Exception):
     """
     if try to create new bookmark when max limit of bookmarks already reached
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 def get_bookmark(user, usage_key, fields=None):
@@ -196,9 +199,9 @@ def _track_event(event_name, bookmark):
     tracker.emit(
         event_name,
         {
-            'course_id': str(bookmark.course_key),
+            'course_id': six.text_type(bookmark.course_key),
             'bookmark_id': bookmark.resource_id,
             'component_type': bookmark.usage_key.block_type,
-            'component_usage_id': str(bookmark.usage_key),
+            'component_usage_id': six.text_type(bookmark.usage_key),
         }
     )

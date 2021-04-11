@@ -30,16 +30,16 @@ class TermsOfServiceCheckboxInput(CheckboxInput):
         # Translators: link_start and link_end are HTML tags for a link to the terms of service.
         # platform_name is the name of this Open edX installation.
         label = Text(_(
-            'I, and my organization, accept the {link_start}{platform_name} API Terms of Service{link_end}.'
+            u'I, and my organization, accept the {link_start}{platform_name} API Terms of Service{link_end}.'
         )).format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            link_start=HTML('<a href="{url}" rel="noopener" target="_blank">').format(
+            link_start=HTML(u'<a href="{url}" rel="noopener" target="_blank">').format(
                 url=reverse('api_admin:api-tos')
             ),
             link_end=HTML('</a>'),
         )
 
-        html = HTML('<input{{}} /> <label class="tos-checkbox-label" for="{id}">{label}</label>').format(
+        html = HTML(u'<input{{}} /> <label class="tos-checkbox-label" for="{id}">{label}</label>').format(
             id=final_attrs['id'],
             label=label
         )

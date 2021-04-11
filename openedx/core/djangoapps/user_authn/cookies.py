@@ -9,23 +9,19 @@ import time
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.dispatch import Signal
 from django.urls import NoReverseMatch, reverse
-from django.utils.http import http_date, parse_http_date
+from django.utils.http import http_date
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
 from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
 from oauth2_provider.models import Application
-from common.djangoapps.student.models import UserProfile
 
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from common.djangoapps.util.json_request import JsonResponse
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
-
 
 log = logging.getLogger(__name__)
 
@@ -157,26 +153,13 @@ def set_logged_in_cookies(request, response, user):
     return response
 
 
-def get_response_with_refreshed_jwt_cookies(request, user):
+def refresh_jwt_cookies(request, response, user):
     """
-    Generates the response and resets the JWT related cookies in the response for the given user.
+    Resets the JWT related cookies in the response for the given user.
     """
     cookie_settings = standard_cookie_settings(request)
-    response = JsonResponse({})
     _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
 
-    current_time = time.time()
-    expires_date = cookie_settings.get('expires', None)
-    expires_epoch = parse_http_date(expires_date) if expires_date else 0
-    response.content = json.dumps(
-        {
-            'success': True,
-            'response_epoch_seconds': current_time,
-            'response_http_date': http_date(current_time),
-            'expires': expires_date if expires_date else 'not-found',
-            'expires_epoch_seconds': expires_epoch,
-        }
-    )
     return response
 
 
@@ -221,14 +204,6 @@ def _set_deprecated_logged_in_cookie(response, cookie_settings):
     return response
 
 
-def _convert_to_absolute_uris(request, urls_obj):
-    """ Convert relative URL paths to absolute URIs """
-    for url_name, url_path in six.iteritems(urls_obj):
-        urls_obj[url_name] = request.build_absolute_uri(url_path)
-
-    return urls_obj
-
-
 def _get_user_info_cookie_data(request, user):
     """ Returns information that will populate the user info cookie. """
 
@@ -255,21 +230,14 @@ def _get_user_info_cookie_data(request, user):
     except User.DoesNotExist:
         pass
 
-    header_urls = _convert_to_absolute_uris(request, header_urls)
-
-    image_urls = {}
-    try:
-        image_urls = get_profile_image_urls_for_user(user)
-    except UserProfile.DoesNotExist:
-        pass
-
-    image_urls = _convert_to_absolute_uris(request, image_urls)
+    # Convert relative URL paths to absolute URIs
+    for url_name, url_path in six.iteritems(header_urls):
+        header_urls[url_name] = request.build_absolute_uri(url_path)
 
     user_info = {
         'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         'username': user.username,
         'header_urls': header_urls,
-        'user_image_urls': image_urls,
     }
 
     return user_info
@@ -349,6 +317,6 @@ def _get_login_oauth_client():
     try:
         return Application.objects.get(client_id=login_client_id)
     except Application.DoesNotExist:
-        raise AuthFailedError(  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AuthFailedError(
             u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
         )

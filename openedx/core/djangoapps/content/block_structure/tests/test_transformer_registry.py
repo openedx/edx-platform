@@ -15,21 +15,21 @@ class TestTransformer1(MockTransformer):
     """
     1st test instance of the MockTransformer that is registered.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class TestTransformer2(MockTransformer):
     """
     2nd test instance of the MockTransformer that is registered.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class UnregisteredTestTransformer3(MockTransformer):
     """
     3rd test instance of the MockTransformer that is not registered.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @ddt.ddt
@@ -39,7 +39,7 @@ class TransformerRegistryTestCase(TestCase):
     """
 
     def tearDown(self):
-        super().tearDown()
+        super(TransformerRegistryTestCase, self).tearDown()
         clear_registered_transformers_cache()
 
     @ddt.data(
@@ -71,13 +71,13 @@ class TransformerRegistryTestCase(TestCase):
         # hash with TestTransformer1
         with mock_registered_transformers([TestTransformer1]):
             version_hash_1 = TransformerRegistry.get_write_version_hash()
-            assert version_hash_1 == '+2nc5o2YRerVfAtItQBQ/6jVkkw='
+            self.assertEqual(version_hash_1, '+2nc5o2YRerVfAtItQBQ/6jVkkw=')
 
             # should return the same value again
-            assert version_hash_1 == TransformerRegistry.get_write_version_hash()
+            self.assertEqual(version_hash_1, TransformerRegistry.get_write_version_hash())
 
         # hash with TestTransformer1 and TestTransformer2
         with mock_registered_transformers([TestTransformer1, TestTransformer2]):
             version_hash_2 = TransformerRegistry.get_write_version_hash()
-            assert version_hash_2 == '5GwhvmSM9hknjUslzPnKDA5QaCo='
-            assert version_hash_1 != version_hash_2
+            self.assertEqual(version_hash_2, '5GwhvmSM9hknjUslzPnKDA5QaCo=')
+            self.assertNotEqual(version_hash_1, version_hash_2)

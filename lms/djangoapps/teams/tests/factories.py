@@ -20,21 +20,21 @@ class CourseTeamFactory(DjangoModelFactory):
 
     Note that team_id is not auto-generated from name when using the factory.
     """
-    class Meta:
+    class Meta(object):
         model = CourseTeam
         django_get_or_create = ('team_id',)
 
-    team_id = factory.Sequence('team-{}'.format)
-    topic_id = factory.Sequence('topic-{}'.format)
+    team_id = factory.Sequence('team-{0}'.format)
+    topic_id = factory.Sequence('topic-{0}'.format)
     discussion_topic_id = factory.LazyAttribute(lambda a: uuid4().hex)
-    name = factory.Sequence("Awesome Team {}".format)
+    name = factory.Sequence(u"Awesome Team {0}".format)
     description = "A simple description"
     last_activity_at = LAST_ACTIVITY_AT
 
 
 class CourseTeamMembershipFactory(DjangoModelFactory):
     """Factory for CourseTeamMemberships."""
-    class Meta:
+    class Meta(object):
         model = CourseTeamMembership
 
     last_activity_at = LAST_ACTIVITY_AT

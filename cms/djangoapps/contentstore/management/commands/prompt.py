@@ -5,6 +5,8 @@ Takes user input.
 
 import sys
 
+from six.moves import input
+
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -30,7 +32,7 @@ def query_yes_no(question, default="yes"):
     elif default == "no":
         prompt = " [y/N] "
     else:
-        raise ValueError("invalid default answer: '%s'" % default)
+        raise ValueError(u"invalid default answer: '%s'" % default)
 
     while True:
         sys.stdout.write(question + prompt)

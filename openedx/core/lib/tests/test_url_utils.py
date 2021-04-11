@@ -27,8 +27,8 @@ class TestQuoteSlashes(TestCase):
 
     @data(*TEST_STRINGS)
     def test_inverse(self, test_string):
-        assert test_string == unquote_slashes(quote_slashes(test_string))
+        self.assertEqual(test_string, unquote_slashes(quote_slashes(test_string)))
 
     @data(*TEST_STRINGS)
     def test_escaped(self, test_string):
-        assert '/' not in quote_slashes(test_string)
+        self.assertNotIn('/', quote_slashes(test_string))

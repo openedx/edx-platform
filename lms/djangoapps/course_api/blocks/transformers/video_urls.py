@@ -3,10 +3,11 @@ Video block URL Transformer
 """
 
 
+import six
 from django.conf import settings
 
-from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from xmodule.video_module.video_utils import rewrite_video_url
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 from .student_view import StudentViewTransformer
 
@@ -51,7 +52,7 @@ class VideoBlockURLTransformer(BlockStructureTransformer):
             if only_on_web:
                 continue
             encoded_videos = student_view_data.get('encoded_videos')
-            for video_format, video_data in encoded_videos.items():
+            for video_format, video_data in six.iteritems(encoded_videos):
                 if video_format in self.VIDEO_FORMAT_EXCEPTIONS:
                     continue
                 video_data['url'] = rewrite_video_url(self.CDN_URL, video_data['url'])

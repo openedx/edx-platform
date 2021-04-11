@@ -21,8 +21,8 @@ Methods for creating RequestContext for using with Mako templates.
 
 from crum import get_current_request
 from django.template import RequestContext
-from edx_django_utils.cache import RequestCache
 
+from edx_django_utils.cache import RequestCache
 from openedx.core.lib.request_utils import safe_get_host
 
 

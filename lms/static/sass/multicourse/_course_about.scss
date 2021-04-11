@@ -407,7 +407,7 @@
   }
 
   .course-sidebar {
-    @include media-breakpoint-up(md) {
+    @include media-breakpoint-up(dm) {
       box-sizing: border-box;
 
       @include float(left);

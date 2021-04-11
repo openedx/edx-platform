@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -8,7 +8,6 @@
 # J.14 <jithinchman@gmail.com>, 2014
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
 # J.14 <jithinchman@gmail.com>, 2014
-# k sukhum <k.sukhum@gmail.com>, 2020
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
 # peemmaruj <peemmaruj@gmail.com>, 2014
 # peemmaruj <peemmaruj@gmail.com>, 2014
@@ -19,7 +18,7 @@
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2013
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -31,23 +30,20 @@
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (https://www.transifex.com/open-edx/teams/6205/th/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2019 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2019.
 #
 # Translators:
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2019
-# นพดล โชติ <noppadol@thaicyberu.go.th>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# edx demo <edx.one2clouds@gmail.com>, 2020
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
-# k sukhum <k.sukhum@gmail.com>, 2020
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
@@ -55,11 +51,10 @@
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2019 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# edx demo <edx.one2clouds@gmail.com>, 2019
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
 # Pornchai TummarATTAnanonT <yantaku@gmail.com>, 2015
@@ -70,24 +65,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
-"Last-Translator: เรียก'สิ โซปอน <phamonti.pangklang@gmail.com>\n"
+"POT-Creation-Date: 2019-07-24 06:10+0000\n"
+"PO-Revision-Date: 2019-07-21 20:42+0000\n"
+"Last-Translator: Noppachai Eiamwasant <noporo@hotmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 2.8.0\n"
-
-#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/video_transcripts.js
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid ""
-"This may be happening because of an error with our server or your internet "
-"connection. Try refreshing the page or making sure you are online."
-msgstr ""
+"Generated-By: Babel 1.3\n"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 #: cms/static/js/certificates/views/signatory_details.js
@@ -98,9 +85,8 @@ msgstr ""
 #: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/list_item_editor.js
 #: cms/static/js/views/modals/edit_xblock.js cms/static/js/views/tabs.js
-#: cms/static/js/views/utils/xblock_utils.js
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
-#: lms/static/js/ccx/schedule.js lms/static/js/views/fields.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/ccx/schedule.js
+#: lms/static/js/views/fields.js
 msgid "Saving"
 msgstr "กำลังบันทึก"
 
@@ -137,7 +123,6 @@ msgstr "ลบ"
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/signatory-actions.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -158,10 +143,8 @@ msgstr "กำลังอัพโหลด"
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/video_transcripts.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/demographics_collection/Wizard.jsx
 #: lms/static/js/student_account/tos_modal.js
 #: cms/templates/js/course-video-settings.underscore
-#: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
@@ -272,14 +255,6 @@ msgid "Your changes have been saved."
 msgstr "การแก้ไขเปลี่ยนแปลงของคุณได้รับการเก็บบันทึกแล้ว"
 
 #. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Warning"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
@@ -288,8 +263,8 @@ msgstr ""
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
 #: lms/static/js/student_account/views/FinishAuthView.js
+#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 #: lms/static/js/views/fields.js
 msgid "Error"
@@ -299,18 +274,6 @@ msgstr "ผิดพลาด"
 #: common/lib/xmodule/xmodule/js/public/js/library_content_edit.js
 msgid "Updating with latest library content"
 msgstr "อัพเดทส่วนเนื้อหาจากห้องสมุดล่าสุด"
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Loading..."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx
-msgid "Selected blocks"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/assets/library_source_block/public/js/library_source_block.js
-msgid "Unable to update settings"
-msgstr ""
 
 #: common/lib/xmodule/xmodule/assets/split_test/public/js/split_test_author_view.js
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
@@ -357,50 +320,50 @@ msgstr ""
 msgid "Reply to Annotation"
 msgstr ""
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded, results hidden)"
-msgid_plural "{num_points} points possible (graded, results hidden)"
+msgid "%(num_points)s point possible (graded, results hidden)"
+msgid_plural "%(num_points)s points possible (graded, results hidden)"
 msgstr[0] ""
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded, results hidden)"
-msgid_plural "{num_points} points possible (ungraded, results hidden)"
+msgid "%(num_points)s point possible (ungraded, results hidden)"
+msgid_plural "%(num_points)s points possible (ungraded, results hidden)"
 msgstr[0] ""
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (graded)"
-msgid_plural "{num_points} points possible (graded)"
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
 msgstr[0] ""
 
-#. Translators: {num_points} is the number of points possible (examples: 1, 3,
-#. 10).;
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{num_points} point possible (ungraded)"
-msgid_plural "{num_points} points possible (ungraded)"
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
 msgstr[0] ""
 
-#. Translators: {earned} is the number of points earned. {possible} is the
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (graded)"
-msgid_plural "{earned}/{possible} points (graded)"
+msgid "%(earned)s/%(possible)s point (graded)"
+msgid_plural "%(earned)s/%(possible)s points (graded)"
 msgstr[0] ""
 
-#. Translators: {earned} is the number of points earned. {possible} is the
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "{earned}/{possible} point (ungraded)"
-msgid_plural "{earned}/{possible} points (ungraded)"
+msgid "%(earned)s/%(possible)s point (ungraded)"
+msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
@@ -446,11 +409,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid ""
-"{paragraph}=p;{preformatted}=pre;{heading3}=h3;{heading4}=h4;{heading5}=h5;{heading6}=h6"
 msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -764,14 +722,12 @@ msgstr ""
 msgid "Delete table"
 msgstr ""
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
-msgstr ""
+msgstr "คำอธิบาย"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -815,7 +771,6 @@ msgstr ""
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: common/static/common/templates/discussion/templates.underscore
 msgid "Edit"
 msgstr ""
 
@@ -1210,7 +1165,6 @@ msgstr ""
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/templates.underscore
 msgid "Next"
 msgstr "ถัดไป"
 
@@ -1552,7 +1506,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/templates.underscore
 msgid "Title"
 msgstr ""
 
@@ -1611,6 +1564,7 @@ msgid "Vertical space"
 msgstr ""
 
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
+#: openedx/features/course_search/static/course_search/templates/course_search_item.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_item.underscore
 msgid "View"
 msgstr "ดู"
@@ -2076,16 +2030,16 @@ msgid "This post could not be reopened. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "Show Discussion"
-msgstr "แสดงบทสนทนา"
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
 msgstr "ซ่อนบทสนทนา"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "This discussion could not be loaded. Refresh the page and try again."
 msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "แสดงบทสนทนา"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -2291,38 +2245,6 @@ msgstr[0] ""
 msgid "Select a section or problem"
 msgstr ""
 
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
-msgid "Create a report of problem responses"
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "Your report is being generated..."
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "Your report has been successfully generated."
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/ReportStatus/ReportStatus.jsx
-msgid "View Report"
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
-msgid "There was an error generating the report link."
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
-msgid "There was an error generating your report."
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
-msgid "Unable to get report generation status."
-msgstr ""
-
-#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/data/actions/problemResponses.js
-msgid "Unable to submit request to generate report."
-msgstr ""
-
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองอีกครั้ง"
@@ -2430,14 +2352,6 @@ msgid "Masters"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
@@ -2446,24 +2360,12 @@ msgid "Proctoring"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
 msgid "Other"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Course Discussion Forum"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid ""
-"While our support team is happy to assist with the edX platform, the course "
-"staff has the expertise for specific assignment questions, grading or the "
-"proper procedures in each course. Please post all course related questions "
-"within the Discussion Forum where the Course Staff can directly respond."
+msgid "What can we help you with, {username}?"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2471,23 +2373,20 @@ msgid "Details"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "the more quickly and helpfully we can respond!"
+msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Create Support Ticket"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "What can we help you with, {username}?"
-msgstr ""
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "ยอมรับ"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-msgid "Need help logging in?"
+msgid ""
+"If you are unable to access your account contact us via email using {email}."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2502,18 +2401,6 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -2539,8 +2426,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid ""
-"Thank you for submitting a request! We appreciate your patience while we "
-"work to review your request."
+"Thank you for submitting a request! We will contact you within 24 hours."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/upload_progress.jsx
@@ -2653,14 +2539,14 @@ msgstr "ข้อผิดพลาดเกิดขึ้นขณะกำล
 msgid "This team does not have any members."
 msgstr "ทีมนี้ไม่มีสมาชิกทีมใดๆ"
 
-#. Translators: 'date' is a placeholder for a fuzzy,
-#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Joined %(date)s"
 msgstr "เข้าร่วมเมื่อ %(date)s"
 
-#. Translators: 'date' is a placeholder for a fuzzy,
-#. * relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. https://github.com/rmm5t/jquery-timeago)
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid "Last Activity %(date)s"
 msgstr "กิจกรรมสุดท้ายเมื่อ %(date)s"
@@ -2671,9 +2557,11 @@ msgstr "ต้องการลบสมาชิกทีมคนนี้?"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 msgid ""
-"This learner will be removed from the team,allowing another learner to take "
-"the available spot."
+"This learner will be removed from the team, allowing another learner to take"
+" the available spot."
 msgstr ""
+"ผู้เรียนคนนี้จะถูกลบออกจากทีม "
+"อนุญาตให้ผู้เรียนคนอื่นสามารถเข้าแทนที่ที่มีอยู่"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Delete this team?"
@@ -2681,38 +2569,35 @@ msgstr "ต้องการลบทีมนี้?"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid ""
-"Deleting a team is permanent and cannot be undone.All members are removed "
+"Deleting a team is permanent and cannot be undone. All members are removed "
 "from the team, and team discussions can no longer be accessed."
 msgstr ""
+"การลบทีมเป็นแบบถาวรและไม่สามารถยกเลิกได้ "
+"สมาชิกทุกคนจะถูกลบออกจากทีมและการสนทนาของทีมไม่สามารถเข้าถึงได้"
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/manage.js
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Manage"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr "คุณไม่ได้เป็นสมาชิกของทีมใดๆในปัจจุบัน"
 
-#. Translators: "and others" refers to fact that additional
-#. * members of a team exist that are not displayed.
+#. Translators: "and others" refers to fact that additional members of a team
+#. exist that are not displayed.
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
 msgid "and others"
 msgstr "และ อื่นๆ"
 
-#. Translators: 'date' is a placeholder for a fuzzy,
-#. * relative timestamp (see: http://momentjs.com/)
+#. Translators: 'date' is a placeholder for a fuzzy, relative timestamp (see:
+#. http://momentjs.com/)
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "Last activity {date}"
-msgstr ""
+msgid "Last activity %(date)s"
+msgstr "กิจกรรมสุดท้ายเมื่อ %(date)s"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_card.js
-msgid "View {span_start} {team_name} {span_end}"
-msgstr ""
+msgid "View %(span_start)s %(team_name)s %(span_end)s"
+msgstr "การเข้าชม %(span_start)s %(team_name)s %(span_end)s"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
@@ -2720,18 +2605,16 @@ msgid "An error occurred. Try again."
 msgstr "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
-msgid "No assignments for team"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
 msgstr "ต้องการออกจากทีม?"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid ""
-"If you leave, you can no longer post in this team's discussions.Your place "
+"If you leave, you can no longer post in this team's discussions. Your place "
 "will be available to another learner."
 msgstr ""
+"ถ้าคุณออกจากทีม คุณจะไม่สามารถโพสต์ในการสนทนาของทีมนี้อีกต่อไป "
+"ที่ของคุณจะสามารถเข้าแทนที่ด้วยผู้เรียนคนอื่น"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
@@ -2740,21 +2623,17 @@ msgid "Confirm"
 msgstr "ยืนยัน"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "You already belong to another team in this team set."
-msgstr ""
+msgid "You already belong to another team."
+msgstr "คุณเป็นสมาชิกของทีมอื่นเรียบร้อยแล้ว"
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
 msgid "This team is full."
 msgstr "ทีมนี้เต็มแล้ว"
 
-#: lms/djangoapps/teams/static/teams/js/views/team_profile_header_actions.js
-msgid "Cannot join instructor managed team"
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/js/views/team_utils.js
-msgid " Member"
-msgid_plural " Members"
-msgstr[0] ""
+msgid "%(memberCount)s / %(maxMemberCount)s Member"
+msgid_plural "%(memberCount)s / %(maxMemberCount)s Members"
+msgstr[0] "%(memberCount)s / %(maxMemberCount)s สมาชิก"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "All teams"
@@ -2769,8 +2648,17 @@ msgid "Topics"
 msgstr "หัวข้อ"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "My Teams"
+msgid ""
+"See all teams in your course, organized by topic. Join a team to collaborate"
+" with other learners who are interested in the same topic as you are."
 msgstr ""
+"ดูทีมทั้งหมดในหลักสูตรที่จัดโดยหัวข้อ "
+"เข้าร่วมกับทีมเพื่อทำงานร่วมกับผู้เรียนคนอื่น ๆ "
+"ที่มีความสนใจในหัวข้อเดียวกันที่คุณมี"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "My Team"
+msgstr "ทีมของฉัน"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
@@ -2791,6 +2679,10 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
 msgstr "ค้นหาทีม"
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+msgid "Showing results for \"{searchString}\""
+msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -2830,29 +2722,8 @@ msgstr ""
 "โดยเฉพาะอย่างยิ่งถ้าพวกเขาไม่ได้มีส่วนร่วมในกิจกรรมของทีม"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "Showing results for \"{searchString}\""
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Search teams"
 msgstr "ค้นหาทีม"
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams you belong to and all public teams in your course, organized "
-"by topic. Join an open public team to collaborate with other learners who "
-"are interested in the same topic as you are."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid ""
-"See all teams you belong to and all public teams in your course, organized "
-"by topic."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-msgid "See all teams you belong to."
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "All Topics"
@@ -2871,18 +2742,26 @@ msgid "The team \"{team}\" could not be found."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "{team_count} Team"
-msgid_plural "{team_count} Teams"
-msgstr[0] ""
+msgid "%(team_count)s Team"
+msgid_plural "%(team_count)s Teams"
+msgstr[0] "%(team_count)sทีม"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "Topic"
 msgstr "หัวข้อ"
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
-msgid "View Teams in the {topic_name} Topic"
-msgstr ""
+msgid "View Teams in the %(topic_name)s Topic"
+msgstr "เข้าดูทีมในหัวข้อ %(topic_name)s"
 
+#. Translators: this string is shown at the bottom of the teams page
+#. to find a team to join or else to create a new one. There are three
+#. links that need to be included in the message:
+#. 1. Browse teams in other topics
+#. 2. search teams
+#. 3. create a new team
+#. Be careful to start each link with the appropriate start indicator
+#. (e.g. {browse_span_start} for #1) and finish it with {span_end}.
 #: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
 msgid ""
 "{browse_span_start}Browse teams in other topics{span_end} or "
@@ -2893,11 +2772,6 @@ msgstr ""
 "{browse_span_start}เบราว์ทีมในหัวข้ออื่น{span_end} หรือ {search_span_start} "
 "ค้นหาทีม {span_end} ในหัวข้อนี้. ถ้าคุณยังไม่สามารถหาทีมเพื่อเข้าร่วม, "
 "{create_span_start} สร้างทีมใหม่ในหัวข้อนี้ {span_end}."
-
-#: lms/djangoapps/teams/static/teams/js/views/topic_teams.js
-msgid ""
-"An error occurred while looking up team membership. Try refreshing the page."
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/topics.js
 msgid "All topics"
@@ -3218,7 +3092,6 @@ msgid "There has been an error processing your survey."
 msgstr "มีข้อผิดพลาดเกิดขึ้นในการประมวลผลของคุณ"
 
 #: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "More"
@@ -3235,7 +3108,6 @@ msgid "HTML preview of post"
 msgstr ""
 
 #: lms/static/js/customwmd.js
-#: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
 msgstr ""
 
@@ -3288,90 +3160,6 @@ msgstr ""
 msgid ""
 "Unable to determine whether we should give you a refund because of System "
 "Error. Please try again later."
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
-msgid "Want to make edX better for everyone?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx
-msgid "Get started"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Help make edX better for everyone!"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Why does edX collect this information?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"An error occurred while attempting to retrieve or save the information "
-"below. Please try again later."
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What was the total combined income, during the last 12 months, of all "
-"members of your family? "
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"Have you ever served on active duty in the U.S. Armed Forces, Reserves, or "
-"National Guard?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr ""
-
-#: lms/static/js/demographics_collection/MultiselectDropdown.jsx
-msgid "Clear all"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "demographics questionnaire"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "close questionnaire"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "finish later"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "Return to my dashboard"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "Finish later"
-msgstr ""
-
-#: lms/static/js/demographics_collection/Wizard.jsx
-msgid "next page"
 msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
@@ -3497,6 +3285,7 @@ msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr "ไม่พบผลลัพธ์สำหรับ \"%(query_string)s\". กรุณาลองค้นหาใหม่อีกครั้ง"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "ผลการค้นหา"
@@ -3707,27 +3496,22 @@ msgid "Error while regenerating certificates. Please try again."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Loading data..."
 msgstr "กำลังโหลดข้อมูล"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error getting issued certificates list."
 msgstr "ข้อผิดพลาดเกี่ยวกับรายชื่อใบรับรอง"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr "เกิดความผิดพลาดในผลคุมสอบ โปรดลองอีกครั้ง"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating survey results. Please try again."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating student profile information. Please try again."
 msgstr "ความผิดพลาดเกิดขึ้นในโปรไฟล์ของนักเรียน. โปรดลองใหม่อีกครั้ง"
 
@@ -3743,7 +3527,6 @@ msgid "Error getting student list."
 msgstr "ข้อผิดพลาด ในการเก็บรายชื่อนักเรียน"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "เกิดความผิดพลาดเกิดขึ้นในรายการของนักเรียนที่อาจจะลงทะเบียน. "
@@ -3754,17 +3537,14 @@ msgid "Error retrieving grading configuration."
 msgstr "มีข้อผิดพลาดในการเรียกการตั้งค่าการจัดเกรด"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating grades. Please try again."
 msgstr "เกิดความผิดพลาดในการออกเกรด โปรดลองอีกครั้ง"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "เกิดความผิดพลาดในปัญหาการรายงานเกรด โปรดลองอีกครั้ง"
 
 #: lms/static/js/instructor_dashboard/data_download.js
-#: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
 
@@ -4551,31 +4331,27 @@ msgid ""
 "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
 "the above carefully before proceeding. This is an irreversible action, and "
 "{strongStart}you will no longer be able to use the same email on "
-"{platformName}.{strongEnd}"
+"edX.{strongEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid "We’re sorry to see you go!"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
 "Please note: Deletion of your account and personal data is permanent and "
-"cannot be undone. {platformName} will not be able to recover your account or"
-" the data that is deleted."
+"cannot be undone. EdX will not be able to recover your account or the data "
+"that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
-"Once your account is deleted, you cannot use it to take courses on the "
-"{platformName} app, {siteName}, or any other site hosted by {platformName}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-#: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
-msgid ""
-"This includes access to {siteName} from your employer’s or university’s "
-"system{additionalSiteSpecificDeletionText}."
-msgstr ""
-
-#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
-msgid "We’re sorry to see you go!"
+"Once your account is deleted, you cannot use it to take courses on the edX "
+"app, edx.org, or any other site hosted by edX. This includes access to "
+"edx.org from your employer’s or university’s system and access to private "
+"sites offered by MIT Open Learning, Wharton Executive Education, and Harvard"
+" Medical School."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
@@ -4608,15 +4384,17 @@ msgstr ""
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "You have selected “Delete my account.” Deletion of your account and personal"
-" data is permanent and cannot be undone. {platformName} will not be able to "
-"recover your account or the data that is deleted."
+" data is permanent and cannot be undone. EdX will not be able to recover "
+"your account or the data that is deleted."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
 "If you proceed, you will be unable to use this account to take courses on "
-"the {platformName} app, {siteName}, or any other site hosted by "
-"{platformName}."
+"the edX app, edx.org, or any other site hosted by edX. This includes access "
+"to edx.org from your employer’s or university’s system and access to private"
+" sites offered by MIT Open Learning, Wharton Executive Education, and "
+"Harvard Medical School."
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
@@ -4700,19 +4478,6 @@ msgstr ""
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
-msgstr ""
-
-#: lms/static/js/student_account/views/LoginView.js
-msgid ""
-"In order to sign in, you need to activate your "
-"account.{line_break}{line_break}We just sent an activation link to "
-"{strong_start} {email} {strong_end}. If  you do not receive an email, check "
-"your spam folders or  {anchorStart}contact {platform_name} "
-"Support{anchorEnd}."
-msgstr ""
-
-#: lms/static/js/student_account/views/LoginView.js
-msgid "An unexpected error has occurred."
 msgstr ""
 
 #: lms/static/js/student_account/views/LoginView.js
@@ -4876,13 +4641,11 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "{platform_display_name} Link"
+msgid " Link"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"Enter your {platform_display_name} username or the URL to your "
-"{platform_display_name} page. Delete the URL to remove the link."
+msgid "Enter your "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -5048,6 +4811,10 @@ msgstr "มีข้อผิดพลาด. กรุณาลองอีก�
 msgid "Could not submit order"
 msgstr "ไม่สามารถส่งคำสั่งได้"
 
+#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
+msgid "Could not retrieve payment information"
+msgstr "ไม่สามารถเรียกข้อมูลการจ่าย"
+
 #: lms/static/js/verify_student/views/reverify_view.js
 msgid "Take a photo of your ID"
 msgstr "ถ่ายภาพรหัสของคุณ"
@@ -5183,6 +4950,25 @@ msgid ""
 "release date."
 msgstr ""
 
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] "%(num_students)s ผู้เรียนเปิดส่วนนี้"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] "%(num_students)s ผู้เรียน"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] "%(num_questions)s คำถาม"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "Number of Students"
+msgstr "จำนวนของผู้เรียน"
+
 #: lms/templates/courseware/progress_graph.js
 msgid "Overall Score"
 msgstr ""
@@ -5211,19 +4997,9 @@ msgstr "แสดงทั้งหมด"
 msgid "Collapse All"
 msgstr "ซ่อนทั้งหมด"
 
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show More"
-msgstr ""
-
-#: openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Show Less"
-msgstr ""
-
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
-msgid "{total_results} result found for \"{search_term}\""
-msgid_plural "{total_results} results found for \"{search_term}\""
+msgid "{total_results} result"
+msgid_plural "{total_results} results"
 msgstr[0] ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5308,6 +5084,13 @@ msgstr ""
 msgid "Profile"
 msgstr ""
 
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/video_transcripts.js
+msgid ""
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -5354,10 +5137,6 @@ msgstr "ใช่ อนุญาตการแก้ไขไปยังใ�
 msgid "certificate"
 msgstr "ประกาศนียบัตร"
 
-#: cms/static/js/certificates/views/certificate_preview.js
-msgid "Deactivating"
-msgstr ""
-
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
 msgstr "ตั้งค่าใบรับรองของคุณ"
@@ -5369,8 +5148,8 @@ msgid "You have not created any certificates yet."
 msgstr "คุณยังไม่ได้สร้างใบรับรอง"
 
 #: cms/static/js/certificates/views/signatory_editor.js
-msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
-msgstr ""
+msgid "Delete \"<%= signatoryName %>\" from the list of signatories?"
+msgstr "ลบ \"<%= signatoryName %>\" จากรายชื่อการลงนาม?"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5672,8 +5451,8 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
-"Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
-"<%- (fileExtensions) %> to upload."
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -5796,10 +5575,6 @@ msgstr "โหลดไฟล์อื่น"
 msgid "Adding"
 msgstr ""
 
-#: cms/static/js/views/container.js
-msgid "{startTag}{requestToken}{endTag}{selector}"
-msgstr ""
-
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
 msgstr "คุณแน่ใจหรือว่าต้องการที่จะลบการอัปเดทนี้"
@@ -5854,7 +5629,7 @@ msgid "{selectedProvider} credentials saved"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
-msgid "Upload a new PDF to “<%- name %>”"
+msgid "Upload a new PDF to “<%= name %>”"
 msgstr ""
 
 #: cms/static/js/views/edit_chapter.js
@@ -6195,7 +5970,7 @@ msgstr ""
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing access for: {title}"
+msgid "Editing access for: %(title)s"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -6411,14 +6186,17 @@ msgstr ""
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
 "The combined length of the organization, course number, and course run "
-"fields cannot be more than <%- limit %> characters."
+"fields cannot be more than <%=limit%> characters."
 msgstr ""
+"การรวมความยาวของไฟล์องค์กร รหัสหลักสูตร และหลักสูตรที่ใช้งาน "
+"ได้ไม่เกิน<%=limit%>ตัวอักษร"
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
-"more than <%- limit %> characters."
+"more than <%=limit%> characters."
 msgstr ""
+"การรวมความยาวของไฟล์องสถาบันและรหัสคลังข้อมูลได้ไม่เกิน<%=limit%>ตัวอักษร"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -6720,6 +6498,13 @@ msgstr "การตั้งค่าต่างๆ "
 msgid "New {component_type}"
 msgstr ""
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
 msgstr ""
@@ -6756,9 +6541,14 @@ msgstr "การกระทำ"
 msgid "Unscheduled"
 msgstr ""
 
+#: cms/templates/js/course_info_update.underscore
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Date"
+msgstr "วันที่"
+
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/templates.underscore
 msgid "Previous"
 msgstr "ก่อนหน้า"
 
@@ -6805,309 +6595,6 @@ msgstr "ล้างการค้นหา"
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 msgid "Search"
 msgstr "ค้นหา"
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Add a Response"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "This thread is closed."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Add a response:"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "ยอมรับ"
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Pinned"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Reported"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Closed"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Editing post"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid ""
-"Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Edit your post below."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Update post"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Add a comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Editing response"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Update response"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Editing comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Update comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "answered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "unanswered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Following"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Community TA"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "{unread_comments_count} new"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Add a Post"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Visible to"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single group."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "All Groups"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "follow this post"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "post anonymously to classmates"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Error posting your message."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#, python-format
-msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "This post will be visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Topic area"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "(Community TA)"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "(Staff)"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Return to all posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "View discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Load more"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Post type"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Question"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Endorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Unendorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Mark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Unmark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Follow"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Unfollow"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Vote for this post,"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Report abuse"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Report"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Unreport"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Pin"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Unpin"
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "Open"
-msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7166,6 +6653,10 @@ msgid ""
 msgstr ""
 "เลือกกล่องนี้เพื่อรับอีเมล์วันละครั้ง "
 "ซึ่งแจ้งเตือนข้อความใหม่และข้อความที่ยังไม่ได้อ่านจากกระทู้ที่คุณติดตาม "
+
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7374,26 +6865,6 @@ msgstr "ลบทีม"
 msgid "Edit Membership"
 msgstr "แก้ไขสมาชิก"
 
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "View Current Team Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Download Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Assign Team Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Upload Memberships"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/templates/manage.underscore
-msgid "Error assigning team memberships"
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr "คุณกำลังมีปัญหาในการหาทีม?"
@@ -7401,10 +6872,6 @@ msgstr "คุณกำลังมีปัญหาในการหาที
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "เข้าร่วมทีม"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-msgid "Team Assignments"
-msgstr ""
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -7490,21 +6957,101 @@ msgstr ""
 msgid "Remove unit %(unitName)s"
 msgstr ""
 
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"You still need to visit the %(display_name)s website to complete the credit "
+"process."
+msgstr ""
+"คุณยังต้องเข้าชมเว็บไซต์ %(display_name)s "
+"เพื่อให้กระบวนการของหน่วยกิตสมบูรณ์"
+
+#: lms/templates/commerce/provider.underscore
+#, python-format
+msgid ""
+"To finalize course credit, %(display_name)s requires %(platform_name)s "
+"learners to submit a credit request."
+msgstr ""
+
+#: lms/templates/commerce/provider.underscore
+msgid "Get Credit"
+msgstr "รับหน่วยกิต"
+
+#: lms/templates/commerce/receipt.underscore
+#, python-format
+msgid ""
+"Thank you %(full_name)s! We have received your payment for %(course_name)s."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+"โปรดพิมพ์หน้านี้สำหรับบันทึกของคุณ ซึ่งเป็นใบเสร็จรับเงินของคุณ "
+"และคุณจะได้รับอีเมล์รายละเอียดเดียวกันนี้เช่นเดียวกัน"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr "รายการหมายเลข "
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr "จำนวน"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "ทั้งหมด"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr "กรุณาอธิบาย"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Crossed out items have been refunded."
+msgstr "ขีดฆ่าสิ่งที่ชำระแล้ว"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed to"
+msgstr "แจ้งยอดไปที่"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available"
+msgstr "ไม่มีใบเสร็จออกให้"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
+msgid "Go to Dashboard"
+msgstr "ไปที่แดชบอร์ด"
+
+#: lms/templates/commerce/receipt.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from {platformName}"
+" to verify your identity."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr "ต้องการยืนยันตัวตนของคุณในภายหลัง?"
+
+#: lms/templates/commerce/receipt.underscore
+msgid "Verify Now"
+msgstr "ทำการตรวจสอบเดี๋ยวนี้:"
+
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "ทำเครื่องหมายว่าการสอบสมบูรณ์แล้ว"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Exam timer and end exam button"
-msgstr ""
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "End My Exam"
-msgstr "สิ้นสุดการสอบ"
-
-#: lms/templates/courseware/proctored-exam-status.underscore
-msgid "Hide Timer"
-msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "You are taking \"{exam_link}\" as {exam_type}. "
@@ -7522,6 +7069,26 @@ msgstr ""
 msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show More"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Show Less"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Exam timer and end exam button"
+msgstr ""
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "End My Exam"
+msgstr "สิ้นสุดการสอบ"
+
+#: lms/templates/courseware/proctored-exam-status.underscore
+msgid "Hide Timer"
 msgstr ""
 
 #: lms/templates/discovery/course_card.underscore
@@ -7617,7 +7184,7 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"We\\'ve included it here for your application."
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7645,10 +7212,6 @@ msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
 msgstr ""
-
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "ไปที่แดชบอร์ด"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
@@ -7988,6 +7551,14 @@ msgid "You can change sessions until {expiration_date}."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "Final Grade"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
+msgid "for {courseName}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr ""
 
@@ -8201,27 +7772,7 @@ msgid "An error occurred. Please reload the page."
 msgstr "เกิดข้อผิดพลาดขึ้น กรุณาลองใหม่อีกครั้ง"
 
 #: lms/templates/student_account/form_field.underscore
-msgid "Need help signing in?"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Forgot my password"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Other sign-in issues"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Sign in with your company or school"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Need other help signing in?"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Create an account"
+msgid "Need help logging in?"
 msgstr ""
 
 #: lms/templates/student_account/hinted_login.underscore
@@ -8425,22 +7976,32 @@ msgid "What You Need for Verification"
 msgstr "สิ่งที่คุณต้องใช้สำหรับการตรวจสอบ"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "Device with Camera"
-msgstr ""
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr "เว็บแคม"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"You need a device that has a webcam. If you receive a browser prompt for "
-"access to your camera, please make sure to click 'Allow'."
+"You need a computer that has a webcam. When you receive a browser prompt, "
+"make sure that you allow access to the camera."
 msgstr ""
+"คุณต้องมีคอมพิวเตอร์ที่มีกล้อง เมื่อคุณได้รับการตอบสนองจากเบราว์เซอร์ "
+"โปรดตรวจสอบว่าคุณอนุญาตให้เข้าถึงกล้อง"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "ภาพประจำตัว"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid "You need a valid ID that contains your full name and photo."
+msgid ""
+"You need a driver's license, passport, or other government-issued ID that "
+"has your name and photo."
 msgstr ""
+"คุณต้องมีใบอนุญาตขับขี่ หนังสือเดินทางหรือบัตรประจำตัวที่ออกโดยภาครัฐอื่น ๆ "
+"ที่มีชื่อและรูปภาพของคุณ"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8449,8 +8010,8 @@ msgstr "ถ่ายรูปของคุณ"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"When your face is in position, use the Take Photo button {icon} below to "
-"take your photo."
+"When your face is in position, use the camera button {icon} below to take "
+"your photo."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8466,9 +8027,13 @@ msgid "Your entire face fits inside the frame."
 msgstr "ใบหน้าของคุณพอดีกับในกรอบรูป"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+msgid "The photo of your face matches the photo on your ID."
+msgstr "ภาพใบหน้าของคุณตรงกับในบัตรประชาชน"
+
+#: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"To take the photo of your face, click on the camera button {icon}. If you "
-"need to try again, click 'Retake Photo'."
+"To use the current photo, select the camera button {icon}. To take another "
+"photo, select the retake button {icon}."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -8485,10 +8050,15 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr "ทำไม%(platformName)sต้องการรูปของฉัน?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
 msgid ""
-"We use your verification photos to confirm your identity and ensure the "
-"validity of your certificate."
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
 msgstr ""
+"ในส่วนของกระบวนการการยืนยัน คุณถ่ายรูปจากใบหน้าและรูปประจำตัวที่รัฐออกให้ "
+"การให้บริการของเราต้องยืนยันอัตลักษณ์ของคุณโดยการเปรียบเทียบรูปที่ถ่ายกับรูปบัตรประชาชน"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8499,60 +8069,22 @@ msgstr "แล้ว%(platformName)s จะทำอะไรกับรูป�
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-#, python-format
-msgid ""
-"We securely encrypt your photo and send it to our authorization service for "
-"review. Your photo and information are not saved or visible anywhere on "
-"%(platformName)s after the verification process is complete."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"What if I can't see the camera image, or if I can't see my photo do "
-"determine which side is visible?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"You may be able to complete the image capture procedure without assistance, "
-"but it may take a couple of submission attempts to get the camera "
-"positioning right.  Optimal camera positioning varies with each computer, "
-"but generally the best position for a headshot is approximately 12-18 inches"
-" (30-45 centimeters) from the camera, with your head centered relative to "
-"the computer screen. "
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"If the photos you submit are rejected, try moving the computer or camera "
-"orientation to change the lighting angle.  The most common reason for "
-"rejection is inability to read the text on the ID card."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"What if I have difficulty holding my head in position relative to the "
-"camera?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
-"If you require assistance with taking either photo for submission, contact "
-"%(platformName)s support for additional suggestions."
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
 msgstr ""
+"เราใช้ระบบรักษาความปลอดภัยขั้นสูงสุดที่หาได้เพื่อรักษารูปของคุณที่ส่งมายืนยันกับทางเรา"
+" "
+"รูปของคุณและข้อมูลจะไม่ถูกบันทึกหรือเห็นได้จากที่อื่นบน%(platformName)sหลังจากกระบวนการยืนยันตัวตนเสร็จสิ้น"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "ต่อไป: %(nextStepTitle)s"
@@ -8562,14 +8094,20 @@ msgid "Take a Photo of Your ID"
 msgstr "ถ่ายรูปบัตรประชาชนของคุณ"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Use your webcam to take a photo of your ID."
+msgid ""
+"Use your webcam to take a photo of your ID. We will match this photo with "
+"the photo of your face and the name on your account."
 msgstr ""
+"ใช้เว็บแคมของคุณเพื่อถ่ายรูปบัตรประชาชนของคุณ "
+"เราจะทำกับจับคู่รูปนี้กับรูปใบหน้าของคุณและชื่อของคุณในบัญชี"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or ID"
-" are all acceptable."
+"You need an ID with your name and photo. A driver's license, passport, or "
+"other government-issued IDs are all acceptable."
 msgstr ""
+"คุณต้องมีบัตรประจำตัวพร้อมชื่อและรูปถ่าย ใบอนุญาตขับขี่ "
+"หนังสือเดินทางหรือเอกสารที่ออกโดยภาครัฐอื่น ๆ ล้วนยอมรับได้"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8585,35 +8123,13 @@ msgid "Make sure your ID is well-lit"
 msgstr "แน่ใจว่าIDของคุณถูกต้อง"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the Take Photo button {icon} to capture your ID"
+msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Use the Retake Photo button if you are not pleased with your photo"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a photo ID. Our authorization service confirms your identity by comparing "
-"the photo you take with the photo on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"You may be able to complete the image capture procedure without assistance, "
-"but it may take a couple of submission attempts to get the camera "
-"positioning right.  Optimal camera positioning varies with each computer, "
-"but generally, the best position for a photo of an ID card is 8-12 inches "
-"(20-30 centimeters) from the camera, with the ID card centered relative to "
-"the camera. "
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"What if I have difficulty holding my ID in position relative to the camera?"
-msgstr ""
+msgid "Use the retake photo button if you are not pleased with your photo"
+msgstr "กดปุ่มถ่ายรูปอีกครั้งถ้าคุณไม่พอใจกับรูปของคุณ"
 
 #: lms/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
@@ -8640,34 +8156,12 @@ msgid "Be sure your entire face is inside the frame"
 msgstr "ให้แน่ใจว่าหน้าของคุณยังอยู่ในกรอบรูป"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"Once in position, use the Take Photo button {icon} to capture your photo"
+msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr "เราสามารถจับคู่ภาพที่คุณลงไว้กับอีกภาพบนบัตรประชาชนได้ไหม ?"
-
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
-msgstr ""
-"ในส่วนของกระบวนการการยืนยัน คุณถ่ายรูปจากใบหน้าและรูปประจำตัวที่รัฐออกให้ "
-"การให้บริการของเราต้องยืนยันอัตลักษณ์ของคุณโดยการเปรียบเทียบรูปที่ถ่ายกับรูปบัตรประชาชน"
-
-#: lms/templates/verify_student/incourse_reverify.underscore
-#, python-format
-msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
-msgstr ""
-"เราใช้ระบบรักษาความปลอดภัยขั้นสูงสุดที่หาได้เพื่อรักษารูปของคุณที่ส่งมายืนยันกับทางเรา"
-" "
-"รูปของคุณและข้อมูลจะไม่ถูกบันทึกหรือเห็นได้จากที่อื่นบน%(platformName)sหลังจากกระบวนการยืนยันตัวตนเสร็จสิ้น"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
@@ -8684,11 +8178,13 @@ msgstr ""
 "หลังจากยืนยันการใช้งานเสร็จแล้วคุณสามารถกลับไปและรีเฟชรหน้านี้ได้"
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "เปิดใช้งานบัญชีของคุณ"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "ID รูป"
 
@@ -8699,12 +8195,6 @@ msgid ""
 msgstr ""
 "คุณต้องมีใบอนุญาตขับขี่ หนังสือเดินทางหรือเอกสารที่ออกโดยภาครัฐอื่นๆ "
 "ที่มีชื่อและรูปภาพของคุณ"
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid "Webcam"
-msgstr "เว็บแคม"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
@@ -8797,10 +8287,6 @@ msgid "Check your email for an activation message."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-msgid "Total"
-msgstr "ทั้งหมด"
-
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr ""
 
@@ -8833,6 +8319,44 @@ msgid ""
 "government-issued photo ID."
 msgstr ""
 
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Thank you! We have received your payment for {courseName}."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Next Step: Confirm your identity"
+msgstr "ขั้นต่อไป: ยืนยันอัตลักษณ์ของคุณ"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Check your email"
+msgstr "ตรวจสอบอีเมล์"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"You need to activate your account before you can enroll in courses. Check "
+"your inbox for an activation email."
+msgstr ""
+"คุณต้องเปิดการใช้งานบัญชีก่อนถึงจะสามารถลงทะเบียนหลักสูตรได้ "
+"ตรวจสอบอีเมล์การใช้งานในกล่องจดหมาย"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"A driver's license, passport, or government-issued ID with your name and "
+"photo."
+msgstr ""
+"ใบอนุญาตขับขี่ หนังสือเดินทางหรือเอกสารที่ออกโดยภาครัฐอื่นๆ "
+"ที่มีชื่อและรูปภาพของคุณ"
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+#, python-format
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
+msgstr ""
+"ถ้าคุณไม่ยืนยันตัวตนในตอนนี้ คุณยังคงไปสำรวจหลักสูตรจากแดชบอร์ดได้ "
+"คุณจะถูกเตือนเป็นช่วงๆจาก %(platformName)s เพื่อให้ยืนยันตัวตน"
+
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr "การตรวจสอบบุคคลกำลังดำเนินการ"
@@ -8841,9 +8365,12 @@ msgstr "การตรวจสอบบุคคลกำลังดำเน
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
-"(usually within 5-7 days). In the meantime, you can still access all "
+"(usually within 1-2 days). In the meantime, you can still access all "
 "available course content."
 msgstr ""
+"เราได้รับข้อมูลของคุณและกำลังตรวจสอบตัวตนของคุณ "
+"คุณจะเห็นข้อความบนแดชบอร์ดของคุณเมื่อกระบวนการตรวจสอบเสร็จสมบูรณ์ (ปกติภายใน"
+" 1-2 วัน) ในขณะเดียวกันคุณยังสามารถเข้าถึงเนื้อหาหลักสูตรที่มีอยู่ทั้งหมด"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
@@ -8876,6 +8403,10 @@ msgstr "ข้อกำหนดของรูป:"
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr "รูปของคุณแสดงหน้าเต็มหรือไม่?"
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Does the photo of you match your ID photo?"
+msgstr "รูปของคุณเหมือนกับรูปประจำตัวประชาชนของคุณหรือไม่?"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
@@ -8998,16 +8529,18 @@ msgid ""
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+#, python-format
 msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
+"Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
+"your existing account"
 msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
+#, python-format
 msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
+"%(download_link_start)sDownload this image (right-click or option-click, "
+"save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
+"your backpack.</li>"
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
@@ -9344,10 +8877,6 @@ msgid ""
 "If you select an option other than \"%(hide_label)s\", published units in "
 "this subsection become available to learners unless they are explicitly "
 "hidden."
-msgstr ""
-
-#: cms/templates/js/copy-clipboard-button.underscore
-msgid "Copy Component Location"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
@@ -9694,7 +9223,11 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
-msgid "Date"
+msgid "Send push notification to mobile apps"
+msgstr ""
+
+#: cms/templates/js/course_info_update.underscore
+msgid "Send notification to mobile apps"
 msgstr ""
 
 #: cms/templates/js/course_info_update.underscore
@@ -9769,10 +9302,6 @@ msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
-msgstr ""
-
-#: cms/templates/js/edit-title-button.underscore
-msgid "Edit Title"
 msgstr ""
 
 #: cms/templates/js/grading-editor.underscore
@@ -9934,6 +9463,10 @@ msgstr ""
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
+msgstr ""
+
+#: cms/templates/js/metadata-editor.underscore
+msgid "Component Location ID"
 msgstr ""
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
@@ -10293,21 +9826,6 @@ msgid "Exam Types"
 msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"This subsection was released to learners as a special exam, but was reverted"
-" back to a basic exam. You may not configure it as a special exam now. "
-"Contact edX Support for assistance."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
-msgid ""
-"This special exam has been released to learners. You may not convert it to "
-"another type of special exam. You may revert this subsection back to being a"
-" basic exam by selecting 'None', but you will NOT be able to configure it as"
-" a special exam in the future."
-msgstr ""
-
-#: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Timed"
 msgstr ""
 
@@ -10477,11 +9995,11 @@ msgid "Read more"
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "No transcript uploaded."
+msgid "Show transcripts ({totalTranscripts})"
 msgstr ""
 
 #: cms/templates/js/video-transcripts.underscore
-msgid "Show transcripts ({totalTranscripts})"
+msgid "No transcript uploaded."
 msgstr ""
 
 #: cms/templates/js/xblock-access-editor.underscore

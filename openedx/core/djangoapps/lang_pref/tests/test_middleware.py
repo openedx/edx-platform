@@ -4,9 +4,10 @@ Tests for lang_pref middleware.
 
 
 import itertools
-from unittest import mock
 
 import ddt
+import mock
+import six
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
@@ -32,7 +33,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestUserPreferenceMiddleware, self).setUp()
         self.middleware = LanguagePreferenceMiddleware()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
@@ -82,7 +83,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 domain=settings.SESSION_COOKIE_DOMAIN,
             )
 
-        assert LANGUAGE_SESSION_KEY not in self.request.session
+        self.assertNotIn(LANGUAGE_SESSION_KEY, self.request.session)
 
     @ddt.data(*itertools.product(
         (None, 'eo', 'es'),  # LANGUAGE_COOKIE
@@ -101,7 +102,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         self.middleware.process_request(self.request)
 
         if lang_cookie is None:
-            assert mock_set_user_preference.mock_calls == []
+            self.assertEqual(mock_set_user_preference.mock_calls, [])
         else:
             mock_set_user_preference.assert_called_with(self.user, LANGUAGE_KEY, lang_cookie)
 
@@ -150,11 +151,11 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             accept_lang_out = parse_accept_lang_header(accept_lang_out)
 
         if accept_lang_out and accept_lang_result:
-            self.assertCountEqual(accept_lang_result, accept_lang_out)
+            six.assertCountEqual(self, accept_lang_result, accept_lang_out)
         else:
-            assert accept_lang_result == accept_lang_out
+            self.assertEqual(accept_lang_result, accept_lang_out)
 
-        assert self.request.session.get(LANGUAGE_SESSION_KEY) == lang_session_out
+        self.assertEqual(self.request.session.get(LANGUAGE_SESSION_KEY), lang_session_out)
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):
@@ -166,9 +167,12 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         # explicitly clears all cookies
         self.client.get(reverse('logout'))
         if lang_cookie:
-            assert self.client.cookies[settings.LANGUAGE_COOKIE].value == lang_cookie
+            self.assertEqual(
+                self.client.cookies[settings.LANGUAGE_COOKIE].value,
+                lang_cookie
+            )
         else:
-            assert settings.LANGUAGE_COOKIE not in self.client.cookies
+            self.assertNotIn(settings.LANGUAGE_COOKIE, self.client.cookies)
 
     @ddt.data(
         (None, None),
@@ -194,16 +198,19 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
             }
         )
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         if lang_cookie:
-            assert response['Content-Language'] == expected_lang
-            assert get_user_preference(self.user, LANGUAGE_KEY) == lang_cookie
-            assert self.client.cookies[settings.LANGUAGE_COOKIE].value == lang_cookie
+            self.assertEqual(response['Content-Language'], expected_lang)
+            self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), lang_cookie)
+            self.assertEqual(
+                self.client.cookies[settings.LANGUAGE_COOKIE].value,
+                lang_cookie
+            )
         else:
-            assert response['Content-Language'] == 'en'
-            assert get_user_preference(self.user, LANGUAGE_KEY) is None
-            assert self.client.cookies[settings.LANGUAGE_COOKIE].value == ''
+            self.assertEqual(response['Content-Language'], 'en')
+            self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), None)
+            self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE].value, '')
 
     def test_process_response_no_user_noop(self):
         del self.request.user
@@ -211,17 +218,17 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         result = self.middleware.process_response(self.request, response)
 
-        assert result is response
-        assert response.mock_calls == []
+        self.assertIs(result, response)
+        self.assertEqual(response.mock_calls, [])
 
     def test_preference_update_noop(self):
         self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'es'
 
         # No preference yet, should write to the database
 
-        assert get_user_preference(self.user, LANGUAGE_KEY) is None
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), None)
         self.middleware.process_request(self.request)
-        assert get_user_preference(self.user, LANGUAGE_KEY) == 'es'
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'es')
 
         response = mock.Mock(spec=HttpResponse)
 
@@ -233,7 +240,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         with self.assertNumQueries(3):
             self.middleware.process_request(self.request)
 
-        assert get_user_preference(self.user, LANGUAGE_KEY) == 'es'
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'es')
 
         response = mock.Mock(spec=HttpResponse)
 
@@ -244,7 +251,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
 
         self.request.COOKIES[settings.LANGUAGE_COOKIE] = 'en'
         self.middleware.process_request(self.request)
-        assert get_user_preference(self.user, LANGUAGE_KEY) == 'en'
+        self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), 'en')
 
         with self.assertNumQueries(1):
             self.middleware.process_response(self.request, response)

@@ -10,17 +10,16 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from organizations.api import get_organizations
 
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateGenerationCommandConfiguration,
     CertificateGenerationCourseSetting,
     CertificateHtmlViewConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
     GeneratedCertificate
 )
+from common.djangoapps.util.organizations_helpers import get_organizations
 
 
 class CertificateTemplateForm(forms.ModelForm):
@@ -28,7 +27,7 @@ class CertificateTemplateForm(forms.ModelForm):
     Django admin form for CertificateTemplate model
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(CertificateTemplateForm, self).__init__(*args, **kwargs)
         organizations = get_organizations()
         org_choices = [(org["id"], org["name"]) for org in organizations]
         org_choices.insert(0, ('', 'None'))
@@ -42,7 +41,7 @@ class CertificateTemplateForm(forms.ModelForm):
             choices=lang_choices, required=False
         )
 
-    class Meta:
+    class Meta(object):
         model = CertificateTemplate
         fields = '__all__'
 
@@ -69,7 +68,7 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
             extra_context = {'title': mark_safe('Select Certificate Template Asset to change <br/><br/>'
                                                 '<div><strong style="color: red;"> Warning!</strong> Updating '
                                                 'stage asset would also update production asset</div>')}
-        return super().changelist_view(request, extra_context=extra_context)
+        return super(CertificateTemplateAssetAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):
@@ -89,11 +88,6 @@ class CertificateGenerationCourseSettingAdmin(admin.ModelAdmin):
     list_display = ('course_key', 'self_generation_enabled', 'language_specific_templates_enabled')
     search_fields = ('course_key',)
     show_full_result_count = False
-
-
-@admin.register(CertificateGenerationCommandConfiguration)
-class CertificateGenerationCommandConfigurationAdmin(ConfigurationModelAdmin):
-    pass
 
 
 admin.site.register(CertificateGenerationConfiguration)

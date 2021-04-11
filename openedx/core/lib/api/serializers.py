@@ -13,7 +13,7 @@ class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
     """Serializes arbitrary models in a collapsed format, with just an id and url."""
     url = serializers.HyperlinkedIdentityField(view_name='')
 
-    def __init__(self, model_class, view_name, id_source='id', lookup_field=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+    def __init__(self, model_class, view_name, id_source='id', lookup_field=None, *args, **kwargs):
         """Configures the serializer.
 
         Args:
@@ -32,7 +32,7 @@ class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
 
         self.Meta.model = model_class
 
-        super(CollapsedReferenceSerializer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(CollapsedReferenceSerializer, self).__init__(*args, **kwargs)
 
         self.fields[id_source] = serializers.CharField(read_only=True)
         self.fields['url'].view_name = view_name
@@ -46,7 +46,7 @@ class CollapsedReferenceSerializer(serializers.HyperlinkedModelSerializer):
 class CourseKeyField(serializers.Field):
     """ Serializer field for a model CourseKey field. """
 
-    def to_representation(self, data):  # lint-amnesty, pylint: disable=arguments-differ
+    def to_representation(self, data):
         """Convert a course key to unicode. """
         return six.text_type(data)
 
@@ -55,13 +55,13 @@ class CourseKeyField(serializers.Field):
         try:
             return CourseKey.from_string(data)
         except InvalidKeyError as ex:
-            raise serializers.ValidationError(u"Invalid course key: {msg}".format(msg=ex.msg))  # lint-amnesty, pylint: disable=no-member
+            raise serializers.ValidationError(u"Invalid course key: {msg}".format(msg=ex.msg))
 
 
 class UsageKeyField(serializers.Field):
     """ Serializer field for a model UsageKey field. """
 
-    def to_representation(self, data):  # lint-amnesty, pylint: disable=arguments-differ
+    def to_representation(self, data):
         """Convert a usage key to unicode. """
         return six.text_type(data)
 
@@ -70,4 +70,4 @@ class UsageKeyField(serializers.Field):
         try:
             return UsageKey.from_string(data)
         except InvalidKeyError as ex:
-            raise serializers.ValidationError(u"Invalid usage key: {msg}".format(msg=ex.msg))  # lint-amnesty, pylint: disable=no-member
+            raise serializers.ValidationError(u"Invalid usage key: {msg}".format(msg=ex.msg))

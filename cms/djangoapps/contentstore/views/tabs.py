@@ -1,6 +1,9 @@
 """
 Views related to course tabs
 """
+
+
+import six
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
@@ -45,7 +48,7 @@ def tabs_handler(request, course_key_string):
     course_item = modulestore().get_course(course_key)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if request.method == 'GET':  # lint-amnesty, pylint: disable=no-else-raise
+        if request.method == 'GET':
             raise NotImplementedError('coming soon')
         else:
             if 'tabs' in request.json:
@@ -97,7 +100,7 @@ def reorder_tabs_handler(course_item, request):
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
             return JsonResponse(
-                {"error": f"Tab with id_locator '{tab_id_locator}' does not exist."}, status=400
+                {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
             )
         new_tab_list.append(tab)
 
@@ -111,7 +114,7 @@ def reorder_tabs_handler(course_item, request):
         CourseTabList.validate_tabs(new_tab_list)
     except InvalidTabsException as exception:
         return JsonResponse(
-            {"error": "New list of tabs is not valid: {}.".format(str(exception))}, status=400
+            {"error": u"New list of tabs is not valid: {0}.".format(str(exception))}, status=400
         )
 
     # persist the new order of the tabs
@@ -133,7 +136,7 @@ def edit_tab_handler(course_item, request):
     tab = get_tab_by_tab_id_locator(course_item.tabs, tab_id_locator)
     if tab is None:
         return JsonResponse(
-            {"error": f"Tab with id_locator '{tab_id_locator}' does not exist."}, status=400
+            {"error": u"Tab with id_locator '{0}' does not exist.".format(tab_id_locator)}, status=400
         )
 
     if 'is_hidden' in request.json:
@@ -141,7 +144,7 @@ def edit_tab_handler(course_item, request):
         tab.is_hidden = request.json['is_hidden']
         modulestore().update_item(course_item, request.user.id)
     else:
-        raise NotImplementedError(f'Unsupported request to edit tab: {request.json}')
+        raise NotImplementedError(u'Unsupported request to edit tab: {0}'.format(request.json))
 
     return JsonResponse()
 
@@ -197,7 +200,7 @@ def primitive_delete(course, num):
 def primitive_insert(course, num, tab_type, name):
     "Inserts a new tab at the given number (0 based)."
     validate_args(num, tab_type)
-    new_tab = CourseTab.from_json({'type': str(tab_type), 'name': str(name)})
+    new_tab = CourseTab.from_json({u'type': six.text_type(tab_type), u'name': six.text_type(name)})
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)

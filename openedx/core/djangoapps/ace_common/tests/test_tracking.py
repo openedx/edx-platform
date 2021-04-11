@@ -20,11 +20,11 @@ class TestCampaignTrackingInfo(QueryStringAssertionMixin, TestCase):
 
     def test_default_campaign_info(self):
         campaign = CampaignTrackingInfo()
-        assert campaign.source == DEFAULT_CAMPAIGN_SOURCE
-        assert campaign.medium == DEFAULT_CAMPAIGN_MEDIUM
-        assert campaign.campaign is None
-        assert campaign.term is None
-        assert campaign.content is None
+        self.assertEqual(campaign.source, DEFAULT_CAMPAIGN_SOURCE)
+        self.assertEqual(campaign.medium, DEFAULT_CAMPAIGN_MEDIUM)
+        self.assertIsNone(campaign.campaign)
+        self.assertIsNone(campaign.term)
+        self.assertIsNone(campaign.content)
 
     def test_to_query_string(self):
         campaign = CampaignTrackingInfo(
@@ -76,7 +76,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_default_parameters(self):
         pixel = GoogleAnalyticsTrackingPixel()
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
             pixel.generate_image_url(),
             scheme='https',
@@ -105,7 +105,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
             document_host='test_host.com',
             client_id='123456.123456',
         )
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
             pixel.generate_image_url(),
             scheme='https',
@@ -117,7 +117,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
 
     def test_missing_settings(self):
         pixel = GoogleAnalyticsTrackingPixel()
-        assert pixel.generate_image_url() is None
+        self.assertIsNone(pixel.generate_image_url())
 
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_site_config_override(self):
@@ -135,7 +135,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     )
     def test_custom_dimension(self):
         pixel = GoogleAnalyticsTrackingPixel(user_id=10, campaign_source=None, campaign_medium=None)
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
             pixel.generate_image_url(),
             query='v=1&t=event&ec=email&ea=edx.bi.email.opened&cid={cid}&tid=UA-123456-1&cd40=10&uid=10'.format(
@@ -149,7 +149,7 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     )
     def test_custom_dimension_without_user_id(self):
         pixel = GoogleAnalyticsTrackingPixel(campaign_source=None, campaign_medium=None)
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_url_components_equal(
             pixel.generate_image_url(),
             query='v=1&t=event&ec=email&ea=edx.bi.email.opened&cid={cid}&tid=UA-123456-1'.format(
@@ -161,11 +161,11 @@ class TestGoogleAnalyticsTrackingPixel(QueryStringAssertionMixin, CacheIsolation
     def test_course_id(self):
         course_id = 'foo/bar/baz'
         pixel = GoogleAnalyticsTrackingPixel(course_id=course_id)
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_query_string_parameters_equal(pixel.generate_image_url(), el=course_id)
 
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID='UA-123456-1')
     def test_course_id_with_event_label(self):
         pixel = GoogleAnalyticsTrackingPixel(course_id='foo/bar/baz', event_label='test_label')
-        assert pixel.generate_image_url() is not None
+        self.assertIsNotNone(pixel.generate_image_url())
         self.assert_query_string_parameters_equal(pixel.generate_image_url(), el='test_label')

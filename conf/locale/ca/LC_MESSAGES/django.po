@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (https://www.transifex.com/open-edx/teams/6205/ca/)\n"
@@ -582,9 +582,17 @@ msgstr "{platform_name} Certificat Professional per {course_name}"
 
 #: common/djangoapps/student/models.py
 msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
+"The company identifier for the LinkedIn Add-to-Profile button e.g "
+"0_0dPSPyS070e0HsE9HNz_13_d11_"
+msgstr ""
+"L'empresa amb el butó  Afegir al perfil per LinkedIn ex. "
+"0_0dPSPyS070e0HsE9HNz_13_d11_"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"Short identifier for the LinkedIn partner used in the tracking code.  "
+"(Example: 'edx')  If no value is provided, tracking codes will not be sent "
+"to LinkedIn."
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -665,7 +673,7 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, current_email, desired_email"
+"follows:                     username, email, new_email"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2030,6 +2038,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Mostrar resposta"
 
@@ -6042,6 +6051,14 @@ msgstr ""
 msgid "Total number of users"
 msgstr ""
 
+#: lms/templates/tracking_log.html
+msgid "username"
+msgstr "username"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr ""
+
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr ""
@@ -6108,6 +6125,14 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
@@ -7277,10 +7302,6 @@ msgstr ""
 msgid "Find information related to a learner's program enrollments"
 msgstr ""
 
-#: lms/templates/tracking_log.html
-msgid "username"
-msgstr "username"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -7931,7 +7952,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -8818,13 +8839,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
 msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -9951,13 +9965,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "Massa errors per entrar. Prova-ho de nou més tard."
 
@@ -9968,14 +9975,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -9994,6 +9993,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/password_reset.py
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -10221,10 +10224,6 @@ msgstr ""
 msgid ""
 "I agree to the {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
 msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -11243,8 +11242,9 @@ msgstr "No s'ha especificat cap `rol`."
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"L'usuari {email} s'ha enregistrat però encara no ha activat el seu compte."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12176,7 +12176,7 @@ msgid "Welcome to {platform_name}"
 msgstr "Benvingut a {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr "Funciona! Amb el suport de Open edX{registered_trademark}"
@@ -12379,22 +12379,6 @@ msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "Hint"
-msgstr "Pista"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "Desa la teva resposta"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "Reinicia la teva resposta"
-
-#: lms/templates/problem.html
-msgid "Show answer"
-msgstr ""
-
-#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "Has fet servir {num_used} de {num_total} intents"
@@ -12407,6 +12391,18 @@ msgid ""
 msgstr ""
 "Alguns problemes tenen opcions com ara desar, restablir, suggerir o mostrar "
 "resposta. Aquestes opcions segueixen el botó Enviar."
+
+#: lms/templates/problem.html
+msgid "Hint"
+msgstr "Pista"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "Desa la teva resposta"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "Reinicia la teva resposta"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -12712,10 +12708,6 @@ msgid "Git Logs"
 msgstr "Registes Git"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "Gestió d'usuaris"
 
@@ -12732,12 +12724,28 @@ msgid "Create user"
 msgstr "Crea usuari"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr "Descarrega la llista de tots els usuaris (fitxer CSV)"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr "Comproveu i repareu el mapa d'autenticació extern"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
 "Anar al Tauler d'instructors de cada curs individual per gestionar la "
 "inscripció al curs."
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr "Gestionar personal i instructors del curs"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr "Baixeu la llista de personal i de l'instructor (fitxer CSV)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -16244,8 +16252,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your verification is effective for one year. It will expire on {expiry_date}"
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -16723,10 +16730,6 @@ msgstr "Honor"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "Professional"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -18818,6 +18821,10 @@ msgstr "Aquest curs no té actualitzacions."
 msgid "Latest Update"
 msgstr "Última actualització"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr ""
@@ -18903,6 +18910,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "edX Partner Portal"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
@@ -21811,10 +21826,14 @@ msgstr "Autoportant"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses offer suggested due dates for assignments or exams based "
-"on the learner’s enrollment date and the expected course duration. These "
-"courses offer learners flexibility to modify the assignment dates as needed."
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
 msgstr ""
+"Els cursos de ritme autònom no tenen dates de publicació per al contingut "
+"del curs o les dates de venciment de les assignacions. Els alumnes poden "
+"completar el material del curs en qualsevol moment abans de la data de "
+"finalització del curs."
 
 #: cms/templates/settings.html
 msgid "Course Schedule"

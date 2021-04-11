@@ -11,9 +11,9 @@ arguments.
 import hashlib
 from collections import Counter
 
+import six
 from celery.states import READY_STATES
 
-from common.djangoapps.util import milestones_helpers
 from lms.djangoapps.bulk_email.models import CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory
 from lms.djangoapps.instructor_task.api_helper import (
@@ -36,15 +36,14 @@ from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
     export_ora2_submission_files,
-    export_ora2_summary,
     generate_certificates,
     override_problem_score,
     proctored_exam_results_csv,
     rescore_problem,
     reset_problem_attempts,
-    send_bulk_course_email,
-    generate_anonymous_ids_for_course
+    send_bulk_course_email
 )
+from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 
@@ -52,7 +51,7 @@ class SpecificStudentIdMissingError(Exception):
     """
     Exception indicating that a student id was not provided when generating a certificate for a specific student.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 def get_running_instructor_tasks(course_id):
@@ -311,8 +310,8 @@ def submit_bulk_course_email(request, course_key, email_id):
     targets = Counter([target.target_type for target in email_obj.targets.all()])
     targets = [
         target if count <= 1 else
-        f"{count} {target}"
-        for target, count in targets.items()
+        u"{} {}".format(count, target)
+        for target, count in six.iteritems(targets)
     ]
 
     task_type = 'bulk_course_email'
@@ -465,18 +464,6 @@ def submit_export_ora2_submission_files(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_export_ora2_summary(request, course_key):
-    """
-    AlreadyRunningError is raised if an ora2 report is already being generated.
-    """
-    task_type = 'export_ora2_summary'
-    task_class = export_ora2_summary
-    task_input = {}
-    task_key = ''
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
 def generate_certificates_for_students(request, course_key, student_set=None, specific_student_id=None):
     """
     Submits a task to generate certificates for given students enrolled in the course.
@@ -548,15 +535,3 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate):
     )
 
     return instructor_task
-
-
-def generate_anonymous_ids(request, course_key):
-    """
-    Generate anonymize id CSV report.
-    """
-    task_type = 'generate_anonymous_ids_for_course'
-    task_class = generate_anonymous_ids_for_course
-    task_input = {}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)

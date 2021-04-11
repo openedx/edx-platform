@@ -32,9 +32,8 @@ from six import text_type
                 domain=site_domain,
                 path=reverse('about_course', args=[text_type(course.id)])
             )
-        )
-
-        tweet_action = u"https://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote(tweet_text))
+        ).replace(u" ", u"+")
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=six.moves.urllib.parse.quote_plus(tweet_text.encode('UTF-8')))
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
 
@@ -47,12 +46,12 @@ from six import text_type
                     domain=site_domain,
                     path=reverse('about_course', args=[text_type(course.id)]),
                 )
-        )
+        ).replace(u" ", u"%20")
 
         email_subject = _("Take a course with {platform} online").format(platform=platform_name)
         email_link = u"mailto:?subject={subject}&body={body}".format(
-            subject=six.moves.urllib.parse.quote(email_subject.encode('UTF-8')),
-            body=six.moves.urllib.parse.quote(email_body.encode('UTF-8'))
+            subject=six.moves.urllib.parse.quote_plus(email_subject.encode('UTF-8')),
+            body=six.moves.urllib.parse.quote_plus(email_body.encode('UTF-8'))
         )
       %>
       <a href="${tweet_action}" class="share">

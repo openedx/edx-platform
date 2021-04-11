@@ -5,6 +5,8 @@ The public API for certificates.
 
 import logging
 from datetime import datetime
+
+import six
 from pytz import UTC
 
 from lms.djangoapps.certificates.models import CertificateStatuses, CertificateWhitelist
@@ -57,7 +59,7 @@ def is_certificate_valid(certificate):
     return CourseEnrollment.is_enrolled_as_verified(certificate.user, certificate.course_id) and certificate.is_valid()
 
 
-def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):  # lint-amnesty, pylint: disable=missing-function-docstring
+def can_show_certificate_message(course, student, course_grade, certificates_enabled_for_course):
     is_whitelisted = CertificateWhitelist.objects.filter(user=student, course_id=course.id, whitelist=True).exists()
     auto_cert_gen_enabled = auto_certificate_generation_enabled()
     has_active_enrollment = CourseEnrollment.is_enrolled(student, course.id)
@@ -79,17 +81,9 @@ def _course_uses_available_date(course):
     return can_show_certificate_available_date_field(course) and course.certificate_available_date
 
 
-def available_date_for_certificate(course, certificate, certificate_available_date=None):
-    """
-    Returns the available date to use with a certificate
-
-    Arguments:
-        course (CourseOverview): The course we're checking
-        certificate (GeneratedCertificate): The certificate we're getting the date for
-        certificate_available_date (datetime): An optional date to override the from the course overview.
-    """
+def available_date_for_certificate(course, certificate):
     if _course_uses_available_date(course):
-        return certificate_available_date or course.certificate_available_date
+        return course.certificate_available_date
     return certificate.modified_date
 
 

@@ -1,11 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 Test that various events are fired for models in the student app.
 """
 
 
-from unittest import mock
-import pytest
-
+import mock
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
@@ -20,7 +19,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
     Test that we emit field change events when UserProfile models are changed.
     """
     def setUp(self):
-        super().setUp()
+        super(TestUserProfileEvents, self).setUp()
         self.table = 'auth_userprofile'
         self.user = UserFactory.create()
         self.profile = self.user.profile
@@ -37,7 +36,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
 
         # Verify that we remove the temporary `_changed_fields` property from
         # the model after we're done emitting events.
-        with pytest.raises(AttributeError):
+        with self.assertRaises(AttributeError):
             self.profile._changed_fields    # pylint: disable=pointless-statement, protected-access
 
     def test_change_many_fields(self):
@@ -45,18 +44,18 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         Verify that we emit one event per field when many fields change on the
         user profile in one transaction.
         """
-        self.profile.gender = 'o'
+        self.profile.gender = u'o'
         self.profile.bio = 'test bio'
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='bio', old=None, new=self.profile.bio)
-        self.assert_user_setting_event_emitted(setting='gender', old='m', new='o')
+        self.assert_user_setting_event_emitted(setting='gender', old=u'm', new=u'o')
 
     def test_unicode(self):
         """
         Verify that the events we emit can handle unicode characters.
         """
         old_name = self.profile.name
-        self.profile.name = 'Dånîél'
+        self.profile.name = u'Dånîél'
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='name', old=old_name, new=self.profile.name)
 
@@ -64,7 +63,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that we properly serialize the JSON-unfriendly Country field.
         """
-        self.profile.country = Country('AL', 'dummy_flag_url')
+        self.profile.country = Country(u'AL', 'dummy_flag_url')
         self.profile.save()
         self.assert_user_setting_event_emitted(setting='country', old=None, new=self.profile.country)
 
@@ -72,7 +71,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that we don't emit events for ignored fields.
         """
-        self.profile.meta = {'foo': 'bar'}
+        self.profile.meta = {u'foo': u'bar'}
         self.profile.save()
         self.assert_no_events_were_emitted()
 
@@ -84,7 +83,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         should never emit an event if save fails.
         """
         self.profile.gender = "unknown"
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             self.profile.save()
         self.assert_no_events_were_emitted()
 
@@ -94,7 +93,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
     Test that we emit field change events when User models are changed.
     """
     def setUp(self):
-        super().setUp()
+        super(TestUserEvents, self).setUp()
         self.user = UserFactory.create()
         self.reset_tracker()
         self.table = 'auth_user'
@@ -104,7 +103,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         Verify that we emit an event when a single field changes on the user.
         """
         old_username = self.user.username
-        self.user.username = 'new username'
+        self.user.username = u'new username'
         self.user.save()
         self.assert_user_setting_event_emitted(setting='username', old=old_username, new=self.user.username)
 
@@ -115,7 +114,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         old_email = self.user.email
         old_is_staff = self.user.is_staff
-        self.user.email = 'foo@bar.com'
+        self.user.email = u'foo@bar.com'
         self.user.is_staff = True
         self.user.save()
         self.assert_user_setting_event_emitted(setting='email', old=old_email, new=self.user.email)
@@ -125,7 +124,7 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         Verify that password values are not included in the event payload.
         """
-        self.user.password = 'new password'
+        self.user.password = u'new password'
         self.user.save()
         self.assert_user_setting_event_emitted(setting='password', old=None, new=None)
 
@@ -144,8 +143,8 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         signal is not called in this case either, but the intent is to make it clear that this model
         should never emit an event if save fails.
         """
-        self.user.password = 'new password'
-        with pytest.raises(IntegrityError):
+        self.user.password = u'new password'
+        with self.assertRaises(IntegrityError):
             self.user.save()
         self.assert_no_events_were_emitted()
 
@@ -162,14 +161,14 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         """
         Test that when a user's email changes, the user is enrolled in pending courses.
         """
-        pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)  # lint-amnesty, pylint: disable=unused-variable
+        pending_enrollment = CourseEnrollmentAllowedFactory(auto_enroll=True)
 
         # the e-mail will change to test@edx.org (from something else)
-        assert self.user.email != 'test@edx.org'
+        self.assertNotEqual(self.user.email, 'test@edx.org')
 
         # there's a CEA for the new e-mail
-        assert CourseEnrollmentAllowed.objects.count() == 1
-        assert CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count() == 1
+        self.assertEqual(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)
 
         # Changing the e-mail to the enrollment-allowed e-mail should enroll
         self.user.email = 'test@edx.org'
@@ -177,5 +176,5 @@ class TestUserEvents(UserSettingsEventTestMixin, TestCase):
         self.assert_user_enrollment_occurred('edX/toy/2012_Fall')
 
         # CEAs shouldn't have been affected
-        assert CourseEnrollmentAllowed.objects.count() == 1
-        assert CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count() == 1
+        self.assertEqual(CourseEnrollmentAllowed.objects.count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(email='test@edx.org').count(), 1)

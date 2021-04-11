@@ -2,13 +2,14 @@
 Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
+
 import logging
-from unittest import mock
 from uuid import uuid4
 
+import mock
 from boto.exception import NoAuthHandlerFound
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -71,7 +72,7 @@ class TestUserTasks(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
@@ -79,7 +80,7 @@ class TestUserTasks(APITestCase):
         cls.artifact = UserTaskArtifact.objects.create(status=cls.status, text='Lorem ipsum')
 
     def setUp(self):
-        super().setUp()
+        super(TestUserTasks, self).setUp()
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 
@@ -144,14 +145,14 @@ class TestUserTaskStopped(APITestCase):
     """
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         cls.user = User.objects.create_user('test_user', 'test@example.com', 'password')
         cls.status = UserTaskStatus.objects.create(
             user=cls.user, task_id=str(uuid4()), task_class='test_rest_api.sample_task', name='SampleTask 2',
             total_steps=5)
 
     def setUp(self):
-        super().setUp()
+        super(TestUserTaskStopped, self).setUp()
         self.status.refresh_from_db()
         self.client.force_authenticate(self.user)  # pylint: disable=no-member
 
@@ -168,7 +169,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         body_fragments = [
-            f"Your {self.status.name.lower()} task has completed with the status",
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
             "https://test.edx.org/",
             reverse('usertaskstatus-detail', args=[self.status.uuid])
         ]
@@ -201,7 +202,7 @@ class TestUserTaskStopped(APITestCase):
             platform_name=settings.PLATFORM_NAME, studio_name=settings.STUDIO_NAME
         )
         fragments = [
-            f"Your {self.status.name.lower()} task has completed with the status",
+            "Your {task_name} task has completed with the status".format(task_name=self.status.name.lower()),
             "Sign in to view the details of your task or download any files created."
         ]
 
@@ -233,4 +234,4 @@ class TestUserTaskStopped(APITestCase):
             mock_delay.side_effect = NoAuthHandlerFound()
             user_task_stopped.send(sender=UserTaskStatus, status=self.status)
             self.assertTrue(mock_delay.called)
-            self.assertEqual(hdlr.messages['error'][0], 'Unable to queue send_task_complete_email')
+            self.assertEqual(hdlr.messages['error'][0], u'Unable to queue send_task_complete_email')

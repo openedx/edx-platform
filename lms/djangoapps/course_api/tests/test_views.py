@@ -2,17 +2,19 @@
 Tests for Course API views.
 """
 
+
 from datetime import datetime
 from hashlib import md5
 from unittest import TestCase
-import pytest
+
 import ddt
+import six
+from six.moves import range
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_django_utils.cache import RequestCache
-from opaque_keys.edx.locator import LibraryLocator
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
@@ -20,12 +22,13 @@ from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.auth import add_users
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from common.djangoapps.student.tests.factories import AdminFactory
+from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,7 +45,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         """
         log in the specified user and set its is_active field
         """
-        assert self.client.login(username=requesting_user.username, password=TEST_PASSWORD)
+        self.assertTrue(self.client.login(username=requesting_user.username, password=TEST_PASSWORD))
         if make_inactive:
             requesting_user.is_active = False
             requesting_user.save()
@@ -64,7 +67,7 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         query_params = {}
         query_params.update(params or {})
         response = self.client.get(url or self.url, data=query_params)
-        assert response.status_code == expected_status_code
+        self.assertEqual(response.status_code, expected_status_code)
         return response
 
 
@@ -76,7 +79,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseListViewTestCase, cls).setUpClass()
         cls.course = cls.create_course()
         cls.url = reverse('course-list')
         cls.staff_user = cls.create_user(username='staff', is_staff=True)
@@ -110,7 +113,7 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_missing_username(self):
         self.setup_user(self.honor_user)
         response_to_missing_username = self.verify_response(expected_status_code=200)
-        assert response_to_missing_username.data is not None
+        self.assertIsNotNone(response_to_missing_username.data)
 
     def test_not_logged_in(self):
         self.client.logout()
@@ -123,10 +126,10 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         throttle.scope = user_scope
         try:
             rate_limit, __ = throttle.parse_rate(throttle.get_rate())
-            assert rate_limit == expected_rate
-            assert not throws_exception
+            self.assertEqual(rate_limit, expected_rate)
+            self.assertFalse(throws_exception)
         except ImproperlyConfigured:
-            assert throws_exception
+            self.assertTrue(throws_exception)
 
     @ddt.data(('staff', False, 40), ('user', False, 20), ('unknown', True, None))
     @ddt.unpack
@@ -157,7 +160,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super().setUp()
+        super(CourseListViewTestCaseMultipleCourses, self).setUp()
         self.course = self.create_course(mobile_available=False)
         self.url = reverse('course-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -172,16 +175,20 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
-        assert alternate_course.org != self.course.org
+        self.assertNotEqual(alternate_course.org, self.course.org)
 
         # No filtering.
         unfiltered_response = self.verify_response(params={'username': self.staff_user.username})
         for org in [self.course.org, alternate_course.org]:
-            assert any(((course['org'] == org) for course in unfiltered_response.data['results']))
+            self.assertTrue(
+                any(course['org'] == org for course in unfiltered_response.data['results'])
+            )
 
         # With filtering.
         filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
-        assert all(((course['org'] == self.course.org) for course in filtered_response.data['results']))
+        self.assertTrue(
+            all(course['org'] == self.course.org for course in filtered_response.data['results'])
+        )
 
     def test_filter(self):
         self.setup_user(self.staff_user)
@@ -199,7 +206,11 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             if filter_:
                 params.update(filter_)
             response = self.verify_response(params=params)
-            assert {course['course_id'] for course in response.data['results']} == {str(course.id) for course in expected_courses}, f'testing course_api.views.CourseListView with filter_={filter_}'  # pylint: disable=line-too-long
+            self.assertEqual(
+                {course['course_id'] for course in response.data['results']},
+                {six.text_type(course.id) for course in expected_courses},
+                u"testing course_api.views.CourseListView with filter_={}".format(filter_),
+            )
 
 
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
@@ -209,9 +220,9 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseDetailViewTestCase, cls).setUpClass()
         cls.course = cls.create_course()
-        cls.hidden_course = cls.create_course(course='hidden', visible_to_staff_only=True)
+        cls.hidden_course = cls.create_course(course=u'hidden', visible_to_staff_only=True)
         cls.url = reverse('course-detail', kwargs={'course_key_string': cls.course.id})
         cls.hidden_url = reverse('course-detail', kwargs={'course_key_string': cls.hidden_course.id})
         cls.nonexistent_url = reverse('course-detail', kwargs={'course_key_string': 'edX/nope/Fall_2014'})
@@ -266,7 +277,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         request.query_params = {}
         request.user = self.staff_user
         response = CourseDetailView().dispatch(request, course_key_string='a:b:c')
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
 
 @override_settings(ELASTIC_FIELD_MAPPINGS={
@@ -275,7 +286,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
     'enrollment_end': {'type': 'date'}
 })
 @override_settings(SEARCH_ENGINE="search.tests.mock_search_engine.MockSearchEngine")
-@override_settings(COURSEWARE_INFO_INDEX_NAME=TEST_INDEX_NAME)
+@override_settings(COURSEWARE_INDEX_NAME=TEST_INDEX_NAME)
 class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, SearcherMixin):
     """
     Tests the search functionality of the courses API.
@@ -287,7 +298,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
     ENABLED_CACHES = ModuleStoreTestCase.ENABLED_CACHES + ['configuration']
 
     def setUp(self):
-        super().setUp()
+        super(CourseListSearchViewTest, self).setUp()
         DemoCourse.reset_count()
         self.searcher.destroy()
 
@@ -314,7 +325,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             'run': '2010',
             'number': 'DemoZ',
             # Using the slash separated course ID bcuz `DemoCourse` isn't updated yet to new locator.
-            'id': f'{org_code}/DemoZ/2010',
+            'id': '{org_code}/DemoZ/2010'.format(org_code=org_code),
             'content': {
                 'short_description': short_description,
             },
@@ -339,21 +350,19 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         Test without search, should list all the courses.
         """
         res = self.verify_response()
-        assert 'results' in res.data
-        assert res.data['results'] != []
-        assert res.data['pagination']['count'] == 3
-        # Should list all of the 3 courses
+        self.assertIn('results', res.data)
+        self.assertNotEqual(res.data['results'], [])
+        self.assertEqual(res.data['pagination']['count'], 3)  # Should list all of the 3 courses
 
     def test_list_all_with_search_term(self):
         """
         Test with search, should list only the course that matches the search term.
         """
         res = self.verify_response(params={'search_term': 'unique search term'})
-        assert 'results' in res.data
-        assert res.data['results'] != []
-        assert res.data['pagination']['count'] == 1
-        assert len(res.data['results']) == 1
-        # Should return a single course
+        self.assertIn('results', res.data)
+        self.assertNotEqual(res.data['results'], [])
+        self.assertEqual(res.data['pagination']['count'], 1)
+        self.assertEqual(len(res.data['results']), 1)  # Should return a single course
 
     def test_too_many_courses(self):
         """
@@ -375,10 +384,10 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         # Create 300 courses across 30 organizations
         for org_num in range(10):
-            org_id = f'org{org_num}'
+            org_id = 'org{}'.format(org_num)
             for course_num in range(30):
-                course_name = f'course{org_num}.{course_num}'
-                course_run_name = f'run{org_num}.{course_num}'
+                course_name = 'course{}.{}'.format(org_num, course_num)
+                course_run_name = 'run{}.{}'.format(org_num, course_num)
                 course = CourseFactory.create(org=org_id, number=course_name, run=course_run_name, emit_signals=True)
                 CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
                 CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED)
@@ -397,10 +406,13 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
             with self.assertNumQueries(query_counts[page - 1]):
                 response = self.verify_response(params={'page': page, 'page_size': 30})
 
-                assert 'results' in response.data
-                assert response.data['pagination']['count'] == 303
-                assert len(response.data['results']) == (30 if (page < 11) else 3)
-                assert [c['id'] for c in response.data['results']] == ordered_course_ids[((page - 1) * 30):(page * 30)]
+                self.assertIn('results', response.data)
+                self.assertEqual(response.data['pagination']['count'], 303)
+                self.assertEqual(len(response.data['results']), 30 if page < 11 else 3)
+                self.assertEqual(
+                    [c['id'] for c in response.data['results']],
+                    ordered_course_ids[(page - 1) * 30:page * 30]
+                )
 
 
 class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
@@ -410,7 +422,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
-        super().setUp()
+        super(CourseIdListViewTestCase, self).setUp()
         self.course = self.create_course()
         self.url = reverse('course-id-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
@@ -426,7 +438,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         # Request the courses as the staff user with the different roles specified.
         for role in ('staff', 'instructor'):
             filtered_response = self.verify_response(params={'username': self.staff_user.username, 'role': role})
-            assert len(filtered_response.data['results']) == 1
+            self.assertEqual(len(filtered_response.data['results']), 1)
 
     def test_filter_by_roles_non_staff(self):
         """
@@ -437,7 +449,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         # Request the courses as the non-staff user with the different roles should *not* be allowed.
         for role in ('staff', 'instructor'):
             filtered_response = self.verify_response(params={'username': self.honor_user.username, 'role': role})
-            assert len(filtered_response.data['results']) == 0
+            self.assertEqual(len(filtered_response.data['results']), 0)
 
     def test_filter_by_roles_course_staff(self):
         """
@@ -464,23 +476,23 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_staff_user.username,
             'role': 'staff'
         })
-        assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
 
         # The course staff user does *not* have the course instructor role on any courses.
         filtered_response = self.verify_response(params={
             'username': course_staff_user.username,
             'role': 'instructor'
         })
-        assert len(filtered_response.data['results']) == 0
+        self.assertEqual(len(filtered_response.data['results']), 0)
 
         # The course instructor user only has the course instructor role on one course.
         filtered_response = self.verify_response(params={
             'username': course_instructor_user.username,
             'role': 'instructor'
         })
-        assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -488,8 +500,8 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_instructor_user.username,
             'role': 'staff'
         })
-        assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course1.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
 
         # The user with both instructor AND staff on a course has the inferred course staff role on that one course.
         self.setup_user(course_instructor_staff_user)
@@ -497,8 +509,8 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_instructor_staff_user.username,
             'role': 'staff'
         })
-        assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(alternate_course2.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course2.org))
 
     def test_no_libraries(self):
         """
@@ -519,14 +531,14 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'username': course_staff_user.username,
             'role': 'staff'
         })
-        assert len(filtered_response.data['results']) == 1
-        assert filtered_response.data['results'][0].startswith(self.course.org)
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
 
 
-class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class LazyPageNumberPaginationTestCase(TestCase):
 
     def test_lazy_page_number_pagination(self):
-        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
+        number_sequence = range(20)
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence
@@ -555,7 +567,7 @@ class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disab
         self.assertDictEqual(expected_response, paginated_response.data)
 
     def test_not_found_error_for_invalid_page(self):
-        number_sequence = range(20)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
+        number_sequence = range(20)
         even_numbers_lazy_sequence = LazySequence(
             (
                 number for number in number_sequence
@@ -567,10 +579,10 @@ class LazyPageNumberPaginationTestCase(TestCase):  # lint-amnesty, pylint: disab
         request = RequestFactory().get('/endpoint', data={'page': 3, 'page_size': 5})
         request.query_params = {'page': 3, 'page_size': 5}
 
-        with pytest.raises(Exception) as exc:
+        with self.assertRaises(Exception) as exc:
             pagination = LazyPageNumberPagination()
             pagination.max_page_size = 5
             pagination.page_size = 5
             paginated_queryset = pagination.paginate_queryset(even_numbers_lazy_sequence, request)
             pagination.get_paginated_response(paginated_queryset)
-            assert 'Invalid page' in exc.exception
+            self.assertIn('Invalid page', exc.exception)

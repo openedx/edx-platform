@@ -7,7 +7,6 @@ import sys
 import unittest
 from contextlib import contextmanager
 from uuid import uuid4
-import pytest
 
 from django.conf import settings
 from django.core.management import call_command
@@ -32,11 +31,11 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestRemoveSocialAuthUsersCommand, cls).setUpClass()
         cls.command = remove_social_auth_users.Command()
 
     def setUp(self):
-        super().setUp()
+        super(TestRemoveSocialAuthUsersCommand, self).setUp()
         self.provider_hogwarts = SAMLProviderConfigFactory.create(slug='hogwarts')
         self.provider_durmstrang = SAMLProviderConfigFactory.create(slug='durmstrang')
 
@@ -48,7 +47,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         self.create_social_auth_entry(self.user_viktor, self.provider_durmstrang)
 
     @contextmanager
-    def _replace_stdin(self, text):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _replace_stdin(self, text):
         orig = sys.stdin
         sys.stdin = StringIO(text)
         yield
@@ -58,7 +57,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         external_id = uuid4()
         UserSocialAuth.objects.create(
             user=user,
-            uid=f'{provider.slug}:{external_id}',
+            uid='{0}:{1}'.format(provider.slug, external_id),
             provider=provider.slug,
         )
 
@@ -70,16 +69,16 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         call_command(self.command, self.provider_hogwarts.slug, force=True)
 
         # user with input idp is removed, along with social auth entries
-        with pytest.raises(User.DoesNotExist):
+        with self.assertRaises(User.DoesNotExist):
             User.objects.get(username='harry')
-        with pytest.raises(UserSocialAuth.DoesNotExist):
+        with self.assertRaises(UserSocialAuth.DoesNotExist):
             self.find_user_social_auth_entry('harry')
 
         # other users intact
         self.user_fleur.refresh_from_db()
         self.user_viktor.refresh_from_db()
-        assert self.user_fleur is not None
-        assert self.user_viktor is not None
+        self.assertIsNotNone(self.user_fleur)
+        self.assertIsNotNone(self.user_viktor)
 
         # other social auth intact
         self.find_user_social_auth_entry(self.user_viktor.username)
@@ -87,7 +86,7 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
     def test_invalid_idp(self):
         invalid_slug = 'jedi-academy'
-        err_string = f'No SAML provider found for slug {invalid_slug}'
+        err_string = u'No SAML provider found for slug {}'.format(invalid_slug)
         with self.assertRaisesRegex(CommandError, err_string):
             call_command(self.command, invalid_slug)
 
@@ -97,9 +96,9 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
         with self._replace_stdin('confirm'):
             call_command(self.command, self.provider_hogwarts.slug)
 
-        with pytest.raises(User.DoesNotExist):
+        with self.assertRaises(User.DoesNotExist):
             User.objects.get(username='harry')
-        with pytest.raises(UserSocialAuth.DoesNotExist):
+        with self.assertRaises(UserSocialAuth.DoesNotExist):
             self.find_user_social_auth_entry('harry')
 
     @override_settings(FEATURES=FEATURES_WITH_ENABLED)
@@ -110,8 +109,8 @@ class TestRemoveSocialAuthUsersCommand(TestCase):
                 call_command(self.command, self.provider_hogwarts.slug)
 
         # no users should be removed
-        assert len(User.objects.all()) == 3
-        assert len(UserSocialAuth.objects.all()) == 2
+        self.assertEqual(len(User.objects.all()), 3)
+        self.assertEqual(len(UserSocialAuth.objects.all()), 2)
 
     def test_feature_default_disabled(self):
         """ By default this command should not be enabled """

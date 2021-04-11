@@ -397,7 +397,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -6456,6 +6456,15 @@ msgid "Total number of users"
 msgstr "用户总数"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "用户名"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr "邮箱"
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "创建用户结果"
 
@@ -6522,6 +6531,14 @@ msgstr "主讲教师"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
 msgstr "所有课程的选课信息"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr "角色"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
+msgstr "全名"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -7714,10 +7731,6 @@ msgstr ""
 msgid "Find information related to a learner's program enrollments"
 msgstr ""
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "用户名"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -8380,7 +8393,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -10404,13 +10417,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "失败次数超过限制，请稍后再试！"
 
@@ -10421,14 +10427,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10448,6 +10446,10 @@ msgstr ""
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "您在{platform_name}上注册的邮箱"
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr "创建账号"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -10686,10 +10688,6 @@ msgid ""
 "I agree to the {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr "我同意{platform_name} {tos_link_start}{terms_of_service}{tos_link_end}"
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
-msgstr "创建账号"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -10978,6 +10976,11 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "更新"
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr "评论"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11678,8 +11681,8 @@ msgstr "“角色”未指定。"
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
-msgstr ""
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "用户{email}已注册但尚未激活其账号。"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12584,7 +12587,7 @@ msgid "Welcome to {platform_name}"
 msgstr "欢迎来到{platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
@@ -13096,10 +13099,6 @@ msgid "Git Logs"
 msgstr "Git日志"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "用户管理"
 
@@ -13116,10 +13115,26 @@ msgid "Create user"
 msgstr "创建用户"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr "下载所有用户列表 (csv 文件)"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr "检查修复外部认证映射"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr "进入每个课程的教师控制面板来管理课程选修信息。"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr "管理课程工作人员与教师"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr "下载教员与主讲教师列名单(csv 文件)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -16187,9 +16202,8 @@ msgstr "恭喜！您的身份ID已认证成功。"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
-msgstr ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr "您的验证有效期为一年。它将在{expiry_date}过期"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -16616,10 +16630,6 @@ msgstr "荣誉"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "专业"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -18587,6 +18597,14 @@ msgstr "在合作伙伴网站上访问“课程人员支持”来提交或查看
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "edX 合作伙伴网站"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""

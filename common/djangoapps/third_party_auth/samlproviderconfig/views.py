@@ -18,7 +18,7 @@ from .serializers import SAMLProviderConfigSerializer
 from ..utils import convert_saml_slug_provider_id
 
 
-class SAMLProviderMixin:
+class SAMLProviderMixin(object):
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderConfigSerializer
@@ -95,7 +95,7 @@ class SAMLProviderConfigViewSet(PermissionRequiredMixin, SAMLProviderMixin, view
         try:
             enterprise_customer = EnterpriseCustomer.objects.get(pk=customer_uuid)
         except EnterpriseCustomer.DoesNotExist:
-            raise ValidationError(f'Enterprise customer not found at uuid: {customer_uuid}')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError('Enterprise customer not found at uuid: {}'.format(customer_uuid))
 
         # Create the samlproviderconfig model first
         serializer = self.get_serializer(data=request.data)

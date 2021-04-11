@@ -8,13 +8,13 @@ from oauth2_provider import models
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
 
 
-class DOTAdapter:
+class DOTAdapter(object):
     """
     Standard interface for working with django-oauth-toolkit
     """
 
     backend = object()
-    FILTER_USER_ME = 'user:me'
+    FILTER_USER_ME = u'user:me'
 
     def create_confidential_client(self,
                                    name,

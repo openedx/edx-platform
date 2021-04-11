@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 from django.test import TestCase
 from mock import patch
@@ -6,9 +6,9 @@ from mock import patch
 from common.djangoapps.track.backends.mongodb import MongoBackend
 
 
-class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestMongoBackend(TestCase):
     def setUp(self):
-        super(TestMongoBackend, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestMongoBackend, self).setUp()
         self.mongo_patcher = patch('common.djangoapps.track.backends.mongodb.MongoClient')
         self.mongo_patcher.start()
         self.addCleanup(self.mongo_patcher.stop)
@@ -25,7 +25,7 @@ class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class
 
         calls = self.backend.collection.insert.mock_calls
 
-        assert len(calls) == 2
+        self.assertEqual(len(calls), 2)
 
         # Unpack the arguments and check if the events were used
         # as the first argument to collection.insert
@@ -34,5 +34,5 @@ class TestMongoBackend(TestCase):  # lint-amnesty, pylint: disable=missing-class
             _, args, _ = call
             return args[0]
 
-        assert events[0] == first_argument(calls[0])
-        assert events[1] == first_argument(calls[1])
+        self.assertEqual(events[0], first_argument(calls[0]))
+        self.assertEqual(events[1], first_argument(calls[1]))

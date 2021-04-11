@@ -28,4 +28,4 @@ class BadRequestRateLimiter(RequestRateLimiter):
     """
     Default rate limit is 30 requests for every 5 minutes.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

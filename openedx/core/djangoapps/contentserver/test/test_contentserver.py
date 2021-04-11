@@ -6,16 +6,17 @@ Tests for StaticContentServer
 import copy
 
 import datetime
+import ddt
 import logging
+import six
 import unittest
-from unittest.mock import patch
 from uuid import uuid4
 
-import ddt
 from django.conf import settings
 from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
+from mock import patch
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
@@ -23,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.assetstore.assetmgr import AssetManager
-from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -61,7 +62,7 @@ def get_old_style_versioned_asset_url(asset_path):
     try:
         locator = StaticContent.get_location_from_path(asset_path)
         content = AssetManager.find(locator, as_stream=True)
-        return f'{VERSIONED_ASSETS_PREFIX}/{content.content_digest}{asset_path}'
+        return u'{}/{}{}'.format(VERSIONED_ASSETS_PREFIX, content.content_digest, asset_path)
     except (InvalidKeyError, ItemNotFoundError):
         pass
 
@@ -77,7 +78,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(ContentStoreToyCourseTest, cls).setUpClass()
 
         cls.contentstore = contentstore()
         cls.modulestore = modulestore()
@@ -91,14 +92,14 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         # A locked asset
         cls.locked_asset = cls.course_key.make_asset_key('asset', 'sample_static.html')
-        cls.url_locked = str(cls.locked_asset)
+        cls.url_locked = six.text_type(cls.locked_asset)
         cls.url_locked_versioned = get_versioned_asset_url(cls.url_locked)
         cls.url_locked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_locked)
         cls.contentstore.set_attr(cls.locked_asset, 'locked', True)
 
         # An unlocked asset
         cls.unlocked_asset = cls.course_key.make_asset_key('asset', 'another_static.txt')
-        cls.url_unlocked = str(cls.unlocked_asset)
+        cls.url_unlocked = six.text_type(cls.unlocked_asset)
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
@@ -107,7 +108,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         Create user and login.
         """
-        super().setUp()
+        super(ContentStoreToyCourseTest, self).setUp()
         self.staff_usr = AdminFactory.create()
         self.non_staff_usr = UserFactory.create()
 
@@ -119,7 +120,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_unlocked_versioned_asset(self):
         """
@@ -127,7 +128,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked_versioned)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_unlocked_versioned_asset_old_style(self):
         """
@@ -135,7 +136,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked_versioned_old_style)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_unlocked_versioned_asset_with_nonexistent_version(self):
         """
@@ -146,30 +147,30 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
 
         self.client.logout()
         resp = self.client.get(url_unlocked_versioned_old)
-        assert resp.status_code == 301
-        assert resp.url.endswith(self.url_unlocked_versioned)
+        self.assertEqual(resp.status_code, 301)
+        self.assertTrue(resp.url.endswith(self.url_unlocked_versioned))
 
     def test_locked_versioned_asset(self):
         """
         Test that locked assets that are versioned are being served.
         """
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked_versioned)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_locked_versioned_old_styleasset(self):
         """
         Test that locked assets that are versioned (old-style) are being served.
         """
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked_versioned_old_style)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_not_logged_in(self):
         """
@@ -178,7 +179,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 403
+        self.assertEqual(resp.status_code, 403)
 
     def test_locked_asset_not_registered(self):
         """
@@ -187,7 +188,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 403
+        self.assertEqual(resp.status_code, 403)
 
     def test_locked_asset_registered(self):
         """
@@ -195,11 +196,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         and registered for the course.
         """
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_staff(self):
         """
@@ -207,7 +208,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         self.client.login(username=self.staff_usr, password='test')
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def test_range_request_full_file(self):
         """
@@ -216,12 +217,10 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0-')
 
-        assert resp.status_code == 206
-        # HTTP_206_PARTIAL_CONTENT
-        assert resp['Content-Range'] ==\
-               'bytes {first}-{last}/{length}'.format(first=0, last=(self.length_unlocked - 1),
-                                                      length=self.length_unlocked)
-        assert resp['Content-Length'] == str(self.length_unlocked)
+        self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
+        self.assertEqual(resp['Content-Range'], u'bytes {first}-{last}/{length}'
+                         .format(first=0, last=self.length_unlocked - 1, length=self.length_unlocked))
+        self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
 
     def test_range_request_partial_file(self):
         """
@@ -234,12 +233,10 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
             first=first_byte, last=last_byte))
 
-        assert resp.status_code == 206
-        # HTTP_206_PARTIAL_CONTENT
-        assert resp['Content-Range'] == 'bytes {first}-{last}/{length}'.format(first=first_byte,
-                                                                               last=last_byte,
-                                                                               length=self.length_unlocked)
-        assert resp['Content-Length'] == str((last_byte - first_byte) + 1)
+        self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
+        self.assertEqual(resp['Content-Range'], u'bytes {first}-{last}/{length}'.format(
+            first=first_byte, last=last_byte, length=self.length_unlocked))
+        self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 
     def test_range_request_multiple_ranges(self):
         """
@@ -247,13 +244,13 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+        # pylint: disable=unicode-format-string
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
-        assert resp.status_code == 200
-        assert 'Content-Range' not in resp
-        assert resp['Content-Length'] == str(self.length_unlocked)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
+        self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
 
     @ddt.data(
         'bytes 0-',
@@ -266,8 +263,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         Test that syntactically invalid Range values result in a 200 OK full content response.
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE=header_value)
-        assert resp.status_code == 200
-        assert 'Content-Range' not in resp
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
 
     def test_range_request_malformed_invalid_range(self):
         """
@@ -276,7 +273,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
             first=(self.length_unlocked // 2), last=(self.length_unlocked // 4)))
-        assert resp.status_code == 416
+        self.assertEqual(resp.status_code, 416)
 
     def test_range_request_malformed_out_of_bounds(self):
         """
@@ -285,7 +282,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
             first=(self.length_unlocked), last=(self.length_unlocked)))
-        assert resp.status_code == 416
+        self.assertEqual(resp.status_code, 416)
 
     def test_vary_header_sent(self):
         """
@@ -293,8 +290,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         cached in a way that breaks XHR requests to the same asset.
         """
         resp = self.client.get(self.url_unlocked)
-        assert resp.status_code == 200
-        assert 'Origin' == resp['Vary']
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual('Origin', resp['Vary'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_unlocked(self, mock_get_cache_ttl):
@@ -305,9 +302,9 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         mock_get_cache_ttl.return_value = 10
 
         resp = self.client.get(self.url_unlocked)
-        assert resp.status_code == 200
-        assert 'Expires' in resp
-        assert 'public, max-age=10, s-maxage=10' == resp['Cache-Control']
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Expires', resp)
+        self.assertEqual('public, max-age=10, s-maxage=10', resp['Cache-Control'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_locked(self, mock_get_cache_ttl):
@@ -318,13 +315,13 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         mock_get_cache_ttl.return_value = 10
 
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 200
-        assert 'Expires' not in resp
-        assert 'private, no-cache, no-store' == resp['Cache-Control']
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Expires', resp)
+        self.assertEqual('private, no-cache, no-store', resp['Cache-Control'])
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_without_ttl_unlocked(self, mock_get_cache_ttl):
@@ -335,9 +332,9 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         mock_get_cache_ttl.return_value = 0
 
         resp = self.client.get(self.url_unlocked)
-        assert resp.status_code == 200
-        assert 'Expires' not in resp
-        assert 'Cache-Control' not in resp
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Expires', resp)
+        self.assertNotIn('Cache-Control', resp)
 
     @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_without_ttl_locked(self, mock_get_cache_ttl):
@@ -348,18 +345,18 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         mock_get_cache_ttl.return_value = 0
 
         CourseEnrollment.enroll(self.non_staff_usr, self.course_key)
-        assert CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.non_staff_usr, self.course_key))
 
         self.client.login(username=self.non_staff_usr, password='test')
         resp = self.client.get(self.url_locked)
-        assert resp.status_code == 200
-        assert 'Expires' not in resp
-        assert 'private, no-cache, no-store' == resp['Cache-Control']
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Expires', resp)
+        self.assertEqual('private, no-cache, no-store', resp['Cache-Control'])
 
     def test_get_expiration_value(self):
         start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
-        assert 'Thu, 01 Dec 1983 20:00:55 GMT' == near_expire_dt
+        self.assertEqual("Thu, 01 Dec 1983 20:00:55 GMT", near_expire_dt)
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_normal_request(self, mock_get_cdn_user_agents):
@@ -373,7 +370,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
 
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
-        assert is_from_cdn is False
+        self.assertEqual(is_from_cdn, False)
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_cdn_request(self, mock_get_cdn_user_agents):
@@ -387,7 +384,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
-        assert is_from_cdn is True
+        self.assertEqual(is_from_cdn, True)
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_cdn_request_multiple_user_agents(self, mock_get_cdn_user_agents):
@@ -402,7 +399,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
-        assert is_from_cdn is True
+        self.assertEqual(is_from_cdn, True)
 
 
 @ddt.ddt
@@ -412,12 +409,12 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ParseRangeHeaderTestCase, self).setUp()
         self.content_length = 10000
 
     def test_bytes_unit(self):
         unit, __ = parse_range_header('bytes=100-', self.content_length)
-        assert unit == 'bytes'
+        self.assertEqual(unit, 'bytes')
 
     @ddt.data(
         ('bytes=100-', 1, [(100, 9999)]),
@@ -430,8 +427,8 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     @ddt.unpack
     def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
         __, ranges = parse_range_header(header_value, self.content_length)
-        assert len(ranges) == excepted_ranges_length
-        assert ranges == expected_ranges
+        self.assertEqual(len(ranges), excepted_ranges_length)
+        self.assertEqual(ranges, expected_ranges)
 
     @ddt.data(
         ('bytes=one-20', ValueError, 'invalid literal for int()'),

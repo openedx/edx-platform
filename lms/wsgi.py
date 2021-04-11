@@ -13,16 +13,16 @@ from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
 # Disable PyContract contract checking when running as a webserver
-import contracts  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+import contracts
 contracts.disable_all()
 
-import os  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lms.envs.aws")
 
-import lms.startup as startup  # lint-amnesty, pylint: disable=wrong-import-position
+import lms.startup as startup
 startup.run()
 
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.modulestore.django import modulestore
 
 # Trigger a forced initialization of our modulestores since this can take a
 # while to complete and we want this done before HTTP requests are accepted.
@@ -31,5 +31,5 @@ modulestore()
 
 # This application object is used by the development server
 # as well as any WSGI server configured to use this file.
-from django.core.wsgi import get_wsgi_application  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

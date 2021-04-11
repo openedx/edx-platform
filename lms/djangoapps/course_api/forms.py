@@ -5,6 +5,7 @@ Course API forms
 
 from collections import namedtuple
 
+import six
 from django.core.exceptions import ValidationError
 from django.forms import CharField, Form
 from opaque_keys import InvalidKeyError
@@ -13,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField
 
 
-class UsernameValidatorMixin:
+class UsernameValidatorMixin(object):
     """
     Mixin class for validating the username parameter.
     """
@@ -42,7 +43,7 @@ class CourseDetailGetForm(UsernameValidatorMixin, Form):
         try:
             return CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(str(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
 
 
 class CourseListGetForm(UsernameValidatorMixin, Form):
@@ -64,7 +65,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
         """
         Return cleaned data, including additional filters.
         """
-        cleaned_data = super().clean()
+        cleaned_data = super(CourseListGetForm, self).clean()
 
         # create a filter for all supported filter fields
         filter_ = dict()

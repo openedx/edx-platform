@@ -1,15 +1,16 @@
 """ Tests for API permissions classes. """
+
+
 import ddt
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import RequestFactory, TestCase
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
 
+from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.lib.api.permissions import IsCourseStaffInstructor, IsMasterCourseStaffInstructor, IsStaffOrOwner
 
 
 class TestObject(object):
@@ -22,7 +23,7 @@ class TestObject(object):
 class TestCcxObject(TestObject):
     """ Fake class for object permission for CCX Courses """
     def __init__(self, user=None, course_id=None):
-        super(TestCcxObject, self).__init__(user, course_id)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCcxObject, self).__init__(user, course_id)
         self.coach = user
 
 
@@ -30,7 +31,7 @@ class IsCourseStaffInstructorTests(TestCase):
     """ Test for IsCourseStaffInstructor permission class. """
 
     def setUp(self):
-        super(IsCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(IsCourseStaffInstructorTests, self).setUp()
         self.permission = IsCourseStaffInstructor()
         self.coach = UserFactory()
         self.user = UserFactory()
@@ -41,29 +42,29 @@ class IsCourseStaffInstructorTests(TestCase):
 
     def test_course_staff_has_access(self):
         CourseStaffRole(course_key=self.course_key).add_users(self.user)
-        assert self.permission.has_object_permission(self.request, None, self.obj)
+        self.assertTrue(self.permission.has_object_permission(self.request, None, self.obj))
 
     def test_course_instructor_has_access(self):
         CourseInstructorRole(course_key=self.course_key).add_users(self.user)
-        assert self.permission.has_object_permission(self.request, None, self.obj)
+        self.assertTrue(self.permission.has_object_permission(self.request, None, self.obj))
 
     def test_course_coach_has_access(self):
         self.request.user = self.coach
-        assert self.permission.has_object_permission(self.request, None, self.obj)
+        self.assertTrue(self.permission.has_object_permission(self.request, None, self.obj))
 
     def test_any_user_has_no_access(self):
-        assert not self.permission.has_object_permission(self.request, None, self.obj)
+        self.assertFalse(self.permission.has_object_permission(self.request, None, self.obj))
 
     def test_anonymous_has_no_access(self):
         self.request.user = AnonymousUser()
-        assert not self.permission.has_object_permission(self.request, None, self.obj)
+        self.assertFalse(self.permission.has_object_permission(self.request, None, self.obj))
 
 
 class IsMasterCourseStaffInstructorTests(TestCase):
     """ Test for IsMasterCourseStaffInstructorTests permission class. """
 
     def setUp(self):
-        super(IsMasterCourseStaffInstructorTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(IsMasterCourseStaffInstructorTests, self).setUp()
         self.permission = IsMasterCourseStaffInstructor()
         master_course_id = 'edx/test123/run'
         self.user = UserFactory()
@@ -75,31 +76,31 @@ class IsMasterCourseStaffInstructorTests(TestCase):
 
     def test_course_staff_has_access(self):
         CourseStaffRole(course_key=self.course_key).add_users(self.user)
-        assert self.permission.has_permission(self.get_request, None)
-        assert self.permission.has_permission(self.post_request, None)
+        self.assertTrue(self.permission.has_permission(self.get_request, None))
+        self.assertTrue(self.permission.has_permission(self.post_request, None))
 
     def test_course_instructor_has_access(self):
         CourseInstructorRole(course_key=self.course_key).add_users(self.user)
-        assert self.permission.has_permission(self.get_request, None)
-        assert self.permission.has_permission(self.post_request, None)
+        self.assertTrue(self.permission.has_permission(self.get_request, None))
+        self.assertTrue(self.permission.has_permission(self.post_request, None))
 
     def test_any_user_has_partial_access(self):
-        assert not self.permission.has_permission(self.get_request, None)
-        assert not self.permission.has_permission(self.post_request, None)
+        self.assertFalse(self.permission.has_permission(self.get_request, None))
+        self.assertFalse(self.permission.has_permission(self.post_request, None))
 
     def test_anonymous_has_no_access(self):
         user = AnonymousUser()
         self.get_request.user = user
         self.post_request.user = user
-        assert not self.permission.has_permission(self.get_request, None)
-        assert not self.permission.has_permission(self.post_request, None)
+        self.assertFalse(self.permission.has_permission(self.get_request, None))
+        self.assertFalse(self.permission.has_permission(self.post_request, None))
 
     def test_wrong_course_id_raises(self):
         get_request = RequestFactory().get('/?master_course_id=this_is_invalid')
-        with pytest.raises(Http404):
+        with self.assertRaises(Http404):
             self.permission.has_permission(get_request, None)
         post_request = RequestFactory().post('/', data={'master_course_id': 'this_is_invalid'})
-        with pytest.raises(Http404):
+        with self.assertRaises(Http404):
             self.permission.has_permission(post_request, None)
 
 
@@ -108,7 +109,7 @@ class IsStaffOrOwnerTests(TestCase):
     """ Tests for IsStaffOrOwner permission class. """
 
     def setUp(self):
-        super(IsStaffOrOwnerTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(IsStaffOrOwnerTests, self).setUp()
         self.permission = IsStaffOrOwner()
         self.request = RequestFactory().get('/')
         self.obj = TestObject()
@@ -122,7 +123,7 @@ class IsStaffOrOwnerTests(TestCase):
             permitted (boolean)
         """
         self.request.user = user
-        assert self.permission.has_object_permission(self.request, None, self.obj) == permitted
+        self.assertEqual(self.permission.has_object_permission(self.request, None, self.obj), permitted)
 
     def test_staff_user(self):
         """ Staff users should be permitted. """
@@ -143,14 +144,14 @@ class IsStaffOrOwnerTests(TestCase):
     def test_has_permission_as_staff(self):
         """ Staff users always have permission. """
         self.request.user = UserFactory(is_staff=True)
-        assert self.permission.has_permission(self.request, None)
+        self.assertTrue(self.permission.has_permission(self.request, None))
 
     def test_has_permission_as_owner_with_get(self):
         """ Owners always have permission to make GET actions. """
         user = UserFactory()
         request = RequestFactory().get('/?username={}'.format(user.username))
         request.user = user
-        assert self.permission.has_permission(request, None)
+        self.assertTrue(self.permission.has_permission(request, None))
 
     def test_has_permission_with_view_kwargs_as_owner_with_get(self):
         """ Owners always have permission to make GET actions. """
@@ -158,7 +159,7 @@ class IsStaffOrOwnerTests(TestCase):
         self.request.user = user
         view = GenericAPIView()
         view.kwargs = {'username': user.username}
-        assert self.permission.has_permission(self.request, view)
+        self.assertTrue(self.permission.has_permission(self.request, view))
 
     @ddt.data('patch', 'post', 'put')
     def test_has_permission_as_owner_with_edit(self, action):
@@ -169,14 +170,14 @@ class IsStaffOrOwnerTests(TestCase):
         request = getattr(RequestFactory(), action)('/', data, format='json')
         request.user = user
         request.data = data  # Note (CCB): This is a hack that should be fixed. (ECOM-3171)
-        assert self.permission.has_permission(request, None)
+        self.assertTrue(self.permission.has_permission(request, None))
 
     def test_has_permission_as_non_owner(self):
         """ Non-owners should not have permission. """
         user = UserFactory()
         request = RequestFactory().get('/?username={}'.format(user.username))
         request.user = UserFactory()
-        assert not self.permission.has_permission(request, None)
+        self.assertFalse(self.permission.has_permission(request, None))
 
     def test_has_permission_with_view_kwargs_as_non_owner(self):
         """ Non-owners should not have permission. """
@@ -184,4 +185,4 @@ class IsStaffOrOwnerTests(TestCase):
         self.request.user = user
         view = GenericAPIView()
         view.kwargs = {'username': UserFactory().username}
-        assert not self.permission.has_permission(self.request, view)
+        self.assertFalse(self.permission.has_permission(self.request, view))

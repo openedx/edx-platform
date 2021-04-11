@@ -7,6 +7,8 @@ import json
 import tempfile
 
 import ddt
+import six
+from six.moves import range
 from django.urls import reverse
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
@@ -25,7 +27,7 @@ HANDLER_POST_PAYLOAD = '{"name":"Default","user_count":0,"assignment_type":"rand
 ,"group_id":null}'
 HANDLER_PATCH_PAYLOAD = '{"name":"Default Group","group_id":null,"user_partition_id":null,"assignment_type":"random"}'
 ADD_USER_PAYLOAD = json.dumps({'users': [USER_MAIL, ]})
-CSV_DATA = f'''email,cohort\n{USER_MAIL},DEFAULT'''
+CSV_DATA = '''email,cohort\n{},DEFAULT'''.format(USER_MAIL)
 
 
 @skip_unless_lms
@@ -39,11 +41,11 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestCohortOauth, cls).setUpClass()
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = str(cls.course_key)
+        cls.course_str = six.text_type(cls.course_key)
 
     @ddt.data({'path_name': 'api_cohorts:cohort_settings'},
               {'path_name': 'api_cohorts:cohort_handler'}, )
@@ -60,13 +62,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.get(path=path, **headers)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.get(path=path, **headers)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def test_oauth_users(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
@@ -84,13 +86,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.post(path=path, data=data, **headers)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.post(path=path, data=data, **headers)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def test_oauth_csv(self):
         """ Verify the endpoint supports OAuth, and only allows authorization for staff users. """
@@ -105,13 +107,13 @@ class TestCohortOauth(SharedModuleStoreTestCase):
 
         # Non-staff users should not have access to the API
         response = self.client.post(path=path, **headers)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
         # Staff users should have access to the API
         user.is_staff = True
         user.save()
         response = self.client.post(path=path, **headers)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
 
 @skip_unless_lms
@@ -125,11 +127,11 @@ class TestCohortApi(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestCohortApi, cls).setUpClass()
         cls.user = UserFactory(username=USERNAME, email=USER_MAIL, password=cls.password)
         cls.staff_user = UserFactory(is_staff=True, password=cls.password)
         cls.course_key = ToyCourseFactory.create().id
-        cls.course_str = str(cls.course_key)
+        cls.course_str = six.text_type(cls.course_key)
 
     @ddt.data(
         {'is_staff': True, 'status': 200},
@@ -311,7 +313,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
             expected_results = [{
                 'username': user.username,
                 'email': user.email,
-                'name': f'{user.first_name} {user.last_name}'
+                'name': u'{} {}'.format(user.first_name, user.last_name)
             } for user in users]
             assert results == expected_results
 
@@ -454,7 +456,7 @@ class TestCohortApi(SharedModuleStoreTestCase):
         path = reverse('api_cohorts:cohort_users_csv', kwargs={'course_key_string': self.course_str})
         user = self.staff_user if is_staff else self.user
         assert self.client.login(username=user.username, password=self.password)
-        with open(file_name) as file_pointer:
+        with open(file_name, 'r') as file_pointer:
             response = self.client.post(path=path,
                                         data={'uploaded-file': file_pointer})
             assert response.status_code == status

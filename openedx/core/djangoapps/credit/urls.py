@@ -7,7 +7,7 @@ from django.conf.urls import include, url
 
 from openedx.core.djangoapps.credit import models, routers, views
 
-PROVIDER_ID_PATTERN = fr'(?P<provider_id>{models.CREDIT_PROVIDER_ID_REGEX})'
+PROVIDER_ID_PATTERN = r'(?P<provider_id>{})'.format(models.CREDIT_PROVIDER_ID_REGEX)
 
 PROVIDER_URLS = [
     url(r'^request/$', views.CreditProviderRequestCreateView.as_view(), name='create_request'),
@@ -15,7 +15,7 @@ PROVIDER_URLS = [
 ]
 
 V1_URLS = [
-    url(fr'^providers/{PROVIDER_ID_PATTERN}/', include(PROVIDER_URLS)),
+    url(r'^providers/{}/'.format(PROVIDER_ID_PATTERN), include(PROVIDER_URLS)),
     url(r'^eligibility/$', views.CreditEligibilityView.as_view(), name='eligibility_details'),
 ]
 

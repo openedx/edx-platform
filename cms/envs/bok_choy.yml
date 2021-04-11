@@ -108,7 +108,7 @@ MODULESTORE:
           fs_root: '** OVERRIDDEN **'
           host: [localhost]
           port: 27017
-          render_template: common.djangoapps.edxmako.shortcuts.render_to_string
+          render_template: edxmako.shortcuts.render_to_string
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
         OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}

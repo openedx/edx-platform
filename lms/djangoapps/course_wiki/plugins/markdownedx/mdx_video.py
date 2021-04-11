@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # TODO: Is this file still used? If so it should be refactored and tests added.
 # pylint: disable=line-too-long, invalid-name
-"""
+u"""
 Embeds web videos using URLs.  For instance, if a URL to an youtube video is
 found in the text submitted to markdown and it isn't enclosed in parenthesis
 like a normal link in markdown, then the URL will be swapped with a embedded
@@ -142,7 +142,7 @@ except ImportError:
 version = "0.1.6"
 
 
-class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missing-class-docstring
+class VideoExtension(markdown.Extension):
     def __init__(self, **kwargs):
         self.config = {
             'bliptv_width': ['480', 'Width for Blip.tv videos'],
@@ -164,7 +164,7 @@ class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missi
         }
 
         # Override defaults with user settings
-        super().__init__(**kwargs)
+        super(VideoExtension, self).__init__(**kwargs)
 
     def add_inline(self, md, name, klass, re):  # pylint: disable=invalid-name
         """Adds the inline link"""
@@ -173,7 +173,7 @@ class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missi
         pattern.ext = self
         md.inlinePatterns.add(name, pattern, "<reference")
 
-    def extendMarkdown(self, md, md_globals):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def extendMarkdown(self, md, md_globals):
         self.add_inline(md, 'bliptv', Bliptv,
                         r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
         self.add_inline(md, 'dailymotion', Dailymotion,
@@ -192,7 +192,7 @@ class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missi
                         r'([^(]|^)http://www\.youtube\.com/watch\?\S*v=(?P<youtubeargs>[A-Za-z0-9_&=-]+)\S*')
 
 
-class Bliptv(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Bliptv(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://blip.tv/scripts/flash/showplayer.swf?file=http://blip.tv/file/get/%s' % m.group('bliptvfile')
         # pylint: disable=no-member
@@ -201,7 +201,7 @@ class Bliptv(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=
         return flash_object(url, width, height)
 
 
-class Dailymotion(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Dailymotion(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.dailymotion.com/swf/%s' % m.group('dailymotionid').split('/')[-1]
         # pylint: disable=no-member
@@ -210,7 +210,7 @@ class Dailymotion(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: dis
         return flash_object(url, width, height)
 
 
-class Gametrailers(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Gametrailers(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.gametrailers.com/remote_wrap.php?mid=%s' % \
             m.group('gametrailersid').split('/')[-1]
@@ -220,7 +220,7 @@ class Gametrailers(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: di
         return flash_object(url, width, height)
 
 
-class Metacafe(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Metacafe(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.metacafe.com/fplayer/%s.swf' % m.group('metacafeid')
         # pylint: disable=no-member
@@ -229,7 +229,7 @@ class Metacafe(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disabl
         return flash_object(url, width, height)
 
 
-class Veoh(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Veoh(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.veoh.com/videodetails2.swf?permalinkId=%s' % m.group('veohid')
         # pylint: disable=no-member
@@ -238,7 +238,7 @@ class Veoh(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=mi
         return flash_object(url, width, height)
 
 
-class Vimeo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Vimeo(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://vimeo.com/moogaloop.swf?clip_id=%s&amp;server=vimeo.com' % m.group('vimeoid')
         # pylint: disable=no-member
@@ -247,7 +247,7 @@ class Vimeo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=m
         return flash_object(url, width, height)
 
 
-class Yahoo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Yahoo(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = "http://d.yimg.com/static.video.yahoo.com/yep/YV_YEP.swf?ver=2.2.40"
         # pylint: disable=no-member
@@ -256,12 +256,13 @@ class Yahoo(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=m
         obj = flash_object(url, width, height)
         param = etree.Element('param')
         param.set('name', 'flashVars')
-        param.set('value', "id={}&vid={}".format(m.group('yahooid'), m.group('yahoovid')))
+        param.set('value', "id=%s&vid=%s" % (m.group('yahooid'),
+                                             m.group('yahoovid')))
         obj.append(param)
         return obj
 
 
-class Youtube(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Youtube(markdown.inlinepatterns.Pattern):
     def handleMatch(self, m):
         url = 'http://www.youtube.com/v/%s' % m.group('youtubeargs')
         # pylint: disable=no-member
@@ -270,7 +271,7 @@ class Youtube(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: disable
         return flash_object(url, width, height)
 
 
-def flash_object(url, width, height):  # lint-amnesty, pylint: disable=missing-function-docstring
+def flash_object(url, width, height):
     obj = etree.Element('object')
     obj.set('type', 'application/x-shockwave-flash')
     obj.set('width', width)

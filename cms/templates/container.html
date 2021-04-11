@@ -64,7 +64,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 $('.seq_new_button').click(function(evt) {
                     evt.preventDefault();
                     XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
-                        ViewUtils.redirect('/container/' + locator + '?action=new');
+                        ViewUtils.redirect('/container/' + locator + '?action=new');      
                         return false;
                     });
                     return false;
@@ -100,17 +100,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="nav-sub">
                                 <ul>
                                 % for child in block['children']:
-                                    <%
-                                        # Not all xblock has their own studio page
-                                        # Check if siblings has any url to their own studio
-                                        # page, otherwise avoid including them in dropdown.
-                                        url = xblock_studio_url(child)
-                                    %>
-                                    % if url:
-                                        <li class="nav-item">
-                                            <a href="${url}">${child.display_name_with_default}</a>
-                                        </li>
-                                    % endif
+                                <li class="nav-item">
+                                    <a href="${xblock_studio_url(child)}">${child.display_name_with_default}</a>
+                                </li>
                                 % endfor
                                 </ul>
                             </div>
@@ -131,7 +123,6 @@ from openedx.core.djangolib.markup import HTML, Text
         <nav class="nav-actions" aria-label="${_('Page Actions')}">
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
-                ## Hide the sequence navigation when we've browsed into a child of the unit, e.g. showing the child blocks of a problem-builder xblock
                 % if is_unit_page:
                     <li class="action-item action-view nav-item">
                         <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" rel="external" title="${_('Open the courseware in the LMS')}">
@@ -153,9 +144,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 % endif
             </ul>
         </nav>
-    % if is_unit_page:
     <div id="sequence-nav"></div>
-    % endif
     </header>
 </div>
 

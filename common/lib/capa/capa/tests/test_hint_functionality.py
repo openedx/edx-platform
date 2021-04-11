@@ -5,7 +5,7 @@ Tests of extended hints
 
 
 import unittest
-import pytest
+
 from ddt import data, ddt, unpack
 
 from capa.tests.helpers import load_fixture, new_loncapa_problem
@@ -89,7 +89,7 @@ class TextInputHintsTest(HintTest):
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 @ddt
@@ -121,7 +121,7 @@ class TextInputExtendedHintsCaseInsensitive(HintTest):
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 @ddt
@@ -149,7 +149,7 @@ class TextInputExtendedHintsCaseSensitive(HintTest):
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
         message_text = self.get_hint(problem_id, choice)
-        assert message_text == expected_string
+        self.assertEqual(message_text, expected_string)
 
 
 @ddt
@@ -173,8 +173,8 @@ class TextInputExtendedHintsCompatible(HintTest):
     @unpack
     def test_text_input_hints(self, problem_id, choice, correct, expected_string):
         message_text = self.get_hint(problem_id, choice)
-        assert message_text == expected_string
-        assert self.correctness(problem_id, choice) == correct
+        self.assertEqual(message_text, expected_string)
+        self.assertEqual(self.correctness(problem_id, choice), correct)
 
 
 @ddt
@@ -209,8 +209,8 @@ class TextInputExtendedHintsRegex(HintTest):
     @unpack
     def test_text_input_hints(self, problem_id, choice, correct, expected_string):
         message_text = self.get_hint(problem_id, choice)
-        assert message_text == expected_string
-        assert self.correctness(problem_id, choice) == correct
+        self.assertEqual(message_text, expected_string)
+        self.assertEqual(self.correctness(problem_id, choice), correct)
 
 
 @ddt
@@ -250,7 +250,7 @@ class NumericInputHintsTest(HintTest):
     @unpack
     def test_numeric_input_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 @ddt
@@ -329,7 +329,7 @@ class CheckboxHintsTest(HintTest):
     def test_checkbox_hints(self, problem_id, choice, expected_string):
         self.maxDiff = None  # pylint: disable=invalid-name
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 class CheckboxHintsTestTracking(HintTest):
@@ -449,7 +449,7 @@ class MultpleChoiceHintsTest(HintTest):
     @unpack
     def test_multiplechoice_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 @ddt
@@ -483,7 +483,7 @@ class MultpleChoiceHintsWithHtmlTest(HintTest):
     @unpack
     def test_multiplechoice_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 @ddt
@@ -530,7 +530,7 @@ class DropdownHintsTest(HintTest):
     @unpack
     def test_dropdown_hints(self, problem_id, choice, expected_string):
         hint = self.get_hint(problem_id, choice)
-        assert hint == expected_string
+        self.assertEqual(hint, expected_string)
 
 
 class ErrorConditionsTest(HintTest):
@@ -539,5 +539,5 @@ class ErrorConditionsTest(HintTest):
     """
     def test_error_conditions_illegal_element(self):
         xml_with_errors = load_fixture('extended_hints_with_errors.xml')
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             new_loncapa_problem(xml_with_errors)    # this problem is improperly constructed

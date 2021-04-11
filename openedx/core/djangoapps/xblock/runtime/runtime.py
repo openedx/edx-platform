@@ -5,7 +5,7 @@ Common base classes for all new XBlock runtimes.
 import logging
 
 import crum
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from completion.services import CompletionService
 from django.contrib.auth import get_user_model
@@ -72,12 +72,15 @@ class XBlockRuntime(RuntimeShim, Runtime):
     suppports_state_for_anonymous_users = True
 
     def __init__(self, system, user):
-        super(XBlockRuntime, self).__init__(  # lint-amnesty, pylint: disable=super-with-arguments
+        super(XBlockRuntime, self).__init__(
             id_reader=system.id_reader,
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
                 XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
+            services={
+                "i18n": ModuleI18nService(),
+            },
             default_class=None,
             select=None,
             id_generator=system.id_generator,
@@ -180,7 +183,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         Submit a completion object for the block.
         """
-        if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
             return
         BlockCompletion.objects.submit_completion(
             user=self.user,
@@ -226,14 +229,12 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == "completion":
             context_key = block.scope_ids.usage_id.context_key
             return CompletionService(user=self.user, context_key=context_key)
-        elif service_name == "i18n":
-            return ModuleI18nService(block=block)
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
         # Otherwise, fall back to the base implementation which loads services
         # defined in the constructor:
         if service is None:
-            service = super(XBlockRuntime, self).service(block, service_name)  # lint-amnesty, pylint: disable=super-with-arguments
+            service = super(XBlockRuntime, self).service(block, service_name)
         return service
 
     def _init_field_data_for_block(self, block):
@@ -290,7 +291,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
         # We want all resource URLs to be absolute, such as is done when
         # local_resource_url() is used.
-        fragment = super(XBlockRuntime, self).render(block, view_name, context)  # lint-amnesty, pylint: disable=super-with-arguments
+        fragment = super(XBlockRuntime, self).render(block, view_name, context)
         needs_fix = False
         for resource in fragment.resources:
             if resource.kind == 'url' and resource.data.startswith('/'):

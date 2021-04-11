@@ -6,18 +6,19 @@ Tests for sequence module.
 
 import ast
 import json
-from datetime import datetime, timedelta
-from unittest.mock import Mock, patch
+from datetime import timedelta
 
 import ddt
-from django.test.utils import override_settings
+import six
 from django.utils.timezone import now
 from freezegun import freeze_time
+from mock import Mock, patch
+from six.moves import range
 from web_fragments.fragment import Fragment
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceBlock
+from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.seq_module import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
@@ -37,7 +38,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     """
 
     def setUp(self):
-        super().setUp()
+        super(SequenceBlockTestCase, self).setUp()
 
         course_xml = self._set_up_course_xml()
         self.course = self.process_xml(course_xml)
@@ -98,6 +99,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
         block.xmodule_runtime._services['user'] = StubUserService()  # pylint: disable=protected-access
+        block.xmodule_runtime.xmodule_instance = getattr(block, '_xmodule', None)
         block.parent = parent.location
         return block
 
@@ -125,7 +127,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         # The render operation will ask modulestore for the current course to get some data. As these tests were
         # originally not written to be compatible with a real modulestore, we've mocked out the relevant return values.
-        with patch.object(SequenceBlock, '_get_course') as mock_course:
+        with patch.object(SequenceModule, '_get_course') as mock_course:
             self.course.self_paced = self_paced
             mock_course.return_value = self.course
             return sequence.xmodule_runtime.render(sequence, view, context).content
@@ -134,15 +136,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Verifies that the rendered view contains the expected position.
         """
-        assert f"'position': {expected_position}" in rendered_html
+        self.assertIn("'position': {}".format(expected_position), rendered_html)
 
     def test_student_view_init(self):
-        module_system = get_test_system()
-        module_system.position = 2
-        seq_module = SequenceBlock(runtime=module_system, scope_ids=Mock())
-        seq_module.bind_for_student(module_system, 34)
-        assert seq_module.position == 2
-        # matches position set in the runtime
+        seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
+        self.assertEqual(seq_module.position, 2)  # matches position set in the runtime
 
     @ddt.unpack
     @ddt.data(
@@ -156,15 +154,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             view=view
         )
         self._assert_view_at_position(html, expected_position=1)
-        assert str(self.sequence_3_1.location) in html
-        assert "'gated': False" in html
-        assert "'next_url': 'NextSequential'" in html
-        assert "'prev_url': 'PrevSequential'" in html
-        assert 'fa fa-check-circle check-circle is-hidden' not in html
+        self.assertIn(six.text_type(self.sequence_3_1.location), html)
+        self.assertIn("'gated': False", html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
+        self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
 
-    # pylint: disable=line-too-long
-    @patch('xmodule.seq_module.SequenceBlock.gate_entire_sequence_if_it_is_a_timed_exam_and_contains_content_type_gated_problems')
-    def test_timed_exam_gating_waffle_flag(self, mocked_function):  # pylint: disable=unused-argument
+    @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
+    def test_timed_exam_gating_waffle_flag(self, mocked_user):
         """
         Verify the code inside the waffle flag is not executed with the flag off
         Verify the code inside the waffle flag is executed with the flag on
@@ -177,7 +174,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
                 view=STUDENT_VIEW
             )
-            mocked_function.assert_not_called()
+            mocked_user.assert_not_called()
 
         with override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True):
             self._get_rendered_view(
@@ -185,12 +182,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
                 view=STUDENT_VIEW
             )
-            mocked_function.assert_called_once()
+            mocked_user.assert_called_once()
 
     @override_waffle_flag(TIMED_EXAM_GATING_WAFFLE_FLAG, active=True)
-    def test_that_timed_sequence_gating_respects_access_configurations(self):
+    @patch('xmodule.seq_module.User.objects.get', return_value=UserFactory.build())
+    def test_that_timed_sequence_gating_respects_access_configurations(self, mocked_user):  # pylint: disable=unused-argument
         """
         Verify that if a time limited sequence contains content type gated problems, we gate the sequence
+        Verify that if a time limited sequence does not contain content type gated problems, we do not gate the sequence
         """
         # the one problem in this sequence needs to have graded set to true in order to test content type gating
         self.sequence_5_1.get_children()[0].get_children()[0].graded = True
@@ -198,18 +197,51 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         # When a time limited sequence contains content type gated problems, the sequence itself is gated
         self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
-            check_children_for_content_type_gating_paywall=Mock(return_value=gated_fragment.content),
+            enabled_for_enrollment=Mock(return_value=True),
+            content_type_gate_for_block=Mock(return_value=gated_fragment)
         ))
         view = self._get_rendered_view(
             self.sequence_5_1,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
             view=STUDENT_VIEW
         )
-        assert 'i_am_gated' in view
+        self.assertIn('i_am_gated', view)
         # check a few elements to ensure the correct page was loaded
-        assert 'seq_module.html' in view
-        assert 'NextSequential' in view
-        assert 'PrevSequential' in view
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
+
+        # When enabled_for_enrollment is false, the sequence itself is not gated
+        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
+            enabled_for_enrollment=Mock(return_value=False),
+            content_type_gate_for_block=Mock(return_value=gated_fragment)
+        ))
+        view = self._get_rendered_view(
+            self.sequence_5_1,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=STUDENT_VIEW
+        )
+        self.assertNotIn('i_am_gated', view)
+        # check a few elements to ensure the correct page was loaded
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
+
+        # When content_type_gate_for_block returns None, the sequence itself is not gated
+        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
+            enabled_for_enrollment=Mock(return_value=True),
+            content_type_gate_for_block=Mock(return_value=None)
+        ))
+        view = self._get_rendered_view(
+            self.sequence_5_1,
+            extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=STUDENT_VIEW
+        )
+        self.assertNotIn('i_am_gated', view)
+        # check a few elements to ensure the correct page was loaded
+        self.assertIn("seq_module.html", view)
+        self.assertIn('NextSequential', view)
+        self.assertIn('PrevSequential', view)
 
     @ddt.unpack
     @ddt.data(
@@ -234,12 +266,12 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     def test_tooltip(self):
         html = self._get_rendered_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
-            assert f"'page_title': '{child.block_id}'" in html
+            self.assertIn("'page_title': '{}'".format(child.block_id), html)
 
     def test_hidden_content_before_due(self):
         html = self._get_rendered_view(self.sequence_4_1)
-        assert 'seq_module.html' in html
-        assert "'banner_text': None" in html
+        self.assertIn("seq_module.html", html)
+        self.assertIn("'banner_text': None", html)
 
     def test_hidden_content_past_due(self):
         with freeze_time(COURSE_END_DATE):
@@ -248,8 +280,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 self.sequence_4_1,
                 extra_context=dict(progress_url=progress_url),
             )
-            assert 'hidden_content.html' in html
-            assert progress_url in html
+            self.assertIn("hidden_content.html", html)
+            self.assertIn(progress_url, html)
 
     def test_masquerade_hidden_content_past_due(self):
         with freeze_time(COURSE_END_DATE):
@@ -257,15 +289,18 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 self.sequence_4_1,
                 extra_context=dict(specific_masquerade=True),
             )
-            assert 'seq_module.html' in html
+            self.assertIn("seq_module.html", html)
             html = self.get_context_dict_from_string(html)
-            assert 'Because the due date has passed, this assignment is hidden from the learner.' == html['banner_text']
+            self.assertEqual(
+                'Because the due date has passed, this assignment is hidden from the learner.',
+                html['banner_text']
+            )
 
     def test_hidden_content_self_paced_past_due_before_end(self):
         with freeze_time(PAST_DUE_BEFORE_END_DATE):
             html = self._get_rendered_view(self.sequence_4_1, self_paced=True)
-            assert 'seq_module.html' in html
-            assert "'banner_text': None" in html
+            self.assertIn("seq_module.html", html)
+            self.assertIn("'banner_text': None", html)
 
     def test_hidden_content_self_paced_past_end(self):
         with freeze_time(COURSE_END_DATE + timedelta(days=7)):
@@ -275,50 +310,56 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
                 extra_context=dict(progress_url=progress_url),
                 self_paced=True,
             )
-            assert 'hidden_content.html' in html
-            assert progress_url in html
+            self.assertIn("hidden_content.html", html)
+            self.assertIn(progress_url, html)
 
     def _assert_gated(self, html, sequence):
         """
         Assert sequence content is gated
         """
-        assert 'seq_module.html' in html
+        self.assertIn("seq_module.html", html)
         html = self.get_context_dict_from_string(html)
-        assert html['banner_text'] is None
-        assert [] == html['items']
-        assert html['gated_content']['gated']
-        assert 'PrereqUrl' == html['gated_content']['prereq_url']
-        assert 'PrereqSectionName' == html['gated_content']['prereq_section_name']
-        assert str(sequence.display_name) in html['gated_content']['gated_section_name']
-        assert 'NextSequential' == html['next_url']
-        assert 'PrevSequential' == html['prev_url']
+        self.assertIsNone(html['banner_text'])
+        self.assertEqual([], html['items'])
+        self.assertTrue(html['gated_content']['gated'])
+        self.assertEqual('PrereqUrl', html['gated_content']['prereq_url'])
+        self.assertEqual('PrereqSectionName', html['gated_content']['prereq_section_name'])
+        self.assertIn(
+            six.text_type(sequence.display_name),
+            html['gated_content']['gated_section_name']
+        )
+        self.assertEqual('NextSequential', html['next_url'])
+        self.assertEqual('PrevSequential', html['prev_url'])
 
     def _assert_prereq(self, html, sequence):
         """
         Assert sequence is a prerequisite with unfulfilled gates
         """
-        assert 'seq_module.html' in html
+        self.assertIn("seq_module.html", html)
         html = self.get_context_dict_from_string(html)
-        assert 'This section is a prerequisite. You must complete this section in order to unlock additional content.' == html['banner_text']
-        assert not html['gated_content']['gated']
-        assert str(sequence.location) == html['item_id']
-        assert html['gated_content']['prereq_url'] is None
-        assert html['gated_content']['prereq_section_name'] is None
-        assert 'NextSequential' == html['next_url']
-        assert 'PrevSequential' == html['prev_url']
+        self.assertEqual(
+            "This section is a prerequisite. You must complete this section in order to unlock additional content.",
+            html['banner_text']
+        )
+        self.assertFalse(html['gated_content']['gated'])
+        self.assertEqual(six.text_type(sequence.location), html['item_id'])
+        self.assertIsNone(html['gated_content']['prereq_url'])
+        self.assertIsNone(html['gated_content']['prereq_section_name'])
+        self.assertEqual('NextSequential', html['next_url'])
+        self.assertEqual('PrevSequential', html['prev_url'])
 
     def _assert_ungated(self, html, sequence):
         """
         Assert sequence is not gated
         """
-        assert 'seq_module.html' in html
-        assert "'banner_text': None" in html
-        assert "'gated': False" in html
-        assert str(sequence.location) in html
-        assert "'prereq_url': None" in html
-        assert "'prereq_section_name': None" in html
-        assert "'next_url': 'NextSequential'" in html
-        assert "'prev_url': 'PrevSequential'" in html
+        self.assertIn("seq_module.html", html)
+        self.assertIn("'banner_text': None", html)
+        self.assertIn("'gated': False", html)
+        self.assertIn(six.text_type(sequence.location), html)
+        self.assertIn("'prereq_url': None", html)
+        self.assertIn("'prereq_section_name': None", html)
+        self.assertIn("'next_url': 'NextSequential'", html)
+        self.assertIn("'prev_url': 'PrevSequential'", html)
 
     def test_gated_content(self):
         """
@@ -375,14 +416,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         targeted vertical through ajax call
         """
         for child in self.sequence_3_1.get_children():
-            usage_key = str(child.location)
+            usage_key = six.text_type(child.location)
             completion_return = json.loads(self.sequence_3_1.handle_ajax(
                 'get_completion',
                 {'usage_key': usage_key}
             ))
-            assert completion_return is not None
-            assert 'complete' in completion_return
-            assert completion_return['complete'] is True
+            self.assertIsNot(completion_return, None)
+            self.assertTrue('complete' in completion_return)
+            self.assertEqual(completion_return['complete'], True)
 
     def test_handle_ajax_get_completion_return_none(self):
         """
@@ -394,7 +435,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             'get_completion',
             {'usage_key': usage_key}
         )
-        assert completion_return is None
+        self.assertIs(completion_return, None)
 
     def test_handle_ajax_metadata(self):
         """
@@ -403,33 +444,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         # rather than dealing with json serialization of the Mock object,
         # let's just disable the bookmarks service
-        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None  # lint-amnesty, pylint: disable=protected-access
+        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None
         metadata = json.loads(self.sequence_3_1.handle_ajax('metadata', {}))
-        assert len(metadata['items']) == 3
-        assert metadata['tag'] == 'sequential'
-        assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
-
-    @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-        'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
-    ))
-    def test_handle_ajax_metadata_content_type_gated_content(self):
-        """
-        The contains_content_type_gated_content field should reflect
-        whether the given item contains content type gated content
-        """
-        self.sequence_5_1.xmodule_runtime._services['bookmarks'] = None  # pylint: disable=protected-access
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        metadata = json.loads(self.sequence_5_1.handle_ajax('metadata', {}))
-        assert metadata['items'][0]['contains_content_type_gated_content'] is False
-
-        # When a block contains content type gated problems, set the contains_content_type_gated_content field
-        self.sequence_5_1.get_children()[0].get_children()[0].graded = True
-        self.sequence_5_1.runtime._services['content_type_gating'] = Mock(return_value=Mock(  # pylint: disable=protected-access
-            enabled_for_enrollment=Mock(return_value=True),
-            content_type_gate_for_block=Mock(return_value=Fragment('i_am_gated'))
-        ))
-        metadata = json.loads(self.sequence_5_1.handle_ajax('metadata', {}))
-        assert metadata['items'][0]['contains_content_type_gated_content'] is True
+        self.assertEqual(len(metadata['items']), 3)
+        self.assertEqual(metadata['tag'], 'sequential')
+        self.assertEqual(metadata['display_name'], self.sequence_3_1.display_name_with_default)
 
     def get_context_dict_from_string(self, data):
         """

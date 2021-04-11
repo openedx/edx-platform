@@ -61,7 +61,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
     perf_test = True
 
     def setUp(self):
-        super().setUp()
+        super(CrossStoreXMLRoundtrip, self).setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
@@ -75,7 +75,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
         """
         Generate timings for different amounts of asset metadata and different modulestores.
         """
-        if CodeBlockTimer is None:  # lint-amnesty, pylint: disable=undefined-variable
+        if CodeBlockTimer is None:
             pytest.skip("CodeBlockTimer undefined.")
 
         desc = "XMLRoundTrip:{}->{}:{}".format(
@@ -84,9 +84,9 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
             num_assets
         )
 
-        with CodeBlockTimer(desc):  # lint-amnesty, pylint: disable=undefined-variable
+        with CodeBlockTimer(desc):
 
-            with CodeBlockTimer("fake_assets"):  # lint-amnesty, pylint: disable=undefined-variable
+            with CodeBlockTimer("fake_assets"):
                 # First, make the fake asset metadata.
                 make_asset_xml(num_assets, ASSET_XML_PATH)
                 validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
@@ -96,7 +96,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                     source_course_key = source_store.make_course_key('a', 'course', 'course')
                     dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
-                    with CodeBlockTimer("initial_import"):  # lint-amnesty, pylint: disable=undefined-variable
+                    with CodeBlockTimer("initial_import"):
                         import_course_from_xml(
                             source_store,
                             'test_user',
@@ -108,7 +108,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                             raise_on_failure=True,
                         )
 
-                    with CodeBlockTimer("export"):  # lint-amnesty, pylint: disable=undefined-variable
+                    with CodeBlockTimer("export"):
                         export_course_to_xml(
                             source_store,
                             source_content,
@@ -117,7 +117,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                             'exported_source_course',
                         )
 
-                    with CodeBlockTimer("second_import"):  # lint-amnesty, pylint: disable=undefined-variable
+                    with CodeBlockTimer("second_import"):
                         import_course_from_xml(
                             dest_store,
                             'test_user',
@@ -194,7 +194,7 @@ class TestModulestoreAssetSize(unittest.TestCase):
 
                 results = asset_collection.map_reduce(mapper, reducer, "size_results")
                 result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
-                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]
                 )
                 with open("bson_sizes.txt", "a") as f:
                     f.write(result_str)

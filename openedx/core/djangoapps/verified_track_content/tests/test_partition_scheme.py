@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import pytz
 import six
-import pytest
+
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -32,13 +32,13 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
     def test_only_default_mode(self):
         partition = create_enrollment_track_partition(self.course)
         groups = partition.groups
-        assert 1 == len(groups)
-        assert 'Audit' == groups[0].name
+        self.assertEqual(1, len(groups))
+        self.assertEqual("Audit", groups[0].name)
 
     def test_using_verified_track_cohort(self):
         VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
         partition = create_enrollment_track_partition(self.course)
-        assert 0 == len(partition.groups)
+        self.assertEqual(0, len(partition.groups))
 
     def test_multiple_groups(self):
         create_mode(self.course, CourseMode.AUDIT, "Audit Enrollment Track", min_price=0)
@@ -53,19 +53,19 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
 
         partition = create_enrollment_track_partition(self.course)
         groups = partition.groups
-        assert 2 == len(groups)
-        assert self.get_group_by_name(partition, 'Audit Enrollment Track') is not None
-        assert self.get_group_by_name(partition, 'Verified Enrollment Track') is not None
+        self.assertEqual(2, len(groups))
+        self.assertIsNotNone(self.get_group_by_name(partition, "Audit Enrollment Track"))
+        self.assertIsNotNone(self.get_group_by_name(partition, "Verified Enrollment Track"))
 
     def test_to_json_supported(self):
         user_partition_json = create_enrollment_track_partition(self.course).to_json()
-        assert 'Test Enrollment Track Partition' == user_partition_json['name']
-        assert 'enrollment_track' == user_partition_json['scheme']
-        assert 'Test partition for segmenting users by enrollment track' == user_partition_json['description']
+        self.assertEqual('Test Enrollment Track Partition', user_partition_json['name'])
+        self.assertEqual('enrollment_track', user_partition_json['scheme'])
+        self.assertEqual('Test partition for segmenting users by enrollment track', user_partition_json['description'])
 
     def test_from_json_not_supported(self):
         user_partition_json = create_enrollment_track_partition(self.course).to_json()
-        with pytest.raises(ReadOnlyUserPartitionError):
+        with self.assertRaises(ReadOnlyUserPartitionError):
             UserPartition.from_json(user_partition_json)
 
     def test_group_ids(self):
@@ -74,7 +74,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         with group IDs associated with cohort and random user partitions).
         """
         for mode in ENROLLMENT_GROUP_IDS:
-            assert ENROLLMENT_GROUP_IDS[mode]['id'] < MINIMUM_STATIC_PARTITION_ID
+            self.assertLess(ENROLLMENT_GROUP_IDS[mode]['id'], MINIMUM_STATIC_PARTITION_ID)
 
     @staticmethod
     def get_group_by_name(partition, name):
@@ -103,34 +103,34 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
         """
         Ensure that the scheme extension is correctly plugged in (via entry point in setup.py)
         """
-        assert UserPartition.get_scheme('enrollment_track') == EnrollmentTrackPartitionScheme
+        self.assertEqual(UserPartition.get_scheme('enrollment_track'), EnrollmentTrackPartitionScheme)
 
     def test_create_user_partition(self):
         user_partition = UserPartition.get_scheme('enrollment_track').create_user_partition(
             301, "partition", "test partition", parameters={"course_id": six.text_type(self.course.id)}
         )
-        assert isinstance(user_partition, EnrollmentTrackUserPartition)
-        assert user_partition.name == 'partition'
+        self.assertEqual(type(user_partition), EnrollmentTrackUserPartition)
+        self.assertEqual(user_partition.name, "partition")
 
         groups = user_partition.groups
-        assert 1 == len(groups)
-        assert 'Audit' == groups[0].name
+        self.assertEqual(1, len(groups))
+        self.assertEqual("Audit", groups[0].name)
 
     def test_not_enrolled(self):
-        assert self._get_user_group() is None
+        self.assertIsNone(self._get_user_group())
 
     def test_default_enrollment(self):
         CourseEnrollment.enroll(self.student, self.course.id)
-        assert 'Audit' == self._get_user_group().name
+        self.assertEqual("Audit", self._get_user_group().name)
 
     def test_enrolled_in_nonexistent_mode(self):
         CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.VERIFIED)
-        assert 'Audit' == self._get_user_group().name
+        self.assertEqual("Audit", self._get_user_group().name)
 
     def test_enrolled_in_verified(self):
         create_mode(self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1)
         CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.VERIFIED)
-        assert 'Verified Enrollment Track' == self._get_user_group().name
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
     def test_enrolled_in_expired(self):
         create_mode(
@@ -138,18 +138,18 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
             min_price=1, expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=-1)
         )
         CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.VERIFIED)
-        assert 'Verified Enrollment Track' == self._get_user_group().name
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
     def test_enrolled_in_non_selectable(self):
         create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Enrollment Track", min_price=1)
         CourseEnrollment.enroll(self.student, self.course.id, mode=CourseMode.CREDIT_MODE)
 
         # The default mode is returned because Credit mode is filtered out, and no verified mode exists.
-        assert 'Audit' == self._get_user_group().name
+        self.assertEqual("Audit", self._get_user_group().name)
 
         # Now create a verified mode and check that it is returned for the learner enrolled in Credit.
         create_mode(self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1)
-        assert 'Verified Enrollment Track' == self._get_user_group().name
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
     def test_credit_after_upgrade_deadline(self):
         create_mode(self.course, CourseMode.CREDIT_MODE, "Credit Enrollment Track", min_price=1)
@@ -162,12 +162,12 @@ class EnrollmentTrackPartitionSchemeTest(SharedModuleStoreTestCase):
             self.course, CourseMode.VERIFIED, "Verified Enrollment Track", min_price=1,
             expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=-1)
         )
-        assert 'Verified Enrollment Track' == self._get_user_group().name
+        self.assertEqual("Verified Enrollment Track", self._get_user_group().name)
 
     def test_using_verified_track_cohort(self):
         VerifiedTrackCohortedCourse.objects.create(course_key=self.course.id, enabled=True).save()
         CourseEnrollment.enroll(self.student, self.course.id)
-        assert self._get_user_group() is None
+        self.assertIsNone(self._get_user_group())
 
     def _get_user_group(self):
         """

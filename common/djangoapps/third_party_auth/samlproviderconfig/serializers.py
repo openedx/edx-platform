@@ -7,7 +7,7 @@ from rest_framework import serializers
 from common.djangoapps.third_party_auth.models import SAMLProviderConfig, SAMLConfiguration
 
 
-class SAMLProviderConfigSerializer(serializers.ModelSerializer):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SAMLProviderConfigSerializer(serializers.ModelSerializer):
     saml_config_id = serializers.IntegerField(required=False)
 
     class Meta:

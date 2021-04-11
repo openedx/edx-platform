@@ -5,11 +5,11 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
-from unittest import mock
 from uuid import uuid4
 
+import mock
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
@@ -20,7 +20,6 @@ from cms.djangoapps.contentstore.tasks import export_olx, rerun_course
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
-from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore
 
@@ -46,7 +45,7 @@ class ExportCourseTestCase(CourseTestCase):
         Verify that a routine course export task succeeds
         """
         key = str(self.course.location.course_key)
-        result = export_olx.delay(self.user.id, key, 'en')
+        result = export_olx.delay(self.user.id, key, u'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)
@@ -60,18 +59,17 @@ class ExportCourseTestCase(CourseTestCase):
         The export task should fail gracefully if an exception is thrown
         """
         key = str(self.course.location.course_key)
-        result = export_olx.delay(self.user.id, key, 'en')
-        self._assert_failed(result, json.dumps({'raw_error_msg': 'Boom!'}))
+        result = export_olx.delay(self.user.id, key, u'en')
+        self._assert_failed(result, json.dumps({u'raw_error_msg': u'Boom!'}))
 
-    @mock.patch('cms.djangoapps.contentstore.tasks.User.objects.get', side_effect=User.DoesNotExist)
-    def test_invalid_user_id(self, mock_raise_exc):  # pylint: disable=unused-argument
+    def test_invalid_user_id(self):
         """
         Verify that attempts to export a course as an invalid user fail
         """
-        user = UserFactory(id=User.objects.order_by('-id').first().pk + 100)
+        user_id = User.objects.order_by(u'-id').first().pk + 100
         key = str(self.course.location.course_key)
-        result = export_olx.delay(user.id, key, 'en')
-        self._assert_failed(result, f'Unknown User ID: {user.id}')
+        result = export_olx.delay(user_id, key, u'en')
+        self._assert_failed(result, u'Unknown User ID: {}'.format(user_id))
 
     def test_non_course_author(self):
         """
@@ -79,8 +77,8 @@ class ExportCourseTestCase(CourseTestCase):
         """
         _, nonstaff_user = self.create_non_staff_authed_user_client()
         key = str(self.course.location.course_key)
-        result = export_olx.delay(nonstaff_user.id, key, 'en')
-        self._assert_failed(result, 'Permission denied')
+        result = export_olx.delay(nonstaff_user.id, key, u'en')
+        self._assert_failed(result, u'Permission denied')
 
     def _assert_failed(self, task_result, error_message):
         """
@@ -91,7 +89,7 @@ class ExportCourseTestCase(CourseTestCase):
         artifacts = UserTaskArtifact.objects.filter(status=status)
         self.assertEqual(len(artifacts), 1)
         error = artifacts[0]
-        self.assertEqual(error.name, 'Error')
+        self.assertEqual(error.name, u'Error')
         self.assertEqual(error.text, error_message)
 
 
@@ -106,7 +104,7 @@ class ExportLibraryTestCase(LibraryTestCase):
         Verify that a routine library export task succeeds
         """
         key = str(self.lib_key)
-        result = export_olx.delay(self.user.id, key, 'en')
+        result = export_olx.delay(self.user.id, key, u'en')
         status = UserTaskStatus.objects.get(task_id=result.id)
         self.assertEqual(status.state, UserTaskStatus.SUCCEEDED)
         artifacts = UserTaskArtifact.objects.filter(status=status)
@@ -116,7 +114,7 @@ class ExportLibraryTestCase(LibraryTestCase):
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
-class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class RerunCourseTaskTestCase(CourseTestCase):
     def _rerun_course(self, old_course_key, new_course_key):
         CourseRerunState.objects.initiated(old_course_key, new_course_key, self.user, 'Test Re-run')
         rerun_course(str(old_course_key), str(new_course_key), self.user.id)
@@ -129,7 +127,7 @@ class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=
         old_course_id = str(old_course_key)
         new_course_id = str(new_course_key)
 
-        organization = OrganizationFactory(short_name=old_course_key.org)
+        organization = OrganizationFactory()
         OrganizationCourse.objects.create(course_id=old_course_id, organization=organization)
 
         restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)

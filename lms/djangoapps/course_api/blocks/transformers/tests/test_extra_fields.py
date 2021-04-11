@@ -30,7 +30,7 @@ class TestExtraFieldsTransformer(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super().setUp()
+        super(TestExtraFieldsTransformer, self).setUp()
 
         self.course = SampleCourseFactory.create(
             other_course_settings=self.OTHER_COURSE_SETTINGS_DEFAULT
@@ -55,4 +55,7 @@ class TestExtraFieldsTransformer(ModuleStoreTestCase):
             self.course_usage_key, ExtraFieldsTransformer,
         )
 
-        assert block_data.other_course_settings == self.OTHER_COURSE_SETTINGS_DEFAULT
+        self.assertEqual(
+            block_data.other_course_settings,
+            self.OTHER_COURSE_SETTINGS_DEFAULT
+        )

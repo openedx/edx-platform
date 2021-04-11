@@ -3,7 +3,7 @@ Course Goals Models
 """
 
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -12,10 +12,10 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 # Each goal is represented by a goal key and a string description.
 GOAL_KEY_CHOICES = Choices(
-    ('certify', _('Earn a certificate')),
-    ('complete', _('Complete the course')),
-    ('explore', _('Explore the course')),
-    ('unsure', _('Not sure yet')),
+    (u'certify', _('Earn a certificate')),
+    (u'complete', _('Complete the course')),
+    (u'explore', _('Explore the course')),
+    (u'unsure', _('Not sure yet')),
 )
 
 
@@ -26,7 +26,7 @@ class CourseGoal(models.Model):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "course_goals"
         unique_together = ("user", "course_key")
 

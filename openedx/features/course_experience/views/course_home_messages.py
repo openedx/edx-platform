@@ -51,7 +51,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         'is_staff': True if the user is a staff member of the course, False otherwise
     }
     """
-    def render_to_fragment(self, request, course_id, user_access, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, course_id, user_access, **kwargs):
         """
         Renders a course message fragment for the specified course.
         """
@@ -107,7 +107,7 @@ class CourseHomeMessageFragmentView(EdxFragmentView):
         return Fragment(html)
 
 
-def _register_course_home_messages(request, course, user_access, course_start_data):  # lint-amnesty, pylint: disable=unused-argument
+def _register_course_home_messages(request, course, user_access, course_start_data):
     """
     Register messages to be shown in the course home content page.
     """
@@ -209,7 +209,7 @@ def _register_course_goal_message(request, course):
             ).format(
                 goal_key=goal_key,
                 aria_label_choice=Text(_(u"Set goal to: {goal_text}")).format(
-                    goal_text=Text(_(goal_text))  # lint-amnesty, pylint: disable=translation-of-non-string
+                    goal_text=Text(_(goal_text))
                 )
             ),
             goal_text=goal_text,

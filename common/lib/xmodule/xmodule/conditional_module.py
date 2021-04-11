@@ -1,36 +1,26 @@
-"""
-ConditionalBlock is an XBlock which you can use for disabling some XBlocks by conditions.
+"""Conditional module is the xmodule, which you can use for disabling
+some xmodules by conditions.
 """
 
 
 import json
 import logging
 
+import six
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
 from pkg_resources import resource_string
+from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.fields import ReferenceList, Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.seq_module import SequenceMixin
-from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.seq_module import SequenceDescriptor
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.xml_module import XmlMixin
-from xmodule.x_module import (
-    HTMLSnippet,
-    ResourceTemplates,
-    shim_xmodule_js,
-    STUDENT_VIEW,
-    XModuleDescriptorToXBlockMixin,
-    XModuleMixin,
-    XModuleToXBlockMixin,
-)
-
+from xmodule.x_module import STUDENT_VIEW, XModule
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -38,55 +28,8 @@ log = logging.getLogger('edx.' + __name__)
 _ = lambda text: text
 
 
-class ConditionalBlock(
-    SequenceMixin,
-    MakoTemplateBlockBase,
-    XmlMixin,
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-    HTMLSnippet,
-    ResourceTemplates,
-    XModuleMixin,
-    StudioEditableBlock,
-):
-    """
-    Blocks child blocks from showing unless certain conditions are met.
-
-    Example:
-
-        <conditional sources="i4x://.../problem_1; i4x://.../problem_2" completed="True">
-            <show sources="i4x://.../test_6; i4x://.../Avi_resources"/>
-            <video url_name="secret_video" />
-        </conditional>
-
-        <conditional> tag attributes:
-            sources - location id of required modules, separated by ';'
-
-            submitted - map to `is_submitted` module method.
-            (pressing RESET button makes this function to return False.)
-
-            attempted - map to `is_attempted` module method
-            correct - map to `is_correct` module method
-            poll_answer - map to `poll_answer` module attribute
-            voted - map to `voted` module attribute
-
-        <show> tag attributes:
-            sources - location id of required modules, separated by ';'
-
-        You can add you own rules for <conditional> tag, like
-        "completed", "attempted" etc. To do that yo must extend
-        `ConditionalBlock.conditions_map` variable and add pair:
-            my_attr: my_property/my_method
-
-        After that you can use it:
-            <conditional my_attr="some value" ...>
-                ...
-            </conditional>
-
-        And my_property/my_method will be called for required modules.
-
-    """
-
+class ConditionalFields(object):
+    has_children = True
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -114,7 +57,7 @@ class ConditionalBlock(
         scope=Scope.content,
         default='correct',
         values=lambda: [{'display_name': xml_attr, 'value': xml_attr}
-                        for xml_attr in ConditionalBlock.conditions_map]
+                        for xml_attr in ConditionalModule.conditions_map.keys()]
     )
 
     conditional_value = String(
@@ -134,39 +77,56 @@ class ConditionalBlock(
         default=_('You must complete {link} before you can access this unit.')
     )
 
-    has_children = True
 
-    _tag_name = 'conditional'
+class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
+    """
+    Blocks child module from showing unless certain conditions are met.
 
-    resources_dir = None
+    Example:
 
-    filename_extension = "xml"
+        <conditional sources="i4x://.../problem_1; i4x://.../problem_2" completed="True">
+            <show sources="i4x://.../test_6; i4x://.../Avi_resources"/>
+            <video url_name="secret_video" />
+        </conditional>
 
-    has_score = False
+        <conditional> tag attributes:
+            sources - location id of required modules, separated by ';'
 
-    show_in_read_only_mode = True
+            submitted - map to `is_submitted` module method.
+            (pressing RESET button makes this function to return False.)
 
-    preview_view_js = {
+            attempted - map to `is_attempted` module method
+            correct - map to `is_correct` module method
+            poll_answer - map to `poll_answer` module attribute
+            voted - map to `voted` module attribute
+
+        <show> tag attributes:
+            sources - location id of required modules, separated by ';'
+
+        You can add you own rules for <conditional> tag, like
+        "completed", "attempted" etc. To do that yo must extend
+        `ConditionalModule.conditions_map` variable and add pair:
+            my_attr: my_property/my_method
+
+        After that you can use it:
+            <conditional my_attr="some value" ...>
+                ...
+            </conditional>
+
+        And my_property/my_method will be called for required modules.
+
+    """
+
+    js = {
         'js': [
             resource_string(__name__, 'js/src/conditional/display.js'),
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
+        ]
     }
 
-    mako_template = 'widgets/metadata-edit.html'
-    studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
-    }
+    js_module_name = "Conditional"
+    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     # Map
     # key: <tag attribute in xml>
@@ -188,33 +148,20 @@ class ConditionalBlock(
         'voted': 'voted'  # poll_question attr
     }
 
-    def __init__(self, *args, **kwargs):
-        """
-        Create an instance of the Conditional XBlock.
-        """
-        super().__init__(*args, **kwargs)
-        # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
-        # substitution can be done.
-        if not self.sources_list:
-            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], str):
-                self.sources_list = [
-                    # TODO: it is not clear why we are replacing the run here (which actually is a no-op
-                    # for old-style course locators. However, this is the implementation of
-                    # CourseLocator.make_usage_key_from_deprecated_string, which was previously
-                    # being called in this location.
-                    BlockUsageLocator.from_string(item).replace(run=self.location.course_key.run)
-                    for item in ConditionalBlock.parse_sources(self.xml_attributes)
-                ]
+    @lazy
+    def required_modules(self):
+        return [self.system.get_module(descriptor) for
+                descriptor in self.descriptor.get_required_module_descriptors()]
 
-    def is_condition_satisfied(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def is_condition_satisfied(self):
         attr_name = self.conditions_map[self.conditional_attr]
 
-        if self.conditional_value and self.get_required_blocks:
-            for module in self.get_required_blocks:
+        if self.conditional_value and self.required_modules:
+            for module in self.required_modules:
                 if not hasattr(module, attr_name):
                     # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
-                    # for the resulting module to be a (flavor of) ErrorBlock.
+                    # for the resulting module to be a (flavor of) ErrorModule.
                     # So just log and return false.
                     if module is not None:
                         # We do not want to log when module is None, and it is when requester
@@ -233,22 +180,15 @@ class ConditionalBlock(
                 return True
         return False
 
-    def student_view(self, _context):
-        """
-        Renders the student view.
-        """
-        fragment = Fragment()
-        fragment.add_content(self.get_html())
-        add_webpack_to_fragment(fragment, 'ConditionalBlockPreview')
-        shim_xmodule_js(fragment, 'Conditional')
-        return fragment
-
     def get_html(self):
-        required_html_ids = [descriptor.location.html_id() for descriptor in self.get_required_blocks]
+        # Calculate html ids of dependencies
+        self.required_html_ids = [descriptor.location.html_id() for
+                                  descriptor in self.descriptor.get_required_module_descriptors()]
+
         return self.system.render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
-            'ajax_url': self.ajax_url,
-            'depends': ';'.join(required_html_ids)
+            'ajax_url': self.system.ajax_url,
+            'depends': ';'.join(self.required_html_ids)
         })
 
     def author_view(self, context):
@@ -264,17 +204,6 @@ class ConditionalBlock(
         # else: When shown on a unit page, don't show any sort of preview -
         # just the status of this block in the validation area.
 
-        return fragment
-
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
-        )
-        add_webpack_to_fragment(fragment, 'ConditionalBlockStudio')
-        shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
     def handle_ajax(self, _dispatch, _data):
@@ -298,13 +227,54 @@ class ConditionalBlock(
         # OBSOLETE: This obsoletes 'type'
         class_priority = ['video', 'problem']
 
-        child_classes = [
-            child_descriptor.get_icon_class() for child_descriptor in self.get_children()
-        ]
+        child_classes = [self.system.get_module(child_descriptor).get_icon_class()
+                         for child_descriptor in self.descriptor.get_children()]
         for c in class_priority:
             if c in child_classes:
                 new_class = c
         return new_class
+
+    def validate(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        return self.descriptor.validate()
+
+
+class ConditionalDescriptor(ConditionalFields, SequenceDescriptor, StudioEditableDescriptor):
+    """Descriptor for conditional xmodule."""
+    _tag_name = 'conditional'
+
+    module_class = ConditionalModule
+
+    resources_dir = None
+
+    filename_extension = "xml"
+
+    has_score = False
+
+    show_in_read_only_mode = True
+
+    def __init__(self, *args, **kwargs):
+        """
+        Create an instance of the conditional module.
+        """
+        super(ConditionalDescriptor, self).__init__(*args, **kwargs)
+
+        # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
+        # substitution can be done.
+        if not self.sources_list:
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], six.string_types):
+                self.sources_list = [
+                    # TODO: it is not clear why we are replacing the run here (which actually is a no-op
+                    # for old-style course locators. However, this is the implementation of
+                    # CourseLocator.make_usage_key_from_deprecated_string, which was previously
+                    # being called in this location.
+                    BlockUsageLocator.from_string(item).replace(run=self.location.course_key.run)
+                    for item in ConditionalDescriptor.parse_sources(self.xml_attributes)
+                ]
 
     @staticmethod
     def parse_sources(xml_element):
@@ -313,16 +283,9 @@ class ConditionalBlock(
         if sources:
             return [location.strip() for location in sources.split(';')]
 
-    @lazy
-    def get_required_blocks(self):
-        """
-        Returns a list of bound XBlocks instances upon which XBlock depends.
-        """
-        return [self.system.get_module(descriptor) for descriptor in self.get_required_module_descriptors()]
-
     def get_required_module_descriptors(self):
-        """
-        Returns a list of unbound XBlocks instances upon which this XBlock depends.
+        """Returns a list of XModuleDescriptor instances upon
+        which this module depends.
         """
         descriptors = []
         for location in self.sources_list:
@@ -341,7 +304,7 @@ class ConditionalBlock(
         children = []
         show_tag_list = []
         definition = {}
-        for conditional_attr in cls.conditions_map:
+        for conditional_attr in six.iterkeys(ConditionalModule.conditions_map):
             conditional_value = xml_object.get(conditional_attr)
             if conditional_value is not None:
                 definition.update({
@@ -350,7 +313,7 @@ class ConditionalBlock(
                 })
         for child in xml_object:
             if child.tag == 'show':
-                locations = cls.parse_sources(child)
+                locations = ConditionalDescriptor.parse_sources(child)
                 for location in locations:
                     children.append(location)
                     show_tag_list.append(location)
@@ -358,7 +321,7 @@ class ConditionalBlock(
                 try:
                     descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
                     children.append(descriptor.scope_ids.usage_id)
-                except:  # lint-amnesty, pylint: disable=bare-except
+                except:
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)
                     system.error_tracker(msg)
@@ -375,28 +338,28 @@ class ConditionalBlock(
                 self.runtime.add_block_as_child_node(child, xml_object)
 
         if self.show_tag_list:
-            show_str = HTML('<show sources="{sources}" />').format(
-                sources=Text(';'.join(str(location) for location in self.show_tag_list)))
+            show_str = HTML(u'<show sources="{sources}" />').format(
+                sources=Text(';'.join(text_type(location) for location in self.show_tag_list)))
             xml_object.append(etree.fromstring(show_str))
 
         # Overwrite the original sources attribute with the value from sources_list, as
         # Locations may have been changed to Locators.
-        stringified_sources_list = [str(loc) for loc in self.sources_list]
+        stringified_sources_list = [text_type(loc) for loc in self.sources_list]
         self.xml_attributes['sources'] = ';'.join(stringified_sources_list)
         self.xml_attributes[self.conditional_attr] = self.conditional_value
         self.xml_attributes['message'] = self.conditional_message
         return xml_object
 
     def validate(self):
-        validation = super().validate()
+        validation = super(ConditionalDescriptor, self).validate()
         if not self.sources_list:
             conditional_validation = StudioValidation(self.location)
             conditional_validation.add(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _("This component has no source components configured yet."),
+                    _(u"This component has no source components configured yet."),
                     action_class='edit-button',
-                    action_label=_("Configure list of sources")
+                    action_label=_(u"Configure list of sources")
                 )
             )
             validation = StudioValidation.copy(validation)
@@ -405,9 +368,14 @@ class ConditionalBlock(
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields = super(ConditionalDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            ConditionalBlock.due,
-            ConditionalBlock.show_tag_list,
+            ConditionalDescriptor.due,
+            ConditionalDescriptor.is_practice_exam,
+            ConditionalDescriptor.is_proctored_enabled,
+            ConditionalDescriptor.is_time_limited,
+            ConditionalDescriptor.default_time_limit_minutes,
+            ConditionalDescriptor.show_tag_list,
+            ConditionalDescriptor.exam_review_rules,
         ])
         return non_editable_fields

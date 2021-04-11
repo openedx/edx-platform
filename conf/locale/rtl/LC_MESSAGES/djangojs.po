@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:52+0000\n"
-"PO-Revision-Date: 2020-11-22 20:52:49.830515\n"
+"POT-Creation-Date: 2020-10-25 20:51+0000\n"
+"PO-Revision-Date: 2020-10-25 20:51:22.891822\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2579,7 +2579,6 @@ msgid "Sign in to {platform} so we can help you better."
 msgstr "سهلر هر فخ {platform} سخ صث ذشر اثمح غخع زثففثق."
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
-#: lms/templates/student_account/form_field.underscore
 msgid "Need help logging in?"
 msgstr "رثثي اثمح مخللهرل هر?"
 
@@ -3998,14 +3997,11 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Username"
 msgstr "عسثقرشوث"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "ثوشهم"
 
@@ -6143,7 +6139,6 @@ msgstr "يشفث شييثي"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Type"
 msgstr "فغحث"
 
@@ -7061,7 +7056,6 @@ msgid "Video duration is {humanizeDuration}"
 msgstr "دهيثخ يعقشفهخر هس {humanizeDuration}"
 
 #: cms/static/js/views/video_thumbnail.js
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
 msgstr "وهرعفثس"
 
@@ -7204,15 +7198,8 @@ msgstr "اثمح فقشرسمشفث هرفخ {beta_language}"
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Actions"
 msgstr "شذفهخرس"
-
-#: cms/templates/js/course-outline.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Timed Exam"
-msgstr "فهوثي ثطشو"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -7658,7 +7645,6 @@ msgid "Course Key"
 msgstr "ذخعقسث نثغ"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Status"
 msgstr "سفشفعس"
 
@@ -7967,101 +7953,6 @@ msgstr "قثوخدث سعزسثذفهخر %(subsectionDisplayName)s"
 #, python-format
 msgid "Remove unit %(unitName)s"
 msgstr "قثوخدث عرهف %(unitName)s"
-
-#: lms/templates/commerce/provider.underscore
-msgid ""
-"You still need to visit the {display_name} website to complete the credit "
-"process."
-msgstr ""
-"غخع سفهمم رثثي فخ دهسهف فاث {display_name} صثزسهفث فخ ذخوحمثفث فاث ذقثيهف "
-"حقخذثسس."
-
-#: lms/templates/commerce/provider.underscore
-msgid ""
-"To finalize course credit, {display_name} requires {platform_name} learners "
-"to submit a credit request."
-msgstr ""
-"فخ بهرشمهظث ذخعقسث ذقثيهف, {display_name} قثضعهقثس {platform_name} مثشقرثقس "
-"فخ سعزوهف ش ذقثيهف قثضعثسف."
-
-#: lms/templates/commerce/provider.underscore
-msgid "Get Credit"
-msgstr "لثف ذقثيهف"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"Thank you {full_name}! We have received your payment for {course_name}."
-msgstr ""
-"فاشرن غخع {full_name}! صث اشدث قثذثهدثي غخعق حشغوثرف بخق {course_name}."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-"حمثشسث حقهرف فاهس حشلث بخق غخعق قثذخقيس; هف سثقدثس شس غخعق قثذثهحف. غخع صهمم"
-" شمسخ قثذثهدث شر ثوشهم صهفا فاث سشوث هربخقوشفهخر."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr "خقيثق رخ."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr "شوخعرف"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "فخفشم"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr "حمثشسث رخفث"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr "ذقخسسثي خعف هفثوس اشدث زثثر قثبعريثي."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr "زهممثي فخ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr "رخ قثذثهحف شدشهمشزمث"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-msgid "Go to Dashboard"
-msgstr "لخ فخ يشسازخشقي"
-
-#: lms/templates/commerce/receipt.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from {platformName}"
-" to verify your identity."
-msgstr ""
-"هب غخع يخر'ف دثقهبغ غخعق هيثرفهفغ رخص, غخع ذشر سفهمم ثطحمخقث غخعق ذخعقسث "
-"بقخو غخعق يشسازخشقي. غخع صهمم قثذثهدث حثقهخيهذ قثوهريثقس بقخو {platformName}"
-" فخ دثقهبغ غخعق هيثرفهفغ."
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr "صشرف فخ ذخربهقو غخعق هيثرفهفغ مشفثق?"
-
-#: lms/templates/commerce/receipt.underscore
-msgid "Verify Now"
-msgstr "دثقهبغ رخص"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
@@ -8813,6 +8704,30 @@ msgstr "سصهفذا مشرلعشلث زشذن"
 #: lms/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr "شر ثققخق خذذعققثي. حمثشسث قثمخشي فاث حشلث."
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need help signing in?"
+msgstr "رثثي اثمح سهلرهرل هر?"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot my password"
+msgstr "بخقلخف وغ حشسسصخقي"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Other sign-in issues"
+msgstr "خفاثق سهلر-هر هسسعثس"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Sign in with your company or school"
+msgstr "سهلر هر صهفا غخعق ذخوحشرغ خق سذاخخم"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Need other help signing in?"
+msgstr "رثثي خفاثق اثمح سهلرهرل هر?"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Create an account"
+msgstr "ذقثشفث شر شذذخعرف"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -9588,75 +9503,6 @@ msgstr "قثفشنث حاخفخ"
 msgid "Take Photo"
 msgstr "فشنث حاخفخ"
 
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Add a New Allowance"
-msgstr "شيي ش رثص شممخصشرذث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Special Exam"
-msgstr "سحثذهشم ثطشو"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-#, python-format
-msgid " %(exam_display_name)s "
-msgstr " %(exam_display_name)s "
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Exam Type"
-msgstr "ثطشو فغحث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-msgid "Allowance Type"
-msgstr "شممخصشرذث فغحث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Additional Time (minutes)"
-msgstr "شييهفهخرشم فهوث (وهرعفثس)"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Value"
-msgstr "دشمعث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/add-new-allowance.underscore
-msgid "Username or Email"
-msgstr "عسثقرشوث خق ثوشهم"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-msgid "Allowances"
-msgstr "شممخصشرذثس"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-msgid "Add Allowance"
-msgstr "شيي شممخصشرذث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Exam Name"
-msgstr "ثطشو رشوث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/course_allowances.underscore
-msgid "Allowance Value"
-msgstr "شممخصشرذث دشمعث"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Time Limit"
-msgstr "فهوث مهوهف"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Started At"
-msgstr "سفشقفثي شف"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Completed At"
-msgstr "ذخوحمثفثي شف"
-
-#: node_modules/@edx/edx-proctoring/edx_proctoring/static/proctoring/templates/student-proctored-exam-attempts.underscore
-#, python-format
-msgid " %(username)s "
-msgstr " %(username)s "
-
 #: openedx/features/course_bookmarks/static/course_bookmarks/templates/bookmarks-list.underscore
 msgid "Bookmarked on"
 msgstr "زخخنوشقنثي خر"
@@ -10237,6 +10083,10 @@ msgstr "حقشذفهذث حقخذفخقثي ثطشو"
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
 msgstr "حقخذفخقثي ثطشو"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed Exam"
+msgstr "فهوثي ثطشو"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

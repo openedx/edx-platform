@@ -6,7 +6,7 @@ Utilities for testing the dump_to_neo4j management command
 from py2neo import Node
 
 
-class MockGraph:
+class MockGraph(object):
     """
     A stubbed out version of py2neo's Graph object, used for testing.
     Args:
@@ -27,7 +27,7 @@ class MockGraph:
         return MockTransaction(self)
 
 
-class MockTransaction:
+class MockTransaction(object):
     """
     A stubbed out version of py2neo's Transaction object, used for testing.
     """
@@ -50,9 +50,9 @@ class MockTransaction:
         end = query.find("'")
         course_key = query[:end]
 
-        self.graph.nodes = {
+        self.graph.nodes = set([
             node for node in self.graph.nodes if node['course_key'] != course_key
-        }
+        ])
 
     def create(self, element):
         """
@@ -84,7 +84,7 @@ class MockTransaction:
         self.graph.number_rollbacks += 1
 
 
-class MockNodeSelector:
+class MockNodeSelector(object):
     """
     Mocks out py2neo's NodeSelector class. Used to select a node from a graph.
     py2neo's NodeSelector expects a real graph object to run queries against,

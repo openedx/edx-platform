@@ -13,5 +13,5 @@ class TestStaticContent(unittest.TestCase):
 
     def test_optional_include_mako(self):
         out = render_to_string("test_optional_include_mako.html", {})
-        assert 'Welcome to test_optional_include_mako.html' in out
-        assert 'This is test_exists.html' in out
+        self.assertIn("Welcome to test_optional_include_mako.html", out)
+        self.assertIn("This is test_exists.html", out)

@@ -30,14 +30,14 @@ class HelperFunctionTest(unittest.TestCase):
         """
         xmltree = etree.fromstring(self.sample_xml)
 
-        expected_xml = "<div><p>Helper Test Instructions.</p></div>"
+        expected_xml = u"<div><p>Helper Test Instructions.</p></div>"
         actual_xml = get_instructions(xmltree)
-        assert actual_xml is not None
-        assert expected_xml.strip() == actual_xml.strip()
+        self.assertIsNotNone(actual_xml)
+        self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
         actual = get_instructions(xmltree)
-        assert actual is None
+        self.assertIsNone(actual)
 
     def test_get_extension(self):
         """
@@ -47,10 +47,10 @@ class HelperFunctionTest(unittest.TestCase):
         expectednotyoutube = 'video/mp4'
         result1 = get_extension(self.sample_sourceurl)
         result2 = get_extension(self.sample_youtubeurl)
-        assert expectedyoutube == result2
-        assert expectednotyoutube == result1
+        self.assertEqual(expectedyoutube, result2)
+        self.assertEqual(expectednotyoutube, result1)
 
     def test_html_to_text(self):
         expectedtext = "Testing here and not bolded here"
         result = html_to_text(self.sample_html)
-        assert expectedtext == result
+        self.assertEqual(expectedtext, result)

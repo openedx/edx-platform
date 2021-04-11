@@ -5,10 +5,10 @@ Tests for minimum grade requirement status
 
 from datetime import datetime, timedelta
 
-from unittest.mock import MagicMock
 import ddt
 import pytz
 from django.test.client import RequestFactory
+from mock import MagicMock
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
@@ -39,7 +39,7 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     }
 
     def setUp(self):
-        super().setUp()
+        super(TestMinGradedRequirementStatus, self).setUp()
         self.course = CourseFactory.create(
             org='Robot', number='999', display_name='Test Course'
         )
@@ -81,11 +81,11 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
         listen_for_grade_calculation(None, self.user, course_grade, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
 
-        assert req_status[0]['status'] == expected_status
+        self.assertEqual(req_status[0]['status'], expected_status)
 
         if expected_status == 'satisfied':
             expected_reason = {'final_grade': grade}
-            assert req_status[0]['reason'] == expected_reason
+            self.assertEqual(req_status[0]['reason'], expected_reason)
 
     @ddt.data(
         (0.6, 'valid'),

@@ -1,19 +1,19 @@
 """
 Tests for the InstructorService
 """
+
+
 import json
-from unittest import mock
 
-import pytest
-from django.core.exceptions import ObjectDoesNotExist
-from opaque_keys import InvalidKeyError
+import mock
+import six
 
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.instructor.services import InstructorService
 from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -25,9 +25,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
-        cls.email = 'escalation@test.com'
-        cls.course = CourseFactory.create(proctoring_escalation_email=cls.email)
+        super(InstructorServiceTests, cls).setUpClass()
+        cls.course = CourseFactory.create()
         cls.problem_location = msk_from_problem_urlname(
             cls.course.id,
             'robot-some-problem-urlname'
@@ -36,11 +35,11 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             cls.course.id,
             'robot-some-other_problem-urlname'
         )
-        cls.problem_urlname = str(cls.problem_location)
-        cls.other_problem_urlname = str(cls.other_problem_location)
+        cls.problem_urlname = six.text_type(cls.problem_location)
+        cls.other_problem_urlname = six.text_type(cls.other_problem_location)
 
     def setUp(self):
-        super().setUp()
+        super(InstructorServiceTests, self).setUp()
 
         self.student = UserFactory()
         CourseEnrollment.enroll(self.student, self.course.id)
@@ -60,58 +59,70 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
 
         # make sure the attempt is there
-        assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
-                                            module_state_key=self.module_to_reset.module_state_key).count() == 1
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.module_to_reset.student,
+                course_id=self.course.id,
+                module_state_key=self.module_to_reset.module_state_key,
+            ).count(),
+            1
+        )
 
         self.service.delete_student_attempt(
             self.student.username,
-            str(self.course.id),
+            six.text_type(self.course.id),
             self.problem_urlname,
             requesting_user=self.student,
         )
 
         # make sure the module has been deleted
-        assert StudentModule.objects.filter(student=self.module_to_reset.student, course_id=self.course.id,
-                                            module_state_key=self.module_to_reset.module_state_key).count() == 0
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.module_to_reset.student,
+                course_id=self.course.id,
+                module_state_key=self.module_to_reset.module_state_key,
+            ).count(),
+            0
+        )
 
     def test_reset_bad_content_id(self):
         """
         Negative test of trying to reset attempts with bad content_id
         """
 
-        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
+        result = self.service.delete_student_attempt(
             self.student.username,
-            str(self.course.id),
+            six.text_type(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
-        assert result is None
+        self.assertIsNone(result)
 
     def test_reset_bad_user(self):
         """
         Negative test of trying to reset attempts with bad user identifier
         """
 
-        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
+        result = self.service.delete_student_attempt(
             'bad_student',
-            str(self.course.id),
+            six.text_type(self.course.id),
             'foo/bar/baz',
             requesting_user=self.student,
         )
-        assert result is None
+        self.assertIsNone(result)
 
     def test_reset_non_existing_attempt(self):
         """
         Negative test of trying to reset attempts with bad user identifier
         """
 
-        result = self.service.delete_student_attempt(  # lint-amnesty, pylint: disable=assignment-from-none
+        result = self.service.delete_student_attempt(
             self.student.username,
-            str(self.course.id),
+            six.text_type(self.course.id),
             self.other_problem_urlname,
             requesting_user=self.student,
         )
-        assert result is None
+        self.assertIsNone(result)
 
     def test_is_user_staff(self):
         """
@@ -119,17 +130,17 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         result = self.service.is_course_staff(
             self.student,
-            str(self.course.id)
+            six.text_type(self.course.id)
         )
-        assert not result
+        self.assertFalse(result)
 
         # allow staff access to the student
         allow_access(self.course, self.student, 'staff')
         result = self.service.is_course_staff(
             self.student,
-            str(self.course.id)
+            six.text_type(self.course.id)
         )
-        assert result
+        self.assertTrue(result)
 
     def test_report_suspicious_attempt(self):
         """
@@ -137,11 +148,11 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         requester_name = "edx-proctoring"
         email = "edx-proctoring@edx.org"
-        subject = "Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+        subject = u"Proctored Exam Review: {review_status}".format(review_status="Suspicious")
 
-        body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
-               "reviewed as {review_status} by the proctored exam review provider.\n" \
-               "Review link: {url}"
+        body = u"A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
+               u"reviewed as {review_status} by the proctored exam review provider.\n" \
+               u"Review link: {url}"
         args = {
             'exam_name': 'test_exam',
             'student_username': 'test_student',
@@ -154,7 +165,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
 
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=str(self.course.id),
+                course_id=six.text_type(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",
@@ -166,7 +177,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         args['url'] = 'http://review/url'
         with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
-                course_id=str(self.course.id),
+                course_id=six.text_type(self.course.id),
                 exam_name=args['exam_name'],
                 student_username=args["student_username"],
                 review_status="Suspicious",
@@ -174,31 +185,3 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             )
         expected_body = body.format(**args)
         mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, expected_body, tags)
-
-    def test_get_proctoring_escalation_email_from_course_key(self):
-        """
-        Test that it returns the correct proctoring escalation email from a course key object
-        """
-        email = self.service.get_proctoring_escalation_email(self.course.id)
-        assert email == self.email
-
-    def test_get_proctoring_escalation_email_from_course_id(self):
-        """
-        Test that it returns the correct proctoring escalation email from a course id string
-        """
-        email = self.service.get_proctoring_escalation_email(str(self.course.id))
-        assert email == self.email
-
-    def test_get_proctoring_escalation_email_no_course(self):
-        """
-        Test that it raises an exception if the course is not found
-        """
-        with pytest.raises(ObjectDoesNotExist):
-            self.service.get_proctoring_escalation_email('a/b/c')
-
-    def test_get_proctoring_escalation_email_invalid_key(self):
-        """
-        Test that it raises an exception if the course_key is invalid
-        """
-        with pytest.raises(InvalidKeyError):
-            self.service.get_proctoring_escalation_email('invalid key')

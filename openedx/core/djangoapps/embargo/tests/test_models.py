@@ -2,7 +2,8 @@
 
 
 import json
-import pytest
+
+import six
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
@@ -28,22 +29,28 @@ class EmbargoModelsTest(CacheIsolationTestCase):
     def test_course_embargo(self):
         course_id = CourseLocator('abc', '123', 'doremi')
         # Test that course is not authorized by default
-        assert not EmbargoedCourse.is_embargoed(course_id)
+        self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
 
         # Authorize
         cauth = EmbargoedCourse(course_id=course_id, embargoed=True)
         cauth.save()
 
         # Now, course should be embargoed
-        assert EmbargoedCourse.is_embargoed(course_id)
-        assert str(cauth) == f"Course '{course_id}' is Embargoed"
+        self.assertTrue(EmbargoedCourse.is_embargoed(course_id))
+        self.assertEqual(
+            six.text_type(cauth),
+            u"Course '{course_id}' is Embargoed".format(course_id=course_id)
+        )
 
         # Unauthorize by explicitly setting email_enabled to False
         cauth.embargoed = False
         cauth.save()
         # Test that course is now unauthorized
-        assert not EmbargoedCourse.is_embargoed(course_id)
-        assert str(cauth) == f"Course '{course_id}' is Not Embargoed"
+        self.assertFalse(EmbargoedCourse.is_embargoed(course_id))
+        self.assertEqual(
+            six.text_type(cauth),
+            u"Course '{course_id}' is Not Embargoed".format(course_id=course_id)
+        )
 
     def test_state_embargo(self):
         # Azerbaijan and France should not be blocked
@@ -53,7 +60,7 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         currently_blocked = EmbargoedState.current().embargoed_countries_list
 
         for state in blocked_states + good_states:
-            assert state not in currently_blocked
+            self.assertNotIn(state, currently_blocked)
 
         # Block
         cauth = EmbargoedState(embargoed_countries='US, AQ')
@@ -61,9 +68,9 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         currently_blocked = EmbargoedState.current().embargoed_countries_list
 
         for state in good_states:
-            assert state not in currently_blocked
+            self.assertNotIn(state, currently_blocked)
         for state in blocked_states:
-            assert state in currently_blocked
+            self.assertIn(state, currently_blocked)
 
         # Change embargo - block Isle of Man too
         blocked_states.append('IM')
@@ -72,41 +79,41 @@ class EmbargoModelsTest(CacheIsolationTestCase):
         currently_blocked = EmbargoedState.current().embargoed_countries_list
 
         for state in good_states:
-            assert state not in currently_blocked
+            self.assertNotIn(state, currently_blocked)
         for state in blocked_states:
-            assert state in currently_blocked
+            self.assertIn(state, currently_blocked)
 
     def test_ip_blocking(self):
-        whitelist = '127.0.0.1'
-        blacklist = '18.244.51.3'
+        whitelist = u'127.0.0.1'
+        blacklist = u'18.244.51.3'
 
         cwhitelist = IPFilter.current().whitelist_ips
-        assert whitelist not in cwhitelist
+        self.assertNotIn(whitelist, cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
-        assert blacklist not in cblacklist
+        self.assertNotIn(blacklist, cblacklist)
 
         IPFilter(whitelist=whitelist, blacklist=blacklist).save()
 
         cwhitelist = IPFilter.current().whitelist_ips
-        assert whitelist in cwhitelist
+        self.assertIn(whitelist, cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
-        assert blacklist in cblacklist
+        self.assertIn(blacklist, cblacklist)
 
     def test_ip_network_blocking(self):
-        whitelist = '1.0.0.0/24'
-        blacklist = '1.1.0.0/16'
+        whitelist = u'1.0.0.0/24'
+        blacklist = u'1.1.0.0/16'
 
         IPFilter(whitelist=whitelist, blacklist=blacklist).save()
 
         cwhitelist = IPFilter.current().whitelist_ips
-        assert '1.0.0.100' in cwhitelist
-        assert '1.0.0.10' in cwhitelist
-        assert '1.0.1.0' not in cwhitelist
+        self.assertIn(u'1.0.0.100', cwhitelist)
+        self.assertIn(u'1.0.0.10', cwhitelist)
+        self.assertNotIn(u'1.0.1.0', cwhitelist)
         cblacklist = IPFilter.current().blacklist_ips
-        assert '1.1.0.0' in cblacklist
-        assert '1.1.0.1' in cblacklist
-        assert '1.1.1.0' in cblacklist
-        assert '1.2.0.0' not in cblacklist
+        self.assertIn(u'1.1.0.0', cblacklist)
+        self.assertIn(u'1.1.0.1', cblacklist)
+        self.assertIn(u'1.1.1.0', cblacklist)
+        self.assertNotIn(u'1.2.0.0', cblacklist)
 
 
 class RestrictedCourseTest(CacheIsolationTestCase):
@@ -117,7 +124,10 @@ class RestrictedCourseTest(CacheIsolationTestCase):
     def test_unicode_values(self):
         course_id = CourseLocator('abc', '123', 'doremi')
         restricted_course = RestrictedCourse.objects.create(course_key=course_id)
-        assert str(restricted_course) == str(course_id)
+        self.assertEqual(
+            six.text_type(restricted_course),
+            six.text_type(course_id)
+        )
 
     def test_restricted_course_cache_with_save_delete(self):
         course_id = CourseLocator('abc', '123', 'doremi')
@@ -133,7 +143,7 @@ class RestrictedCourseTest(CacheIsolationTestCase):
             RestrictedCourse.is_restricted_course(course_id)
             RestrictedCourse.is_disabled_access_check(course_id)
 
-        assert not RestrictedCourse.is_disabled_access_check(course_id)
+        self.assertFalse(RestrictedCourse.is_disabled_access_check(course_id))
 
         # add new the course so the cache must get delete and again hit the db
         new_course_id = CourseLocator('def', '123', 'doremi')
@@ -147,7 +157,7 @@ class RestrictedCourseTest(CacheIsolationTestCase):
             RestrictedCourse.is_restricted_course(new_course_id)
             RestrictedCourse.is_disabled_access_check(new_course_id)
 
-        assert RestrictedCourse.is_disabled_access_check(new_course_id)
+        self.assertTrue(RestrictedCourse.is_disabled_access_check(new_course_id))
 
         # deleting an object will delete cache also.and hit db on
         # get the is_restricted course
@@ -166,7 +176,7 @@ class CountryTest(TestCase):
 
     def test_unicode_values(self):
         country = Country.objects.create(country='NZ')
-        assert str(country) == 'New Zealand (NZ)'
+        self.assertEqual(six.text_type(country), "New Zealand (NZ)")
 
 
 class CountryAccessRuleTest(CacheIsolationTestCase):
@@ -183,7 +193,10 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        assert str(access_rule) == f'Whitelist New Zealand (NZ) for {course_id}'
+        self.assertEqual(
+            six.text_type(access_rule),
+            u"Whitelist New Zealand (NZ) for {course_key}".format(course_key=course_id)
+        )
 
         course_id = CourseLocator('def', '123', 'doremi')
         restricted_course1 = RestrictedCourse.objects.create(course_key=course_id)
@@ -193,7 +206,10 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        assert str(access_rule) == f'Blacklist New Zealand (NZ) for {course_id}'
+        self.assertEqual(
+            six.text_type(access_rule),
+            u"Blacklist New Zealand (NZ) for {course_key}".format(course_key=course_id)
+        )
 
     def test_unique_together_constraint(self):
         """
@@ -210,7 +226,7 @@ class CountryAccessRuleTest(CacheIsolationTestCase):
             country=country
         )
 
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             CountryAccessRule.objects.create(
                 restricted_course=restricted_course1,
                 rule_type=CountryAccessRule.BLACKLIST_RULE,
@@ -245,7 +261,7 @@ class CourseAccessRuleHistoryTest(TestCase):
     """Test course access rule history. """
 
     def setUp(self):
-        super().setUp()
+        super(CourseAccessRuleHistoryTest, self).setUp()
         self.course_key = CourseLocator('edx', 'DemoX', 'Demo_Course')
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course_key)
         self.countries = {
@@ -325,20 +341,26 @@ class CourseAccessRuleHistoryTest(TestCase):
         record = CourseAccessRuleHistory.objects.latest()
 
         # Check that the record is for the correct course
-        assert record.course_key == self.course_key
+        self.assertEqual(record.course_key, self.course_key)
 
         # Load the history entry and verify the message keys
         snapshot = json.loads(record.snapshot)
-        assert snapshot['enroll_msg'] == enroll_msg
-        assert snapshot['access_msg'] == access_msg
+        self.assertEqual(snapshot['enroll_msg'], enroll_msg)
+        self.assertEqual(snapshot['access_msg'], access_msg)
 
         # For each rule, check that there is an entry
         # in the history record.
         for (country, rule_type) in country_rules:
-            assert {'country': country, 'rule_type': rule_type} in snapshot['country_rules']
+            self.assertIn(
+                {
+                    'country': country,
+                    'rule_type': rule_type
+                },
+                snapshot['country_rules']
+            )
 
         # Check that there are no duplicate entries
-        assert len(snapshot['country_rules']) == len(country_rules)
+        self.assertEqual(len(snapshot['country_rules']), len(country_rules))
 
     def _assert_history_deleted(self):
         """Check the latest history entry for a 'DELETED' placeholder.
@@ -348,5 +370,5 @@ class CourseAccessRuleHistoryTest(TestCase):
 
         """
         record = CourseAccessRuleHistory.objects.latest()
-        assert record.course_key == self.course_key
-        assert record.snapshot == 'DELETED'
+        self.assertEqual(record.course_key, self.course_key)
+        self.assertEqual(record.snapshot, "DELETED")

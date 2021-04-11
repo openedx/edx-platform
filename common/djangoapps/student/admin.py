@@ -24,6 +24,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from edx_toggles.toggles import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
+from common.djangoapps.student import STUDENT_WAFFLE_NAMESPACE
 from common.djangoapps.student.models import (
     AccountRecovery,
     AccountRecoveryConfiguration,
@@ -49,19 +50,13 @@ from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
 
-# .. toggle_name: student.courseenrollment_admin
-# .. toggle_implementation: WaffleSwitch
-# .. toggle_default: False
-# .. toggle_description: This toggle will enable the rendering of the admin view of the CourseEnrollment model.
-# .. toggle_warnings: Enabling this toggle may cause performance problems. The CourseEnrollment admin view
-#     makes DB queries that could cause site outages for a large enough Open edX installation.
-# .. toggle_use_cases: opt_in, open_edx
-# .. toggle_creation_date: 2018-08-01
-# .. toggle_tickets: https://github.com/edx/edx-platform/pull/18638
-COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch('student.courseenrollment_admin', __name__)
+# This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
+# In a large enough deployment of Open edX, this is enough to cause a site outage.
+# See https://openedx.atlassian.net/browse/OPS-2943
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin', __name__)
 
 
-class _Check:
+class _Check(object):
     """
     A method decorator that pre-emptively returns false if a feature is disabled.
     Otherwise, it returns the return value of the decorated method.
@@ -128,12 +123,12 @@ class DisableEnrollmentAdminMixin:
 class CourseAccessRoleForm(forms.ModelForm):
     """Form for adding new Course Access Roles view the Django Admin Panel."""
 
-    class Meta:
+    class Meta(object):
         model = CourseAccessRole
         fields = '__all__'
 
     email = forms.EmailField(required=True)
-    COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+    COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]
     role = forms.ChoiceField(choices=COURSE_ACCESS_ROLES)
 
     def clean_course_id(self):
@@ -152,7 +147,7 @@ class CourseAccessRoleForm(forms.ModelForm):
             org_name = self.cleaned_data.get('course_id').org
             if org.lower() != org_name.lower():
                 raise forms.ValidationError(
-                    "Org name {} is not valid. Valid name is {}.".format(
+                    u"Org name {} is not valid. Valid name is {}.".format(
                         org, org_name
                     )
                 )
@@ -167,8 +162,8 @@ class CourseAccessRoleForm(forms.ModelForm):
         try:
             user = User.objects.get(email=email)
         except Exception:
-            raise forms.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Email does not exist. Could not find {email}. Please re-enter email address".format(
+            raise forms.ValidationError(
+                u"Email does not exist. Could not find {email}. Please re-enter email address".format(
                     email=email
                 )
             )
@@ -179,7 +174,7 @@ class CourseAccessRoleForm(forms.ModelForm):
         """
         Checking the course already exists in db.
         """
-        cleaned_data = super().clean()
+        cleaned_data = super(CourseAccessRoleForm, self).clean()
         if not self.errors:
             if CourseAccessRole.objects.filter(
                     user=cleaned_data.get("email"),
@@ -192,7 +187,7 @@ class CourseAccessRoleForm(forms.ModelForm):
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(CourseAccessRoleForm, self).__init__(*args, **kwargs)
         if self.instance.user_id:
             self.fields['email'].initial = self.instance.user.email
 
@@ -219,14 +214,14 @@ class CourseAccessRoleAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.user = form.cleaned_data['email']
-        super().save_model(request, obj, form, change)
+        super(CourseAccessRoleAdmin, self).save_model(request, obj, form, change)
 
 
 @admin.register(LinkedInAddToProfileConfiguration)
 class LinkedInAddToProfileConfigurationAdmin(admin.ModelAdmin):
     """Admin interface for the LinkedIn Add to Profile configuration. """
 
-    class Meta:
+    class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
 
@@ -240,10 +235,10 @@ class CourseEnrollmentForm(forms.ModelForm):
             try:
                 args_copy['course'] = CourseKey.from_string(args_copy['course'])
             except InvalidKeyError:
-                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(args_copy['course']))
             args = [args_copy]
 
-        super().__init__(*args, **kwargs)
+        super(CourseEnrollmentForm, self).__init__(*args, **kwargs)
 
         if self.data.get('course'):
             try:
@@ -254,20 +249,20 @@ class CourseEnrollmentForm(forms.ModelForm):
                 # However, the args copy above before the super() call handles this case.
                 pass
 
-    def clean_course_id(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def clean_course_id(self):
         course_id = self.cleaned_data['course']
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            raise forms.ValidationError(f"Cannot make a valid CourseKey from id {course_id}!")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise forms.ValidationError("Cannot make a valid CourseKey from id {}!".format(course_id))
 
         if not modulestore().has_course(course_key):
-            raise forms.ValidationError(f"Cannot find course with id {course_id} in the modulestore")
+            raise forms.ValidationError("Cannot find course with id {} in the modulestore".format(course_id))
 
         return course_key
 
-    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs, unused-argument
-        course_enrollment = super().save(commit=False)
+    def save(self, *args, **kwargs):
+        course_enrollment = super(CourseEnrollmentForm, self).save(commit=False)
         user = self.cleaned_data['user']
         course_overview = self.cleaned_data['course']
         enrollment = CourseEnrollment.get_or_create_enrollment(user, course_overview.id)
@@ -290,7 +285,7 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     form = CourseEnrollmentForm
 
     def get_search_results(self, request, queryset, search_term):
-        qs, use_distinct = super().get_search_results(request, queryset, search_term)
+        qs, use_distinct = super(CourseEnrollmentAdmin, self).get_search_results(request, queryset, search_term)
 
         # annotate each enrollment with whether the username was an
         # exact match for the search term
@@ -305,7 +300,7 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return qs, use_distinct
 
     def queryset(self, request):
-        return super().queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
 
 
 class UserProfileInline(admin.StackedInline):
@@ -331,7 +326,7 @@ class UserChangeForm(BaseUserChangeForm):
     last_name = forms.CharField(max_length=30, required=False)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(UserChangeForm, self).__init__(*args, **kwargs)
 
         if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
             self.fields["password"] = ReadOnlyPasswordHashField(
@@ -351,9 +346,9 @@ class UserAdmin(BaseUserAdmin):
     def get_readonly_fields(self, request, obj=None):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
-        The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.  # lint-amnesty, pylint: disable=line-too-long
+        The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
         """
-        django_readonly = super().get_readonly_fields(request, obj)
+        django_readonly = super(UserAdmin, self).get_readonly_fields(request, obj)
         if obj:
             return django_readonly + ('username',)
         return django_readonly
@@ -367,7 +362,7 @@ class UserAttributeAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('name', 'value', 'user__username',)
 
-    class Meta:
+    class Meta(object):
         model = UserAttribute
 
 
@@ -377,7 +372,7 @@ class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
     list_display = ('email', 'course_id', 'auto_enroll',)
     search_fields = ('email', 'course_id',)
 
-    class Meta:
+    class Meta(object):
         model = CourseEnrollmentAllowed
 
 
@@ -395,35 +390,35 @@ class LoginFailuresAdmin(admin.ModelAdmin):
         """
         Only enabled if feature is enabled.
         """
-        return super().has_module_permission(request)
+        return super(LoginFailuresAdmin, self).has_module_permission(request)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_view_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super().has_view_permission(request, obj)
+        return super(LoginFailuresAdmin, self).has_view_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_delete_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super().has_delete_permission(request, obj)
+        return super(LoginFailuresAdmin, self).has_delete_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_change_permission(self, request, obj=None):
         """
         Only enabled if feature is enabled.
         """
-        return super().has_change_permission(request, obj)
+        return super(LoginFailuresAdmin, self).has_change_permission(request, obj)
 
     @_Check.is_enabled(LoginFailures.is_feature_enabled)
     def has_add_permission(self, request):
         """
         Only enabled if feature is enabled.
         """
-        return super().has_add_permission(request)
+        return super(LoginFailuresAdmin, self).has_add_permission(request)
 
     def unlock_student_accounts(self, request, queryset):
         """
@@ -456,13 +451,13 @@ class LoginFailuresAdmin(admin.ModelAdmin):
                 self.unlock_student(request, object_id=object_id)
                 url = reverse('admin:student_loginfailures_changelist', current_app=self.admin_site.name)
                 return HttpResponseRedirect(url)
-        return super().change_view(request, object_id, form_url, extra_context)
+        return super(LoginFailuresAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def get_actions(self, request):
         """
         Get actions for model admin and remove delete action.
         """
-        actions = super().get_actions(request)
+        actions = super(LoginFailuresAdmin, self).get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
@@ -480,7 +475,7 @@ class LoginFailuresAdmin(admin.ModelAdmin):
 class AllowedAuthUserForm(forms.ModelForm):
     """Model Form for AllowedAuthUser model's admin interface."""
 
-    class Meta:
+    class Meta(object):
         model = AllowedAuthUser
         fields = ('site', 'email', )
 
@@ -492,14 +487,14 @@ class AllowedAuthUserForm(forms.ModelForm):
         email_domain = email.split('@')[-1]
         allowed_site_email_domain = self.cleaned_data['site'].configuration.get_value('THIRD_PARTY_AUTH_ONLY_DOMAIN')
 
-        if not allowed_site_email_domain:  # lint-amnesty, pylint: disable=no-else-raise
+        if not allowed_site_email_domain:
             raise forms.ValidationError(
                 _("Please add a key/value 'THIRD_PARTY_AUTH_ONLY_DOMAIN/{site_email_domain}' in SiteConfiguration "
                   "model's site_values field.")
             )
         elif email_domain != allowed_site_email_domain:
             raise forms.ValidationError(
-                _(f"Email doesn't have {allowed_site_email_domain} domain name.")  # lint-amnesty, pylint: disable=translation-of-non-string
+                _("Email doesn't have {domain_name} domain name.".format(domain_name=allowed_site_email_domain))
             )
         elif not User.objects.filter(email=email).exists():
             raise forms.ValidationError(_("User with this email doesn't exist in system."))
@@ -515,7 +510,7 @@ class AllowedAuthUserAdmin(admin.ModelAdmin):
     search_fields = ('email',)
     ordering = ('-created',)
 
-    class Meta:
+    class Meta(object):
         model = AllowedAuthUser
 
 
@@ -526,7 +521,7 @@ class CourseEnrollmentCelebrationAdmin(DisableEnrollmentAdminMixin, admin.ModelA
     list_display = ('id', 'course', 'user', 'celebrate_first_section')
     search_fields = ('enrollment__course__id', 'enrollment__user__username')
 
-    class Meta:
+    class Meta(object):
         model = CourseEnrollmentCelebration
 
     def course(self, obj):

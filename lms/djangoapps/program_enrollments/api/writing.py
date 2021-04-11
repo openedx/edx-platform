@@ -11,9 +11,9 @@ import logging
 from simple_history.utils import bulk_create_with_history
 
 from common.djangoapps.course_modes.models import CourseMode
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.student.models import CourseEnrollment, NonExistentCourseError
 from common.djangoapps.student.roles import CourseStaffRole
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from ..constants import ProgramCourseEnrollmentRoles, ProgramCourseEnrollmentStatuses
 from ..constants import ProgramCourseOperationStatuses as ProgramCourseOpStatuses
@@ -390,7 +390,7 @@ def enroll_in_masters_track(user, course_key, status):
     """
     _ensure_course_exists(course_key, user.id)
     if status not in ProgramCourseEnrollmentStatuses.__ALL__:
-        raise ValueError(f"invalid ProgramCourseEnrollmentStatus: {status}")
+        raise ValueError("invalid ProgramCourseEnrollmentStatus: {}".format(status))
     if CourseEnrollment.is_enrolled(user, course_key):
         course_enrollment = CourseEnrollment.objects.get(
             user=user,
@@ -552,8 +552,8 @@ def _get_conflicting_active_course_enrollments(
             and str(existing_enrollment.program_enrollment.program_uuid) != str(program_uuid)
         ):
             logger.error(
-                'Detected conflicting active ProgramCourseEnrollment. This is happening on'
-                ' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
+                u'Detected conflicting active ProgramCourseEnrollment. This is happening on'
+                u' The program_uuid [{}] with course_key [{}] for external_user_key [{}]'.format(
                     program_uuid,
                     course_key,
                     external_user_key

@@ -3,18 +3,19 @@ Tests for ContentLibraryTransformer.
 """
 
 
-from unittest import mock
+from six.moves import range
+import mock
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 from ...api import get_course_blocks
-from ..library_content import ContentLibraryOrderTransformer, ContentLibraryTransformer
+from ..library_content import ContentLibraryTransformer, ContentLibraryOrderTransformer
 from .helpers import CourseStructureTestCase
 
 
-class MockedModule:
+class MockedModule(object):
     """
     Object with mocked selected modules for user.
     """
@@ -35,7 +36,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library transformer test.
         """
-        super().setUp()
+        super(ContentLibraryTransformerTestCase, self).setUp()
 
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
@@ -121,7 +122,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             self.course.location,
             transformers=BlockStructureTransformers(),
         )
-        assert len(list(raw_block_structure.get_block_keys())) == len(self.blocks)
+        self.assertEqual(len(list(raw_block_structure.get_block_keys())), len(self.blocks))
 
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
@@ -136,13 +137,12 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1'
         )
         for key in block_key_set:
-            assert key in trans_keys
+            self.assertIn(key, trans_keys)
 
         vertical2_selected = self.get_block_key_set(self.blocks, 'vertical2').pop() in trans_keys
         vertical3_selected = self.get_block_key_set(self.blocks, 'vertical3').pop() in trans_keys
 
-        assert vertical2_selected != vertical3_selected
-        # only one of them should be selected
+        self.assertNotEqual(vertical2_selected, vertical3_selected)  # only one of them should be selected
         selected_vertical = 'vertical2' if vertical2_selected else 'vertical3'
         selected_child = 'html1' if vertical2_selected else 'html2'
 
@@ -154,7 +154,20 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                 self.course.location,
                 self.transformers,
             )
-            assert set(trans_block_structure.get_block_keys()) == self.get_block_key_set(self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1', selected_vertical, selected_child), f"Expected 'selected' equality failed in iteration {i}."  # pylint: disable=line-too-long
+            self.assertEqual(
+                set(trans_block_structure.get_block_keys()),
+                self.get_block_key_set(
+                    self.blocks,
+                    'course',
+                    'chapter1',
+                    'lesson1',
+                    'vertical1',
+                    'library_content1',
+                    selected_vertical,
+                    selected_child,
+                ),
+                u"Expected 'selected' equality failed in iteration {}.".format(i)
+            )
 
 
 class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
@@ -167,7 +180,7 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for content library order transformer test.
         """
-        super().setUp()
+        super(ContentLibraryOrderTransformerTestCase, self).setUp()
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
@@ -277,8 +290,11 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
                     break
 
             expected_children = ['vertical_vertical3', 'vertical_vertical2', 'vertical_vertical4']
-            assert expected_children == [child.block_id for child in children], \
-                f"Expected 'selected' equality failed in iteration {i}."
+            self.assertEqual(
+                expected_children,
+                [child.block_id for child in children],
+                u"Expected 'selected' equality failed in iteration {}.".format(i)
+            )
 
     @mock.patch('lms.djangoapps.course_blocks.transformers.library_content.get_student_module_as_dict')
     def test_content_library_randomize_selected_blocks_mismatch(self, mocked):
@@ -328,4 +344,7 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
                     children = trans_block_structure.get_children(block_key)
                     break
 
-            assert expected_children_without_hiding_or_gating != [child.block_id for child in children]
+            self.assertNotEqual(
+                expected_children_without_hiding_or_gating,
+                [child.block_id for child in children],
+            )

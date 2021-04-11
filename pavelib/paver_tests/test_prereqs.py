@@ -5,10 +5,9 @@ Tests covering the Open edX Paver prequisites installation workflow
 
 import os
 import unittest
-from unittest import mock
-from unittest.mock import patch
 
-import pytest
+import mock
+from mock import patch
 from paver.easy import BuildFailure
 
 import pavelib.prereqs
@@ -30,8 +29,12 @@ class TestPaverPrereqInstall(unittest.TestCase):
         """
         _orig_environ = dict(os.environ)
         os.environ['NO_PREREQ_INSTALL'] = set_val
-        assert pavelib.prereqs.no_prereq_install() == expected_val,\
-            f'NO_PREREQ_INSTALL is set to {set_val}, but we read it as {expected_val}'
+        self.assertEqual(
+            pavelib.prereqs.no_prereq_install(),
+            expected_val,
+            'NO_PREREQ_INSTALL is set to {}, but we read it as {}'.format(
+                set_val, expected_val),
+        )
 
         # Reset Environment back to original state
         os.environ.clear()
@@ -94,11 +97,11 @@ class TestPaverNodeInstall(PaverTestCase):
             attrs = {'wait': fail_on_npm_install}
             _mock_subprocess.configure_mock(**attrs)
             _mock_popen.return_value = _mock_subprocess
-            with pytest.raises(Exception):
+            with self.assertRaises(Exception):
                 pavelib.prereqs.node_prereqs_installation()
 
         # npm install will be called twice
-        assert _mock_popen.call_count == 2
+        self.assertEqual(_mock_popen.call_count, 2)
 
     def test_npm_install_called_once_when_successful(self):
         """
@@ -107,7 +110,7 @@ class TestPaverNodeInstall(PaverTestCase):
         with patch('subprocess.Popen') as _mock_popen:
             pavelib.prereqs.node_prereqs_installation()
         # when there's no failure, npm install is only called once
-        assert _mock_popen.call_count == 1
+        self.assertEqual(_mock_popen.call_count, 1)
 
     def test_npm_install_with_unexpected_subprocess_error(self):
         """
@@ -115,6 +118,6 @@ class TestPaverNodeInstall(PaverTestCase):
         """
         with patch('subprocess.Popen') as _mock_popen:
             _mock_popen.side_effect = unexpected_fail_on_npm_install
-            with pytest.raises(BuildFailure):
+            with self.assertRaises(BuildFailure):
                 pavelib.prereqs.node_prereqs_installation()
-        assert _mock_popen.call_count == 1
+        self.assertEqual(_mock_popen.call_count, 1)

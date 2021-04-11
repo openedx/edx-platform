@@ -21,10 +21,10 @@ class IncorrectDeadline(Exception):
     """
     Exception raised explicitly to use default date when date given by user is prior to today.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
 
     help = """
     Changes the credit course eligibility deadline for a student in a particular course.
@@ -65,14 +65,14 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            logger.exception(f'Invalid or non-existent username {username}')
+            logger.exception('Invalid or non-existent username {}'.format(username))
             raise
 
         try:
             course_key = CourseKey.from_string(course_id)
             CourseEnrollment.objects.get(user=user, course_id=course_key, mode=CourseMode.CREDIT_MODE)
         except InvalidKeyError:
-            logger.exception(f'Invalid or non-existent course id {course_id}')
+            logger.exception('Invalid or non-existent course id {}'.format(course_id))
             raise
         except CourseEnrollment.DoesNotExist:
             logger.exception('No enrollment found in database for {username} in course {course_id}'
@@ -89,7 +89,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             expected_date = datetime.utcnow() + timedelta(days=DEFAULT_DAYS)
 
         self.update_credit_eligibility_deadline(username, course_key, expected_date)
-        logger.info(f"Successfully updated credit eligibility deadline for {username}")
+        logger.info("Successfully updated credit eligibility deadline for {}".format(username))
 
     def update_credit_eligibility_deadline(self, username, course_key, new_deadline):
         """ Update Credit Eligibility new_deadline for a specific user """

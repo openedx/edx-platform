@@ -8,7 +8,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import get_language_bidi, ugettext_lazy as _
 from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -71,7 +71,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     Render the program details fragment.
     """
 
-    def render_to_fragment(self, request, program_uuid, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, program_uuid, **kwargs):
         """View details about a specific program."""
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
         if not programs_config.enabled or not request.user.is_authenticated:

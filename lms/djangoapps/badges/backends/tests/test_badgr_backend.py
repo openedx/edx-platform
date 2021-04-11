@@ -4,19 +4,20 @@ Tests for BadgrBackend
 
 
 from datetime import datetime
-from unittest.mock import Mock, call, patch
 
 import ddt
+import six
 from django.db.models.fields.files import ImageFieldFile
 from django.test.utils import override_settings
-from lazy.lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
+from lazy.lazy import lazy
+from mock import Mock, call, patch
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.track.tests import EventTrackingTestCase
 from lms.djangoapps.badges.backends.badgr import BadgrBackend
 from lms.djangoapps.badges.models import BadgeAssertion
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,7 +43,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Create a course and user to test with.
         """
-        super().setUp()
+        super(BadgrBackendTestCase, self).setUp()
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(
             org='edX', course='course_test', run='test_run', display_name='Badged',
@@ -71,26 +72,28 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Make sure the handler generates the correct URLs for different API tasks.
         """
-        assert self.handler._base_url == 'https://example.com/v1/issuer/issuers/test-issuer'
-        # lint-amnesty, pylint: disable=no-member
-        assert self.handler._badge_create_url == 'https://example.com/v1/issuer/issuers/test-issuer/badges'
-        # lint-amnesty, pylint: disable=no-member
-        assert self.handler._badge_url('test_slug_here') ==\
-               'https://example.com/v1/issuer/issuers/test-issuer/badges/test_slug_here'
-        assert self.handler._assertion_url('another_test_slug') ==\
-               'https://example.com/v1/issuer/issuers/test-issuer/badges/another_test_slug/assertions'
+        self.assertEqual(self.handler._base_url, 'https://example.com/v1/issuer/issuers/test-issuer')
+        self.assertEqual(self.handler._badge_create_url, 'https://example.com/v1/issuer/issuers/test-issuer/badges')
+        self.assertEqual(
+            self.handler._badge_url('test_slug_here'),
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/test_slug_here'
+        )
+        self.assertEqual(
+            self.handler._assertion_url('another_test_slug'),
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/another_test_slug/assertions'
+        )
 
     def check_headers(self, headers):
         """
         Verify the a headers dict from a requests call matches the proper auth info.
         """
-        assert headers == {'Authorization': 'Token 12345'}
+        self.assertEqual(headers, {'Authorization': 'Token 12345'})
 
     def test_get_headers(self):
         """
         Check to make sure the handler generates appropriate HTTP headers.
         """
-        self.check_headers(self.handler._get_headers())  # lint-amnesty, pylint: disable=no-member
+        self.check_headers(self.handler._get_headers())
 
     @patch('requests.post')
     def test_create_badge(self, post):
@@ -99,16 +102,20 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         self.handler._create_badge(self.badge_class)
         args, kwargs = post.call_args
-        assert args[0] == 'https://example.com/v1/issuer/issuers/test-issuer/badges'
-        assert kwargs['files']['image'][0] == self.badge_class.image.name
-        assert isinstance(kwargs['files']['image'][1], ImageFieldFile)
-        assert kwargs['files']['image'][2] == 'image/png'
+        self.assertEqual(args[0], 'https://example.com/v1/issuer/issuers/test-issuer/badges')
+        self.assertEqual(kwargs['files']['image'][0], self.badge_class.image.name)
+        self.assertIsInstance(kwargs['files']['image'][1], ImageFieldFile)
+        self.assertEqual(kwargs['files']['image'][2], 'image/png')
         self.check_headers(kwargs['headers'])
-        assert kwargs['data'] ==\
-               {'name': 'Test Badge',
+        self.assertEqual(
+            kwargs['data'],
+            {
+                'name': 'Test Badge',
                 'slug': EXAMPLE_SLUG,
                 'criteria': 'https://example.com/syllabus',
-                'description': "Yay! It's a test badge."}
+                'description': "Yay! It's a test badge.",
+            }
+        )
 
     def test_ensure_badge_created_cache(self):
         """
@@ -116,8 +123,8 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         BadgrBackend.badges.append(EXAMPLE_SLUG)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
-        assert not self.handler._create_badge.called
+        self.handler._ensure_badge_created(self.badge_class)
+        self.assertFalse(self.handler._create_badge.called)
 
     @ddt.unpack
     @ddt.data(
@@ -126,35 +133,38 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         ('no_course_badge_class', 'test_componenttest_slug')
     )
     def test_slugs(self, badge_class_type, slug):
-        assert self.handler._slugify(getattr(self, badge_class_type)) == slug
-        # lint-amnesty, pylint: disable=no-member
+        self.assertEqual(self.handler._slugify(getattr(self, badge_class_type)), slug)
 
     @patch('requests.get')
     def test_ensure_badge_created_checks(self, get):
         response = Mock()
         response.status_code = 200
         get.return_value = response
-        assert 'test_componenttest_slug' not in BadgrBackend.badges
+        self.assertNotIn('test_componenttest_slug', BadgrBackend.badges)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
-        assert get.called
+        self.handler._ensure_badge_created(self.badge_class)
+        self.assertTrue(get.called)
         args, kwargs = get.call_args
-        assert args[0] == ('https://example.com/v1/issuer/issuers/test-issuer/badges/' + EXAMPLE_SLUG)
+        self.assertEqual(
+            args[0],
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            EXAMPLE_SLUG
+        )
         self.check_headers(kwargs['headers'])
-        assert EXAMPLE_SLUG in BadgrBackend.badges
-        assert not self.handler._create_badge.called
+        self.assertIn(EXAMPLE_SLUG, BadgrBackend.badges)
+        self.assertFalse(self.handler._create_badge.called)
 
     @patch('requests.get')
     def test_ensure_badge_created_creates(self, get):
         response = Mock()
         response.status_code = 404
         get.return_value = response
-        assert EXAMPLE_SLUG not in BadgrBackend.badges
+        self.assertNotIn(EXAMPLE_SLUG, BadgrBackend.badges)
         self.handler._create_badge = Mock()
-        self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
-        assert self.handler._create_badge.called
-        assert self.handler._create_badge.call_args == call(self.badge_class)
-        assert EXAMPLE_SLUG in BadgrBackend.badges
+        self.handler._ensure_badge_created(self.badge_class)
+        self.assertTrue(self.handler._create_badge.called)
+        self.assertEqual(self.handler._create_badge.call_args, call(self.badge_class))
+        self.assertIn(EXAMPLE_SLUG, BadgrBackend.badges)
 
     @patch('requests.post')
     def test_badge_creation_event(self, post):
@@ -168,20 +178,28 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response.json.return_value = result
         post.return_value = response
         self.recreate_tracker()
-        self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')  # lint-amnesty, pylint: disable=no-member
+        self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')
         args, kwargs = post.call_args
-        assert args[0] == (('https://example.com/v1/issuer/issuers/test-issuer/badges/' + EXAMPLE_SLUG) + '/assertions')
+        self.assertEqual(
+            args[0],
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            EXAMPLE_SLUG +
+            '/assertions'
+        )
         self.check_headers(kwargs['headers'])
         assertion = BadgeAssertion.objects.get(user=self.user, badge_class__course_id=self.course.location.course_key)
-        assert assertion.data == result
-        assert assertion.image_url == 'http://www.example.com/example.png'
-        assert assertion.assertion_url == 'http://www.example.com/example'
-        assert kwargs['data'] == {'email': 'example@example.com', 'evidence': 'https://example.com/irrefutable_proof'}
+        self.assertEqual(assertion.data, result)
+        self.assertEqual(assertion.image_url, 'http://www.example.com/example.png')
+        self.assertEqual(assertion.assertion_url, 'http://www.example.com/example')
+        self.assertEqual(kwargs['data'], {
+            'email': 'example@example.com',
+            'evidence': 'https://example.com/irrefutable_proof'
+        })
         assert_event_matches({
             'name': 'edx.badge.assertion.created',
             'data': {
                 'user_id': self.user.id,
-                'course_id': str(self.course.location.course_key),
+                'course_id': six.text_type(self.course.location.course_key),
                 'enrollment_mode': 'honor',
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',

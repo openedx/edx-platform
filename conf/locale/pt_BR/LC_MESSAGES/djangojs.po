@@ -27,7 +27,6 @@
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Eduardo Barasal Morales <emorales@nic.br>, 2017
 # Emili Costa <m.lee.costa@gmail.com>, 2015
-# Emmanuel Halbout <emmanuelhalbout@neojiba.org>, 2020
 # Erik Henrique <contato@erikhenrique.com.br>, 2015
 # Fabiana Lavor <lavorfabiana@gmail.com>, 2016
 # Fabio Eis <fabio@fabioeis.com>, 2016
@@ -244,7 +243,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
 "PO-Revision-Date: 2020-10-04 20:44+0000\n"
 "Last-Translator: Genaro Costa <genarocosta@yahoo.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"

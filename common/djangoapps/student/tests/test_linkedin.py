@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for LinkedIn Add to Profile configuration. """
 
 
@@ -56,10 +57,12 @@ class LinkedInAddToProfileUrlTests(TestCase):
         # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
         # self.assertEqual(actual_url, expected_url)
 
-        assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
-        assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
-        assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-        assert f'&organizationId={config.company_identifier}' in actual_url
+        self.assertIn('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME', actual_url)
+        self.assertIn('&name={platform}+{cert_name}'.format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')), cert_name=expected_cert_name
+        ), actual_url)
+        self.assertIn('&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')), actual_url)
+        self.assertIn('&organizationId={org_id}'.format(org_id=config.company_identifier), actual_url)
 
     @ddt.data(
         ('honor', 'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
@@ -91,7 +94,9 @@ class LinkedInAddToProfileUrlTests(TestCase):
             # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
             # self.assertEqual(actual_url, expected_url)
 
-            assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
-            assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
-            assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-            assert f'&organizationId={config.company_identifier}' in actual_url
+            self.assertIn('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME', actual_url)
+            self.assertIn('&name={platform}+{cert_name}'.format(
+                platform=quote(settings.PLATFORM_NAME.encode('utf-8')), cert_name=expected_cert_name
+            ), actual_url)
+            self.assertIn('&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')), actual_url)
+            self.assertIn('&organizationId={org_id}'.format(org_id=config.company_identifier), actual_url)

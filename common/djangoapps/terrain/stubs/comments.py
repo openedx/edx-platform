@@ -11,13 +11,13 @@ import six.moves.urllib.parse
 from .http import StubHttpRequestHandler, StubHttpService
 
 
-class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     @property
     def _params(self):
         return six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(self.path).query)
 
-    def do_GET(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def do_GET(self):
         pattern_handlers = OrderedDict([
             ("/api/v1/users/(?P<user_id>\\d+)/active_threads$", self.do_user_profile),
             ("/api/v1/users/(?P<user_id>\\d+)$", self.do_user),
@@ -32,7 +32,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylin
 
         self.send_response(404, content="404 Not Found")
 
-    def match_pattern(self, pattern_handlers):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def match_pattern(self, pattern_handlers):
         path = six.moves.urllib.parse.urlparse(self.path).path
         for pattern in pattern_handlers:
             match = re.match(pattern, path)
@@ -51,11 +51,11 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylin
             return
         self.send_response(204, "")
 
-    def do_put_user(self, user_id):  # lint-amnesty, pylint: disable=unused-argument
+    def do_put_user(self, user_id):
         self.server.config['default_sort_key'] = self.post_dict.get("default_sort_key", "date")
-        self.send_json_response({'username': self.post_dict.get("username"), 'external_id': self.post_dict.get("external_id")})  # lint-amnesty, pylint: disable=line-too-long
+        self.send_json_response({'username': self.post_dict.get("username"), 'external_id': self.post_dict.get("external_id")})
 
-    def do_DELETE(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def do_DELETE(self):
         pattern_handlers = {
             "/api/v1/comments/(?P<comment_id>\\w+)$": self.do_delete_comment
         }
@@ -63,7 +63,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylin
             return
         self.send_json_response({})
 
-    def do_user(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def do_user(self, user_id):
         response = {
             "id": user_id,
             "default_sort_key": self.server.config.get("default_sort_key", "date"),
@@ -78,7 +78,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylin
             })
         self.send_json_response(response)
 
-    def do_user_profile(self, user_id):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+    def do_user_profile(self, user_id):
         if 'active_threads' in self.server.config:
             user_threads = self.server.config['active_threads'][:]
             params = self._params
@@ -94,13 +94,13 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylin
         else:
             self.send_response(404, content="404 Not Found")
 
-    def do_thread(self, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def do_thread(self, thread_id):
         if thread_id in self.server.config.get('threads', {}):
             thread = self.server.config['threads'][thread_id].copy()
             params = six.moves.urllib.parse.parse_qs(six.moves.urllib.parse.urlparse(self.path).query)
             if "recursive" in params and params["recursive"][0] == "True":
                 thread.setdefault('children', [])
-                resp_total = thread.setdefault('resp_total', len(thread['children']))  # lint-amnesty, pylint: disable=unused-variable
+                resp_total = thread.setdefault('resp_total', len(thread['children']))
                 resp_skip = int(params.get("resp_skip", ["0"])[0])
                 resp_limit = int(params.get("resp_limit", ["10000"])[0])
                 thread['children'] = thread['children'][resp_skip:(resp_skip + resp_limit)]

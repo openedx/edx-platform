@@ -268,7 +268,7 @@ class DemographicsCollectionModal extends React.Component {
                   <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
                     {gettext('Help make edX better for everyone!')}
                   </h2>
-                  <p className="message">
+                  <p>
                     {gettext('Welcome to edX! Before you get started, please take a few minutes to fill-in the additional information below to help us understand a bit more about your background. You can always edit this information later in Account Settings.')}
                   </p>
                   <br />

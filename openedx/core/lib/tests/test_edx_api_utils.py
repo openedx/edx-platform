@@ -26,7 +26,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetEdxApiData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestGetEdxApiData, self).setUp()
 
         self.user = UserFactory()
 
@@ -34,7 +34,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         cache.clear()
 
     def _mock_catalog_api(self, responses, url=None):
-        assert httpretty.is_enabled(), 'httpretty must be enabled to mock Catalog API calls.'
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
 
         url = url if url else CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/'
 
@@ -42,7 +42,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
     def _assert_num_requests(self, count):
         """DRY helper for verifying request counts."""
-        assert len(httpretty.httpretty.latest_requests) == count
+        self.assertEqual(len(httpretty.httpretty.latest_requests), count)
 
     def test_get_unpaginated_data(self):
         """Verify that unpaginated data can be retrieved."""
@@ -63,8 +63,8 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
 
             # Verify that the helper function didn't initialize its own client.
-            assert not mock_init.called
-            assert actual_collection == expected_collection
+            self.assertFalse(mock_init.called)
+            self.assertEqual(actual_collection, expected_collection)
 
         # Verify the API was actually hit (not the cache)
         self._assert_num_requests(1)
@@ -92,7 +92,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         self._mock_catalog_api(responses)
 
         actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
-        assert actual_collection == expected_collection
+        self.assertEqual(actual_collection, expected_collection)
 
         self._assert_num_requests(len(expected_collection))
 
@@ -121,7 +121,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         )
 
         actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, traverse_pagination=False)
-        assert actual_collection == expected_response
+        self.assertEqual(actual_collection, expected_response)
         self._assert_num_requests(1)
 
     def test_get_specific_resource(self):
@@ -143,7 +143,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         )
 
         actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
-        assert actual_resource == expected_resource
+        self.assertEqual(actual_resource, expected_resource)
 
         self._assert_num_requests(1)
 
@@ -172,7 +172,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         )
 
         actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
-        assert actual_resource == expected_resource
+        self.assertEqual(actual_resource, expected_resource)
 
         self._assert_num_requests(1)
 
@@ -203,7 +203,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
         actual_resource_for_lang = get_edx_api_data(
             catalog_integration, 'course_runs', resource_id=resource_id, api=api, cache_key=cache_key, fields=['lang']
         )
-        assert actual_resource_for_lang == expected_resource_for_lang
+        self.assertEqual(actual_resource_for_lang, expected_resource_for_lang)
 
         # Hit the cache
         actual_resource = get_edx_api_data(
@@ -211,7 +211,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             fields=['weeks_to_complete']
         )
 
-        assert actual_resource == expected_resource_for_weeks_to_complete
+        self.assertEqual(actual_resource, expected_resource_for_weeks_to_complete)
 
         # Verify that only one requests were made, not three.
         self._assert_num_requests(1)
@@ -252,12 +252,12 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         # Hit the cache.
         actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, cache_key=cache_key)
-        assert actual_collection == expected_collection
+        self.assertEqual(actual_collection, expected_collection)
 
         actual_resource = get_edx_api_data(
             catalog_integration, 'programs', api=api, resource_id=resource_id, cache_key=cache_key
         )
-        assert actual_resource == expected_resource
+        self.assertEqual(actual_resource, expected_resource)
 
         # Verify that only two requests were made, not four.
         self._assert_num_requests(2)
@@ -269,8 +269,8 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         actual = get_edx_api_data(catalog_integration, 'programs', api=None)
 
-        assert mock_warning.called
-        assert actual == []
+        self.assertTrue(mock_warning.called)
+        self.assertEqual(actual, [])
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
     def test_data_retrieval_failure(self, mock_exception):
@@ -284,8 +284,8 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         actual = get_edx_api_data(catalog_integration, 'programs', api=api)
 
-        assert mock_exception.called
-        assert actual == []
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, [])
 
     @mock.patch(UTILITY_MODULE + '.log.warning')
     def test_api_config_disabled_with_id_and_not_collection(self, mock_warning):
@@ -300,8 +300,8 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             many=False
         )
 
-        assert mock_warning.called
-        assert actual == {}
+        self.assertTrue(mock_warning.called)
+        self.assertEqual(actual, {})
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
     def test_data_retrieval_failure_with_id(self, mock_exception):
@@ -320,5 +320,5 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
             resource_id=100,
             many=False
         )
-        assert mock_exception.called
-        assert actual == {}
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, {})

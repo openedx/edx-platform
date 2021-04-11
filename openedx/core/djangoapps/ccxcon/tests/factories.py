@@ -12,7 +12,7 @@ class CcxConFactory(DjangoModelFactory):
     """
     Model factory for the CCXCon model
     """
-    class Meta:
+    class Meta(object):
         model = CCXCon
 
     oauth_client_id = 'asdfjasdljfasdkjffsdfjksd98fsd8y24fdsiuhsfdsf'

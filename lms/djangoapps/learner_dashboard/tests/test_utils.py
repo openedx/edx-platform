@@ -4,6 +4,7 @@ Unit test module covering utils module
 
 
 import ddt
+import six
 from django.test import TestCase
 
 from lms.djangoapps.learner_dashboard import utils
@@ -21,5 +22,5 @@ class TestUtils(TestCase):
         Test to make sure the function 'strip_course_id'
         handles various url input
         """
-        actual = utils.strip_course_id(path + str(utils.FAKE_COURSE_KEY))
-        assert actual == path
+        actual = utils.strip_course_id(path + six.text_type(utils.FAKE_COURSE_KEY))
+        self.assertEqual(actual, path)

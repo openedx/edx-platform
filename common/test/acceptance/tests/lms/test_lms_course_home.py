@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
@@ -21,7 +22,7 @@ class CourseHomeBaseTest(UniqueCourseTest):
         """
         Initialize pages and install a course fixture.
         """
-        super().setUp()
+        super(CourseHomeBaseTest, self).setUp()
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)

@@ -8,11 +8,12 @@ import logging
 import mimetypes
 
 import requests
+import six
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from eventtracking import tracker
-from lazy import lazy  # lint-amnesty, pylint: disable=no-name-in-module
-from requests.packages.urllib3.exceptions import HTTPError  # lint-amnesty, pylint: disable=import-error
+from lazy import lazy
+from requests.packages.urllib3.exceptions import HTTPError
 
 from lms.djangoapps.badges.backends.base import BadgeBackend
 from lms.djangoapps.badges.models import BadgeAssertion
@@ -28,7 +29,7 @@ class BadgrBackend(BadgeBackend):
     badges = []
 
     def __init__(self):
-        super().__init__()
+        super(BadgrBackend, self).__init__()
         if not settings.BADGR_API_TOKEN:
             raise ImproperlyConfigured("BADGR_API_TOKEN not set.")
 
@@ -37,20 +38,20 @@ class BadgrBackend(BadgeBackend):
         """
         Base URL for all API requests.
         """
-        return f"{settings.BADGR_BASE_URL}/v1/issuer/issuers/{settings.BADGR_ISSUER_SLUG}"
+        return "{}/v1/issuer/issuers/{}".format(settings.BADGR_BASE_URL, settings.BADGR_ISSUER_SLUG)
 
     @lazy
     def _badge_create_url(self):
         """
         URL for generating a new Badge specification
         """
-        return f"{self._base_url}/badges"
+        return "{}/badges".format(self._base_url)
 
     def _badge_url(self, slug):
         """
         Get the URL for a course's badge in a given mode.
         """
-        return f"{self._badge_create_url}/{slug}"
+        return "{}/{}".format(self._badge_create_url, slug)
 
     def _assertion_url(self, slug):
         """
@@ -66,7 +67,7 @@ class BadgrBackend(BadgeBackend):
         if badge_class.issuing_component and badge_class.course_id:
             # Make this unique to the course, and down to 64 characters.
             # We don't do this to badges without issuing_component set for backwards compatibility.
-            slug = hashlib.sha256((slug + str(badge_class.course_id)).encode('utf-8')).hexdigest()
+            slug = hashlib.sha256((slug + six.text_type(badge_class.course_id)).encode('utf-8')).hexdigest()
         if len(slug) > MAX_SLUG_LENGTH:
             # Will be 64 characters.
             slug = hashlib.sha256(slug).hexdigest()
@@ -80,9 +81,9 @@ class BadgrBackend(BadgeBackend):
             response.raise_for_status()
         except HTTPError:
             LOGGER.error(
-                "Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
-                "and data values %r\n"
-                "Response status was %s.\n%s",
+                u"Encountered an error when contacting the Badgr-Server. Request sent to %r with headers %r.\n"
+                u"and data values %r\n"
+                u"Response status was %s.\n%s",
                 response.request.url, response.request.headers,
                 data,
                 response.status_code, response.content
@@ -99,8 +100,8 @@ class BadgrBackend(BadgeBackend):
         content_type, __ = mimetypes.guess_type(image.name)
         if not content_type:
             raise ValueError(
-                "Could not determine content-type of image! Make sure it is a properly named .png file. "
-                "Filename was: {}".format(image.name)
+                u"Could not determine content-type of image! Make sure it is a properly named .png file. "
+                u"Filename was: {}".format(image.name)
             )
         files = {'image': (image.name, image, content_type)}
         data = {
@@ -125,7 +126,7 @@ class BadgrBackend(BadgeBackend):
                 'badge_slug': assertion.badge_class.slug,
                 'badge_name': assertion.badge_class.display_name,
                 'issuing_component': assertion.badge_class.issuing_component,
-                'course_id': str(assertion.badge_class.course_id),
+                'course_id': six.text_type(assertion.badge_class.course_id),
                 'enrollment_mode': assertion.badge_class.mode,
                 'assertion_id': assertion.id,
                 'assertion_image_url': assertion.image_url,
@@ -161,7 +162,7 @@ class BadgrBackend(BadgeBackend):
         """
         Headers to send along with the request-- used for authentication.
         """
-        return {'Authorization': f'Token {settings.BADGR_API_TOKEN}'}
+        return {'Authorization': u'Token {}'.format(settings.BADGR_API_TOKEN)}
 
     def _ensure_badge_created(self, badge_class):
         """

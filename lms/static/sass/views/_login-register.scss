@@ -69,14 +69,13 @@
   -webkit-flex-wrap: wrap;
   -moz-flex-wrap: wrap;
 
-  h1 {
+  h2 {
     @extend %t-title4;
 
     margin-top: $baseline;
     letter-spacing: normal;
     font-family: $font-family-sans-serif;
     color: $uxpl-blue-hover-active;
-    text-align: left;
   }
 
   h3 {
@@ -320,10 +319,6 @@ ul.fa-ul{
       width: calc(50% - 10px);
     }
 
-    .label-text-small {
-      font-size: small;
-    }
-
     /** FROM _accounts.scss - start **/
     label,
     input,
@@ -337,10 +332,6 @@ ul.fa-ul{
       font-style: normal;
       font-weight: 500;
 
-      &.honor_tos_combined {
-        font-size: small;
-      }
-
       &.focus-in {
         position: relative;
         padding-top: 0;
@@ -350,7 +341,7 @@ ul.fa-ul{
 
       &.focus-out {
         position: absolute;
-        padding-top: 2.5px;
+        padding-top: 5px;
         padding-left: 9px;
         opacity: 0.75;
         z-index: 1;
@@ -438,7 +429,7 @@ ul.fa-ul{
         display: inline;
         width: auto;
         height: auto;
-        margin-right: 0px;
+        margin-right: ($baseline/4);
 
         & + label {
           display: inline;

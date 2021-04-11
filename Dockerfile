@@ -36,15 +36,11 @@ RUN apt-get update && \
     libxml2-dev \
     libxmlsec1-dev \
     libxslt1-dev \
-    # lynx: Required by https://github.com/edx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
-    lynx \
     ntp \
     pkg-config \
-    python3-pip \
-    python3 \
     python3-dev \
     python3-venv \
-    -qy && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -59,10 +55,6 @@ ENV CONFIG_ROOT /edx/etc/
 ENV PATH /edx/app/edxapp/edx-platform/bin:${PATH}
 ENV SETTINGS production
 RUN mkdir -p /edx/etc/
-
-# TODO: Install requirements before copying in code.
-RUN pip install setuptools==39.0.1 pip==21.0.1
-RUN pip install -r requirements/edx/base.txt
 
 ENV VIRTUAL_ENV=/edx/app/edxapp/venvs/edxapp
 RUN python3.8 -m venv $VIRTUAL_ENV
@@ -104,16 +96,6 @@ CMD gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name l
 FROM lms as lms-newrelic
 RUN pip install newrelic
 CMD newrelic-admin run-program gunicorn -c /edx/app/edxapp/edx-platform/lms/docker_lms_gunicorn.py --name lms --bind=0.0.0.0:8000 --max-requests=1000 --access-logfile - lms.wsgi:application
-
-
-FROM lms as lms-devstack
-# TODO: This compiles static assets.
-# However, it's a bit of a hack, it's slow, and it's inefficient because makes the final Docker cache layer very large.
-# We ought to be able to this higher up in the Dockerfile, and do it the same for Prod and Devstack.
-RUN mkdir -p test_root/log
-ENV DJANGO_SETTINGS_MODULE ""
-RUN NO_PREREQ_INSTALL=1 paver update_assets lms --settings devstack_decentralized
-ENV DJANGO_SETTINGS_MODULE lms.envs.devstack_decentralized
 
 FROM lms as lms-devstack
 # TODO: This compiles static assets.

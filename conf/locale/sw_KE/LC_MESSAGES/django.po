@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Swahili (Kenya) (https://www.transifex.com/open-edx/teams/6205/sw_KE/)\n"
@@ -6229,6 +6229,15 @@ msgid "Total number of users"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "jina la mtumiaji"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr "barua pepe"
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "Buni Matokeo ya Mtumiaji"
 
@@ -6295,6 +6304,14 @@ msgstr "Waalimu"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
 msgstr "Taarifa ya Usajili kwa kozi zote"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr "jukumu"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
+msgstr "jina_kamili"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -7490,10 +7507,6 @@ msgstr ""
 msgid "Find information related to a learner's program enrollments"
 msgstr ""
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "jina la mtumiaji"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -8153,7 +8166,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -10160,13 +10173,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Majaribio mengi ya kuingia mtandaoni hayakufaulu. Tafadhali jaribu tena "
@@ -10179,14 +10185,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10206,6 +10204,10 @@ msgstr ""
 #, python-brace-format
 msgid "The email address you used to register with {platform_name}"
 msgstr "Anwani ya barua pepe uliyotumia kujisajili na{platform_name}"
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -10452,10 +10454,6 @@ msgstr ""
 msgid ""
 "I agree to the {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
 msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -10743,6 +10741,10 @@ msgstr ""
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "Ukimilishaji"
+
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
+msgstr "Mapitio"
 
 #: openedx/features/course_experience/views/course_home_messages.py
 #, python-brace-format
@@ -11458,8 +11460,8 @@ msgstr "Hakuna 'jukumu' lililobainshwa."
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
-msgstr ""
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "Mtumiaji {email} amesajili lakini hajaamsha akaunti yake."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12375,7 +12377,7 @@ msgid "Welcome to {platform_name}"
 msgstr "Karibu kwenye {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
@@ -12909,10 +12911,6 @@ msgid "Git Logs"
 msgstr "Kumbukumbu za Git"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "Usimamizi wa Mtumiaji"
 
@@ -12929,10 +12927,26 @@ msgid "Create user"
 msgstr "Buni mtumiaji"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr "Pakua orodha ya watumiaji wote (faili la csv)"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr "Angalia na urekebishe uthibitisho wa ramani ya nje"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr "Nenda kwa kila dashibodi ya mwalimu wa kozi kumudu usajili wa kozi."
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr "Simamia wafanyikazi wa kozi na wakufunzi"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr "Pakua orodha ya wafanyakazi na wakufunzi (faili la csv)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -16170,8 +16184,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your verification is effective for one year. It will expire on {expiry_date}"
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -16641,10 +16654,6 @@ msgstr "Heshima"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "Mtaalamu"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -18736,6 +18745,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "Jukwaa Huru linalowezesha edX"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""

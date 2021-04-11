@@ -16,6 +16,90 @@ securityDefinitions:
 security:
   - Basic: []
 paths:
+  /badges/v1/assertions/user/{username}/:
+    get:
+      operationId: badges_v1_assertions_user_read
+      summary: '**Use Cases**'
+      description: "Request a list of assertions for a user, optionally constrained\
+        \ to a course.\n\n**Example Requests**\n\n    GET /api/badges/v1/assertions/user/{username}/\n\
+        \n**Response Values**\n\n    Body comprised of a list of objects with the\
+        \ following fields:\n\n    * badge_class: The badge class the assertion was\
+        \ awarded for. Represented as an object\n      with the following fields:\n\
+        \        * slug: The identifier for the badge class\n        * issuing_component:\
+        \ The software component responsible for issuing this badge.\n        * display_name:\
+        \ The display name of the badge.\n        * course_id: The course key of the\
+        \ course this badge is scoped to, or null if it isn't scoped to a course.\n\
+        \        * description: A description of the award and its significance.\n\
+        \        * criteria: A description of what is needed to obtain this award.\n\
+        \        * image_url: A URL to the icon image used to represent this award.\n\
+        \    * image_url: The baked assertion image derived from the badge_class icon--\
+        \ contains metadata about the award\n      in its headers.\n    * assertion_url:\
+        \ The URL to the OpenBadges BadgeAssertion object, for verification by compatible\
+        \ tools\n      and software.\n\n**Params**\n\n    * slug (optional): The identifier\
+        \ for a particular badge class to filter by.\n    * issuing_component (optional):\
+        \ The issuing component for a particular badge class to filter by\n      (requires\
+        \ slug to have been specified, or this will be ignored.) If slug is provided\
+        \ and this is not,\n      assumes the issuing_component should be empty.\n\
+        \    * course_id (optional): Returns assertions that were awarded as part\
+        \ of a particular course. If slug is\n      provided, and this field is not\
+        \ specified, assumes that the target badge has an empty course_id field.\n\
+        \      '*' may be used to get all badges with the specified slug, issuing_component\
+        \ combination across all courses.\n\n**Returns**\n\n    * 200 on success,\
+        \ with a list of Badge Assertion objects.\n    * 403 if a user who does not\
+        \ have permission to masquerade as\n      another user specifies a username\
+        \ other than their own.\n    * 404 if the specified user does not exist\n\n\
+        \    {\n        \"count\": 7,\n        \"previous\": null,\n        \"num_pages\"\
+        : 1,\n        \"results\": [\n            {\n                \"badge_class\"\
+        : {\n                    \"slug\": \"special_award\",\n                  \
+        \  \"issuing_component\": \"openedx__course\",\n                    \"display_name\"\
+        : \"Very Special Award\",\n                    \"course_id\": \"course-v1:edX+DemoX+Demo_Course\"\
+        ,\n                    \"description\": \"Awarded for people who did something\
+        \ incredibly special\",\n                    \"criteria\": \"Do something\
+        \ incredibly special.\",\n                    \"image\": \"http://example.com/media/badge_classes/badges/special_xdpqpBv_9FYOZwN.png\"\
+        \n                },\n                \"image_url\": \"http://badges.example.com/media/issued/cd75b69fc1c979fcc1697c8403da2bdf.png\"\
+        ,\n                \"assertion_url\": \"http://badges.example.com/public/assertions/07020647-e772-44dd-98b7-d13d34335ca6\"\
+        \n            },\n        ...\n        ]\n    }"
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/BadgeAssertion'
+      tags:
+        - badges
+    parameters:
+      - name: username
+        in: path
+        required: true
+        type: string
   /bookmarks/v1/bookmarks/:
     get:
       operationId: bookmarks_v1_bookmarks_list
@@ -93,6 +177,137 @@ paths:
         required: true
         type: string
       - name: username
+        in: path
+        required: true
+        type: string
+  /bulk_enroll/v1/bulk_enroll:
+    post:
+      operationId: bulk_enroll_v1_bulk_enroll_create
+      summary: '**Use Case**'
+      description: "Enroll multiple users in one or more courses.\n\n**Example Request**\n\
+        \n    POST /api/bulk_enroll/v1/bulk_enroll/ {\n        \"auto_enroll\": true,\n\
+        \        \"email_students\": true,\n        \"action\": \"enroll\",\n    \
+        \    \"courses\": \"course-v1:edX+Demo+123,course-v1:edX+Demo2+456\",\n  \
+        \      \"cohorts\": \"cohortA,cohortA\",\n        \"identifiers\": \"brandon@example.com,yamilah@example.com\"\
+        \n    }\n\n    **POST Parameters**\n\n      A POST request can include the\
+        \ following parameters.\n\n      * auto_enroll: When set to `true`, students\
+        \ will be enrolled as soon\n        as they register.\n      * email_students:\
+        \ When set to `true`, students will be sent email\n        notifications upon\
+        \ enrollment.\n      * action: Can either be set to \"enroll\" or \"unenroll\"\
+        . This determines the behavior\n      * cohorts: Optional. If provided, the\
+        \ number of items in the list should be equal to\n        the number of courses.\
+        \ first cohort coressponds with the first course and so on.\n        The learners\
+        \ will be added to the corresponding cohort.\n\n**Response Values**\n\n  \
+        \  If the supplied course data is valid and the enrollments were\n    successful,\
+        \ an HTTP 200 \"OK\" response is returned.\n\n    The HTTP 200 response body\
+        \ contains a list of response data for each\n    enrollment. (See the `instructor.views.api.students_update_enrollment`\n\
+        \    docstring for the specifics of the response data available for each\n\
+        \    enrollment)\n\n    If a cohorts list is provided, additional 'cohort'\
+        \ keys will be added\n    to the 'before' and 'after' states."
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - bulk_enroll
+    parameters: []
+  /ccx/v0/ccx/:
+    get:
+      operationId: ccx_v0_ccx_list
+      summary: Gets a list of CCX Courses for a given Master Course.
+      description: Additional parameters are allowed for pagination purposes.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/CCXCourse'
+      tags:
+        - ccx
+    post:
+      operationId: ccx_v0_ccx_create
+      description: Creates a new CCX course for a given Master Course.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CCXCourse'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/CCXCourse'
+      tags:
+        - ccx
+    parameters: []
+  /ccx/v0/ccx/{ccx_course_id}/:
+    get:
+      operationId: ccx_v0_ccx_read
+      description: Gets a CCX Course information.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CCXCourse'
+      tags:
+        - ccx
+    patch:
+      operationId: ccx_v0_ccx_partial_update
+      description: Modifies a CCX course.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CCXCourse'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CCXCourse'
+      tags:
+        - ccx
+    delete:
+      operationId: ccx_v0_ccx_delete
+      description: Deletes a CCX course.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - ccx
+    parameters:
+      - name: ccx_course_id
         in: path
         required: true
         type: string
@@ -2641,6 +2856,17 @@ paths:
       tags:
         - edxnotes
     parameters: []
+  /embargo/v1/course_access/:
+    get:
+      operationId: embargo_v1_course_access_list
+      description: GET /api/embargo/v1/course_access/
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - embargo
+    parameters: []
   /enrollment/v1/course/{course_id}:
     get:
       operationId: enrollment_v1_course_read
@@ -2665,8 +2891,8 @@ paths:
         \ named by the 'user' GET\nparameter. If the username does not match that\
         \ of the currently logged in user, only\ncourses for which the currently logged\
         \ in user has the Staff or Admin role are listed.\nAs a result, a course team\
-        \ member can find out which of their own courses a particular\nlearner is\
-        \ enrolled in.\n\nOnly the Staff or Admin role (granted on the Django administrative\
+        \ member can find out which of their own courses a particular\nlearner\
+        \ is enrolled in.\n\nOnly the Staff or Admin role (granted on the Django administrative\
         \ console as the staff\nor instructor permission) in individual courses gives\
         \ the requesting user access to\nenrollment data. Permissions granted at the\
         \ organizational level do not give a user\naccess to enrollment data for all\
@@ -2989,25 +3215,6 @@ paths:
       tags:
         - experiments
     parameters: []
-  /experiments/v0/custom/userMetadata/{username},{course_id}:
-    get:
-      operationId: experiments_v0_custom_userMetadata_read
-      description: Return user-metadata for the given course and user
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - experiments
-    parameters:
-      - name: course_id
-        in: path
-        required: true
-        type: string
-      - name: username
-        in: path
-        required: true
-        type: string
   /experiments/v0/data/:
     get:
       operationId: experiments_v0_data_list
@@ -3433,6 +3640,226 @@ paths:
         - learning_sequences
     parameters:
       - name: course_key_str
+        in: path
+        required: true
+        type: string
+  /mobile/{api_version}/course_info/{course_id}/handouts:
+    get:
+      operationId: mobile_course_info_handouts_list
+      summary: '**Use Case**'
+      description: "Get the HTML for course handouts.\n\n**Example Request**\n\n \
+        \   GET /api/mobile/v0.5/course_info/{course_id}/handouts\n\n**Response Values**\n\
+        \n    If the request is successful, the request returns an HTTP 200 \"OK\"\
+        \n    response along with the following value.\n\n    * handouts_html: The\
+        \ HTML for course handouts."
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+      - name: course_id
+        in: path
+        required: true
+        type: string
+  /mobile/{api_version}/course_info/{course_id}/updates:
+    get:
+      operationId: mobile_course_info_updates_list
+      summary: '**Use Case**'
+      description: "Get the content for course updates.\n\n**Example Request**\n\n\
+        \    GET /api/mobile/v0.5/course_info/{course_id}/updates\n\n**Response Values**\n\
+        \n    If the request is successful, the request returns an HTTP 200 \"OK\"\
+        \n    response along with an array of course updates. Each course update\n\
+        \    contains the following values.\n\n        * content: The content, as\
+        \ an HTML string, of the course update.\n        * date: The date of the course\
+        \ update.\n        * id: The unique identifier of the update.\n        * status:\
+        \ Whether the update is visible or not."
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+      - name: course_id
+        in: path
+        required: true
+        type: string
+  /mobile/{api_version}/my_user_info:
+    get:
+      operationId: mobile_my_user_info_list
+      description: Redirect to the currently-logged-in user's info page
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+  /mobile/{api_version}/users/{username}:
+    get:
+      operationId: mobile_users_read
+      summary: '**Use Case**'
+      description: "Get information about the specified user and access other resources\n\
+        \    the user has permissions for.\n\n    Users are redirected to this endpoint\
+        \ after they sign in.\n\n    You can use the **course_enrollments** value\
+        \ in the response to get a\n    list of courses the user is enrolled in.\n\
+        \n**Example Request**\n\n    GET /api/mobile/{version}/users/{username}\n\n\
+        **Response Values**\n\n    If the request is successful, the request returns\
+        \ an HTTP 200 \"OK\" response.\n\n    The HTTP 200 response has the following\
+        \ values.\n\n    * course_enrollments: The URI to list the courses the currently\
+        \ signed\n      in user is enrolled in.\n    * email: The email address of\
+        \ the currently signed in user.\n    * id: The ID of the user.\n    * name:\
+        \ The full name of the currently signed in user.\n    * username: The username\
+        \ of the currently signed in user."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/mobile_api.User'
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+      - name: username
+        in: path
+        description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+          only.
+        required: true
+        type: string
+        pattern: ^[\w.@+-]+$
+  /mobile/{api_version}/users/{username}/course_enrollments/:
+    get:
+      operationId: mobile_users_course_enrollments_list
+      summary: '**Use Case**'
+      description: "Get information about the courses that the currently signed in\
+        \ user is\n    enrolled in.\n\n    v1 differs from v0.5 version by returning\
+        \ ALL enrollments for\n    a user rather than only the enrollments the user\
+        \ has access to (that haven't expired).\n    An additional attribute \"expiration\"\
+        \ has been added to the response, which lists the date\n    when access to\
+        \ the course will expire or null if it doesn't expire.\n\n**Example Request**\n\
+        \n    GET /api/mobile/v1/users/{username}/course_enrollments/\n\n**Response\
+        \ Values**\n\n    If the request for information about the user is successful,\
+        \ the\n    request returns an HTTP 200 \"OK\" response.\n\n    The HTTP 200\
+        \ response has the following values.\n\n    * expiration: The course expiration\
+        \ date for given user course pair\n      or null if the course does not expire.\n\
+        \    * certificate: Information about the user's earned certificate in the\n\
+        \      course.\n    * course: A collection of the following data about the\
+        \ course.\n\n    * courseware_access: A JSON representation with access information\
+        \ for the course,\n      including any access errors.\n\n      * course_about:\
+        \ The URL to the course about page.\n      * course_sharing_utm_parameters:\
+        \ Encoded UTM parameters to be included in course sharing url\n      * course_handouts:\
+        \ The URI to get data for course handouts.\n      * course_image: The path\
+        \ to the course image.\n      * course_updates: The URI to get data for course\
+        \ updates.\n      * discussion_url: The URI to access data for course discussions\
+        \ if\n        it is enabled, otherwise null.\n      * end: The end date of\
+        \ the course.\n      * id: The unique ID of the course.\n      * name: The\
+        \ name of the course.\n      * number: The course number.\n      * org: The\
+        \ organization that created the course.\n      * start: The date and time\
+        \ when the course starts.\n      * start_display:\n        If start_type is\
+        \ a string, then the advertised_start date for the course.\n        If start_type\
+        \ is a timestamp, then a formatted date for the start of the course.\n   \
+        \     If start_type is empty, then the value is None and it indicates that\
+        \ the course has not yet started.\n      * start_type: One of either \"string\"\
+        , \"timestamp\", or \"empty\"\n      * subscription_id: A unique \"clean\"\
+        \ (alphanumeric with '_') ID of\n        the course.\n      * video_outline:\
+        \ The URI to get the list of all videos that the user\n        can access\
+        \ in the course.\n\n    * created: The date the course was created.\n    *\
+        \ is_active: Whether the course is currently active. Possible values\n   \
+        \   are true or false.\n    * mode: The type of certificate registration for\
+        \ this course (honor or\n      certified).\n    * url: URL to the downloadable\
+        \ version of the certificate, if exists."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CourseEnrollment'
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+      - name: username
+        in: path
+        required: true
+        type: string
+  ? /mobile/{api_version}/users/{username}/course_status_info/(P{course_id}[/+]+{var}[/+]+api/mobile/{api_version}/users/{username}/course_status_info/(P{course_id}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: mobile_users_course_status_info_+]+api_mobile_users_course_status_info_+]+(_|+)[_]+)_list
+      description: Get the ID of the module that the specified user last visited in
+        the specified course.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - mobile
+    patch:
+      operationId: mobile_users_course_status_info_+]+api_mobile_users_course_status_info_+]+(_|+)[_]+)_partial_update
+      description: Update the ID of the module that the specified user last visited
+        in the specified course.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - mobile
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
+      - name: course_id
+        in: path
+        required: true
+        type: string
+      - name: username
+        in: path
+        required: true
+        type: string
+      - name: var
         in: path
         required: true
         type: string
@@ -4185,18 +4612,6 @@ paths:
         in: path
         required: true
         type: string
-  /third_party_auth_context:
-    get:
-      operationId: third_party_auth_context_list
-      description: Returns the context for third party auth providers and the currently
-        running pipeline.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - third_party_auth_context
-    parameters: []
   /toggles/v0/state/:
     get:
       operationId: toggles_v0_state_list
@@ -4207,63 +4622,6 @@ paths:
           description: ''
       tags:
         - toggles
-    parameters: []
-  /user/v1/account/login_session/:
-    get:
-      operationId: user_v1_account_login_session_list
-      description: HTTP end-points for logging in users.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - user
-    post:
-      operationId: user_v1_account_login_session_create
-      summary: Log in a user.
-      description: "See `login_user` for details.\n\nExample Usage:\n\n    POST /api/user/v1/login_session\n\
-        \    with POST params `email`, `password`.\n\n    200 {'success': true}"
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - user
-    parameters: []
-  /user/v1/account/password_reset/:
-    get:
-      operationId: user_v1_account_password_reset_list
-      description: HTTP end-point for GETting a description of the password reset
-        form.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - user
-    parameters: []
-  /user/v1/account/registration/:
-    get:
-      operationId: user_v1_account_registration_list
-      description: HTTP end-points for creating a new user.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - user
-    post:
-      operationId: user_v1_account_registration_create
-      summary: Create the user's account.
-      description: "You must send all required form fields with the request.\n\nYou\
-        \ can optionally send a \"course_id\" param to indicate in analytics\nevents\
-        \ that the user registered while enrolling in a particular course."
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - user
     parameters: []
   /user/v1/accounts:
     get:
@@ -4567,51 +4925,6 @@ paths:
         in: path
         required: true
         type: string
-  /user/v1/forum_roles/{name}/users/:
-    get:
-      operationId: user_v1_forum_roles_users_list
-      description: Forum roles are represented by a list of user dicts
-      parameters:
-        - name: page
-          in: query
-          description: A page number within the paginated result set.
-          required: false
-          type: integer
-        - name: page_size
-          in: query
-          description: Number of results to return per page.
-          required: false
-          type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-              - count
-              - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/user_api.User'
-      tags:
-        - user
-    parameters:
-      - name: name
-        in: path
-        required: true
-        type: string
   /user/v1/me:
     get:
       operationId: user_v1_get
@@ -4625,90 +4938,6 @@ paths:
       tags:
         - user
     parameters: []
-  /user/v1/preferences/email_opt_in/:
-    post:
-      operationId: user_v1_preferences_email_opt_in_create
-      summary: Post function for updating the email opt in preference.
-      description: "Allows the modification or creation of the email opt in preference\
-        \ at an\norganizational level."
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - user
-    parameters: []
-  /user/v1/preferences/time_zones/:
-    get:
-      operationId: user_v1_preferences_time_zones_list
-      summary: '**Use Cases**'
-      description: "Retrieves a list of all time zones, by default, or common time\
-        \ zones for country, if given\n\n    The country is passed in as its ISO 3166-1\
-        \ Alpha-2 country code as an\n    optional 'country_code' argument. The country\
-        \ code is also case-insensitive.\n\n**Example Requests**\n\n    GET /api/user/v1/preferences/time_zones/\n\
-        \n    GET /api/user/v1/preferences/time_zones/?country_code=FR\n\n**Example\
-        \ GET Response**\n\n    If the request is successful, an HTTP 200 \"OK\" response\
-        \ is returned along with a\n    list of time zone dictionaries for all time\
-        \ zones or just for time zones commonly\n    used in a country, if given.\n\
-        \n    Each time zone dictionary contains the following values.\n\n       \
-        \ * time_zone: The name of the time zone.\n        * description: The display\
-        \ version of the time zone"
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/CountryTimeZone'
-      tags:
-        - user
-    parameters: []
-  /user/v1/preferences/{pref_key}/users/:
-    get:
-      operationId: user_v1_preferences_users_list
-      description: DRF class for listing a user's preferences
-      parameters:
-        - name: page
-          in: query
-          description: A page number within the paginated result set.
-          required: false
-          type: integer
-        - name: page_size
-          in: query
-          description: Number of results to return per page.
-          required: false
-          type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-              - count
-              - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/user_api.User'
-      tags:
-        - user
-    parameters:
-      - name: pref_key
-        in: path
-        required: true
-        type: string
   /user/v1/preferences/{username}:
     get:
       operationId: user_v1_preferences_read
@@ -4774,134 +5003,6 @@ paths:
         in: path
         required: true
         type: string
-  /user/v1/user_prefs/:
-    get:
-      operationId: user_v1_user_prefs_list
-      description: DRF class for interacting with the UserPreference ORM
-      parameters:
-        - name: key
-          in: query
-          description: ''
-          required: false
-          type: string
-        - name: user
-          in: query
-          description: ''
-          required: false
-          type: string
-        - name: page
-          in: query
-          description: A page number within the paginated result set.
-          required: false
-          type: integer
-        - name: page_size
-          in: query
-          description: Number of results to return per page.
-          required: false
-          type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-              - count
-              - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/UserPreference'
-      tags:
-        - user
-    parameters: []
-  /user/v1/user_prefs/{id}/:
-    get:
-      operationId: user_v1_user_prefs_read
-      description: DRF class for interacting with the UserPreference ORM
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/UserPreference'
-      tags:
-        - user
-    parameters:
-      - name: id
-        in: path
-        description: A unique integer value identifying this user preference.
-        required: true
-        type: integer
-  /user/v1/users/:
-    get:
-      operationId: user_v1_users_list
-      description: DRF class for interacting with the User ORM object
-      parameters:
-        - name: page
-          in: query
-          description: A page number within the paginated result set.
-          required: false
-          type: integer
-        - name: page_size
-          in: query
-          description: Number of results to return per page.
-          required: false
-          type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-              - count
-              - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/user_api.User'
-      tags:
-        - user
-    parameters: []
-  /user/v1/users/{id}/:
-    get:
-      operationId: user_v1_users_read
-      description: DRF class for interacting with the User ORM object
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/user_api.User'
-      tags:
-        - user
-    parameters:
-      - name: id
-        in: path
-        description: A unique integer value identifying this user.
-        required: true
-        type: integer
   /user/v1/validation/registration:
     post:
       operationId: user_v1_validation_registration_create
@@ -4913,29 +5014,6 @@ paths:
         \ name and the value is\nuser input. One may enter individual inputs if needed.\
         \ Some inputs\ncan get extra verification checks if entered along with others,\n\
         like when the password may not equal the username."
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - user
-    parameters: []
-  /user/v2/account/registration/:
-    get:
-      operationId: user_v2_account_registration_list
-      description: HTTP end-points for creating a new user.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - user
-    post:
-      operationId: user_v2_account_registration_create
-      summary: Create the user's account.
-      description: "You must send all required form fields with the request.\n\nYou\
-        \ can optionally send a \"course_id\" param to indicate in analytics\nevents\
-        \ that the user registered while enrolling in a particular course."
       parameters: []
       responses:
         '201':
@@ -5190,6 +5268,116 @@ paths:
         required: true
         type: string
 definitions:
+  BadgeClass:
+    title: Badge class
+    required:
+      - slug
+      - display_name
+      - description
+      - criteria
+    type: object
+    properties:
+      slug:
+        title: Slug
+        type: string
+        format: slug
+        pattern: ^[-a-zA-Z0-9_]+$
+        maxLength: 255
+        minLength: 1
+      issuing_component:
+        title: Issuing component
+        type: string
+        format: slug
+        pattern: ^[-a-zA-Z0-9_]+$
+        default: ''
+        maxLength: 50
+      display_name:
+        title: Display name
+        type: string
+        maxLength: 255
+        minLength: 1
+      course_id:
+        title: Course id
+        type: string
+        maxLength: 255
+      description:
+        title: Description
+        type: string
+        minLength: 1
+      criteria:
+        title: Criteria
+        type: string
+        minLength: 1
+      image_url:
+        title: Image url
+        type: string
+        readOnly: true
+        format: uri
+  BadgeAssertion:
+    required:
+      - image_url
+      - assertion_url
+    type: object
+    properties:
+      badge_class:
+        $ref: '#/definitions/BadgeClass'
+      image_url:
+        title: Image url
+        type: string
+        format: uri
+        maxLength: 200
+        minLength: 1
+      assertion_url:
+        title: Assertion url
+        type: string
+        format: uri
+        maxLength: 200
+        minLength: 1
+      created:
+        title: Created
+        type: string
+        format: date-time
+        readOnly: true
+  CCXCourse:
+    required:
+      - master_course_id
+      - display_name
+      - coach_email
+      - start
+      - due
+      - max_students_allowed
+    type: object
+    properties:
+      ccx_course_id:
+        title: Ccx course id
+        type: string
+        readOnly: true
+      master_course_id:
+        title: Master course id
+        type: string
+        minLength: 1
+      display_name:
+        title: Display name
+        type: string
+        minLength: 1
+      coach_email:
+        title: Coach email
+        type: string
+        format: email
+        minLength: 1
+      start:
+        title: Start
+        type: string
+      due:
+        title: Due
+        type: string
+      max_students_allowed:
+        title: Max students allowed
+        type: integer
+      course_modules:
+        title: Course modules
+        type: string
+        readOnly: true
   CohortUsersAPI:
     required:
       - username
@@ -6361,6 +6549,64 @@ definitions:
         type: string
         format: date-time
         readOnly: true
+  mobile_api.User:
+    required:
+      - username
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      username:
+        title: Username
+        description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+          only.
+        type: string
+        pattern: ^[\w.@+-]+$
+        maxLength: 150
+        minLength: 1
+      email:
+        title: Email address
+        type: string
+        format: email
+        maxLength: 254
+      name:
+        title: Name
+        type: string
+        readOnly: true
+      course_enrollments:
+        title: Course enrollments
+        type: string
+        readOnly: true
+  CourseEnrollment:
+    type: object
+    properties:
+      audit_access_expires:
+        title: Audit access expires
+        type: string
+        readOnly: true
+      created:
+        title: Created
+        type: string
+        format: date-time
+        readOnly: true
+      mode:
+        title: Mode
+        type: string
+        maxLength: 100
+        minLength: 1
+      is_active:
+        title: Is active
+        type: boolean
+      course:
+        title: Course
+        type: string
+        readOnly: true
+      certificate:
+        title: Certificate
+        type: string
+        readOnly: true
   Organization:
     required:
       - name
@@ -6576,77 +6822,6 @@ definitions:
         title: Updated at
         type: string
         format: date-time
-  user_api.User:
-    type: object
-    properties:
-      id:
-        title: ID
-        type: integer
-        readOnly: true
-      url:
-        title: Url
-        type: string
-        format: uri
-        readOnly: true
-      email:
-        title: Email address
-        type: string
-        format: email
-        readOnly: true
-        minLength: 1
-      name:
-        title: Name
-        type: string
-        readOnly: true
-      username:
-        title: Username
-        description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
-          only.
-        type: string
-        readOnly: true
-        minLength: 1
-      preferences:
-        title: Preferences
-        type: string
-        readOnly: true
-  CountryTimeZone:
-    required:
-      - time_zone
-      - description
-    type: object
-    properties:
-      time_zone:
-        title: Time zone
-        type: string
-        minLength: 1
-      description:
-        title: Description
-        type: string
-        minLength: 1
-  UserPreference:
-    required:
-      - user
-      - key
-      - value
-    type: object
-    properties:
-      user:
-        $ref: '#/definitions/user_api.User'
-      key:
-        title: Key
-        type: string
-        pattern: '[-_a-zA-Z0-9]+'
-        maxLength: 255
-        minLength: 1
-      value:
-        title: Value
-        type: string
-        minLength: 1
-      url:
-        title: Url
-        type: string
-        format: uri
-        readOnly: true
   EncodedVideo:
     required:
       - url

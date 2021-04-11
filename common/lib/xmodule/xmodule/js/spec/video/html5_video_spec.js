@@ -3,7 +3,7 @@
         var STATUS = window.STATUS;
         var state,
             oldOTBD,
-            playbackRates = [0.75, 1.0, 1.25, 1.5, 2.0],
+            playbackRates = [0.75, 1.0, 1.25, 1.5],
             describeInfo,
             POSTER_URL = '/media/video-images/poster.png';
 
@@ -280,14 +280,8 @@
                 });
 
                 describe('setPlaybackRate', function() {
-                    it('set a slow value', function() {
-                        playbackRate = 0.75;
-                        state.videoPlayer.player.setPlaybackRate(playbackRate);
-                        expect(state.videoPlayer.player.video.playbackRate).toBe(playbackRate);
-                    });
-
-                    it('set a fast value', function() {
-                        playbackRate = 2.0;
+                    it('set a correct value', function() {
+                        playbackRate = 1.5;
                         state.videoPlayer.player.setPlaybackRate(playbackRate);
                         expect(state.videoPlayer.player.video.playbackRate).toBe(playbackRate);
                     });

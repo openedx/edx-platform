@@ -60,7 +60,7 @@ def test_js(options):
         test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
         test_suite.run()
 
-    if (suite == 'jest-snapshot') or (suite == 'all'):  # lint-amnesty, pylint: disable=consider-using-in
+    if (suite == 'jest-snapshot') or (suite == 'all'):
         test_suite = JestSnapshotTestSuite('jest')
         test_suite.run()
 

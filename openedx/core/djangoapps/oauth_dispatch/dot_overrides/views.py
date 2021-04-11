@@ -36,7 +36,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                 oauth2_settings.REQUEST_APPROVAL_PROMPT,
             )
             if require_approval != 'auto_even_if_expired':
-                return super().get(request, *args, **kwargs)
+                return super(EdxOAuth2AuthorizationView, self).get(request, *args, **kwargs)
 
             scopes, credentials = self.validate_authorization_request(request)
             all_scopes = get_scopes_backend().get_all_scopes()
@@ -59,7 +59,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
             kwargs['response_type'] = credentials['response_type']
             kwargs['state'] = credentials['state']
 
-            self.oauth2_data = kwargs  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+            self.oauth2_data = kwargs
             # following two loc are here only because of https://code.djangoproject.com/ticket/17795
             form = self.get_form(self.get_form_class())
             kwargs['form'] = form
@@ -69,7 +69,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
             # This is useful for in-house applications-> assume an in-house applications
             # are already approved.
             if application.skip_authorization:
-                uri, headers, body, status = self.create_authorization_response(  # lint-amnesty, pylint: disable=unused-variable
+                uri, headers, body, status = self.create_authorization_response(
                     request=self.request, scopes=" ".join(scopes),
                     credentials=credentials, allow=True)
                 return OAuth2ResponseRedirect(uri, application.get_allowed_schemes())

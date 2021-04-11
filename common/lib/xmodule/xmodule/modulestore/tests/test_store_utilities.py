@@ -4,9 +4,9 @@ Tests for store_utilities.py
 
 
 import unittest
-from unittest.mock import Mock
 
 import ddt
+from mock import Mock
 
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 
@@ -81,4 +81,4 @@ class TestUtils(unittest.TestCase):
             module_nodes.append(draft_node_constructor(Mock(), node_args[0], node_args[1]))
         subtree_roots_urls = [root.url for root in get_draft_subtree_roots(module_nodes)]
         # check that we return the expected urls
-        assert set(subtree_roots_urls) == set(expected_roots_urls)
+        self.assertEqual(set(subtree_roots_urls), set(expected_roots_urls))

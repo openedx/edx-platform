@@ -1,12 +1,12 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import json
 import six
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from eventtracking import tracker as eventtracker
-from ipware.ip import get_client_ip
+from ipware.ip import get_ip
 
 from common.djangoapps.track import contexts, shim, tracker
 
@@ -22,7 +22,7 @@ def _get_request_header(request, header_name, default=''):
 def _get_request_ip(request, default=''):
     """Helper method to get IP from a request's META dict, if present."""
     if request is not None and hasattr(request, 'META'):
-        return get_client_ip(request)[0]
+        return get_ip(request)
     else:
         return default
 
@@ -73,7 +73,7 @@ def user_track(request):
     """
     try:
         username = request.user.username
-    except:  # lint-amnesty, pylint: disable=bare-except
+    except:
         username = "anonymous"
 
     name = _get_request_value(request, 'event_type')
@@ -109,7 +109,7 @@ def server_track(request, event_type, event, page=None):
 
     try:
         username = request.user.username
-    except:  # lint-amnesty, pylint: disable=bare-except
+    except:
         username = "anonymous"
 
     context_override = _get_course_context(page)

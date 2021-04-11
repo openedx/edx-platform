@@ -4,9 +4,8 @@ Tests for Paver's Stylelint tasks.
 
 
 import unittest
-from unittest.mock import patch
 
-import pytest
+from mock import patch
 from paver.easy import BuildFailure, call_task
 
 import pavelib.quality
@@ -40,7 +39,7 @@ class TestPaverESLint(unittest.TestCase):
         run_eslint encounters an error parsing the eslint output log
         """
         mock_count.return_value = None
-        with pytest.raises(BuildFailure):
+        with self.assertRaises(BuildFailure):
             call_task('pavelib.quality.run_eslint', args=[''])
 
     @patch.object(pavelib.quality, '_write_metric')

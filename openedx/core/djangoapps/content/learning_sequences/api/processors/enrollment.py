@@ -31,7 +31,7 @@ class EnrollmentOutlineProcessor(OutlineProcessor):
 
         # Otherwise remove everything:
         seqs_to_remove = set(full_course_outline.sequences)
-        sections_to_remove = {sec.usage_key for sec in full_course_outline.sections}
+        sections_to_remove = set(sec.usage_key for sec in full_course_outline.sections)
 
         return frozenset(seqs_to_remove | sections_to_remove)
 

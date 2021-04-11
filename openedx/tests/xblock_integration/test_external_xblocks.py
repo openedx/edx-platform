@@ -22,7 +22,7 @@ class DuplicateXBlockTest(Exception):
     effect deployed XBlocks. See discussion at:
       https://github.com/edx/edx-platform/pull/11032#discussion_r48097392).
     '''
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class InvalidTestName(Exception):
@@ -33,7 +33,7 @@ class InvalidTestName(Exception):
     `DoneXBlock` instead of `TestDone`), or otherwise made an error, you
     will see this exception.
     '''
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 xblock_loaded = False  # pylint: disable=invalid-name
 

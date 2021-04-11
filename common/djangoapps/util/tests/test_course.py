@@ -1,9 +1,10 @@
 """
 Tests for course utils.
 """
-from unittest import mock
+
 
 import ddt
+import mock
 from django.conf import settings
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -19,7 +20,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
     Tests for course sharing links.
     """
     def setUp(self):
-        super().setUp()
+        super(TestCourseSharingLinks, self).setUp()
 
         # create test mongo course
         self.course = CourseFactory.create(
@@ -69,7 +70,7 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         (True, True, 'test_social_sharing_url'),
         (False, True, 'test_marketing_url'),
         (True, False, 'test_social_sharing_url'),
-        (False, False, f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'),
+        (False, False, '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)),
     )
     @ddt.unpack
     def test_sharing_link_with_settings(self, enable_social_sharing, enable_mktg_site, expected_course_sharing_link):
@@ -80,14 +81,14 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_social_sharing=enable_social_sharing,
             enable_mktg_site=enable_mktg_site,
         )
-        assert actual_course_sharing_link == expected_course_sharing_link
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
 
     @ddt.data(
         (['social_sharing_url'], 'test_marketing_url'),
         (['marketing_url'], 'test_social_sharing_url'),
         (
             ['social_sharing_url', 'marketing_url'],
-            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
         ),
     )
     @ddt.unpack
@@ -105,13 +106,13 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_social_sharing=True,
             enable_mktg_site=True,
         )
-        assert actual_course_sharing_link == expected_course_sharing_link
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)
 
     @ddt.data(
         (True, 'test_social_sharing_url'),
         (
             False,
-            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
+            '{}/courses/course-v1:test_org+test_number+test_run/about'.format(settings.LMS_ROOT_URL)
         ),
     )
     @ddt.unpack
@@ -125,4 +126,4 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
             enable_mktg_site=True,
             use_overview=False,
         )
-        assert actual_course_sharing_link == expected_course_sharing_link
+        self.assertEqual(actual_course_sharing_link, expected_course_sharing_link)

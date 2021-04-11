@@ -10,7 +10,7 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from ipware.ip import get_client_ip
+from ipware.ip import get_ip
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -84,9 +84,9 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
         if not CountryAccessRule.check_country_access(course_key, user_country_from_ip):
             log.info(
                 (
-                    "Blocking user %s from accessing course %s at %s "
-                    "because the user's IP address %s appears to be "
-                    "located in %s."
+                    u"Blocking user %s from accessing course %s at %s "
+                    u"because the user's IP address %s appears to be "
+                    u"located in %s."
                 ),
                 getattr(user, 'id', '<Not Authenticated>'),
                 course_key,
@@ -104,8 +104,8 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
         if not CountryAccessRule.check_country_access(course_key, user_country_from_profile):
             log.info(
                 (
-                    "Blocking user %s from accessing course %s at %s "
-                    "because the user's profile country is %s."
+                    u"Blocking user %s from accessing course %s at %s "
+                    u"because the user's profile country is %s."
                 ),
                 user.id, course_key, url, user_country_from_profile
             )
@@ -146,7 +146,7 @@ def _get_user_country_from_profile(user):
         user country from profile.
 
     """
-    cache_key = f'user.{user.id}.profile.country'
+    cache_key = u'user.{user_id}.profile.country'.format(user_id=user.id)
     profile_country = cache.get(cache_key)
     if profile_country is None:
         profile = getattr(user, 'profile', None)
@@ -197,13 +197,13 @@ def get_embargo_response(request, course_id, user):
 
     """
     redirect_url = redirect_if_blocked(
-        course_id, user=user, ip_address=get_client_ip(request)[0], url=request.path)
+        course_id, user=user, ip_address=get_ip(request), url=request.path)
     if redirect_url:
         return Response(
             status=status.HTTP_403_FORBIDDEN,
             data={
                 "message": (
-                    "Users from this location cannot access the course '{course_id}'."
+                    u"Users from this location cannot access the course '{course_id}'."
                 ).format(course_id=course_id),
                 "user_message_url": request.build_absolute_uri(redirect_url)
             }

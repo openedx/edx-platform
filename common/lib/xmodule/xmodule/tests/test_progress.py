@@ -2,8 +2,8 @@
 
 
 import unittest
-from unittest.mock import Mock
 
+from mock import Mock
 from xblock.field_data import DictFieldData
 
 from xmodule import x_module
@@ -41,50 +41,50 @@ class ProgressTest(unittest.TestCase):
         self.assertRaises(TypeError, Progress, 2j, 3)
 
     def test_clamp(self):
-        assert (2, 2) == Progress(3, 2).frac()
-        assert (0, 2) == Progress((- 2), 2).frac()
+        self.assertEqual((2, 2), Progress(3, 2).frac())
+        self.assertEqual((0, 2), Progress(-2, 2).frac())
 
     def test_frac(self):
         prg = Progress(1, 2)
         (a_mem, b_mem) = prg.frac()
-        assert a_mem == 1
-        assert b_mem == 2
+        self.assertEqual(a_mem, 1)
+        self.assertEqual(b_mem, 2)
 
     def test_percent(self):
-        assert self.not_started.percent() == 0
-        assert round(self.part_done.percent() - 33.33333333333333, 7) >= 0
-        assert self.half_done.percent() == 50
-        assert self.done.percent() == 100
+        self.assertEqual(self.not_started.percent(), 0)
+        self.assertAlmostEqual(self.part_done.percent(), 33.33333333333333)
+        self.assertEqual(self.half_done.percent(), 50)
+        self.assertEqual(self.done.percent(), 100)
 
-        assert self.half_done.percent() == self.also_half_done.percent()
+        self.assertEqual(self.half_done.percent(), self.also_half_done.percent())
 
     def test_started(self):
-        assert not self.not_started.started()
+        self.assertFalse(self.not_started.started())
 
-        assert self.part_done.started()
-        assert self.half_done.started()
-        assert self.done.started()
+        self.assertTrue(self.part_done.started())
+        self.assertTrue(self.half_done.started())
+        self.assertTrue(self.done.started())
 
     def test_inprogress(self):
         # only true if working on it
-        assert not self.done.inprogress()
-        assert not self.not_started.inprogress()
+        self.assertFalse(self.done.inprogress())
+        self.assertFalse(self.not_started.inprogress())
 
-        assert self.part_done.inprogress()
-        assert self.half_done.inprogress()
+        self.assertTrue(self.part_done.inprogress())
+        self.assertTrue(self.half_done.inprogress())
 
     def test_done(self):
-        assert self.done.done()
-        assert not self.half_done.done()
-        assert not self.not_started.done()
+        self.assertTrue(self.done.done())
+        self.assertFalse(self.half_done.done())
+        self.assertFalse(self.not_started.done())
 
     def test_str(self):
-        assert str(self.not_started) == '0/17'
-        assert str(self.part_done) == '2/6'
-        assert str(self.done) == '7/7'
-        assert str(Progress(2.1234, 7)) == '2.12/7'
-        assert str(Progress(2.0034, 7)) == '2/7'
-        assert str(Progress(0.999, 7)) == '1/7'
+        self.assertEqual(str(self.not_started), "0/17")
+        self.assertEqual(str(self.part_done), "2/6")
+        self.assertEqual(str(self.done), "7/7")
+        self.assertEqual(str(Progress(2.1234, 7)), '2.12/7')
+        self.assertEqual(str(Progress(2.0034, 7)), '2/7')
+        self.assertEqual(str(Progress(0.999, 7)), '1/7')
 
     def test_add(self):
         '''Test the Progress.add_counts() method'''
@@ -94,12 +94,12 @@ class ProgressTest(unittest.TestCase):
         prg_none = None
         add = lambda a, b: Progress.add_counts(a, b).frac()
 
-        assert add(prg1, prg1) == (0, 4)
-        assert add(prg1, prg2) == (1, 5)
-        assert add(prg2, prg3) == (3, 8)
+        self.assertEqual(add(prg1, prg1), (0, 4))
+        self.assertEqual(add(prg1, prg2), (1, 5))
+        self.assertEqual(add(prg2, prg3), (3, 8))
 
-        assert add(prg2, prg_none) == prg2.frac()
-        assert add(prg_none, prg2) == prg2.frac()
+        self.assertEqual(add(prg2, prg_none), prg2.frac())
+        self.assertEqual(add(prg_none, prg2), prg2.frac())
 
     def test_equality(self):
         '''Test that comparing Progress objects for equality
@@ -107,12 +107,12 @@ class ProgressTest(unittest.TestCase):
         prg1 = Progress(1, 2)
         prg2 = Progress(2, 4)
         prg3 = Progress(1, 2)
-        assert prg1 == prg3
-        assert prg1 != prg2
+        self.assertEqual(prg1, prg3)
+        self.assertNotEqual(prg1, prg2)
 
         # Check != while we're at it
-        assert prg1 != prg2
-        assert prg1 == prg3
+        self.assertNotEqual(prg1, prg2)
+        self.assertEqual(prg1, prg3)
 
 
 class ModuleProgressTest(unittest.TestCase):
@@ -122,5 +122,5 @@ class ModuleProgressTest(unittest.TestCase):
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
         xmod = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
-        prg = xmod.get_progress()  # lint-amnesty, pylint: disable=assignment-from-none
-        assert prg is None
+        prg = xmod.get_progress()
+        self.assertEqual(prg, None)

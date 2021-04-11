@@ -8,12 +8,15 @@ import json
 from collections import OrderedDict
 from datetime import timedelta
 
+import six
 from django.contrib import messages
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
 from django.utils.timezone import now
+from six import text_type
+from six.moves import range
 from xblock.field_data import DictFieldData
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
@@ -24,9 +27,10 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.course_duration_limits.access import EXPIRATION_DATE_FORMAT_STR
 from common.djangoapps.student.models import CourseEnrollment, Registration
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.date_utils import strftime_localized_html
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -74,7 +78,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         runtime.get_block = modulestore().get_item
         return runtime
 
-    def initialize_module(self, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def initialize_module(self, **kwargs):
         kwargs.update({
             'parent_location': self.section.location,
             'category': self.CATEGORY
@@ -87,13 +91,13 @@ class BaseTestXmodule(ModuleStoreTestCase):
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
 
-        self.item_url = str(self.item_descriptor.location)
+        self.item_url = six.text_type(self.item_descriptor.location)
 
-    def setup_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
@@ -126,10 +130,10 @@ class BaseTestXmodule(ModuleStoreTestCase):
             for user in self.users
         ]
 
-        assert all(self.login_statuses)
+        self.assertTrue(all(self.login_statuses))
 
     def setUp(self):
-        super().setUp()
+        super(BaseTestXmodule, self).setUp()
         self.setup_course()
         self.initialize_module(metadata=self.METADATA, data=self.DATA)
 
@@ -137,17 +141,17 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """Return item url with dispatch."""
         return reverse(
             'xblock_handler',
-            args=(str(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
+            args=(six.text_type(self.course.id), quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
-class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
+class XModuleRenderingTestBase(BaseTestXmodule):
 
     def new_module_runtime(self):
         """
         Create a runtime that actually does html rendering
         """
-        runtime = super().new_module_runtime()
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
         runtime.render_template = render_to_string
         return runtime
 
@@ -163,9 +167,9 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Create a user account, activate, and log in.
         """
-        self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.password = 'bar'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.email = 'foo@test.com'
+        self.password = 'bar'
+        self.username = 'test'
         self.user = self.create_account(
             self.username,
             self.email,
@@ -182,16 +186,23 @@ class LoginEnrollmentTestCase(TestCase):
         """
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
-        assert response.status_code == status_code, f'{method} request to {url} returned status code {response.status_code}, expected status code {status_code}'  # pylint: disable=line-too-long
+        self.assertEqual(
+            response.status_code, status_code,
+            u"{method} request to {url} returned status code {actual}, "
+            u"expected status code {expected}".format(
+                method=method, url=url,
+                actual=response.status_code, expected=status_code
+            )
+        )
         return response
 
-    def assert_account_activated(self, url, method="GET", **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def assert_account_activated(self, url, method="GET", **kwargs):
         make_request = getattr(self.client, method.lower())
         response = make_request(url, **kwargs)
         message_list = list(messages.get_messages(response.wsgi_request))
-        assert len(message_list) == 1
-        assert 'success' in message_list[0].tags
-        assert 'You have activated your account.' in message_list[0].message
+        self.assertEqual(len(message_list), 1)
+        self.assertIn("success", message_list[0].tags)
+        self.assertIn("You have activated your account.", message_list[0].message)
 
     # ============ User creation and login ==============
 
@@ -201,7 +212,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         resp = self.client.post(reverse('user_api_login_session'),
                                 {'email': email, 'password': password})
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
     def logout(self):
         """
@@ -226,7 +237,7 @@ class LoginEnrollmentTestCase(TestCase):
         self.assert_request_status_code(200, url, method="POST", data=request_data)
         # Check both that the user is created, and inactive
         user = User.objects.get(email=email)
-        assert not user.is_active
+        self.assertFalse(user.is_active)
         return user
 
     def activate_user(self, email):
@@ -240,37 +251,37 @@ class LoginEnrollmentTestCase(TestCase):
         self.assert_account_activated(url)
         # Now make sure that the user is now actually activated
         user = User.objects.get(email=email)
-        assert user.is_active
+        self.assertTrue(user.is_active)
         # And return the user we fetched.
         return user
 
     def enroll(self, course, verify=False):
         """
         Try to enroll and return boolean indicating result.
-        `course` is an instance of CourseBlock.
+        `course` is an instance of CourseDescriptor.
         `verify` is an optional boolean parameter specifying whether we
         want to verify that the student was successfully enrolled
         in the course.
         """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
-            'course_id': str(course.id),
+            'course_id': text_type(course.id),
             'check_access': True,
         })
         result = resp.status_code == 200
         if verify:
-            assert result
+            self.assertTrue(result)
         return result
 
     def unenroll(self, course):
         """
         Unenroll the currently logged-in user, and check that it worked.
-        `course` is an instance of CourseBlock.
+        `course` is an instance of CourseDescriptor.
         """
         url = reverse('change_enrollment')
         request_data = {
             'enrollment_action': 'unenroll',
-            'course_id': str(course.id),
+            'course_id': text_type(course.id),
         }
         self.assert_request_status_code(200, url, method="POST", data=request_data)
 
@@ -291,10 +302,10 @@ class CourseAccessTestMixin(TestCase):
         Arguments:
             user (User): a user.
             action (str): type of access to test.
-            course (CourseBlock): a course.
+            course (CourseDescriptor): a course.
         """
-        assert has_access(user, action, course)
-        assert has_access(user, action, CourseOverview.get_from_id(course.id))
+        self.assertTrue(has_access(user, action, course))
+        self.assertTrue(has_access(user, action, CourseOverview.get_from_id(course.id)))
 
     def assertCannotAccessCourse(self, user, action, course):
         """
@@ -306,7 +317,7 @@ class CourseAccessTestMixin(TestCase):
         Arguments:
             user (User): a user.
             action (str): type of access to test.
-            course (CourseBlock): a course.
+            course (CourseDescriptor): a course.
 
         Note:
             It may seem redundant to have one method for testing access
@@ -314,8 +325,8 @@ class CourseAccessTestMixin(TestCase):
             them into one method with a boolean flag?), but it makes reading
             stack traces of failed tests easier to understand at a glance.
         """
-        assert not has_access(user, action, course)
-        assert not has_access(user, action, CourseOverview.get_from_id(course.id))
+        self.assertFalse(has_access(user, action, course))
+        self.assertFalse(has_access(user, action, CourseOverview.get_from_id(course.id)))
 
 
 class MasqueradeMixin:
@@ -359,8 +370,8 @@ class MasqueradeMixin:
             }),
             'application/json'
         )
-        assert response.status_code == 200
-        assert response.json()['success'], response.json().get('error')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'], response.json().get('error'))
         return response
 
 
@@ -372,7 +383,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
 
     Arguments:
         user (User): a user.
-        course (CourseBlock): a course.
+        course (CourseDescriptor): a course.
         partition_id (int): the integer partition id, referring to partitions already
            configured in the course.
         group_id (int); the integer group id, within the specified partition.
@@ -384,7 +395,7 @@ def masquerade_as_group_member(user, course, partition_id, group_id):
         user,
         data={"role": "student", "user_partition_id": partition_id, "group_id": group_id}
     )
-    response = MasqueradeView.as_view()(request, str(course.id))
+    response = MasqueradeView.as_view()(request, six.text_type(course.id))
     setup_masquerade(request, course.id, True)
     return response.status_code
 
@@ -400,23 +411,33 @@ def _create_mock_json_request(user, data, method='POST'):
     return request
 
 
-def get_expiration_banner_text(user, course, language='en'):  # lint-amnesty, pylint: disable=unused-argument
+def get_expiration_banner_text(user, course, language='en'):
     """
     Get text for banner that messages user course expiration date
     for different tests that depend on it.
     """
+    expiration_date = now() + timedelta(weeks=4)
     upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
-    expiration_date = enrollment.created + timedelta(weeks=4)
     upgrade_deadline = enrollment.upgrade_deadline
     if upgrade_deadline is None or now() < upgrade_deadline:
         upgrade_deadline = enrollment.course_upgrade_deadline
 
-    formatted_expiration_date = strftime_localized_html(expiration_date, 'SHORT_DATE')
+    date_string = u'<span class="localized-datetime" data-format="shortDate" \
+        data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
+    formatted_expiration_date = date_string.format(
+        language=language,
+        formatted_date=expiration_date.strftime("%Y-%m-%d"),
+        formatted_date_localized=strftime_localized(expiration_date, EXPIRATION_DATE_FORMAT_STR)
+    )
     if upgrade_deadline:
-        formatted_upgrade_deadline = strftime_localized_html(upgrade_deadline, 'SHORT_DATE')
+        formatted_upgrade_deadline = date_string.format(
+            language=language,
+            formatted_date=upgrade_deadline.strftime("%Y-%m-%d"),
+            formatted_date_localized=strftime_localized(upgrade_deadline, EXPIRATION_DATE_FORMAT_STR)
+        )
 
-        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      <br>Upgrade by {upgrade_deadline} to get unlimited access to the course as long as it exists\
                      on the site. <a id="FBE_banner" href="{upgrade_link}">Upgrade now<span class="sr-only"> to retain access past\
@@ -426,7 +447,7 @@ def get_expiration_banner_text(user, course, language='en'):  # lint-amnesty, py
             upgrade_deadline=formatted_upgrade_deadline
         )
     else:
-        bannerText = '<strong>Audit Access Expires {expiration_date}</strong><br>\
+        bannerText = u'<strong>Audit Access Expires {expiration_date}</strong><br>\
                      You lose all access to this course, including your progress, on {expiration_date}.\
                      '.format(
             expiration_date=formatted_expiration_date

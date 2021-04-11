@@ -20,8 +20,8 @@ class CoursewarePage(CoursePage):
     section_selector = '.chapter'
     subsection_selector = '.chapter-content-container a'
 
-    def __init__(self, browser, course_id):  # lint-amnesty, pylint: disable=useless-super-delegation
-        super().__init__(browser, course_id)
+    def __init__(self, browser, course_id):
+        super(CoursewarePage, self).__init__(browser, course_id)
         # self.nav = CourseNavPage(browser, self)
 
     def is_browser_on_page(self):
@@ -45,7 +45,7 @@ class CoursewarePage(CoursePage):
             except IndexError:
                 return False
 
-        sequential_position_css = '#sequence-list #tab_{}'.format(sequential_position - 1)
+        sequential_position_css = u'#sequence-list #tab_{0}'.format(sequential_position - 1)
         self.q(css=sequential_position_css).first.click()
         EmptyPromise(is_at_new_position, "Position navigation fulfilled").fulfill()
 
@@ -74,6 +74,6 @@ class CoursewarePage(CoursePage):
                 return False
 
         self.q(
-            css=f'.{top_or_bottom_class} > .sequence-nav-button.{next_or_previous_class}'
+            css=u'.{} > .sequence-nav-button.{}'.format(top_or_bottom_class, next_or_previous_class)
         ).first.click()
         EmptyPromise(is_at_new_tab_id, "Button navigation fulfilled").fulfill()

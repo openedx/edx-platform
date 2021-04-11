@@ -5,8 +5,8 @@ This test file will test registration, login, activation, and session activity t
 
 import datetime
 import time
-from unittest import mock
 
+import mock
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.core.cache import cache
@@ -91,7 +91,7 @@ class AuthTestCase(ContentStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super().setUp()
+        super(AuthTestCase, self).setUp()
 
         self.email = 'a@b.com'
         self.pw = 'xyz'
@@ -127,7 +127,7 @@ class AuthTestCase(ContentStoreTestCase):
         # Not logged in.  Should redirect to login.
         print('Not logged in')
         for page in auth_pages:
-            print(f"Checking '{page}'")
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=302)
 
         # Logged in should work.
@@ -135,7 +135,7 @@ class AuthTestCase(ContentStoreTestCase):
 
         print('Logged in')
         for page in simple_auth_pages:
-            print(f"Checking '{page}'")
+            print(u"Checking '{0}'".format(page))
             self.check_page_get(page, expected=200)
 
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
@@ -176,7 +176,7 @@ class AuthTestCase(ContentStoreTestCase):
             assertion_method = getattr(self, assertion_method_name)
             assertion_method(
                 response,
-                '<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format
+                u'<a class="action action-signup" href="{}/register?next=http%3A%2F%2Ftestserver%2F">Sign Up</a>'.format
                 (settings.LMS_ROOT_URL)
             )
             self.assertContains(
@@ -191,7 +191,7 @@ class ForumTestCase(CourseTestCase):
 
     def setUp(self):
         """ Creates the test course. """
-        super().setUp()
+        super(ForumTestCase, self).setUp()
         self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
 
     def set_blackout_dates(self, blackout_dates):
@@ -242,7 +242,7 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         """
         Create test course.
         """
-        super().setUp()
+        super(CourseKeyVerificationTestCase, self).setUp()
         self.course = CourseFactory.create(org='edX', number='test_course_key', display_name='Test Course')
 
     @data(('edX/test_course_key/Test_Course', 200), ('garbage:edX+test_course_key+Test_Course', 404))
@@ -251,7 +251,7 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         """
         Tests for the ensure_valid_course_key decorator.
         """
-        url = f'/import/{course_key}'
+        url = '/import/{course_key}'.format(course_key=course_key)
         resp = self.client.get_html(url)
         self.assertEqual(resp.status_code, status_code)
 

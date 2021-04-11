@@ -4,6 +4,7 @@
 import logging
 
 import edx_api_doc_tools as apidocs
+import six
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -16,12 +17,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from lms.djangoapps.certificates.api import get_certificate_for_user, get_certificates_for_user
-from lms.djangoapps.certificates.apis.v0.permissions import IsOwnerOrPublicCertificates
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts.api import visible_fields
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
+from .permissions import IsOwnerOrPublicCertificates
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -107,7 +109,7 @@ class CertificatesDetailView(APIView):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            log.warning('Course ID string "%s" is not valid', course_id)
+            log.warning(u'Course ID string "%s" is not valid', course_id)
             return Response(
                 status=404,
                 data={'error_code': 'course_id_not_valid'}
@@ -131,7 +133,7 @@ class CertificatesDetailView(APIView):
         return Response(
             {
                 "username": user_cert.get('username'),
-                "course_id": str(user_cert.get('course_key')),
+                "course_id": six.text_type(user_cert.get('course_key')),
                 "certificate_type": user_cert.get('type'),
                 "created_date": user_cert.get('created'),
                 "status": user_cert.get('status'),
@@ -158,7 +160,7 @@ class CertificatesListView(APIView):
                 permissions.JwtHasUserFilterForRequestedUser
             )
         ),
-        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),  # pylint: disable=unsupported-binary-operation
+        (C(permissions.IsStaff) | IsOwnerOrPublicCertificates),
     )
 
     required_scopes = ['certificates:read']
@@ -227,7 +229,7 @@ class CertificatesListView(APIView):
             for user_cert in self._get_certificates_for_user(username):
                 user_certs.append({
                     'username': user_cert.get('username'),
-                    'course_id': str(user_cert.get('course_key')),
+                    'course_id': six.text_type(user_cert.get('course_key')),
                     'course_display_name': user_cert.get('course_display_name'),
                     'course_organization': user_cert.get('course_organization'),
                     'certificate_type': user_cert.get('type'),

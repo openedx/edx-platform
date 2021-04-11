@@ -57,7 +57,7 @@ class CourseWikiSubviewPage(CoursePage):  # pylint: disable=abstract-method
         Course ID is currently of the form "edx/999/2013_Spring"
         but this format could change.
         """
-        super().__init__(browser, course_id)
+        super(CourseWikiSubviewPage, self).__init__(browser, course_id)
         self.course_id = course_id
         self.course_info = course_info
         self.article_name = "{org}.{course_number}.{course_run}".format(

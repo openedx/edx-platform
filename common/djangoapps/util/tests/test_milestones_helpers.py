@@ -1,15 +1,17 @@
 """
 Tests for the milestones helpers library, which is the integration point for the edx_milestones API
 """
-from unittest.mock import patch
+
 
 import ddt
 import pytest
+import six
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidCourseKeyException, InvalidUserException
 from milestones.models import MilestoneRelationshipType
+from mock import patch
 
 from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,7 +31,7 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         """
         Test case scaffolding
         """
-        super().setUp()
+        super(MilestonesHelpersTestCase, self).setUp()
         self.course = CourseFactory.create(
             metadata={
                 'entrance_exam_enabled': True,
@@ -63,65 +65,65 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
             'ENABLE_PREREQUISITE_COURSES': feature_flags[0],
             'MILESTONES_APP': feature_flags[1]
         }):
-            assert feature_flags[2] == milestones_helpers.is_prerequisite_courses_enabled()
+            self.assertEqual(feature_flags[2], milestones_helpers.is_prerequisite_courses_enabled())
 
     def test_add_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_milestone(milestone_data=self.milestone)
-        assert response is None
+        self.assertIsNone(response)
 
     def test_get_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_milestones(namespace="whatever")
-        assert len(response) == 0
+        self.assertEqual(len(response), 0)
 
     def test_get_milestone_relationship_types_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_milestone_relationship_types()
-        assert len(response) == 0
+        self.assertEqual(len(response), 0)
 
     def test_add_course_milestone_returns_none_when_app_disabled(self):
-        response = milestones_helpers.add_course_milestone(str(self.course.id), 'requires', self.milestone)
-        assert response is None
+        response = milestones_helpers.add_course_milestone(six.text_type(self.course.id), 'requires', self.milestone)
+        self.assertIsNone(response)
 
     def test_get_course_milestones_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones(str(self.course.id))
-        assert len(response) == 0
+        response = milestones_helpers.get_course_milestones(six.text_type(self.course.id))
+        self.assertEqual(len(response), 0)
 
     def test_add_course_content_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_course_content_milestone(
-            str(self.course.id),
+            six.text_type(self.course.id),
             'i4x://any/content/id',
             'requires',
             self.milestone
         )
-        assert response is None
+        self.assertIsNone(response)
 
     def test_get_course_content_milestones_returns_none_when_app_disabled(self):
         response = milestones_helpers.get_course_content_milestones(
-            str(self.course.id),
+            six.text_type(self.course.id),
             'i4x://doesnt/matter/for/this/test',
             'requires'
         )
-        assert len(response) == 0
+        self.assertEqual(len(response), 0)
 
     def test_remove_content_references_returns_none_when_app_disabled(self):
         response = milestones_helpers.remove_content_references("i4x://any/content/id/will/do")
-        assert response is None
+        self.assertIsNone(response)
 
     def test_get_namespace_choices_returns_values_when_app_disabled(self):
         response = milestones_helpers.get_namespace_choices()
-        assert 'ENTRANCE_EXAM' in response
+        self.assertIn('ENTRANCE_EXAM', response)
 
     def test_get_course_milestones_fulfillment_paths_returns_none_when_app_disabled(self):
-        response = milestones_helpers.get_course_milestones_fulfillment_paths(str(self.course.id), self.user)
-        assert response is None
+        response = milestones_helpers.get_course_milestones_fulfillment_paths(six.text_type(self.course.id), self.user)
+        self.assertIsNone(response)
 
     def test_add_user_milestone_returns_none_when_app_disabled(self):
         response = milestones_helpers.add_user_milestone(self.user, self.milestone)
-        assert response is None
+        self.assertIsNone(response)
 
     def test_get_service_returns_none_when_app_disabled(self):
         """MilestonesService is None when app disabled"""
         response = milestones_helpers.get_service()
-        assert response is None
+        self.assertIsNone(response)
 
     @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})
     def test_any_unfulfilled_milestones(self):
@@ -132,9 +134,9 @@ class MilestonesHelpersTestCase(ModuleStoreTestCase):
         # Should not raise any exceptions
         milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user['id'])
 
-        with pytest.raises(InvalidCourseKeyException):
+        with self.assertRaises(InvalidCourseKeyException):
             milestones_helpers.any_unfulfilled_milestones(None, self.user['id'])
-        with pytest.raises(InvalidUserException):
+        with self.assertRaises(InvalidUserException):
             milestones_helpers.any_unfulfilled_milestones(self.course.id, None)
 
     @patch.dict(settings.FEATURES, {'MILESTONES_APP': True})

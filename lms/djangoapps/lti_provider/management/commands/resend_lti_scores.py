@@ -5,6 +5,7 @@ Management command to resend all lti scores for the requested course.
 
 import textwrap
 
+import six
 from django.core.management import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 
@@ -28,11 +29,11 @@ class Command(BaseCommand):
     help = textwrap.dedent(__doc__)
 
     def add_arguments(self, parser):
-        parser.add_argument('course_keys', type=CourseKey.from_string, nargs='*')
+        parser.add_argument(u'course_keys', type=CourseKey.from_string, nargs='*')
 
     def handle(self, *args, **options):
-        if options['course_keys']:
-            for course_key in options['course_keys']:
+        if options[u'course_keys']:
+            for course_key in options[u'course_keys']:
                 for assignment in self._iter_course_assignments(course_key):
                     self._send_score(assignment)
         else:
@@ -45,7 +46,7 @@ class Command(BaseCommand):
         """
         tasks.send_composite_outcome.delay(
             assignment.user_id,
-            str(assignment.course_key),
+            six.text_type(assignment.course_key),
             assignment.id,
             assignment.version_number,
         )

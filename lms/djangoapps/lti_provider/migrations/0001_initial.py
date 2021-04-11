@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from openedx.core.lib.hash_utils import create_hash256, short_token
 
 from django.conf import settings
@@ -61,10 +63,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='ltiuser',
-            unique_together={('lti_consumer', 'lti_user_id')},
+            unique_together=set([('lti_consumer', 'lti_user_id')]),
         ),
         migrations.AlterUniqueTogether(
             name='gradedassignment',
-            unique_together={('outcome_service', 'lis_result_sourcedid')},
+            unique_together=set([('outcome_service', 'lis_result_sourcedid')]),
         ),
     ]

@@ -4,7 +4,7 @@
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 
 
-class ProgramsApiConfigMixin:
+class ProgramsApiConfigMixin(object):
     """Utilities for working with Programs configuration during testing."""
 
     DEFAULTS = {

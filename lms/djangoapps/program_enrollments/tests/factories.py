@@ -9,13 +9,13 @@ import factory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.program_enrollments import models
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ProgramEnrollmentFactory(DjangoModelFactory):
     """ A Factory for the ProgramEnrollment model. """
-    class Meta:
+    class Meta(object):
         model = models.ProgramEnrollment
 
     user = factory.SubFactory(UserFactory)
@@ -32,7 +32,7 @@ PROGRAM_COURSE_ENROLLMENT_DEFAULT_COURSE_KEY = (
 
 class ProgramCourseEnrollmentFactory(DjangoModelFactory):
     """ A factory for the ProgramCourseEnrollment model. """
-    class Meta:
+    class Meta(object):
         model = models.ProgramCourseEnrollment
 
     program_enrollment = factory.SubFactory(ProgramEnrollmentFactory)
@@ -49,7 +49,7 @@ class ProgramCourseEnrollmentFactory(DjangoModelFactory):
 
 class CourseAccessRoleAssignmentFactory(DjangoModelFactory):
     """ A factory for the CourseAccessRoleAssignment model. """
-    class Meta:
+    class Meta(object):
         model = models.CourseAccessRoleAssignment
 
     enrollment = factory.SubFactory(ProgramCourseEnrollmentFactory)

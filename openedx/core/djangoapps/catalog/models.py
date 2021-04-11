@@ -46,7 +46,7 @@ class CatalogIntegration(ConfigurationModel):
 
     service_username = models.CharField(
         max_length=100,
-        default='lms_catalog_service_user',
+        default=u'lms_catalog_service_user',
         null=False,
         blank=False,
         help_text=_(

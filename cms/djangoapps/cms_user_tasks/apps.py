@@ -11,7 +11,7 @@ class CmsUserTasksConfig(AppConfig):
     """
     Application Configuration for cms_user_tasks.
     """
-    name = 'cms.djangoapps.cms_user_tasks'
+    name = u'cms.djangoapps.cms_user_tasks'
 
     def ready(self):
         """

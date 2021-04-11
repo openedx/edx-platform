@@ -14,11 +14,11 @@ from common.djangoapps.student.tests.factories import UserFactory
 
 
 class ApplicationFactory(DjangoModelFactory):
-    class Meta:
+    class Meta(object):
         model = Application
 
     user = factory.SubFactory(UserFactory)
-    client_id = factory.Sequence('client_{}'.format)
+    client_id = factory.Sequence(u'client_{0}'.format)
     client_secret = 'some_secret'
     client_type = 'confidential'
     authorization_grant_type = Application.CLIENT_CONFIDENTIAL
@@ -26,7 +26,7 @@ class ApplicationFactory(DjangoModelFactory):
 
 
 class ApplicationAccessFactory(DjangoModelFactory):
-    class Meta:
+    class Meta(object):
         model = ApplicationAccess
 
     application = factory.SubFactory(ApplicationFactory)
@@ -34,7 +34,7 @@ class ApplicationAccessFactory(DjangoModelFactory):
 
 
 class AccessTokenFactory(DjangoModelFactory):
-    class Meta:
+    class Meta(object):
         model = AccessToken
         django_get_or_create = ('user', 'application')
 
@@ -43,7 +43,7 @@ class AccessTokenFactory(DjangoModelFactory):
 
 
 class RefreshTokenFactory(DjangoModelFactory):
-    class Meta:
+    class Meta(object):
         model = RefreshToken
         django_get_or_create = ('user', 'application')
 

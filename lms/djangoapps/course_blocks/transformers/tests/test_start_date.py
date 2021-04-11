@@ -4,10 +4,11 @@ Tests for StartDateTransformer.
 
 
 from datetime import timedelta
-from unittest.mock import patch
 
 import ddt
+import six
 from django.utils.timezone import now
+from mock import patch
 
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 
@@ -24,7 +25,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     BETA_USER = 2
     TRANSFORMER_CLASS_TO_TEST = StartDateTransformer
 
-    class StartDateType:
+    class StartDateType(object):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
@@ -49,7 +50,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
                 return DEFAULT_START_DATE
 
     def setUp(self):
-        super().setUp()
+        super(StartDateTransformerTestCase, self).setUp()
         self.beta_user = BetaTesterFactory(course_key=self.course.id, username='beta_tester', password=self.password)
         course = self.get_block(0)
         course.days_early_for_beta = 33
@@ -109,7 +110,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
             expected_student_visible_blocks,
             blocks_with_differing_student_access
     ):
-        for idx, start_date_type in start_date_type_values.items():
+        for idx, start_date_type in six.iteritems(start_date_type_values):
             block = self.get_block(idx)
             block.start = self.StartDateType.start(start_date_type)
             update_block(block)

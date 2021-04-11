@@ -38,7 +38,6 @@
                     'terms_of_service'
                 ],
                 formType: 'register',
-                formFields: '.form-fields',
                 formStatusTpl: formStatusTpl,
                 authWarningJsHook: 'js-auth-warning',
                 defaultFormErrorsTitle: gettext('We couldn\'t create your account.'),
@@ -64,7 +63,6 @@
                     this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
                     this.registerFormSubmitButtonText =
                         data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
-                    this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled || false;
 
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                     this.listenTo(this.model, 'validation', this.renderLiveValidations);
@@ -148,8 +146,7 @@
                                 hasSecondaryProviders: this.hasSecondaryProviders,
                                 platformName: this.platformName,
                                 autoRegisterWelcomeMessage: this.autoRegisterWelcomeMessage,
-                                registerFormSubmitButtonText: this.registerFormSubmitButtonText,
-                                is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
+                                registerFormSubmitButtonText: this.registerFormSubmitButtonText
                             }
                         });
 
@@ -423,9 +420,6 @@
                     $label.addClass(indicator);
                     $req.addClass(indicator);
                     $icon.addClass(indicator + ' ' + icon);
-                    if (['username', 'email'].indexOf($el.attr('name')) > -1) {
-                        $tip.addClass(' data-hj-suppress');
-                    }
                     $tip.text(msg);
                 },
 
@@ -454,22 +448,15 @@
                         _.map(
                             // Something is passing this 'undefined'. Protect against this.
                             JSON.parse(error.responseText || '[]'),
-                            function(errorList, key) {
-                                if (key === 'error_code') {
-                                    return null;
-                                } else {
-                                    return _.map(
-                                        errorList,
-                                        function(errorItem) {
-                                            return StringUtils.interpolate('<li {suppressAttr} >{error}</li>', {
-                                                error: errorItem.user_message,
-                                                suppressAttr: (
-                                                  key === 'email' || key === 'username'
-                                                ) ? 'data-hj-suppress' : ''
-                                            });
-                                        }
-                                  );
-                                }
+                            function(errorList) {
+                                return _.map(
+                                    errorList,
+                                    function(errorItem) {
+                                        return StringUtils.interpolate('<li>{error}</li>', {
+                                            error: errorItem.user_message
+                                        });
+                                    }
+                                );
                             }
                         )
                     );
@@ -504,7 +491,6 @@
                         jsHook: this.authWarningJsHook,
                         message: fullMsg
                     });
-                    $(this.formFields).removeClass('hidden');
                 },
 
                 submitForm: function(event) { // eslint-disable-line no-unused-vars

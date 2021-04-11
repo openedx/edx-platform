@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the service classes in verify_student.
 """
 
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 from django.conf import settings
@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from django.utils.translation import ugettext as _
 from freezegun import freeze_time
+from mock import patch
 from pytz import utc
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -44,11 +45,11 @@ class TestIDVerificationService(ModuleStoreTestCase):
         for status in ["created", "ready", "denied", "submitted", "must_retry"]:
             attempt.status = status
             attempt.save()
-            assert not IDVerificationService.user_is_verified(user), status
+            self.assertFalse(IDVerificationService.user_is_verified(user), status)
 
         attempt.status = "approved"
         attempt.save()
-        assert IDVerificationService.user_is_verified(user), attempt.status
+        self.assertTrue(IDVerificationService.user_is_verified(user), attempt.status)
 
     def test_user_has_valid_or_pending(self):
         """
@@ -62,14 +63,14 @@ class TestIDVerificationService(ModuleStoreTestCase):
         for status in ["created", "ready", "denied"]:
             attempt.status = status
             attempt.save()
-            assert not IDVerificationService.user_has_valid_or_pending(user), status
+            self.assertFalse(IDVerificationService.user_has_valid_or_pending(user), status)
 
         # Any of these, and we are. Note the benefit of the doubt we're giving
         # -- must_retry, and submitted both count until we hear otherwise
         for status in ["submitted", "must_retry", "approved"]:
             attempt.status = status
             attempt.save()
-            assert IDVerificationService.user_has_valid_or_pending(user), status
+            self.assertTrue(IDVerificationService.user_has_valid_or_pending(user), status)
 
     @ddt.unpack
     @ddt.data(
@@ -91,7 +92,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
             mock_verification.return_value = status
 
             status = IDVerificationService.verification_status_for_user(user, enrollment_mode)
-            assert status == output
+            self.assertEqual(status, output)
 
     def test_get_verified_user_ids(self):
         """
@@ -113,32 +114,7 @@ class TestIDVerificationService(ModuleStoreTestCase):
         ]))
         expected_user_ids = {user_a.id, user_b.id, user_c.id}
 
-        assert expected_user_ids == verified_user_ids
-
-    def test_get_verify_location_no_course_key(self):
-        """
-        Test for the path to the IDV flow with no course key given
-        """
-        path = IDVerificationService.get_verify_location()
-        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == expected_path
-
-    def test_get_verify_location_from_course_id(self):
-        """
-        Test for the path to the IDV flow with a course ID
-        """
-        course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
-        path = IDVerificationService.get_verify_location(course.id)
-        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == (expected_path + '?course_id=Robot/999/Test_Course')
-
-    def test_get_verify_location_from_string(self):
-        """
-        Test for the path to the IDV flow with a course key string
-        """
-        path = IDVerificationService.get_verify_location('course-v1:edX+DemoX+Demo_Course')
-        expected_path = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
-        assert path == (expected_path + '?course_id=course-v1%3AedX%2BDemoX%2BDemo_Course')
+        self.assertEqual(expected_user_ids, verified_user_ids)
 
 
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
@@ -151,7 +127,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
     we just put everything inside of a frozen time
     """
     def setUp(self):
-        super().setUp()
+        super(TestIDVerificationServiceUserStatus, self).setUp()
         self.user = UserFactory.create()
 
     def test_no_verification(self):
@@ -249,7 +225,7 @@ class TestIDVerificationServiceUserStatus(TestCase):
             frozen_datetime.move_to('2016-07-11')
             expected_status = {
                 'status': 'expired',
-                'error': _("Your {platform_name} verification has expired.").format(
+                'error': _(u"Your {platform_name} verification has expired.").format(
                     platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
                 ),
                 'should_display': True,
@@ -320,28 +296,6 @@ class TestIDVerificationServiceUserStatus(TestCase):
             expected_status = {
                 'status': 'approved', 'error': '', 'should_display': False,
                 'verification_expiry': '', 'status_date': now()
-            }
-            status = IDVerificationService.user_status(self.user)
-            self.assertDictEqual(status, expected_status)
-
-    def test_denied_after_approved_verification(self):
-        with freeze_time('2015-07-11') as frozen_datetime:
-            # create approved photo verification for the user
-            SoftwareSecurePhotoVerification.objects.create(
-                user=self.user,
-                status='approved',
-                expiration_date=now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-            )
-            expected_date = now()
-            frozen_datetime.move_to('2015-07-14')
-            SoftwareSecurePhotoVerification.objects.create(
-                user=self.user,
-                status='denied',
-                expiration_date=now() + timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
-            )
-            expected_status = {
-                'status': 'approved', 'error': '', 'should_display': True,
-                'verification_expiry': '', 'status_date': expected_date
             }
             status = IDVerificationService.user_status(self.user)
             self.assertDictEqual(status, expected_status)

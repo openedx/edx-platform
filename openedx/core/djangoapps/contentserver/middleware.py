@@ -6,6 +6,7 @@ Middleware to serve assets.
 import datetime
 import logging
 
+import six
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -17,6 +18,7 @@ from django.http import (
 from django.utils.deprecation import MiddlewareMixin
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
+from six import text_type
 
 from openedx.core.djangoapps.header_control import force_header_for_response
 from common.djangoapps.student.models import CourseEnrollment
@@ -39,7 +41,7 @@ except ImportError:
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
 
-HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+HTTP_DATE_FORMAT = u"%a, %d %b %Y %H:%M:%S GMT"
 
 
 class StaticContentServer(MiddlewareMixin):
@@ -61,7 +63,7 @@ class StaticContentServer(MiddlewareMixin):
         """Process the given request"""
         asset_path = request.path
 
-        if self.is_asset_request(request):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        if self.is_asset_request(request):
             # Make sure we can convert this request into a location.
             if AssetLocator.CANONICAL_NAMESPACE in asset_path:
                 asset_path = asset_path.replace('block/', 'block@', 1)
@@ -142,19 +144,19 @@ class StaticContentServer(MiddlewareMixin):
                 except ValueError as exception:
                     # If the header field is syntactically invalid it should be ignored.
                     log.exception(
-                        "%s in Range header: %s for content: %s",
-                        str(exception), header_value, str(loc)
+                        u"%s in Range header: %s for content: %s",
+                        text_type(exception), header_value, six.text_type(loc)
                     )
                 else:
                     if unit != 'bytes':
                         # Only accept ranges in bytes
-                        log.warning("Unknown unit in Range header: %s for content: %s", header_value, str(loc))
+                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, text_type(loc))
                     elif len(ranges) > 1:
                         # According to Http/1.1 spec content for multiple ranges should be sent as a multipart message.
                         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16
                         # But we send back the full content.
                         log.warning(
-                            "More than 1 ranges in Range header: %s for content: %s", header_value, str(loc)
+                            u"More than 1 ranges in Range header: %s for content: %s", header_value, text_type(loc)
                         )
                     else:
                         first, last = ranges[0]
@@ -162,7 +164,7 @@ class StaticContentServer(MiddlewareMixin):
                         if 0 <= first <= last < content.length:
                             # If the byte range is satisfiable
                             response = HttpResponse(content.stream_data_in_range(first, last))
-                            response['Content-Range'] = 'bytes {first}-{last}/{length}'.format(
+                            response['Content-Range'] = u'bytes {first}-{last}/{length}'.format(
                                 first=first, last=last, length=content.length
                             )
                             response['Content-Length'] = str(last - first + 1)
@@ -172,8 +174,8 @@ class StaticContentServer(MiddlewareMixin):
                                 newrelic.agent.add_custom_parameter('contentserver.ranged', True)
                         else:
                             log.warning(
-                                "Cannot satisfy ranges in Range header: %s for content: %s",
-                                header_value, str(loc)
+                                u"Cannot satisfy ranges in Range header: %s for content: %s",
+                                header_value, text_type(loc)
                             )
                             return HttpResponse(status=416)  # Requested Range Not Satisfiable
 
@@ -217,7 +219,7 @@ class StaticContentServer(MiddlewareMixin):
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', True)
 
             response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
-            response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
+            response['Cache-Control'] = u"public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
         elif is_locked:
             if newrelic:
                 newrelic.agent.add_custom_parameter('contentserver.cacheable', False)
@@ -290,7 +292,7 @@ class StaticContentServer(MiddlewareMixin):
             # Not in cache, so just try and load it from the asset manager.
             try:
                 content = AssetManager.find(location, as_stream=True)
-            except (ItemNotFoundError, NotFoundError):  # lint-amnesty, pylint: disable=try-except-raise
+            except (ItemNotFoundError, NotFoundError):
                 raise
 
             # Now that we fetched it, let's go ahead and try to cache it. We cap this at 1MB
@@ -322,7 +324,7 @@ def parse_range_header(header_value, content_length):
         for byte_range_string in byte_ranges_string.split(','):
             byte_range_string = byte_range_string.strip()
             # Case 0:
-            if '-' not in byte_range_string:  # Invalid syntax of header value.  # lint-amnesty, pylint: disable=no-else-raise
+            if '-' not in byte_range_string:  # Invalid syntax of header value.
                 raise ValueError('Invalid syntax.')
             # Case 1: -500
             elif byte_range_string.startswith('-'):

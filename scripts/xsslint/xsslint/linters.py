@@ -16,7 +16,7 @@ from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
 from xsslint.django_linter import TransExpression, BlockTransExpression, HtmlInterpolateExpression
 
 
-class BaseLinter:
+class BaseLinter(object):
     """
     BaseLinter provides some helper functions that are used by multiple linters.
 
@@ -53,7 +53,7 @@ class BaseLinter:
             A string containing the files contents.
 
         """
-        with open(file_full_path, 'r') as input_file:
+        with io.open(file_full_path, 'r') as input_file:
             file_contents = input_file.read()
             return file_contents
 
@@ -177,7 +177,7 @@ class BaseLinter:
         """
         if self.LINE_COMMENT_DELIM is not None:
             line_start_index = StringLines(template).index_to_line_start_index(start_index)
-            uncommented_line_start_index_regex = re.compile(fr"^(?!\s*{self.LINE_COMMENT_DELIM})", re.MULTILINE)
+            uncommented_line_start_index_regex = re.compile(r"^(?!\s*{})".format(self.LINE_COMMENT_DELIM), re.MULTILINE)
             # Finds the line start index of the first uncommented line, including the current line.
             match = uncommented_line_start_index_regex.search(template, line_start_index)
             if match is None:
@@ -207,7 +207,7 @@ class UnderscoreTemplateLinter(BaseLinter):
         """
         Init method.
         """
-        super().__init__()
+        super(UnderscoreTemplateLinter, self).__init__()
         self._skip_underscore_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
@@ -335,7 +335,7 @@ class JavaScriptLinter(BaseLinter):
         """
         Init method.
         """
-        super().__init__()
+        super(JavaScriptLinter, self).__init__()
         self.underscore_linter = underscore_linter
         self.ruleset = self.ruleset + self.underscore_linter.ruleset
         self._skip_javascript_dirs = javascript_skip_dirs or ()
@@ -468,7 +468,7 @@ class JavaScriptLinter(BaseLinter):
 
         """
         # Ignores calls starting with "HtmlUtils.", because those are safe
-        regex = re.compile(fr"(?<!HtmlUtils).(?:{function_names})\(")
+        regex = re.compile(r"(?<!HtmlUtils).(?:{})\(".format(function_names))
         for function_match in regex.finditer(file_contents):
             is_violation = True
             expression = self._get_expression_for_function(file_contents, function_match)
@@ -709,7 +709,7 @@ class PythonLinter(BaseLinter):
         """
         Init method.
         """
-        super().__init__()
+        super(PythonLinter, self).__init__()
         self._skip_python_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
@@ -887,7 +887,7 @@ class MakoTemplateLinter(BaseLinter):
         """
         Init method.
         """
-        super().__init__()
+        super(MakoTemplateLinter, self).__init__()
         self.javascript_linter = javascript_linter
         self.python_linter = python_linter
         self.ruleset = self.ruleset + self.javascript_linter.ruleset + self.python_linter.ruleset
@@ -1490,7 +1490,7 @@ class DjangoTemplateLinter(BaseLinter):
         """
         Init method.
         """
-        super().__init__()
+        super(DjangoTemplateLinter, self).__init__()
         self._skip_django_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):

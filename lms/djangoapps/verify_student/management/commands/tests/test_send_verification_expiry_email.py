@@ -4,18 +4,18 @@ Tests for django admin command `send_verification_expiry_email` in the verify_st
 
 
 from datetime import timedelta
-from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import mail
-from django.core.management import CommandError, call_command
+from django.core.management import call_command, CommandError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
+from mock import patch
+from common.djangoapps.student.tests.factories import UserFactory
 from testfixtures import LogCapture
 
-from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
@@ -30,7 +30,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
     def setUp(self):
         """ Initial set up for tests """
-        super().setUp()
+        super(TestSendVerificationExpiryEmail, self).setUp()
         Site.objects.create(domain='edx.org', name='edx.org')
         self.resend_days = settings.VERIFICATION_EXPIRY_EMAIL['RESEND_DAYS']
         self.days = settings.VERIFICATION_EXPIRY_EMAIL['DAYS_RANGE']
@@ -76,11 +76,11 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         call_command('send_verification_expiry_email')
 
         # Check that only one email is sent
-        assert len(mail.outbox) == 1
+        self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the email is not sent to the out of range verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk).expiry_email_date
-        assert expiry_email_date is None
+        self.assertIsNone(expiry_email_date)
 
     def test_expiry_email_date_range(self):
         """
@@ -99,7 +99,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         # Check that email is sent even if the verification is not in expiration_date range but matches
         # the criteria to resend email
-        assert len(mail.outbox) == 1
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_most_recent_verification(self):
         """
@@ -116,7 +116,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         # Check that the expiry_email_date is not set for the outdated verification
         expiry_email_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_email_date
-        assert expiry_email_date is None
+        self.assertIsNone(expiry_email_date)
 
     def test_send_verification_expiry_email(self):
         """
@@ -132,8 +132,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         expected_date = now()
         attempt = SoftwareSecurePhotoVerification.objects.get(user_id=verification.user_id)
-        assert attempt.expiry_email_date.date() == expected_date.date()
-        assert len(mail.outbox) == 1
+        self.assertEqual(attempt.expiry_email_date.date(), expected_date.date())
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_verification_expiry_email_not_sent_valid_ssov(self):
         """
@@ -145,7 +145,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         SSOVerification.objects.create(user=expired_ssp_verification.user, status='approved')
 
         call_command('send_verification_expiry_email')
-        assert len(mail.outbox) == 0
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_verification_expiry_email_not_sent_valid_manual_verification(self):
         """
@@ -157,7 +157,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         ManualVerification.objects.create(user=expired_ssp_verification.user, status='approved')
 
         call_command('send_verification_expiry_email')
-        assert len(mail.outbox) == 0
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_email_already_sent(self):
         """
@@ -173,7 +173,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         call_command('send_verification_expiry_email')
 
-        assert len(mail.outbox) == 0
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_no_verification_found(self):
         """
@@ -184,8 +184,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
             call_command('send_verification_expiry_email')
             logger.check(
                 (LOGGER_NAME,
-                 'INFO', "No approved expired entries found in SoftwareSecurePhotoVerification for the "
-                         "date range {} - {}".format(start_date.date(), now().date()))
+                 'INFO', u"No approved expired entries found in SoftwareSecurePhotoVerification for the "
+                         u"date range {} - {}".format(start_date.date(), now().date()))
             )
 
     def test_dry_run_flag(self):
@@ -206,15 +206,15 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
             logger.check(
                 (LOGGER_NAME,
                  'INFO',
-                 "For the date range {} - {}, total Software Secure Photo verification filtered are {}"
+                 u"For the date range {} - {}, total Software Secure Photo verification filtered are {}"
                  .format(start_date.date(), now().date(), count)
                  ),
                 (LOGGER_NAME,
                  'INFO',
-                 "This was a dry run, no email was sent. For the actual run email would have been sent "
-                 "to {} learner(s)".format(count)
+                 u"This was a dry run, no email was sent. For the actual run email would have been sent "
+                 u"to {} learner(s)".format(count)
                  ))
-        assert len(mail.outbox) == 0
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_not_enrolled_in_verified_course(self):
         """
@@ -235,8 +235,8 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
         # check that after sending the default number of emails, the expiry_email_date is set to none for a
         # user who is not enrolled in verified track
         attempt = SoftwareSecurePhotoVerification.objects.get(pk=verification.id)
-        assert len(mail.outbox) == 1
-        assert attempt.expiry_email_date is None
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIsNone(attempt.expiry_email_date)
 
     def test_number_of_emails_sent(self):
         """
@@ -264,13 +264,13 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
                 break
 
         # expiry_email_date set to None means it no longer will be filtered hence no emails will be sent in future
-        assert SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date is None
-        assert len(mail.outbox) == self.default_no_of_emails
+        self.assertIsNone(SoftwareSecurePhotoVerification.objects.get(pk=verification.id).expiry_email_date)
+        self.assertEqual(len(mail.outbox), self.default_no_of_emails)
 
     @override_settings(VERIFICATION_EXPIRY_EMAIL={'RESEND_DAYS': 15, 'DAYS_RANGE': 1, 'DEFAULT_EMAILS': 0})
     def test_command_error(self):
-        err_string = "DEFAULT_EMAILS must be a positive integer. If you do not wish to send " \
-                     "emails use --dry-run flag instead."
+        err_string = u"DEFAULT_EMAILS must be a positive integer. If you do not wish to send " \
+                     u"emails use --dry-run flag instead."
         with self.assertRaisesRegex(CommandError, err_string):
             call_command('send_verification_expiry_email')
 
@@ -299,6 +299,6 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
 
         for verification in verifications:
             verification.refresh_from_db()
-        assert verifications[0].expiry_email_date is None
-        assert verifications[1].expiry_email_date is not None
-        assert mock_ace.send.call_count == 2
+        self.assertIsNone(verifications[0].expiry_email_date)
+        self.assertIsNotNone(verifications[1].expiry_email_date)
+        self.assertEqual(mock_ace.send.call_count, 2)

@@ -36,7 +36,7 @@ def blockstore_def_key_from_modulestore_usage_key(usage_key):
     return block_type + "/" + usage_key.block_id
 
 
-class XBlockSerializer:
+class XBlockSerializer(object):
     """
     This class will serialize an XBlock, producing:
         (1) A new definition ID for use in Blockstore

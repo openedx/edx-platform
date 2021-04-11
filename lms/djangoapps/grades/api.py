@@ -11,12 +11,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six import text_type
 
-from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 # Public Grades Modules
 from lms.djangoapps.grades import constants, context, course_data, events
 # Grades APIs that should NOT belong within the Grades subsystem
 # TODO move Gradebook to be an external feature outside of core Grades
-from lms.djangoapps.grades.config.waffle import gradebook_can_see_bulk_management, is_writable_gradebook_enabled
+from lms.djangoapps.grades.config.waffle import is_writable_gradebook_enabled, gradebook_can_see_bulk_management
 # Public Grades Factories
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.models_api import *
@@ -28,6 +27,7 @@ from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactor
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
 from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.utils import _get_key
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 
 def graded_subsections_for_course_id(course_id):
@@ -80,8 +80,8 @@ def override_subsection_grade(
     signals.SUBSECTION_OVERRIDE_CHANGED.send(
         sender=None,
         user_id=user_id,
-        course_id=str(course_key),
-        usage_id=str(usage_key),
+        course_id=text_type(course_key),
+        usage_id=text_type(usage_key),
         only_if_higher=False,
         modified=override.modified,
         score_deleted=False,
@@ -124,8 +124,8 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
     signals.SUBSECTION_OVERRIDE_CHANGED.send(
         sender=None,
         user_id=user_id,
-        course_id=str(course_key),
-        usage_id=str(usage_key),
+        course_id=text_type(course_key),
+        usage_id=text_type(usage_key),
         only_if_higher=False,
         modified=datetime.now().replace(tzinfo=pytz.UTC),  # Not used when score_deleted=True
         score_deleted=True,

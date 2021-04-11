@@ -5,7 +5,10 @@ Add and create new modes for running courses on this particular LMS
 
 from collections import defaultdict, namedtuple
 from datetime import timedelta
+
+import inspect
 import logging
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -18,6 +21,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
+from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -68,7 +72,7 @@ class CourseMode(models.Model):
     min_price = models.IntegerField(default=0, verbose_name=_("Price"))
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default="usd", max_length=8)
+    currency = models.CharField(default=u"usd", max_length=8)
 
     # The datetime at which the course mode will expire.
     # This is used to implement "upgrade" deadlines.
@@ -77,12 +81,12 @@ class CourseMode(models.Model):
     # Once the date passes, users will no longer be able to enroll as verified.
     _expiration_datetime = models.DateTimeField(
         default=None, null=True, blank=True,
-        verbose_name=_("Upgrade Deadline"),
+        verbose_name=_(u"Upgrade Deadline"),
         help_text=_(
-            "OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
-            "Leave this blank if users can enroll in this mode until enrollment closes for the course."
+            u"OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. "
+            u"Leave this blank if users can enroll in this mode until enrollment closes for the course."
         ),
-        db_column='expiration_datetime',
+        db_column=u'expiration_datetime',
     )
 
     # The system prefers to set this automatically based on default settings. But
@@ -96,7 +100,7 @@ class CourseMode(models.Model):
     # DEPRECATED: the suggested prices for this mode
     # We used to allow users to choose from a set of prices, but we now allow only
     # a single price.  This field has been deprecated by `min_price`
-    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+    suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
                                         validators=[validate_comma_separated_integer_list])
 
     # optional description override
@@ -108,10 +112,10 @@ class CourseMode(models.Model):
         max_length=255,
         null=True,
         blank=True,
-        verbose_name="SKU",
+        verbose_name=u"SKU",
         help_text=_(
-            "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
-            "Leave this blank if the course has not yet been migrated to the ecommerce service."
+            u"OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external ecommerce service.  "
+            u"Leave this blank if the course has not yet been migrated to the ecommerce service."
         )
     )
 
@@ -121,9 +125,9 @@ class CourseMode(models.Model):
         null=True,
         blank=True,
         default=None,  # Need this in order to set DEFAULT NULL on the database column
-        verbose_name="Bulk SKU",
+        verbose_name=u"Bulk SKU",
         help_text=_(
-            "This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
+            u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
         )
     )
 
@@ -183,14 +187,14 @@ class CourseMode(models.Model):
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
-    CACHE_NAMESPACE = "course_modes.CourseMode.cache."
+    CACHE_NAMESPACE = u"course_modes.CourseMode.cache."
 
-    class Meta:
+    class Meta(object):
         app_label = "course_modes"
         unique_together = ('course', 'mode_slug', 'currency')
 
-    def __init__(self, *args, **kwargs):  # lint-amnesty, pylint: disable=useless-super-delegation
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(CourseMode, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
@@ -199,7 +203,7 @@ class CourseMode(models.Model):
         """
         if self.is_professional_slug(self.mode_slug) and self.expiration_datetime is not None:
             raise ValidationError(
-                _("Professional education modes are not allowed to have expiration_datetime set.")
+                _(u"Professional education modes are not allowed to have expiration_datetime set.")
             )
 
         mode_config = settings.COURSE_ENROLLMENT_MODES.get(self.mode_slug, {})
@@ -207,21 +211,21 @@ class CourseMode(models.Model):
         if int(self.min_price) < min_price_for_mode:
             mode_display_name = mode_config.get('display_name', self.mode_slug)
             raise ValidationError(
-                _(  # lint-amnesty, pylint: disable=translation-of-non-string
-                    "The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(  # lint-amnesty, pylint: disable=line-too-long
+                _(
+                    u"The {course_mode} course mode has a minimum price of {min_price}. You must set a price greater than or equal to {min_price}.".format(
                         course_mode=mode_display_name, min_price=min_price_for_mode
                     )
                 )
             )
 
-    def save(self, force_insert=False, force_update=False, using=None):  # lint-amnesty, pylint: disable=arguments-differ
+    def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
         self.clean()  # ensure object-level validation is performed before we save.
         self.currency = self.currency.lower()
         if self.id is None:
             # If this model has no primary key at save time, it needs to be force-inserted.
             force_insert = True
-        super().save(force_insert, force_update, using)
+        super(CourseMode, self).save(force_insert, force_update, using)
 
     @property
     def slug(self):
@@ -303,7 +307,7 @@ class CourseMode(models.Model):
                 mode for mode in modes
                 if mode.expiration_datetime is None or mode.expiration_datetime >= now_dt
             ]
-            for course_id, modes in all_modes.items()
+            for course_id, modes in six.iteritems(all_modes)
         }
 
         return (all_modes, unexpired_modes)
@@ -363,7 +367,7 @@ class CourseMode(models.Model):
             raise ValueError("One of course_id or course must not be None.")
 
         if course is not None and not isinstance(course, CourseOverview):
-            # CourseBlocks don't have the data needed to pull related modes,
+            # CourseModules don't have the data needed to pull related modes,
             # so we'll fall back on course_id-based lookup instead
             course_id = course.id
             course = None
@@ -806,7 +810,7 @@ class CourseMode(models.Model):
         )
 
     def __str__(self):
-        return "{} : {}, min={}".format(
+        return u"{} : {}, min={}".format(
             self.course_id, self.mode_slug, self.min_price
         )
 
@@ -887,7 +891,7 @@ class CourseModesArchive(models.Model):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "course_modes"
 
     # the course that this mode is attached to
@@ -904,11 +908,11 @@ class CourseModesArchive(models.Model):
     min_price = models.IntegerField(default=0)
 
     # the suggested prices for this mode
-    suggested_prices = models.CharField(max_length=255, blank=True, default='',
+    suggested_prices = models.CharField(max_length=255, blank=True, default=u'',
                                         validators=[validate_comma_separated_integer_list])
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default="usd", max_length=8)
+    currency = models.CharField(default=u"usd", max_length=8)
 
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)
@@ -923,7 +927,7 @@ class CourseModeExpirationConfig(ConfigurationModel):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "course_modes"
 
     verification_window = models.DurationField(
@@ -935,4 +939,4 @@ class CourseModeExpirationConfig(ConfigurationModel):
 
     def __str__(self):
         """ Returns the unicode date of the verification window. """
-        return str(self.verification_window)
+        return six.text_type(self.verification_window)

@@ -18,7 +18,7 @@ class UserStandingMiddleware(MiddlewareMixin):
     Checks a user's standing on request. Returns a 403 if the user's
     status is 'disabled'.
     """
-    def process_request(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def process_request(self, request):
         user = request.user
         try:
             user_account = UserStanding.objects.get(user=user.id)
@@ -33,7 +33,7 @@ class UserStandingMiddleware(MiddlewareMixin):
                     'this was done in error, please contact us at '
                     '{support_email}'
                 )).format(
-                    support_email=HTML('<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
+                    support_email=HTML(u'<a href="mailto:{address}?subject={subject_line}">{address}</a>').format(
                         address=settings.DEFAULT_FEEDBACK_EMAIL,
                         subject_line=_('Disabled Account'),
                     ),

@@ -5,42 +5,11 @@ Template module
 from string import Template
 
 from lxml import etree
-from pkg_resources import resource_string
-from web_fragments.fragment import Fragment
-from xmodule.editing_module import EditingMixin
-from xmodule.raw_module import RawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import (
-    HTMLSnippet,
-    ResourceTemplates,
-    shim_xmodule_js,
-    XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-)
-from xmodule.xml_module import XmlMixin
-
-from openedx.core.djangolib.markup import Text
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 
 
-class CustomTagTemplateBlock(  # pylint: disable=abstract-method
-    RawMixin,
-    XmlMixin,
-    EditingMixin,
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-    HTMLSnippet,
-    ResourceTemplates,
-    XModuleMixin,
-):
-    """
-    A block which provides templates for CustomTagBlock. The template name
-    is set on the `impl` attribute of CustomTagBlock. See below for more details
-    on how to use it.
-    """
-
-
-class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
+class CustomTagModule(XModule):
     """
     This module supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
@@ -62,34 +31,16 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     Renders to::
         More information given in <a href="/book/234">the text</a>
     """
+
+    def get_html(self):
+        return self.descriptor.rendered_html
+
+
+class CustomTagDescriptor(RawDescriptor):
+    """ Descriptor for custom tags.  Loads the template when created."""
+    module_class = CustomTagModule
     resources_dir = None
     template_dir_name = 'customtag'
-
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
-    }
-    studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')],
-    }
-
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
-        )
-        add_webpack_to_fragment(fragment, 'CustomTagBlockStudio')
-        shim_xmodule_js(fragment, 'XMLEditingDescriptor')
-        return fragment
 
     def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
@@ -103,7 +54,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
                 template_name = child_impl.text
             else:
                 # TODO (vshnayder): better exception type
-                raise Exception("Could not find impl attribute in customtag {}"
+                raise Exception("Could not find impl attribute in customtag {0}"
                                 .format(self.location))
 
         params = dict(list(xmltree.items()))
@@ -120,47 +71,9 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     def rendered_html(self):
         return self.render_template(self.system, self.data)
 
-    def student_view(self, _context):
-        """
-        Renders the student view.
-        """
-        fragment = Fragment()
-        fragment.add_content(self.rendered_html)
-        return fragment
-
     def export_to_file(self):
         """
         Custom tags are special: since they're already pointers, we don't want
         to export them in a file with yet another layer of indirection.
         """
         return False
-
-
-class TranslateCustomTagBlock(  # pylint: disable=abstract-method
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-    XModuleMixin,
-):
-    """
-    Converts olx of the form `<$custom_tag attr="" attr=""/>` to CustomTagBlock
-    of the form `<customtag attr="" attr="" impl="$custom_tag"/>`.
-    """
-    resources_dir = None
-
-    @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        """
-        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
-        <customtag attr="" attr="" impl="$custom_tag"/>
-        """
-
-        xml_object = etree.fromstring(xml_data)
-        system.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
-                             'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
-                             .format(tag=xml_object.tag))
-
-        tag = xml_object.tag
-        xml_object.tag = 'customtag'
-        xml_object.attrib['impl'] = tag
-
-        return system.process_xml(etree.tostring(xml_object))

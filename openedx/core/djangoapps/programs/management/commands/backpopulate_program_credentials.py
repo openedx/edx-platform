@@ -84,10 +84,10 @@ class Command(BaseCommand):
         self._load_usernames(users=usernames)
 
         if options.get('commit'):
-            logger.info('Enqueuing program certification tasks for %d candidates.', len(self.usernames))
+            logger.info(u'Enqueuing program certification tasks for %d candidates.', len(self.usernames))
         else:
             logger.info(
-                'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
+                u'Found %d candidates. To enqueue program certification tasks, pass the -c or --commit flags.',
                 len(self.usernames)
             )
             return
@@ -98,14 +98,14 @@ class Command(BaseCommand):
                 award_program_certificates.delay(username)
             except:  # pylint: disable=bare-except
                 failed += 1
-                logger.exception('Failed to enqueue task for user [%s]', username)
+                logger.exception(u'Failed to enqueue task for user [%s]', username)
             else:
                 succeeded += 1
-                logger.debug('Successfully enqueued task for user [%s]', username)
+                logger.debug(u'Successfully enqueued task for user [%s]', username)
 
         logger.info(
-            'Done. Successfully enqueued tasks for %d candidates. '
-            'Failed to enqueue tasks for %d candidates.',
+            u'Done. Successfully enqueued tasks for %d candidates. '
+            u'Failed to enqueue tasks for %d candidates.',
             succeeded,
             failed
         )
@@ -117,7 +117,7 @@ class Command(BaseCommand):
             programs.extend(get_programs(uuids=program_uuids))
         else:
             for site in Site.objects.all():
-                logger.info('Loading programs from the catalog for site %s.', site.domain)
+                logger.info(u'Loading programs from the catalog for site %s.', site.domain)
                 programs.extend(get_programs(site))
 
         self.course_runs = self._flatten(programs)

@@ -6,23 +6,25 @@ import json
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.core.cache import cache
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
-from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     ExampleCertificate,
-    ExampleCertificateSet
+    ExampleCertificateSet,
+    GeneratedCertificate
 )
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -52,7 +54,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super().setUp()
+        super(UpdateExampleCertificateViewTest, self).setUp()
         self.cert_set = ExampleCertificateSet.objects.create(course_key=self.COURSE_KEY)
         self.cert = ExampleCertificate.objects.create(
             example_cert_set=self.cert_set,
@@ -70,8 +72,8 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self._assert_response(response)
 
         self.cert = ExampleCertificate.objects.get()
-        assert self.cert.status == ExampleCertificate.STATUS_SUCCESS
-        assert self.cert.download_url == self.DOWNLOAD_URL
+        self.assertEqual(self.cert.status, ExampleCertificate.STATUS_SUCCESS)
+        self.assertEqual(self.cert.download_url, self.DOWNLOAD_URL)
 
     def test_update_example_certificate_invalid_key(self):
         payload = {
@@ -84,15 +86,15 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             })
         }
         response = self.client.post(self.url, data=payload)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def test_update_example_certificate_error(self):
         response = self._post_to_view(self.cert, error_reason=self.ERROR_REASON)
         self._assert_response(response)
 
         self.cert = ExampleCertificate.objects.get()
-        assert self.cert.status == ExampleCertificate.STATUS_ERROR
-        assert self.cert.error_reason == self.ERROR_REASON
+        self.assertEqual(self.cert.status, ExampleCertificate.STATUS_ERROR)
+        self.assertEqual(self.cert.error_reason, self.ERROR_REASON)
 
     @ddt.data('xqueue_header', 'xqueue_body')
     def test_update_example_certificate_invalid_params(self, missing_param):
@@ -108,7 +110,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         del payload[missing_param]
 
         response = self.client.post(self.url, data=payload)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
     def test_update_example_certificate_missing_download_url(self):
         payload = {
@@ -120,19 +122,19 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
             })
         }
         response = self.client.post(self.url, data=payload)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
-    def test_update_example_certificate_non_json_param(self):
+    def test_update_example_cetificate_non_json_param(self):
         payload = {
             'xqueue_header': '{/invalid',
             'xqueue_body': '{/invalid'
         }
         response = self.client.post(self.url, data=payload)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
     def test_unsupported_http_method(self):
         response = self.client.get(self.url)
-        assert response.status_code == 405
+        self.assertEqual(response.status_code, 405)
 
     def test_bad_request_rate_limiting(self):
         payload = {
@@ -154,7 +156,7 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
 
         # The final status code should indicate that the rate
         # limit was exceeded.
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def _post_to_view(self, cert, download_url=None, error_reason=None):
         """Simulate a callback from the XQueue to the example certificate end-point. """
@@ -177,8 +179,8 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     def _assert_response(self, response):
         """Check the response from the callback end-point. """
         content = json.loads(response.content.decode('utf-8'))
-        assert response.status_code == 200
-        assert content['return_code'] == 0
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(content['return_code'], 0)
 
 
 class CertificatesViewsSiteTests(ModuleStoreTestCase):
@@ -204,7 +206,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     }"""
 
     def setUp(self):
-        super().setUp()
+        super(CertificatesViewsSiteTests, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg',
@@ -224,7 +226,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
         self.user.profile.name = "Joe User"
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
-        self.cert = GeneratedCertificateFactory(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.user,
             course_id=self.course_id,
             download_uuid=uuid4().hex,
@@ -255,7 +257,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
                 'name': 'Signatory_Name ' + str(i),
                 'title': 'Signatory_Title ' + str(i),
                 'organization': 'Signatory_Organization ' + str(i),
-                'signature_image_path': f'/static/certificates/images/demo-sig{i}.png',
+                'signature_image_path': '/static/certificates/images/demo-sig{}.png'.format(i),
                 'id': i,
             } for i in range(signatory_count)
 
@@ -283,7 +285,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_for_site(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)
@@ -302,7 +304,7 @@ class CertificatesViewsSiteTests(ModuleStoreTestCase):
     def test_html_view_site_configuration_missing(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             uuid=self.cert.verify_uuid
         )
         self._add_course_certificates(count=1, signatory_count=2)

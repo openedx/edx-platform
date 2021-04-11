@@ -7,11 +7,11 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -22,7 +22,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(VerificationDeadlineSignalTest, self).setUp()
         self.end = now().replace(microsecond=0) + timedelta(days=7)
         self.course = CourseFactory.create(end=self.end)
         VerificationDeadline.objects.all().delete()
@@ -31,7 +31,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         """ Verify the signal sets deadline to course end when no deadline exists."""
         _listen_for_course_publish('store', self.course.id)
 
-        assert VerificationDeadline.deadline_for_course(self.course.id) == self.course.end
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), self.course.end)
 
     def test_deadline(self):
         """ Verify deadline is set to course end date by signal when changed. """
@@ -39,7 +39,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         VerificationDeadline.set_deadline(self.course.id, deadline)
 
         _listen_for_course_publish('store', self.course.id)
-        assert VerificationDeadline.deadline_for_course(self.course.id) == self.course.end
+        self.assertEqual(VerificationDeadline.deadline_for_course(self.course.id), self.course.end)
 
     def test_deadline_explicit(self):
         """ Verify deadline is unchanged by signal when explicitly set. """
@@ -49,8 +49,8 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
         _listen_for_course_publish('store', self.course.id)
 
         actual_deadline = VerificationDeadline.deadline_for_course(self.course.id)
-        assert actual_deadline != self.course.end
-        assert actual_deadline == deadline
+        self.assertNotEqual(actual_deadline, self.course.end)
+        self.assertEqual(actual_deadline, deadline)
 
 
 class RetirementSignalTest(ModuleStoreTestCase):
@@ -83,7 +83,7 @@ class RetirementSignalTest(ModuleStoreTestCase):
 
         # All values for this user should now be empty string
         for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
-            assert '' == getattr(ver_obj, field)
+            self.assertEqual('', getattr(ver_obj, field))
 
     def test_retire_success_no_entries(self):
         user = UserFactory()
@@ -101,4 +101,4 @@ class RetirementSignalTest(ModuleStoreTestCase):
 
         # All values for this user should now be empty string
         for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
-            assert '' == getattr(ver_obj, field)
+            self.assertEqual('', getattr(ver_obj, field))

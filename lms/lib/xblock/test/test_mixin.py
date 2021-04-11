@@ -1,7 +1,7 @@
-# lint-amnesty, pylint: disable=django-not-configured
 """
 Tests of the LMS XBlock Mixin
 """
+
 
 import ddt
 from xblock.validation import ValidationMessage
@@ -70,22 +70,22 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
     Unit tests for XBlock validation
     """
     def setUp(self):
-        super().setUp()
+        super(XBlockValidationTest, self).setUp()
         self.build_course()
 
     def verify_validation_message(self, message, expected_message, expected_message_type):
         """
         Verify that the validation message has the expected validation message and type.
         """
-        assert message.text == expected_message
-        assert message.type == expected_message_type
+        self.assertEqual(message.text, expected_message)
+        self.assertEqual(message.type, expected_message_type)
 
     def test_validate_full_group_access(self):
         """
         Test the validation messages produced for an xblock with full group access.
         """
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 0
+        self.assertEqual(len(validation.messages), 0)
 
     def test_validate_restricted_group_access(self):
         """
@@ -93,7 +93,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, self.group2.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 0
+        self.assertEqual(len(validation.messages), 0)
 
     def test_validate_invalid_user_partitions(self):
         """
@@ -101,7 +101,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         self.set_group_access(self.video_location, {999: [self.group1.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_VALIDATION_COMPONENT,
@@ -113,7 +113,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         # only a single error message will be returned.
         self.set_group_access(self.video_location, {998: [self.group2.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_VALIDATION_COMPONENT,
@@ -126,7 +126,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         self.set_group_access(self.vertical_location, {999: [self.group1.id]})
         validation = self.store.get_item(self.vertical_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_VALIDATION_UNIT,
@@ -138,7 +138,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         # only a single error message will be returned.
         self.set_group_access(self.vertical_location, {998: [self.group2.id]})
         validation = self.store.get_item(self.vertical_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_VALIDATION_UNIT,
@@ -151,7 +151,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, 999]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
@@ -161,7 +161,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         # Now try again with two invalid group ids
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, 998, 999]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
@@ -182,13 +182,13 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.child_vertical_location, {self.user_partition.id: [self.group2.id]})
         self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group2.id]})
         validation = self.store.get_item(self.child_html_module_location).validate()
-        assert len(validation.messages) == 0
+        self.assertEqual(len(validation.messages), 0)
 
         # Test that a validation message is displayed on split_test child when the child contradicts the parent,
         # even though the child agrees with the grandparent unit.
         self.set_group_access(self.child_html_module_location, {self.user_partition.id: [self.group1.id]})
         validation = self.store.get_item(self.child_html_module_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             NONSENSICAL_ACCESS_RESTRICTION,
@@ -201,7 +201,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id, 999]})
         validation = self.store.get_item(self.vertical_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION_UNIT,
@@ -217,13 +217,13 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 0
+        self.assertEqual(len(validation.messages), 0)
 
         # Now try again with opposing access restrictions
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             NONSENSICAL_ACCESS_RESTRICTION,
@@ -234,7 +234,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, self.group2.id]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             NONSENSICAL_ACCESS_RESTRICTION,
@@ -245,7 +245,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.video_location, {})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 1
+        self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
             NONSENSICAL_ACCESS_RESTRICTION,
@@ -261,7 +261,7 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         self.set_group_access(self.vertical_location, {self.user_partition.id: [self.group1.id]})
         self.set_group_access(self.video_location, {self.user_partition.id: [self.group2.id, 999]})
         validation = self.store.get_item(self.video_location).validate()
-        assert len(validation.messages) == 2
+        self.assertEqual(len(validation.messages), 2)
         self.verify_validation_message(
             validation.messages[0],
             INVALID_USER_PARTITION_GROUP_VALIDATION_COMPONENT,
@@ -280,7 +280,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(OpenAssessmentBlockMixinTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         self.open_assessment = ItemFactory.create(
@@ -293,7 +293,7 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         """
         Test has_score is true for ora2 problems.
         """
-        assert self.open_assessment.has_score
+        self.assertTrue(self.open_assessment.has_score)
 
 
 @ddt.ddt
@@ -313,7 +313,7 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
 
             course_key = ToyCourseFactory.create().id
             course = self.store.get_course(course_key)
-            assert course.get_parent() is None
+            self.assertIsNone(course.get_parent())
 
             def recurse(parent):
                 """
@@ -322,13 +322,13 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
                 """
                 visited = []
                 for child in parent.get_children():
-                    assert parent.location == child.get_parent().location
+                    self.assertEqual(parent.location, child.get_parent().location)
                     visited.append(child)
                     visited += recurse(child)
                 return visited
 
             visited = recurse(course)
-            assert len(visited) == 28
+            self.assertEqual(len(visited), 28)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_parents_draft_content(self, modulestore_type):
@@ -342,7 +342,7 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
             old_parent_location = self.vertical_location.for_branch(None)
 
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-                assert self.course.get_parent() is None
+                self.assertIsNone(self.course.get_parent())
 
                 with self.store.bulk_operations(self.course.id):
                     user_id = ModuleStoreEnum.UserID.test
@@ -358,11 +358,17 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
                     # re-fetch video from draft store
                     video = self.store.get_item(child_to_move_location)
 
-                    assert new_parent_location == video.get_parent().location
+                    self.assertEqual(
+                        new_parent_location,
+                        video.get_parent().location
+                    )
             with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
                 # re-fetch video from published store
                 video = self.store.get_item(child_to_move_location)
-                assert old_parent_location == video.get_parent().location.for_branch(None)
+                self.assertEqual(
+                    old_parent_location,
+                    video.get_parent().location.for_branch(None)
+                )
 
 
 class RenamedTuple(tuple):
@@ -370,7 +376,7 @@ class RenamedTuple(tuple):
     This class is only used to allow overriding __name__ on the tuples passed
     through ddt, in order to have the generated test names make sense.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 def ddt_named(parent, child):
@@ -378,7 +384,7 @@ def ddt_named(parent, child):
     Helper to get more readable dynamically-generated test names from ddt.
     """
     args = RenamedTuple([parent, child])
-    args.__name__ = f'parent_{parent}_child_{child}'      # pylint: disable=attribute-defined-outside-init
+    args.__name__ = 'parent_{}_child_{}'.format(parent, child)      # pylint: disable=attribute-defined-outside-init
     return args
 
 
@@ -406,7 +412,7 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     )
 
     def setUp(self):
-        super().setUp()
+        super(XBlockMergedGroupAccessTest, self).setUp()
         self.build_course()
 
     def verify_group_access(self, block_location, expected_dict):
@@ -414,7 +420,7 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
         Verify the expected value for the block's group_access.
         """
         block = self.store.get_item(block_location)
-        assert block.merged_group_access == expected_dict
+        self.assertEqual(block.merged_group_access, expected_dict)
 
     @ddt.data(*PARENT_CHILD_PAIRS)
     @ddt.unpack

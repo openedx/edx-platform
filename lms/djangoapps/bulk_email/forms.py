@@ -19,7 +19,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
 
     name = forms.CharField(required=False)
 
-    class Meta:
+    class Meta(object):
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -27,11 +27,11 @@ class CourseEmailTemplateForm(forms.ModelForm):
         """Check the template for required tags."""
         index = template.find(COURSE_EMAIL_MESSAGE_BODY_TAG)
         if index < 0:
-            msg = f'Missing tag: "{COURSE_EMAIL_MESSAGE_BODY_TAG}"'
+            msg = u'Missing tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
             log.warning(msg)
             raise ValidationError(msg)
         if template.find(COURSE_EMAIL_MESSAGE_BODY_TAG, index + 1) >= 0:
-            msg = f'Multiple instances of tag: "{COURSE_EMAIL_MESSAGE_BODY_TAG}"'
+            msg = u'Multiple instances of tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
             log.warning(msg)
             raise ValidationError(msg)
         # TODO: add more validation here, including the set of known tags
@@ -63,7 +63,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
             try:
                 CourseEmailTemplate.get_template(name)
                 # already exists, this is no good
-                raise ValidationError(f'Name of "{name}" already exists, this must be unique.')
+                raise ValidationError(u'Name of "{}" already exists, this must be unique.'.format(name))
             except CourseEmailTemplate.DoesNotExist:
                 # this is actually the successful validation
                 pass
@@ -73,7 +73,7 @@ class CourseEmailTemplateForm(forms.ModelForm):
 class CourseAuthorizationAdminForm(forms.ModelForm):
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta:
+    class Meta(object):
         model = CourseAuthorization
         fields = '__all__'
 

@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import datetime
 import json
@@ -6,7 +6,7 @@ import random
 import sys
 from textwrap import dedent
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from pytz import UTC
 
@@ -28,10 +28,10 @@ def group_from_value(groups, v):
         curr_sum = curr_sum + p_value
         if curr_sum > v:
             return group
-    return group  # For round-off errors  # lint-amnesty, pylint: disable=undefined-loop-variable
+    return group  # For round-off errors
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = dedent("""
         Assign users to test groups. Takes a list of groups:
         a:0.3,b:0.4,c:0.3 file.txt "Testing something"
@@ -54,7 +54,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         print("Groups", groups)
 
         # Confirm group probabilities add up to 1
-        total = sum(zip(*groups)[1])  # lint-amnesty, pylint: disable=unsubscriptable-object
+        total = sum(zip(*groups)[1])
         print("Total:", total)
         if abs(total - 1) > 0.01:
             print("Total not 1")
@@ -74,7 +74,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         for group in dict(groups):
             utg = UserTestGroup()
             utg.name = group
-            utg.description = json.dumps({"description": options['description']},  # lint-amnesty, pylint: disable=too-many-function-args
+            utg.description = json.dumps({"description": options['description']},
                                          {"time": datetime.datetime.now(UTC).isoformat()})
             group_objects[group] = utg
             group_objects[group].save()
@@ -89,7 +89,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             v = random.uniform(0, 1)
             group = group_from_value(groups, v)
             group_objects[group].users.add(user)
-            f.write("Assigned user {name} ({id}) to {group}\n".format(
+            f.write(u"Assigned user {name} ({id}) to {group}\n".format(
                 name=user.username,
                 id=user.id,
                 group=group

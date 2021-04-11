@@ -1,13 +1,10 @@
-"""
-Certificates factories
-"""
+# Factories are self documenting
 
 
 from uuid import uuid4
 
 from factory.django import DjangoModelFactory
 
-from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -15,13 +12,12 @@ from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     GeneratedCertificate
 )
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 
 
 class GeneratedCertificateFactory(DjangoModelFactory):
-    """
-    GeneratedCertificate factory
-    """
-    class Meta:
+
+    class Meta(object):
         model = GeneratedCertificate
 
     course_id = None
@@ -33,11 +29,8 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):
-    """
-    CertificateWhitelist factory
-    """
 
-    class Meta:
+    class Meta(object):
         model = CertificateWhitelist
 
     course_id = None
@@ -46,11 +39,8 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
 
 class CertificateInvalidationFactory(DjangoModelFactory):
-    """
-    CertificateInvalidation factory
-    """
 
-    class Meta:
+    class Meta(object):
         model = CertificateInvalidation
 
     notes = 'Test Notes'
@@ -58,11 +48,8 @@ class CertificateInvalidationFactory(DjangoModelFactory):
 
 
 class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
-    """
-    CertificateHtmlViewConfiguration factory
-    """
 
-    class Meta:
+    class Meta(object):
         model = CertificateHtmlViewConfiguration
 
     enabled = True
@@ -95,11 +82,8 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
 
 
 class LinkedInAddToProfileConfigurationFactory(DjangoModelFactory):
-    """
-    LinkedInAddToProfileConfiguration factory
-    """
 
-    class Meta:
+    class Meta(object):
         model = LinkedInAddToProfileConfiguration
 
     enabled = True

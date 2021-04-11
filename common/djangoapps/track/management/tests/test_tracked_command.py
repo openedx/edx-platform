@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import json
 from six import StringIO
@@ -24,4 +24,4 @@ class CommandsTestBase(TestCase):
         args = ['whee']
         kwargs = {'key1': 'default', 'key2': True}
         json_out = self._run_dummy_command(*args, **kwargs)
-        assert json_out['command'].strip() == 'tracked_dummy_command'
+        self.assertEqual(json_out['command'].strip(), 'tracked_dummy_command')

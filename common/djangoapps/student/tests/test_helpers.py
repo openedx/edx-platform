@@ -3,7 +3,6 @@
 
 import logging
 import unittest
-from unittest.mock import patch
 
 import ddt
 from django.conf import settings
@@ -11,10 +10,11 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import patch
 from testfixtures import LogCapture
 
-from common.djangoapps.student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 
 LOGGER_NAME = "common.djangoapps.student.helpers"
 
@@ -25,7 +25,7 @@ class TestLoginHelper(TestCase):
     static_url = settings.STATIC_URL
 
     def setUp(self):
-        super().setUp()
+        super(TestLoginHelper, self).setUp()
         self.request = RequestFactory()
 
     @staticmethod
@@ -56,7 +56,7 @@ class TestLoginHelper(TestCase):
     def test_next_failures(self, log_level, log_name, unsafe_url, http_accept, user_agent, expected_log):
         """ Test unsafe next parameter """
         with LogCapture(LOGGER_NAME, level=log_level) as logger:
-            req = self.request.get(settings.LOGIN_URL + f"?next={unsafe_url}")
+            req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=unsafe_url))
             req.META["HTTP_ACCEPT"] = http_accept
             req.META["HTTP_USER_AGENT"] = user_agent
             get_next_url_for_login_page(req)
@@ -74,10 +74,10 @@ class TestLoginHelper(TestCase):
     @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org', 'test2.edx.org'])
     def test_safe_next(self, next_url, http_accept, host):
         """ Test safe next parameter """
-        req = self.request.get(settings.LOGIN_URL + f"?next={next_url}", HTTP_HOST=host)
+        req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url), HTTP_HOST=host)
         req.META["HTTP_ACCEPT"] = http_accept
         next_page = get_next_url_for_login_page(req)
-        assert next_page == next_url
+        self.assertEqual(next_page, next_url)
 
     tpa_hint_test_cases = [
         # Test requests outside the TPA pipeline - tpa_hint should be added.
@@ -121,13 +121,13 @@ class TestLoginHelper(TestCase):
             Assert that get_next_url_for_login_page returns as expected.
             """
             if method == 'GET':
-                req = self.request.get(settings.LOGIN_URL + f"?next={next_url}")
+                req = self.request.get(settings.LOGIN_URL + "?next={url}".format(url=next_url))
             elif method == 'POST':
                 req = self.request.post(settings.LOGIN_URL, {'next': next_url})
             req.META["HTTP_ACCEPT"] = "text/html"
             self._add_session(req)
             next_page = get_next_url_for_login_page(req)
-            assert next_page == expected_url
+            self.assertEqual(next_page, expected_url)
 
         with override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
@@ -153,4 +153,4 @@ class TestLoginHelper(TestCase):
         with with_site_configuration_context(configuration=configuration_values):
             next_page = get_next_url_for_login_page(req)
 
-        assert next_page == expected_url
+        self.assertEqual(next_page, expected_url)

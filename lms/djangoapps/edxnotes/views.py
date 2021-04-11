@@ -16,12 +16,12 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from six import text_type
 
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from lms.djangoapps.edxnotes.helpers import (
     DEFAULT_PAGE,
@@ -35,6 +35,7 @@ from lms.djangoapps.edxnotes.helpers import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import RetirementStateError, UserRetirementStatus
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 
 log = logging.getLogger(__name__)
 
@@ -174,13 +175,13 @@ def notes(request, course_id):
             text=text
         )
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
-        return JsonResponseBadRequest({"error": str(err)}, status=500)
+        return JsonResponseBadRequest({"error": text_type(err)}, status=500)
 
-    return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+    return HttpResponse(json.dumps(notes_info, cls=NoteJSONEncoder), content_type="application/json")
 
 
 @login_required
-def get_token(request, course_id):  # lint-amnesty, pylint: disable=unused-argument
+def get_token(request, course_id):
     """
     Get JWT ID-Token, in case you need new one.
     """
@@ -209,7 +210,7 @@ def edxnotes_visibility(request, course_id):
         return JsonResponse(status=200)
     except (ValueError, KeyError):
         log.warning(
-            "Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
+            u"Could not decode request body as JSON and find a boolean visibility field: '%s'", request.body
         )
         return JsonResponseBadRequest()
 
@@ -258,8 +259,8 @@ class RetireUserView(APIView):
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            return Response(text_type(exc), status=status.HTTP_405_METHOD_NOT_ALLOWED)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)

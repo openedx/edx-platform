@@ -14,8 +14,8 @@ from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 
-from common.djangoapps.track import segment
 from openedx.core.lib.api.permissions import IsStaffOrOwner
+from common.djangoapps.track import segment
 
 from .api import get_course_goal_options
 from .models import GOAL_KEY_CHOICES, CourseGoal
@@ -58,21 +58,21 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
     serializer_class = CourseGoalSerializer
 
     # Another version of this endpoint exists in ../course_home_api/outline/v1/views.py
-    def create(self, post_data):  # lint-amnesty, pylint: disable=arguments-differ
+    def create(self, post_data):
         """ Create a new goal if one does not exist, otherwise update the existing goal. """
         # Ensure goal_key is valid
         goal_options = get_course_goal_options()
         goal_key = post_data.data.get('goal_key')
         if not goal_key:
             return Response(
-                'Please provide a valid goal key from following options. (options= {goal_options}).'.format(
+                u'Please provide a valid goal key from following options. (options= {goal_options}).'.format(
                     goal_options=goal_options,
                 ),
                 status=status.HTTP_400_BAD_REQUEST,
             )
         elif goal_key not in goal_options:
             return Response(
-                'Provided goal key, {goal_key}, is not a valid goal key (options= {goal_options}).'.format(
+                u'Provided goal key, {goal_key}, is not a valid goal key (options= {goal_options}).'.format(
                     goal_key=goal_key,
                     goal_options=goal_options,
                 ),
@@ -83,7 +83,7 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
         course_key = CourseKey.from_string(post_data.data['course_key'])
         if not course_key:
             return Response(
-                'Provided course_key ({course_key}) does not map to a course.'.format(
+                u'Provided course_key ({course_key}) does not map to a course.'.format(
                     course_key=course_key
                 ),
                 status=status.HTTP_400_BAD_REQUEST,
@@ -105,11 +105,11 @@ class CourseGoalViewSet(viewsets.ModelViewSet):
             'goal_text': str(goal_options[goal_key]),
             'is_unsure': goal_key == GOAL_KEY_CHOICES.unsure,
         }
-        return JsonResponse(data, content_type="application/json", status=(200 if goal else 201))  # lint-amnesty, pylint: disable=redundant-content-type-for-json-response
+        return JsonResponse(data, content_type="application/json", status=(200 if goal else 201))
 
 
 @receiver(post_save, sender=CourseGoal, dispatch_uid="emit_course_goals_event")
-def emit_course_goal_event(sender, instance, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def emit_course_goal_event(sender, instance, **kwargs):
     """Emit events for both tracking logs and for Segment."""
     name = 'edx.course.goal.added' if kwargs.get('created', False) else 'edx.course.goal.updated'
     tracker.emit(

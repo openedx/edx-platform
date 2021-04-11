@@ -5,8 +5,8 @@ Discussion API views
 
 import logging
 
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -17,8 +17,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import text_type
 
-from common.djangoapps.util.json_request import JsonResponse
+from lms.djangoapps.discussion.views import get_divided_discussions
+from lms.djangoapps.instructor.access import update_forum_role
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -46,8 +48,6 @@ from lms.djangoapps.discussion.rest_api.serializers import (
     DiscussionRolesSerializer,
     DiscussionSettingsSerializer
 )
-from lms.djangoapps.discussion.views import get_divided_discussions
-from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.django_comment_common.utils import (
@@ -57,8 +57,10 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -592,7 +594,7 @@ class RetireUserView(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
             raise
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -659,7 +661,7 @@ class ReplaceUsernamesView(APIView):
             cc_user.replace_username(new_username)
         except User.DoesNotExist:
             log.warning(
-                "Unable to change username from %s to %s in forums because %s doesn't exist in LMS DB.",
+                u"Unable to change username from %s to %s in forums because %s doesn't exist in LMS DB.",
                 current_username,
                 new_username,
                 new_username,
@@ -668,14 +670,14 @@ class ReplaceUsernamesView(APIView):
         except comment_client.CommentClientRequestError as exc:
             if exc.status_code == 404:
                 log.info(
-                    "Unable to change username from %s to %s in forums because user doesn't exist in forums",
+                    u"Unable to change username from %s to %s in forums because user doesn't exist in forums",
                     current_username,
                     new_username,
                 )
                 return True
             else:
                 log.exception(
-                    "Unable to change username from %s to %s in forums because forums API call failed with: %s.",
+                    u"Unable to change username from %s to %s in forums because forums API call failed with: %s.",
                     current_username,
                     new_username,
                     exc,
@@ -683,7 +685,7 @@ class ReplaceUsernamesView(APIView):
             return False
 
         log.info(
-            "Successfully changed username from %s to %s in forums.",
+            u"Successfully changed username from %s to %s in forums.",
             current_username,
             new_username,
         )
@@ -822,7 +824,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
         try:
             discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
         except ValueError as e:
-            raise ValidationError(str(e))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(text_type(e))
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -935,7 +937,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         try:
             update_forum_role(course_id, user, rolename, action)
         except Role.DoesNotExist:
-            raise ValidationError(f"Role '{rolename}' does not exist")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(u"Role '{}' does not exist".format(rolename))
 
         role = form.cleaned_data['role']
         data = {'course_id': course_id, 'users': role.users.all()}

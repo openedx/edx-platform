@@ -11,15 +11,17 @@ from textwrap import dedent
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+
 from django.core.management.base import BaseCommand, CommandError
-from enterprise.models import EnterpriseCourseEnrollment
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 from slumber.exceptions import HttpServerError, SlumberBaseException
 
+from enterprise.models import EnterpriseCourseEnrollment
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.query import use_read_replica_if_available
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+
+from common.djangoapps.util.query import use_read_replica_if_available
 
 User = get_user_model()
 
@@ -46,7 +48,7 @@ class Command(BaseCommand):
             EnterpriseCourseEnrollments Queryset
 
         """
-        self.stdout.write('Getting enrollments from {start} to {end} index (as per command params)'
+        self.stdout.write(u'Getting enrollments from {start} to {end} index (as per command params)'
                           .format(start=start_index or 'start', end=end_index or 'end'))
         enrollments_qs = EnterpriseCourseEnrollment.objects.filter(
             source__isnull=True
@@ -116,7 +118,7 @@ class Command(BaseCommand):
         """
 
         self.stdout.write(
-            '\tFetching Enrollments from {start} to {end}'.format(start=offset, end=offset + batch_size)
+            u'\tFetching Enrollments from {start} to {end}'.format(start=offset, end=offset + batch_size)
         )
         enrollments = enrollments_queryset.select_related(
             'enterprise_customer_user', 'enterprise_customer_user__enterprise_customer'
@@ -133,7 +135,7 @@ class Command(BaseCommand):
         invalid = 0
 
         self.stdout.write(
-            '\t\tProcessing Total : {},'.format(len(enrollments_batch))
+            u'\t\tProcessing Total : {},'.format(len(enrollments_batch))
         )
 
         for enrollment in enrollments_batch:
@@ -158,23 +160,23 @@ class Command(BaseCommand):
                     "enterprise_customer_uuid": str(enterprise_customer.uuid),
                 }
             except CourseEnrollment.DoesNotExist:
-                self.stderr.write(f'\t\tskipping enrollment {enrollment.id}, as CourseEnrollment not found')
+                self.stderr.write(u'\t\tskipping enrollment {}, as CourseEnrollment not found'.format(enrollment.id))
                 invalid += 1
                 continue
             except Exception as ex:  # pylint: disable=broad-except
-                self.stderr.write(f'\t\tskipping enrollment {enrollment.id} due to invalid data. {ex}')
+                self.stderr.write(u'\t\tskipping enrollment {} due to invalid data. {}'.format(enrollment.id, ex))
                 invalid += 1
                 continue
             enrollments_payload.append(enrollment_payload)
 
-        self.stdout.write('\t\tFound {count} Paid enrollments to sync'.format(count=len(enrollments_payload)))
+        self.stdout.write(u'\t\tFound {count} Paid enrollments to sync'.format(count=len(enrollments_payload)))
         if not enrollments_payload:
             return 0, 0, 0, invalid, non_paid, []
 
-        self.stdout.write('\t\tSyncing started...')
+        self.stdout.write(u'\t\tSyncing started...')
         success, new, failed, order_numbers = self._create_manual_enrollment_orders(enrollments_payload)
         self.stdout.write(
-            '\t\tSuccess: {} , New: {}, Failed: {}, Invalid:{} , Non-Paid: {}'.format(
+            u'\t\tSuccess: {} , New: {}, Failed: {}, Invalid:{} , Non-Paid: {}'.format(
                 success, new, failed, invalid, non_paid,
             )
         )
@@ -184,7 +186,7 @@ class Command(BaseCommand):
         """
             Syncs a single site
         """
-        self.stdout.write('Syncing process started.')
+        self.stdout.write(u'Syncing process started.')
 
         offset = 0
         enrollments_queue = []
@@ -199,7 +201,7 @@ class Command(BaseCommand):
         while offset < enrollments_count:
             is_last_iteration = (offset + enrollments_query_batch_size) >= enrollments_count
             self.stdout.write(
-                '\tSyncing enrollments batch from {start} to {end}.'.format(
+                u'\tSyncing enrollments batch from {start} to {end}.'.format(
                     start=offset, end=offset + enrollments_query_batch_size
                 )
             )
@@ -219,23 +221,23 @@ class Command(BaseCommand):
                 invalid_enrollments += invalid
                 non_paid_enrollments += non_paid
                 new_created_order_numbers += order_numbers
-                self.stdout.write(f'\t\tsleeping for {sleep_time} second/seconds')
+                self.stdout.write(u'\t\tsleeping for {} second/seconds'.format(sleep_time))
                 time.sleep(sleep_time)
 
             self.stdout.write(
-                '\tSuccessfully synced enrollments batch from {start} to {end}'.format(
+                u'\tSuccessfully synced enrollments batch from {start} to {end}'.format(
                     start=offset, end=offset + enrollments_query_batch_size,
                 )
             )
             offset += enrollments_query_batch_size
 
         self.stdout.write(
-            '[Final Summary] Enrollments Success: {}, New: {}, Failed: {}, Invalid: {} , Non-Paid: {}'.format(
+            u'[Final Summary] Enrollments Success: {}, New: {}, Failed: {}, Invalid: {} , Non-Paid: {}'.format(
                 successfully_synced_enrollments, new_created_orders, failed_to_synced_enrollments, invalid_enrollments,
                 non_paid_enrollments
             )
         )
-        self.stdout.write(f'New created order numbers {new_created_order_numbers}')
+        self.stdout.write('New created order numbers {}'.format(new_created_order_numbers))
 
     def add_arguments(self, parser):
         """
@@ -279,12 +281,12 @@ class Command(BaseCommand):
         sleep_time = options['sleep_time']
 
         try:
-            self.stdout.write(f'Command execution started with options = {options}.')
+            self.stdout.write(u'Command execution started with options = {}.'.format(options))
             enrollments_queryset = self._get_enrollments_queryset(start_index, end_index)
             enrollments_count = enrollments_queryset.count()
-            self.stdout.write(f'Total Enrollments count to process: {enrollments_count}')
+            self.stdout.write(u'Total Enrollments count to process: {count}'.format(count=enrollments_count))
             self._sync(enrollments_queryset, enrollments_count, batch_size, sleep_time)
 
         except Exception as ex:
             traceback.print_exc()
-            raise CommandError('Command failed with traceback %s' % str(ex))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(u'Command failed with traceback %s' % str(ex))

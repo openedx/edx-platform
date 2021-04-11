@@ -4,9 +4,10 @@ Unit tests for the gating feature in Studio
 
 
 import json
-from unittest.mock import patch
 
 import ddt
+import six
+from mock import patch
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_usage_url
@@ -29,7 +30,7 @@ class TestSubsectionGating(CourseTestCase):
         """
         Initial data setup
         """
-        super().setUp()
+        super(TestSubsectionGating, self).setUp()
 
         # Enable subsection gating for the test course
         self.course.enable_subsection_gating = True
@@ -89,13 +90,13 @@ class TestSubsectionGating(CourseTestCase):
 
         self.client.ajax_post(
             self.seq2_url,
-            data={'prereqUsageKey': str(self.seq1.location), 'prereqMinScore': '100',
+            data={'prereqUsageKey': six.text_type(self.seq1.location), 'prereqMinScore': '100',
                   'prereqMinCompletion': '100'}
         )
         mock_set_required_content.assert_called_with(
             self.course.id,
             self.seq2.location,
-            str(self.seq1.location),
+            six.text_type(self.seq1.location),
             '100',
             '100'
         )
@@ -132,17 +133,17 @@ class TestSubsectionGating(CourseTestCase):
             mock_is_prereq, mock_get_required_content, mock_get_prereqs
     ):
         mock_is_prereq.return_value = True
-        mock_get_required_content.return_value = str(self.seq1.location), min_score, min_completion
+        mock_get_required_content.return_value = six.text_type(self.seq1.location), min_score, min_completion
         mock_get_prereqs.return_value = [
-            {'namespace': '{}{}'.format(str(self.seq1.location), GATING_NAMESPACE_QUALIFIER)},
-            {'namespace': '{}{}'.format(str(self.seq2.location), GATING_NAMESPACE_QUALIFIER)}
+            {'namespace': '{}{}'.format(six.text_type(self.seq1.location), GATING_NAMESPACE_QUALIFIER)},
+            {'namespace': '{}{}'.format(six.text_type(self.seq2.location), GATING_NAMESPACE_QUALIFIER)}
         ]
         resp = json.loads(self.client.get_json(self.seq2_url).content.decode('utf-8'))
         mock_is_prereq.assert_called_with(self.course.id, self.seq2.location)
         mock_get_required_content.assert_called_with(self.course.id, self.seq2.location)
         mock_get_prereqs.assert_called_with(self.course.id)
         self.assertTrue(resp['is_prereq'])
-        self.assertEqual(resp['prereq'], str(self.seq1.location))
+        self.assertEqual(resp['prereq'], six.text_type(self.seq1.location))
         self.assertEqual(resp['prereq_min_score'], min_score)
         self.assertEqual(resp['prereq_min_completion'], min_completion)
         self.assertEqual(resp['visibility_state'], VisibilityState.gated)

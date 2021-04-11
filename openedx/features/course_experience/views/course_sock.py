@@ -18,7 +18,7 @@ class CourseSockFragmentView(EdxFragmentView):
     """
     A fragment to provide extra functionality in a dropdown sock.
     """
-    def render_to_fragment(self, request, course, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, course, **kwargs):
         """
         Render the course's sock fragment.
         """
@@ -27,7 +27,7 @@ class CourseSockFragmentView(EdxFragmentView):
         return Fragment(html)
 
     @staticmethod
-    def get_verification_context(request, course):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_verification_context(request, course):
         enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
         show_course_sock = can_show_verified_upgrade(request.user, enrollment, course)
         if show_course_sock:

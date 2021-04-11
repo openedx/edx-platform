@@ -3,6 +3,7 @@ CourseBlocks API views
 """
 
 
+import six
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import Http404
@@ -12,6 +13,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from six import text_type
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -236,7 +238,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(str(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(u"Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes(is_authenticated=False)
@@ -299,57 +301,5 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(str(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
-        response = super().list(request, course_usage_key,
-                                hide_access_denials=hide_access_denials)
-
-        calculate_completion = any('completion' in param
-                                   for param in request.query_params.getlist('requested_fields', []))
-        if not calculate_completion:
-            return response
-
-        course_blocks = {}
-        root = None
-        if request.query_params.get('return_type') == 'list':
-            for course_block in response.data:
-                course_blocks[course_block['id']] = course_block
-
-                if course_block.get('type') == 'course':
-                    root = course_block['id']
-        else:
-            root = response.data['root']
-            course_blocks = response.data['blocks']
-
-        if not root:
-            raise ValueError(f"Unable to find course block in {course_key_string}")
-
-        recurse_mark_complete(root, course_blocks)
-        return response
-
-
-def recurse_mark_complete(block_id, blocks):
-    """
-    Helper function to walk course tree dict,
-    marking completion as 1 or 0
-
-    If all blocks are complete, mark parent block complete
-
-    :param blocks: dict of all blocks
-    :param block_id: root or child block id
-
-    :return:
-        block: course_outline_root_block block object or child block
-    """
-    block = blocks.get(block_id, {})
-    if block.get('completion') == 1:
-        return
-
-    child_blocks = block.get('children', block.get('descendants'))
-    # Unit blocks(blocks with no children) completion is being marked by patch call to completion service.
-    if child_blocks:
-        for child_block in child_blocks:
-            recurse_mark_complete(child_block, blocks)
-
-        completable_blocks = [blocks[child_block_id] for child_block_id in child_blocks
-                              if blocks[child_block_id].get('type') != 'discussion']
-        block['completion'] = int(all(child.get('completion') == 1 for child in completable_blocks))
+            raise ValidationError(u"'{}' is not a valid course key.".format(six.text_type(course_key_string)))
+        return super(BlocksInCourseView, self).list(request, course_usage_key, hide_access_denials=hide_access_denials)

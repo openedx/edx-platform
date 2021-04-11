@@ -1,6 +1,9 @@
 """
 Extension of XBlock Validation class to include information for presentation in Studio.
 """
+
+
+import six
 from xblock.validation import Validation, ValidationMessage
 
 
@@ -30,17 +33,17 @@ class StudioValidationMessage(ValidationMessage):
             action_runtime_event (str): An event name to be triggered on the xblock client-side runtime when
                 the "fix-up" action is clicked (optional).
         """
-        super().__init__(message_type, message_text)
+        super(StudioValidationMessage, self).__init__(message_type, message_text)
         if action_label is not None:
-            if not isinstance(action_label, str):
+            if not isinstance(action_label, six.text_type):
                 raise TypeError("Action label must be unicode.")
             self.action_label = action_label
         if action_class is not None:
-            if not isinstance(action_class, str):
+            if not isinstance(action_class, six.string_types):
                 raise TypeError("Action class must be a string.")
             self.action_class = action_class
         if action_runtime_event is not None:
-            if not isinstance(action_runtime_event, str):
+            if not isinstance(action_runtime_event, six.string_types):
                 raise TypeError("Action runtime event must be a string.")
             self.action_runtime_event = action_runtime_event
 
@@ -51,7 +54,7 @@ class StudioValidationMessage(ValidationMessage):
         Returns:
             dict: A dict representation that is json-serializable.
         """
-        serialized = super().to_json()
+        serialized = super(StudioValidationMessage, self).to_json()
         if hasattr(self, "action_label"):
             serialized["action_label"] = self.action_label
         if hasattr(self, "action_class"):
@@ -91,7 +94,7 @@ class StudioValidation(Validation):
         Args:
             xblock_id (object): An identification object that must support conversion to unicode.
         """
-        super().__init__(xblock_id)
+        super(StudioValidation, self).__init__(xblock_id)
         self.summary = None
 
     def set_summary(self, message):
@@ -113,7 +116,7 @@ class StudioValidation(Validation):
         Returns:
             bool: True iff this instance has no validation issues and therefore has no messages or summary.
         """
-        return super().empty and not self.summary
+        return super(StudioValidation, self).empty and not self.summary
 
     def to_json(self):
         """
@@ -122,7 +125,7 @@ class StudioValidation(Validation):
         Returns:
             dict: A dict representation that is json-serializable.
         """
-        serialized = super().to_json()
+        serialized = super(StudioValidation, self).to_json()
         if self.summary:
             serialized["summary"] = self.summary.to_json()
         return serialized

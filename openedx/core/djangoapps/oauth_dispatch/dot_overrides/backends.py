@@ -17,4 +17,4 @@ class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
 
     See: https://openedx.atlassian.net/browse/TNL-4516
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

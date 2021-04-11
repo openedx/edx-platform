@@ -2,6 +2,8 @@
 """ User model wrapper for comment service"""
 
 
+from six import text_type
+
 from . import models, settings, utils
 
 
@@ -20,7 +22,7 @@ class User(models.Model):
 
     metric_tag_fields = ['course_id']
 
-    base_url = f"{settings.PREFIX}/users"
+    base_url = "{prefix}/users".format(prefix=settings.PREFIX)
     default_retrieve_params = {'complete': True}
     type = 'user'
 
@@ -40,7 +42,7 @@ class User(models.Model):
             _url_for_read(self.id),
             params,
             metric_action='user.read',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
         )
 
     def follow(self, source):
@@ -50,7 +52,7 @@ class User(models.Model):
             _url_for_subscription(self.id),
             params,
             metric_action='user.follow',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
         )
 
     def unfollow(self, source):
@@ -60,7 +62,7 @@ class User(models.Model):
             _url_for_subscription(self.id),
             params,
             metric_action='user.unfollow',
-            metric_tags=self._metric_tags + [f'target.type:{source.type}'],
+            metric_tags=self._metric_tags + ['target.type:{}'.format(source.type)],
         )
 
     def vote(self, voteable, value):
@@ -76,7 +78,7 @@ class User(models.Model):
             url,
             params,
             metric_action='user.vote',
-            metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
+            metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
         voteable._update_from_response(response)
 
@@ -93,7 +95,7 @@ class User(models.Model):
             url,
             params,
             metric_action='user.unvote',
-            metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
+            metric_tags=self._metric_tags + ['target.type:{}'.format(voteable.type)],
         )
         voteable._update_from_response(response)
 
@@ -103,7 +105,7 @@ class User(models.Model):
         if not self.course_id:
             raise utils.CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
-        params = {'course_id': str(self.course_id)}
+        params = {'course_id': text_type(self.course_id)}
         params.update(query_params)
         response = utils.perform_request(
             'get',
@@ -123,7 +125,7 @@ class User(models.Model):
                 "Must provide course_id when retrieving subscribed threads for the user",
             )
         url = _url_for_user_subscribed_threads(self.id)
-        params = {'course_id': str(self.course_id)}
+        params = {'course_id': text_type(self.course_id)}
         params.update(query_params)
         response = utils.perform_request(
             'get',
@@ -145,7 +147,7 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = str(self.course_id)
+            retrieve_params['course_id'] = text_type(self.course_id)
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.group_id
         try:
@@ -198,41 +200,41 @@ class User(models.Model):
 
 
 def _url_for_vote_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/votes"
+    return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
 
 
 def _url_for_vote_thread(thread_id):
-    return f"{settings.PREFIX}/threads/{thread_id}/votes"
+    return "{prefix}/threads/{thread_id}/votes".format(prefix=settings.PREFIX, thread_id=thread_id)
 
 
 def _url_for_subscription(user_id):
-    return f"{settings.PREFIX}/users/{user_id}/subscriptions"
+    return "{prefix}/users/{user_id}/subscriptions".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_user_active_threads(user_id):
-    return f"{settings.PREFIX}/users/{user_id}/active_threads"
+    return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_user_subscribed_threads(user_id):
-    return f"{settings.PREFIX}/users/{user_id}/subscribed_threads"
+    return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_read(user_id):
     """
     Returns cs_comments_service url endpoint to mark thread as read for given user_id
     """
-    return f"{settings.PREFIX}/users/{user_id}/read"
+    return "{prefix}/users/{user_id}/read".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_retire(user_id):
     """
     Returns cs_comments_service url endpoint to retire a user (remove all post content, etc.)
     """
-    return f"{settings.PREFIX}/users/{user_id}/retire"
+    return "{prefix}/users/{user_id}/retire".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_username_replacement(user_id):
     """
     Returns cs_comments_servuce url endpoint to replace the username of a user
     """
-    return f"{settings.PREFIX}/users/{user_id}/replace_username"
+    return "{prefix}/users/{user_id}/replace_username".format(prefix=settings.PREFIX, user_id=user_id)

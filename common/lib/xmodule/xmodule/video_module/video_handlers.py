@@ -10,6 +10,7 @@ import json
 import logging
 import math
 
+import six
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
@@ -46,15 +47,15 @@ def to_boolean(value):
     """
     Convert a value from a GET or POST request parameter to a bool
     """
-    if isinstance(value, bytes):
+    if isinstance(value, six.binary_type):
         value = value.decode('ascii', errors='replace')
-    if isinstance(value, str):
+    if isinstance(value, six.text_type):
         return value.lower() == 'true'
     else:
         return bool(value)
 
 
-class VideoStudentViewHandlers:
+class VideoStudentViewHandlers(object):
     """
     Handlers for video module instance.
     """
@@ -90,19 +91,19 @@ class VideoStudentViewHandlers:
                         value = now()
 
                     if key == 'speed' and math.isnan(value):
-                        message = f"Invalid speed value {value}, must be a float."
+                        message = u"Invalid speed value {}, must be a float.".format(value)
                         log.warning(message)
                         return json.dumps({'success': False, 'error': message})
 
                     setattr(self, key, value)
 
                     if key == 'speed':
-                        self.global_speed = self.speed  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+                        self.global_speed = self.speed
 
             return json.dumps({'success': True})
 
-        log.debug(f"GET {data}")
-        log.debug(f"DISPATCH {dispatch}")
+        log.debug(u"GET {0}".format(data))
+        log.debug(u"DISPATCH {0}".format(dispatch))
 
         raise NotFoundError('Unexpected dispatch type')
 
@@ -158,7 +159,7 @@ class VideoStudentViewHandlers:
                 generate_sjson_for_all_speeds(
                     self,
                     other_lang[self.transcript_language],
-                    {speed: youtube_id for youtube_id, speed in youtube_ids.items()},
+                    {speed: youtube_id for youtube_id, speed in six.iteritems(youtube_ids)},
                     self.transcript_language
                 )
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
@@ -217,7 +218,7 @@ class VideoStudentViewHandlers:
             if asset_path:
                 response = Response(
                     status=307,
-                    location='/static/{}/{}'.format(
+                    location='/static/{0}/{1}'.format(
                         asset_path,
                         subs_filename(transcript_name, self.transcript_language)
                     )
@@ -238,15 +239,15 @@ class VideoStudentViewHandlers:
         Return value: JSON response (200 on success, 400 for malformed data)
         """
         completion_service = self.runtime.service(self, 'completion')
-        if completion_service is None:  # lint-amnesty, pylint: disable=no-else-raise
-            raise JsonHandlerError(500, "No completion service found")
+        if completion_service is None:
+            raise JsonHandlerError(500, u"No completion service found")
         elif not completion_service.completion_tracking_enabled():
-            raise JsonHandlerError(404, "Completion tracking is not enabled and API calls are unexpected")
-        if not isinstance(data['completion'], (int, float)):  # lint-amnesty, pylint: disable=no-else-raise
-            message = "Invalid completion value {}. Must be a float in range [0.0, 1.0]"
+            raise JsonHandlerError(404, u"Completion tracking is not enabled and API calls are unexpected")
+        if not isinstance(data['completion'], (int, float)):
+            message = u"Invalid completion value {}. Must be a float in range [0.0, 1.0]"
             raise JsonHandlerError(400, message.format(data['completion']))
         elif not 0.0 <= data['completion'] <= 1.0:
-            message = "Invalid completion value {}. Must be in range [0.0, 1.0]"
+            message = u"Invalid completion value {}. Must be in range [0.0, 1.0]"
             raise JsonHandlerError(400, message.format(data['completion']))
         self.runtime.publish(self, "completion", data)
         return {"result": "ok"}
@@ -271,7 +272,7 @@ class VideoStudentViewHandlers:
             headerlist.append(
                 (
                     'Content-Disposition',
-                    f'attachment; filename="{filename}"'
+                    'attachment; filename="{}"'.format(filename.encode('utf-8') if six.PY2 else filename)
                 )
             )
 
@@ -321,8 +322,8 @@ class VideoStudentViewHandlers:
                 log.info("Video: transcript facilities are not available for given language.")
                 return Response(status=404)
 
-            if language != self.transcript_language:  # lint-amnesty, pylint: disable=access-member-before-definition
-                self.transcript_language = language  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+            if language != self.transcript_language:
+                self.transcript_language = language
 
             try:
                 if is_bumper:
@@ -383,25 +384,7 @@ class VideoStudentViewHandlers:
         return response
 
     @XBlock.handler
-    def student_view_user_state(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Endpoint to get user-specific state, like current position and playback speed,
-        without rendering the full student_view HTML. This is similar to student_view_state,
-        but that one cannot contain user-specific info.
-        """
-        view_state = self.student_view_data()
-        view_state.update({
-            "saved_video_position": self.saved_video_position.total_seconds(),
-            "speed": self.speed,
-        })
-        return Response(
-            json.dumps(view_state),
-            content_type='application/json',
-            charset='UTF-8'
-        )
-
-    @XBlock.handler
-    def yt_video_metadata(self, request, suffix=''):  # lint-amnesty, pylint: disable=unused-argument
+    def yt_video_metadata(self, request, suffix=''):
         """
         Endpoint to get YouTube metadata.
         This handler is only used in the Blockstore-based runtime. The old
@@ -418,7 +401,7 @@ class VideoStudentViewHandlers:
         return response
 
 
-class VideoStudioViewHandlers:
+class VideoStudioViewHandlers(object):
     """
     Handlers for Studio view.
     """
@@ -442,15 +425,15 @@ class VideoStudioViewHandlers:
         available_translations = self.available_translations(transcripts, verify_assets=True)
 
         if missing:
-            error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
+            error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
         elif (
             data['language_code'] != data['new_language_code'] and data['new_language_code'] in available_translations
         ):
-            error = _('A transcript with the "{language_code}" language code already exists.'.format(  # lint-amnesty, pylint: disable=translation-of-non-string
+            error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
                 language_code=data['new_language_code']
             ))
         elif 'file' not in data:
-            error = _('A transcript file is required.')
+            error = _(u'A transcript file is required.')
 
         return error
 
@@ -499,7 +482,7 @@ class VideoStudioViewHandlers:
                     if not edx_video_id:
                         # Back-populate the video ID for an external video.
                         # pylint: disable=attribute-defined-outside-init
-                        self.edx_video_id = edx_video_id = create_external_video(display_name='external video')
+                        self.edx_video_id = edx_video_id = create_external_video(display_name=u'external video')
 
                     try:
                         # Convert SRT transcript into an SJSON format
@@ -527,7 +510,7 @@ class VideoStudioViewHandlers:
                         response = Response(
                             json={
                                 'error': _(
-                                    'There is a problem with this transcript file. Try to upload a different file.'
+                                    u'There is a problem with this transcript file. Try to upload a different file.'
                                 )
                             },
                             status=400
@@ -544,7 +527,7 @@ class VideoStudioViewHandlers:
                 if edx_video_id:
                     delete_video_transcript(video_id=edx_video_id, language_code=language)
 
-                if language == 'en':
+                if language == u'en':
                     # remove any transcript file from content store for the video ids
                     possible_sub_ids = [
                         self.sub,  # pylint: disable=access-member-before-definition
@@ -566,7 +549,7 @@ class VideoStudioViewHandlers:
             elif request.method == 'GET':
                 language = request.GET.get('language_code')
                 if not language:
-                    return Response(json={'error': _('Language is required.')}, status=400)
+                    return Response(json={'error': _(u'Language is required.')}, status=400)
 
                 try:
                     transcript_content, transcript_name, mime_type = get_transcript(
@@ -575,7 +558,9 @@ class VideoStudioViewHandlers:
                     response = Response(transcript_content, headerlist=[
                         (
                             'Content-Disposition',
-                            f'attachment; filename="{transcript_name}"'
+                            'attachment; filename="{}"'.format(
+                                transcript_name.encode('utf8') if six.PY2 else transcript_name
+                            )
                         ),
                         ('Content-Language', language),
                         ('Content-Type', mime_type)

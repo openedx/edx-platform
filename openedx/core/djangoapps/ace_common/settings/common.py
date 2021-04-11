@@ -1,9 +1,4 @@
-"""
-Settings for ace_common app.
-"""
-
-
-def plugin_settings(settings):  # lint-amnesty, pylint: disable=missing-function-docstring, missing-module-docstring
+def plugin_settings(settings):
     settings.ACE_ENABLED_CHANNELS = [
         'django_email'
     ]

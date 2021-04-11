@@ -1,26 +1,15 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import logging
 import textwrap
 
 from lxml import etree
 from pkg_resources import resource_string
-from web_fragments.fragment import Fragment
 from xblock.fields import Scope, String
 
 from openedx.core.djangolib.markup import HTML, Text
-from xmodule.editing_module import EditingMixin
-from xmodule.raw_module import RawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.xml_module import XmlMixin
-from xmodule.x_module import (
-    HTMLSnippet,
-    ResourceTemplates,
-    shim_xmodule_js,
-    XModuleMixin,
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-)
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import XModule
 
 log = logging.getLogger(__name__)
 
@@ -29,24 +18,11 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class AnnotatableBlock(
-    RawMixin,
-    XmlMixin,
-    EditingMixin,
-    XModuleDescriptorToXBlockMixin,
-    XModuleToXBlockMixin,
-    HTMLSnippet,
-    ResourceTemplates,
-    XModuleMixin,
-):
-    """
-    Annotatable XBlock.
-    """
-
+class AnnotatableFields(object):
     data = String(
         help=_("XML data for the annotation"),
         scope=Scope.content,
-        default=textwrap.dedent(HTML("""
+        default=textwrap.dedent(HTML(u"""
         <annotatable>
             <instructions>
                 <p>Enter your (optional) instructions for the exercise in HTML format.</p>
@@ -71,43 +47,31 @@ class AnnotatableBlock(
         default=_('Annotation'),
     )
 
-    uses_xmodule_styles_setup = True
 
-    preview_view_js = {
+class AnnotatableModule(AnnotatableFields, XModule):
+    js = {
         'js': [
             resource_string(__name__, 'js/src/html/display.js'),
             resource_string(__name__, 'js/src/annotatable/display.js'),
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        ]
     }
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/annotatable/display.scss'),
-        ],
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/raw/edit/xml.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/codemirror/codemirror.scss'),
-        ],
-    }
-    studio_js_module_name = "XMLEditingDescriptor"
-    mako_template = "widgets/raw-edit.html"
-
+    js_module_name = "Annotatable"
+    css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'annotatable'
-    resources_dir = None
 
-    HIGHLIGHT_COLORS = ['yellow', 'orange', 'purple', 'blue', 'green']
+    def __init__(self, *args, **kwargs):
+        super(AnnotatableModule, self).__init__(*args, **kwargs)
 
-    def _get_annotation_class_attr(self, index, el):  # lint-amnesty, pylint: disable=unused-argument
+        xmltree = etree.fromstring(self.data)
+
+        self.instructions = self._extract_instructions(xmltree)
+        self.content = etree.tostring(xmltree, encoding='unicode')
+        self.element_id = self.location.html_id()
+        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
+
+    def _get_annotation_class_attr(self, index, el):
         """ Returns a dict with the CSS class attribute to set on the annotation
             and an XML key to delete from the element.
          """
@@ -118,14 +82,14 @@ class AnnotatableBlock(
         color = el.get(highlight_key)
 
         if color is not None:
-            if color in self.HIGHLIGHT_COLORS:
+            if color in self.highlight_colors:
                 cls.append('highlight-' + color)
             attr['_delete'] = highlight_key
         attr['value'] = ' '.join(cls)
 
         return {'class': attr}
 
-    def _get_annotation_data_attr(self, index, el):  # lint-amnesty, pylint: disable=unused-argument
+    def _get_annotation_data_attr(self, index, el):
         """ Returns a dict in which the keys are the HTML data attributes
             to set on the annotation element. Each data attribute has a
             corresponding 'value' and (optional) '_delete' key to specify
@@ -139,7 +103,7 @@ class AnnotatableBlock(
             'problem': 'data-problem-id'
         }
 
-        for xml_key in attrs_map.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for xml_key in attrs_map.keys():
             if xml_key in el.attrib:
                 value = el.get(xml_key, '')
                 html_key = attrs_map[xml_key]
@@ -155,7 +119,7 @@ class AnnotatableBlock(
 
         el.tag = 'span'
 
-        for key in attr.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for key in attr.keys():
             el.set(key, attr[key]['value'])
             if '_delete' in attr[key] and attr[key]['_delete'] is not None:
                 delete_key = attr[key]['_delete']
@@ -163,11 +127,7 @@ class AnnotatableBlock(
 
     def _render_content(self):
         """ Renders annotatable content with annotation spans and returns HTML. """
-
-        xmltree = etree.fromstring(self.data)
-        content = etree.tostring(xmltree, encoding='unicode')
-
-        xmltree = etree.fromstring(content)
+        xmltree = etree.fromstring(self.content)
         xmltree.tag = 'div'
         if 'display_name' in xmltree.attrib:
             del xmltree.attrib['display_name']
@@ -190,37 +150,17 @@ class AnnotatableBlock(
 
     def get_html(self):
         """ Renders parameters to template. """
-
-        xmltree = etree.fromstring(self.data)
-        instructions = self._extract_instructions(xmltree)
-
         context = {
-            'display_name': self.display_name_with_default,
-            'element_id': self.location.html_id(),
-            'instructions_html': instructions,
+            'display_name': self.display_name_with_default_escaped,
+            'element_id': self.element_id,
+            'instructions_html': self.instructions,
             'content_html': self._render_content()
         }
 
         return self.system.render_template('annotatable.html', context)
 
-    def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
-        """
-        Renders the output that a student will see.
-        """
-        fragment = Fragment()
-        fragment.add_content(self.get_html())
-        add_webpack_to_fragment(fragment, 'AnnotatableBlockPreview')
-        shim_xmodule_js(fragment, 'Annotatable')
 
-        return fragment
-
-    def studio_view(self, _context):
-        """
-        Return the studio view.
-        """
-        fragment = Fragment(
-            self.system.render_template(self.mako_template, self.get_context())
-        )
-        add_webpack_to_fragment(fragment, 'AnnotatableBlockStudio')
-        shim_xmodule_js(fragment, self.studio_js_module_name)
-        return fragment
+class AnnotatableDescriptor(AnnotatableFields, RawDescriptor):
+    module_class = AnnotatableModule
+    mako_template = "widgets/raw-edit.html"
+    resources_dir = None

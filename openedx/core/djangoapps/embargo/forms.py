@@ -25,7 +25,7 @@ class RestrictedCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta:
+    class Meta(object):
         model = RestrictedCourse
         fields = '__all__'
 
@@ -48,7 +48,7 @@ class RestrictedCourseForm(forms.ModelForm):
         try:
             course_key = CourseKey.from_string(cleaned_id)
         except InvalidKeyError:
-            raise forms.ValidationError(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise forms.ValidationError(error_msg)
 
         if not modulestore().has_course(course_key):
             raise forms.ValidationError(error_msg)
@@ -59,7 +59,7 @@ class RestrictedCourseForm(forms.ModelForm):
 class IPFilterForm(forms.ModelForm):
     """Form validating entry of IP addresses"""
 
-    class Meta:
+    class Meta(object):
         model = IPFilter
         fields = '__all__'
 
@@ -86,7 +86,7 @@ class IPFilterForm(forms.ModelForm):
             if not self._is_valid_ip(address):
                 error_addresses.append(address)
         if error_addresses:
-            msg = f'Invalid IP Address(es): {error_addresses}'
+            msg = u'Invalid IP Address(es): {0}'.format(error_addresses)
             msg += ' Please fix the error(s) and try again.'
             raise forms.ValidationError(msg)
 

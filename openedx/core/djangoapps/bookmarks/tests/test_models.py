@@ -5,13 +5,15 @@ Tests for Bookmarks models.
 
 import datetime
 from contextlib import contextmanager
-from unittest import mock
 
 import ddt
+import mock
 import pytz
 from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from six import text_type
+from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
@@ -24,8 +26,8 @@ from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
 from .factories import BookmarkFactory
 
-EXAMPLE_USAGE_KEY_1 = 'i4x://org.15/course_15/chapter/Week_1'
-EXAMPLE_USAGE_KEY_2 = 'i4x://org.15/course_15/chapter/Week_2'
+EXAMPLE_USAGE_KEY_1 = u'i4x://org.15/course_15/chapter/Week_1'
+EXAMPLE_USAGE_KEY_2 = u'i4x://org.15/course_15/chapter/Week_2'
 
 
 noop_contextmanager = contextmanager(lambda x: (yield))  # pylint: disable=invalid-name
@@ -42,7 +44,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super().setUp()
+        super(BookmarksTestsBase, self).setUp()
 
         self.admin = AdminFactory()
         self.user = UserFactory.create(password=self.TEST_PASSWORD)
@@ -55,7 +57,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         with self.store.default_store(store_type):
 
             self.course = CourseFactory.create(display_name='An Introduction to API Testing')
-            self.course_id = str(self.course.id)
+            self.course_id = text_type(self.course.id)
 
             with self.store.bulk_operations(self.course.id):
 
@@ -155,7 +157,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
         self.other_bookmark_1 = BookmarkFactory.create(
             user=self.user,
-            course_key=str(self.other_course.id),
+            course_key=text_type(self.other_course.id),
             usage_key=self.other_vertical_1.location,
             xblock_cache=XBlockCache.create({
                 'display_name': self.other_vertical_1.display_name,
@@ -182,7 +184,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
                     for block in blocks_at_current_level:
                         for __ in range(children_per_block):
                             blocks_at_next_level += [ItemFactory.create(
-                                parent_location=block.scope_ids.usage_id, display_name=str(display_name)
+                                parent_location=block.scope_ids.usage_id, display_name=text_type(display_name)
                             )]
                             display_name += 1
 
@@ -198,7 +200,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             with self.store.bulk_operations(course.id):
                 blocks = [ItemFactory.create(
-                    parent_location=course.location, category='chapter', display_name=str(index)
+                    parent_location=course.location, category='chapter', display_name=text_type(index)
                 ) for index in range(count)]
 
             bookmarks = [BookmarkFactory.create(
@@ -217,30 +219,30 @@ class BookmarksTestsBase(ModuleStoreTestCase):
         """
         Assert that the attributes of the bookmark model were set correctly.
         """
-        assert bookmark.user == bookmark_data['user']
-        assert bookmark.course_key == bookmark_data['course_key']
-        assert str(bookmark.usage_key) == str(bookmark_data['usage_key'])
-        assert bookmark.resource_id == '{},{}'.format(bookmark_data['user'], bookmark_data['usage_key'])
-        assert bookmark.display_name == bookmark_data['display_name']
-        assert bookmark.path == self.path
-        assert bookmark.created is not None
+        self.assertEqual(bookmark.user, bookmark_data['user'])
+        self.assertEqual(bookmark.course_key, bookmark_data['course_key'])
+        self.assertEqual(text_type(bookmark.usage_key), text_type(bookmark_data['usage_key']))
+        self.assertEqual(bookmark.resource_id, u"{},{}".format(bookmark_data['user'], bookmark_data['usage_key']))
+        self.assertEqual(bookmark.display_name, bookmark_data['display_name'])
+        self.assertEqual(bookmark.path, self.path)
+        self.assertIsNotNone(bookmark.created)
 
-        assert bookmark.xblock_cache.course_key == bookmark_data['course_key']
-        assert bookmark.xblock_cache.display_name == bookmark_data['display_name']
+        self.assertEqual(bookmark.xblock_cache.course_key, bookmark_data['course_key'])
+        self.assertEqual(bookmark.xblock_cache.display_name, bookmark_data['display_name'])
 
     def assert_bookmark_data_is_valid(self, bookmark, bookmark_data, check_optional_fields=False):
         """
         Assert that the bookmark data matches the data in the model.
         """
-        assert bookmark_data['id'] == bookmark.resource_id
-        assert bookmark_data['course_id'] == str(bookmark.course_key)
-        assert bookmark_data['usage_id'] == str(bookmark.usage_key)
-        assert bookmark_data['block_type'] == str(bookmark.usage_key.block_type)
-        assert bookmark_data['created'] is not None
+        self.assertEqual(bookmark_data['id'], bookmark.resource_id)
+        self.assertEqual(bookmark_data['course_id'], text_type(bookmark.course_key))
+        self.assertEqual(bookmark_data['usage_id'], text_type(bookmark.usage_key))
+        self.assertEqual(bookmark_data['block_type'], text_type(bookmark.usage_key.block_type))
+        self.assertIsNotNone(bookmark_data['created'])
 
         if check_optional_fields:
-            assert bookmark_data['display_name'] == bookmark.display_name
-            assert bookmark_data['path'] == bookmark.path
+            self.assertEqual(bookmark_data['display_name'], bookmark.display_name)
+            self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
 @ddt.ddt
@@ -251,7 +253,7 @@ class BookmarkModelTests(BookmarksTestsBase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(BookmarkModelTests, self).setUp()
 
         self.vertical_4 = ItemFactory.create(
             parent_location=self.sequential_2.location,
@@ -302,9 +304,9 @@ class BookmarkModelTests(BookmarksTestsBase):
         with check_mongo_calls(expected_mongo_calls):
             bookmark, __ = Bookmark.create(bookmark_data)
 
-        assert bookmark.path == expected_path
-        assert bookmark.xblock_cache is not None
-        assert bookmark.xblock_cache.paths == []
+        self.assertEqual(bookmark.path, expected_path)
+        self.assertIsNotNone(bookmark.xblock_cache)
+        self.assertEqual(bookmark.xblock_cache.paths, [])
 
     def test_create_bookmark_success(self):
         """
@@ -318,14 +320,14 @@ class BookmarkModelTests(BookmarksTestsBase):
         bookmark_data_different_values['display_name'] = 'Introduction Video'
         bookmark2, __ = Bookmark.create(bookmark_data_different_values)
         # The bookmark object already created should have been returned without modifications.
-        assert bookmark == bookmark2
-        assert bookmark.xblock_cache == bookmark2.xblock_cache
+        self.assertEqual(bookmark, bookmark2)
+        self.assertEqual(bookmark.xblock_cache, bookmark2.xblock_cache)
         self.assert_bookmark_model_is_valid(bookmark2, bookmark_data)
 
         bookmark_data_different_user = self.get_bookmark_data(self.vertical_2)
         bookmark_data_different_user['user'] = UserFactory.create()
         bookmark3, __ = Bookmark.create(bookmark_data_different_user)
-        assert bookmark != bookmark3
+        self.assertNotEqual(bookmark, bookmark3)
         self.assert_bookmark_model_is_valid(bookmark3, bookmark_data_different_user)
 
     def test_create_bookmark_successfully_with_display_name_none(self):
@@ -357,15 +359,15 @@ class BookmarkModelTests(BookmarksTestsBase):
 
         bookmark_data = self.get_bookmark_data(html)
         bookmark, __ = Bookmark.create(bookmark_data)
-        assert bookmark.xblock_cache is not None
+        self.assertIsNotNone(bookmark.xblock_cache)
 
         modification_datetime = datetime.datetime.now(pytz.utc) + datetime.timedelta(seconds=seconds_delta)
         with freeze_time(modification_datetime):
             bookmark.xblock_cache.paths = paths
             bookmark.xblock_cache.save()
 
-        assert bookmark.path == block_path
-        assert mock_get_path.call_count == get_path_call_count
+        self.assertEqual(bookmark.path, block_path)
+        self.assertEqual(mock_get_path.call_count, get_path_call_count)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 2, 2, 2),
@@ -399,7 +401,7 @@ class BookmarkModelTests(BookmarksTestsBase):
 
         with check_mongo_calls(expected_mongo_calls):
             path = Bookmark.get_path(block.location)
-            assert len(path) == (depth - 2)
+            self.assertEqual(len(path), depth - 2)
 
     def test_get_path_in_case_of_exceptions(self):
 
@@ -408,7 +410,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         # Block does not exist
         usage_key = UsageKey.from_string('i4x://edX/apis/html/interactive')
         usage_key.replace(course_key=self.course.id)
-        assert Bookmark.get_path(usage_key) == []
+        self.assertEqual(Bookmark.get_path(usage_key), [])
 
         # Block is an orphan
         self.other_sequential_1.children = []
@@ -417,16 +419,16 @@ class BookmarkModelTests(BookmarksTestsBase):
         bookmark_data = self.get_bookmark_data(self.other_vertical_2, user=user)
         bookmark, __ = Bookmark.create(bookmark_data)
 
-        assert bookmark.path == []
-        assert bookmark.xblock_cache is not None
-        assert bookmark.xblock_cache.paths == []
+        self.assertEqual(bookmark.path, [])
+        self.assertIsNotNone(bookmark.xblock_cache)
+        self.assertEqual(bookmark.xblock_cache.paths, [])
 
         # Parent block could not be retrieved
         with mock.patch('openedx.core.djangoapps.bookmarks.models.search.path_to_location') as mock_path_to_location:
             mock_path_to_location.return_value = [usage_key]
             bookmark_data = self.get_bookmark_data(self.other_sequential_1, user=user)
             bookmark, __ = Bookmark.create(bookmark_data)
-            assert bookmark.path == []
+            self.assertEqual(bookmark.path, [])
 
 
 @ddt.ddt
@@ -440,23 +442,23 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
     SECTION2_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='section', block_id='section1')
     VERTICAL1_USAGE_KEY = BlockUsageLocator(COURSE_KEY, block_type='vertical', block_id='sequential1')
     PATH1 = [
-        [str(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [str(SECTION1_USAGE_KEY), 'Section 1'],
+        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [text_type(SECTION1_USAGE_KEY), 'Section 1'],
     ]
     PATH2 = [
-        [str(CHAPTER1_USAGE_KEY), 'Chapter 1'],
-        [str(SECTION2_USAGE_KEY), 'Section 2'],
+        [text_type(CHAPTER1_USAGE_KEY), 'Chapter 1'],
+        [text_type(SECTION2_USAGE_KEY), 'Section 2'],
     ]
 
     def assert_xblock_cache_data(self, xblock_cache, data):
         """
         Assert that the XBlockCache object values match.
         """
-        assert xblock_cache.usage_key == data['usage_key']
-        assert xblock_cache.course_key == data['usage_key'].course_key
-        assert xblock_cache.display_name == data['display_name']
-        assert xblock_cache._paths == data['_paths']  # pylint: disable=protected-access
-        assert xblock_cache.paths == [parse_path_data(path) for path in data['_paths']]
+        self.assertEqual(xblock_cache.usage_key, data['usage_key'])
+        self.assertEqual(xblock_cache.course_key, data['usage_key'].course_key)
+        self.assertEqual(xblock_cache.display_name, data['display_name'])
+        self.assertEqual(xblock_cache._paths, data['_paths'])  # pylint: disable=protected-access
+        self.assertEqual(xblock_cache.paths, [parse_path_data(path) for path in data['_paths']])
 
     @ddt.data(
         (
@@ -501,11 +503,11 @@ class XBlockCacheModelTest(ModuleStoreTestCase):
             'display_name': 'The end.',
             '_paths': original_paths,
         })
-        assert xblock_cache.paths == [parse_path_data(path) for path in original_paths]
+        self.assertEqual(xblock_cache.paths, [parse_path_data(path) for path in original_paths])
 
         xblock_cache.paths = [parse_path_data(path) for path in updated_paths]
         xblock_cache.save()
 
         xblock_cache = XBlockCache.objects.get(id=xblock_cache.id)
-        assert xblock_cache._paths == updated_paths  # pylint: disable=protected-access
-        assert xblock_cache.paths == [parse_path_data(path) for path in updated_paths]
+        self.assertEqual(xblock_cache._paths, updated_paths)  # pylint: disable=protected-access
+        self.assertEqual(xblock_cache.paths, [parse_path_data(path) for path in updated_paths])

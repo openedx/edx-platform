@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 from xmodule.contentstore.content import StaticContent
 
@@ -15,13 +15,13 @@ def empty_asset_trashcan(course_locs):
         # first delete all of the thumbnails
         thumbs = store.get_all_content_thumbnails_for_course(course_loc)
         for thumb in thumbs:
-            print(f"Deleting {thumb}...")
+            print("Deleting {0}...".format(thumb))
             store.delete(thumb['asset_key'])
 
         # then delete all of the assets
         assets, __ = store.get_all_content_for_course(course_loc)
         for asset in assets:
-            print(f"Deleting {asset}...")
+            print("Deleting {0}...".format(asset))
             store.delete(asset['asset_key'])
 
 
@@ -43,5 +43,5 @@ def restore_asset_from_trashcan(location):
         try:
             thumbnail_content = trash.find(content.thumbnail_location)
             store.save(thumbnail_content)
-        except Exception:  # lint-amnesty, pylint: disable=broad-except
+        except Exception:
             pass  # OK if this is left dangling

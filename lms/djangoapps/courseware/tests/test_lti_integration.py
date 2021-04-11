@@ -4,11 +4,12 @@
 import json
 from collections import OrderedDict
 
-from unittest import mock
-import urllib
+import mock
 import oauthlib
+import six
 from django.conf import settings
 from django.urls import reverse
+from six import text_type
 
 from lms.djangoapps.courseware.tests.helpers import BaseTestXmodule
 from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
@@ -32,42 +33,44 @@ class TestLTI(BaseTestXmodule):
         """
         Mock oauth1 signing of requests library for testing.
         """
-        super().setUp()
-        mocked_nonce = '135685044251684026041377608307'
-        mocked_timestamp = '1234567890'
-        mocked_signature_after_sign = 'my_signature%3D'
-        mocked_decoded_signature = 'my_signature='
+        super(TestLTI, self).setUp()
+        mocked_nonce = u'135685044251684026041377608307'
+        mocked_timestamp = u'1234567890'
+        mocked_signature_after_sign = u'my_signature%3D'
+        mocked_decoded_signature = u'my_signature='
 
         # Note: this course_id is actually a course_key
-        context_id = str(self.item_descriptor.course_id)
-        user_id = str(self.item_descriptor.xmodule_runtime.anonymous_student_id)
+        context_id = text_type(self.item_descriptor.course_id)
+        user_id = text_type(self.item_descriptor.xmodule_runtime.anonymous_student_id)
         hostname = self.item_descriptor.xmodule_runtime.hostname
-        resource_link_id = str(urllib.parse.quote('{}-{}'.format(hostname, self.item_descriptor.location.html_id())))
+        resource_link_id = text_type(six.moves.urllib.parse.quote('{}-{}'.format(hostname,
+                                                                                 self.item_descriptor.location.html_id()
+                                                                                 )))
 
         sourcedId = "{context}:{resource_link}:{user_id}".format(
-            context=urllib.parse.quote(context_id),
+            context=six.moves.urllib.parse.quote(context_id),
             resource_link=resource_link_id,
             user_id=user_id
         )
 
         self.correct_headers = {
-            'user_id': user_id,
-            'oauth_callback': 'about:blank',
-            'launch_presentation_return_url': '',
-            'lti_message_type': 'basic-lti-launch-request',
-            'lti_version': 'LTI-1p0',
-            'roles': 'Student',
-            'context_id': context_id,
+            u'user_id': user_id,
+            u'oauth_callback': u'about:blank',
+            u'launch_presentation_return_url': '',
+            u'lti_message_type': u'basic-lti-launch-request',
+            u'lti_version': 'LTI-1p0',
+            u'roles': u'Student',
+            u'context_id': context_id,
 
-            'resource_link_id': resource_link_id,
-            'lis_result_sourcedid': sourcedId,
+            u'resource_link_id': resource_link_id,
+            u'lis_result_sourcedid': sourcedId,
 
-            'oauth_nonce': mocked_nonce,
-            'oauth_timestamp': mocked_timestamp,
-            'oauth_consumer_key': '',
-            'oauth_signature_method': 'HMAC-SHA1',
-            'oauth_version': '1.0',
-            'oauth_signature': mocked_decoded_signature
+            u'oauth_nonce': mocked_nonce,
+            u'oauth_timestamp': mocked_timestamp,
+            u'oauth_consumer_key': u'',
+            u'oauth_signature_method': u'HMAC-SHA1',
+            u'oauth_version': u'1.0',
+            u'oauth_signature': mocked_decoded_signature
         }
 
         saved_sign = oauthlib.oauth1.Client.sign
@@ -77,14 +80,14 @@ class TestLTI(BaseTestXmodule):
             'input_fields': self.correct_headers,
             'element_class': self.item_descriptor.category,
             'element_id': self.item_descriptor.location.html_id(),
-            'launch_url': 'http://www.example.com',  # default value
+            'launch_url': u'http://www.example.com',  # default value
             'open_in_a_new_page': True,
             'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,
                                                                          'preview_handler').rstrip('/?'),
             'hide_launch': False,
             'has_score': False,
             'module_score': None,
-            'comment': '',
+            'comment': u'',
             'weight': 1.0,
             'ask_to_send_username': self.item_descriptor.ask_to_send_username,
             'ask_to_send_email': self.item_descriptor.ask_to_send_email,
@@ -100,12 +103,12 @@ class TestLTI(BaseTestXmodule):
             # self is <oauthlib.oauth1.rfc5849.Client object> here:
             __, headers, __ = saved_sign(self, *args, **kwargs)
             # we should replace nonce, timestamp and signed_signature in headers:
-            old = headers['Authorization']
+            old = headers[u'Authorization']
             old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
-            old_parsed['OAuth oauth_nonce'] = mocked_nonce
-            old_parsed['oauth_timestamp'] = mocked_timestamp
-            old_parsed['oauth_signature'] = mocked_signature_after_sign
-            headers['Authorization'] = ', '.join([k + '="' + v + '"' for k, v in old_parsed.items()])
+            old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
+            old_parsed[u'oauth_timestamp'] = mocked_timestamp
+            old_parsed[u'oauth_signature'] = mocked_signature_after_sign
+            headers[u'Authorization'] = ', '.join([k + '="' + v + '"' for k, v in old_parsed.items()])
             return None, headers, None
 
         patcher = mock.patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
@@ -115,15 +118,15 @@ class TestLTI(BaseTestXmodule):
     def test_lti_constructor(self):
         generated_content = self.item_descriptor.render(STUDENT_VIEW).content
         expected_content = self.runtime.render_template('lti.html', self.expected_context)
-        assert generated_content == expected_content
+        self.assertEqual(generated_content, expected_content)
 
     def test_lti_preview_handler(self):
         generated_content = self.item_descriptor.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
-        assert generated_content.decode('utf-8') == expected_content
+        self.assertEqual(generated_content.decode('utf-8'), expected_content)
 
 
-class TestLTIBlockListing(SharedModuleStoreTestCase):
+class TestLTIModuleListing(SharedModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course
     """
@@ -133,7 +136,7 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestLTIModuleListing, cls).setUpClass()
         cls.course = CourseFactory.create(display_name=cls.COURSE_NAME, number=cls.COURSE_SLUG)
         cls.chapter1 = ItemFactory.create(
             parent_location=cls.course.location,
@@ -172,28 +175,28 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
         return "https://{}{}".format(settings.SITE_NAME, reverse(
             'xblock_handler_noauth',
             args=[
-                str(self.course.id),
-                quote_slashes(str(self.lti_published.scope_ids.usage_id)),
+                text_type(self.course.id),
+                quote_slashes(text_type(self.lti_published.scope_ids.usage_id)),
                 handler
             ]
         ))
 
     def test_lti_rest_bad_course(self):
         """Tests what happens when the lti listing rest endpoint gets a bad course_id"""
-        bad_ids = ["sf", "dne/dne/dne", "fo/ey/\\u5305"]
+        bad_ids = [u"sf", u"dne/dne/dne", u"fo/ey/\\u5305"]
         for bad_course_id in bad_ids:
-            lti_rest_endpoints_url = f'courses/{bad_course_id}/lti_rest_endpoints/'
+            lti_rest_endpoints_url = 'courses/{}/lti_rest_endpoints/'.format(bad_course_id)
             response = self.client.get(lti_rest_endpoints_url)
-            assert 404 == response.status_code
+            self.assertEqual(404, response.status_code)
 
     def test_lti_rest_listing(self):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
-        response = get_course_lti_endpoints(request, course_id=str(self.course.id))
+        response = get_course_lti_endpoints(request, course_id=text_type(self.course.id))
 
-        assert 200 == response.status_code
-        assert 'application/json' == response['Content-Type']
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('application/json', response['Content-Type'])
 
         expected = {
             "lti_1_1_result_service_xml_endpoint": self.expected_handler_url('grade_handler'),
@@ -201,7 +204,7 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
             self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
             "display_name": self.lti_published.display_name,
         }
-        assert [expected] == json.loads(response.content.decode('utf-8'))
+        self.assertEqual([expected], json.loads(response.content.decode('utf-8')))
 
     def test_lti_rest_non_get(self):
         """tests that the endpoint returns 404 when hit with NON-get"""
@@ -209,5 +212,5 @@ class TestLTIBlockListing(SharedModuleStoreTestCase):
         for method in DISALLOWED_METHODS:
             request = mock.Mock()
             request.method = method
-            response = get_course_lti_endpoints(request, str(self.course.id))
-            assert 405 == response.status_code
+            response = get_course_lti_endpoints(request, text_type(self.course.id))
+            self.assertEqual(405, response.status_code)

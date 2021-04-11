@@ -76,7 +76,7 @@ ${block_content | n, decode.utf8}
         <label for="sd_fs_${location.block_id}"> / ${max_problem_score}</label>
       </div>
       % endif
-      <div data-location="${location}" data-location-name="${location.block_id}" data-course-id="${location.course_key}">
+      <div data-location="${location}" data-location-name="${location.block_id}">
         [
         % if can_reset_attempts:
         <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
@@ -128,8 +128,8 @@ ${block_content | n, decode.utf8}
       <h2>${_("Submission History Viewer")}</h2>
     </header>
     <form id="${element_id}_history_form">
-      <label for="${element_id}_history_student_username">${_("Learner's {platform_name} email address or username:").format(platform_name=settings.PLATFORM_NAME)}</label>
-      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder="${_('Enter the learner email address or username')}"/>
+      <label for="${element_id}_history_student_username">${_("User:")}</label>
+      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
       <input type="hidden" id="${element_id}_history_location" value="${location}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>

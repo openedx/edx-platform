@@ -6,6 +6,7 @@ from textwrap import dedent
 from django.core.management import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
+from six.moves import map
 
 from cms.djangoapps.contentstore.courseware_index import LibrarySearchIndexer
 from xmodule.modulestore.django import modulestore
@@ -23,7 +24,7 @@ class Command(BaseCommand):
         ./manage.py reindex_library --all - reindexes all available libraries
     """
     help = dedent(__doc__)
-    CONFIRMATION_PROMPT = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+    CONFIRMATION_PROMPT = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
         parser.add_argument('library_ids', nargs='*')
@@ -39,7 +40,7 @@ class Command(BaseCommand):
         result = CourseKey.from_string(raw_value)
 
         if not isinstance(result, LibraryLocator):
-            raise CommandError(f"Argument {raw_value} is not a library key")
+            raise CommandError(u"Argument {0} is not a library key".format(raw_value))
 
         return result
 
@@ -49,7 +50,7 @@ class Command(BaseCommand):
         So, there could be no better docstring than emphasize this once again.
         """
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
-            raise CommandError("reindex_library requires one or more <library_id>s or the --all flag.")
+            raise CommandError(u"reindex_library requires one or more <library_id>s or the --all flag.")
 
         store = modulestore()
 
@@ -62,5 +63,5 @@ class Command(BaseCommand):
             library_keys = list(map(self._parse_library_key, options['library_ids']))
 
         for library_key in library_keys:
-            print(f"Indexing library {library_key}")
+            print(u"Indexing library {}".format(library_key))
             LibrarySearchIndexer.do_library_reindex(store, library_key)

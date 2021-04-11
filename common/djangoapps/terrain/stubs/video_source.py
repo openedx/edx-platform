@@ -25,7 +25,7 @@ class VideoSourceRequestHandler(SimpleHTTPRequestHandler):
         becomes /gizmo.mp4
         """
         root_dir = self.server.config.get('root_dir')
-        path = f'{root_dir}{path}'
+        path = '{}{}'.format(root_dir, path)
         return path.split('?')[0]
 
     def end_headers(self):

@@ -5,11 +5,12 @@ Unit tests for getting the list of courses and the course outline.
 
 import datetime
 import json
-from unittest import mock
 
 import ddt
 import lxml
+import mock
 import pytz
+import six
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
@@ -22,10 +23,10 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
 from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
 from common.djangoapps.course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
@@ -43,7 +44,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Add a course with odd characters in the fields
         """
-        super().setUp()
+        super(TestCourseIndex, self).setUp()
         # had a problem where index showed course but has_access failed to retrieve it for non-staff
         self.odd_course = CourseFactory.create(
             org='test.org_1-2',
@@ -74,7 +75,7 @@ class TestCourseIndex(CourseTestCase):
             self.assertEqual(len(library_tab), 1)
 
         # Add a library:
-        lib1 = LibraryFactory.create()  # lint-amnesty, pylint: disable=unused-variable
+        lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
@@ -139,7 +140,7 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], str(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
@@ -149,7 +150,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], str(chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -249,7 +250,7 @@ class TestCourseIndex(CourseTestCase):
         """
         # Testing the response code by passing slash separated course id whose format is valid but no course
         # having this id exists.
-        invalid_course_key = f'{self.course.id}_blah_blah_blah'
+        invalid_course_key = '{}_blah_blah_blah'.format(self.course.id)
         course_updates_url = reverse_course_url('course_info_handler', invalid_course_key)
         response = self.client.get(course_updates_url)
         self.assertEqual(response.status_code, 404)
@@ -262,7 +263,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertEqual(response.status_code, 404)
 
         # Testing the response by passing split course id whose format is invalid.
-        invalid_course_id = f'invalid.course.key/{split_course_key}'
+        invalid_course_id = 'invalid.course.key/{}'.format(split_course_key)
         course_updates_url_split = reverse_course_url('course_info_handler', invalid_course_id)
         response = self.client.get(course_updates_url_split)
         self.assertEqual(response.status_code, 404)
@@ -273,7 +274,7 @@ class TestCourseIndex(CourseTestCase):
         """
         # Testing the response code by passing slash separated course key, no course
         # having this key exists.
-        invalid_course_key = f'{self.course.id}_some_invalid_run'
+        invalid_course_key = '{}_some_invalid_run'.format(self.course.id)
         course_outline_url = reverse_course_url('course_handler', invalid_course_key)
         response = self.client.get_html(course_outline_url)
         self.assertEqual(response.status_code, 404)
@@ -328,7 +329,7 @@ class TestCourseIndexArchived(CourseTestCase):
         """
         Add courses with the end date set to various values
         """
-        super().setUp()
+        super(TestCourseIndexArchived, self).setUp()
 
         # Base course has no end date (so is active)
         self.course.end = None
@@ -425,7 +426,7 @@ class TestCourseOutline(CourseTestCase):
         """
         Set up the for the course outline tests.
         """
-        super().setUp()
+        super(TestCourseOutline, self).setUp()
 
         self.chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
@@ -455,7 +456,7 @@ class TestCourseOutline(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], str(self.course.location))
+        self.assertEqual(json_response['id'], six.text_type(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertNotEqual(json_response.get('published', False), is_concise)
         self.assertIsNone(json_response.get('visibility_state'))
@@ -465,7 +466,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertGreater(len(children), 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], str(self.chapter.location))
+        self.assertEqual(first_child_response['id'], six.text_type(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertNotEqual(json_response.get('published', False), is_concise)
         if not is_concise:
@@ -499,12 +500,12 @@ class TestCourseOutline(CourseTestCase):
         self.assertIsNone(course_outline_initial_state('no-such-locator', course_structure))
 
         # Verify that the correct initial state is returned for the test chapter
-        chapter_locator = str(self.chapter.location)
+        chapter_locator = six.text_type(self.chapter.location)
         initial_state = course_outline_initial_state(chapter_locator, course_structure)
         self.assertEqual(initial_state['locator_to_show'], chapter_locator)
         expanded_locators = initial_state['expanded_locators']
-        self.assertIn(str(self.sequential.location), expanded_locators)
-        self.assertIn(str(self.vertical.location), expanded_locators)
+        self.assertIn(six.text_type(self.sequential.location), expanded_locators)
+        self.assertIn(six.text_type(self.vertical.location), expanded_locators)
 
     def _create_test_data(self, course_module, create_blocks=False, publish=True, block_types=None):
         """
@@ -515,7 +516,7 @@ class TestCourseOutline(CourseTestCase):
                 ItemFactory.create(
                     parent_location=self.vertical.location,
                     category=block_type,
-                    display_name=f'{block_type} Problem'
+                    display_name=u'{} Problem'.format(block_type)
                 )
 
             if not publish:
@@ -532,7 +533,7 @@ class TestCourseOutline(CourseTestCase):
             expected_blocks.append(
                 [
                     reverse_usage_url('container_handler', self.vertical.location),
-                    f'{block_type} Problem'
+                    u'{} Problem'.format(block_type)
                 ]
             )
 
@@ -541,7 +542,7 @@ class TestCourseOutline(CourseTestCase):
             [component for component in advanced_modules if component in deprecated_block_types]
         )
 
-        self.assertCountEqual(info['blocks'], expected_blocks)
+        six.assertCountEqual(self, info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
             reverse_course_url('advanced_settings_handler', course_id)
@@ -603,7 +604,7 @@ class TestCourseReIndex(CourseTestCase):
         Set up the for the course outline tests.
         """
 
-        super().setUp()
+        super(TestCourseReIndex, self).setUp()
 
         self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, self.user.id)
@@ -693,7 +694,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -705,7 +706,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
@@ -719,7 +720,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -741,7 +742,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -752,7 +753,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             reindex_course_and_check_access(self.course.id, self.user)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
     def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
         """
         Test json response with mocked error data for sequence
@@ -763,7 +764,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -803,7 +804,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # Start manual reindex
@@ -815,7 +816,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoBlock.index_dictionary')
@@ -829,7 +830,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -851,7 +852,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response
@@ -862,7 +863,7 @@ class TestCourseReIndex(CourseTestCase):
         with self.assertRaises(SearchIndexingError):
             CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
 
-    @mock.patch('xmodule.seq_module.SequenceBlock.index_dictionary')
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
     def test_indexing_seq_error_responses(self, mock_index_dictionary):
         """
         Test do_course_reindex response with mocked error data for sequence
@@ -873,7 +874,7 @@ class TestCourseReIndex(CourseTestCase):
             user=self.user,
             size=10,
             from_=0,
-            course_id=str(self.course.id))
+            course_id=six.text_type(self.course.id))
         self.assertEqual(response['total'], 1)
 
         # set mocked exception response

@@ -10,12 +10,12 @@ from celery.states import PENDING
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.tests.factories import UserFactory as StudentUserFactory
 from lms.djangoapps.instructor_task.models import InstructorTask
+from common.djangoapps.student.tests.factories import UserFactory as StudentUserFactory
 
 
-class InstructorTaskFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class InstructorTaskFactory(DjangoModelFactory):
+    class Meta(object):
         model = InstructorTask
 
     task_type = 'rescore_problem'

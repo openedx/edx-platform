@@ -4,18 +4,17 @@ Tests for the LTI user management functionality
 
 
 import string
-from unittest.mock import MagicMock, PropertyMock, patch
 
-import pytest
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-
-from common.djangoapps.student.tests.factories import UserFactory
+from mock import MagicMock, PropertyMock, patch
+from six.moves import range
 
 from .. import users
 from ..models import LtiConsumer, LtiUser
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UserManagementHelperTest(TestCase):
@@ -24,7 +23,7 @@ class UserManagementHelperTest(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(UserManagementHelperTest, self).setUp()
         self.request = RequestFactory().post('/')
         self.old_user = UserFactory.create()
         self.new_user = UserFactory.create()
@@ -43,7 +42,7 @@ class UserManagementHelperTest(TestCase):
 
     @patch('django.contrib.auth.authenticate', return_value=None)
     def test_permission_denied_for_unknown_user(self, _authenticate_mock):
-        with pytest.raises(PermissionDenied):
+        with self.assertRaises(PermissionDenied):
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
 
     @patch('lms.djangoapps.lti_provider.users.login')
@@ -65,11 +64,13 @@ class UserManagementHelperTest(TestCase):
     def test_random_username_generator(self):
         for _idx in range(1000):
             username = users.generate_random_edx_username()
-            assert len(username) <= 30, 'Username too long'
+            self.assertLessEqual(len(username), 30, 'Username too long')
             # Check that the username contains only allowable characters
-            for char in range(len(username)):  # lint-amnesty, pylint: disable=consider-using-enumerate
-                assert username[char] in (string.ascii_letters + string.digits), \
-                    "Username has forbidden character '{}'".format(username[char])
+            for char in range(len(username)):
+                self.assertIn(
+                    username[char], string.ascii_letters + string.digits,
+                    u"Username has forbidden character '{}'".format(username[char])
+                )
 
 
 @patch('lms.djangoapps.lti_provider.users.switch_user', autospec=True)
@@ -80,7 +81,7 @@ class AuthenticateLtiUserTest(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(AuthenticateLtiUserTest, self).setUp()
         self.lti_consumer = LtiConsumer(
             consumer_name='TestConsumer',
             consumer_key='TestKey',
@@ -120,8 +121,8 @@ class AuthenticateLtiUserTest(TestCase):
         self.request.user = lti_user.edx_user
         assert self.request.user.is_authenticated
         users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
-        assert not create_user.called
-        assert not switch_user.called
+        self.assertFalse(create_user.called)
+        self.assertFalse(switch_user.called)
 
     def test_authentication_with_unauthenticated_user(self, create_user, switch_user):
         lti_user = self.create_lti_user_model()
@@ -129,7 +130,7 @@ class AuthenticateLtiUserTest(TestCase):
         with patch('django.contrib.auth.models.User.is_authenticated', new_callable=PropertyMock) as mock_is_auth:
             mock_is_auth.return_value = False
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
-            assert not create_user.called
+            self.assertFalse(create_user.called)
             switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
     def test_authentication_with_wrong_user(self, create_user, switch_user):
@@ -137,7 +138,7 @@ class AuthenticateLtiUserTest(TestCase):
         self.request.user = self.old_user
         assert self.request.user.is_authenticated
         users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
-        assert not create_user.called
+        self.assertFalse(create_user.called)
         switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
 
 
@@ -147,7 +148,7 @@ class CreateLtiUserTest(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CreateLtiUserTest, self).setUp()
         self.lti_consumer = LtiConsumer(
             consumer_name='TestConsumer',
             consumer_key='TestKey',
@@ -157,25 +158,25 @@ class CreateLtiUserTest(TestCase):
 
     def test_create_lti_user_creates_auth_user_model(self):
         users.create_lti_user('lti_user_id', self.lti_consumer)
-        assert User.objects.count() == 1
+        self.assertEqual(User.objects.count(), 1)
 
     @patch('uuid.uuid4', return_value='random_uuid')
     @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', return_value='edx_id')
     def test_create_lti_user_creates_correct_user(self, uuid_mock, _username_mock):
         users.create_lti_user('lti_user_id', self.lti_consumer)
-        assert User.objects.count() == 1
+        self.assertEqual(User.objects.count(), 1)
         user = User.objects.get(username='edx_id')
-        assert user.email == 'edx_id@lti.example.com'
+        self.assertEqual(user.email, 'edx_id@lti.example.com')
         uuid_mock.assert_called_with()
 
     @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', side_effect=['edx_id', 'new_edx_id'])
     def test_unique_username_created(self, username_mock):
         User(username='edx_id').save()
         users.create_lti_user('lti_user_id', self.lti_consumer)
-        assert username_mock.call_count == 2
-        assert User.objects.count() == 2
+        self.assertEqual(username_mock.call_count, 2)
+        self.assertEqual(User.objects.count(), 2)
         user = User.objects.get(username='new_edx_id')
-        assert user.email == 'new_edx_id@lti.example.com'
+        self.assertEqual(user.email, 'new_edx_id@lti.example.com')
 
 
 class LtiBackendTest(TestCase):
@@ -184,7 +185,7 @@ class LtiBackendTest(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(LtiBackendTest, self).setUp()
         self.edx_user = UserFactory.create()
         self.edx_user.save()
         self.lti_consumer = LtiConsumer(
@@ -209,7 +210,7 @@ class LtiBackendTest(TestCase):
             lti_user_id=self.lti_user_id,
             lti_consumer=self.lti_consumer
         )
-        assert user == self.edx_user
+        self.assertEqual(user, self.edx_user)
 
     def test_missing_user_returns_none(self):
         user = users.LtiBackend().authenticate(
@@ -218,7 +219,7 @@ class LtiBackendTest(TestCase):
             lti_user_id='Invalid Username',
             lti_consumer=self.lti_consumer
         )
-        assert user is None
+        self.assertIsNone(user)
 
     def test_non_lti_user_returns_none(self):
         non_edx_user = UserFactory.create()
@@ -227,7 +228,7 @@ class LtiBackendTest(TestCase):
             self.request,
             username=non_edx_user.username,
         )
-        assert user is None
+        self.assertIsNone(user)
 
     def test_missing_lti_id_returns_null(self):
         user = users.LtiBackend().authenticate(
@@ -235,7 +236,7 @@ class LtiBackendTest(TestCase):
             username=self.edx_user.username,
             lti_consumer=self.lti_consumer
         )
-        assert user is None
+        self.assertIsNone(user)
 
     def test_missing_lti_consumer_returns_null(self):
         user = users.LtiBackend().authenticate(
@@ -243,12 +244,12 @@ class LtiBackendTest(TestCase):
             username=self.edx_user.username,
             lti_user_id=self.lti_user_id,
         )
-        assert user is None
+        self.assertIsNone(user)
 
     def test_existing_user_returned_by_get_user(self):
         user = users.LtiBackend().get_user(self.edx_user.id)
-        assert user == self.edx_user
+        self.assertEqual(user, self.edx_user)
 
     def test_get_user_returns_none_for_invalid_user(self):
         user = users.LtiBackend().get_user(-1)
-        assert user is None
+        self.assertIsNone(user)

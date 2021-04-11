@@ -19,18 +19,18 @@ class TestGetMockRequest(TestCase):
     """
     Validate the behavior of get_mock_request
     """
-    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUp(self):
         self.addCleanup(set_current_request, None)
 
     def test_mock_request_is_request(self):
         request = get_mock_request(USER_MODEL())
-        assert isinstance(request, HttpRequest)
+        self.assertIsInstance(request, HttpRequest)
 
     def test_user_is_attached_to_mock_request(self):
         user = USER_MODEL()
         request = get_mock_request(user)
-        assert request.user is user
+        self.assertIs(request.user, user)
 
     def test_mock_request_without_user(self):
         request = get_mock_request()
-        assert isinstance(request.user, AnonymousUser)
+        self.assertIsInstance(request.user, AnonymousUser)

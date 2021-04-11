@@ -5,9 +5,9 @@ Utilities for grades related tests
 
 from contextlib import contextmanager
 from datetime import datetime
-from unittest.mock import MagicMock, patch
 
 import pytz
+from mock import MagicMock, patch
 
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module

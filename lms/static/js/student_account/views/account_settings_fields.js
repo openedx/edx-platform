@@ -110,7 +110,7 @@
                     var view = this;
                     $.ajax({
                         type: 'GET',
-                        url: '/api/user/v1/preferences/time_zones/',
+                        url: '/user_api/v1/preferences/time_zones/',
                         data: {country_code: user.attributes.country},
                         success: function(data) {
                             var countryTimeZones = $.map(data, function(timeZoneInfo) {

@@ -26,7 +26,7 @@ def is_skip_dir(skip_dirs, directory):
     return False
 
 
-class StringLines:
+class StringLines(object):
     """
     StringLines provides utility methods to work with a string in terms of
     lines.  As an example, it can convert an index into a line number or column
@@ -199,7 +199,7 @@ class StringLines:
         return len(self._line_start_indexes)
 
 
-class ParseString:
+class ParseString(object):
     """
     ParseString is the result of parsing a string out of a template.
 
@@ -303,7 +303,7 @@ class ParseString:
                 }
 
 
-class Expression:
+class Expression(object):
     """
     Represents an arbitrary expression.
 

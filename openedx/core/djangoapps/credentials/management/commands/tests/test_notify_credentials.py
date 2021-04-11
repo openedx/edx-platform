@@ -4,7 +4,7 @@ Tests the ``notify_credentials`` management command.
 
 
 from datetime import datetime
-from unittest import mock
+import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -31,7 +31,7 @@ class TestNotifyCredentials(TestCase):
     Tests the ``notify_credentials`` management command.
     """
     def setUp(self):
-        super().setUp()
+        super(TestNotifyCredentials, self).setUp()
         self.user = UserFactory.create()
         self.user2 = UserFactory.create()
 
@@ -65,9 +65,9 @@ class TestNotifyCredentials(TestCase):
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_course_args(self, mock_send):
         call_command(Command(), '--course', 'course-v1:edX+Test+1', 'course-v1:edX+Test+2')
-        assert mock_send.called
-        assert list(mock_send.call_args[0][0]) == [self.cert1, self.cert2]
-        assert list(mock_send.call_args[0][1]) == [self.grade1, self.grade2]
+        self.assertTrue(mock_send.called)
+        self.assertEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2])
+        self.assertEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2])
 
     @freeze_time(datetime(2017, 5, 1, 4))
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
@@ -91,118 +91,109 @@ class TestNotifyCredentials(TestCase):
 
         call_command(Command(), '--auto')
 
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [cert1, cert2])
         self.assertListEqual(list(mock_send.call_args[0][1]), [grade1, grade2])
 
-        assert len(list(mock_send.call_args[0][0])) <= len(total_certificates)
-        assert len(list(mock_send.call_args[0][1])) <= len(total_grades)
+        self.assertLessEqual(len(list(mock_send.call_args[0][0])), len(total_certificates))
+        self.assertLessEqual(len(list(mock_send.call_args[0][1])), len(total_grades))
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_date_args(self, mock_send):
         call_command(Command(), '--start-date', '2017-01-31')
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4, self.cert3])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4, self.grade3])
         mock_send.reset_mock()
 
         call_command(Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02')
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4])
         mock_send.reset_mock()
 
         call_command(Command(), '--end-date', '2017-02-02')
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4])
         mock_send.reset_mock()
 
         call_command(Command(), '--start-date', "2017-02-01 00:00:00", '--end-date', '2017-02-01 04:00:00')
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_username_arg(self, mock_send):
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user2.id
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user2.username
         )
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--user_ids', self.user2.id
+            Command(), '--username', self.user2.username
         )
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user.id
+            Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--username', self.user.username
         )
-        assert mock_send.called
+        self.assertTrue(mock_send.called)
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2])
         mock_send.reset_mock()
 
         call_command(
-            Command(), '--user_ids', self.user.id
+            Command(), '--username', self.user2.username
         )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert3])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade3])
-        mock_send.reset_mock()
-
-        call_command(
-            Command(), '--user_ids', self.user.id, self.user2.id
-        )
-        assert mock_send.called
-        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4, self.cert3])
-        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4, self.grade3])
+        self.assertTrue(mock_send.called)
+        self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert4])
+        self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
         mock_send.reset_mock()
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_no_args(self, mock_send):
         with self.assertRaisesRegex(CommandError, 'You must specify a filter.*'):
             call_command(Command())
-        assert not mock_send.called
+        self.assertFalse(mock_send.called)
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_dry_run(self, mock_send):
         call_command(Command(), '--dry-run', '--start-date', '2017-02-01')
-        assert not mock_send.called
+        self.assertFalse(mock_send.called)
 
     @mock.patch(COMMAND_MODULE + '.handle_course_cert_awarded')
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
     @mock.patch(COMMAND_MODULE + '.handle_course_cert_changed')
     def test_hand_off(self, mock_grade_interesting, mock_program_changed, mock_program_awarded):
         call_command(Command(), '--start-date', '2017-02-01')
-        assert mock_grade_interesting.call_count == 3
-        assert mock_program_changed.call_count == 3
-        assert mock_program_awarded.call_count == 0
+        self.assertEqual(mock_grade_interesting.call_count, 3)
+        self.assertEqual(mock_program_changed.call_count, 3)
+        self.assertEqual(mock_program_awarded.call_count, 0)
         mock_grade_interesting.reset_mock()
         mock_program_changed.reset_mock()
         mock_program_awarded.reset_mock()
 
         call_command(Command(), '--start-date', '2017-02-01', '--notify_programs')
-        assert mock_grade_interesting.call_count == 3
-        assert mock_program_changed.call_count == 3
-        assert mock_program_awarded.call_count == 1
+        self.assertEqual(mock_grade_interesting.call_count, 3)
+        self.assertEqual(mock_program_changed.call_count, 3)
+        self.assertEqual(mock_program_awarded.call_count, 1)
 
     @mock.patch(COMMAND_MODULE + '.time')
     def test_delay(self, mock_time):
         call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
-        assert mock_time.sleep.call_count == 0
+        self.assertEqual(mock_time.sleep.call_count, 0)
         mock_time.sleep.reset_mock()
 
         call_command(Command(), '--start-date', '2017-01-01', '--page-size=2', '--delay', '0.2')
-        assert mock_time.sleep.call_count == 2
-        # Between each page, twice (2 pages, for certs and grades)
-        assert mock_time.sleep.call_args[0][0] == 0.2
+        self.assertEqual(mock_time.sleep.call_count, 2)  # Between each page, twice (2 pages, for certs and grades)
+        self.assertEqual(mock_time.sleep.call_args[0][0], 0.2)
 
     @override_settings(DEBUG=True)
     def test_page_size(self):
@@ -212,13 +203,11 @@ class TestNotifyCredentials(TestCase):
 
         reset_queries()
         call_command(Command(), '--start-date', '2017-01-01', '--page-size=1')
-        assert len(connection.queries) == (baseline + 6)
-        # two extra page queries each for certs & grades
+        self.assertEqual(len(connection.queries), baseline + 6)  # two extra page queries each for certs & grades
 
         reset_queries()
         call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
-        assert len(connection.queries) == (baseline + 2)
-        # one extra page query each for certs & grades
+        self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades
 
     @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
     def test_site(self, mock_grade_interesting):
@@ -227,7 +216,7 @@ class TestNotifyCredentials(TestCase):
         )
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
-        assert mock_grade_interesting.call_count == 1
+        self.assertEqual(mock_grade_interesting.call_count, 1)
 
     @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
     def test_args_from_database(self, mock_send):
@@ -243,12 +232,11 @@ class TestNotifyCredentials(TestCase):
 
         # Not told to use config, should ignore it
         call_command(Command(), '--start-date', '2017-01-01')
-        assert len(mock_send.call_args[0][0]) == 4
-        # Number of certs expected
+        self.assertEqual(len(mock_send.call_args[0][0]), 4)  # Number of certs expected
 
         # Told to use it, and enabled. Should use config in preference of command line
         call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
-        assert len(mock_send.call_args[0][0]) == 1
+        self.assertEqual(len(mock_send.call_args[0][0]), 1)
 
         config.enabled = False
         config.save()

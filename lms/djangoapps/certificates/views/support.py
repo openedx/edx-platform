@@ -7,10 +7,10 @@ See lms/djangoapps/support for more details.
 
 
 import logging
-import urllib
 from functools import wraps
 
 import bleach
+import six
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
@@ -19,12 +19,13 @@ from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.models import CourseEnrollment, User
-from common.djangoapps.util.json_request import JsonResponse
-from lms.djangoapps.certificates.api import get_certificates_for_user, regenerate_user_certificates
+from lms.djangoapps.certificates import api
+from lms.djangoapps.certificates.models import CertificateInvalidation
 from lms.djangoapps.certificates.permissions import GENERATE_ALL_CERTIFICATES, VIEW_ALL_CERTIFICATES
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ def search_certificates(request):
         ]
 
     """
-    unbleached_filter = urllib.parse.unquote(urllib.parse.quote_plus(request.GET.get("user", "")))
+    unbleached_filter = six.moves.urllib.parse.unquote(six.moves.urllib.parse.quote_plus(request.GET.get("user", "")))
     user_filter = bleach.clean(unbleached_filter)
     if not user_filter:
         msg = _("user is not given.")
@@ -97,21 +98,21 @@ def search_certificates(request):
     try:
         user = User.objects.get(Q(email=user_filter) | Q(username=user_filter))
     except User.DoesNotExist:
-        return HttpResponseBadRequest(_("user '{user}' does not exist").format(user=user_filter))
+        return HttpResponseBadRequest(_(u"user '{user}' does not exist").format(user=user_filter))
 
-    certificates = get_certificates_for_user(user.username)
+    certificates = api.get_certificates_for_user(user.username)
     for cert in certificates:
-        cert["course_key"] = str(cert["course_key"])
+        cert["course_key"] = six.text_type(cert["course_key"])
         cert["created"] = cert["created"].isoformat()
         cert["modified"] = cert["modified"].isoformat()
         cert["regenerate"] = not cert['is_pdf_certificate']
 
-    course_id = urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
+    course_id = six.moves.urllib.parse.quote_plus(request.GET.get("course_id", ""), safe=':/')
     if course_id:
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            return HttpResponseBadRequest(_("Course id '{course_id}' is not valid").format(course_id=course_id))
+            return HttpResponseBadRequest(_(u"Course id '{course_id}' is not valid").format(course_id=course_id))
         else:
             try:
                 if CourseOverview.get_from_id(course_key):
@@ -120,7 +121,7 @@ def search_certificates(request):
                     if not certificates:
                         return JsonResponse([{'username': user.username, 'course_key': course_id, 'regenerate': False}])
             except CourseOverview.DoesNotExist:
-                msg = _("The course does not exist against the given key '{course_key}'").format(course_key=course_key)
+                msg = _(u"The course does not exist against the given key '{course_key}'").format(course_key=course_key)
                 return HttpResponseBadRequest(msg)
 
     return JsonResponse(certificates)
@@ -141,14 +142,14 @@ def _validate_post_params(params):
         username = params.get("username")
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        msg = _("User {username} does not exist").format(username=username)
+        msg = _(u"User {username} does not exist").format(username=username)
         return None, HttpResponseBadRequest(msg)
 
     # Validate the course key
     try:
         course_key = CourseKey.from_string(params.get("course_key"))
     except InvalidKeyError:
-        msg = _("{course_key} is not a valid course key").format(course_key=params.get("course_key"))
+        msg = _(u"{course_key} is not a valid course key").format(course_key=params.get("course_key"))
         return None, HttpResponseBadRequest(msg)
 
     return {"user": user, "course_key": course_key}, None
@@ -187,12 +188,12 @@ def regenerate_certificate_for_user(request):
     # Check that the course exists
     course = modulestore().get_course(params["course_key"])
     if course is None:
-        msg = _("The course {course_key} does not exist").format(course_key=params["course_key"])
+        msg = _(u"The course {course_key} does not exist").format(course_key=params["course_key"])
         return HttpResponseBadRequest(msg)
 
     # Check that the user is enrolled in the course
     if not CourseEnrollment.is_enrolled(params["user"], params["course_key"]):
-        msg = _("User {username} is not enrolled in the course {course_key}").format(
+        msg = _(u"User {username} is not enrolled in the course {course_key}").format(
             username=params["user"].username,
             course_key=params["course_key"]
         )
@@ -200,20 +201,23 @@ def regenerate_certificate_for_user(request):
 
     # Attempt to regenerate certificates
     try:
-        regenerate_user_certificates(params["user"], params["course_key"], course=course)
+        certificate = api.regenerate_user_certificates(params["user"], params["course_key"], course=course)
     except:  # pylint: disable=bare-except
         # We are pessimistic about the kinds of errors that might get thrown by the
         # certificates API.  This may be overkill, but we're logging everything so we can
         # track down unexpected errors.
         log.exception(
-            "Could not regenerate certificates for user %s in course %s",
+            u"Could not regenerate certificates for user %s in course %s",
             params["user"].id,
             params["course_key"]
         )
         return HttpResponseServerError(_("An unexpected error occurred while regenerating certificates."))
 
+    # Deactivate certificate invalidation by setting active to False.
+    _deactivate_invalidation(certificate)
+
     log.info(
-        "Started regenerating certificates for user %s in course %s from the support page.",
+        u"Started regenerating certificates for user %s in course %s from the support page.",
         params["user"].id, params["course_key"]
     )
     return HttpResponse(200)
@@ -252,12 +256,12 @@ def generate_certificate_for_user(request):
         # Check that the course exists
         CourseOverview.get_from_id(params["course_key"])
     except CourseOverview.DoesNotExist:
-        msg = _("The course {course_key} does not exist").format(course_key=params["course_key"])
+        msg = _(u"The course {course_key} does not exist").format(course_key=params["course_key"])
         return HttpResponseBadRequest(msg)
     else:
         # Check that the user is enrolled in the course
         if not CourseEnrollment.is_enrolled(params["user"], params["course_key"]):
-            msg = _("User {username} is not enrolled in the course {course_key}").format(
+            msg = _(u"User {username} is not enrolled in the course {course_key}").format(
                 username=params["user"].username,
                 course_key=params["course_key"]
             )
@@ -271,3 +275,25 @@ def generate_certificate_for_user(request):
             specific_student_id=params["user"].id
         )
         return HttpResponse(200)
+
+
+def _deactivate_invalidation(certificate):
+    """
+    Deactivate certificate invalidation by setting active to False.
+
+    Arguments:
+        certificate : The student certificate object
+
+    Return:
+        None
+    """
+    try:
+        # Fetch CertificateInvalidation object
+        certificate_invalidation = CertificateInvalidation.objects.get(
+            generated_certificate=certificate,
+            active=True
+        )
+        # Deactivate certificate invalidation if it was fetched successfully.
+        certificate_invalidation.deactivate()
+    except CertificateInvalidation.DoesNotExist:
+        pass

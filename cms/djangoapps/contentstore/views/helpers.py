@@ -2,9 +2,9 @@
 Helper methods for Studio views.
 """
 
-import urllib
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -12,8 +12,8 @@ from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 
@@ -107,9 +107,9 @@ def xblock_studio_url(xblock, parent_xblock=None):
     if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)
     elif category in ('chapter', 'sequential'):
-        return '{url}?show={usage_key}'.format(
+        return u'{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=urllib.parse.quote(str(xblock.location))
+            usage_key=six.moves.urllib.parse.quote(six.text_type(xblock.location))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
@@ -142,7 +142,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string
+        return _(component_class.display_name.default)
     else:
         return default_display_name
 
@@ -220,7 +220,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
-        if isinstance(data, str):
+        if isinstance(data, six.string_types):
             data = {'data': data}
 
         created_block = store.create_child(

@@ -75,7 +75,7 @@
             </div>
         <% } %>
     <% } else if (type === 'plaintext' ) { %>
-            <span class="plaintext-field honor_tos_combined"><%= HtmlUtils.HTML(label) %></span>
+            <span class="plaintext-field"><%= HtmlUtils.HTML(label) %></span>
             <input id="<%- form %>-<%- name %>"
                type="hidden"
                name="<%- name %>"

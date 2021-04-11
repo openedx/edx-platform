@@ -18,7 +18,7 @@ class DiscussionThreadPage(PageObject):
     url = None
 
     def __init__(self, browser, thread_selector):
-        super().__init__(browser)
+        super(DiscussionThreadPage, self).__init__(browser)
         self.thread_selector = thread_selector
 
     def _find_within(self, selector):
@@ -74,12 +74,12 @@ class DiscussionThreadPage(PageObject):
             ).fulfill()
 
 
-class DiscussionTabSingleThreadPage(CoursePage):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DiscussionTabSingleThreadPage(CoursePage):
     def __init__(self, browser, course_id, discussion_id, thread_id):
-        super().__init__(browser, course_id)
+        super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
         self.thread_page = DiscussionThreadPage(
             browser,
-            f"body.discussion .discussion-article[data-id='{thread_id}']"
+            u"body.discussion .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
         )
         self.url_path = "discussion/forum/{discussion_id}/threads/{thread_id}".format(
             discussion_id=discussion_id, thread_id=thread_id
@@ -103,7 +103,7 @@ class DiscussionTabHomePage(CoursePage):
     ALERT_SELECTOR = ".discussion-body .forum-nav .search-alert"
 
     def __init__(self, browser, course_id):
-        super().__init__(browser, course_id)
+        super(DiscussionTabHomePage, self).__init__(browser, course_id)
         self.url_path = "discussion/forum/"
         self.root_selector = None
 

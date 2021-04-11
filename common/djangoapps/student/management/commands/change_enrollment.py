@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, User
@@ -18,10 +19,10 @@ class RollbackException(Exception):
     """
     Exception raised explicitly to cause a database transaction rollback.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
 
     help = """
     Changes the enrollment status for students that meet
@@ -76,7 +77,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         try:
             course_key = CourseKey.from_string(options['course_id'])
         except InvalidKeyError:
-            raise CommandError('Invalid or non-existant course id {}'.format(options['course_id']))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError('Invalid or non-existant course id {}'.format(options['course_id']))
 
         if not options['username'] and not options['email']:
             raise CommandError('You must include usernames (-u) or emails (-e) to select users to update')
@@ -97,7 +98,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         self.report(error_users, success_users)
 
-    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users, enrollment_attrs=None):  # lint-amnesty, pylint: disable=line-too-long
+    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users, enrollment_attrs=None):
         """ Update enrollments for a specific user identifier (email or username). """
         users = options[identifier].split(",")
 
@@ -154,4 +155,4 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if len(error_users) > 0:
             logger.info('The following %i user(s) not saved:', len(error_users))
             for user, error in error_users:
-                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, str(error))
+                logger.info('user: [%s] reason: [%s] %s', user, type(error).__name__, text_type(error))

@@ -7,15 +7,18 @@ import json
 import operator
 
 import dateutil
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import six
+from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from edx_when import api
 from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
+from six import string_types, text_type
+from six.moves import zip
 
-from common.djangoapps.student.models import CourseEnrollment, get_user_by_username_or_email
 from openedx.core.djangoapps.schedules.models import Schedule
+from common.djangoapps.student.models import get_user_by_username_or_email, CourseEnrollment
 
 
 class DashboardError(Exception):
@@ -26,7 +29,7 @@ class DashboardError(Exception):
         """
         Generate an instance of HttpResponseBadRequest for this error.
         """
-        error = str(self)
+        error = six.text_type(self)
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
 
@@ -49,7 +52,7 @@ def handle_dashboard_error(view):
 
 
 def strip_if_string(value):
-    if isinstance(value, str):
+    if isinstance(value, string_types):
         return value.strip()
     return value
 
@@ -76,8 +79,8 @@ def require_student_from_identifier(unique_student_identifier):
     try:
         return get_student_from_identifier(unique_student_identifier)
     except User.DoesNotExist:
-        raise DashboardError(  # lint-amnesty, pylint: disable=raise-missing-from
-            _("Could not find student matching identifier: {student_identifier}").format(
+        raise DashboardError(
+            _(u"Could not find student matching identifier: {student_identifier}").format(
                 student_identifier=unique_student_identifier
             )
         )
@@ -91,7 +94,7 @@ def parse_datetime(datestr):
     try:
         return dateutil.parser.parse(datestr).replace(tzinfo=UTC)
     except ValueError:
-        raise DashboardError(_("Unable to parse date: ") + datestr)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise DashboardError(_("Unable to parse date: ") + datestr)
 
 
 def find_unit(course, url):
@@ -104,7 +107,7 @@ def find_unit(course, url):
         """
         Find node in course tree for url.
         """
-        if str(node.location) == url:
+        if text_type(node.location) == url:
             return node
         for child in node.get_children():
             found = find(child, url)
@@ -114,7 +117,7 @@ def find_unit(course, url):
 
     unit = find(course, url)
     if unit is None:
-        raise DashboardError(_("Couldn't find module for url: {0}").format(url))
+        raise DashboardError(_(u"Couldn't find module for url: {0}").format(url))
     return unit
 
 
@@ -154,7 +157,7 @@ def title_or_url(node):
     """
     title = getattr(node, 'display_name', None)
     if not title:
-        title = str(node.location)
+        title = text_type(node.location)
     return title
 
 
@@ -166,7 +169,7 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
         DashboardError if the unit or extended, due date is invalid or user is
         not enrolled in the course.
     """
-    mode, __ = CourseEnrollment.enrollment_mode_for_user(user=student, course_id=str(course.id))
+    mode, __ = CourseEnrollment.enrollment_mode_for_user(user=student, course_id=six.text_type(course.id))
     if not mode:
         raise DashboardError(_("Could not find student enrollment in the course."))
 
@@ -193,10 +196,10 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
             try:
                 api.set_date_for_block(course.id, block.location, 'due', due_date, user=student, reason=reason,
                                        actor=actor)
-            except api.MissingDateError as ex:
-                raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location)) from ex
-            except api.InvalidDateError as ex:
-                raise DashboardError(_("An extended due date must be later than the original due date.")) from ex
+            except api.MissingDateError:
+                raise DashboardError(_(u"Unit {0} has no due date to extend.").format(unit.location))
+            except api.InvalidDateError:
+                raise DashboardError(_("An extended due date must be later than the original due date."))
         else:
             api.set_date_for_block(course.id, block.location, 'due', None, user=student, reason=reason, actor=actor)
 
@@ -209,12 +212,12 @@ def dump_module_extensions(course, unit):
     header = [_("Username"), _("Full Name"), _("Extended Due Date")]
     data = []
     for username, fullname, due_date in api.get_overrides_for_block(course.id, unit.location):
-        due_date = due_date.strftime('%Y-%m-%d %H:%M')
+        due_date = due_date.strftime(u'%Y-%m-%d %H:%M')
         data.append(dict(list(zip(header, (username, fullname, due_date)))))
     data.sort(key=operator.itemgetter(_("Username")))
     return {
         "header": header,
-        "title": _("Users with due date extensions for {0}").format(
+        "title": _(u"Users with due date extensions for {0}").format(
             title_or_url(unit)),
         "data": data
     }
@@ -235,13 +238,13 @@ def dump_student_extensions(course, student):
         if location not in units:
             continue
         due = override['actual_date']
-        due = due.strftime("%Y-%m-%d %H:%M")
+        due = due.strftime(u"%Y-%m-%d %H:%M")
         title = title_or_url(units[location])
         data.append(dict(list(zip(header, (title, due)))))
     data.sort(key=operator.itemgetter(_("Unit")))
     return {
         "header": header,
-        "title": _("Due date extensions for {0} {1} ({2})").format(
+        "title": _(u"Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
 

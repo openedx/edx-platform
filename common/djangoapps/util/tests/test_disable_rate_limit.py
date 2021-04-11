@@ -2,9 +2,8 @@
 
 
 import unittest
-from unittest import mock
 
-import pytest
+import mock
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
@@ -33,7 +32,7 @@ class DisableRateLimitTest(TestCase):
     """Check that we can disable rate limiting for perf testing. """
 
     def setUp(self):
-        super().setUp()
+        super(DisableRateLimitTest, self).setUp()
         cache.clear()
         self.view = FakeApiView()
 
@@ -45,7 +44,7 @@ class DisableRateLimitTest(TestCase):
         # Since our fake throttle always rejects requests,
         # we should expect the request to be rejected.
         request = mock.Mock()
-        with pytest.raises(Throttled):
+        with self.assertRaises(Throttled):
             self.view.check_throttles(request)
 
     def test_disable_rate_limit(self):

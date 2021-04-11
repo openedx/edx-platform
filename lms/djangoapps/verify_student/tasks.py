@@ -7,19 +7,20 @@ from smtplib import SMTPException
 
 import requests
 import simplejson
-from celery import Task, shared_task
+from celery import Task, task
 from celery.states import FAILURE
 from django.conf import settings
 from django.core.mail import EmailMessage
-from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+ACE_ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = getattr(settings, 'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY', None)
 log = logging.getLogger(__name__)
 
 
-class BaseSoftwareSecureTask(Task):  # lint-amnesty, pylint: disable=abstract-method
+class BaseSoftwareSecureTask(Task):
     """
     Base task class for use with Software Secure request.
 
@@ -72,8 +73,7 @@ class BaseSoftwareSecureTask(Task):  # lint-amnesty, pylint: disable=abstract-me
             )
 
 
-@shared_task
-@set_code_owner_attribute
+@task(routing_key=ACE_ROUTING_KEY)
 def send_verification_status_email(context):
     """
     Spins a task to send verification status email to the learner
@@ -91,16 +91,16 @@ def send_verification_status_email(context):
         msg.content_subtype = 'html'
         msg.send(fail_silently=False)
     except SMTPException:
-        log.warning("Failure in sending verification status e-mail to %s", dest_addr)
+        log.warning(u"Failure in sending verification status e-mail to %s", dest_addr)
 
 
-@shared_task(
+@task(
     base=BaseSoftwareSecureTask,
     bind=True,
     default_retry_delay=settings.SOFTWARE_SECURE_REQUEST_RETRY_DELAY,
     max_retries=settings.SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS,
+    routing_key=SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY,
 )
-@set_code_owner_attribute
 def send_request_to_ss_for_user(self, user_verification_id, copy_id_photo_from):
     """
     Assembles a submission to Software Secure.

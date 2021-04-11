@@ -17,7 +17,7 @@ class TestTimeZoneUtils(TestCase):
         """
         Sets up user for testing with time zone utils.
         """
-        super(TestTimeZoneUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestTimeZoneUtils, self).setUp()
 
         self.user = UserFactory.build()
         self.user.save()
@@ -37,11 +37,11 @@ class TestTimeZoneUtils(TestCase):
         """
         Asserts that all display_tz_info is equal to the expected inputs
         """
-        assert display_tz_info['str'] == '{name} ({abbr}, UTC{offset})'.format(
-            name=expected_name, abbr=expected_abbr, offset=expected_offset
-        )
-        assert display_tz_info['abbr'] == expected_abbr
-        assert display_tz_info['offset'] == expected_offset
+        self.assertEqual(display_tz_info['str'], u'{name} ({abbr}, UTC{offset})'.format(name=expected_name,
+                                                                                        abbr=expected_abbr,
+                                                                                        offset=expected_offset))
+        self.assertEqual(display_tz_info['abbr'], expected_abbr)
+        self.assertEqual(display_tz_info['offset'], expected_offset)
 
     def test_display_time_zone_without_dst(self):
         """

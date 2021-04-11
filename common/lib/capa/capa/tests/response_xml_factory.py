@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 from abc import ABCMeta, abstractmethod
 
@@ -372,7 +372,7 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         # we should override the default behavior
         # of including a <solution> tag as well
         kwargs['explanation_text'] = None
-        return super(CodeResponseXMLFactory, self).build_xml(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super(CodeResponseXMLFactory, self).build_xml(**kwargs)
 
     def create_response_element(self, **kwargs):
         """
@@ -536,7 +536,7 @@ class FormulaResponseXMLFactory(ResponseXMLFactory):
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
 
-    def _sample_str(self, sample_dict, num_samples, tolerance):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+    def _sample_str(self, sample_dict, num_samples, tolerance):
         # Loncapa uses a special format for sample strings:
         # "x,y,z@4,5,3:10,12,8#4" means plug in values for (x,y,z)
         # from within the box defined by points (4,5,3) and (10,12,8)

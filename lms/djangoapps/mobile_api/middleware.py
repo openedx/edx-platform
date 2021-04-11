@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from pytz import UTC
+import six
 
 from lms.djangoapps.mobile_api.mobile_platform import MobilePlatform
 from lms.djangoapps.mobile_api.models import AppVersionConfig
@@ -78,7 +79,7 @@ class AppVersionUpgrade(MiddlewareMixin):
         Returns:
             string: Cache key to be used.
         """
-        return f"mobile_api.app_version_upgrade.{field}.{key}"
+        return "mobile_api.app_version_upgrade.{}.{}".format(field, key)
 
     def _get_version_info(self, request):
         """
@@ -111,7 +112,7 @@ class AppVersionUpgrade(MiddlewareMixin):
                 request_cache_dict[self.LAST_SUPPORTED_DATE_HEADER] = last_supported_date
 
                 latest_version = cached_data.get(latest_version_cache_key)
-                if not (latest_version and isinstance(latest_version, str)):
+                if not (latest_version and isinstance(latest_version, six.text_type)):
                     latest_version = self._get_latest_version(platform.NAME)
                     cache.set(latest_version_cache_key, latest_version, self.CACHE_TIMEOUT)
                 request_cache_dict[self.LATEST_VERSION_HEADER] = latest_version

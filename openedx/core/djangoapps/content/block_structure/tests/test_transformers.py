@@ -1,10 +1,11 @@
 """
 Tests for transformers.py
 """
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
 
-import pytest
+
+from unittest import TestCase
+
+from mock import MagicMock, patch
 
 from ..block_structure import BlockStructureModulestoreData
 from ..exceptions import TransformerDataIncompatible, TransformerException
@@ -21,10 +22,10 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         """
         Mock transformer that is not registered.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def setUp(self):
-        super().setUp()
+        super(TestBlockStructureTransformers, self).setUp()
         self.transformers = BlockStructureTransformers(usage_info=MagicMock())
         self.registered_transformers = [MockTransformer(), MockFilteringTransformer()]
 
@@ -37,15 +38,21 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
 
     def test_add_registered(self):
         self.add_mock_transformer()
-        assert self.registered_transformers[0] in self.transformers._transformers['no_filter']  # pylint: disable=protected-access, line-too-long
-        assert self.registered_transformers[1] in self.transformers._transformers['supports_filter']  # pylint: disable=protected-access, line-too-long
+        self.assertIn(
+            self.registered_transformers[0],
+            self.transformers._transformers['no_filter']  # pylint: disable=protected-access
+        )
+        self.assertIn(
+            self.registered_transformers[1],
+            self.transformers._transformers['supports_filter']  # pylint: disable=protected-access
+        )
 
     def test_add_unregistered(self):
-        with pytest.raises(TransformerException):
+        with self.assertRaises(TransformerException):
             self.transformers += [self.UnregisteredTransformer()]
 
-        assert self.transformers._transformers['no_filter'] == []  # pylint: disable=protected-access
-        assert self.transformers._transformers['supports_filter'] == []  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['no_filter'], [])  # pylint: disable=protected-access
+        self.assertEqual(self.transformers._transformers['supports_filter'], [])  # pylint: disable=protected-access
 
     def test_collect(self):
         with mock_registered_transformers(self.registered_transformers):
@@ -53,7 +60,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
                 'openedx.core.djangoapps.content.block_structure.tests.helpers.MockTransformer.collect'
             ) as mock_collect_call:
                 BlockStructureTransformers.collect(block_structure=MagicMock())
-                assert mock_collect_call.called
+                self.assertTrue(mock_collect_call.called)
 
     def test_transform(self):
         self.add_mock_transformer()
@@ -62,7 +69,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
             'openedx.core.djangoapps.content.block_structure.tests.helpers.MockTransformer.transform'
         ) as mock_transform_call:
             self.transformers.transform(block_structure=MagicMock())
-            assert mock_transform_call.called
+            self.assertTrue(mock_transform_call.called)
 
     def test_verify_versions(self):
         block_structure = self.create_block_structure(
@@ -71,7 +78,7 @@ class TestBlockStructureTransformers(ChildrenMapTestMixin, TestCase):
         )
 
         with mock_registered_transformers(self.registered_transformers):
-            with pytest.raises(TransformerDataIncompatible):
+            with self.assertRaises(TransformerDataIncompatible):
                 self.transformers.verify_versions(block_structure)
             self.transformers.collect(block_structure)
-            assert self.transformers.verify_versions(block_structure)
+            self.assertTrue(self.transformers.verify_versions(block_structure))

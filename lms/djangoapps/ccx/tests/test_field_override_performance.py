@@ -1,3 +1,4 @@
+# coding=UTF-8
 """
 Performance tests for field overrides.
 """
@@ -5,10 +6,12 @@ Performance tests for field overrides.
 
 import itertools
 from datetime import datetime
-from unittest import mock
 
 import ddt
+import mock
 import pytest
+import six
+from six.moves import range
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -21,15 +24,15 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xblock.core import XBlock
 
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.ccx.tests.factories import CcxFactory
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.courseware.views.views import progress
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -55,7 +58,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
     """
     __test__ = False
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = {alias for alias in connections}
 
     # TEST_DATA must be overridden by subclasses
     TEST_DATA = None
@@ -64,7 +67,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         Create a test client, course, and user.
         """
-        super().setUp()
+        super(FieldOverridePerformanceTestCase, self).setUp()
 
         self.request_factory = RequestFactory()
         self.student = UserFactory.create()
@@ -137,7 +140,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             self.student,
             course_key
         )
-        return CourseKey.from_string(str(course_key))
+        return CourseKey.from_string(six.text_type(course_key))
 
     def grade_course(self, course_key):
         """
@@ -145,7 +148,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         return progress(
             self.request,
-            course_id=str(course_key),
+            course_id=six.text_type(course_key),
             student_id=self.student.id
         )
 
@@ -226,7 +229,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
             MODULESTORE_FIELD_OVERRIDE_PROVIDERS=providers[overrides],
         ):
-            sql_queries, mongo_reads = self.TEST_DATA[  # lint-amnesty, pylint: disable=unsubscriptable-object
+            sql_queries, mongo_reads = self.TEST_DATA[
                 (overrides, course_width, enable_ccx, view_as_ccx)
             ]
             self.instrument_course_progress_render(
@@ -242,7 +245,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 31
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
@@ -271,7 +274,7 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 31
 
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
@@ -280,9 +283,9 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
         ('ccx', 1, True, False): (QUERY_COUNT, 3),
         ('ccx', 2, True, False): (QUERY_COUNT, 3),
         ('ccx', 3, True, False): (QUERY_COUNT, 3),
-        ('ccx', 1, True, True): (QUERY_COUNT + 2, 3),
-        ('ccx', 2, True, True): (QUERY_COUNT + 2, 3),
-        ('ccx', 3, True, True): (QUERY_COUNT + 2, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 1, 3),
         ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 3, False, False): (QUERY_COUNT, 3),

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -6,13 +7,14 @@
 # http://www.sphinx-doc.org/en/master/config
 
 
-import datetime  # lint-amnesty, pylint: disable=unused-import
+import datetime
 import os
 import sys
 from subprocess import check_call
 
 import django
 import edx_theme
+import six
 from path import Path
 
 root = Path('../..').abspath()
@@ -21,10 +23,16 @@ root = Path('../..').abspath()
 # can be successfully imported
 sys.path.insert(0, root)
 sys.path.append(root / "docs/guides")
+sys.path.append(root / "cms/djangoapps")
+sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib/capa")
 sys.path.append(root / "common/lib/safe_lxml")
 sys.path.append(root / "common/lib/symmath")
 sys.path.append(root / "common/lib/xmodule")
+sys.path.append(root / "lms/djangoapps")
+sys.path.append(root / "lms/envs")
+sys.path.append(root / "openedx/core/djangoapps")
+sys.path.append(root / "openedx/features")
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -36,14 +44,14 @@ django.setup()
 
 # -- Project information -----------------------------------------------------
 
-project = 'edx-platform'
-copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
+project = u'edx-platform'
+copyright = edx_theme.COPYRIGHT
 author = edx_theme.AUTHOR
 
 # The short X.Y version
-version = ''
+version = u''
 # The full version, including alpha/beta/rc tags
-release = ''
+release = u''
 
 
 # -- General configuration ---------------------------------------------------
@@ -87,7 +95,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -157,7 +165,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'edx-platform.tex', 'edx-platform Documentation',
+    (master_doc, 'edx-platform.tex', u'edx-platform Documentation',
      author, 'manual'),
 ]
 
@@ -167,7 +175,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'edx-platform', 'edx-platform Documentation',
+    (master_doc, 'edx-platform', u'edx-platform Documentation',
      [author], 1)
 ]
 
@@ -178,7 +186,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'edx-platform', 'edx-platform Documentation',
+    (master_doc, 'edx-platform', u'edx-platform Documentation',
      author, 'edx-platform', 'The Open edX platform, the software that powers edX!',
      'Miscellaneous'),
 ]
@@ -233,6 +241,19 @@ modules = {
     'openedx': 'openedx',
 }
 
+# These Django apps under cms don't import correctly with the "cms.djangapps" prefix
+# Others don't import correctly without it...INSTALLED_APPS entries are inconsistent
+cms_djangoapps = ['contentstore', 'course_creators', 'xblock_config']
+for app in cms_djangoapps:
+    path = os.path.join('cms', 'djangoapps', app)
+    modules[path] = path
+
+# The Django apps under common must be imported directly, not under their path
+for app in os.listdir(six.text_type(root / 'common' / 'djangoapps')):
+    path = os.path.join('common', 'djangoapps', app)
+    if os.path.isdir(six.text_type(root / path)) and app != 'terrain':
+        modules[path] = path
+
 
 def update_settings_module(service='lms'):
     """
@@ -240,13 +261,13 @@ def update_settings_module(service='lms'):
     for the module sphinx-apidoc is about to be run on.
     """
     if os.environ['EDX_PLATFORM_SETTINGS'] == 'devstack_docker':
-        settings_module = f'{service}.envs.devstack_docker'
+        settings_module = '{}.envs.devstack_docker'.format(service)
     else:
-        settings_module = f'{service}.envs.devstack'
+        settings_module = '{}.envs.devstack'.format(service)
     os.environ['DJANGO_SETTINGS_MODULE'] = settings_module
 
 
-def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
+def on_init(app):  # pylint: disable=unused-argument
     """
     Run sphinx-apidoc after Sphinx initialization.
 
@@ -260,11 +281,12 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
         bin_path = os.path.abspath(os.path.join(sys.prefix, 'bin'))
         apidoc_path = os.path.join(bin_path, apidoc_path)
     exclude_dirs = ['envs', 'migrations', 'test', 'tests']
-
+    exclude_dirs.extend(cms_djangoapps)
+    exclude_dirs.extend(lms_djangoapps)
     exclude_files = ['admin.py', 'test.py', 'testing.py', 'tests.py', 'testutils.py', 'wsgi.py']
     for module in modules:
-        module_path = str(root / module)
-        output_path = str(docs_path / modules[module])
+        module_path = six.text_type(root / module)
+        output_path = six.text_type(docs_path / modules[module])
         args = [apidoc_path, '--ext-intersphinx', '-o',
                 output_path, module_path]
         exclude = []
@@ -291,7 +313,7 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
         check_call(args)
 
 
-def setup(app):  # lint-amnesty, pylint: disable=redefined-outer-name
+def setup(app):
     """Sphinx extension: run sphinx-apidoc."""
-    event = 'builder-inited'
+    event = b'builder-inited' if six.PY2 else 'builder-inited'
     app.connect(event, on_init)

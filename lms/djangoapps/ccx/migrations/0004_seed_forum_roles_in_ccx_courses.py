@@ -1,8 +1,14 @@
+# -*- coding: utf-8 -*-
+
+
 import logging
 
 import six
 from ccx_keys.locator import CCXLocator
 from django.db import migrations
+from django.http import Http404
+
+from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
@@ -46,7 +52,7 @@ def seed_forum_roles_for_existing_ccx(apps, schema_editor):
             )
             continue
 
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
 
         # Create forum roles.
         admin_role, _ = Role.objects.get_or_create(name=FORUM_ROLE_ADMINISTRATOR, course_id=ccx_locator)

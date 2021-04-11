@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
@@ -597,10 +597,21 @@ msgstr "{platform_name} პროფესიული სერტიფიკ�
 
 #: common/djangoapps/student/models.py
 msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
+"The company identifier for the LinkedIn Add-to-Profile button e.g "
+"0_0dPSPyS070e0HsE9HNz_13_d11_"
 msgstr ""
+"კომპანიის იდენტიფიკატორი LinkedIn-ის პროფაილზე დასამატებელი ღილაკისთვის, "
+"მაგ.: 0_0dPSPyS070e0HsE9HNz_13_d11_"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"Short identifier for the LinkedIn partner used in the tracking code.  "
+"(Example: 'edx')  If no value is provided, tracking codes will not be sent "
+"to LinkedIn."
+msgstr ""
+"მონიტორინგის კოდში გამოყენებულია LinkedIn-ის პარტნიორის მოკლე "
+"იდენტიფიკატორი. (მაგალითად: 'edx') მონიტორინგის კოდი არ გაეგზავნება "
+"LinkedIn-ს თუ არ იქნება შეყვანილი მონაცემები."
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -682,7 +693,7 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, current_email, desired_email"
+"follows:                     username, email, new_email"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2093,6 +2104,7 @@ msgstr "ვადაგასული"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "პასუხის ჩვენება"
 
@@ -6592,6 +6604,15 @@ msgid "Total number of users"
 msgstr "მომხმარებლების სრული რაოდენობა"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "მომხმარებლის სახელი"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr "ელფოსტა"
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "მომხმარებლის შედეგების შექმნა"
 
@@ -6659,6 +6680,14 @@ msgstr "ინსტრუქტორები"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
 msgstr "რეგისტრაციის ინფორმაცია ყველა კურსისთვის"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr "როლი"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
+msgstr "full_name"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -7936,10 +7965,6 @@ msgstr ""
 msgid "Find information related to a learner's program enrollments"
 msgstr ""
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "მომხმარებლის სახელი"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -8599,7 +8624,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -9448,13 +9473,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
 msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -10640,13 +10658,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr "შესვლის ძალიან ბევრი წარუმატებელი მცდელობა. სცადეთ მოგვიანებით."
 
@@ -10657,14 +10668,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10685,6 +10688,10 @@ msgstr ""
 msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "ელფოსტის მისამართი, რომელიც {platform_name}-ზე რეგისტრაციისას გამოიყენეთ."
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -10922,10 +10929,6 @@ msgstr ""
 msgid ""
 "I agree to the {platform_name} "
 "{tos_link_start}{terms_of_service}{tos_link_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
 msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -11935,8 +11938,10 @@ msgstr "`role` არ არის მითითებული"
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"მომხმარებელი {email} დარეგისტრირდა, მაგრამ საკუთარი ანგარიშის აქტივაცია ჯერ "
+"არ მოუხდენია."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -12851,7 +12856,7 @@ msgid "Welcome to {platform_name}"
 msgstr "კეთილი იყოს თქვენი მობრძანება {platform_name}-ში"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr ""
@@ -13054,22 +13059,6 @@ msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "Hint"
-msgstr "მინიშნება"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "თქვენი პასუხის შენახვა"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "თქვენი პასუხის ჩამოყრა"
-
-#: lms/templates/problem.html
-msgid "Show answer"
-msgstr ""
-
-#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "თქვენ გამოიყენეთ {num_used}, დაშვებული {num_total} მცდელობიდან"
@@ -13080,6 +13069,18 @@ msgid ""
 "Some problems have options such as save, reset, hints, or show answer. These"
 " options follow the Submit button."
 msgstr ""
+
+#: lms/templates/problem.html
+msgid "Hint"
+msgstr "მინიშნება"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "თქვენი პასუხის შენახვა"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "თქვენი პასუხის ჩამოყრა"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -13383,10 +13384,6 @@ msgid "Git Logs"
 msgstr "Git ჟურნალები"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "მომხმარებლის მართვა"
 
@@ -13403,12 +13400,28 @@ msgid "Create user"
 msgstr "მომხმარებლის შექმნა"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr "ყველა მომხმარებლის სიის ჩამოტვირთვა (csv ფაილი)"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr "ავთენტიფიკაციის გარე რუკის შემოწმება და აღდგენა"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
 "კურსების ჩარიცხვების სამართავად გადადით სათითაო კურსის ინსტრუქტორის მართვის "
 "დაფაზე."
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr "კურსის პერსონალისა და ინსტრუქტორების მართვა"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr "პერსონალისა და ინსტრუქტორების სიის ჩამოტვირთვა (csv ფაილი)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -16670,8 +16683,7 @@ msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your verification is effective for one year. It will expire on {expiry_date}"
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -17155,10 +17167,6 @@ msgstr "საპატიო"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "პროფესიული"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -19177,6 +19185,10 @@ msgstr ""
 msgid "Latest Update"
 msgstr ""
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr ""
+
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr ""
@@ -19260,6 +19272,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "edX პარტნიორი პორტალი"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
@@ -22084,10 +22104,13 @@ msgstr "თვითრეგულირებადი"
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses offer suggested due dates for assignments or exams based "
-"on the learner’s enrollment date and the expected course duration. These "
-"courses offer learners flexibility to modify the assignment dates as needed."
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
 msgstr ""
+"თვითრეგულირებად კურსს არ გააჩნია კურსის შინაარსის გამოქვეყნების თარიღი ან "
+"ვადები დავალებებზე. მსმენელებს შეუძლიათ კურსის მასალა კურსის დასრულებამდე "
+"ნებისმიერ დროს დაასრულონ."
 
 #: cms/templates/settings.html
 msgid "Course Schedule"

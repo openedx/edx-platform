@@ -9,9 +9,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from social_django.models import UserSocialAuth
 
-from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 from .api import fetch_program_enrollments_by_student, link_program_enrollment_to_lms_user
 from .models import ProgramEnrollment
@@ -29,7 +29,7 @@ def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
 
 
 @receiver(post_save, sender=UserSocialAuth)
-def listen_for_social_auth_creation(sender, instance, created, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def listen_for_social_auth_creation(sender, instance, created, **kwargs):
     """
     Post-save signal that will attempt to link a social auth entry with waiting enrollments
     """

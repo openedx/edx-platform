@@ -13,15 +13,11 @@ def get_localized_name(name):
     return name['localized'].get(locale, '')
 
 
-class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
+class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):
     """Integration tests for provider.LinkedInOauth2."""
 
-    PROVIDER_NAME = "linkedin"
-    PROVIDER_BACKEND = "linkedin-oauth2"
-    PROVIDER_ID = "oa2-linkedin-oauth2"
-
     def setUp(self):
-        super().setUp()
+        super(LinkedInOauth2IntegrationTest, self).setUp()
         self.provider = self.configure_linkedin_provider(
             enabled=True,
             visible=True,

@@ -10,7 +10,7 @@ from . import views
 
 COURSE_URLS = ([
     url(r'^$', views.CourseListView.as_view(), name='list'),
-    url(fr'^{settings.COURSE_ID_PATTERN}/$', views.CourseRetrieveUpdateView.as_view(), name='retrieve_update'),
+    url(r'^{}/$'.format(settings.COURSE_ID_PATTERN), views.CourseRetrieveUpdateView.as_view(), name='retrieve_update'),
 ], 'courses')
 
 ORDER_URLS = ([

@@ -11,7 +11,7 @@ class ApiAccessRequestSerializer(serializers.ModelSerializer):
     """
     ApiAccessRequest serializer.
     """
-    class Meta:
+    class Meta(object):
         model = ApiAccessRequest
         fields = (
             'id', 'created', 'modified', 'user', 'status', 'website',

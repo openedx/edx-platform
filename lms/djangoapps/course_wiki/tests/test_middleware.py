@@ -17,12 +17,12 @@ class TestWikiAccessMiddleware(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super().setUp()
+        super(TestWikiAccessMiddleware, self).setUp()
 
         self.wiki = get_or_create_root()
 
-        self.course_math101 = CourseFactory.create(org='edx', number='math101', display_name='2014', metadata={'use_unique_wiki_id': 'false'})  # lint-amnesty, pylint: disable=line-too-long
-        self.course_math101_instructor = InstructorFactory(course_key=self.course_math101.id, username='instructor', password='secret')  # lint-amnesty, pylint: disable=line-too-long
+        self.course_math101 = CourseFactory.create(org='edx', number='math101', display_name='2014', metadata={'use_unique_wiki_id': 'false'})
+        self.course_math101_instructor = InstructorFactory(course_key=self.course_math101.id, username='instructor', password='secret')
         self.wiki_math101 = URLPath.create_article(self.wiki, 'math101', title='math101')
 
         self.client = Client()

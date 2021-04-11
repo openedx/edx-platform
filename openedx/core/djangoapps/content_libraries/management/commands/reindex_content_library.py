@@ -1,4 +1,4 @@
-""" Management command to update content libraries' search index """  # lint-amnesty, pylint: disable=cyclic-import
+""" Management command to update content libraries' search index """
 
 
 import logging
@@ -31,8 +31,8 @@ class Command(BaseCommand):
         ./manage.py reindex_content_library --clear-all - clear all libraries indexes
     """
     help = dedent(__doc__)
-    CONFIRMATION_PROMPT_CLEAR = "This will clear all indexed libraries from elasticsearch. Do you want to continue?"
-    CONFIRMATION_PROMPT_ALL = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+    CONFIRMATION_PROMPT_CLEAR = u"This will clear all indexed libraries from elasticsearch. Do you want to continue?"
+    CONFIRMATION_PROMPT_ALL = u"Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 from importlib import import_module
 
@@ -18,7 +18,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def contentstore(name='default'):  # lint-amnesty, pylint: disable=missing-function-docstring
+def contentstore(name='default'):
     if name not in _CONTENTSTORE:
         class_ = load_function(settings.CONTENTSTORE['ENGINE'])
         options = {}

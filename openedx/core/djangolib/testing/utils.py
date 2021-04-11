@@ -59,7 +59,7 @@ class CacheIsolationMixin(object):
         super(CacheIsolationMixin, cls).tearDownClass()
 
     def setUp(self):
-        super(CacheIsolationMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(CacheIsolationMixin, self).setUp()
 
         self.clear_caches()
         self.addCleanup(self.clear_caches)
@@ -165,7 +165,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         self.test_case = test_case
         self.num = num
         self.table_blacklist = table_blacklist
-        super(_AssertNumQueriesContext, self).__init__(connection)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(_AssertNumQueriesContext, self).__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
         def is_unfiltered_query(query):
@@ -185,15 +185,18 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
                         return False
             return True
 
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         filtered_queries = [query for query in self.captured_queries if is_unfiltered_query(query)]
         executed = len(filtered_queries)
-
-        assert executed == self.num, (
-            u'%d queries executed, %d expected\nCaptured queries were:\n%s' % (
-                executed, self.num, '\n'.join((query['sql'] for query in filtered_queries))
+        self.test_case.assertEqual(
+            executed, self.num,
+            u"%d queries executed, %d expected\nCaptured queries were:\n%s" % (
+                executed, self.num,
+                '\n'.join(
+                    query['sql'] for query in filtered_queries
+                )
             )
         )
 
@@ -204,7 +207,7 @@ class FilteredQueryCountMixin(object):
     assertNumQueries with one that accepts a blacklist of tables to filter out
     of the count.
     """
-    def assertNumQueries(self, num, func=None, table_blacklist=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+    def assertNumQueries(self, num, func=None, table_blacklist=None, *args, **kwargs):
         """
         Used to replace Django's assertNumQueries with the same capability, with
         the addition of the following argument:

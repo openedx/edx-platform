@@ -15,6 +15,7 @@ from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from jwkest import jwk
+from six.moves import range
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class Command(BaseCommand):
     '''
 
     def create_parser(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        parser = super().create_parser(*args, **kwargs)
+        parser = super(Command, self).create_parser(*args, **kwargs)
         parser.formatter_class = RawTextHelpFormatter
         return parser
 
@@ -114,7 +115,7 @@ class Command(BaseCommand):
                 'JWT_AUTH': public_keys,
             }
             jwt_auth_data['JWT_AUTH'].update(private_keys)
-            with open(options['output_file'], 'w') as f_out:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+            with open(options['output_file'], 'w') as f_out:  # pylint: disable=open-builtin
                 yaml.safe_dump(jwt_auth_data, stream=f_out)
 
     def _generate_key_id(self, size, chars=string.ascii_uppercase + string.digits):
@@ -134,7 +135,7 @@ class Command(BaseCommand):
         serialized_public_keys = public_keys.dump_jwks()
 
         prefix = '' if strip_prefix else 'COMMON_'
-        public_signing_key = f'{prefix}JWT_PUBLIC_SIGNING_JWK_SET'
+        public_signing_key = '{}JWT_PUBLIC_SIGNING_JWK_SET'.format(prefix)
 
         log.info('New JWT_PUBLIC_SIGNING_JWK_SET: %s.', serialized_public_keys)
         print("  ")
@@ -148,7 +149,7 @@ class Command(BaseCommand):
             "docs/decisions/0008-use-asymmetric-jwts.rst"
         )
         print("  ")
-        print(f"  {public_signing_key}: '{serialized_public_keys}'")
+        print("  {}: '{}'".format(public_signing_key, serialized_public_keys))
         return {public_signing_key: serialized_public_keys}
 
     def _add_previous_public_keys(self, public_keys):
@@ -162,8 +163,8 @@ class Command(BaseCommand):
         serialized_keypair_json = json.dumps(serialized_keypair)
 
         prefix = '' if strip_prefix else 'EDXAPP_'
-        private_signing_key = f'{prefix}JWT_PRIVATE_SIGNING_JWK'
-        algorithm_key = f'{prefix}JWT_SIGNING_ALGORITHM'
+        private_signing_key = '{}JWT_PRIVATE_SIGNING_JWK'.format(prefix)
+        algorithm_key = '{}JWT_SIGNING_ALGORITHM'.format(prefix)
 
         print("  ")
         print("  ")
@@ -176,9 +177,9 @@ class Command(BaseCommand):
             "docs/decisions/0008-use-asymmetric-jwts.rst"
         )
         print("  ")
-        print(f"  {private_signing_key}: '{serialized_keypair_json}'")
+        print("  {}: '{}'".format(private_signing_key, serialized_keypair_json))
         print("  ")
-        print(f"  {algorithm_key}: 'RS512'")
+        print("  {}: 'RS512'".format(algorithm_key))
         return {
             private_signing_key: serialized_keypair_json,
             algorithm_key: 'RS512',

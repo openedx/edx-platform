@@ -8,8 +8,9 @@ from importlib import import_module
 import gettext
 import logging
 
+import six
 from pkg_resources import resource_filename
-import re  # lint-amnesty, pylint: disable=wrong-import-order
+import re
 
 from django.conf import settings
 
@@ -18,16 +19,16 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 
-from django.core.cache import caches, InvalidCacheBackendError  # lint-amnesty, pylint: disable=wrong-import-position
-import django.dispatch  # lint-amnesty, pylint: disable=wrong-import-position
-import django.utils  # lint-amnesty, pylint: disable=wrong-import-position
-from django.utils.translation import get_language, to_locale  # lint-amnesty, pylint: disable=wrong-import-position
-from edx_django_utils.cache import DEFAULT_REQUEST_CACHE  # lint-amnesty, pylint: disable=wrong-import-position
+from django.core.cache import caches, InvalidCacheBackendError
+import django.dispatch
+import django.utils
+from django.utils.translation import get_language, to_locale
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-position
-from xmodule.modulestore.draft_and_published import BranchSettingMixin  # lint-amnesty, pylint: disable=wrong-import-position
-from xmodule.modulestore.mixed import MixedModuleStore  # lint-amnesty, pylint: disable=wrong-import-position
-from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.draft_and_published import BranchSettingMixin
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -67,7 +68,7 @@ class SwitchedSignal(django.dispatch.Signal):
 
         All other args are passed to the constructor for django.dispatch.Signal.
         """
-        super().__init__(*args, **kwargs)
+        super(SwitchedSignal, self).__init__(*args, **kwargs)
         self.name = name
         self._allow_signals = True
 
@@ -102,7 +103,7 @@ class SwitchedSignal(django.dispatch.Signal):
             "ALLOW" if self._allow_signals else "BLOCK"
         )
         if self._allow_signals:
-            return super().send(*args, **kwargs)
+            return super(SwitchedSignal, self).send(*args, **kwargs)
         return []
 
     def send_robust(self, *args, **kwargs):
@@ -120,14 +121,14 @@ class SwitchedSignal(django.dispatch.Signal):
             "ALLOW" if self._allow_signals else "BLOCK"
         )
         if self._allow_signals:
-            return super().send_robust(*args, **kwargs)
+            return super(SwitchedSignal, self).send_robust(*args, **kwargs)
         return []
 
     def __repr__(self):
-        return f"SwitchedSignal('{self.name}')"
+        return u"SwitchedSignal('{}')".format(self.name)
 
 
-class SignalHandler:
+class SignalHandler(object):
     """
     This class is to allow the modulestores to emit signals that can be caught
     by other parts of the Django application. If your app needs to do something
@@ -137,16 +138,14 @@ class SignalHandler:
     To listen for a signal, do the following::
 
         from django.dispatch import receiver
-        from celery import shared_task
-        from edx_django_utils.monitoring import set_code_owner_attribute
+        from celery.task import task
         from xmodule.modulestore.django import modulestore, SignalHandler
 
         @receiver(SignalHandler.course_published)
         def listen_for_course_publish(sender, course_key, **kwargs):
             do_my_expensive_update.delay(course_key)
 
-        @shared_task()
-        @set_code_owner_attribute
+        @task()
         def do_my_expensive_update(course_key):
             # ...
 
@@ -251,7 +250,7 @@ def create_modulestore_instance(
 
     FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
-        if key in _options and isinstance(_options[key], str):
+        if key in _options and isinstance(_options[key], six.string_types):
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE
@@ -344,7 +343,7 @@ def clear_existing_modulestores():
     _MIXED_MODULESTORE = None
 
 
-class ModuleI18nService:
+class ModuleI18nService(object):
     """
     Implement the XBlock runtime "i18n" service.
 
@@ -378,12 +377,12 @@ class ModuleI18nService:
                     xblock_locale_path,
                     [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
                 )
-            except OSError:
+            except IOError:
                 # Fall back to the default Django translator if the XBlock translator is not found.
                 pass
 
     def __getattr__(self, name):
-        name = 'gettext' if name == 'ugettext' else name
+        name = 'gettext' if six.PY3 and name == 'ugettext' else name
         return getattr(self.translator, name)
 
     def strftime(self, *args, **kwargs):

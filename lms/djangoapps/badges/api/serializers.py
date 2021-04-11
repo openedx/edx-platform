@@ -14,7 +14,7 @@ class BadgeClassSerializer(serializers.ModelSerializer):
     """
     image_url = serializers.ImageField(source='image')
 
-    class Meta:
+    class Meta(object):
         model = BadgeClass
         fields = ('slug', 'issuing_component', 'display_name', 'course_id', 'description', 'criteria', 'image_url')
 
@@ -25,6 +25,6 @@ class BadgeAssertionSerializer(serializers.ModelSerializer):
     """
     badge_class = BadgeClassSerializer(read_only=True)
 
-    class Meta:
+    class Meta(object):
         model = BadgeAssertion
         fields = ('badge_class', 'image_url', 'assertion_url', 'created')

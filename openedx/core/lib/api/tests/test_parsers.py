@@ -2,12 +2,12 @@
 TestCases verifying proper behavior of custom DRF request parsers.
 """
 
+
 from collections import namedtuple
 from io import BytesIO
 
-import pytest
 from rest_framework import exceptions
-from rest_framework.test import APIRequestFactory, APITestCase
+from rest_framework.test import APITestCase, APIRequestFactory
 
 from openedx.core.lib.api import parsers
 
@@ -18,7 +18,7 @@ class TestTypedFileUploadParser(APITestCase):
     """
 
     def setUp(self):
-        super(TestTypedFileUploadParser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestTypedFileUploadParser, self).setUp()
         self.parser = parsers.TypedFileUploadParser()
         self.request_factory = APIRequestFactory()
         upload_media_types = {'image/png', 'image/jpeg', 'application/octet-stream'}
@@ -36,9 +36,9 @@ class TestTypedFileUploadParser(APITestCase):
         )
         context = {'view': self.view, 'request': request}
         result = self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
-        assert result.data == {}
-        assert 'file' in result.files
-        assert result.files['file'].read() == b'abcdefgh'
+        self.assertEqual(result.data, {})
+        self.assertIn('file', result.files)
+        self.assertEqual(result.files['file'].read(), b'abcdefgh')
 
     def test_parse_unsupported_type(self):
         """
@@ -51,7 +51,7 @@ class TestTypedFileUploadParser(APITestCase):
             HTTP_CONTENT_DISPOSITION='attachment; filename="file.tiff"',
         )
         context = {'view': self.view, 'request': request}
-        with pytest.raises(exceptions.UnsupportedMediaType):
+        with self.assertRaises(exceptions.UnsupportedMediaType):
             self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/tiff', parser_context=context)
 
     def test_parse_unconstrained_type(self):
@@ -68,9 +68,9 @@ class TestTypedFileUploadParser(APITestCase):
         result = self.parser.parse(
             stream=BytesIO(b'abcdefgh'), media_type='application/octet-stream', parser_context=context
         )
-        assert result.data == {}
-        assert 'file' in result.files
-        assert result.files['file'].read() == b'abcdefgh'
+        self.assertEqual(result.data, {})
+        self.assertIn('file', result.files)
+        self.assertEqual(result.files['file'].read(), b'abcdefgh')
 
     def test_parse_mismatched_filename_and_mimetype(self):
         """
@@ -84,12 +84,10 @@ class TestTypedFileUploadParser(APITestCase):
             HTTP_CONTENT_DISPOSITION='attachment; filename="file.jpg"',
         )
         context = {'view': self.view, 'request': request}
-        with pytest.raises(exceptions.ParseError) as err:
+        with self.assertRaises(exceptions.ParseError) as err:
             self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
-            assert 'developer_message' in err.detail
-            # lint-amnesty, pylint: disable=no-member
-            assert 'user_message' not in err.detail
-            # lint-amnesty, pylint: disable=no-member
+            self.assertIn('developer_message', err.detail)
+            self.assertNotIn('user_message', err.detail)
 
     def test_no_acceptable_types(self):
         """
@@ -97,7 +95,7 @@ class TestTypedFileUploadParser(APITestCase):
         everything.
         """
         view = object()
-        assert not hasattr(view, 'upload_media_types')
+        self.assertFalse(hasattr(view, 'upload_media_types'))
 
         request = self.request_factory.post(
             '/',
@@ -105,9 +103,7 @@ class TestTypedFileUploadParser(APITestCase):
             HTTP_CONTENT_DISPOSITION='attachment; filename="file.png"',
         )
         context = {'view': view, 'request': request}
-        with pytest.raises(exceptions.UnsupportedMediaType) as err:
+        with self.assertRaises(exceptions.UnsupportedMediaType) as err:
             self.parser.parse(stream=BytesIO(b'abcdefgh'), media_type='image/png', parser_context=context)
-            assert 'developer_message' in err.detail
-            # lint-amnesty, pylint: disable=no-member
-            assert 'user_message' in err.detail
-            # lint-amnesty, pylint: disable=no-member
+            self.assertIn('developer_message', err.detail)
+            self.assertIn('user_message', err.detail)

@@ -1,12 +1,11 @@
-"""  # lint-amnesty, pylint: disable=cyclic-import
+"""
 Tests for course_team reindex command.
 """
 
 
-from unittest.mock import patch
-
 import ddt
 from django.core.management import CommandError, call_command
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from search.search_engine_base import SearchEngine
 
@@ -28,7 +27,7 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         """
         Set up tests.
         """
-        super().setUp()
+        super(ReindexCourseTeamTest, self).setUp()
 
         self.team1 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team1')
         self.team2 = CourseTeamFactory(course_id=COURSE_KEY1, team_id='team2')
@@ -62,8 +61,8 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
         """
         Test that raises CommandError for invalid team id.
         """
-        team_id = 'team4'
-        error_str = f'Argument {team_id} is not a course_team team_id'
+        team_id = u'team4'
+        error_str = u'Argument {} is not a course_team team_id'.format(team_id)
         with self.assertRaisesRegex(CommandError, error_str):
             call_command('reindex_course_team', team_id)
 

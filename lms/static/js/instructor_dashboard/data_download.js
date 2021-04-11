@@ -118,30 +118,7 @@
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
             this.clear_display();
             this.$list_anon_btn.click(function() {
-                var url = dataDownloadObj.$list_anon_btn.data('endpoint');
-                var errorMessage = gettext('Error generating anonymous IDs. Please try again.');
-                return $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    url: url,
-                    error: function(error) {
-                        if (error.responseText) {
-                            errorMessage = JSON.parse(error.responseText);
-                        }
-                        dataDownloadObj.clear_display();
-                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
-                        return dataDownloadObj.$reports_request_response_error.css({
-                            display: 'block'
-                        });
-                    },
-                    success: function(data) {
-                        dataDownloadObj.clear_display();
-                        dataDownloadObj.$reports_request_response.text(data.status);
-                        return $('.msg-confirm').css({
-                            display: 'block'
-                        });
-                    }
-                });
+                location.href = dataDownloadObj.$list_anon_btn.data('endpoint');
             });
             this.$proctored_exam_csv_btn.click(function() {
                 var url = dataDownloadObj.$proctored_exam_csv_btn.data('endpoint');

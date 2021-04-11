@@ -2,10 +2,10 @@
 Test signal handlers for completion.
 """
 
+
 from datetime import datetime
 
 import ddt
-import pytest
 import six
 from completion import handlers
 from completion.models import BlockCompletion
@@ -47,7 +47,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = True
 
     def setUp(self):
-        super(ScorableCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ScorableCompletionHandlerTestCase, self).setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def call_scorable_block_completion_handler(self, block_key, score_deleted=None):
@@ -85,7 +85,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=self.block_key,
         )
-        assert completion.completion == expected_completion
+        self.assertEqual(completion.completion, expected_completion)
 
     @XBlock.register_temp_plugin(CustomScorableBlock, 'custom_scorable')
     def test_handler_skips_custom_block(self):
@@ -96,7 +96,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=custom_block_key,
         )
-        assert not completion.exists()
+        self.assertFalse(completion.exists())
 
     @XBlock.register_temp_plugin(ExcludedScorableBlock, 'excluded_scorable')
     def test_handler_skips_excluded_block(self):
@@ -107,7 +107,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=excluded_block_key,
         )
-        assert not completion.exists()
+        self.assertFalse(completion.exists())
 
     def test_handler_skips_discussion_block(self):
         discussion_block_key = self.context_key.make_usage_key(block_type='discussion', block_id='blue')
@@ -117,7 +117,7 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             context_key=self.context_key,
             block_key=discussion_block_key,
         )
-        assert not completion.exists()
+        self.assertFalse(completion.exists())
 
     def test_signal_calls_handler(self):
         with patch('completion.handlers.BlockCompletion.objects.submit_completion') as mock_handler:
@@ -143,7 +143,7 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
     COMPLETION_SWITCH_ENABLED = False
 
     def setUp(self):
-        super(DisabledCompletionHandlerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(DisabledCompletionHandlerTestCase, self).setUp()
         self.block_key = self.context_key.make_usage_key(block_type='problem', block_id='red')
 
     def test_disabled_handler_does_not_submit_completion(self):
@@ -157,7 +157,7 @@ class DisabledCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
             modified=datetime.utcnow().replace(tzinfo=utc),
             score_db_table='submissions',
         )
-        with pytest.raises(BlockCompletion.DoesNotExist):
+        with self.assertRaises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(
                 user=self.user,
                 context_key=self.context_key,

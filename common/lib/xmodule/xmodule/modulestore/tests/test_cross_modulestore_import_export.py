@@ -17,9 +17,9 @@ import itertools
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
-from unittest.mock import patch
 
 import ddt
+from mock import patch
 from path import Path as path
 
 from openedx.core.lib.tests import attr
@@ -43,7 +43,7 @@ COURSE_DATA_NAMES = (
     'split_test_module_draft',
 )
 
-EXPORTED_COURSE_DIR_NAME = 'exported_source_course'
+EXPORTED_COURSE_DIR_NAME = u'exported_source_course'
 
 
 @ddt.ddt
@@ -55,7 +55,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CrossStoreXMLRoundtrip, self).setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
@@ -164,8 +164,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                 with MongoContentstoreBuilder().build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with SPLIT_MODULESTORE_SETUP.build(contentstore=dest_content) as dest_store:
-                        source_course_key = source_store.make_course_key('a', 'source', '2015_Fall')  # lint-amnesty, pylint: disable=no-member
-                        dest_course_key = dest_store.make_course_key('a', 'dest', '2015_Fall')  # lint-amnesty, pylint: disable=no-member
+                        source_course_key = source_store.make_course_key('a', 'source', '2015_Fall')
+                        dest_course_key = dest_store.make_course_key('a', 'dest', '2015_Fall')
 
                         import_course_from_xml(
                             source_store,
@@ -186,14 +186,14 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             EXPORTED_COURSE_DIR_NAME,
                         )
 
-                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
+                        source_course = source_store.get_course(source_course_key, depth=None, lazy=False)
 
-                        assert source_course.url_name == 'course'
+                        self.assertEqual(source_course.url_name, 'course')
 
                         export_dir_path = path(self.export_dir)
                         policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course_key.run
                         policy_path = policy_dir / 'policy.json'
-                        assert os.path.exists(policy_path)
+                        self.assertTrue(os.path.exists(policy_path))
 
                         import_course_from_xml(
                             dest_store,
@@ -206,6 +206,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             create_if_not_present=True,
                         )
 
-                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)  # lint-amnesty, pylint: disable=no-member
+                        dest_course = dest_store.get_course(dest_course_key, depth=None, lazy=False)
 
-                        assert dest_course.url_name == 'course'
+                        self.assertEqual(dest_course.url_name, 'course')

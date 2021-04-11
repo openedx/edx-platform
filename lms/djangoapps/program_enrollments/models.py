@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 Django model specifications for the Program Enrollments API
 """
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -27,7 +28,7 @@ class ProgramEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta:
+    class Meta(object):
         app_label = "program_enrollments"
 
         # A student enrolled in a given (program, curriculum) should always
@@ -81,10 +82,10 @@ class ProgramEnrollment(TimeStampedModel):
         return True
 
     def __str__(self):
-        return f'[ProgramEnrollment id={self.id}]'
+        return '[ProgramEnrollment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (  # lint-amnesty, pylint: disable=missing-format-attribute
+        return (
             "<ProgramEnrollment"    # pylint: disable=missing-format-attribute
             " id={self.id}"
             " user={self.user!r}"
@@ -105,7 +106,7 @@ class ProgramCourseEnrollment(TimeStampedModel):
     """
     STATUS_CHOICES = ProgramCourseEnrollmentStatuses.__MODEL_CHOICES__
 
-    class Meta:
+    class Meta(object):
         app_label = "program_enrollments"
 
         # For each program enrollment, there may be only one
@@ -137,10 +138,10 @@ class ProgramCourseEnrollment(TimeStampedModel):
         return self.status == ProgramCourseEnrollmentStatuses.ACTIVE
 
     def __str__(self):
-        return f'[ProgramCourseEnrollment id={self.id}]'
+        return '[ProgramCourseEnrollment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (  # lint-amnesty, pylint: disable=missing-format-attribute
+        return (
             "<ProgramCourseEnrollment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " program_enrollment={self.program_enrollment!r}"
@@ -157,17 +158,17 @@ class CourseAccessRoleAssignment(TimeStampedModel):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         unique_together = ('role', 'enrollment')
 
     role = models.CharField(max_length=64, choices=ProgramCourseEnrollmentRoles.__MODEL_CHOICES__)
     enrollment = models.ForeignKey(ProgramCourseEnrollment, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'[CourseAccessRoleAssignment id={self.id}]'
+        return '[CourseAccessRoleAssignment id={}]'.format(self.id)
 
     def __repr__(self):
-        return (  # lint-amnesty, pylint: disable=missing-format-attribute
+        return (
             "<CourseAccessRoleAssignment"  # pylint: disable=missing-format-attribute
             " id={self.id}"
             " role={self.role!r}"

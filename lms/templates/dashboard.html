@@ -196,10 +196,8 @@ from common.djangoapps.student.models import CourseEnrollment
                     enrollment = CourseEnrollment(user=user, course=CourseOverview.get_from_id(pseudo_key), mode=pseudo_session['type'])
                   # We only show email settings for entitlement cards if the entitlement has an associated enrollment
                   show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
-                  course_overview = enrollment.course_overview
                 else:
                   show_email_settings = (enrollment.course_id in show_email_settings_for)
-                  course_overview = CourseOverview.get_from_id(enrollment.course_id)
 
                 session_id = enrollment.course_id
                 show_courseware_link = show_courseware_links_for.get(session_id, False)
@@ -214,6 +212,7 @@ from common.djangoapps.student.models import CourseEnrollment
                 course_requirements = courses_requirements_not_met.get(session_id)
                 related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
+                course_overview = enrollment.course_overview
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
               <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />

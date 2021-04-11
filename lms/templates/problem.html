@@ -1,6 +1,6 @@
 <%page expression_filter="h"/>
 <%!
-from django.utils.translation import ngettext, gettext as _
+from django.utils.translation import ungettext, ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
 
@@ -29,12 +29,12 @@ from openedx.core.djangolib.markup import HTML
     <div class="problem-action-buttons-wrapper">
       % if demand_hint_possible:
       <span class="problem-action-button-wrapper">
-          <button type="button" class="hint-button problem-action-btn btn-link btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
+          <button type="button" class="hint-button problem-action-btn btn-default btn-small" data-value="${_('Hint')}" ${'' if should_enable_next_hint else 'disabled'}>${_('Hint')}</button>
       </span>
       % endif
       % if save_button:
       <span class="problem-action-button-wrapper">
-          <button type="button" class="save problem-action-btn btn-link btn-small" data-value="${_('Save')}">
+          <button type="button" class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}">
               <span aria-hidden="true">${_('Save')}</span>
               <span class="sr">${_("Save your answer")}</span>
           </button>
@@ -42,12 +42,12 @@ from openedx.core.djangolib.markup import HTML
       % endif
       % if reset_button:
       <span class="problem-action-button-wrapper">
-          <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
+          <button type="button" class="reset problem-action-btn btn-default btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>
       % endif
       % if answer_available:
       <span class="problem-action-button-wrapper">
-          <button type="button" class="show problem-action-btn btn-link btn-small" aria-describedby="${ short_id }-problem-title"><span class="show-label">${_('Show answer')}</span></button>
+          <button type="button" class="show problem-action-btn btn-default btn-small" aria-describedby="${ short_id }-problem-title"><span class="show-label">${_('Show answer')}</span></button>
       </span>
       % endif
     </div>
@@ -58,7 +58,7 @@ from openedx.core.djangolib.markup import HTML
 
       % if submit_disabled_cta:
         % if submit_disabled_cta.get('event_data'):
-          <button class="submit-cta-link-button btn-link btn-small" onclick="emit_event(${submit_disabled_cta['event_data']})">
+          <button class="submit-cta-link-button btn-default btn-small" onclick="emit_event(${submit_disabled_cta['event_data']})">
             ${submit_disabled_cta['link_name']}
           </button>
           <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
@@ -73,7 +73,7 @@ from openedx.core.djangolib.markup import HTML
               % for form_name, form_value in submit_disabled_cta['form_values'].items():
                   <input type="hidden" name="${form_name}" value="${form_value}">
               % endfor
-              <button class="submit-cta-link-button btn-link btn-small">
+              <button class="submit-cta-link-button btn-default btn-small">
                 ${submit_disabled_cta['link_name']}
               </button>
               <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
@@ -85,10 +85,9 @@ from openedx.core.djangolib.markup import HTML
             </form>
         % endif
       % endif
-      <div class="submission-feedback ${'cta-enabled' if submit_disabled_cta else ''}" id="submission_feedback_${short_id}">
-        ## When attempts are not 0, the CTA above will contain a message about the number of used attempts
-        % if attempts_allowed and (not submit_disabled_cta or attempts_used == 0):
-          ${ngettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
+      <div class="submission-feedback" id="submission_feedback_${short_id}">
+        % if attempts_allowed:
+          ${ungettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
         % endif
         <span class="sr">${_("Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.")}</span>
       </div>

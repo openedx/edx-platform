@@ -6,14 +6,12 @@ import json
 import ddt
 import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
 from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
-from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
-from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,
@@ -21,7 +19,8 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):
@@ -32,7 +31,7 @@ class AutoAuthTestCase(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
+class AutoAuthEnabledTestCase(AutoAuthTestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
@@ -49,9 +48,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-
-        self.CREATE_USER = False  # no need to add a user from modulestore setup
-        super(AutoAuthEnabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(AutoAuthEnabledTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -60,16 +57,16 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         Test that user gets created when visiting the page.
         """
         self._auto_auth()
-        assert User.objects.count() == 1
+        self.assertEqual(User.objects.count(), 1)
         user = User.objects.all()[0]
-        assert user.is_active
-        assert not user.profile.requires_parental_consent()
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.profile.requires_parental_consent())
 
     @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_same_user(self):
         self._auto_auth({'username': 'test'})
         self._auto_auth({'username': 'test'})
-        assert User.objects.count() == 1
+        self.assertEqual(User.objects.count(), 1)
 
     def test_create_multiple_users(self):
         """
@@ -78,7 +75,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         self._auto_auth()
         self.client.logout()
         self._auto_auth()
-        assert User.objects.all().count() == 2
+        self.assertEqual(User.objects.all().count(), 2)
 
     def test_create_defined_user(self):
         """
@@ -92,16 +89,16 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
 
         # Check that the user has the correct info
         user = User.objects.get(username='robot')
-        assert user.username == 'robot'
-        assert user.check_password('test')
-        assert user.email == 'robot@edx.org'
+        self.assertEqual(user.username, 'robot')
+        self.assertTrue(user.check_password('test'))
+        self.assertEqual(user.email, 'robot@edx.org')
 
         # Check that the user has a profile
         user_profile = UserProfile.objects.get(user=user)
-        assert user_profile.name == 'Robot Name'
+        self.assertEqual(user_profile.name, "Robot Name")
 
         # By default, the user should not be global staff
-        assert not user.is_staff
+        self.assertFalse(user.is_staff)
 
     @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_staff_user(self):
@@ -109,12 +106,12 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         # Create a staff user
         self._auto_auth({'username': 'test', 'staff': 'true'})
         user = User.objects.get(username='test')
-        assert user.is_staff
+        self.assertTrue(user.is_staff)
 
         # Revoke staff privileges
         self._auto_auth({'username': 'test', 'staff': 'false'})
         user = User.objects.get(username='test')
-        assert not user.is_staff
+        self.assertFalse(user.is_staff)
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
@@ -124,9 +121,9 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         self._auto_auth({'username': 'test', 'course_id': course_id})
 
         # Check that a course enrollment was created for the user
-        assert CourseEnrollment.objects.count() == 1
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
         enrollment = CourseEnrollment.objects.get(course_id=course_key)
-        assert enrollment.user.username == 'test'
+        self.assertEqual(enrollment.user.username, "test")
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
@@ -140,30 +137,32 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         self._auto_auth({'username': 'test', 'course_id': course_id})
 
         # Check that only one course enrollment was created for the user
-        assert CourseEnrollment.objects.count() == 1
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
         enrollment = CourseEnrollment.objects.get(course_id=course_key)
-        assert enrollment.user.username == 'test'
+        self.assertEqual(enrollment.user.username, "test")
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
     def test_set_roles(self, course_id, course_key):
         seed_permissions_roles(course_key)
         course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_key))
-        assert len(course_roles) == 5
-        # sanity check
+        self.assertEqual(len(course_roles), 5)  # sanity check
 
         # Student role is assigned by default on course enrollment.
         self._auto_auth({'username': 'a_student', 'course_id': course_id})
         user = User.objects.get(username='a_student')
         user_roles = user.roles.all()
-        assert len(user_roles) == 1
-        assert user_roles[0] == course_roles[FORUM_ROLE_STUDENT]
+        self.assertEqual(len(user_roles), 1)
+        self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
 
         self.client.logout()
         self._auto_auth({'username': 'a_moderator', 'course_id': course_id, 'roles': 'Moderator'})
         user = User.objects.get(username='a_moderator')
         user_roles = user.roles.all()
-        assert set(user_roles) == set([course_roles[FORUM_ROLE_STUDENT], course_roles[FORUM_ROLE_MODERATOR]])
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR]]))
 
         # check multiple roles work.
         self.client.logout()
@@ -173,15 +172,18 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         })
         user = User.objects.get(username='an_admin')
         user_roles = user.roles.all()
-        assert set(user_roles) == {course_roles[FORUM_ROLE_STUDENT], course_roles[FORUM_ROLE_MODERATOR],
-                                   course_roles[FORUM_ROLE_ADMINISTRATOR]}
+        self.assertEqual(
+            set(user_roles),
+            set([course_roles[FORUM_ROLE_STUDENT],
+                course_roles[FORUM_ROLE_MODERATOR],
+                course_roles[FORUM_ROLE_ADMINISTRATOR]]))
 
     def test_json_response(self):
         """ The view should return JSON. """
         response = self._auto_auth()
         response_data = json.loads(response.content.decode('utf-8'))
         for key in ['created_status', 'username', 'email', 'password', 'user_id', 'anonymous_id']:
-            assert key in response_data
+            self.assertIn(key, response_data)
         user = User.objects.get(username=response_data['username'])
         self.assertDictContainsSubset(
             {
@@ -203,9 +205,9 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         }, status_code=302)
 
         # Check that a course enrollment was created for the user
-        assert CourseEnrollment.objects.count() == 1
+        self.assertEqual(CourseEnrollment.objects.count(), 1)
         enrollment = CourseEnrollment.objects.get(course_id=course_key)
-        assert enrollment.user.username == 'test'
+        self.assertEqual(enrollment.user.username, "test")
 
         # Check that the redirect was to the course info/outline page
         if settings.ROOT_URLCONF == 'lms.urls':
@@ -213,7 +215,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         else:
             url_pattern = '/course/{}'.format(six.text_type(course_key))
 
-        assert response.url.endswith(url_pattern)
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def test_redirect_to_main(self):
         # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
@@ -229,7 +231,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         else:
             url_pattern = '/home'
 
-        assert response.url.endswith(url_pattern)
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def test_redirect_to_specified(self):
         # Create user and redirect to specified url
@@ -240,7 +242,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
             'staff': 'true',
         }, status_code=302)
 
-        assert response.url.endswith(url_pattern)
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def _auto_auth(self, params=None, status_code=200, **kwargs):
         """
@@ -258,12 +260,12 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         params = params or {}
         response = self.client.get(self.url, params, **kwargs)
 
-        assert response.status_code == status_code
+        self.assertEqual(response.status_code, status_code)
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            assert cookie in response.cookies
-            assert response.cookies[cookie].value
+            self.assertIn(cookie, response.cookies)
+            self.assertTrue(response.cookies[cookie].value)
 
         return response
 
@@ -273,26 +275,27 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
         """
         response = self.client.get(self.url)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def test_course_access_roles(self):
         """ Passing role names via the course_access_roles query string parameter should create CourseAccessRole
         objects associated with the user.
         """
-
         expected_roles = ['finance_admin', 'sales_admin']
         course_key = CourseLocator.from_string(self.COURSE_ID_SPLIT)
         params = {
             'course_id': str(course_key),
             'course_access_roles': ','.join(expected_roles)
         }
-
         response = self._auto_auth(params)
         user_info = json.loads(response.content.decode('utf-8'))
 
         for role in expected_roles:
-            assert CourseAccessRole.objects\
-                .filter(user__id=user_info['user_id'], course_id=course_key, org=course_key.org, role=role).exists()
+            self.assertTrue(
+                CourseAccessRole.objects.filter(
+                    user__id=user_info['user_id'], course_id=course_key, org=course_key.org, role=role
+                ).exists()
+            )
 
 
 class AutoAuthDisabledTestCase(AutoAuthTestCase):
@@ -306,7 +309,7 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthDisabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(AutoAuthDisabledTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -315,7 +318,7 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         Make sure automatic authentication is disabled.
         """
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
 
 class AutoAuthRestrictedTestCase(AutoAuthTestCase):
@@ -330,7 +333,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthRestrictedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(AutoAuthRestrictedTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -348,6 +351,6 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         Make sure that existing users cannot be modified.
         """
         response = self.client.get(self.url, {'username': 'test'})
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         response = self.client.get(self.url, {'username': 'test'})
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)

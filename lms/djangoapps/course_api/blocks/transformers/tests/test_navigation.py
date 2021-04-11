@@ -7,6 +7,7 @@ Tests for BlockNavigationTransformer.
 from unittest import TestCase
 
 import ddt
+import six
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
@@ -56,7 +57,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
 
         for block_key, expected_nav in enumerate(expected_nav_map):
             self.assertSetEqual(
-                {str(block) for block in expected_nav},
+                set(six.text_type(block) for block in expected_nav),
                 set(
                     block_structure.get_transformer_block_field(
                         block_key,
@@ -91,14 +92,14 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
         BlockNavigationTransformer.collect(block_structure)
         block_structure._collect_requested_xblock_fields()
 
-        assert chapter_x_key in block_structure
+        self.assertIn(chapter_x_key, block_structure)
 
         # transform phase
         BlockDepthTransformer().transform(usage_info=None, block_structure=block_structure)
         BlockNavigationTransformer(0).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
 
-        assert chapter_x_key in block_structure
+        self.assertIn(chapter_x_key, block_structure)
 
         course_descendants = block_structure.get_transformer_block_field(
             course_usage_key,
@@ -113,7 +114,7 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_y1a'),
                 course_key.make_usage_key('problem', 'problem_y1a_1'),
         ]:
-            assert str(block_key) in course_descendants
+            self.assertIn(six.text_type(block_key), course_descendants)
 
         # chapter_x and its descendants should not be included
         for block_key in [
@@ -122,4 +123,4 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_x1a'),
                 course_key.make_usage_key('problem', 'problem_x1a_1'),
         ]:
-            assert str(block_key) not in course_descendants
+            self.assertNotIn(six.text_type(block_key), course_descendants)

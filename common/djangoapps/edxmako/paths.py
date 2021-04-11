@@ -6,9 +6,9 @@ Set up lookup paths for mako templates.
 import contextlib
 import hashlib
 import os
+import six
 
 import pkg_resources
-import six
 from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
@@ -19,13 +19,13 @@ from openedx.core.lib.cache_utils import request_cached
 from . import LOOKUP
 
 
-class TopLevelTemplateURI(str):
+class TopLevelTemplateURI(six.text_type):
     """
     A marker class for template URIs used to signal the template lookup infrastructure that the template corresponding
     to the URI should be looked up straight in the standard edx-platform location instead of trying to locate an
     overridding template in the current theme first.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class DynamicTemplateLookup(TemplateLookup):
@@ -34,7 +34,7 @@ class DynamicTemplateLookup(TemplateLookup):
     for adding directories progressively.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(DynamicTemplateLookup, self).__init__(*args, **kwargs)
         self.__original_module_directory = self.template_args['module_directory']
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class DynamicTemplateLookup(TemplateLookup):
         that template lookup skips the current theme and looks up the built-in template in standard locations.
         """
         # Make requested uri relative to the calling uri.
-        relative_uri = super().adjust_uri(uri, relativeto)
+        relative_uri = super(DynamicTemplateLookup, self).adjust_uri(uri, relativeto)
         # Is the calling template (relativeto) which is including or inheriting current template (uri)
         # located inside a theme?
         if relativeto != strip_site_theme_templates_path(relativeto):
@@ -99,7 +99,7 @@ class DynamicTemplateLookup(TemplateLookup):
         else:
             try:
                 # Try to find themed template, i.e. see if current theme overrides the template
-                template = super().get_template(get_template_path_with_theme(uri))
+                template = super(DynamicTemplateLookup, self).get_template(get_template_path_with_theme(uri))
             except TopLevelLookupException:
                 template = self._get_toplevel_template(uri)
 
@@ -110,7 +110,7 @@ class DynamicTemplateLookup(TemplateLookup):
         Lookup a default/toplevel template, ignoring current theme.
         """
         # Strip off the prefix path to theme and look in default template dirs.
-        return super().get_template(strip_site_theme_templates_path(uri))
+        return super(DynamicTemplateLookup, self).get_template(strip_site_theme_templates_path(uri))
 
 
 def clear_lookups(namespace):

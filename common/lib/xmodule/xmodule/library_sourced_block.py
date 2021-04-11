@@ -55,7 +55,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
     MAX_BLOCKS_ALLOWED = 10
 
     def __str__(self):
-        return f"LibrarySourcedBlock: {self.display_name}"
+        return "LibrarySourcedBlock: {}".format(self.display_name)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -121,7 +121,7 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
             validation.add(
                 ValidationMessage(
                     ValidationMessage.ERROR,
-                    _("A maximum of {0} components may be added.").format(self.MAX_BLOCKS_ALLOWED)
+                    _(u"A maximum of {0} components may be added.").format(self.MAX_BLOCKS_ALLOWED)
                 )
             )
 
@@ -137,9 +137,9 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
-                    _("No XBlock has been configured for this component. Use the editor to select the target blocks."),
+                    _(u"No XBlock has been configured for this component. Use the editor to select the target blocks."),
                     action_class='edit-button',
-                    action_label=_("Open Editor")
+                    action_label=_(u"Open Editor")
                 )
             )
         return validation
@@ -156,5 +156,5 @@ class LibrarySourcedBlock(StudioEditableXBlockMixin, EditableChildrenMixin, XBlo
             lib_tools.import_from_blockstore(self, self.source_block_ids)
         except Exception as err:  # pylint: disable=broad-except
             log.exception(err)
-            return Response(_("Importing Library Block failed - are the IDs valid and readable?"), status=400)
+            return Response(_(u"Importing Library Block failed - are the IDs valid and readable?"), status=400)
         return response

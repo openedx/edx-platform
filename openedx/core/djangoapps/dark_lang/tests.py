@@ -4,12 +4,12 @@ Tests of DarkLangMiddleware
 
 
 import unittest
-from unittest.mock import Mock
 
 import ddt
 from django.http import HttpRequest
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
+from mock import Mock
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -34,7 +34,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
     Tests of DarkLangMiddleware
     """
     def setUp(self):
-        super().setUp()
+        super(DarkLangMiddlewareTests, self).setUp()
         self.user = UserFactory.build(username='test', email='test@edx.org', password='test_password')
         self.user.save()
         self.client = Client()
@@ -69,7 +69,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         )
 
         # Process it through the Middleware to ensure the language is available as expected.
-        assert DarkLangMiddleware().process_request(request) is None
+        self.assertIsNone(DarkLangMiddleware().process_request(request))
         return request
 
     def assertAcceptEquals(self, value, request):
@@ -77,7 +77,10 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         Assert that the HTML_ACCEPT_LANGUAGE header in request
         is equal to value
         """
-        assert value == request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
+        self.assertEqual(
+            value,
+            request.META.get('HTTP_ACCEPT_LANGUAGE', UNSET)
+        )
 
     def test_empty_accept(self):
         self.assertAcceptEquals(UNSET, self.process_middleware_request())
@@ -227,20 +230,23 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
 
         self.assertAcceptEquals(
             'es-419;q=1.0',
-            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))  # pylint:disable=no-member
+            self.process_middleware_request(accept=b'{};q=1.0, pt;q=0.5'.format(latin_america_code))
         )
 
     def assert_session_lang_equals(self, value, session):
         """
         Assert that the LANGUAGE_SESSION_KEY set in session is equal to value
         """
-        assert value == session.get(LANGUAGE_SESSION_KEY, UNSET)
+        self.assertEqual(
+            value,
+            session.get(LANGUAGE_SESSION_KEY, UNSET)
+        )
 
     def _post_set_preview_lang(self, preview_language):
         """
         Sends a post request to set the preview language
         """
-        return self.client.post('/update_lang/', {'preview_language': preview_language, 'action': 'set_preview_language'})  # lint-amnesty, pylint: disable=line-too-long
+        return self.client.post('/update_lang/', {'preview_language': preview_language, 'action': 'set_preview_language'})
 
     def _post_clear_preview_lang(self):
         """

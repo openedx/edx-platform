@@ -143,36 +143,36 @@
                     expect($speedButton).toBeFocused();
                 });
 
-                it('ENTER keydown on speed entry selects 2.0x speed and closes menu',
+                it('ENTER keydown on speed entry selects speed and closes menu',
                    function() {
                     // First open menu.
                        $speedControl.trigger(keyPressEvent(KEY.UP));
-                    // Focus on 2.0x speed
+                    // Focus on 1.50x speed
                        speedEntries.eq(0).focus();
                        speedEntries.eq(0).trigger(keyPressEvent(KEY.ENTER));
 
                     // Menu is closed, focus has been returned to speed
-                    // control and video speed is 2.0x.
+                    // control and video speed is 1.50x.
                        expect($speedButton).toBeFocused();
-                       expect($('.video-speeds li[data-speed="2.0"]'))
+                       expect($('.video-speeds li[data-speed="1.50"]'))
                         .toHaveClass('is-active');
-                       expect($('.speeds .value')).toHaveHtml('2.0x');
+                       expect($('.speeds .value')).toHaveHtml('1.50x');
                    });
 
-                it('SPACE keydown on speed entry selects 0.75x speed and closes menu',
+                it('SPACE keydown on speed entry selects speed and closes menu',
                    function() {
                     // First open menu.
                        $speedControl.trigger(keyPressEvent(KEY.UP));
-                    // Focus on 0.75x speed
-                       speedEntries.eq(4).focus();
-                       speedEntries.eq(4).trigger(keyPressEvent(KEY.SPACE));
+                    // Focus on 1.50x speed
+                       speedEntries.eq(0).focus();
+                       speedEntries.eq(0).trigger(keyPressEvent(KEY.SPACE));
 
                     // Menu is closed, focus has been returned to speed
-                    // control and video speed is 0.75x.
+                    // control and video speed is 1.50x.
                        expect($speedButton).toBeFocused();
-                       expect($('.video-speeds li[data-speed="0.75"]'))
+                       expect($('.video-speeds li[data-speed="1.50"]'))
                         .toHaveClass('is-active');
-                       expect($('.speeds .value')).toHaveHtml('0.75x');
+                       expect($('.speeds .value')).toHaveHtml('1.50x');
                    });
             });
         });

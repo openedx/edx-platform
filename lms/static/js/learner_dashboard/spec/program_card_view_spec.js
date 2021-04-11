@@ -88,7 +88,6 @@ describe('Program card View', () => {
 
   it('should load the program-card based on passed in context', () => {
     cardRenders(view.$el);
-    expect(view.$el.find('.banner-image').attr('srcset')).toEqual(program.banner_image.small.url);
   });
 
   it('should call reEvaluatePicture if reLoadBannerImage is called', () => {
@@ -127,33 +126,5 @@ describe('Program card View', () => {
     });
     cardRenders(view.$el);
     expect(view.$('.progress').length).toEqual(0);
-  });
-
-  it('should render cards if there are missing banner images', () => {
-    view.remove();
-    const programNoBanner = JSON.parse(JSON.stringify(program));
-    delete programNoBanner.banner_image;
-    programModel = new ProgramModel(programNoBanner);
-    view = new ProgramCardView({
-      model: programModel,
-      context: {},
-    });
-    cardRenders(view.$el);
-    expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
-  });
-
-  it('should render cards if there are missing banner image sizes', () => {
-    view.remove();
-    const programNoBanner = JSON.parse(JSON.stringify(program));
-    delete programNoBanner.banner_image['x-small'];
-    delete programNoBanner.banner_image.small;
-
-    programModel = new ProgramModel(programNoBanner);
-    view = new ProgramCardView({
-      model: programModel,
-      context: {},
-    });
-    cardRenders(view.$el);
-    expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
   });
 });

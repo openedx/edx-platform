@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import unittest
 import xml.sax.saxutils as saxutils
@@ -17,7 +17,7 @@ def extract_context(xml):
     Given an xml element corresponding to the output of test_capa_system.render_template, get back the
     original context
     """
-    return eval(xml.text)  # lint-amnesty, pylint: disable=eval-used
+    return eval(xml.text)
 
 
 def quote_attr(s):
@@ -30,7 +30,7 @@ class HelperTest(unittest.TestCase):
     '''
     def check(self, d):
         xml = etree.XML(test_capa_system().render_template('blah', d))
-        assert d == extract_context(xml)
+        self.assertEqual(d, extract_context(xml))
 
     def test_extract_context(self):
         self.check({})
@@ -51,12 +51,12 @@ class SolutionRenderTest(unittest.TestCase):
 
         renderer = lookup_tag('solution')(test_capa_system(), element)
 
-        assert renderer.id == 'solution_12'
+        self.assertEqual(renderer.id, 'solution_12')
 
         # Our test_capa_system "renders" templates to a div with the repr of the context.
         xml = renderer.get_html()
         context = extract_context(xml)
-        assert context == {'id': 'solution_12'}
+        self.assertEqual(context, {'id': 'solution_12'})
 
 
 class MathRenderTest(unittest.TestCase):
@@ -64,13 +64,13 @@ class MathRenderTest(unittest.TestCase):
     Make sure math renders properly.
     '''
 
-    def check_parse(self, latex_in, mathjax_out):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def check_parse(self, latex_in, mathjax_out):
         xml_str = """<math>{tex}</math>""".format(tex=latex_in)
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag('math')(test_capa_system(), element)
 
-        assert renderer.mathstr == mathjax_out
+        self.assertEqual(renderer.mathstr, mathjax_out)
 
     def test_parsing(self):
         self.check_parse('$abc$', '[mathjaxinline]abc[/mathjaxinline]')

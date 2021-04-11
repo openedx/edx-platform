@@ -2,11 +2,19 @@
 Mixins to facilitate testing OAuth connections to Django-OAuth-Toolkit or
 Django-OAuth2-Provider.
 """
+
+
+from unittest import expectedFailure
+
+from django.test.client import RequestFactory
+
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
 
+from ..views import DOTAccessTokenExchangeView
 
-class DOTAdapterMixin:
+
+class DOTAdapterMixin(object):
     """
     Mixin to rewire existing tests to use django-oauth-toolkit (DOT) backend
 
@@ -44,3 +52,17 @@ class DOTAdapterMixin:
         Return the set of keys provided when requesting an access token
         """
         return {'access_token', 'refresh_token', 'token_type', 'expires_in', 'scope'}
+
+    def test_get_method(self):
+        # Dispatch routes all get methods to DOP, so we test this on the view
+        request_factory = RequestFactory()
+        request = request_factory.get('/oauth2/exchange_access_token/')
+        request.session = {}
+        view = DOTAccessTokenExchangeView.as_view()
+        response = view(request, backend='facebook')
+        self.assertEqual(response.status_code, 400)
+
+    @expectedFailure
+    def test_single_access_token(self):
+        # TODO: Single access tokens not supported yet for DOT (See MA-2122)
+        super(DOTAdapterMixin, self).test_single_access_token()

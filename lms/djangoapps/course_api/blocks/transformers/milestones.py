@@ -5,13 +5,14 @@ Milestones Transformer
 
 import logging
 
+import six
 from django.conf import settings
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
+from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from common.djangoapps.student.models import EntranceExamConfiguration
 from common.djangoapps.util import milestones_helpers
-from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
     """
     A transformer that handles both milestones and special (timed) exams.
 
-    It includes or excludes all unfulfilled milestones from the student view based on the value of `include_gated_sections`.  # lint-amnesty, pylint: disable=line-too-long
+    It includes or excludes all unfulfilled milestones from the student view based on the value of `include_gated_sections`.
 
     An entrance exam is considered a milestone, and is not considered a "special exam".
 
@@ -101,8 +102,8 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
         them from accessing this block.
         """
         return bool(milestones_helpers.get_course_content_milestones(
-            str(block_key.course_key),
-            str(block_key),
+            six.text_type(block_key.course_key),
+            six.text_type(block_key),
             'requires',
             usage_info.user.id
         ))
@@ -119,8 +120,8 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
             # This will return None, if (user, course_id, content_id) is not applicable.
             special_exam_attempt_context = get_attempt_status_summary(
                 usage_info.user.id,
-                str(block_key.course_key),
-                str(block_key)
+                six.text_type(block_key.course_key),
+                six.text_type(block_key)
             )
         except ProctoredExamNotFoundException as ex:
             log.exception(ex)
@@ -154,13 +155,13 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
         if user_can_skip_entrance_exam:
             # remove the entrance exam from required content
-            entrance_exam_id = block_structure.get_xblock_field(block_structure.root_block_usage_key, 'entrance_exam_id')  # lint-amnesty, pylint: disable=line-too-long
+            entrance_exam_id = block_structure.get_xblock_field(block_structure.root_block_usage_key, 'entrance_exam_id')
             required_content = [content for content in required_content if not content == entrance_exam_id]
 
         return required_content
 
     @staticmethod
-    def gated_by_required_content(block_key, block_structure, required_content):  # lint-amnesty, pylint: disable=unused-argument
+    def gated_by_required_content(block_key, block_structure, required_content):
         """
         Returns True if the current block associated with the block_key should be gated by the given required_content.
         Returns False otherwise.
@@ -168,7 +169,7 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
         if not required_content:
             return False
 
-        if block_key.block_type == 'chapter' and str(block_key) not in required_content:
+        if block_key.block_type == 'chapter' and six.text_type(block_key) not in required_content:
             return True
 
         return False

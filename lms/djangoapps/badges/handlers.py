@@ -5,10 +5,10 @@ Badges related signal handlers.
 
 from django.dispatch import receiver
 
-from common.djangoapps.student.models import EnrollStatusChange
-from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE
 from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
 from lms.djangoapps.badges.utils import badges_enabled
+from common.djangoapps.student.models import EnrollStatusChange
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE
 
 
 @receiver(ENROLL_STATUS_CHANGE)

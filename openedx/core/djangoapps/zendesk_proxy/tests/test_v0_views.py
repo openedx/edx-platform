@@ -34,7 +34,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 'message': "Help! I'm trapped in a unit test factory and I can't get out!",
             }
         }
-        return super(ZendeskProxyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super(ZendeskProxyTestCase, self).setUp()
 
     def test_post(self):
         with patch('requests.post', return_value=MagicMock(status_code=201)) as mock_post:
@@ -46,23 +46,33 @@ class ZendeskProxyTestCase(ApiTestCase):
             )
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
-            assert mock_args == ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',)
+            self.assertEqual(mock_args, ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',))
             six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
-            assert mock_kwargs['headers'] == {
-                'content-type': 'application/json', 'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
-            }
-            assert json.loads(mock_kwargs['data']) == {
-                'ticket':
-                    {
-                        'comment':
-                            {
-                                'body': "Help! I'm trapped in a unit test factory and I can't get out!", 'uploads': None
-                            }, 'custom_fields': None,
-                        'requester': {'email': 'JohnQStudent@example.com', 'name': 'John Q. Student'},
+            self.assertEqual(
+                mock_kwargs['headers'],
+                {
+                    'content-type': 'application/json',
+                    'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
+                }
+            )
+            self.assertEqual(
+                json.loads(mock_kwargs['data']),
+                {
+                    'ticket': {
+                        'comment': {
+                            'body': "Help! I'm trapped in a unit test factory and I can't get out!",
+                            'uploads': None,
+                        },
+                        'custom_fields': None,
+                        'requester': {
+                            'email': 'JohnQStudent@example.com',
+                            'name': 'John Q. Student',
+                        },
                         'subject': 'Python Unit Test Help Request',
-                        'tags': ['python_unit_test']
-                    }
-            }
+                        'tags': ['python_unit_test'],
+                    },
+                }
+            )
 
     @ddt.data('name', 'tags', 'email')
     def test_bad_request(self, key_to_delete):
@@ -93,4 +103,4 @@ class ZendeskProxyTestCase(ApiTestCase):
         for _ in range(ZENDESK_REQUESTS_PER_HOUR):
             self.request_without_auth('post', self.url)
         response = self.request_without_auth('post', self.url)
-        assert response.status_code == 429
+        self.assertEqual(response.status_code, 429)

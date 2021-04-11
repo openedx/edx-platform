@@ -8,10 +8,10 @@ from datetime import datetime
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-TEST_PASSWORD = 'edx'
+TEST_PASSWORD = u'edx'
 
 
-class CourseApiFactoryMixin:
+class CourseApiFactoryMixin(object):
     """
     Mixin to allow creation of test courses and users.
     """
@@ -37,7 +37,7 @@ class CourseApiFactoryMixin:
         """
         return UserFactory(
             username=username,
-            email=f'{username}@example.com',
+            email=u'{}@example.com'.format(username),
             password=TEST_PASSWORD,
             is_staff=is_staff
         )

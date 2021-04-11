@@ -184,7 +184,7 @@ class EventTransformer(dict):
             always be run.
     """
     def __init__(self, *args, **kwargs):
-        super(EventTransformer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(EventTransformer, self).__init__(*args, **kwargs)
         self.load_payload()
 
     # Properties to be overridden
@@ -261,14 +261,14 @@ class EventTransformer(dict):
         Override this method to specify how to update event fields to maintain
         compatibility with legacy events.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def process_event(self):
         """
         Override this method to make unconditional modifications to event
         fields.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
 
 @EventTransformerRegistry.register
@@ -395,7 +395,7 @@ class VideoEventTransformer(EventTransformer):
         expected types of events.
         """
         if self.name in self.name_to_event_type_map:
-            super(VideoEventTransformer, self).transform()  # lint-amnesty, pylint: disable=super-with-arguments
+            super(VideoEventTransformer, self).transform()
 
     def process_event(self):
         """

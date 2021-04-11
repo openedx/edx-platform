@@ -46,4 +46,4 @@ class TestAdapters(unittest.TestCase):
         </problem>
         """
         olx_out = adapters.rewrite_absolute_static_urls(olx_in, course_id)
-        assert olx_out == olx_expected
+        self.assertEqual(olx_out, olx_expected)

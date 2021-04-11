@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 # -----------------------------------------------------------------------------
 # class used to store graded responses to CAPA questions
 #
@@ -39,8 +38,8 @@ class CorrectMap(object):
         return self.cmap.__iter__()
 
     # See the documentation for 'set_dict' for the use of kwargs
-    def set(  # lint-amnesty, pylint: disable=missing-function-docstring
-        self,  # lint-amnesty, pylint: disable=unused-argument
+    def set(
+        self,
         answer_id=None,
         correctness=None,
         npoints=None,
@@ -48,7 +47,7 @@ class CorrectMap(object):
         hint='',
         hintmode=None,
         queuestate=None,
-        answervariable=None,
+        answervariable=None,  # pylint: disable=C0330
         **kwargs
     ):
 
@@ -145,13 +144,13 @@ class CorrectMap(object):
         # if not correct and no points have been assigned, return 0
         return 0
 
-    def set_property(self, answer_id, property, value):  # lint-amnesty, pylint: disable=redefined-builtin
+    def set_property(self, answer_id, property, value):
         if answer_id in self.cmap:
             self.cmap[answer_id][property] = value
         else:
             self.cmap[answer_id] = {property: value}
 
-    def get_property(self, answer_id, property, default=None):  # lint-amnesty, pylint: disable=redefined-builtin
+    def get_property(self, answer_id, property, default=None):
         if answer_id in self.cmap:
             return self.cmap[answer_id].get(property, default)
         return default

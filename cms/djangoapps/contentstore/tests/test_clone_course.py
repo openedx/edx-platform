@@ -4,9 +4,10 @@ Unit tests for cloning a course between the same and different module stores.
 
 
 import json
-from unittest.mock import Mock, patch
 
+import six
 from django.conf import settings
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 from cms.djangoapps.contentstore.tasks import rerun_course
@@ -57,7 +58,7 @@ class CloneCourseTest(CourseTestCase):
         course_run = '2015_Q1'
         display_name = 'rerun'
         fields = {'display_name': display_name}
-        course_assets = {'subs_Introduction%20To%20New.srt.sjson'}
+        course_assets = set([u'subs_Introduction%20To%20New.srt.sjson'], )
 
         # Create a course using split modulestore
         course = CourseFactory.create(
@@ -78,14 +79,14 @@ class CloneCourseTest(CourseTestCase):
         # Get & verify all assets of the course
         assets, count = contentstore().get_all_content_for_course(course.id)
         self.assertEqual(count, 1)
-        self.assertEqual({asset['asset_key'].block_id for asset in assets}, course_assets)  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        self.assertEqual(set([asset['asset_key'].block_id for asset in assets]), course_assets)
 
         # rerun from split into split
         split_rerun_id = CourseLocator(org=org, course=course_number, run="2012_Q2")
         CourseRerunState.objects.initiated(course.id, split_rerun_id, self.user, fields['display_name'])
         result = rerun_course.delay(
-            str(course.id),
-            str(split_rerun_id),
+            six.text_type(course.id),
+            six.text_type(split_rerun_id),
             self.user.id,
             json.dumps(fields, cls=EdxJSONEncoder)
         )
@@ -108,7 +109,7 @@ class CloneCourseTest(CourseTestCase):
         # Mark the action as initiated
         fields = {'display_name': 'rerun'}
         CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
-        result = rerun_course.delay(str(mongo_course1_id), str(split_course3_id), self.user.id,
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
         self.assertTrue(has_course_author_access(self.user, split_course3_id), "Didn't grant access")
@@ -116,7 +117,7 @@ class CloneCourseTest(CourseTestCase):
         self.assertEqual(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
 
         # try creating rerunning again to same name and ensure it generates error
-        result = rerun_course.delay(str(mongo_course1_id), str(split_course3_id), self.user.id)
+        result = rerun_course.delay(six.text_type(mongo_course1_id), six.text_type(split_course3_id), self.user.id)
         self.assertEqual(result.get(), "duplicate course")
         # the below will raise an exception if the record doesn't exist
         CourseRerunState.objects.find_first(
@@ -125,11 +126,11 @@ class CloneCourseTest(CourseTestCase):
         )
 
         # try to hit the generic exception catch
-        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoConnection.insert_course_index', Mock(side_effect=Exception)):  # lint-amnesty, pylint: disable=line-too-long
+        with patch('xmodule.modulestore.split_mongo.mongo_connection.MongoConnection.insert_course_index', Mock(side_effect=Exception)):
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])
-            result = rerun_course.delay(str(split_course3_id), str(split_course4_id), self.user.id,
+            result = rerun_course.delay(six.text_type(split_course3_id), six.text_type(split_course4_id), self.user.id,
                                         json.dumps(fields, cls=EdxJSONEncoder))
             self.assertIn("exception: ", result.get())
             self.assertIsNone(self.store.get_course(split_course4_id), "Didn't delete course after error")

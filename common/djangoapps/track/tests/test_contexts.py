@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from unittest import TestCase
 
 import ddt
@@ -7,7 +6,7 @@ from common.djangoapps.track import contexts
 
 
 @ddt.ddt
-class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestContexts(TestCase):
 
     COURSE_ID = 'test/course_name/course_run'
     SPLIT_COURSE_ID = 'course-v1:test+course_name+course_run'
@@ -27,14 +26,25 @@ class TestContexts(TestCase):  # lint-amnesty, pylint: disable=missing-class-doc
         self.assert_parses_course_id_from_url(url, course_id)
 
     def assert_parses_course_id_from_url(self, format_string, course_id):
-        assert contexts.course_context_from_url(format_string.format(course_id=course_id)) ==\
-               {'course_id': course_id, 'org_id': self.ORG_ID}
+        self.assertEqual(
+            contexts.course_context_from_url(format_string.format(course_id=course_id)),
+            {
+                'course_id': course_id,
+                'org_id': self.ORG_ID
+            }
+        )
 
     def test_no_course_id_in_url(self):
         self.assert_empty_context_for_url('http://foo.bar.com/dashboard')
 
     def assert_empty_context_for_url(self, url):
-        assert contexts.course_context_from_url(url) == {'course_id': '', 'org_id': ''}
+        self.assertEqual(
+            contexts.course_context_from_url(url),
+            {
+                'course_id': '',
+                'org_id': ''
+            }
+        )
 
     @ddt.data('', '/', '/?', '?format=json')
     def test_malformed_course_id(self, postfix):

@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from contextlib import contextmanager
 from datetime import timedelta
 from unittest import mock
@@ -8,8 +7,8 @@ from django.db import DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils.timezone import now
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestVerificationBase(TestCase):
@@ -44,21 +43,21 @@ class TestVerificationBase(TestCase):
         """
         # Not active before the created date
         before = attempt.created_at - timedelta(minutes=1)
-        assert not attempt.active_at_datetime(before)
+        self.assertFalse(attempt.active_at_datetime(before))
 
         # Active immediately after created date
         after_created = attempt.created_at + timedelta(seconds=1)
-        assert attempt.active_at_datetime(after_created)
+        self.assertTrue(attempt.active_at_datetime(after_created))
 
         # Active immediately before expiration date
         expiration = attempt.expiration_datetime
         before_expiration = expiration - timedelta(seconds=1)
-        assert attempt.active_at_datetime(before_expiration)
+        self.assertTrue(attempt.active_at_datetime(before_expiration))
 
         # Not active after the expiration date
         attempt.expiration_date = now() - timedelta(days=1)
         attempt.save()
-        assert not attempt.active_at_datetime(now())
+        self.assertFalse(attempt.active_at_datetime(now()))
 
     def submit_attempt(self, attempt):
         with self.immediate_on_commit():
@@ -85,7 +84,7 @@ class TestVerificationBase(TestCase):
         if not user:
             user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
-        user.profile.name = "Rust\u01B4"
+        user.profile.name = u"Rust\u01B4"
 
         attempt.upload_face_image("Just pretend this is image data")
         attempt.upload_photo_id_image("Hey, we're a photo ID")

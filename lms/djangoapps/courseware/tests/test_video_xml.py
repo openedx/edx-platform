@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=protected-access
 
 """Test for Video Xmodule functional logic.
@@ -44,7 +45,10 @@ class VideoBlockLogicTest(TestCase):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
         output = VideoBlock._parse_youtube(youtube_str)
-        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': 'ZwkTiUPN0mg', '1.25': 'rsq9auxASqI', '1.50': 'kMyNdzVHHgg'}
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': 'ZwkTiUPN0mg',
+                                  '1.25': 'rsq9auxASqI',
+                                  '1.50': 'kMyNdzVHHgg'})
 
     def test_parse_youtube_one_video(self):
         """
@@ -53,7 +57,10 @@ class VideoBlockLogicTest(TestCase):
         """
         youtube_str = '0.75:jNCf2gIqpeE'
         output = VideoBlock._parse_youtube(youtube_str)
-        assert output == {'0.75': 'jNCf2gIqpeE', '1.00': '', '1.25': '', '1.50': ''}
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
 
     def test_parse_youtube_key_format(self):
         """
@@ -61,11 +68,18 @@ class VideoBlockLogicTest(TestCase):
         """
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
-        assert VideoBlock._parse_youtube(youtube_str) == VideoBlock._parse_youtube(youtube_str_hack)
+        self.assertEqual(
+            VideoBlock._parse_youtube(youtube_str),
+            VideoBlock._parse_youtube(youtube_str_hack)
+        )
 
     def test_parse_youtube_empty(self):
         """
         Some courses have empty youtube attributes, so we should handle
         that well.
         """
-        assert VideoBlock._parse_youtube('') == {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
+        self.assertEqual(VideoBlock._parse_youtube(''),
+                         {'0.75': '',
+                          '1.00': '',
+                          '1.25': '',
+                          '1.50': ''})

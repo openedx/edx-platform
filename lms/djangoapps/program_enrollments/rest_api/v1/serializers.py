@@ -4,6 +4,7 @@ API Serializers
 
 
 from rest_framework import serializers
+from six import text_type
 
 from lms.djangoapps.program_enrollments.api import is_course_staff_enrollment
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
@@ -13,7 +14,7 @@ from .constants import CourseRunProgressStatuses
 # pylint: disable=abstract-method
 
 
-class InvalidStatusMixin:
+class InvalidStatusMixin(object):
     """
     Mixin to provide has_invalid_status method
     """
@@ -39,7 +40,7 @@ class ProgramEnrollmentSerializer(serializers.Serializer):
     username = serializers.SerializerMethodField()
     email = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(object):
         model = ProgramEnrollment
 
     def get_account_exists(self, obj):
@@ -91,7 +92,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
     curriculum_uuid = serializers.SerializerMethodField()
     course_staff = serializers.SerializerMethodField()
 
-    class Meta:
+    class Meta(object):
         model = ProgramCourseEnrollment
 
     def get_student_key(self, obj):
@@ -101,7 +102,7 @@ class ProgramCourseEnrollmentSerializer(serializers.Serializer):
         return bool(obj.program_enrollment.user)
 
     def get_curriculum_uuid(self, obj):
-        return str(obj.program_enrollment.curriculum_uuid)
+        return text_type(obj.program_enrollment.curriculum_uuid)
 
     def get_course_staff(self, obj):
         return is_course_staff_enrollment(obj)

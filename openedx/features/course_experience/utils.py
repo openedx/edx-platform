@@ -3,11 +3,18 @@ Common utilities for the course experience, including course outline.
 """
 
 
+from datetime import timedelta
+
+from completion.models import BlockCompletion
+from django.db.models import Q
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
+from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.cache_utils import request_cached
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -16,7 +23,7 @@ from xmodule.modulestore.django import modulestore
 
 
 @request_cached()
-def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):  # lint-amnesty, pylint: disable=too-many-statements
+def get_course_outline_block_tree(request, course_id, user=None, allow_start_dates_in_future=False):
     """
     Returns the root block of the course outline, with children as blocks.
 
@@ -45,6 +52,88 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
 
         return block
 
+    def set_last_accessed_default(block):
+        """
+        Set default of False for resume_block on all blocks.
+        """
+        block['resume_block'] = False
+        block['complete'] = False
+        for child in block.get('children', []):
+            set_last_accessed_default(child)
+
+    def mark_blocks_completed(block, user, course_key):
+        """
+        Walk course tree, marking block completion.
+        Mark 'most recent completed block as 'resume_block'
+
+        """
+        last_completed_child_position = BlockCompletion.get_latest_block_completed(user, course_key)
+
+        if last_completed_child_position:
+            # Mutex w/ NOT 'course_block_completions'
+            recurse_mark_complete(
+                course_block_completions=BlockCompletion.get_learning_context_completions(user, course_key),
+                latest_completion=last_completed_child_position,
+                block=block
+            )
+
+    def recurse_mark_complete(course_block_completions, latest_completion, block):
+        """
+        Helper function to walk course tree dict,
+        marking blocks as 'complete' and 'last_complete'
+
+        If all blocks are complete, mark parent block complete
+        mark parent blocks of 'last_complete' as 'last_complete'
+
+        :param course_block_completions: dict[course_completion_object] =  completion_value
+        :param latest_completion: course_completion_object
+        :param block: course_outline_root_block block object or child block
+
+        :return:
+            block: course_outline_root_block block object or child block
+        """
+        block_key = block.serializer.instance
+
+        if course_block_completions.get(block_key):
+            block['complete'] = True
+            if block_key == latest_completion.full_block_key:
+                block['resume_block'] = True
+
+        if block.get('children'):
+            for idx in range(len(block['children'])):
+                recurse_mark_complete(
+                    course_block_completions,
+                    latest_completion,
+                    block=block['children'][idx]
+                )
+                if block['children'][idx].get('resume_block') is True:
+                    block['resume_block'] = True
+
+            completable_blocks = [child for child in block['children']
+                                  if child.get('type') != 'discussion']
+            if all(child.get('complete') for child in completable_blocks):
+                block['complete'] = True
+
+    def mark_last_accessed(user, course_key, block):
+        """
+        Recursively marks the branch to the last accessed block.
+        """
+        block_key = block.serializer.instance
+        student_module_dict = get_student_module_as_dict(user, course_key, block_key)
+
+        last_accessed_child_position = student_module_dict.get('position')
+        if last_accessed_child_position and block.get('children'):
+            block['resume_block'] = True
+            if last_accessed_child_position <= len(block['children']):
+                last_accessed_child_block = block['children'][last_accessed_child_position - 1]
+                last_accessed_child_block['resume_block'] = True
+                mark_last_accessed(user, course_key, last_accessed_child_block)
+            else:
+                # We should be using an id in place of position for last accessed.
+                # However, while using position, if the child block is no longer accessible
+                # we'll use the last child.
+                block['children'][-1]['resume_block'] = True
+
     def recurse_mark_scored(block):
         """
         Mark this block as 'scored' if any of its descendents are 'scored' (that is, 'has_score' and 'weight' > 0).
@@ -52,7 +141,7 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         is_scored = block.get('has_score', False) and block.get('weight', 1) > 0
         # Use a list comprehension to force the recursion over all children, rather than just stopping
         # at the first child that is scored.
-        children_scored = any(recurse_mark_scored(child) for child in block.get('children', []))
+        children_scored = any([recurse_mark_scored(child) for child in block.get('children', [])])
         if is_scored or children_scored:
             block['scored'] = True
             return True
@@ -92,6 +181,23 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
     course_key = CourseKey.from_string(course_id)
     course_usage_key = modulestore().make_course_usage_key(course_key)
 
+    # Deeper query for course tree traversing/marking complete
+    # and last completed block
+    block_types_filter = [
+        'course',
+        'chapter',
+        'sequential',
+        'vertical',
+        'html',
+        'problem',
+        'video',
+        'discussion',
+        'drag-and-drop-v2',
+        'poll',
+        'word_cloud',
+        'lti',
+        'lti_consumer',
+    ]
     all_blocks = get_blocks(
         request,
         course_usage_key,
@@ -99,23 +205,19 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         nav_depth=3,
         requested_fields=[
             'children',
-            'contains_gated_content',
             'display_name',
+            'type',
+            'start',
+            'contains_gated_content',
             'due',
-            'effort_activities',
-            'effort_time',
-            'format',
             'graded',
             'has_score',
-            'show_gated_sections',
-            'special_exam_info',
-            'start',
-            'type',
             'weight',
-            'completion',
-            'complete',
-            'resume_block',
+            'special_exam_info',
+            'show_gated_sections',
+            'format'
         ],
+        block_types_filter=block_types_filter,
         allow_start_dates_in_future=allow_start_dates_in_future,
     )
 
@@ -125,6 +227,13 @@ def get_course_outline_block_tree(request, course_id, user=None, allow_start_dat
         recurse_mark_scored(course_outline_root_block)
         recurse_num_graded_problems(course_outline_root_block)
         recurse_mark_auth_denial(course_outline_root_block)
+        if user:
+            set_last_accessed_default(course_outline_root_block)
+            mark_blocks_completed(
+                block=course_outline_root_block,
+                user=user,
+                course_key=course_key
+            )
     return course_outline_root_block
 
 
@@ -133,7 +242,7 @@ def get_resume_block(block):
     Gets the deepest block marked as 'resume_block'.
 
     """
-    if block.get('authorization_denial_reason') or not block.get('resume_block'):
+    if block.get('authorization_denial_reason') or not block['resume_block']:
         return None
     if not block.get('children'):
         return block
@@ -143,18 +252,6 @@ def get_resume_block(block):
         if resume_block:
             return resume_block
     return block
-
-
-def get_start_block(block):
-    """
-    Gets the deepest block to use as the starting block.
-    """
-    if not block.get('children'):
-        return block
-
-    first_child = block['children'][0]
-
-    return get_start_block(first_child)
 
 
 def dates_banner_should_display(course_key, user):
@@ -182,6 +279,13 @@ def dates_banner_should_display(course_key, user):
 
     # Only display the banner for enrolled users
     if not CourseEnrollment.is_enrolled(user, course_key):
+        return False, False
+
+    # Don't display the banner for course staff
+    is_course_staff = bool(
+        user and course_overview and has_access(user, 'staff', course_overview, course_overview.id)
+    )
+    if is_course_staff:
         return False, False
 
     # Don't display the banner if the course has ended
@@ -213,15 +317,6 @@ def is_block_structure_complete_for_assignments(block_data, block_key):
     children = block_data.get_children(block_key)
     if children:
         return all(is_block_structure_complete_for_assignments(block_data, child_key) for child_key in children)
-
-    category = block_data.get_xblock_field(block_key, 'category')
-    if category in ('course', 'chapter', 'sequential', 'vertical'):
-        # If there are no children for these "hierarchy" block types, just bail. This could be because the
-        # content isn't available yet (start date in future) or we're too late and the block has hide_after_due
-        # set. Or maybe a different transformer cut off content for whatever reason. Regardless of the cause - if the
-        # user can't see this content and we continue, we might accidentally say this block is complete because it
-        # isn't scored (which most hierarchy blocks wouldn't be).
-        return False
 
     complete = block_data.get_xblock_field(block_key, 'complete', False)
     graded = block_data.get_xblock_field(block_key, 'graded', False)

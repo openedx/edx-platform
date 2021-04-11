@@ -182,7 +182,7 @@ class CourseGradingPolicy(GradeViewMixin, ListAPIView):
         try:
             course_key = get_course_key(request, course_id)
         except InvalidKeyError:
-            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise self.api_error(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 developer_message='The provided course key cannot be parsed.',
                 error_code='invalid_course_key'

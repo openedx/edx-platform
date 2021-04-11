@@ -116,7 +116,7 @@
 
   &.recovery-email-alert,
   &.learner-portal-enabled-alert {
-    &.banner-msg {
+    &#banner-msg {
       position: relative;
       top: -10px;
       padding: 20px 40px;
@@ -138,7 +138,7 @@
   }
 
   &.learner-portal-enabled-alert {
-    &.banner-msg {
+    &#banner-msg {
       margin-bottom: 10px;
     }
   }

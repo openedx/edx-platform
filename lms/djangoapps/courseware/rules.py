@@ -8,6 +8,7 @@ import traceback
 
 import laboratory
 import rules
+import six
 from bridgekeeper.rules import EMPTY, Rule
 from django.conf import settings
 from django.db.models import Q
@@ -15,12 +16,12 @@ from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xblock.core import XBlock
 
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
-from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import CourseRole, OrgRole
-from xmodule.course_module import CourseBlock
-from xmodule.error_module import ErrorBlock
+from xmodule.course_module import CourseDescriptor
+from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
 
@@ -35,7 +36,8 @@ def is_track_ok_for_exam(user, exam):
     Returns whether the user is in an appropriate enrollment mode
     """
     course_id = CourseKey.from_string(exam['course_id'])
-    return is_enrollment_valid_for_proctoring(user.username, course_id)
+    mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    return is_active and mode in (CourseMode.VERIFIED, CourseMode.MASTERS, CourseMode.PROFESSIONAL, CourseMode.EXECUTIVE_EDUCATION)
 
 
 # The edx_proctoring.api uses this permission to gate access to the
@@ -62,7 +64,7 @@ class HasAccessRule(Rule):
         return Q(pk__in=[])
 
 
-class StaffAccessExperiment(laboratory.Experiment):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StaffAccessExperiment(laboratory.Experiment):
     def compare(self, control, candidate):
         return bool(control.value) == candidate.value
 
@@ -70,7 +72,7 @@ class StaffAccessExperiment(laboratory.Experiment):  # lint-amnesty, pylint: dis
         if not result.match:
 
             LOG.warning(
-                "StaffAccessExperiment: control=%r, candidate=%r\n%s",
+                u"StaffAccessExperiment: control=%r, candidate=%r\n%s",
                 result.control,
                 result.candidates[0],
                 "".join(traceback.format_stack(limit=10))
@@ -104,15 +106,15 @@ class HasStaffAccessToContent(Rule):
         """
         # delegate the work to type-specific functions.
         # (start with more specific types, then get more general)
-        if isinstance(instance, (CourseBlock, CourseOverview)):
+        if isinstance(instance, (CourseDescriptor, CourseOverview)):
             course_key = instance.id
-        elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
+        elif isinstance(instance, (ErrorDescriptor, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key
         elif isinstance(instance, CourseKey):
             course_key = instance
         elif isinstance(instance, UsageKey):
             course_key = instance.course_key
-        elif isinstance(instance, str):
+        elif isinstance(instance, six.string_types):
             course_key = CourseKey.from_string(instance)
 
         return self.filter(user, CourseOverview.objects.filter(id=course_key)).exists()
@@ -153,7 +155,7 @@ class HasStaffAccessToContent(Rule):
         return query
 
 
-class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+class HasRolesRule(Rule):
     def __init__(self, *roles):
         self.roles = roles
 
@@ -162,9 +164,9 @@ class HasRolesRule(Rule):  # lint-amnesty, pylint: disable=abstract-method, miss
             return False
         if isinstance(instance, CourseKey):
             course_key = instance
-        elif isinstance(instance, (CourseBlock, CourseOverview)):
+        elif isinstance(instance, (CourseDescriptor, CourseOverview)):
             course_key = instance.id
-        elif isinstance(instance, (ErrorBlock, XModule, XBlock)):
+        elif isinstance(instance, (ErrorDescriptor, XModule, XBlock)):
             course_key = instance.scope_ids.usage_id.course_key
         else:
             course_key = CourseKey.from_string(str(instance))

@@ -14,7 +14,7 @@ from django.urls import reverse
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import Text, HTML
-from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
+from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
 from openedx.features.course_experience.course_tools import HttpMethod
 %>
 
@@ -84,9 +84,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % endif
         </div>
         <aside class="page-content-secondary course-sidebar">
-            % if show_proctoring_info_panel:
-                <div class="proctoring-info-panel" data-course-id="${course_key}"></div>
-            % endif
             % if has_goal_permission:
                 <div class="section section-goals ${'' if current_goal else 'hidden'}">
                     <div class="current-goal-container">
@@ -120,7 +117,8 @@ from openedx.features.course_experience.course_tools import HttpMethod
                             <li class="course-tool">
                                 % if course_tool.http_method == HttpMethod.GET:
                                     <a class="course-tool-link" data-analytics-id="${course_tool.analytics_id()}" href="${course_tool.url(course_key)}">
-                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>${course_tool.title()}
+                                        <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                                        ${course_tool.title()}
                                     </a>
                                 % elif course_tool.http_method == HttpMethod.POST:
                                     <form class="course-tool-form" action="${course_tool.url(course_key)}" method="post">
@@ -140,9 +138,7 @@ from openedx.features.course_experience.course_tools import HttpMethod
             % if upgrade_url and upgrade_price:
                 <div class="section section-upgrade course-home-sidebar-upgrade ${'discount' if has_discount else 'no-discount'}">
                     <h3 class="hd hd-6">${_("Pursue a verified certificate")}</h3>
-                        <img src="${static.url('images/edx-verified-mini-cert.png')}"
-                             alt="${_('Sample verified certificate with your name, the course title, the logo of the institution and the signatures of the instructors for this course.')}" />
-
+                        <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png" alt="">
                         <div class="upgrade-container">
                             <p>
                                 <a id="green_upgrade" class="btn-brand btn-upgrade"
@@ -251,4 +247,4 @@ from openedx.features.course_experience.course_tools import HttpMethod
         linkCategory: "(none)"
       });
 
-</%static:require_module_async>
+</%static:require_module_async> 

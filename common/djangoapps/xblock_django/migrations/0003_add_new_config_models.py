@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
@@ -33,8 +36,8 @@ class Migration(migrations.Migration):
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
                 ('name', models.CharField(max_length=255, db_index=True)),
-                ('template', models.CharField(default='', max_length=255, blank=True)),
-                ('support_level', models.CharField(default='us', max_length=2, choices=[('fs', 'Fully Supported'), ('ps', 'Provisionally Supported'), ('us', 'Unsupported')])),
+                ('template', models.CharField(default=u'', max_length=255, blank=True)),
+                ('support_level', models.CharField(default=u'us', max_length=2, choices=[(u'fs', 'Fully Supported'), (u'ps', 'Provisionally Supported'), (u'us', 'Unsupported')])),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
         ),

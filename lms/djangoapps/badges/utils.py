@@ -10,8 +10,8 @@ def site_prefix():
     """
     Get the prefix for the site URL-- protocol and server name.
     """
-    scheme = "https" if settings.HTTPS == "on" else "http"
-    return f'{scheme}://{settings.SITE_NAME}'
+    scheme = u"https" if settings.HTTPS == "on" else u"http"
+    return u'{}://{}'.format(scheme, settings.SITE_NAME)
 
 
 def requires_badges_enabled(function):

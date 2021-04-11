@@ -317,7 +317,7 @@
         this.dom.$results = $('<div></div>').hide().addClass(this.options.resultsClass).css({
             position: 'absolute'
         });
-        $('body').append(this.dom.$results); // xss-lint: disable=javascript-jquery-append
+        $('body').append(this.dom.$results);
 
         /**
          * Attach keyboard monitoring to $elem
@@ -494,7 +494,7 @@
         }
         return false;
     };
-
+    
     /**
      * Set timeout to activate autocompleter
      */
@@ -765,7 +765,7 @@
      */
     $.Autocompleter.prototype.createItemFromResult = function(result) {
         var self = this;
-        var $li = $('<li>' + this.showResult(result.value, result.data) + '</li>'); // xss-lint: disable=javascript-concat-html
+        var $li = $('<li>' + this.showResult(result.value, result.data) + '</li>');
         $li.data({value: result.value, data: result.data})
             .click(function() {
                 self.selectItem($li);
@@ -814,7 +814,7 @@
             // input element location may have changed.
             this.position();
 
-            this.dom.$results.html($ul).show(); // xss-lint: disable=javascript-jquery-html
+            this.dom.$results.html($ul).show();
             if (this.options.autoWidth) {
                 autoWidth = this.dom.$elem.outerWidth() - this.dom.$results.outerWidth() + this.dom.$results.width();
                 this.dom.$results.css(this.options.autoWidth, autoWidth);
@@ -940,7 +940,7 @@
         this.setCaret(d.start + displayValue.length + extraCaretPos);
         this.callHook('onItemSelect', { value: value, data: data });
         this.deactivate(true);
-        elem.focus();
+        elem.focus();    
     };
 
     $.Autocompleter.prototype.displayValue = function(value, data) {
@@ -1033,7 +1033,7 @@
         return {
             start: s,
             end: e
-        };
+        };        
     };
 
     /**

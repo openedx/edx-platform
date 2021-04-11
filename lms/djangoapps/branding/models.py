@@ -33,7 +33,7 @@ class BrandingInfoConfig(ConfigurationModel):
         app_label = "branding"
 
     configuration = TextField(
-        help_text="JSON data of Configuration for Video Branding."
+        help_text=u"JSON data of Configuration for Video Branding."
     )
 
     def clean(self):
@@ -43,7 +43,7 @@ class BrandingInfoConfig(ConfigurationModel):
         try:
             json.loads(self.configuration)
         except ValueError:
-            raise ValidationError('Must be valid JSON string.')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError('Must be valid JSON string.')
 
     @classmethod
     def get_config(cls):

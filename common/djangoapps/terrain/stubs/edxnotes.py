@@ -10,7 +10,8 @@ from datetime import datetime
 from math import ceil
 from uuid import uuid4
 
-from urllib.parse import urlencode
+import six
+from six.moves.urllib.parse import urlencode
 
 from .http import StubHttpRequestHandler, StubHttpService
 
@@ -61,7 +62,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         if method in self.URL_HANDLERS:
             handlers_list = self.URL_HANDLERS[method]
         else:
-            self.log_error(f"Unrecognized method '{method}'")
+            self.log_error("Unrecognized method '{method}'".format(method=method))
             return
 
         # Check the path (without querystring params) against our list of handlers
@@ -106,7 +107,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         self.send_response(200, headers={
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With, X-Annotator-Auth-Token, X-Requested-With, X-CSRFToken",  # lint-amnesty, pylint: disable=line-too-long
+            "Access-Control-Allow-Headers": "Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With, X-Annotator-Auth-Token, X-Requested-With, X-CSRFToken",
         })
 
     def respond(self, status_code=200, content=None):
@@ -299,7 +300,7 @@ class StubEdxNotesService(StubHttpService):
     HANDLER_CLASS = StubEdxNotesServiceHandler
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(StubEdxNotesService, self).__init__(*args, **kwargs)
         self.notes = list()
 
     def get_all_notes(self):
@@ -392,4 +393,4 @@ class StubEdxNotesService(StubHttpService):
         """
         Search the `query(str)` text in the provided `data(list)`.
         """
-        return [note for note in data if str(query).strip() in note.get("text", "").split()]
+        return [note for note in data if six.text_type(query).strip() in note.get("text", "").split()]

@@ -4,11 +4,12 @@ Xml parsing tests for XModules
 
 
 import pprint
-from unittest.mock import Mock
 
 from django.test import TestCase
 from lxml import etree
+from mock import Mock
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.mako_module import MakoDescriptorSystem
@@ -29,7 +30,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             """Return the policy data for the specified usage"""
             return xml_import_data.policy.get(policy_key(usage_id), {})
 
-        super().__init__(
+        super(InMemorySystem, self).__init__(
             get_policy=get_policy,
             process_xml=self.process_xml,
             load_item=self.load_item,
@@ -49,12 +50,12 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             None,
             CourseLocationManager(self.course_id),
         )
-        self._descriptors[str(descriptor.location)] = descriptor
+        self._descriptors[text_type(descriptor.location)] = descriptor
         return descriptor
 
     def load_item(self, location, for_parent=None):  # pylint: disable=method-hidden, unused-argument
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[str(location)]
+        return self._descriptors[text_type(location)]
 
 
 class XModuleXmlImportTest(TestCase):

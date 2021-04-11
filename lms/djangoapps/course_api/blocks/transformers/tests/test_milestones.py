@@ -3,17 +3,17 @@ Tests for ProctoredExamTransformer.
 """
 
 
-from unittest.mock import Mock, patch
-
 import ddt
+import six
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from lms.djangoapps.gating import api as lms_gating_api
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.lib.gating import api as gating_api
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 from ..milestones import MilestonesAndSpecialExamsTransformer
 
@@ -30,7 +30,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         """
         Setup course structure and create user for split test transformer test.
         """
-        super().setUp()
+        super(MilestonesTransformerTestCase, self).setUp()
 
         # Build course.
         self.course_hierarchy = self.get_course_hierarchy()
@@ -49,7 +49,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             gated_block: The block that should be inaccessible until gating_block is completed
             gating_block: The block that must be completed before access is granted
         """
-        gating_api.add_prerequisite(self.course.id, str(gating_block.location))
+        gating_api.add_prerequisite(self.course.id, six.text_type(gating_block.location))
         gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100, 0)
 
     ALL_BLOCKS = (
@@ -198,8 +198,8 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks['H'], self.blocks['A'])
         expected_blocks = (
-            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K', 'H',
-            'I')  # lint-amnesty, pylint: disable=line-too-long
+            'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'TimedExam', 'J', 'K', 'H', 'I'
+        )
         self.get_blocks_and_check_against_expected(self.user, expected_blocks)
         # clear the request cache to simulate a new request
         self.clear_caches()
@@ -222,4 +222,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             self.course.location,
             self.transformers,
         )
-        assert set(block_structure.get_block_keys()) == set(self.get_block_key_set(self.blocks, *expected_blocks))
+        self.assertEqual(
+            set(block_structure.get_block_keys()),
+            set(self.get_block_key_set(self.blocks, *expected_blocks)),
+        )

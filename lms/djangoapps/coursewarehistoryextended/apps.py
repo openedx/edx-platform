@@ -1,6 +1,5 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from django.apps import AppConfig
 
 
 class CoursewareHistoryExtendedConfig(AppConfig):
-    name = 'lms.djangoapps.coursewarehistoryextended'
+    name = u'lms.djangoapps.coursewarehistoryextended'

@@ -49,7 +49,7 @@ def mobile_course_access(depth=0):
                     if error.access_error is not None:
                         return Response(data=error.access_error.to_json(), status=status.HTTP_404_NOT_FOUND)
                     # Raise a 404 if the user does not have course access
-                    raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+                    raise Http404
                 return func(self, request, course=course, *args, **kwargs)
 
         return _wrapper

@@ -22,7 +22,7 @@ from django.core.management.base import BaseCommand, CommandError
 from six.moves import configparser
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = "Resets the database for this project."
 
     def add_arguments(self, parser):
@@ -30,7 +30,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             '-R', '--router', action='store', dest='router', default='default',
             help='Use this router-database other than defined in settings.py')
 
-    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
+    def handle(self, *args, **options):
         """
         Resets the database for this project.
 
@@ -87,16 +87,16 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             drop_query = u'DROP DATABASE IF EXISTS `%s`' % database_name
             utf8_support = 'CHARACTER SET utf8'
             create_query = u'CREATE DATABASE `%s` %s' % (database_name, utf8_support)
-            logging.info('Executing... "' + drop_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
+            logging.info('Executing... "' + drop_query + '"')
             connection.query(drop_query)
-            logging.info('Executing... "' + create_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
+            logging.info('Executing... "' + create_query + '"')
             connection.query(create_query)
 
         elif engine in ('postgresql', 'postgresql_psycopg2', 'postgis'):
             if engine == 'postgresql' and django.VERSION < (1, 9):
-                import psycopg as Database  # NOQA  # lint-amnesty, pylint: disable=import-error
+                import psycopg as Database  # NOQA
             elif engine in ('postgresql', 'postgresql_psycopg2', 'postgis'):
-                import psycopg2 as Database  # NOQA  # lint-amnesty, pylint: disable=import-error
+                import psycopg2 as Database  # NOQA
 
             conn_params = {'database': 'template1'}
             if user:
@@ -113,7 +113,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             cursor = connection.cursor()
 
             drop_query = u"DROP DATABASE \"%s\";" % database_name
-            logging.info('Executing... "' + drop_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
+            logging.info('Executing... "' + drop_query + '"')
             try:
                 cursor.execute(drop_query)
             except Database.ProgrammingError as e:
@@ -127,7 +127,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             if engine == 'postgis' and django.VERSION < (1, 9):
                 # For PostGIS 1.5, fetch template name if it exists
                 from django.contrib.gis.db.backends.postgis.base import DatabaseWrapper
-                postgis_template = DatabaseWrapper(dbinfo).template_postgis  # lint-amnesty, pylint: disable=no-member
+                postgis_template = DatabaseWrapper(dbinfo).template_postgis
                 if postgis_template is not None:
                     create_query += u' TEMPLATE = %s' % postgis_template
 
@@ -136,7 +136,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             else:
                 create_query += u';'
 
-            logging.info('Executing... "' + create_query + '"')  # lint-amnesty, pylint: disable=logging-not-lazy
+            logging.info('Executing... "' + create_query + '"')
             cursor.execute(create_query)
 
         else:

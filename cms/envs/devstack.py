@@ -44,12 +44,9 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 ################################# LMS INTEGRATION #############################
 
 LMS_BASE = 'localhost:18000'
-LMS_ROOT_URL = f'http://{LMS_BASE}'
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
-FRONTEND_LOGIN_URL = LMS_ROOT_URL + '/login'
-FRONTEND_LOGOUT_URL = LMS_ROOT_URL + '/logout'
-FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -97,7 +94,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
-    'debug_toolbar.panels.history.HistoryPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -110,7 +106,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
-def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing-function-docstring
+def should_show_debug_toolbar(request):
     # We always want the toolbar on devstack unless running tests from another Docker container
     hostname = request.get_host()
     if hostname.startswith('edx.devstack.studio:') or hostname.startswith('studio.devstack.edx:'):
@@ -122,11 +118,12 @@ def should_show_debug_toolbar(request):  # lint-amnesty, pylint: disable=missing
 FEATURES['MILESTONES_APP'] = True
 
 ########################### ORGANIZATIONS #################################
-# Although production studio.edx.org disables `ORGANIZATIONS_AUTOCREATE`,
-# we purposefully leave auto-creation enabled in Devstack Studio for developer
-# convenience, allowing devs to create test courses for any organization
-# without having to first manually create said organizations in the admin panel.
-ORGANIZATIONS_AUTOCREATE = True
+# This is disabled for Devstack Studio for developer convenience.
+# If it were enabled, then users would not be able to create course runs
+# with any arbritrary org slug -- they would have to first make sure that
+# the organization exists in the Organization table.
+# Note that some production environments (such as studio.edx.org) do enable this flag.
+FEATURES['ORGANIZATIONS_APP'] = False
 
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
@@ -167,10 +164,10 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 JWT_AUTH.update({
-    'JWT_ISSUER': f'{LMS_ROOT_URL}/oauth2',
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
-        'ISSUER': f'{LMS_ROOT_URL}/oauth2',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
         'SECRET_KEY': 'lms-secret',
     }],
     'JWT_SECRET_KEY': 'lms-secret',
@@ -198,7 +195,7 @@ JWT_AUTH.update({
     ),
 })
 
-# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
+# pylint: enable=unicode-format-string
 
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce
@@ -239,11 +236,3 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
-
-################### Special Exams (Proctoring) and Prereqs ###################
-FEATURES['ENABLE_SPECIAL_EXAMS'] = True
-FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
-
-# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
-# (ref MST-637)
-PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'

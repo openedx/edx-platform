@@ -4,7 +4,7 @@
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
 
-class CredentialsApiConfigMixin:
+class CredentialsApiConfigMixin(object):
     """ Utilities for working with Credentials configuration during testing."""
 
     CREDENTIALS_DEFAULTS = {

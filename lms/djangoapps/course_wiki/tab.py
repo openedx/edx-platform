@@ -30,4 +30,4 @@ class WikiTab(EnrolledTab):
             return False
         if course.allow_public_wiki_access:
             return True
-        return super().is_enabled(course, user=user)
+        return super(WikiTab, cls).is_enabled(course, user=user)

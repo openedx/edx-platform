@@ -8,8 +8,9 @@ not migrating so as not to inconvenience users by logging them all out.
 
 
 from functools import wraps
-from urllib.parse import urlencode
 
+import six
+from django.conf import settings
 from django.core import cache
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.
@@ -17,7 +18,7 @@ from django.utils.translation import get_language
 
 try:
     cache = cache.caches['general']         # pylint: disable=invalid-name
-except Exception:  # lint-amnesty, pylint: disable=broad-except
+except Exception:
     cache = cache.cache
 
 
@@ -67,15 +68,15 @@ def cache_if_anonymous(*get_parameters):
                     if parameter_value is not None:
                         # urlencode expects data to be of type str, and doesn't deal well with Unicode data
                         # since it doesn't provide a way to specify an encoding.
-                        cache_key = cache_key + '.' + urlencode({
-                            get_parameter: str(parameter_value).encode('utf-8')
+                        cache_key = cache_key + '.' + six.moves.urllib.parse.urlencode({
+                            get_parameter: six.text_type(parameter_value).encode('utf-8')
                         })
 
                 response = cache.get(cache_key)
 
                 if response:
                     # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
-                    response_content = list(response._container)  # lint-amnesty, pylint: disable=bad-option-value, protected-access, protected-member
+                    response_content = list(response._container)  # pylint: disable=protected-member
                     response.content = b''
                     for item in response_content:
                         response.write(item)

@@ -12,7 +12,7 @@ class TransExpression(Expression):
     """
 
     def __init__(self, ruleset, results, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(TransExpression, self).__init__(*args, **kwargs)
         self.string_lines = StringLines(kwargs['template'])
         self.ruleset = ruleset
         self.results = results
@@ -202,7 +202,7 @@ class BlockTransExpression(Expression):
         The expression handling blocktrans tag
     """
     def __init__(self, ruleset, results, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(BlockTransExpression, self).__init__(*args, **kwargs)
         self.string_lines = StringLines(kwargs['template'])
         self.ruleset = ruleset
         self.results = results
@@ -319,7 +319,7 @@ class HtmlInterpolateExpression(Expression):
         The expression handling interplate_html tag
     """
     def __init__(self, ruleset, results, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(HtmlInterpolateExpression, self).__init__(*args, **kwargs)
         self.string_lines = StringLines(kwargs['template'])
         self.ruleset = ruleset
         self.results = results

@@ -8,8 +8,8 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -77,7 +77,7 @@ class ProctoringExamSettingsTestMixin():
         response = self.make_request(course_id=course_id)
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.data == {
-            'detail': f'Course with course_id {course_id} does not exist.'
+            'detail': 'Course with course_id {} does not exist.'.format(course_id)
         }
 
 

@@ -4,18 +4,18 @@ Tests for the Course Outline view and supporting views.
 
 
 import datetime
+import json
 import re
 
 import ddt
 import six
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
+from completion import waffle
 from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from django.contrib.sites.models import Site
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone
-from edx_toggles.toggles.testutils import override_waffle_switch
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -23,6 +23,7 @@ from pyquery import PyQuery as pq
 from pytz import UTC
 from six import text_type
 from waffle.models import Switch
+from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -34,7 +35,7 @@ from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules.models import Schedule
-from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory  # pylint: disable=unused-import
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -64,7 +65,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
-    def setUpClass(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpClass(cls):
         """
         Set up an array of various courses to be tested.
         """
@@ -77,7 +78,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             course = CourseFactory.create(self_paced=True)
             with cls.store.bulk_operations(course.id):
                 chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")  # lint-amnesty, pylint: disable=line-too-long
+                sequential = ItemFactory.create(category='sequential', parent_location=chapter.location, graded=True, format="Homework")
                 vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
                 problem = ItemFactory.create(category='problem', parent_location=vertical.location)
             course.children = [chapter]
@@ -124,18 +125,21 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             cls.courses.append(course)
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         for course in cls.courses:
-            CourseEnrollment.enroll(cls.user, course.id)
-        Schedule.objects.update(start_date=timezone.now() - datetime.timedelta(days=1))
+            enrollment = CourseEnrollment.enroll(cls.user, course.id)
+            ScheduleFactory.create(
+                start_date=timezone.now() - datetime.timedelta(days=1),
+                enrollment=enrollment
+            )
 
     def setUp(self):
         """
         Set up for the tests.
         """
-        super(TestCourseOutlinePage, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseOutlinePage, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
@@ -153,17 +157,17 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
             )
 
             response = self.client.get(url)
-            assert course.children
+            self.assertTrue(course.children)
             for chapter in course_block_tree['children']:
                 self.assertContains(response, chapter['display_name'])
-                assert chapter['children']
+                self.assertTrue(chapter['children'])
                 for sequential in chapter['children']:
                     self.assertContains(response, sequential['display_name'])
                     if sequential['graded']:
                         print(sequential)
                         self.assertContains(response, sequential['due'].strftime(u'%Y-%m-%d %H:%M:%S'))
                         self.assertContains(response, sequential['format'])
-                    assert sequential['children']
+                    self.assertTrue(sequential['children'])
 
     def test_num_graded_problems(self):
         course = CourseFactory.create()
@@ -197,8 +201,9 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @ddt.data(
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.AUDIT, False, True),
         ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, False, True),
-        ([CourseMode.MASTERS], CourseMode.MASTERS, False, True),
-        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, True, True),  # staff accounts should also see the banner
+        ([CourseMode.AUDIT, CourseMode.VERIFIED, CourseMode.MASTERS], CourseMode.MASTERS, False, True),
+        ([CourseMode.PROFESSIONAL], CourseMode.PROFESSIONAL, False, True),
+        ([CourseMode.AUDIT, CourseMode.VERIFIED], CourseMode.VERIFIED, True, False),
     )
     @ddt.unpack
     def test_reset_course_deadlines_banner_shows_for_self_paced_course(
@@ -235,42 +240,54 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase, MasqueradeMixin):
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines(self):
         course = self.courses[0]
+        enrollment = CourseEnrollment.objects.get(course_id=course.id)
+        enrollment.schedule.start_date = timezone.now() - datetime.timedelta(days=30)
+        enrollment.schedule.save()
 
+        student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
+        student_schedule.start_date = timezone.now() - datetime.timedelta(days=30)
+        student_schedule.save()
         staff = StaffFactory(course_key=course.id)
-        CourseEnrollment.enroll(staff, course.id)
-
-        start_date = timezone.now() - datetime.timedelta(days=30)
-        Schedule.objects.update(start_date=start_date)
+        staff_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(days=30),
+            enrollment__course__id=course.id,
+            enrollment__user=staff,
+        )
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course, username=self.user.username)
 
         post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
-        updated_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
-        assert updated_schedule.start_date.date() == datetime.datetime.today().date()
-        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
-        assert updated_staff_schedule.start_date == start_date
+        updated_schedule = Schedule.objects.get(id=student_schedule.id)
+        self.assertEqual(updated_schedule.start_date.date(), datetime.datetime.today().date())
+        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
+        self.assertEqual(updated_staff_schedule.start_date, staff_schedule.start_date)
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_course_deadlines_masquerade_generic_student(self):
         course = self.courses[0]
 
-        staff = StaffFactory(course_key=course.id)
-        CourseEnrollment.enroll(staff, course.id)
+        student_schedule = CourseEnrollment.objects.get(course_id=course.id, user=self.user).schedule
+        student_schedule.start_date = timezone.now() - datetime.timedelta(days=30)
+        student_schedule.save()
 
-        start_date = timezone.now() - datetime.timedelta(days=30)
-        Schedule.objects.update(start_date=start_date)
+        staff = StaffFactory(course_key=course.id)
+        staff_schedule = ScheduleFactory(
+            start_date=timezone.now() - datetime.timedelta(days=30),
+            enrollment__course__id=course.id,
+            enrollment__user=staff,
+        )
 
         self.client.login(username=staff.username, password=TEST_PASSWORD)
         self.update_masquerade(course=course)
 
         post_dict = {'course_id': str(course.id)}
         self.client.post(reverse(RESET_COURSE_DEADLINES_NAME), post_dict)
-        updated_student_schedule = Schedule.objects.get(enrollment__user=self.user, enrollment__course_id=course.id)
-        assert updated_student_schedule.start_date == start_date
-        updated_staff_schedule = Schedule.objects.get(enrollment__user=staff, enrollment__course_id=course.id)
-        assert updated_staff_schedule.start_date.date() == datetime.date.today()
+        updated_student_schedule = Schedule.objects.get(id=student_schedule.id)
+        self.assertEqual(updated_student_schedule.start_date, student_schedule.start_date)
+        updated_staff_schedule = Schedule.objects.get(id=staff_schedule.id)
+        self.assertEqual(updated_staff_schedule.start_date.date(), datetime.date.today())
 
 
 class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, MilestonesTestCaseMixin):
@@ -293,7 +310,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             cls.course, cls.course_blocks = cls.create_test_course()
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
@@ -340,7 +357,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         """
         Set up for the tests.
         """
-        super(TestCourseOutlinePageWithPrerequisites, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseOutlinePageWithPrerequisites, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def setup_gated_section(self, gated_block, gating_block):
@@ -362,25 +379,25 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         self.setup_gated_section(self.course_blocks['gated_content'], self.course_blocks['prerequisite'])
 
         response = self.client.get(course_home_url(course))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         response_content = pq(response.content)
 
         # check lock icon is present
         lock_icon = response_content('.fa-lock')
-        assert lock_icon, 'lock icon is not present, but should be'
+        self.assertTrue(lock_icon, "lock icon is not present, but should be")
 
         subsection = lock_icon.parents('.subsection-text')
 
         # check that subsection-title-name is the display name
         gated_subsection_title = self.course_blocks['gated_content'].display_name
-        assert gated_subsection_title in subsection.children('.subsection-title').html()
+        self.assertIn(gated_subsection_title, subsection.children('.subsection-title').html())
 
         # check that it says prerequisite required
-        assert 'Prerequisite:' in subsection.children('.details').html()
+        self.assertIn("Prerequisite:", subsection.children('.details').html())
 
         # check that there is not a screen reader message
-        assert not subsection.children('.sr')
+        self.assertFalse(subsection.children('.sr'))
 
     def test_content_unlocked(self):
         """
@@ -399,13 +416,13 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             )
 
         response = self.client.get(course_home_url(course))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         response_content = pq(response.content)
 
         # check unlock icon is not present
         unlock_icon = response_content('.fa-unlock')
-        assert not unlock_icon, "unlock icon is present, yet shouldn't be."
+        self.assertFalse(unlock_icon, "unlock icon is present, yet shouldn't be.")
 
         gated_subsection_title = self.course_blocks['gated_content'].display_name
         every_subsection_on_outline = response_content('.subsection-title')
@@ -418,8 +435,8 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
             says_prerequisite_required = "Prerequisite:" in subsection_contents
 
         # check that subsection-title-name is the display name of gated content section
-        assert subsection_has_gated_text
-        assert not says_prerequisite_required
+        self.assertTrue(subsection_has_gated_text)
+        self.assertFalse(says_prerequisite_required)
 
 
 class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
@@ -442,7 +459,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             cls.course = cls.create_test_course()
 
     @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
@@ -480,7 +497,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         """
         Set up for the tests.
         """
-        super(TestCourseOutlineResumeCourse, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseOutlineResumeCourse, self).setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
     def visit_sequential(self, course, chapter, sequential):
@@ -495,9 +512,14 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
                 'section': sequential.url_name,
             }
         )
-        assert 200 == self.client.get(last_accessed_url).status_code
+        self.assertEqual(200, self.client.get(last_accessed_url).status_code)
 
-    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
+        ),
+        active=True
+    )
     def complete_sequential(self, course, sequential):
         """
         Completes provided sequential.
@@ -525,7 +547,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         :return: response object
         """
         response = self.client.get(course_home_url(course))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Start Course', count=start_count)
         self.assertContains(response, 'Resume Course', count=resume_count)
         return response
@@ -541,7 +563,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         response = self.client.get(course_home_url(course))
         content = pq(response.content)
-        assert len(content('.fa-check')) == 0
+        self.assertEqual(len(content('.fa-check')), 0)
 
         self.complete_sequential(self.course, vertical)
 
@@ -549,7 +571,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         content = pq(response.content)
 
         # Subsection should be checked
-        assert len(content('.fa-check')) == 1
+        self.assertEqual(len(content('.fa-check')), 1)
 
     def test_start_course(self):
         """
@@ -564,8 +586,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
 
-        vertical = course.children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith(('/vertical/' + vertical.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_resume_course_with_completion_api(self):
@@ -585,7 +606,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Test for 'resume' link URL - should be vertical 1
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith(('/vertical/' + vertical1.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical1.url_name))
 
         self.complete_sequential(self.course, vertical2)
         # Test for 'resume' link
@@ -593,7 +614,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Test for 'resume' link URL - should be vertical 2
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith(('/vertical/' + vertical2.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name))
 
         # visit sequential 1, make sure 'Resume Course' URL is robust against 'Last Visited'
         # (even though I visited seq1/vert1, 'Resume Course' still points to seq2/vert2)
@@ -602,7 +623,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         # Test for 'resume' link URL - should be vertical 2 (last completed block, NOT last visited)
         response = self.visit_course_home(course, resume_count=1)
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith(('/vertical/' + vertical2.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name))
 
     def test_resume_course_deleted_sequential(self):
         """
@@ -614,7 +635,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # first navigate to a sequential to make it the last accessed
         chapter = course.children[0]
-        assert len(chapter.children) >= 2
+        self.assertGreaterEqual(len(chapter.children), 2)
         sequential = chapter.children[0]
         sequential2 = chapter.children[1]
         self.complete_sequential(course, sequential)
@@ -628,7 +649,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, resume_count=1)
 
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith(('/sequential/' + sequential2.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/sequential/' + sequential2.url_name))
 
     def test_resume_course_deleted_sequentials(self):
         """
@@ -640,7 +661,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # first navigate to a sequential to make it the last accessed
         chapter = course.children[0]
-        assert len(chapter.children) == 2
+        self.assertEqual(len(chapter.children), 2)
         sequential = chapter.children[0]
         self.complete_sequential(course, sequential)
 
@@ -665,10 +686,14 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         CourseEnrollment.get_enrollment(self.user, course.id).delete()
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
-        vertical = course.children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith(('/vertical/' + vertical.url_name))
+        self.assertTrue(content('.action-resume-course').attr('href').endswith('/course/' + course.url_name))
 
-    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
+    @override_switch(
+        '{}.{}'.format(
+            waffle.WAFFLE_NAMESPACE, waffle.ENABLE_COMPLETION_TRACKING
+        ),
+        active=True
+    )
     def test_course_outline_auto_open(self):
         """
         Tests that the course outline auto-opens to the first subsection
@@ -690,12 +715,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response_content = self.client.get(course_home_url(course)).content
         stripped_response = text_type(re.sub(b"\\s+", b"", response_content), "utf-8")
 
-        assert get_sequential_button(text_type(chapter1.location), False) in stripped_response
-        assert get_sequential_button(text_type(chapter2.location), True) in stripped_response
+        self.assertIn(get_sequential_button(text_type(chapter1.location), False), stripped_response)
+        self.assertIn(get_sequential_button(text_type(chapter2.location), True), stripped_response)
 
         content = pq(response_content)
         button = content('#expand-collapse-outline-all-button')
-        assert 'Expand All' == button.children()[0].text
+        self.assertEqual('Expand All', button.children()[0].text)
 
     def test_user_enrolled_after_completion_collection(self):
         """
@@ -703,11 +728,12 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         time of the waffle switch that enables completion data tracking.
         """
         view = CourseOutlineFragmentView()
-        switch_name = ENABLE_COMPLETION_TRACKING_SWITCH.name
+        switches = waffle.waffle()
+        # pylint: disable=protected-access
+        switch_name = switches._namespaced_name(waffle.ENABLE_COMPLETION_TRACKING)
         switch, _ = Switch.objects.get_or_create(name=switch_name)
 
-        # pylint: disable=protected-access
-        assert switch.created == view._completion_data_collection_start()
+        self.assertEqual(switch.created, view._completion_data_collection_start())
 
         switch.delete()
 
@@ -719,7 +745,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         view = CourseOutlineFragmentView()
 
         # pylint: disable=protected-access
-        assert DEFAULT_COMPLETION_TRACKING_START == view._completion_data_collection_start()
+        self.assertEqual(DEFAULT_COMPLETION_TRACKING_START, view._completion_data_collection_start())
 
 
 class TestCourseOutlinePreview(SharedModuleStoreTestCase, MasqueradeMixin):
@@ -758,11 +784,11 @@ class TestCourseOutlinePreview(SharedModuleStoreTestCase, MasqueradeMixin):
         self.client.login(username=staff_user.username, password='test')
         url = course_home_url(course)
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Future Chapter')
 
         # Verify that staff masquerading as a learner see the future chapter.
         self.update_masquerade(course=course, role='student')
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Future Chapter')

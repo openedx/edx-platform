@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=django-not-configured
 """
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
@@ -11,7 +10,9 @@ import os
 import re
 from collections import Counter
 
-from write_to_html import HtmlOutlineWriter  # noqa pylint: disable=import-error,useless-suppression
+from write_to_html import (
+    HtmlOutlineWriter,
+)  # noqa pylint: disable=import-error,useless-suppression
 
 columns = [
     "message",

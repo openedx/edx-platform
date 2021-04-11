@@ -4,7 +4,7 @@ Management command to send Schedule course updates
 
 import datetime
 import pytz
-from textwrap import dedent  # lint-amnesty, pylint: disable=wrong-import-order
+from textwrap import dedent
 
 from django.contrib.sites.models import Site
 
@@ -14,7 +14,7 @@ from openedx.core.djangoapps.schedules.tasks import ScheduleCourseNextSectionUpd
 
 class Command(SendEmailBaseCommand):
     """
-    Command to send Schedule course updates for Self-paced Courses
+    Command to send Schedule course updates
     """
     help = dedent(__doc__).strip()
     async_send_task = ScheduleCourseNextSectionUpdate

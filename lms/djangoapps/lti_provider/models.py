@@ -12,7 +12,7 @@ changes. To do that,
 
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db import models
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
@@ -125,7 +125,7 @@ class GradedAssignment(models.Model):
     lis_result_sourcedid = models.CharField(max_length=255, db_index=True)
     version_number = models.IntegerField(default=0)
 
-    class Meta:
+    class Meta(object):
         unique_together = ('outcome_service', 'lis_result_sourcedid')
 
 
@@ -142,5 +142,5 @@ class LtiUser(models.Model):
     lti_user_id = models.CharField(max_length=255)
     edx_user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    class Meta:
+    class Meta(object):
         unique_together = ('lti_consumer', 'lti_user_id')

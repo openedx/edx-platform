@@ -6,7 +6,7 @@ Django models related to course groups functionality.
 import json
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
@@ -28,7 +28,7 @@ class CourseUserGroup(models.Model):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         unique_together = (('name', 'course_id'), )
 
     name = models.CharField(max_length=255,
@@ -81,13 +81,13 @@ class CohortMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
 
-    class Meta:
+    class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    def clean_fields(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+    def clean_fields(self, *args, **kwargs):
         if self.course_id is None:
             self.course_id = self.course_user_group.course_id
-        super().clean_fields(*args, **kwargs)
+        super(CohortMembership, self).clean_fields(*args, **kwargs)
 
     def clean(self):
         if self.course_user_group.group_type != CourseUserGroup.COHORT:
@@ -115,7 +115,7 @@ class CohortMembership(models.Model):
                 membership.course_user_group.users.add(user)
                 previous_cohort = None
             elif membership.course_user_group == cohort:
-                raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                raise ValueError(u"User {user_name} already present in cohort {cohort_name}".format(
                     user_name=user.username,
                     cohort_name=cohort.name))
             else:
@@ -130,13 +130,11 @@ class CohortMembership(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.full_clean(validate_unique=False)
 
-        log.info("Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
-        return super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields
-        )
+        log.info(u"Saving CohortMembership for user '%s' in '%s'", self.user.id, self.course_id)
+        return super(CohortMembership, self).save(force_insert=force_insert,
+                                                  force_update=force_update,
+                                                  using=using,
+                                                  update_fields=update_fields)
 
 
 # Needs to exist outside class definition in order to use 'sender=CohortMembership'
@@ -253,7 +251,7 @@ class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     .. pii_retirement: local_api
     """
     # pylint: disable=model-missing-unicode
-    class Meta:
+    class Meta(object):
         unique_together = (('course_id', 'email'), )
 
     course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)

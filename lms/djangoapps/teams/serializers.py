@@ -5,8 +5,9 @@ Defines serializers used by the Team API.
 
 from copy import deepcopy
 
+import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django_countries import countries
 from rest_framework import serializers
 
@@ -28,7 +29,7 @@ class CountryField(serializers.Field):
         """
         Represent the country as a 2-character unicode identifier.
         """
-        return str(obj)
+        return six.text_type(obj)
 
     def to_internal_value(self, data):
         """
@@ -40,7 +41,7 @@ class CountryField(serializers.Field):
         """
         if data and data not in self.COUNTRY_CODES:
             raise serializers.ValidationError(
-                f"{data} is not a valid country code"
+                u"{code} is not a valid country code".format(code=data)
             )
         return data
 
@@ -64,7 +65,7 @@ class UserMembershipSerializer(serializers.ModelSerializer):
         expanded_serializer=UserReadOnlySerializer(configuration=profile_configuration),
     )
 
-    class Meta:
+    class Meta(object):
         model = CourseTeamMembership
         fields = ("user", "date_joined", "last_activity_at")
         read_only_fields = ("date_joined", "last_activity_at")
@@ -76,7 +77,7 @@ class CourseTeamSerializer(serializers.ModelSerializer):
     membership = UserMembershipSerializer(many=True, read_only=True)
     country = CountryField()
 
-    class Meta:
+    class Meta(object):
         model = CourseTeam
         fields = (
             "id",
@@ -100,7 +101,7 @@ class CourseTeamCreationSerializer(serializers.ModelSerializer):
 
     country = CountryField(required=False)
 
-    class Meta:
+    class Meta(object):
         model = CourseTeam
         fields = (
             "name",
@@ -134,7 +135,7 @@ class CourseTeamSerializerWithoutMembership(CourseTeamSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(CourseTeamSerializerWithoutMembership, self).__init__(*args, **kwargs)
         del self.fields['membership']
 
 
@@ -163,7 +164,7 @@ class MembershipSerializer(serializers.ModelSerializer):
         expanded_serializer=CourseTeamSerializerWithoutMembership(read_only=True),
     )
 
-    class Meta:
+    class Meta(object):
         model = CourseTeamMembership
         fields = ("user", "team", "date_joined", "last_activity_at")
         read_only_fields = ("date_joined", "last_activity_at")
@@ -208,7 +209,7 @@ class BulkTeamCountTopicListSerializer(serializers.ListSerializer):  # pylint: d
 
     def to_representation(self, obj):  # pylint: disable=arguments-differ
         """Adds team_count to each topic. """
-        data = super().to_representation(obj)
+        data = super(BulkTeamCountTopicListSerializer, self).to_representation(obj)
         add_team_count(
             self.context['request'].user,
             data,
@@ -223,5 +224,5 @@ class BulkTeamCountTopicSerializer(BaseTopicSerializer):  # pylint: disable=abst
     Serializes a set of topics, adding the team_count field to each topic as a bulk operation.
     Requires that `context` is provided with a valid course_id in order to filter teams within the course.
     """
-    class Meta:
+    class Meta(object):
         list_serializer_class = BulkTeamCountTopicListSerializer

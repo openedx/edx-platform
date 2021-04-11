@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Bok choy acceptance tests for problems in the LMS
 """
@@ -19,10 +20,10 @@ class ProblemsTest(UniqueCourseTest):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ProblemsTest, self).setUp()
 
         self.username = "test_student_{uuid}".format(uuid=self.unique_id[0:8])
-        self.email = f"{self.username}@example.com"
+        self.email = "{username}@example.com".format(username=self.username)
         self.password = "keep it secret; keep it safe."
 
         self.xqueue_grade_response = None
@@ -62,7 +63,7 @@ class ProblemsTest(UniqueCourseTest):
         return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
-class CAPAProblemA11yBaseTestMixin:
+class CAPAProblemA11yBaseTestMixin(object):
     """Base TestCase Class to verify CAPA problem accessibility."""
 
     def test_a11y(self):

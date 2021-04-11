@@ -9,11 +9,10 @@ from datetime import datetime
 from functools import reduce
 
 import pytz
+import six
 from lxml import etree
 from web_fragments.fragment import Fragment
-
-from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
-from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
+from xblock.core import XBlock
 from xmodule.mako_module import MakoTemplateBlockBase
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceFields
@@ -62,14 +61,12 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             if 'bookmarked' not in child_context:
                 bookmarks_service = self.runtime.service(self, 'bookmarks')
                 child_context['bookmarked'] = bookmarks_service.is_bookmarked(
-                    usage_key=self.location),  # lint-amnesty, pylint: disable=no-member, trailing-comma-tuple
+                    usage_key=self.location),  # pylint: disable=no-member
             if 'username' not in child_context:
                 user_service = self.runtime.service(self, 'user')
-                child_context['username'] = user_service.get_current_user().opt_attrs.get(
-                    'edx-platform.username'
-                )
+                child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
 
-        child_blocks = self.get_display_items()  # lint-amnesty, pylint: disable=no-member
+        child_blocks = self.get_display_items()
 
         child_blocks_to_complete_on_view = set()
         completion_service = self.runtime.service(self, 'completion')
@@ -82,8 +79,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         # pylint: disable=no-member
         for child in child_blocks:
-            if context.get('hide_access_error_blocks') and getattr(child, 'has_access_error', False):
-                continue
             child_block_context = copy(child_context)
             if child in list(child_blocks_to_complete_on_view):
                 child_block_context['wrap_xblock_data'] = {
@@ -93,15 +88,15 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             fragment.add_fragment_resources(rendered_child)
 
             contents.append({
-                'id': str(child.location),
+                'id': six.text_type(child.location),
                 'content': rendered_child.content
             })
 
+        cta_service = self.runtime.service(self, 'call_to_action')
+        vertical_banner_ctas = cta_service and cta_service.get_ctas(self, 'vertical_banner')
+
         completed = self.is_block_complete_for_assignments(completion_service)
         past_due = completed is False and self.due and self.due < datetime.now(pytz.UTC)
-        cta_service = self.runtime.service(self, 'call_to_action')
-        vertical_banner_ctas = (cta_service and cta_service.get_ctas(self, 'vertical_banner', completed)) or []  # lint-amnesty, pylint: disable=consider-using-ternary
-
         fragment_context = {
             'items': contents,
             'xblock_context': context,
@@ -119,8 +114,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
                 'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
                 'show_title': child_context.get('show_title', True),
                 'bookmarked': child_context['bookmarked'],
-                'bookmark_id': "{},{}".format(
-                    child_context['username'], str(self.location)),  # pylint: disable=no-member
+                'bookmark_id': u"{},{}".format(
+                    child_context['username'], six.text_type(self.location)),  # pylint: disable=no-member
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', fragment_context))
@@ -171,7 +166,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Returns the highest priority icon class.
         """
-        child_classes = {child.get_icon_class() for child in self.get_children()}
+        child_classes = set(child.get_icon_class() for child in self.get_children())
         new_class = 'other'
         for higher_class in CLASS_PRIORITY:
             if higher_class in child_classes:
@@ -188,7 +183,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             except Exception as exc:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Vertical. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(f"ERROR: {exc}")
+                    system.error_tracker(u"ERROR: {0}".format(exc))
                 continue
         return {}, children
 
@@ -203,14 +198,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         Gather all fields which can't be edited.
         """
-        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            self.fields['due'],  # lint-amnesty, pylint: disable=unsubscriptable-object
+            self.fields['due'],
         ])
         return non_editable_fields
 
     def studio_view(self, context):
-        fragment = super().studio_view(context)
+        fragment = super(VerticalBlock, self).studio_view(context)
         # This continues to use the old XModuleDescriptor javascript code to enabled studio editing.
         # TODO: Remove this when studio better supports editing of pure XBlocks.
         fragment.add_javascript('VerticalBlock = XModule.Descriptor;')
@@ -223,7 +218,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
         # default implementation is an empty dict
-        xblock_body = super().index_dictionary()
+        xblock_body = super(VerticalBlock, self).index_dictionary()
         index_body = {
             "display_name": self.display_name,
         }
@@ -262,7 +257,11 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         all_complete = None
         for child in children:
             complete = completions[child.scope_ids.usage_id] == 1
-            if is_xblock_an_assignment(child):
+            graded = getattr(child, 'graded', False)
+            has_score = getattr(child, 'has_score', False)
+            weight = getattr(child, 'weight', 1)
+            scored = has_score and (weight is None or weight > 0)
+            if graded and scored:
                 if not complete:
                     return False
                 all_complete = True

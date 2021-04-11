@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
@@ -21,7 +21,7 @@ class DemographicsStatusView(APIView):
     authentication_classes = (JwtAuthentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, )
 
-    def _response_context(self, user, user_demographics=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _response_context(self, user, user_demographics=None):
         if user_demographics:
             show_call_to_action = user_demographics.show_call_to_action
         else:

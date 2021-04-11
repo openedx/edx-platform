@@ -10,6 +10,8 @@ import random
 from collections import namedtuple
 from itertools import chain
 
+import six
+from six.moves import range
 from django.core.management.base import BaseCommand
 from mailsnake import MailSnake
 from opaque_keys.edx.keys import CourseKey
@@ -57,7 +59,7 @@ class Command(BaseCommand):
         course_id = options['course_id']
         num_segments = options['num_segments']
 
-        log.info('Syncronizing email list for %s', course_id)
+        log.info(u'Syncronizing email list for %s', course_id)
 
         mailchimp = connect_mailchimp(key)
 
@@ -81,7 +83,7 @@ class Command(BaseCommand):
 
         unsubscribe(mailchimp, list_id, non_enrolled_emails)
 
-        subscribed = subscribed.union({d['EMAIL'] for d in to_subscribe})
+        subscribed = subscribed.union(set(d['EMAIL'] for d in to_subscribe))
         make_segments(mailchimp, list_id, num_segments, subscribed)
 
 
@@ -109,7 +111,7 @@ def verify_list(mailchimp, list_id, course_id):
 
     list_name = lists[0]['name']
 
-    log.debug('list name: %s', list_name)
+    log.debug(u'list name: %s', list_name)
 
     # check that we are connecting to the correct list
     parts = course_id.replace('_', ' ').replace('/', ' ').split()
@@ -244,7 +246,7 @@ def update_merge_tags(mailchimp, list_id, tag_names):
     The purpose of this function is unclear.
     """
     mc_vars = mailchimp.listMergeVars(id=list_id)
-    mc_names = {v['name'] for v in mc_vars}
+    mc_names = set(v['name'] for v in mc_vars)
 
     mc_merge = mailchimp.listMergeVarAdd
 
@@ -286,7 +288,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
 
     Returns None
     """
-    format_entry = lambda e: {name_to_tag(k): v for k, v in e.items()}
+    format_entry = lambda e: {name_to_tag(k): v for k, v in six.iteritems(e)}
     formated_data = list(format_entry(e) for e in user_data)
 
     # send the updates in batches of a fixed size
@@ -297,7 +299,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               update_existing=True)
 
         log.debug(
-            "Added: %s Error on: %s", result['add_count'], result['error_count']
+            u"Added: %s Error on: %s", result['add_count'], result['error_count']
         )
 
 
@@ -332,7 +334,7 @@ def make_segments(mailchimp, list_id, count, emails):
 
         # create segments and add emails
         for seg in range(count):
-            name = f'random_{seg:002}'
+            name = 'random_{0:002}'.format(seg)
             seg_id = mailchimp.listStaticSegmentAdd(id=list_id, name=name)
             for batch in chunk(chunks[seg], BATCH_SIZE):
                 mailchimp.listStaticSegmentMembersAdd(

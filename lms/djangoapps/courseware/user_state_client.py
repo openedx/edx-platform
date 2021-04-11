@@ -9,8 +9,9 @@ import logging
 from operator import attrgetter
 from time import time
 
+import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -56,19 +57,19 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         This error is raised if the service backing this client is currently unavailable.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     class PermissionDenied(XBlockUserStateClient.PermissionDenied):
         """
         This error is raised if the caller is not allowed to access the requested data.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     class DoesNotExist(XBlockUserStateClient.DoesNotExist):
         """
         This error is raised if the caller has requested data that does not exist.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def __init__(self, user=None):
         """
@@ -165,7 +166,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             field_state is a dict mapping field names to values.
         """
         if scope != Scope.user_state:
-            raise ValueError(f"Only Scope.user_state is supported, not {scope}")
+            raise ValueError(u"Only Scope.user_state is supported, not {}".format(scope))
 
         total_block_count = 0
         evt_time = time()
@@ -258,13 +259,13 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 # on get_or_create to be able to see rows created in another
                 # process. This seems to happen frequently, and ignoring it is the
                 # best course of action for now
-                log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                    user, repr(str(usage_key.context_key)), usage_key
+                log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                    user, repr(six.text_type(usage_key.context_key)), usage_key
                 ))
                 return
 
             num_fields_before = num_fields_after = num_new_fields_set = len(state)
-            num_fields_updated = 0  # lint-amnesty, pylint: disable=unused-variable
+            num_fields_updated = 0
             if not created:
                 if student_module.state is None:
                     current_state = {}
@@ -281,10 +282,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
                 except IntegrityError:
                     # The UPDATE above failed. Log information - but ignore the error.
                     # See https://openedx.atlassian.net/browse/TNL-5365
-                    log.warning("set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
-                        user, repr(str(usage_key.context_key)), usage_key
+                    log.warning(u"set_many: IntegrityError for student {} - course_id {} - usage key {}".format(
+                        user, repr(six.text_type(usage_key.context_key)), usage_key
                     ))
-                    log.warning("set_many: All {} block keys: {}".format(
+                    log.warning(u"set_many: All {} block keys: {}".format(
                         len(block_keys_to_state), list(block_keys_to_state.keys())
                     ))
 
@@ -323,7 +324,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        evt_time = time()  # lint-amnesty, pylint: disable=unused-variable
+        evt_time = time()
         student_modules = self._get_student_modules(username, block_keys)
         for student_module, _ in student_modules:
             if fields is None:
@@ -340,7 +341,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             student_module.save(force_update=True)
 
         # Event for the entire delete_many call.
-        finish_time = time()  # lint-amnesty, pylint: disable=unused-variable
+        finish_time = time()
 
     def get_history(self, username, block_key, scope=Scope.user_state):
         """

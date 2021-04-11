@@ -40,7 +40,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         elif hasattr(block, 'location'):
             course_key = block.location.course_key
         else:
-            msg = "Unable to get course id when calculating ccx overide for block type %r"
+            msg = u"Unable to get course id when calculating ccx overide for block type %r"
             log.error(msg, type(block))
         if course_key is not None:
             ccx = get_current_ccx(course_key)
@@ -49,7 +49,7 @@ class CustomCoursesForEdxOverrideProvider(FieldOverrideProvider):
         return default
 
     @classmethod
-    def enabled_for(cls, block):  # lint-amnesty, pylint: disable=arguments-differ
+    def enabled_for(cls, block):
         """
         CCX field overrides are enabled for CCX blocks.
         """

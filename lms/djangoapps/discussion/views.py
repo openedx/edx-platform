@@ -6,9 +6,10 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 import logging
 from functools import wraps
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import render_to_response
@@ -27,8 +28,6 @@ from web_fragments.fragment import Fragment
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.json_request import JsonResponse, expect_json
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
@@ -58,6 +57,8 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
@@ -83,7 +84,7 @@ def make_course_settings(course, user, include_category_map=True):
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'groups': [
-            {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.items()
+            {"id": str(group_id), "name": group_name} for group_id, group_name in six.iteritems(group_names_by_id)
         ]
     }
     if include_category_map:
@@ -99,7 +100,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
 
     Arguments:
         request (WSGIRequest): The user request.
-        course (CourseBlockWithMixins): The course object.
+        course (CourseDescriptorWithMixins): The course object.
         user_info (dict): The comment client User object as a dict.
         discussion_id (unicode): Optional discussion id/commentable id for context.
         per_page (int): Optional number of threads per page.
@@ -114,7 +115,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         'per_page': per_page,
         'sort_key': 'activity',
         'text': '',
-        'course_id': str(course.id),
+        'course_id': six.text_type(course.id),
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -289,7 +290,7 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        course_id = str(course.id)
+        course_id = six.text_type(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion')
 
@@ -343,7 +344,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'annotated_content_info': annotated_content_info,
         })
     else:
-        course_id = str(course.id)
+        course_id = six.text_type(course.id)
         tab_view = CourseTabView()
         return tab_view.get(request, course_id, 'discussion', discussion_id=discussion_id, thread_id=thread_id)
 
@@ -445,7 +446,7 @@ def _create_base_discussion_view_context(request, course_key):
 
 
 def _get_discussion_default_topic_id(course):
-    for topic, entry in course.discussion_topics.items():  # lint-amnesty, pylint: disable=unused-variable
+    for topic, entry in course.discussion_topics.items():
         if entry.get('default') is True:
             return entry['id']
 
@@ -469,12 +470,12 @@ def _create_discussion_board_context(request, base_context, thread=None):
         # we need only return the thread information for this one.
         threads = [thread.to_dict()]
 
-        for thread in threads:  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        for thread in threads:
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False
         thread_pages = 1
-        root_url = reverse('forum_form_discussion', args=[str(course.id)])
+        root_url = reverse('forum_form_discussion', args=[six.text_type(course.id)])
     else:
         threads, query_params = get_threads(request, course, user_info)   # This might process a search query
         thread_pages = query_params['num_pages']
@@ -607,9 +608,9 @@ def user_profile(request, course_key, user_id):
             # 'user_profile' page
             context['load_mathjax'] = False
 
-            return tab_view.get(request, str(course_key), 'discussion', profile_page_context=context)
+            return tab_view.get(request, six.text_type(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
-        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404
     except ValueError:
         return HttpResponseServerError("Invalid group_id")
 
@@ -689,7 +690,7 @@ def followed_threads(request, course_key, user_id):
 
             return render_to_response('discussion/user_profile.html', context)
     except User.DoesNotExist:
-        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404
 
 
 class DiscussionBoardFragmentView(EdxFragmentView):
@@ -697,7 +698,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     Component implementation of the discussion board.
     """
 
-    def render_to_fragment(  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(
         self,
         request,
         course_id=None,
@@ -767,7 +768,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             return fragment
         except TeamDiscussionHiddenFromUserException:
             log.warning(
-                'User with id={user_id} tried to view private discussion with id={discussion_id}'.format(
+                u'User with id={user_id} tried to view private discussion with id={discussion_id}'.format(
                     user_id=request.user.id,
                     discussion_id=discussion_id
                 )
@@ -788,7 +789,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         works in conjunction with the Django pipeline to ensure that in development mode
         the files are loaded individually, but in production just the single bundle is loaded.
         """
-        return list(dict.fromkeys(self.get_js_dependencies('discussion_vendor')))
+        return list(set(self.get_js_dependencies('discussion_vendor')))
 
     def js_dependencies(self):
         """
@@ -866,7 +867,7 @@ def discussion_topics(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    discussion_topics = {}  # lint-amnesty, pylint: disable=redefined-outer-name
+    discussion_topics = {}
     discussion_category_map = utils.get_discussion_category_map(
         course, request.user, divided_only_if_explicit=True, exclude_unstarted=False
     )
@@ -937,7 +938,7 @@ def course_discussions_settings_handler(request, course_key_string):
             )
 
         if not settings_to_change:
-            return JsonResponse({"error": "Bad Request"}, 400)
+            return JsonResponse({"error": six.text_type("Bad Request")}, 400)
 
         try:
             if settings_to_change:
@@ -945,7 +946,7 @@ def course_discussions_settings_handler(request, course_key_string):
 
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": str(err)}, 400)
+            return JsonResponse({"error": six.text_type(err)}, 400)
 
     divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
         course, discussion_settings

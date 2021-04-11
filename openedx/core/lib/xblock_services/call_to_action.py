@@ -12,7 +12,7 @@ class CallToActionService(PluginManager):
     """
     NAMESPACE = 'openedx.call_to_action'
 
-    def get_ctas(self, xblock, category, completion=False):
+    def get_ctas(self, xblock, category):
         """
         Return the calls to action associated with the specified category for the given xblock.
 
@@ -45,5 +45,5 @@ class CallToActionService(PluginManager):
         """
         ctas = []
         for cta_provider in self.get_available_plugins().values():
-            ctas.extend(cta_provider().get_ctas(xblock, category, completion))
+            ctas.extend(cta_provider().get_ctas(xblock, category))
         return ctas

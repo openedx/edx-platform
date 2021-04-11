@@ -5,13 +5,14 @@ Tests for the Studio Tagging XBlockAside
 
 import json
 from datetime import datetime
-from io import StringIO
 
 import ddt
+import six
 from django.test.client import RequestFactory
 from lxml import etree
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from pytz import UTC
+from six import StringIO
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
@@ -38,7 +39,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         Preparation for the test execution
         """
-        super().setUp()
+        super(StructuredTagsAsideTestCase, self).setUp()
         self.aside_name = 'tagging_aside'
         self.aside_tag_dif = 'difficulty'
         self.aside_tag_dif_value = 'Hard'
@@ -112,7 +113,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
     def tearDown(self):
         TagAvailableValues.objects.all().delete()
         TagCategories.objects.all().delete()
-        super().tearDown()
+        super(StructuredTagsAsideTestCase, self).tearDown()
 
     def test_aside_contains_tags(self):
         """
@@ -180,11 +181,11 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         self.assertEqual(option_values2, ['Learned a few things', 'Learned everything', 'Learned nothing'])
 
         # Now ensure the acid_aside is not in the result
-        self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")  # lint-amnesty, pylint: disable=deprecated-method
+        self.assertNotRegexpMatches(problem_html, r"data-block-type=[\"\']acid_aside[\"\']")
 
         # Ensure about video don't have asides
         video_html = get_preview_fragment(request, self.video, context).content
-        self.assertNotRegexpMatches(video_html, "<select")  # lint-amnesty, pylint: disable=deprecated-method
+        self.assertNotRegexpMatches(video_html, "<select")
 
     @ddt.data(AsideUsageKeyV1, AsideUsageKeyV2)
     def test_handle_requests(self, aside_key_class):
@@ -193,7 +194,7 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
         """
         handler_url = reverse_usage_url(
             'component_handler',
-            str(aside_key_class(self.problem.location, self.aside_name)),
+            six.text_type(aside_key_class(self.problem.location, self.aside_name)),
             kwargs={'handler': 'save_tags'}
         )
 

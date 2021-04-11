@@ -14,7 +14,7 @@ class XForwardedForMiddleware(MiddlewareMixin):
 
     """
 
-    def process_request(self, request):  # lint-amnesty, pylint: disable=useless-return
+    def process_request(self, request):
         """
         Process the given request, update the value of REMOTE_ADDR, SERVER_NAME and SERVER_PORT based
         on X-Forwarded-For, HTTP_HOST and X-Forwarded-Port headers

@@ -20,7 +20,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
 class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourseTest):
     """Base class used for program listing page tests."""
     def setUp(self):
-        super().setUp()
+        super(ProgramPageBase, self).setUp()
 
         self.set_programs_api_configuration(is_enabled=True)
 
@@ -79,7 +79,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     a11y = True
 
     def setUp(self):
-        super().setUp()
+        super(ProgramListingPageA11yTest, self).setUp()
 
         self.listing_page = ProgramListingPage(self.browser)
 
@@ -99,8 +99,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.visit()
 
-        assert self.listing_page.is_sidebar_present
-        assert not self.listing_page.are_cards_present
+        self.assertTrue(self.listing_page.is_sidebar_present)
+        self.assertFalse(self.listing_page.are_cards_present)
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
     def test_cards_a11y(self):
@@ -118,8 +118,8 @@ class ProgramListingPageA11yTest(ProgramPageBase):
 
         self.listing_page.visit()
 
-        assert self.listing_page.is_sidebar_present
-        assert self.listing_page.are_cards_present
+        self.assertTrue(self.listing_page.is_sidebar_present)
+        self.assertTrue(self.listing_page.are_cards_present)
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
@@ -128,7 +128,7 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
     a11y = True
 
     def setUp(self):
-        super().setUp()
+        super(ProgramDetailsPageA11yTest, self).setUp()
 
         self.details_page = ProgramDetailsPage(self.browser)
 

@@ -5,8 +5,10 @@ so that we can cache any keys, not just ones that memcache would ordinarily acce
 
 
 import hashlib
-from urllib.parse import quote_plus
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.utils.encoding import smart_str
 
 
@@ -24,7 +26,7 @@ def cleaned_string(val):
     Converts `val` to unicode and URL-encodes special characters
     (including quotes and spaces)
     """
-    return quote_plus(smart_str(val))
+    return six.moves.urllib.parse.quote_plus(smart_str(val))
 
 
 def safe_key(key, key_prefix, version):

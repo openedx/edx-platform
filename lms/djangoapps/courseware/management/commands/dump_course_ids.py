@@ -8,11 +8,12 @@ Output is UTF-8 encoded by default.
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand
+from six import text_type
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = dedent(__doc__).strip()
 
     def add_arguments(self, parser):
@@ -21,6 +22,6 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                             help='name of the modulestore to use')
 
     def handle(self, *args, **options):
-        output = '\n'.join(str(course_overview.id) for course_overview in CourseOverview.get_all_courses()) + '\n'
+        output = '\n'.join(text_type(course_overview.id) for course_overview in CourseOverview.get_all_courses()) + '\n'
 
         return output

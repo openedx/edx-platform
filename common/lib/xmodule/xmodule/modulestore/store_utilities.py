@@ -1,20 +1,21 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import logging
 import re
 import uuid
 from collections import namedtuple
 
+import six
 from xblock.core import XBlock
 
-DETACHED_XBLOCK_TYPES = {name for name, __ in XBlock.load_tagged_classes("detached")}
+DETACHED_XBLOCK_TYPES = set(name for name, __ in XBlock.load_tagged_classes("detached"))
 
 
 def _prefix_only_url_replace_regex(pattern):
     """
     Match urls in quotes pulling out the fields from pattern
     """
-    return re.compile("""
+    return re.compile(u"""
         (?x)                      # flags=re.VERBOSE
         (?P<quote>\\\\?['"])      # the opening quotes
         {}
@@ -44,24 +45,24 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     # create a serialized template for what the id will look like in the source_course but with
     # the block_id as a regex pattern
     placeholder_id = uuid.uuid4().hex
-    asset_block_pattern = str(source_course_id.make_asset_key('asset', placeholder_id))
+    asset_block_pattern = six.text_type(source_course_id.make_asset_key('asset', placeholder_id))
     asset_block_pattern = asset_block_pattern.replace(placeholder_id, r'(?P<block_id>.*?)')
     try:
         text = _prefix_only_url_replace_regex(asset_block_pattern).sub(portable_asset_link_subtitution, text)
     except Exception as exc:  # pylint: disable=broad-except
-        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", asset_block_pattern, text, str(exc))  # lint-amnesty, pylint: disable=line-too-long
+        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", asset_block_pattern, text, str(exc))
 
-    placeholder_category = f'cat_{uuid.uuid4().hex}'
-    usage_block_pattern = str(source_course_id.make_usage_key(placeholder_category, placeholder_id))
+    placeholder_category = 'cat_{}'.format(uuid.uuid4().hex)
+    usage_block_pattern = six.text_type(source_course_id.make_usage_key(placeholder_category, placeholder_id))
     usage_block_pattern = usage_block_pattern.replace(placeholder_category, r'(?P<category>[^/+@]+)')
     usage_block_pattern = usage_block_pattern.replace(placeholder_id, r'(?P<block_id>.*?)')
-    jump_to_link_base = '/courses/{course_key_string}/jump_to/{usage_key_string}'.format(
-        course_key_string=str(source_course_id), usage_key_string=usage_block_pattern
+    jump_to_link_base = u'/courses/{course_key_string}/jump_to/{usage_key_string}'.format(
+        course_key_string=six.text_type(source_course_id), usage_key_string=usage_block_pattern
     )
     try:
         text = _prefix_only_url_replace_regex(jump_to_link_base).sub(portable_jump_to_link_substitution, text)
     except Exception as exc:  # pylint: disable=broad-except
-        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(exc))  # lint-amnesty, pylint: disable=line-too-long
+        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(exc))
 
     # Also, there commonly is a set of link URL's used in the format:
     # /courses/<org>/<course>/<name> which will be broken if migrated to a different course_id
@@ -71,10 +72,10 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = '/courses/{}/'.format(str(source_course_id))
-            text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)  # lint-amnesty, pylint: disable=line-too-long
+            generic_courseware_link_base = u'/courses/{}/'.format(six.text_type(source_course_id))
+            text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception as exc:  # pylint: disable=broad-except
-            logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))  # lint-amnesty, pylint: disable=line-too-long
+            logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))
 
     return text
 

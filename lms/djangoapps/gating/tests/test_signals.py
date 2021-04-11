@@ -3,10 +3,10 @@ Unit tests for gating.signals module
 """
 
 
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.gating.signals import evaluate_subsection_gated_milestones
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -18,7 +18,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
         self.user = UserFactory.create()
         self.subsection_grade = Mock()
@@ -33,7 +33,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             course=self.course,
             subsection_grade=self.subsection_grade,
         )
-        assert mock_gating_milestone.called
+        self.assertTrue(mock_gating_milestone.called)
 
     @patch('lms.djangoapps.gating.api.gating_api.get_gating_milestone')
     def test_gating_disabled(self, mock_gating_milestone):
@@ -43,4 +43,4 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             course=self.course,
             subsection_grade=self.subsection_grade,
         )
-        assert not mock_gating_milestone.called
+        self.assertFalse(mock_gating_milestone.called)

@@ -3,13 +3,12 @@ Tests for CountryMiddleware.
 """
 
 
-from unittest.mock import MagicMock, PropertyMock, patch
-
 import geoip2
 import maxminddb
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import MagicMock, PropertyMock, patch
 
 from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
@@ -20,7 +19,7 @@ class CountryMiddlewareTests(TestCase):
     Tests of CountryMiddleware.
     """
     def setUp(self):
-        super().setUp()
+        super(CountryMiddlewareTests, self).setUp()
         self.country_middleware = CountryMiddleware()
         self.session_middleware = SessionMiddleware()
         self.authenticated_user = UserFactory.create()
@@ -59,12 +58,12 @@ class CountryMiddlewareTests(TestCase):
         request.user = self.authenticated_user
         self.session_middleware.process_request(request)
         # No country code exists before request.
-        assert 'country_code' not in request.session
-        assert 'ip_address' not in request.session
+        self.assertNotIn('country_code', request.session)
+        self.assertNotIn('ip_address', request.session)
         self.country_middleware.process_request(request)
         # Country code added to session.
-        assert 'CN' == request.session.get('country_code')
-        assert '117.79.83.1' == request.session.get('ip_address')
+        self.assertEqual('CN', request.session.get('country_code'))
+        self.assertEqual('117.79.83.1', request.session.get('ip_address'))
 
     def test_ip_address_changed(self):
         request = self.request_factory.get(
@@ -77,8 +76,8 @@ class CountryMiddlewareTests(TestCase):
         request.session['ip_address'] = '117.79.83.1'
         self.country_middleware.process_request(request)
         # Country code is changed.
-        assert 'SD' == request.session.get('country_code')
-        assert '4.0.0.0' == request.session.get('ip_address')
+        self.assertEqual('SD', request.session.get('country_code'))
+        self.assertEqual('4.0.0.0', request.session.get('ip_address'))
 
     def test_ip_address_is_not_changed(self):
         request = self.request_factory.get(
@@ -91,8 +90,8 @@ class CountryMiddlewareTests(TestCase):
         request.session['ip_address'] = '117.79.83.1'
         self.country_middleware.process_request(request)
         # Country code is not changed.
-        assert 'CN' == request.session.get('country_code')
-        assert '117.79.83.1' == request.session.get('ip_address')
+        self.assertEqual('CN', request.session.get('country_code'))
+        self.assertEqual('117.79.83.1', request.session.get('ip_address'))
 
     def test_same_country_different_ip(self):
         request = self.request_factory.get(
@@ -105,8 +104,22 @@ class CountryMiddlewareTests(TestCase):
         request.session['ip_address'] = '117.79.83.1'
         self.country_middleware.process_request(request)
         # Country code is not changed.
-        assert 'CN' == request.session.get('country_code')
-        assert '117.79.83.100' == request.session.get('ip_address')
+        self.assertEqual('CN', request.session.get('country_code'))
+        self.assertEqual('117.79.83.100', request.session.get('ip_address'))
+
+    def test_ip_address_is_none(self):
+        # IP address is not defined in request.
+        request = self.request_factory.get('/somewhere')
+        request.user = self.anonymous_user
+        # Run process_request to set up the session in the request
+        # to be able to override it.
+        self.session_middleware.process_request(request)
+        request.session['country_code'] = 'CN'
+        request.session['ip_address'] = '117.79.83.1'
+        self.country_middleware.process_request(request)
+        # No country code exists after request processing.
+        self.assertNotIn('country_code', request.session)
+        self.assertNotIn('ip_address', request.session)
 
     def test_ip_address_is_ipv6(self):
         request = self.request_factory.get(
@@ -116,9 +129,10 @@ class CountryMiddlewareTests(TestCase):
         request.user = self.authenticated_user
         self.session_middleware.process_request(request)
         # No country code exists before request.
-        assert 'country_code' not in request.session
-        assert 'ip_address' not in request.session
+        self.assertNotIn('country_code', request.session)
+        self.assertNotIn('ip_address', request.session)
         self.country_middleware.process_request(request)
         # Country code added to session.
-        assert 'CN' == request.session.get('country_code')
-        assert '2001:da8:20f:1502:edcf:550b:4a9c:207d' == request.session.get('ip_address')
+        self.assertEqual('CN', request.session.get('country_code'))
+        self.assertEqual(
+            '2001:da8:20f:1502:edcf:550b:4a9c:207d', request.session.get('ip_address'))

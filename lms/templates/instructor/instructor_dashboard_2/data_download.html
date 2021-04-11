@@ -16,9 +16,9 @@ from openedx.core.djangolib.markup import HTML, Text
   <div class="data-display-text" id="data-grade-config-text"></div>
   <br>
 
-  <p>${_("The CSV of anonymized student IDs download has been relocated to the Reports section below.")}</p>
-
- </div>
+  <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
+  <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
+</div>
 
 %if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
   <div class="reports-download-container action-type-container">
@@ -36,9 +36,6 @@ from openedx.core.djangolib.markup import HTML, Text
     <p>${_("Click to generate a CSV file that lists learners who can enroll in the course but have not yet done so.")}</p>
 
     <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
-
-    <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
-    <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
 
     %if section_data['show_generate_proctored_exam_report_button']:
       <p>${_("Click to generate a CSV file of all proctored exam results in this course.")}</p>
@@ -98,7 +95,6 @@ from openedx.core.djangolib.markup import HTML, Text
       <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
       <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
       <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
-      <input type="button" name="export-ora2-summary" class="async-report-btn" value="${_("Generate ORA Summary Report")}" data-endpoint="${ section_data['export_ora2_summary_url'] }"/>
     </p>
 
     <p>${_("Click to generate a ZIP file that contains all submission texts and attachments.")}</p>

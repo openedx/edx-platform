@@ -4,10 +4,11 @@ Shared test utilities for Safe Sessions tests
 
 
 from contextlib import contextmanager
-from unittest.mock import patch
+
+from mock import patch
 
 
-class TestSafeSessionsLogMixin:
+class TestSafeSessionsLogMixin(object):
     """
     Test Mixin class with helpers for testing log method
     calls in the safe sessions middleware.
@@ -20,7 +21,7 @@ class TestSafeSessionsLogMixin:
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.' + log_level) as mock_log:
             yield
-            assert mock_log.called
+            self.assertTrue(mock_log.called)
             self.assertRegex(mock_log.call_args_list[0][0][0], log_string)
 
     @contextmanager
@@ -50,7 +51,7 @@ class TestSafeSessionsLogMixin:
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.warning') as mock_log:
             yield
-            assert not mock_log.called
+            self.assertFalse(mock_log.called)
 
     @contextmanager
     def assert_no_error_logged(self):
@@ -59,7 +60,7 @@ class TestSafeSessionsLogMixin:
         """
         with patch('openedx.core.djangoapps.safe_sessions.middleware.log.error') as mock_log:
             yield
-            assert not mock_log.called
+            self.assertFalse(mock_log.called)
 
     @contextmanager
     def assert_signature_error_logged(self, sig_error_string):
@@ -115,34 +116,28 @@ class TestSafeSessionsLogMixin:
             yield
 
     @contextmanager
-    def assert_logged_for_request_user_mismatch(self, user_at_request, user_at_response, log_level, request_path):
+    def assert_logged_for_request_user_mismatch(self, user_at_request, user_at_response, log_level):
         """
         Asserts that warning was logged when request.user
         was not equal to user at response
         """
         with self.assert_logged_with_message(
-            (
-                "SafeCookieData user at request '{}' does not match user at response: '{}' "
-                "for request path '{}'"
-            ).format(
-                user_at_request, user_at_response, request_path
+            u"SafeCookieData user at request '{}' does not match user at response: '{}'".format(
+                user_at_request, user_at_response
             ),
             log_level=log_level,
         ):
             yield
 
     @contextmanager
-    def assert_logged_for_session_user_mismatch(self, user_at_request, user_in_session, request_path):
+    def assert_logged_for_session_user_mismatch(self, user_at_request, user_in_session):
         """
         Asserts that warning was logged when request.user
         was not equal to user at session
         """
         with self.assert_logged_with_message(
-            (
-                "SafeCookieData user at request '{}' does not match user in session: '{}' "
-                "for request path '{}'"
-            ).format(
-                user_at_request, user_in_session, request_path
+            u"SafeCookieData user at request '{}' does not match user in session: '{}'".format(
+                user_at_request, user_in_session
             ),
             log_level='warning',
         ):

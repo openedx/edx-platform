@@ -162,10 +162,9 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
         var showTab = function(tab) {
             return function(e) {
                 e.preventDefault();
-                window.location.hash = tab;
-                $('.courses-tab').toggleClass('active', tab === 'courses-tab');
-                $('.archived-courses-tab').toggleClass('active', tab === 'archived-courses-tab');
-                $('.libraries-tab').toggleClass('active', tab === 'libraries-tab');
+                $('.courses-tab').toggleClass('active', tab === 'courses');
+                $('.archived-courses-tab').toggleClass('active', tab === 'archived-courses');
+                $('.libraries-tab').toggleClass('active', tab === 'libraries');
 
             // Also toggle this course-related notice shown below the course tab, if it is present:
                 $('.wrapper-creationrights').toggleClass('is-hidden', tab !== 'courses');
@@ -173,10 +172,6 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
         };
 
         var onReady = function() {
-            var courseTabHref = $('#course-index-tabs .courses-tab a').attr('href');
-            var libraryTabHref = $('#course-index-tabs .libraries-tab a').attr('href');
-            var ArchivedTabHref = $('#course-index-tabs .archived-courses-tab a').attr('href');
-
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
 
@@ -186,20 +181,9 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
 
             $('.action-reload').bind('click', ViewUtils.reload);
 
-            if (courseTabHref === '#') {
-                $('#course-index-tabs .courses-tab').bind('click', showTab('courses-tab'));
-            }
-
-            if (libraryTabHref === '#') {
-                $('#course-index-tabs .libraries-tab').bind('click', showTab('libraries-tab'));
-            }
-
-            if (ArchivedTabHref === '#') {
-                $('#course-index-tabs .archived-courses-tab').bind('click', showTab('archived-courses-tab'));
-            }
-            if (window.location.hash) {
-                $(window.location.hash.replace('#', '.')).first('a').trigger('click');
-            }
+            $('#course-index-tabs .courses-tab').bind('click', showTab('courses'));
+            $('#course-index-tabs .archived-courses-tab').bind('click', showTab('archived-courses'));
+            $('#course-index-tabs .libraries-tab').bind('click', showTab('libraries'));
         };
 
         domReady(onReady);

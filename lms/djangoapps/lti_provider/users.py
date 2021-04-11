@@ -10,12 +10,13 @@ import uuid
 
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
+from six.moves import range
 
-from common.djangoapps.student.models import UserProfile
 from lms.djangoapps.lti_provider.models import LtiUser
+from common.djangoapps.student.models import UserProfile
 
 
 def authenticate_lti_user(request, lti_user_id, lti_consumer):
@@ -54,7 +55,7 @@ def create_lti_user(lti_user_id, lti_consumer):
     while not created:
         try:
             edx_user_id = generate_random_edx_username()
-            edx_email = f"{edx_user_id}@{settings.LTI_USER_EMAIL_DOMAIN}"
+            edx_email = "{}@{}".format(edx_user_id, settings.LTI_USER_EMAIL_DOMAIN)
             with transaction.atomic():
                 edx_user = User.objects.create_user(
                     username=edx_user_id,
@@ -111,7 +112,7 @@ def generate_random_edx_username():
     return username
 
 
-class LtiBackend:
+class LtiBackend(object):
     """
     A Django authentication backend that authenticates users via LTI. This
     backend will only return a User object if it is associated with an LTI

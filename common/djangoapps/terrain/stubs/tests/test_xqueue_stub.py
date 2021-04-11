@@ -6,30 +6,30 @@ Unit tests for stub XQueue implementation.
 import ast
 import json
 import unittest
-from unittest import mock
 
+import mock
 import requests
 
 from ..xqueue import StubXQueueService
 
 
-class FakeTimer:
+class FakeTimer(object):
     """
     Fake timer implementation that executes immediately.
     """
-    def __init__(self, delay, func):  # lint-amnesty, pylint: disable=unused-argument
+    def __init__(self, delay, func):
         self.func = func
 
     def start(self):
         self.func()
 
 
-class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StubXQueueServiceTest(unittest.TestCase):
 
     def setUp(self):
-        super().setUp()
+        super(StubXQueueServiceTest, self).setUp()
         self.server = StubXQueueService()
-        self.url = f"http://127.0.0.1:{self.server.port}/xqueue/submit"
+        self.url = "http://127.0.0.1:{0}/xqueue/submit".format(self.server.port)
         self.addCleanup(self.server.shutdown)
 
         # Patch the timer async calls
@@ -116,10 +116,10 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
 
             # Expect that we do NOT receive a response
             # and that an error message is logged
-            assert not self.post.called
-            assert logger.error.called
+            self.assertFalse(self.post.called)
+            self.assertTrue(logger.error.called)
 
-    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):  # lint-amnesty, pylint: disable=unused-argument
+    def _post_submission(self, callback_url, lms_key, queue_name, xqueue_body):
         """
         Post a submission to the stub XQueue implementation.
         `callback_url` is the URL at which we expect to receive a grade response
@@ -144,7 +144,7 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
         resp = requests.post(self.url, data=grade_request)
 
         # Expect that the response is success
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
         # Return back the header, so we can authenticate the response we receive
         return grade_request['xqueue_header']
@@ -167,7 +167,9 @@ class StubXQueueServiceTest(unittest.TestCase):  # lint-amnesty, pylint: disable
             'xqueue_body': expected_body,
         }
         # Check that the POST request was made with the correct params
-        assert self.post.call_args[1]['data']['xqueue_body'] == expected_callback_dict['xqueue_body']
-        assert ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']) ==\
-               ast.literal_eval(expected_callback_dict['xqueue_header'])
-        assert self.post.call_args[0][0] == callback_url
+        self.assertEqual(self.post.call_args[1]['data']['xqueue_body'], expected_callback_dict['xqueue_body'])
+        self.assertEqual(
+            ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']),
+            ast.literal_eval(expected_callback_dict['xqueue_header'])
+        )
+        self.assertEqual(self.post.call_args[0][0], callback_url)

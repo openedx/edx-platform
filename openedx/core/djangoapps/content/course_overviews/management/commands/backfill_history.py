@@ -6,6 +6,7 @@ import csv
 import logging
 import os
 import time
+from io import open
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
@@ -39,7 +40,7 @@ class Command(BaseCommand):
     ]
 
     def add_arguments(self, parser):
-        super().add_arguments(parser)
+        super(Command, self).add_arguments(parser)
 
         parser.add_argument(
             '--sleep_between',
@@ -84,7 +85,7 @@ class Command(BaseCommand):
             history_date = input_filename.rsplit('_')[-1]
 
             with connection.cursor() as cursor:
-                query = """
+                query = u"""
                     SELECT
                         column_name
                     FROM information_schema.columns
@@ -96,20 +97,20 @@ class Command(BaseCommand):
             if exclude_column in columns:
                 columns.remove(exclude_column)
 
-            with open(file_path) as input_file:
+            with open(file_path, 'r') as input_file:
                 reader = csv.DictReader(input_file, delimiter='\x01')
                 lines = list(reader)
 
                 for rows in self.chunks(lines, batch_size):
                     row_ids = [row['ID'] for row in rows]
                     if table == 'course_overviews_courseoverview':
-                        ids = ','.join(f"'{id}'" for id in row_ids)
+                        ids = ','.join("'{}'".format(id) for id in row_ids)
                     else:
                         ids = ','.join(row_ids)
 
                     # Checks for existing historical records
                     with connection.cursor() as cursor:
-                        query = """
+                        query = u"""
                             SELECT COUNT(1)
                             FROM {historical_table}
                             WHERE ID in ({ids})
@@ -123,12 +124,12 @@ class Command(BaseCommand):
 
                     if count == len(rows):
                         log.info(
-                            "Initial history records already exist for ids %s..%s - skipping.",
+                            u"Initial history records already exist for ids %s..%s - skipping.",
                             ','.join(row_ids[:2]), ','.join(row_ids[-2:])
                         )
                         continue
                     elif count != 0:
-                        raise Exception("Database count: {} does not match input count: {}".format(count, len(ids)))
+                        raise Exception(u"Database count: %s does not match input count: %s" % (count, len(ids)))
 
                     values = [[row[column.upper()] for column in columns] for row in rows]
 
@@ -144,17 +145,17 @@ class Command(BaseCommand):
                     # Convert to tuple
                     values = [tuple(value) for value in values]
 
-                    quoted_columns = [f'`{c}`' for c in columns]
+                    quoted_columns = ['`{}`'.format(c) for c in columns]
 
                     with transaction.atomic():
                         with connection.cursor() as cursor:
                             log.info(
-                                "Inserting historical records for %s starting with id %s to %s",
+                                u"Inserting historical records for %s starting with id %s to %s",
                                 table,
                                 row_ids[0],
                                 row_ids[-1]
                             )
-                            query = """
+                            query = u"""
                                 INSERT INTO {historical_table}(
                                     {insert_columns},`history_date`,`history_change_reason`,`history_type`,`history_user_id`
                                 )
@@ -166,5 +167,5 @@ class Command(BaseCommand):
                                 )  # noqa
                             cursor.executemany(query, values)
 
-                    log.info("Sleeping %s seconds...", sleep_between)
+                    log.info(u"Sleeping %s seconds...", sleep_between)
                     time.sleep(sleep_between)

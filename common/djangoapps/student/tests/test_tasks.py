@@ -3,9 +3,10 @@ Tests for the Sending activation email celery tasks
 """
 
 
-from unittest import mock
+import mock
 from django.conf import settings
 from django.test import TestCase
+from six.moves import range
 
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory
@@ -20,7 +21,7 @@ class SendActivationEmailTestCase(TestCase):
     """
     def setUp(self):
         """ Setup components used by each test."""
-        super().setUp()
+        super(SendActivationEmailTestCase, self).setUp()
         self.student = UserFactory()
 
         registration = Registration()
@@ -32,19 +33,15 @@ class SendActivationEmailTestCase(TestCase):
         """
         Tests that attributes of the message are being filled correctly in compose_activation_email
         """
-        # Check that variables used by the base template are present in generated context
-        assert 'platform_name' in self.msg.context
-        assert 'contact_mailing_address' in self.msg.context
-        # Verify the presence of the activation-email specific attributes
-        assert self.msg.recipient.lms_user_id == self.student.id
-        assert self.msg.recipient.email_address == self.student.email
-        assert self.msg.context['routed_user'] == self.student.username
-        assert self.msg.context['routed_user_email'] == self.student.email
-        assert self.msg.context['routed_profile_name'] == ''
+        self.assertEqual(self.msg.recipient.username, self.student.username)
+        self.assertEqual(self.msg.recipient.email_address, self.student.email)
+        self.assertEqual(self.msg.context['routed_user'], self.student.username)
+        self.assertEqual(self.msg.context['routed_user_email'], self.student.email)
+        self.assertEqual(self.msg.context['routed_profile_name'], '')
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
     @mock.patch('common.djangoapps.student.tasks.log')
-    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))  # lint-amnesty, pylint: disable=line-too-long
+    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))
     def test_RetrySendUntilFail(self, mock_log):
         """
         Tests retries when the activation email doesn't send
@@ -62,7 +59,7 @@ class SendActivationEmailTestCase(TestCase):
                     attempt=attempt,
                     max_attempts=email_max_attempts
                 ))
-        assert mock_log.info.call_count == 6
+        self.assertEqual(mock_log.info.call_count, 6)
 
         # Asserts that the error was logged on crossing max retry attempts.
         mock_log.error.assert_called_with(
@@ -71,7 +68,7 @@ class SendActivationEmailTestCase(TestCase):
             self.student.email,
             exc_info=True
         )
-        assert mock_log.error.call_count == 1
+        self.assertEqual(mock_log.error.call_count, 1)
 
     @mock.patch('common.djangoapps.student.tasks.log')
     @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
@@ -91,6 +88,6 @@ class SendActivationEmailTestCase(TestCase):
         )
 
         # Assert that nothing else was logged
-        assert mock_log.info.call_count == 0
-        assert mock_log.error.call_count == 0
-        assert mock_log.exception.call_count == 1
+        self.assertEqual(mock_log.info.call_count, 0)
+        self.assertEqual(mock_log.error.call_count, 0)
+        self.assertEqual(mock_log.exception.call_count, 1)

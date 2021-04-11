@@ -22,7 +22,7 @@ class MobileContextProcessorTests(TestCase):
         request = RequestFactory().get('/')
         request.META['HTTP_USER_AGENT'] = settings.MOBILE_APP_USER_AGENT_REGEXES[0]
         context = is_from_mobile_app(request)
-        assert context['is_from_mobile_app'] is True
+        self.assertEqual(context['is_from_mobile_app'], True)
 
     def test_not_is_from_mobile_app(self):
         """
@@ -31,4 +31,4 @@ class MobileContextProcessorTests(TestCase):
         request = RequestFactory().get('/')
         request.META['HTTP_USER_AGENT'] = "Not from the mobile app"
         context = is_from_mobile_app(request)
-        assert context['is_from_mobile_app'] is False
+        self.assertEqual(context['is_from_mobile_app'], False)

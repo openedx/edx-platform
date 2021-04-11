@@ -1,7 +1,8 @@
 """
 Tests for the plugin API
 """
-import pytest
+
+
 from django.test import TestCase
 from edx_django_utils.plugins import PluginError
 
@@ -18,7 +19,7 @@ class TestCourseTabApi(TestCase):
         Verify that get_plugin works as expected.
         """
         tab_type = CourseTabPluginManager.get_plugin("instructor")
-        assert tab_type.title == 'Instructor'
+        self.assertEqual(tab_type.title, "Instructor")
 
-        with pytest.raises(PluginError):
+        with self.assertRaises(PluginError):
             CourseTabPluginManager.get_plugin("no_such_type")

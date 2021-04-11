@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Python API for language and translation management. """
 
 
@@ -78,7 +79,7 @@ def all_languages():
         alphabetically.
 
     """
-    languages = [(lang[0], _(lang[1])) for lang in settings.ALL_LANGUAGES]  # lint-amnesty, pylint: disable=translation-of-non-string
+    languages = [(lang[0], _(lang[1])) for lang in settings.ALL_LANGUAGES]
     return sorted(languages, key=lambda lang: lang[1])
 
 

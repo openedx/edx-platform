@@ -7,18 +7,20 @@ Tests for UserPartitionTransformer.
 import string
 from collections import namedtuple
 from datetime import datetime
-from unittest.mock import patch
 
 import ddt
+import six
+from six.moves import range
+from mock import patch
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.course_groups.views import link_cohort_to_partition_group
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import create_content_gating_partition
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -27,7 +29,7 @@ from ..user_partitions import UserPartitionTransformer, _MergedGroupAccess
 from .helpers import CourseStructureTestCase, update_block
 
 
-class UserPartitionTestMixin:
+class UserPartitionTestMixin(object):
     """
     Helper Mixin for testing user partitions.
     """
@@ -40,15 +42,15 @@ class UserPartitionTestMixin:
         # Set up groups
         self.groups = []
         for group_num in range(1, num_groups + 1):
-            self.groups.append(Group(group_num, 'Group ' + str(group_num)))
+            self.groups.append(Group(group_num, 'Group ' + six.text_type(group_num)))
 
         # Set up user partitions
         self.user_partitions = []
         for user_partition_num in range(1, num_user_partitions + 1):
             user_partition = UserPartition(
                 id=user_partition_num,
-                name='Partition ' + str(user_partition_num),
-                description='This is partition ' + str(user_partition_num),
+                name='Partition ' + six.text_type(user_partition_num),
+                description='This is partition ' + six.text_type(user_partition_num),
                 groups=self.groups,
                 scheme=CohortPartitionScheme,
                 active=active,
@@ -241,7 +243,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
             return_value=partition
         ), patch(
             'lms.djangoapps.course_blocks.transformers.user_partitions._MergedGroupAccess.get_allowed_groups',
-            return_value={51: set()}
+            return_value={51: set([])}
         ):
             trans_block_structure = get_course_blocks(
                 self.user,
@@ -250,7 +252,7 @@ class UserPartitionTransformerTestCase(UserPartitionTestMixin, CourseStructureTe
             )
             xblocks_denial_reason = [trans_block_structure.get_xblock_field(b, 'authorization_denial_reason')
                                      for b in trans_block_structure.get_block_keys()]
-            self.assertSetEqual(set(xblocks_denial_reason), {'Feature-based Enrollments'})
+            self.assertSetEqual(set(xblocks_denial_reason), set([u'Feature-based Enrollments']))
 
     def test_transform_on_inactive_partition(self):
         """
@@ -285,7 +287,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         Setup course structure and create user for user partition
         transformer test.
         """
-        super().setUp()
+        super(MergedGroupAccessTestData, self).setUp()
 
         # Set up multiple user partitions and groups.
         self.setup_groups_partitions(num_user_partitions=3)
@@ -470,10 +472,13 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
         merged_group_access = _MergedGroupAccess(self.user_partitions, block, merged_parents_list)
 
         # convert group_id to groups in user_partition_groups parameter
-        for partition_id, group_id in user_partition_groups.items():
+        for partition_id, group_id in six.iteritems(user_partition_groups):
             user_partition_groups[partition_id] = self.groups[group_id - 1]
 
-        assert merged_group_access.check_group_access(user_partition_groups) == expected_access
+        self.assertEqual(
+            merged_group_access.check_group_access(user_partition_groups),
+            expected_access,
+        )
 
     @ddt.data(
         ([None], None),
@@ -488,4 +493,7 @@ class MergedGroupAccessTestData(UserPartitionTestMixin, CourseStructureTestCase)
     )
     @ddt.unpack
     def test_intersection_method(self, input_value, expected_result):
-        assert _MergedGroupAccess._intersection(*input_value) == expected_result
+        self.assertEqual(
+            _MergedGroupAccess._intersection(*input_value),
+            expected_result,
+        )

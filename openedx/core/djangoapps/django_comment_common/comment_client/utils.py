@@ -6,6 +6,7 @@ import logging
 from uuid import uuid4
 
 import requests
+import six
 from django.utils.translation import get_language
 
 from .settings import SERVICE_HOST as COMMENTS_SERVICE
@@ -14,13 +15,13 @@ log = logging.getLogger(__name__)
 
 
 def strip_none(dic):
-    return {k: v for k, v in dic.items() if v is not None}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+    return dict([(k, v) for k, v in six.iteritems(dic) if v is not None])
 
 
 def strip_blank(dic):
     def _is_blank(v):
         return isinstance(v, str) and len(v.strip()) == 0
-    return {k: v for k, v in dic.items() if not _is_blank(v)}  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+    return dict([(k, v) for k, v in six.iteritems(dic) if not _is_blank(v)])
 
 
 def extract(dic, keys):
@@ -42,9 +43,9 @@ def perform_request(method, url, data_or_params=None, raw=False,
     if metric_tags is None:
         metric_tags = []
 
-    metric_tags.append(f'method:{method}')
+    metric_tags.append(u'method:{}'.format(method))
     if metric_action:
-        metric_tags.append(f'action:{metric_action}')
+        metric_tags.append(u'action:{}'.format(metric_action))
 
     if data_or_params is None:
         data_or_params = {}
@@ -71,14 +72,14 @@ def perform_request(method, url, data_or_params=None, raw=False,
         timeout=config.connection_timeout
     )
 
-    metric_tags.append(f'status_code:{response.status_code}')
+    metric_tags.append(u'status_code:{}'.format(response.status_code))
     status_code = int(response.status_code)
     if status_code > 200:
-        metric_tags.append('result:failure')
+        metric_tags.append(u'result:failure')
     else:
-        metric_tags.append('result:success')
+        metric_tags.append(u'result:success')
 
-    if 200 < status_code < 500:  # lint-amnesty, pylint: disable=no-else-raise
+    if 200 < status_code < 500:
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
     elif status_code == 503:
@@ -92,8 +93,8 @@ def perform_request(method, url, data_or_params=None, raw=False,
             try:
                 data = response.json()
             except ValueError:
-                raise CommentClientError(  # lint-amnesty, pylint: disable=raise-missing-from
-                    "Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
+                raise CommentClientError(
+                    u"Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
                         request_id=request_id,
                         content=response.text[:100]
                     )
@@ -107,7 +108,7 @@ class CommentClientError(Exception):
 
 class CommentClientRequestError(CommentClientError):
     def __init__(self, msg, status_codes=400):
-        super().__init__(msg)
+        super(CommentClientRequestError, self).__init__(msg)
         self.status_code = status_codes
 
 
@@ -119,7 +120,7 @@ class CommentClientMaintenanceError(CommentClientError):
     pass
 
 
-class CommentClientPaginatedResult:
+class CommentClientPaginatedResult(object):
     """ class for paginated results returned from comment services"""
 
     def __init__(self, collection, page, num_pages, thread_count=0, corrected_text=None):
@@ -154,4 +155,4 @@ def check_forum_heartbeat():
         else:
             return 'forum', False, res.get('check', 'Forum heartbeat failed')
     except Exception as fail:
-        return 'forum', False, str(fail)
+        return 'forum', False, six.text_type(fail)

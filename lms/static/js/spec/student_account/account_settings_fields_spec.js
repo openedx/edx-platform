@@ -95,7 +95,7 @@ define(['backbone',
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    '/api/user/v1/preferences/time_zones/?country_code=GY'
+                    '/user_api/v1/preferences/time_zones/?country_code=GY'
                 );
                 AjaxHelpers.respondWithJson(requests, [
                     {time_zone: 'America/Guyana', description: 'America/Guyana (ECT, UTC-0500)'},

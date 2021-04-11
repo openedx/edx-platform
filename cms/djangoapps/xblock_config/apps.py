@@ -13,8 +13,8 @@ class XBlockConfig(AppConfig):
     """
     Default configuration for the "xblock_config" Django application.
     """
-    name = 'cms.djangoapps.xblock_config'
-    verbose_name = 'XBlock Configuration'
+    name = u'cms.djangoapps.xblock_config'
+    verbose_name = u'XBlock Configuration'
 
     def ready(self):
         from openedx.core.lib.xblock_utils import xblock_local_resource_url

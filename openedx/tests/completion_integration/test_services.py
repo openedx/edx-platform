@@ -80,7 +80,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         cls.problems = [cls.problem, cls.problem2, cls.problem3, cls.problem4, cls.problem5]
 
     def setUp(self):
-        super(CompletionServiceTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(CompletionServiceTestCase, self).setUp()
         self.override_waffle_switch(True)
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()
@@ -140,19 +140,27 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
     def test_completion_service(self):
         # Only the completions for the user and course specified for the CompletionService
         # are returned.  Values are returned for all keys provided.
-        assert self.completion_service.get_completions(self.block_keys) == {
-            self.block_keys[0]: 1.0, self.block_keys[1]: 0.8,
-            self.block_keys[2]: 0.6, self.block_keys[3]: 0.0,
-            self.block_keys[4]: 0.0
-        }
+        self.assertEqual(
+            self.completion_service.get_completions(self.block_keys),
+            {
+                self.block_keys[0]: 1.0,
+                self.block_keys[1]: 0.8,
+                self.block_keys[2]: 0.6,
+                self.block_keys[3]: 0.0,
+                self.block_keys[4]: 0.0
+            },
+        )
 
     @ddt.data(True, False)
     def test_enabled_honors_waffle_switch(self, enabled):
         self.override_waffle_switch(enabled)
-        assert self.completion_service.completion_tracking_enabled() == enabled
+        self.assertEqual(self.completion_service.completion_tracking_enabled(), enabled)
 
     def test_vertical_completion(self):
-        assert self.completion_service.vertical_is_complete(self.vertical) is False
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            False,
+        )
 
         for block_key in self.block_keys:
             BlockCompletion.objects.submit_completion(
@@ -161,7 +169,10 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 completion=1.0
             )
 
-        assert self.completion_service.vertical_is_complete(self.vertical) is True
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            True,
+        )
 
     def test_vertical_partial_completion(self):
         block_keys_count = len(self.block_keys)
@@ -173,16 +184,19 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 completion=1.0
             )
 
-        assert self.completion_service.vertical_is_complete(self.vertical) is False
+        self.assertEqual(
+            self.completion_service.vertical_is_complete(self.vertical),
+            False,
+        )
 
     def test_can_mark_block_complete_on_view(self):
 
-        assert self.completion_service.can_mark_block_complete_on_view(self.course) is False
-        assert self.completion_service.can_mark_block_complete_on_view(self.chapter) is False
-        assert self.completion_service.can_mark_block_complete_on_view(self.sequence) is False
-        assert self.completion_service.can_mark_block_complete_on_view(self.vertical) is False
-        assert self.completion_service.can_mark_block_complete_on_view(self.html) is True
-        assert self.completion_service.can_mark_block_complete_on_view(self.problem) is False
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.course), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.chapter), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.sequence), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.vertical), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.html), True)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.problem), False)
 
     def test_vertical_completion_with_library_content(self):
         library = LibraryFactory.create(modulestore=self.store)
@@ -209,13 +223,13 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # This is needed so we can call get_child_descriptors
         self._bind_course_module(library_content_block)
         # Make sure the runtime knows that the block's children vary per-user:
-        assert library_content_block.has_dynamic_children()
-        assert len(library_content_block.children) == 3
+        self.assertTrue(library_content_block.has_dynamic_children())
+        self.assertEqual(len(library_content_block.children), 3)
         # Check how many children each user will see:
-        assert len(library_content_block.get_child_descriptors()) == 1
+        self.assertEqual(len(library_content_block.get_child_descriptors()), 1)
 
         # No problems are complete yet
-        assert not self.completion_service.vertical_is_complete(lib_vertical)
+        self.assertFalse(self.completion_service.vertical_is_complete(lib_vertical))
 
         for block_key in self.block_keys:
             BlockCompletion.objects.submit_completion(
@@ -224,7 +238,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 completion=1.0
             )
         # Library content problems aren't complete yet
-        assert not self.completion_service.vertical_is_complete(lib_vertical)
+        self.assertFalse(self.completion_service.vertical_is_complete(lib_vertical))
 
         for child in library_content_block.get_child_descriptors():
             BlockCompletion.objects.submit_completion(
@@ -232,7 +246,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 block_key=child.scope_ids.usage_id,
                 completion=1.0
             )
-        assert self.completion_service.vertical_is_complete(lib_vertical)
+        self.assertTrue(self.completion_service.vertical_is_complete(lib_vertical))
 
     def test_vertical_completion_with_nested_children(self):
         parent_vertical = ItemFactory(parent=self.sequence, category='vertical')
@@ -241,7 +255,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         parent_vertical = self.store.get_item(parent_vertical.location)
 
         # Nothing is complete
-        assert not self.completion_service.vertical_is_complete(parent_vertical)
+        self.assertFalse(self.completion_service.vertical_is_complete(parent_vertical))
 
         for block_key in self.block_keys:
             BlockCompletion.objects.submit_completion(
@@ -250,11 +264,11 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 completion=1.0
             )
         # The nested child isn't complete yet
-        assert not self.completion_service.vertical_is_complete(parent_vertical)
+        self.assertFalse(self.completion_service.vertical_is_complete(parent_vertical))
 
         BlockCompletion.objects.submit_completion(
             user=self.user,
             block_key=problem.location,
             completion=1.0
         )
-        assert self.completion_service.vertical_is_complete(parent_vertical)
+        self.assertTrue(self.completion_service.vertical_is_complete(parent_vertical))

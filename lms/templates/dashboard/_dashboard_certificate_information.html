@@ -89,29 +89,29 @@ else:
                 </span>
               </li>
             % elif cert_status['status'] == 'downloadable' and cert_status.get('show_cert_web_view', False):
-              <li>
-                <a class="btn btn-primary" href="${cert_status['cert_web_view_url']}" rel="noopener" target="_blank"
+              <li class="action action-certificate">
+                <a class="btn" href="${cert_status['cert_web_view_url']}" rel="noopener" target="_blank"
                    title="${_('This link will open the certificate web view')}">
                   ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}
                 </a>
               </li>
             % elif cert_status['status'] == 'downloadable' and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
-              <li>
-                <a class="btn btn-primary" href="${cert_status['download_url']}"
+              <li class="action action-certificate">
+                <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document')}">
                   ${_("Download {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}
                 </a>
               </li>
             % elif cert_status['status'] == 'downloadable' and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
-              <li>
-                <a class="btn btn-primary" href="${cert_status['download_url']}"
+              <li class="action">
+                <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document')}">
                   ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}
                 </a>
               </li>
             % elif cert_status['status'] == 'downloadable' and enrollment.mode in CourseMode.VERIFIED_MODES:
-              <li>
-                <a class="btn btn-primary" href="${cert_status['download_url']}"
+              <li class="action">
+                <a class="btn" href="${cert_status['download_url']}"
                    title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
                   ${_("Download Your ID Verified {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}
                 </a>

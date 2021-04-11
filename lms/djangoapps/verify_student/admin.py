@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 Admin site configurations for verify_student.
 """
@@ -6,11 +7,8 @@ Admin site configurations for verify_student.
 from django.contrib import admin
 
 from lms.djangoapps.verify_student.models import (
-    ManualVerification,
-    SoftwareSecurePhotoVerification,
-    SSOVerification,
-    SSPVerificationRetryConfig
-)
+    ManualVerification, SoftwareSecurePhotoVerification, SSOVerification,
+    SSPVerificationRetryConfig)
 
 
 @admin.register(SoftwareSecurePhotoVerification)
@@ -49,4 +47,4 @@ class SSPVerificationRetryAdmin(admin.ModelAdmin):
     """
     Admin for the SSPVerificationRetryConfig table.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

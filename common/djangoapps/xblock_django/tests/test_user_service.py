@@ -2,7 +2,7 @@
 Tests for the DjangoXBlockUserService.
 """
 
-import pytest
+
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -26,7 +26,7 @@ class UserServiceTestCase(TestCase):
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
-        super().setUp()
+        super(UserServiceTestCase, self).setUp()
         self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         set_user_preference(self.user, 'pref-lang', 'en')
@@ -38,21 +38,26 @@ class UserServiceTestCase(TestCase):
         """
         A set of assertions for an anonymous XBlockUser.
         """
-        assert not xb_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED]
-        assert xb_user.full_name is None
+        self.assertFalse(xb_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED])
+        self.assertIsNone(xb_user.full_name)
         self.assertListEqual(xb_user.emails, [])
 
     def assert_xblock_user_matches_django(self, xb_user, dj_user):
         """
         A set of assertions for comparing a XBlockUser to a django User
         """
-        assert xb_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED]
-        assert xb_user.emails[0] == dj_user.email
-        assert xb_user.full_name == dj_user.profile.name
-        assert xb_user.opt_attrs[ATTR_KEY_USERNAME] == dj_user.username
-        assert xb_user.opt_attrs[ATTR_KEY_USER_ID] == dj_user.id
-        assert not xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF]
-        assert all((pref in USER_PREFERENCES_WHITE_LIST) for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES])
+        self.assertTrue(xb_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED])
+        self.assertEqual(xb_user.emails[0], dj_user.email)
+        self.assertEqual(xb_user.full_name, dj_user.profile.name)
+        self.assertEqual(xb_user.opt_attrs[ATTR_KEY_USERNAME], dj_user.username)
+        self.assertEqual(xb_user.opt_attrs[ATTR_KEY_USER_ID], dj_user.id)
+        self.assertFalse(xb_user.opt_attrs[ATTR_KEY_USER_IS_STAFF])
+        self.assertTrue(
+            all(
+                pref in USER_PREFERENCES_WHITE_LIST
+                for pref in xb_user.opt_attrs[ATTR_KEY_USER_PREFERENCES]
+            )
+        )
 
     def test_convert_anon_user(self):
         """
@@ -60,7 +65,7 @@ class UserServiceTestCase(TestCase):
         """
         django_user_service = DjangoXBlockUserService(self.anon_user)
         xb_user = django_user_service.get_current_user()
-        assert xb_user.is_current_user
+        self.assertTrue(xb_user.is_current_user)
         self.assert_is_anon_xb_user(xb_user)
 
     def test_convert_authenticate_user(self):
@@ -69,7 +74,7 @@ class UserServiceTestCase(TestCase):
         """
         django_user_service = DjangoXBlockUserService(self.user)
         xb_user = django_user_service.get_current_user()
-        assert xb_user.is_current_user
+        self.assertTrue(xb_user.is_current_user)
         self.assert_xblock_user_matches_django(xb_user, self.user)
 
     def test_get_anonymous_user_id_returns_none_for_non_staff_users(self):
@@ -82,7 +87,7 @@ class UserServiceTestCase(TestCase):
             username=self.user.username,
             course_id='edx/toy/2012_Fall'
         )
-        assert anonymous_user_id is None
+        self.assertIsNone(anonymous_user_id)
 
     def test_get_anonymous_user_id_returns_none_for_non_existing_users(self):
         """
@@ -91,7 +96,7 @@ class UserServiceTestCase(TestCase):
         django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
 
         anonymous_user_id = django_user_service.get_anonymous_user_id(username="No User", course_id='edx/toy/2012_Fall')
-        assert anonymous_user_id is None
+        self.assertIsNone(anonymous_user_id)
 
     def test_get_anonymous_user_id_returns_id_for_existing_users(self):
         """
@@ -100,7 +105,8 @@ class UserServiceTestCase(TestCase):
         course_key = CourseKey.from_string('edX/toy/2012_Fall')
         anon_user_id = anonymous_id_for_user(
             user=self.user,
-            course_id=course_key
+            course_id=course_key,
+            save=True
         )
 
         django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
@@ -109,7 +115,7 @@ class UserServiceTestCase(TestCase):
             course_id='edX/toy/2012_Fall'
         )
 
-        assert anonymous_user_id == anon_user_id
+        self.assertEqual(anonymous_user_id, anon_user_id)
 
     def test_external_id(self):
         """
@@ -121,5 +127,5 @@ class UserServiceTestCase(TestCase):
         ext_id1 = django_user_service.get_external_user_id('test1')
         ext_id2 = django_user_service.get_external_user_id('test2')
         assert ext_id1 != ext_id2
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             django_user_service.get_external_user_id('unknown')

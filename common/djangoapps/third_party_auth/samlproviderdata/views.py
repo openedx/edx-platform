@@ -17,7 +17,7 @@ from ..models import SAMLProviderConfig, SAMLProviderData
 from .serializers import SAMLProviderDataSerializer
 
 
-class SAMLProviderDataMixin:
+class SAMLProviderDataMixin(object):
     authentication_classes = [JwtAuthentication, SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SAMLProviderDataSerializer
@@ -57,7 +57,7 @@ class SAMLProviderDataViewSet(PermissionRequiredMixin, SAMLProviderDataMixin, vi
             saml_provider = SAMLProviderConfig.objects.current_set().get(
                 slug=convert_saml_slug_provider_id(enterprise_customer_idp.provider_id))
         except SAMLProviderConfig.DoesNotExist:
-            raise Http404('No matching SAML provider found.')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404('No matching SAML provider found.')
         return SAMLProviderData.objects.filter(entity_id=saml_provider.entity_id)
 
     @property

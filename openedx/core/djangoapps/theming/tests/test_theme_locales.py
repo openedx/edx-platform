@@ -20,10 +20,10 @@ class TestComprehensiveThemeLocale(TestCase):
         """
         test comprehensive theming paths in settings.
         """
-        assert settings.REPO_ROOT / 'themes/conf/locale' in settings.LOCALE_PATHS
+        self.assertIn(settings.REPO_ROOT / 'themes/conf/locale', settings.LOCALE_PATHS)
 
     def test_theme_locale_path_exist(self):
         """
         test comprehensive theming directory path exist.
         """
-        assert os.path.exists(settings.REPO_ROOT / 'themes/conf/locale')
+        self.assertTrue(os.path.exists(settings.REPO_ROOT / "themes/conf/locale"))

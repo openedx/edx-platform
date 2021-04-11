@@ -6,6 +6,6 @@ class InvalidAccessPoint(Exception):
 
     def __init__(self, access_point, *args, **kwargs):
         msg = (
-            "Access point '{access_point}' should be either 'enrollment' or 'courseware'"
+            u"Access point '{access_point}' should be either 'enrollment' or 'courseware'"
         ).format(access_point=access_point)
-        super().__init__(msg, *args, **kwargs)
+        super(InvalidAccessPoint, self).__init__(msg, *args, **kwargs)

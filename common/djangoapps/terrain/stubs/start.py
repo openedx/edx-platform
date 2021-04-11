@@ -47,7 +47,7 @@ def get_args():
     config_dict = _parse_config_args(sys.argv[3:])
 
     if service_name not in SERVICES:
-        print("Unrecognized service '{}'.  Valid choices are: {}".format(
+        print("Unrecognized service '{0}'.  Valid choices are: {1}".format(
             service_name, ", ".join(list(SERVICES.keys()))))
         sys.exit(1)
 
@@ -57,7 +57,7 @@ def get_args():
             raise ValueError
 
     except ValueError:
-        print(f"Port '{port_num}' must be a positive integer")
+        print("Port '{0}' must be a positive integer".format(port_num))
         sys.exit(1)
 
     return service_name, port_num, config_dict
@@ -78,8 +78,8 @@ def _parse_config_args(args):
             if len(components) >= 2:
                 config_dict[components[0]] = "=".join(components[1:])
 
-        except:  # lint-amnesty, pylint: disable=bare-except
-            print(f"Warning: could not interpret config value '{config_str}'")
+        except:
+            print("Warning: could not interpret config value '{0}'".format(config_str))
 
     return config_dict
 
@@ -89,7 +89,7 @@ def main():
     Start a server; shut down on keyboard interrupt signal.
     """
     service_name, port_num, config_dict = get_args()
-    print(f"Starting stub service '{service_name}' on port {port_num}...")
+    print("Starting stub service '{0}' on port {1}...".format(service_name, port_num))
 
     server = SERVICES[service_name](port_num=port_num)
     server.config.update(config_dict)

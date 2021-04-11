@@ -14,7 +14,7 @@ class CertificatesConfig(AppConfig):
     """
     Application Configuration for Certificates.
     """
-    name = 'lms.djangoapps.certificates'
+    name = u'lms.djangoapps.certificates'
 
     def ready(self):
         """
@@ -22,7 +22,7 @@ class CertificatesConfig(AppConfig):
         """
         # Can't import models at module level in AppConfigs, and models get
         # included from the signal handlers
-        from lms.djangoapps.certificates import signals  # pylint: disable=unused-import
+        from . import signals  # pylint: disable=unused-import
         if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
-            from lms.djangoapps.certificates.services import CertificateService
+            from .services import CertificateService
             set_runtime_service('certificates', CertificateService())

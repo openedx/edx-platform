@@ -8,6 +8,7 @@ import textwrap
 from abc import ABCMeta, abstractmethod
 
 import ddt
+import six
 from bok_choy.promise import BrokenPromise
 
 from capa.tests.response_xml_factory import (
@@ -48,7 +49,7 @@ class ProblemTypeTestBaseMeta(ABCMeta):
         ]
 
         for required_attr in required_attrs:
-            msg = ('{} is a required attribute for {}').format(
+            msg = (u'{} is a required attribute for {}').format(
                 required_attr, str(cls)
             )
 
@@ -56,12 +57,12 @@ class ProblemTypeTestBaseMeta(ABCMeta):
                 if obj.__getattribute__(required_attr) is None:
                     raise NotImplementedError(msg)
             except AttributeError:
-                raise NotImplementedError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
+                raise NotImplementedError(msg)
 
         return obj
 
 
-class ProblemTypeTestBase(ProblemsTest, EventsTestMixin, metaclass=ProblemTypeTestBaseMeta):
+class ProblemTypeTestBase(six.with_metaclass(ProblemTypeTestBaseMeta, ProblemsTest, EventsTestMixin)):
     """
     Base class for testing assesment problem types in bok choy.
 
@@ -95,7 +96,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin, metaclass=ProblemTypeTe
         """
         Visits courseware_page and defines self.problem_page.
         """
-        super().setUp()
+        super(ProblemTypeTestBase, self).setUp()
         self.courseware_page.visit()
         self.problem_page = ProblemPage(self.browser)
 
@@ -122,7 +123,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin, metaclass=ProblemTypeTe
         Args:
             status: one of ("correct", "incorrect", "unanswered", "submitted")
         """
-        msg = f"Wait for status to be {status}"
+        msg = u"Wait for status to be {}".format(status)
         selector = ', '.join(self.status_indicators[status])
         self.problem_page.wait_for_element_visibility(selector, msg)
 
@@ -153,7 +154,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin, metaclass=ProblemTypeTe
         raise NotImplementedError()
 
 
-class ProblemTypeA11yTestMixin:
+class ProblemTypeA11yTestMixin(object):
     """
     Shared a11y tests for all problem types.
     """
@@ -214,7 +215,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
         """
         Additional setup for AnnotationProblemTypeBase
         """
-        super().setUp(*args, **kwargs)
+        super(AnnotationProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -237,7 +238,7 @@ class AnnotationProblemTypeBase(ProblemTypeTestBase):
 
         self.problem_page.q(css='div.problem textarea.comment').fill(answer)
         self.problem_page.q(
-            css='div.problem span.tag'
+            css='div.problem span.tag'.format(choice=choice)
         ).nth(choice).click()
 
 
@@ -246,7 +247,7 @@ class AnnotationProblemTypeTest(AnnotationProblemTypeBase, ProblemTypeA11yTestMi
     Standard tests for the Annotation Problem Type
     """
     shard = 20
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class CheckboxProblemTypeBase(ProblemTypeTestBase):
@@ -444,7 +445,7 @@ class RadioProblemTypeTest(RadioProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the Multiple Radio Problem Type
     """
     shard = 24
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class RadioProblemTypeTestNonRandomized(RadioProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -499,7 +500,7 @@ class DropdownProblemTypeTest(DropDownProblemTypeBase, ProblemTypeA11yTestMixin)
     Standard tests for the Dropdown Problem Type
     """
     shard = 8
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @ddt.ddt
@@ -568,7 +569,7 @@ class StringProblemTypeBase(ProblemTypeTestBase):
         Answer string problem.
         """
         textvalue = 'correct string' if correctness == 'correct' else 'incorrect string'
-        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(textvalue)
 
 
 class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -576,7 +577,7 @@ class StringProblemTypeTest(StringProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the String Problem Type
     """
     shard = 8
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class NumericalProblemTypeBase(ProblemTypeTestBase):
@@ -632,7 +633,7 @@ class NumericalProblemTypeBase(ProblemTypeTestBase):
             textvalue = 'notNum'
         else:
             textvalue = str(random.randint(-2, 2))
-        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(textvalue)
 
 
 @ddt.ddt
@@ -712,7 +713,7 @@ class FormulaProblemTypeBase(ProblemTypeTestBase):
         Answer formula problem.
         """
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
-        self.problem_page.fill_answer(textvalue)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(textvalue)
 
 
 @ddt.ddt
@@ -780,8 +781,8 @@ class ScriptProblemTypeBase(ProblemTypeTestBase):
         if not correctness == 'correct':
             second_addend += random.randint(1, 10)
 
-        self.problem_page.fill_answer(first_addend, input_num=0)  # lint-amnesty, pylint: disable=no-member
-        self.problem_page.fill_answer(second_addend, input_num=1)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(first_addend, input_num=0)
+        self.problem_page.fill_answer(second_addend, input_num=1)
 
 
 @ddt.ddt
@@ -790,7 +791,7 @@ class ScriptProblemTypeTest(ScriptProblemTypeBase, ProblemTypeA11yTestMixin):
     Standard tests for the Script Problem Type
     """
     shard = 20
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class ScriptProblemTypeTestNonRandomized(ScriptProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -870,7 +871,7 @@ class CodeProblemTypeBase(ProblemTypeTestBase):
         # (there's not <textarea> we can just fill text into)
         # For this reason, we submit the initial code in the response
         # (configured in the problem XML above)
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
 
 class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -884,7 +885,7 @@ class CodeProblemTypeTest(CodeProblemTypeBase, ProblemTypeA11yTestMixin):
         Overridden for script test because the testing grader always responds
         with "correct"
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
 
 class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
@@ -901,7 +902,7 @@ class ChoiceTextProblemTypeTestBase(ProblemTypeTestBase):
         Selects the nth (where n == input_num) choice of the problem.
         """
         self.problem_page.q(
-            css=f'div.problem input.ctinput[type="{self.choice_type}"]'
+            css=u'div.problem input.ctinput[type="{}"]'.format(self.choice_type)
         ).nth(input_num).click()
 
     def _fill_input_text(self, value, input_num):
@@ -973,7 +974,7 @@ class RadioTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for RadioTextProblemTypeBase
         """
-        super().setUp(*args, **kwargs)
+        super(RadioTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -990,7 +991,7 @@ class RadioTextProblemTypeTest(RadioTextProblemTypeBase, ProblemTypeA11yTestMixi
     Standard tests for the Radio Text Problem Type
     """
     shard = 8
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class RadioTextProblemTypeTestNonRandomized(RadioTextProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -1036,7 +1037,7 @@ class CheckboxTextProblemTypeBase(ChoiceTextProblemTypeTestBase):
         """
         Additional setup for CheckboxTextProblemTypeBase
         """
-        super().setUp(*args, **kwargs)
+        super(CheckboxTextProblemTypeBase, self).setUp(*args, **kwargs)
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
@@ -1051,7 +1052,7 @@ class CheckboxTextProblemTypeTest(CheckboxTextProblemTypeBase, ProblemTypeA11yTe
     """
     Standard tests for the Checkbox Text Problem Type
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class CheckboxTextProblemTypeTestNonRandomized(CheckboxTextProblemTypeBase, ProblemTypeA11yTestMixin):
@@ -1099,11 +1100,11 @@ class SymbolicProblemTypeBase(ProblemTypeTestBase):
         Answer symbolic problem.
         """
         choice = "2*x+3*y" if correctness == 'correct' else "3*a+4*b"
-        self.problem_page.fill_answer(choice)  # lint-amnesty, pylint: disable=no-member
+        self.problem_page.fill_answer(choice)
 
 
 class SymbolicProblemTypeTest(SymbolicProblemTypeBase, ProblemTypeA11yTestMixin):
     """
     Standard tests for the Symbolic Problem Type
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

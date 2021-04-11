@@ -30,8 +30,8 @@ class FormatHtmlTest(unittest.TestCase):
     )
     def test_simple(self, before_after):
         (before, after) = before_after
-        assert six.text_type(Text(_(before))) == after  # pylint: disable=translation-of-non-string
-        assert six.text_type(Text(before)) == after
+        self.assertEqual(six.text_type(Text(_(before))), after)  # pylint: disable=translation-of-non-string
+        self.assertEqual(six.text_type(Text(before)), after)
 
     def test_formatting(self):
         # The whole point of this function is to make sure this works:
@@ -39,7 +39,10 @@ class FormatHtmlTest(unittest.TestCase):
             start=HTML("<a href='http://edx.org'>"),
             end=HTML("</a>"),
         )
-        assert six.text_type(out) == u"Point &amp; click <a href='http://edx.org'>here</a>!"
+        self.assertEqual(
+            six.text_type(out),
+            u"Point &amp; click <a href='http://edx.org'>here</a>!",
+        )
 
     def test_nested_formatting(self):
         # Sometimes, you have plain text, with html inserted, and the html has
@@ -48,7 +51,10 @@ class FormatHtmlTest(unittest.TestCase):
             start=HTML(u"<a href='mailto:{email}'>").format(email="A&B"),
             end=HTML("</a>"),
         )
-        assert six.text_type(out) == u"Send <a href='mailto:A&amp;B'>email</a>"
+        self.assertEqual(
+            six.text_type(out),
+            u"Send <a href='mailto:A&amp;B'>email</a>",
+        )
 
     def test_mako(self):
         # The default_filters used here have to match the ones in edxmako.
@@ -64,12 +70,12 @@ class FormatHtmlTest(unittest.TestCase):
             default_filters=['decode.utf8', 'h'],
         )
         out = template.render()
-        assert out.strip() == u'A &amp; B & C'
+        self.assertEqual(out.strip(), u"A &amp; B & C")
 
     def test_ungettext(self):
         for i in [1, 2]:
             out = Text(ungettext(u"1 & {}", u"2 & {}", i)).format(HTML(u"<>"))
-            assert out == u'{} &amp; <>'.format(i)
+            self.assertEqual(out, u"{} &amp; <>".format(i))
 
     def test_strip_all_tags_but_br_filter(self):
         """ Verify filter removes every tags except br """
@@ -84,8 +90,8 @@ class FormatHtmlTest(unittest.TestCase):
         )
         rendered_template = template.render()
 
-        assert '<br>' in rendered_template
-        assert '<script>' not in rendered_template
+        self.assertIn('<br>', rendered_template)
+        self.assertNotIn('<script>', rendered_template)
 
     def test_strip_all_tags_but_br_returns_html(self):
         """
@@ -94,7 +100,7 @@ class FormatHtmlTest(unittest.TestCase):
 
         html = strip_all_tags_but_br('{name}<br><script>')
         html = html.format(name='Rock & Roll')
-        assert six.text_type(html) == u'Rock &amp; Roll<br>'
+        self.assertEqual(six.text_type(html), u'Rock &amp; Roll<br>')
 
     def test_clean_dengers_html_filter(self):
         """ Verify filter removes expected tags """
@@ -143,19 +149,19 @@ class FormatHtmlTest(unittest.TestCase):
         rendered_template = template.render()
         html_soup = BeautifulSoup(rendered_template, 'html.parser')
 
-        assert html_soup.find('a')
-        assert html_soup.find('div')
-        assert html_soup.find('div', attrs={'style': 'display: none'})
-        assert html_soup.find('p')
-        assert html_soup.find('img')
+        self.assertTrue(html_soup.find('a'))
+        self.assertTrue(html_soup.find('div'))
+        self.assertTrue(html_soup.find('div', attrs={'style': 'display: none'}))
+        self.assertTrue(html_soup.find('p'))
+        self.assertTrue(html_soup.find('img'))
 
-        assert not html_soup.find('a', attrs={'onclick': 'evil_function()'})
-        assert not html_soup.find('html')
-        assert not html_soup.find('head')
-        assert not html_soup.find('script')
-        assert not html_soup.find('style')
-        assert not html_soup.find('link')
-        assert not html_soup.find('iframe')
-        assert not html_soup.find('form')
-        assert not html_soup.find('blink')
-        assert not html_soup.find('object')
+        self.assertFalse(html_soup.find('a', attrs={'onclick': 'evil_function()'}))
+        self.assertFalse(html_soup.find('html'))
+        self.assertFalse(html_soup.find('head'))
+        self.assertFalse(html_soup.find('script'))
+        self.assertFalse(html_soup.find('style'))
+        self.assertFalse(html_soup.find('link'))
+        self.assertFalse(html_soup.find('iframe'))
+        self.assertFalse(html_soup.find('form'))
+        self.assertFalse(html_soup.find('blink'))
+        self.assertFalse(html_soup.find('object'))

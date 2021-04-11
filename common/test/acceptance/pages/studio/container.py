@@ -22,16 +22,16 @@ class ContainerPage(PageObject, HelpMixin):
     ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
 
     def __init__(self, browser, locator):
-        super().__init__(browser)
+        super(ContainerPage, self).__init__(browser)
         self.locator = locator
 
     @property
     def url(self):
         """URL to the container page for an xblock."""
-        return f"{BASE_URL}/container/{self.locator}"
+        return u"{}/container/{}".format(BASE_URL, self.locator)
 
     @property
-    def name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def name(self):
         titles = self.q(css=self.NAME_SELECTOR).text
         if titles:
             return titles[0]
@@ -40,7 +40,7 @@ class ContainerPage(PageObject, HelpMixin):
 
     def is_browser_on_page(self):
         def _xblock_count(class_name, request_token):
-            return len(self.q(css='{body_selector} .xblock.{class_name}[data-request-token="{request_token}"]'.format(
+            return len(self.q(css=u'{body_selector} .xblock.{class_name}[data-request-token="{request_token}"]'.format(
                 body_selector=XBlockWrapper.BODY_SELECTOR, class_name=class_name, request_token=request_token
             )).results)
 
@@ -51,7 +51,7 @@ class ContainerPage(PageObject, HelpMixin):
             if len(data_request_elements) > 0:
                 request_token = data_request_elements.first.attrs('data-request-token')[0]
                 # Then find the number of Studio xblock wrappers on the page with that request token.
-                num_wrappers = len(self.q(css=f'{XBlockWrapper.BODY_SELECTOR} [data-request-token="{request_token}"]').results)  # lint-amnesty, pylint: disable=line-too-long
+                num_wrappers = len(self.q(css=u'{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
                 # Wait until all components have been loaded and marked as either initialized or failed.
                 # See:
                 #   - common/static/js/xblock/core.js which adds the class "xblock-initialized"
@@ -159,9 +159,9 @@ class ContainerPage(PageObject, HelpMixin):
         if not warnings.is_present():
             return False
         warning_text = warnings.first.text[0]
-        return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."  # lint-amnesty, pylint: disable=line-too-long
+        return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."
 
-    def shows_inherited_staff_lock(self, parent_type=None, parent_name=None):  # lint-amnesty, pylint: disable=unused-argument
+    def shows_inherited_staff_lock(self, parent_type=None, parent_name=None):
         """
         Returns True if the unit inherits staff lock from a section or subsection.
         """
@@ -187,14 +187,14 @@ class ContainerPage(PageObject, HelpMixin):
         Publishes the container.
         """
         self.scroll_to_element('.action-publish')
-        click_css(self, '.action-publish', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+        click_css(self, '.action-publish', 0, require_notification=False)
 
     def discard_changes(self):
         """
         Discards draft changes (which will then re-render the page).
         """
         self.scroll_to_element('a.action-discard')
-        click_css(self, 'a.action-discard', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+        click_css(self, 'a.action-discard', 0, require_notification=False)
         confirm_prompt(self)
         self.wait_for_ajax()
 
@@ -237,7 +237,7 @@ class ContainerPage(PageObject, HelpMixin):
         if not was_locked_initially:
             self.q(css='a.action-staff-lock').first.click()
         else:
-            click_css(self, 'a.action-staff-lock', 0, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+            click_css(self, 'a.action-staff-lock', 0, require_notification=False)
             if not inherits_staff_lock:
                 confirm_prompt(self)
         self.wait_for_ajax()
@@ -299,7 +299,7 @@ class ContainerPage(PageObject, HelpMixin):
         The index of the first item is 0.
         """
         # Click the delete button
-        click_css(self, '.delete-button', source_index, require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+        click_css(self, '.delete-button', source_index, require_notification=False)
         # Click the confirmation dialog button
         confirm_prompt(self)
 
@@ -324,7 +324,7 @@ class ContainerPage(PageObject, HelpMixin):
             text = self.q(css='#page-alert .alert.confirmation #alert-confirmation-title').text
             return text and message not in text[0] if verify_hidden else text and message in text[0]
 
-        self.wait_for(_verify_message, description='confirmation message {status}'.format(
+        self.wait_for(_verify_message, description=u'confirmation message {status}'.format(
             status='hidden' if verify_hidden else 'present'
         ))
 
@@ -338,7 +338,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Click take me there link.
         """
-        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)
 
     def add_missing_groups(self):
         """
@@ -389,8 +389,8 @@ class ContainerPage(PageObject, HelpMixin):
         Returns:
             list
         """
-        self.q(css=f'.add-xblock-component-button[data-type={category_type}]').first.click()
-        return self.q(css=f'.{category_type}-type-tabs>li>a').text
+        self.q(css='.add-xblock-component-button[data-type={}]'.format(category_type)).first.click()
+        return self.q(css='.{}-type-tabs>li>a'.format(category_type)).text
 
     def get_category_tab_components(self, category_type, tab_index):
         """
@@ -403,7 +403,7 @@ class ContainerPage(PageObject, HelpMixin):
         Returns:
             list
         """
-        css = '#tab{tab_index} button[data-category={category_type}] span'.format(
+        css = u'#tab{tab_index} button[data-category={category_type}] span'.format(
             tab_index=tab_index,
             category_type=category_type
         )
@@ -433,17 +433,17 @@ class XBlockWrapper(PageObject):
     }
 
     def __init__(self, browser, locator):
-        super().__init__(browser)
+        super(XBlockWrapper, self).__init__(browser)
         self.locator = locator
 
     def is_browser_on_page(self):
-        return self.q(css=f'{self.BODY_SELECTOR}[data-locator="{self.locator}"]').present
+        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
 
     def _bounded_selector(self, selector):
         """
         Return `selector`, but limited to this particular `CourseOutlineChild` context
         """
-        return '{}[data-locator="{}"] {}'.format(
+        return u'{}[data-locator="{}"] {}'.format(
             self.BODY_SELECTOR,
             self.locator,
             selector
@@ -465,7 +465,7 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('.xblock-author_view'))[0].text
 
     @property
-    def name(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def name(self):
         titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
             return titles[0]
@@ -495,7 +495,7 @@ class XBlockWrapper(PageObject):
 
     def _validation_paragraph(self, css_class):
         """ Helper method to return the <p> element of a validation warning """
-        return self.q(css=self._bounded_selector(f'{self.VALIDATION_SELECTOR} p.{css_class}'))
+        return self.q(css=self._bounded_selector(u'{} p.{}'.format(self.VALIDATION_SELECTOR, css_class)))
 
     @property
     def has_validation_warning(self):
@@ -524,7 +524,7 @@ class XBlockWrapper(PageObject):
 
     @property
     def validation_error_messages(self):
-        return self.q(css=self._bounded_selector(f'{self.VALIDATION_SELECTOR} .xblock-message-item.error')).text
+        return self.q(css=self._bounded_selector('{} .xblock-message-item.error'.format(self.VALIDATION_SELECTOR))).text
 
     @property
     def validation_not_configured_warning_text(self):
@@ -618,7 +618,7 @@ class XBlockWrapper(PageObject):
         """
         Opens the move modal.
         """
-        click_css(self, '.move-button', require_notification=False)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+        click_css(self, '.move-button', require_notification=False)
         self.wait_for(
             lambda: self.q(css='.modal-window.move-modal').visible, description='move modal is visible'
         )
@@ -627,7 +627,7 @@ class XBlockWrapper(PageObject):
         """
         If editing, set the value of a field.
         """
-        selector = f'{self.editor_selector} li.field label:contains("{field_display_name}") + input'
+        selector = u'{} li.field label:contains("{}") + input'.format(self.editor_selector, field_display_name)
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, field_value)
 
@@ -635,7 +635,7 @@ class XBlockWrapper(PageObject):
         """
         If editing, reset the value of a field to its default.
         """
-        scope = f'{self.editor_selector} li.field label:contains("{field_display_name}")'
+        scope = u'{} li.field label:contains("{}")'.format(self.editor_selector, field_display_name)
         script = "$(arguments[0]).siblings('.setting-clear').click();"
         self.browser.execute_script(script, scope)
 
@@ -643,18 +643,18 @@ class XBlockWrapper(PageObject):
         """
         Set the text of a CodeMirror editor that is part of this xblock's settings.
         """
-        type_in_codemirror(self, index, text, find_prefix=f'$("{self.editor_selector}").find')
+        type_in_codemirror(self, index, text, find_prefix=u'$("{}").find'.format(self.editor_selector))
 
     def set_license(self, license_type):
         """
         Uses the UI to set the course's license to the given license_type (str)
         """
         css_selector = (
-            "ul.license-types li[data-license={license_type}] button"
+            u"ul.license-types li[data-license={license_type}] button"
         ).format(license_type=license_type)
         self.wait_for_element_presence(
             css_selector,
-            f"{license_type} button is present"
+            u"{license_type} button is present".format(license_type=license_type)
         )
         self.q(css=css_selector).click()
 
@@ -666,7 +666,7 @@ class XBlockWrapper(PageObject):
 
     @property
     def editor_selector(self):
-        return '.xblock-studio_view'
+        return u'.xblock-studio_view'
 
     def _click_button(self, button_name):
         """

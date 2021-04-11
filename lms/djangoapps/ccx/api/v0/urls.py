@@ -12,7 +12,7 @@ CCX_COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN.replace('course_id', 'ccx_cou
 
 CCX_URLS = ([
     url(r'^$', views.CCXListView.as_view(), name='list'),
-    url(fr'^{CCX_COURSE_ID_PATTERN}/?$', views.CCXDetailView.as_view(), name='detail'),
+    url(r'^{}/?$'.format(CCX_COURSE_ID_PATTERN), views.CCXDetailView.as_view(), name='detail'),
 ], 'ccx')
 
 app_name = 'v0'

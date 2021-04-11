@@ -6,8 +6,10 @@ Tests for split_migrator
 
 import random
 import uuid
-from unittest import mock
 
+import mock
+import six
+from six.moves import range, zip
 from xblock.fields import UNIQUE_ID, Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.lib.tests import attr
@@ -22,10 +24,10 @@ class TestMigration(SplitWMongoCourseBootstrapper):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestMigration, self).setUp()
         self.migrator = SplitMigrator(self.split_mongo, self.draft_mongo)
 
-    def _create_course(self):  # lint-amnesty, pylint: disable=arguments-differ
+    def _create_course(self):
         """
         A course testing all of the conversion mechanisms:
         * some inheritable settings
@@ -33,7 +35,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         only the live ones get to published. Some are only draft, some are both, some are only live.
         * about, static_tab, and conditional documents
         """
-        super()._create_course(split=False)
+        super(TestMigration, self)._create_course(split=False)
 
         # chapters
         chapter1_name = uuid.uuid4().hex
@@ -52,7 +54,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # vertical in both live and draft
         both_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            both_vert_loc.block_type, both_vert_loc.block_id, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
+            both_vert_loc.block_type, both_vert_loc.block_id, {}, {'display_name': 'Both vertical'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
         self.create_random_units(False, both_vert_loc)
@@ -63,13 +65,13 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # vertical in draft only (x2)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
+            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical'}, 'chapter', chapter1_name,
             draft=True, split=False
         )
         self.create_random_units(True, draft_vert_loc)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical2'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
+            draft_vert_loc.block_type, draft_vert_loc.block_id, {}, {'display_name': 'Draft vertical2'}, 'chapter', chapter1_name,
             draft=True, split=False
         )
         self.create_random_units(True, draft_vert_loc)
@@ -77,7 +79,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
         # and finally one in live only (so published has to skip 2 preceding sibs)
         live_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
         self._create_item(
-            live_vert_loc.block_type, live_vert_loc.block_id, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,  # lint-amnesty, pylint: disable=line-too-long
+            live_vert_loc.block_type, live_vert_loc.block_id, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
         self.create_random_units(False, live_vert_loc)
@@ -149,7 +151,7 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 draft=draft, split=False
             )
 
-    def compare_courses(self, presplit, new_course_key, published):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def compare_courses(self, presplit, new_course_key, published):
         # descend via children to do comparison
         old_root = presplit.get_course(self.old_course_key)
         new_root = self.split_mongo.get_course(new_course_key)
@@ -161,11 +163,11 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 locator = new_course_key.make_usage_key(category, conditional.location.block_id)
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
 
-    def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):
         if split_dag_root.category != 'course':
-            assert presplit_dag_root.location.block_id == split_dag_root.location.block_id
+            self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
         # compare all fields but references
-        for name, field in presplit_dag_root.fields.items():
+        for name, field in six.iteritems(presplit_dag_root.fields):
             # fields generated from UNIQUE_IDs are unique to an XBlock's scope,
             # so if such a field is unset on an XBlock, we don't expect it
             # to persist across courses
@@ -174,11 +176,23 @@ class TestMigration(SplitWMongoCourseBootstrapper):
                 field_generated_from_unique_id or isinstance(field, (Reference, ReferenceList, ReferenceValueDict))
             )
             if should_check_field:
-                assert getattr(presplit_dag_root, name) == getattr(split_dag_root, name), f'{split_dag_root.location}/{name}: {getattr(presplit_dag_root, name)} != {getattr(split_dag_root, name)}'  # pylint: disable=line-too-long
+                self.assertEqual(
+                    getattr(presplit_dag_root, name),
+                    getattr(split_dag_root, name),
+                    u"{}/{}: {} != {}".format(
+                        split_dag_root.location, name, getattr(presplit_dag_root, name), getattr(split_dag_root, name)
+                    )
+                )
 
         # compare children
         if presplit_dag_root.has_children:
-            assert len(presplit_dag_root.get_children()) == len(split_dag_root.children), f"{presplit_dag_root.category} '{presplit_dag_root.display_name}': children  {presplit_dag_root.children} != {split_dag_root.children}"  # pylint: disable=line-too-long
+            self.assertEqual(
+                # need get_children to filter out drafts
+                len(presplit_dag_root.get_children()), len(split_dag_root.children),
+                u"{0.category} '{0.display_name}': children  {1} != {2}".format(
+                    presplit_dag_root, presplit_dag_root.children, split_dag_root.children
+                )
+            )
             for pre_child, split_child in zip(presplit_dag_root.get_children(), split_dag_root.get_children()):
                 self.compare_dags(presplit, pre_child, split_child, published)
 

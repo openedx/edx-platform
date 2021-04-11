@@ -11,7 +11,7 @@ class FormTestMixin(object):
         thereof) according to expected_valid
         """
         form = self.FORM_CLASS(self.form_data, initial=getattr(self, 'initial', None))
-        assert form.is_valid() == expected_valid
+        self.assertEqual(form.is_valid(), expected_valid)
         return form
 
     def assert_error(self, expected_field, expected_message):
@@ -21,7 +21,7 @@ class FormTestMixin(object):
         message
         """
         form = self.get_form(expected_valid=False)
-        assert form.errors == {expected_field: [expected_message]}
+        self.assertEqual(form.errors, {expected_field: [expected_message]})
 
     def assert_valid(self, expected_cleaned_data):
         """
@@ -36,4 +36,4 @@ class FormTestMixin(object):
         that the given field in the cleaned data has the expected value
         """
         form = self.get_form(expected_valid=True)
-        assert form.cleaned_data[field] == expected_value
+        self.assertEqual(form.cleaned_data[field], expected_value)

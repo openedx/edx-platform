@@ -9,12 +9,12 @@ import os
 
 from django.conf import settings
 from django.core.files import File
-from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from path import Path as path
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from six import text_type
 from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore.storage import course_import_export_storage
@@ -35,7 +35,7 @@ class CourseImportExportViewMixin(DeveloperErrorViewMixin):
         """
         Ensures that the user is authenticated (e.g. not an AnonymousUser)
         """
-        super().perform_authentication(request)
+        super(CourseImportExportViewMixin, self).perform_authentication(request)
         if request.user.is_anonymous:
             raise AuthenticationFailed
 
@@ -113,8 +113,6 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         Kicks off an asynchronous course import and returns an ID to be used to check
         the task's status
         """
-        set_custom_attribute('course_import_init', True)
-        set_custom_attributes_for_course_key(course_key)
         try:
             if 'course_data' not in request.FILES:
                 raise self.api_error(
@@ -137,23 +135,23 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             if not course_dir.isdir():
                 os.mkdir(course_dir)
 
-            log.debug(f'importing course to {temp_filepath}')
+            log.debug(u'importing course to {0}'.format(temp_filepath))
             with open(temp_filepath, "wb+") as temp_file:
                 for chunk in request.FILES['course_data'].chunks():
                     temp_file.write(chunk)
 
-            log.info("Course import %s: Upload complete", course_key)
+            log.info(u"Course import %s: Upload complete", course_key)
             with open(temp_filepath, 'rb') as local_file:
                 django_file = File(local_file)
-                storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
+                storage_path = course_import_export_storage.save(u'olx_import/' + filename, django_file)
 
             async_result = import_olx.delay(
-                request.user.id, str(course_key), storage_path, filename, request.LANGUAGE_CODE)
+                request.user.id, text_type(course_key), storage_path, filename, request.LANGUAGE_CODE)
             return Response({
                 'task_id': async_result.task_id
             })
         except Exception as e:
-            log.exception(f'Course import {course_key}: Unknown error in import')
+            log.exception(str(e))
             raise self.api_error(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 developer_message=str(e),
@@ -168,7 +166,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         try:
             task_id = request.GET['task_id']
             filename = request.GET['filename']
-            args = {'course_key_string': str(course_key), 'archive_name': filename}
+            args = {u'course_key_string': str(course_key), u'archive_name': filename}
             name = CourseImportTask.generate_name(args)
             task_status = UserTaskStatus.objects.filter(name=name, task_id=task_id).first()
             return Response({

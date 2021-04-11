@@ -35,7 +35,7 @@ class BaseVisitor(ast.NodeVisitor):
             results: A file results objects to which violations will be added.
 
         """
-        super().__init__()
+        super(BaseVisitor, self).__init__()
         self.file_contents = file_contents
         self.lines = StringLines(self.file_contents)
         self.results = results
@@ -98,7 +98,7 @@ class HtmlStringVisitor(BaseVisitor):
             skip_wrapped_html: True if visitor should skip strings wrapped with
                 HTML() or Text(), and False otherwise.
         """
-        super().__init__(file_contents, results)
+        super(HtmlStringVisitor, self).__init__(file_contents, results)
         self.skip_wrapped_html = skip_wrapped_html
         self.unsafe_html_string_nodes = []
         self.over_escaped_entity_string_nodes = []
@@ -150,7 +150,7 @@ class ContainsFormatVisitor(BaseVisitor):
             results: A file results objects to which violations will be added.
 
         """
-        super().__init__(file_contents, results)
+        super(ContainsFormatVisitor, self).__init__(file_contents, results)
         self.contains_format_call = False
 
     def visit_Attribute(self, node):
@@ -185,7 +185,7 @@ class FormatInterpolateVisitor(BaseVisitor):
             results: A file results objects to which violations will be added.
 
         """
-        super().__init__(file_contents, results)
+        super(FormatInterpolateVisitor, self).__init__(file_contents, results)
         self.interpolates_text_or_html = False
         self.format_caller_node = None
 
@@ -223,7 +223,7 @@ class FormatInterpolateVisitor(BaseVisitor):
         """
         if self.interpolates_text_or_html is False:
             if self.format_caller_node is not node:
-                super().generic_visit(node)
+                super(FormatInterpolateVisitor, self).generic_visit(node)
 
 
 class OuterFormatVisitor(BaseVisitor):

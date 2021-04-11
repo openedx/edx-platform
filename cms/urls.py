@@ -13,7 +13,6 @@ from ratelimitbackend import admin
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
-from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.apidocs import api_info
@@ -89,89 +88,88 @@ urlpatterns = [
     url(r'^howitworks$', contentstore_views.howitworks, name='howitworks'),
     url(r'^signin_redirect_to_lms$', contentstore_views.login_redirect_to_lms, name='login_redirect_to_lms'),
     url(r'^request_course_creator$', contentstore_views.request_course_creator, name='request_course_creator'),
-    url(fr'^course_team/{COURSELIKE_KEY_PATTERN}(?:/(?P<email>.+))?$',
+    url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
         contentstore_views.course_team_handler, name='course_team_handler'),
-    url(fr'^course_info/{settings.COURSE_KEY_PATTERN}$', contentstore_views.course_info_handler,
+    url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.course_info_handler,
         name='course_info_handler'),
-    url(fr'^course_info_update/{settings.COURSE_KEY_PATTERN}/(?P<provided_id>\d+)?$',
+    url(r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.course_info_update_handler, name='course_info_update_handler'
         ),
     url(r'^home/?$', contentstore_views.course_listing, name='home'),
-    url(r'^home_library/?$', contentstore_views.library_listing, name='home_library'),
-    url(fr'^course/{settings.COURSE_KEY_PATTERN}/search_reindex?$',
+    url(r'^course/{}/search_reindex?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.course_search_index_handler,
         name='course_search_index_handler'
         ),
-    url(fr'^course/{settings.COURSE_KEY_PATTERN}?$', contentstore_views.course_handler, name='course_handler'),
+    url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.course_handler, name='course_handler'),
 
-    url(fr'^checklists/{settings.COURSE_KEY_PATTERN}?$',
+    url(r'^checklists/{}?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.checklists_handler,
         name='checklists_handler'),
 
-    url(fr'^course_notifications/{settings.COURSE_KEY_PATTERN}/(?P<action_state_id>\d+)?$',
+    url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.course_notifications_handler,
         name='course_notifications_handler'),
-    url(fr'^course_rerun/{settings.COURSE_KEY_PATTERN}$', contentstore_views.course_rerun_handler,
+    url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.course_rerun_handler,
         name='course_rerun_handler'),
-    url(fr'^container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_handler,
+    url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), contentstore_views.container_handler,
         name='container_handler'),
-    url(fr'^orphan/{settings.COURSE_KEY_PATTERN}$', contentstore_views.orphan_handler,
+    url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.orphan_handler,
         name='orphan_handler'),
-    url(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
+    url(r'^assets/{}/{}?$'.format(settings.COURSE_KEY_PATTERN, settings.ASSET_KEY_PATTERN),
         contentstore_views.assets_handler,
         name='assets_handler'),
-    url(fr'^import/{COURSELIKE_KEY_PATTERN}$', contentstore_views.import_handler,
+    url(r'^import/{}$'.format(COURSELIKE_KEY_PATTERN), contentstore_views.import_handler,
         name='import_handler'),
-    url(fr'^import_status/{COURSELIKE_KEY_PATTERN}/(?P<filename>.+)$',
+    url(r'^import_status/{}/(?P<filename>.+)$'.format(COURSELIKE_KEY_PATTERN),
         contentstore_views.import_status_handler, name='import_status_handler'),
     # rest api for course import/export
     url(r'^api/courses/',
         include('cms.djangoapps.contentstore.api.urls', namespace='courses_api')
         ),
-    url(fr'^export/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_handler,
+    url(r'^export/{}$'.format(COURSELIKE_KEY_PATTERN), contentstore_views.export_handler,
         name='export_handler'),
-    url(fr'^export_output/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_output_handler,
+    url(r'^export_output/{}$'.format(COURSELIKE_KEY_PATTERN), contentstore_views.export_output_handler,
         name='export_output_handler'),
-    url(fr'^export_status/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_status_handler,
+    url(r'^export_status/{}$'.format(COURSELIKE_KEY_PATTERN), contentstore_views.export_status_handler,
         name='export_status_handler'),
-    url(fr'^xblock/outline/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_outline_handler,
+    url(r'^xblock/outline/{}$'.format(settings.USAGE_KEY_PATTERN), contentstore_views.xblock_outline_handler,
         name='xblock_outline_handler'),
-    url(fr'^xblock/container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_container_handler,
+    url(r'^xblock/container/{}$'.format(settings.USAGE_KEY_PATTERN), contentstore_views.xblock_container_handler,
         name='xblock_container_handler'),
-    url(fr'^xblock/{settings.USAGE_KEY_PATTERN}/(?P<view_name>[^/]+)$', contentstore_views.xblock_view_handler,
+    url(r'^xblock/{}/(?P<view_name>[^/]+)$'.format(settings.USAGE_KEY_PATTERN), contentstore_views.xblock_view_handler,
         name='xblock_view_handler'),
-    url(fr'^xblock/{settings.USAGE_KEY_PATTERN}?$', contentstore_views.xblock_handler,
+    url(r'^xblock/{}?$'.format(settings.USAGE_KEY_PATTERN), contentstore_views.xblock_handler,
         name='xblock_handler'),
-    url(fr'^tabs/{settings.COURSE_KEY_PATTERN}$', contentstore_views.tabs_handler,
+    url(r'^tabs/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.tabs_handler,
         name='tabs_handler'),
-    url(fr'^settings/details/{settings.COURSE_KEY_PATTERN}$', contentstore_views.settings_handler,
+    url(r'^settings/details/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.settings_handler,
         name='settings_handler'),
-    url(fr'^settings/grading/{settings.COURSE_KEY_PATTERN}(/)?(?P<grader_index>\d+)?$',
+    url(r'^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.grading_handler, name='grading_handler'),
-    url(fr'^settings/advanced/{settings.COURSE_KEY_PATTERN}$', contentstore_views.advanced_settings_handler,
+    url(r'^settings/advanced/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.advanced_settings_handler,
         name='advanced_settings_handler'),
-    url(fr'^textbooks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.textbooks_list_handler,
+    url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), contentstore_views.textbooks_list_handler,
         name='textbooks_list_handler'),
-    url(fr'^textbooks/{settings.COURSE_KEY_PATTERN}/(?P<textbook_id>\d[^/]*)$',
+    url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.textbooks_detail_handler, name='textbooks_detail_handler'),
-    url(fr'^videos/{settings.COURSE_KEY_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
+    url(r'^videos/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.videos_handler, name='videos_handler'),
-    url(fr'^generate_video_upload_link/{settings.COURSE_KEY_PATTERN}',
+    url(r'^generate_video_upload_link/{}'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.generate_video_upload_link_handler, name='generate_video_upload_link'),
-    url(fr'^video_images/{settings.COURSE_KEY_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
+    url(r'^video_images/{}(?:/(?P<edx_video_id>[-\w]+))?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.video_images_handler, name='video_images_handler'),
-    url(fr'^transcript_preferences/{settings.COURSE_KEY_PATTERN}$',
+    url(r'^transcript_preferences/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
-    url(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',
+    url(r'^transcript_credentials/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.transcript_credentials_handler, name='transcript_credentials_handler'),
     url(r'^transcript_download/$', contentstore_views.transcript_download_handler, name='transcript_download_handler'),
     url(r'^transcript_upload/$', contentstore_views.transcript_upload_handler, name='transcript_upload_handler'),
     url(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
         settings.COURSE_KEY_PATTERN
     ), contentstore_views.transcript_delete_handler, name='transcript_delete_handler'),
-    url(fr'^video_encodings_download/{settings.COURSE_KEY_PATTERN}$',
+    url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.video_encodings_download, name='video_encodings_download'),
-    url(fr'^group_configurations/{settings.COURSE_KEY_PATTERN}$',
+    url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore_views.group_configurations_list_handler,
         name='group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
@@ -206,15 +204,15 @@ urlpatterns += [
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
     urlpatterns += [
-        url(fr'^library/{LIBRARY_KEY_PATTERN}?$',
+        url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),
             contentstore_views.library_handler, name='library_handler'),
-        url(fr'^library/{LIBRARY_KEY_PATTERN}/team/$',
+        url(r'^library/{}/team/$'.format(LIBRARY_KEY_PATTERN),
             contentstore_views.manage_library_users, name='manage_library_users'),
     ]
 
-if toggles.EXPORT_GIT.is_enabled():
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += [
-        url(fr'^export_git/{settings.COURSE_KEY_PATTERN}$',
+        url(r'^export_git/{}$'.format(settings.COURSE_KEY_PATTERN),
             contentstore_views.export_git,
             name='export_git')
     ]
@@ -231,7 +229,7 @@ urlpatterns.append(url(r'^admin/', admin.site.urls))
 
 # enable entrance exams
 if core_toggles.ENTRANCE_EXAMS.is_enabled():
-    urlpatterns.append(url(fr'^course/{settings.COURSE_KEY_PATTERN}/entrance_exam/?$',
+    urlpatterns.append(url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN),
                        contentstore_views.entrance_exam))
 
 # Enable Web/HTML Certificates
@@ -244,14 +242,14 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     )
 
     urlpatterns += [
-        url(fr'^certificates/activation/{settings.COURSE_KEY_PATTERN}/',
+        url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
             certificate_activation_handler,
             name='certificate_activation_handler'),
         url(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
             settings.COURSE_KEY_PATTERN), signatory_detail_handler, name='signatory_detail_handler'),
-        url(fr'^certificates/{settings.COURSE_KEY_PATTERN}/(?P<certificate_id>\d+)?$',
+        url(r'^certificates/{}/(?P<certificate_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
             certificates_detail_handler, name='certificates_detail_handler'),
-        url(fr'^certificates/{settings.COURSE_KEY_PATTERN}$',
+        url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
             certificates_list_handler, name='certificates_list_handler')
     ]
 

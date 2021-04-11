@@ -21,8 +21,9 @@ from django.utils.translation import get_language, to_locale
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
 from edx_django_utils.monitoring.utils import increment
-from ipware.ip import get_client_ip
+from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price
@@ -63,11 +64,11 @@ class ChooseModeView(View):
         atomic() block is active, since that would break atomicity.
 
         """
-        return super().dispatch(*args, **kwargs)
+        return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
-    def get(self, request, course_id, error=None):  # lint-amnesty, pylint: disable=too-many-statements
+    def get(self, request, course_id, error=None):
         """Displays the course mode choice page.
 
         Args:
@@ -89,7 +90,7 @@ class ChooseModeView(View):
         embargo_redirect = embargo_api.redirect_if_blocked(
             course_key,
             user=request.user,
-            ip_address=get_client_ip(request)[0],
+            ip_address=get_ip(request),
             url=request.path
         )
         if embargo_redirect:
@@ -111,7 +112,8 @@ class ChooseModeView(View):
         has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             purchase_workflow = request.GET.get("purchase_workflow", "single")
-            redirect_url = IDVerificationService.get_verify_location(course_id=course_key)
+            verify_url = IDVerificationService.get_verify_location('verify_student_start_flow', course_id=course_key)
+            redirect_url = "{url}?purchase_workflow={workflow}".format(url=verify_url, workflow=purchase_workflow)
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if purchase_workflow == "single" and professional_mode.sku:
@@ -135,13 +137,13 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(str(course_key), None)
+        chosen_price = donation_for_course.get(six.text_type(course_key), None)
 
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
             params = six.moves.urllib.parse.urlencode({'course_closed': enrollment_end_date})
-            return redirect('{}?{}'.format(reverse('dashboard'), params))
+            return redirect('{0}?{1}'.format(reverse('dashboard'), params))
 
         # When a credit mode is available, students will be given the option
         # to upgrade from a verified mode to a credit mode at the end of the course.
@@ -155,7 +157,7 @@ class ChooseModeView(View):
             CourseMode.is_credit_mode(mode) for mode
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
-        course_id = str(course_key)
+        course_id = text_type(course_key)
 
         context = {
             "course_modes_choose_url": reverse(
@@ -306,10 +308,10 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[str(course_key)] = amount_value
+            donation_for_course[six.text_type(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
-            verify_url = IDVerificationService.get_verify_location(course_id=course_key)
+            verify_url = IDVerificationService.get_verify_location('verify_student_start_flow', course_id=course_key)
             return redirect(verify_url)
 
     def _get_requested_mode(self, request_dict):
@@ -357,16 +359,16 @@ def create_mode(request, course_id):
         Response
     """
     PARAMETERS = {
-        'mode_slug': 'honor',
-        'mode_display_name': 'Honor Code Certificate',
+        'mode_slug': u'honor',
+        'mode_display_name': u'Honor Code Certificate',
         'min_price': 0,
-        'suggested_prices': '',
-        'currency': 'usd',
+        'suggested_prices': u'',
+        'currency': u'usd',
         'sku': None,
     }
 
     # Try pulling querystring parameters out of the request
-    for parameter, default in PARAMETERS.items():
+    for parameter, default in six.iteritems(PARAMETERS):
         PARAMETERS[parameter] = request.GET.get(parameter, default)
 
     # Attempt to create the new mode for the given course

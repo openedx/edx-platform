@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for static asset files in Blockstore-based Content Libraries
 """
@@ -10,17 +11,17 @@ from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrarie
 # Binary data representing an SVG image file
 SVG_DATA = """<svg xmlns="http://www.w3.org/2000/svg" height="30" width="100">
   <text x="0" y="15" fill="red">SVG is 🔥</text>
-</svg>""".encode()
+</svg>""".encode('utf-8')
 
 # part of an .srt transcript file
-TRANSCRIPT_DATA = b"""1
+TRANSCRIPT_DATA = """1
 00:00:00,260 --> 00:00:01,510
 Welcome to edX.
 
 2
 00:00:01,510 --> 00:00:04,480
 I'm Anant Agarwal, I'm the president of edX,
-"""
+""".encode('utf-8')
 
 
 class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
@@ -46,7 +47,7 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         file_name = "image.svg"
 
         # A new block has no assets:
-        assert self._get_library_block_assets(block_id) == []
+        self.assertEqual(self._get_library_block_assets(block_id), [])
         self._get_library_block_asset(block_id, file_name, expect_response=404)
 
         # Upload an asset file
@@ -54,22 +55,22 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
 
         # Get metadata about the uploaded asset file
         metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
+        self.assertEqual(metadata["path"], file_name)
+        self.assertEqual(metadata["size"], len(SVG_DATA))
         asset_list = self._get_library_block_assets(block_id)
         # We don't just assert that 'asset_list == [metadata]' because that may
         # break in the future if the "get asset" view returns more detail than
         # the "list assets" view.
-        assert len(asset_list) == 1
-        assert asset_list[0]['path'] == metadata['path']
-        assert asset_list[0]['size'] == metadata['size']
-        assert asset_list[0]['url'] == metadata['url']
+        self.assertEqual(len(asset_list), 1)
+        self.assertEqual(asset_list[0]["path"], metadata["path"])
+        self.assertEqual(asset_list[0]["size"], metadata["size"])
+        self.assertEqual(asset_list[0]["url"], metadata["url"])
 
         # Download the file and check that it matches what was uploaded.
         # We need to download using requests since this is served by Blockstore,
         # which the django test client can't interact with.
         content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
+        self.assertEqual(content_get_result.content, SVG_DATA)
 
         # Set some OLX referencing this asset:
         self._set_library_block_olx(block_id, """
@@ -81,16 +82,16 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         # served differently by Blockstore and we should test that too.
         self._commit_library_changes(library["id"])
         metadata = self._get_library_block_asset(block_id, file_name)
-        assert metadata['path'] == file_name
-        assert metadata['size'] == len(SVG_DATA)
+        self.assertEqual(metadata["path"], file_name)
+        self.assertEqual(metadata["size"], len(SVG_DATA))
         # Download the file from the new URL:
         content_get_result = requests.get(metadata["url"])
-        assert content_get_result.content == SVG_DATA
+        self.assertEqual(content_get_result.content, SVG_DATA)
 
         # Check that the URL in the student_view gets rewritten:
         fragment = self._render_block_view(block_id, "student_view")
-        assert '/static/image.svg' not in fragment['content']
-        assert metadata['url'] in fragment['content']
+        self.assertNotIn("/static/image.svg", fragment["content"])
+        self.assertIn(metadata["url"], fragment["content"])
 
     def test_asset_filenames(self):
         """
@@ -104,14 +105,14 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         # Unicode names are allowed
         file_name = "🏕.svg"  # (camping).svg
         self._set_library_block_asset(block_id, file_name, SVG_DATA)
-        assert self._get_library_block_asset(block_id, file_name)['path'] == file_name
-        assert self._get_library_block_asset(block_id, file_name)['size'] == file_size
+        self.assertEqual(self._get_library_block_asset(block_id, file_name)["path"], file_name)
+        self.assertEqual(self._get_library_block_asset(block_id, file_name)["size"], file_size)
 
         # Subfolder names are allowed
         file_name = "transcripts/en.srt"
         self._set_library_block_asset(block_id, file_name, SVG_DATA)
-        assert self._get_library_block_asset(block_id, file_name)['path'] == file_name
-        assert self._get_library_block_asset(block_id, file_name)['size'] == file_size
+        self.assertEqual(self._get_library_block_asset(block_id, file_name)["path"], file_name)
+        self.assertEqual(self._get_library_block_asset(block_id, file_name)["size"], file_size)
 
         # '../' is definitely not allowed
         file_name = "../definition.xml"
@@ -147,8 +148,8 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
             """
             url = transcript_handler_url + 'translation/en'
             response = self.client.get(url)
-            assert response.status_code == 200
-            assert 'Welcome to edX' in response.content.decode('utf-8')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Welcome to edX", response.content.decode('utf-8'))
 
         def check_download():
             """
@@ -156,8 +157,8 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
             """
             url = transcript_handler_url + 'download'
             response = self.client.get(url)
-            assert response.status_code == 200
-            assert response.content == TRANSCRIPT_DATA
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content, TRANSCRIPT_DATA)
 
         check_sjson()
         check_download()

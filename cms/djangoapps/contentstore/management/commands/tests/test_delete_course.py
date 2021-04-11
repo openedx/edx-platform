@@ -3,8 +3,7 @@ Delete course tests.
 """
 
 
-from unittest import mock
-
+import mock
 from django.core.management import CommandError, call_command
 
 from common.djangoapps.student.roles import CourseInstructorRole

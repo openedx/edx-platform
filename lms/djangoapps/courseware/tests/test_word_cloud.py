@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Word cloud integration tests using mongo modulestore."""
 
 
@@ -62,7 +63,7 @@ class TestWordCloud(BaseTestXmodule):
 
             # We should compare top_words for manually,
             # because they are unsorted.
-            keys_to_compare = set(content.keys()).difference({'top_words'})
+            keys_to_compare = set(content.keys()).difference(set(['top_words']))
             self.assertDictEqual(
                 {k: content[k] for k in keys_to_compare},
                 {k: correct_jsons[username][k] for k in keys_to_compare})
@@ -85,20 +86,25 @@ class TestWordCloud(BaseTestXmodule):
         """
         users_state = self._get_users_state()
 
-        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state.items()
+                        ])),
+            'success')
 
         # correct initial data:
         correct_initial_data = {
-            'status': 'success',
-            'student_words': {},
-            'total_count': 0,
-            'submitted': False,
-            'top_words': {},
-            'display_student_percents': False
+            u'status': u'success',
+            u'student_words': {},
+            u'total_count': 0,
+            u'submitted': False,
+            u'top_words': {},
+            u'display_student_percents': False
         }
 
         for _, response_content in users_state.items():
-            assert response_content == correct_initial_data
+            self.assertEqual(response_content, correct_initial_data)
 
     def test_post_words(self):
         """Students can submit data succesfully.
@@ -112,29 +118,34 @@ class TestWordCloud(BaseTestXmodule):
         ]
 
         correct_words = [
-            "small",
-            "big",
-            "spaced",
-            "few words",
+            u"small",
+            u"big",
+            u"spaced",
+            u"few words",
         ]
 
         users_state = self._post_words(input_words)
 
-        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state.items()
+                        ])),
+            'success')
 
         correct_state = {}
         for index, user in enumerate(self.users):
 
             correct_state[user.username] = {
-                'status': 'success',
-                'submitted': True,
-                'display_student_percents': True,
-                'student_words': {word: 1 + index for word in correct_words},
-                'total_count': len(input_words) * (1 + index),
-                'top_words': [
+                u'status': u'success',
+                u'submitted': True,
+                u'display_student_percents': True,
+                u'student_words': {word: 1 + index for word in correct_words},
+                u'total_count': len(input_words) * (1 + index),
+                u'top_words': [
                     {
-                        'text': word, 'percent': 100 / len(input_words),
-                        'size': (1 + index)
+                        u'text': word, u'percent': 100 / len(input_words),
+                        u'size': (1 + index)
                     }
                     for word in correct_words
                 ]
@@ -163,13 +174,23 @@ class TestWordCloud(BaseTestXmodule):
         # 1.
         users_state = self._get_users_state()
 
-        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state.items()
+                        ])),
+            'success')
 
         # 2.
         # Invcemental state per user.
         users_state_after_post = self._post_words(['word1', 'word2'])
 
-        assert ''.join({content['status'] for (_, content) in users_state_after_post.items()}) == 'success'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state_after_post.items()
+                        ])),
+            'success')
 
         # Final state after all posts.
         users_state_before_fail = self._get_users_state()
@@ -178,19 +199,29 @@ class TestWordCloud(BaseTestXmodule):
         users_state_after_post = self._post_words(
             ['word1', 'word2', 'word3'])
 
-        assert ''.join({content['status'] for (_, content) in users_state_after_post.items()}) == 'fail'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state_after_post.items()
+                        ])),
+            'fail')
 
         # 4.
         current_users_state = self._get_users_state()
         self._check_response(users_state_before_fail, current_users_state)
 
     def test_unicode(self):
-        input_words = [" this is unicode Юникод"]
-        correct_words = ["this is unicode юникод"]
+        input_words = [u" this is unicode Юникод"]
+        correct_words = [u"this is unicode юникод"]
 
         users_state = self._post_words(input_words)
 
-        assert ''.join({content['status'] for (_, content) in users_state.items()}) == 'success'
+        self.assertEqual(
+            ''.join(set([
+                        content['status']
+                        for _, content in users_state.items()
+                        ])),
+            'success')
 
         for user in self.users:
             self.assertListEqual(
@@ -207,7 +238,7 @@ class TestWordCloud(BaseTestXmodule):
         }
 
         status_codes = {response.status_code for response in responses.values()}
-        assert status_codes.pop() == 200
+        self.assertEqual(status_codes.pop(), 200)
 
         for user in self.users:
             self.assertDictEqual(
@@ -233,4 +264,4 @@ class TestWordCloud(BaseTestXmodule):
             'submitted': False,  # default value,
         }
 
-        assert fragment.content == self.runtime.render_template('word_cloud.html', expected_context)
+        self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))

@@ -1,12 +1,13 @@
+# coding=utf-8
+
+
 import json
 import unittest
-from string import capwords
-from unittest.mock import Mock, patch
 
 import ddt
-import pytest
+import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core import mail
 from django.db import transaction
 from django.http import HttpResponse
@@ -14,44 +15,40 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from edx_toggles.toggles.testutils import override_waffle_flag
+from mock import Mock, patch
+from six import text_type
 
-from common.djangoapps.edxmako.shortcuts import marketing_link
-from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
-from common.djangoapps.student.emails import send_proctoring_requirements_email
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_string
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
+from openedx.core.lib.request_utils import safe_get_host
 from common.djangoapps.student.models import PendingEmailChange, Registration, UserProfile
 from common.djangoapps.student.tests.factories import PendingEmailChangeFactory, UserFactory
 from common.djangoapps.student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
+    generate_activation_email_context,
     validate_new_email
 )
 from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
-from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestException(Exception):
     """
     Exception used for testing that nothing will catch explicitly
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 def mock_render_to_string(template_name, context):
     """
     Return a string that encodes template_name and context
     """
-    return str((template_name, sorted(context.items())))
+    return str((template_name, sorted(six.iteritems(context))))
 
 
 def mock_render_to_response(template_name, context):
@@ -63,7 +60,7 @@ def mock_render_to_response(template_name, context):
     return HttpResponse(mock_render_to_string(template_name, context))
 
 
-class EmailTestMixin:
+class EmailTestMixin(object):
     """
     Adds useful assertions for testing `email_user`
     """
@@ -100,29 +97,29 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
     Test sending of the activation email.
     """
 
-    ACTIVATION_SUBJECT = f"Action Required: Activate your {settings.PLATFORM_NAME} account"
+    ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
         (
-            "Use the link below to activate your account to access engaging, "
-            "high-quality {platform_name} courses. Note that you will not be able to log back into your "
-            "account until you have activated it.".format(
+            u"Use the link below to activate your account to access engaging, "
+            u"high-quality {platform_name} courses. Note that you will not be able to log back into your "
+            u"account until you have activated it.".format(
                 platform_name=settings.PLATFORM_NAME
             )
         ),
-        f"{settings.LMS_ROOT_URL}/activate/",
-        "If you need help, please use our web form at ", (
+        u"{}/activate/".format(settings.LMS_ROOT_URL),
+        u"If you need help, please use our web form at ", (
             settings.ACTIVATION_EMAIL_SUPPORT_LINK or settings.SUPPORT_SITE_LINK
         ),
         settings.CONTACT_EMAIL,
-        "This email message was automatically sent by ",
+        u"This email message was automatically sent by ",
         settings.LMS_ROOT_URL,
-        " because someone attempted to create an account on {platform_name}".format(
+        u" because someone attempted to create an account on {platform_name}".format(
             platform_name=settings.PLATFORM_NAME
         ),
-        " using this email address."
+        u" using this email address."
     ]
 
     @ddt.data('plain_text', 'html')
@@ -150,16 +147,21 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
             'terms_of_service': True
         }
         resp = self.client.post(url, params)
-        assert resp.status_code == 200, "Could not create account (status {status}). The response was {response}"\
-            .format(status=resp.status_code, response=resp.content)
+        self.assertEqual(
+            resp.status_code, 200,
+            msg=u"Could not create account (status {status}). The response was {response}".format(
+                status=resp.status_code,
+                response=resp.content
+            )
+        )
 
     def _assert_activation_email(self, subject, body_fragments, test_body_type):
         """
         Verify that the activation email was sent.
         """
-        assert len(mail.outbox) == 1
+        self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
-        assert msg.subject == subject
+        self.assertEqual(msg.subject, subject)
 
         body_text = {
             'plain_text': msg.body,
@@ -169,7 +171,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         body_to_be_tested = body_text[test_body_type]
 
         for fragment in body_fragments:
-            assert fragment in body_to_be_tested
+            self.assertIn(fragment, body_to_be_tested)
 
     def test_do_not_send_email_and_do_activate(self):
         """
@@ -194,8 +196,8 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
                         with patch('common.djangoapps.third_party_auth.is_enabled', return_value=True):
                             reg.skip_email_verification = True
                             inactive_user_view(request)
-                            assert user.is_active
-                            assert email.called is False, 'method should not have been called'
+                            self.assertEqual(user.is_active, True)
+                            self.assertEqual(email.called, False, msg='method should not have been called')
 
     @patch('common.djangoapps.student.views.management.compose_activation_email')
     def test_send_email_to_inactive_user(self, email):
@@ -210,70 +212,7 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         with patch('common.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
-                assert email.called is True, 'method should have been called'
-
-
-@ddt.ddt
-@override_waffle_flag(COURSEWARE_PROCTORING_IMPROVEMENTS, active=True)
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-@override_settings(ACCOUNT_MICROFRONTEND_URL='http://account-mfe')
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-class ProctoringRequirementsEmailTests(EmailTemplateTagMixin, ModuleStoreTestCase):
-    """
-    Test sending of the proctoring requirements email.
-    """
-
-    # pylint: disable=no-member
-    def setUp(self):
-        super().setUp()
-        self.course = CourseFactory(enable_proctored_exams=True)
-        self.user = UserFactory()
-
-    def test_send_proctoring_requirements_email(self):
-        context = generate_proctoring_requirements_email_context(self.user, self.course.id)
-        send_proctoring_requirements_email(context)
-        self._assert_email()
-
-    def _assert_email(self):
-        """
-        Verify that the email was sent.
-        """
-        assert len(mail.outbox) == 1
-
-        message = mail.outbox[0]
-        text = message.body
-        html = message.alternatives[0][0]
-
-        assert message.subject == f"Proctoring requirements for {self.course.display_name}"
-
-        for fragment in self._get_fragments():
-            assert fragment in text
-            assert escape(fragment) in html
-
-    def _get_fragments(self):
-        course_module = modulestore().get_course(self.course.id)
-        proctoring_provider = capwords(course_module.proctoring_provider.replace('_', ' '))
-        id_verification_url = IDVerificationService.get_verify_location()
-        return [
-            (
-                "You are enrolled in {} at {}. This course contains proctored exams.".format(
-                    self.course.display_name,
-                    settings.PLATFORM_NAME
-                )
-            ),
-            (
-                "Proctored exams are timed exams that you take while proctoring software monitors "
-                "your computer's desktop, webcam video, and audio."
-            ),
-            proctoring_provider,
-            (
-                "Carefully review the system requirements as well as the steps to take a proctored "
-                "exam in order to ensure that you are prepared."
-            ),
-            settings.PROCTORING_SETTINGS.get('LINK_URLS', {}).get('faq', ''),
-            ("Before taking a graded proctored exam, you must have approved ID verification photos."),
-            id_verification_url
-        ]
+                self.assertEqual(email.called, True, msg='method should have been called')
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -283,7 +222,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
     """
 
     def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
-        super().setUp(tracker)
+        super(EmailChangeRequestTests, self).setUp(tracker)
         self.user = UserFactory.create()
         self.new_email = 'new.email@edx.org'
         self.req_factory = RequestFactory()
@@ -301,7 +240,7 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
-            return str(err)
+            return text_type(err)
 
     def do_email_change(self, user, email, activation_key=None):
         """
@@ -314,12 +253,11 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         """
         Assert that `response_data` indicates a failed request that returns `expected_error`
         """
-        assert response_data['success'] is False
-        assert expected_error == response_data['error']
-        assert self.user.email_user.called is False
+        self.assertFalse(response_data['success'])
+        self.assertEqual(expected_error, response_data['error'])
+        self.assertFalse(self.user.email_user.called)
 
-    @patch('common.djangoapps.student.views.management.render_to_string',
-           Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_duplicate_activation_key(self):
         """
         Assert that if two users change Email address simultaneously, no error is thrown
@@ -342,13 +280,13 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         (improperly formatted) email address.
         """
         for email in ('bad_email', 'bad_email@', '@bad_email'):
-            assert self.do_email_validation(email) == 'Valid e-mail address required.'
+            self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
 
     def test_change_email_to_existing_value(self):
         """
         Test the error message if user attempts to change email to the existing value.
         """
-        assert self.do_email_validation(self.user.email) == 'Old email is the same as the new email.'
+        self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
     def test_email_failure(self, send_mail):
@@ -372,22 +310,22 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
         self.do_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject='Request to change édX account e-mail',
+            subject=u'Request to change édX account e-mail',
             body_fragments=[
-                'We received a request to change the e-mail associated with',
-                'your édX account from {old_email} to {new_email}.'.format(
+                u'We received a request to change the e-mail associated with',
+                u'your édX account from {old_email} to {new_email}.'.format(
                     old_email=old_email,
                     new_email=new_email,
                 ),
-                'If this is correct, please confirm your new e-mail address by visiting:',
-                f'http://edx.org/email_confirm/{registration_key}',
-                'Please do not reply to this e-mail; if you require assistance,',
-                'check the help section of the édX web site.',
+                u'If this is correct, please confirm your new e-mail address by visiting:',
+                u'http://edx.org/email_confirm/{key}'.format(key=registration_key),
+                u'Please do not reply to this e-mail; if you require assistance,',
+                u'check the help section of the édX web site.',
             ],
         )
 
         self.assert_event_emitted(
-            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting='email', old=old_email, new=new_email
+            SETTING_CHANGE_INITIATED, user_id=self.user.id, setting=u'email', old=old_email, new=new_email
         )
 
     def _assert_email(self, subject, body_fragments):
@@ -408,17 +346,14 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
 
 
 @ddt.ddt
-@patch('common.djangoapps.student.views.management.render_to_response',
-       Mock(side_effect=mock_render_to_response, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
-@patch('common.djangoapps.student.views.management.render_to_string',
-       Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheIsolationMixin, TransactionTestCase):
     """
     Test that confirmation of email change requests function even in the face of exceptions thrown while sending email
     """
-
     def setUp(self):
-        super().setUp()
+        super(EmailChangeConfirmationTests, self).setUp()
         self.clear_caches()
         self.addCleanup(self.clear_caches)
         self.user = UserFactory.create()
@@ -430,46 +365,46 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.key = self.pending_change_request.activation_key
 
         # Expected subject of the email
-        self.email_subject = "Email Change Confirmation for {platform_name}".format(
+        self.email_subject = u"Email Change Confirmation for {platform_name}".format(
             platform_name=settings.PLATFORM_NAME
         )
 
         # Text fragments we expect in the body of the confirmation email
         self.email_fragments = [
-            "This is to confirm that you changed the e-mail associated with {platform_name}"
-            " from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
-            " Contact information is listed at:".format(
+            u"This is to confirm that you changed the e-mail associated with {platform_name}"
+            u" from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
+            u" Contact information is listed at:".format(
                 platform_name=settings.PLATFORM_NAME,
                 old_email=self.user.email,
                 new_email=PendingEmailChange.objects.get(activation_key=self.key).new_email
             ),
-            "We keep a log of old e-mails, so if this request was unintentional, we can investigate."
+            u"We keep a log of old e-mails, so if this request was unintentional, we can investigate."
         ]
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(EmailChangeConfirmationTests, cls).setUpClass()
         cls.start_cache_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_cache_isolation()
-        super().tearDownClass()
+        super(EmailChangeConfirmationTests, cls).tearDownClass()
 
     def assertRolledBack(self):
         """
         Assert that no changes to user, profile, or pending email have been made to the db
         """
-        assert self.user.email == User.objects.get(username=self.user.username).email
-        assert self.profile.meta == UserProfile.objects.get(user=self.user).meta
-        assert PendingEmailChange.objects.count() == 1
+        self.assertEqual(self.user.email, User.objects.get(username=self.user.username).email)
+        self.assertEqual(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
+        self.assertEqual(1, PendingEmailChange.objects.count())
 
     def assertFailedBeforeEmailing(self):
         """
         Assert that the function failed before emailing a user
         """
         self.assertRolledBack()
-        assert len(mail.outbox) == 0
+        self.assertEqual(len(mail.outbox), 0)
 
     def check_confirm_email_change(self, expected_template, expected_context):
         """
@@ -481,9 +416,11 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
             generate the content
         """
         response = confirm_email_change(self.request, self.key)
-        assert response.status_code == 200
-        assert mock_render_to_response(expected_template, expected_context).content.decode('utf-8') \
-               == response.content.decode('utf-8')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            mock_render_to_response(expected_template, expected_context).content.decode('utf-8'),
+            response.content.decode('utf-8')
+        )
 
     def assertChangeEmailSent(self, test_body_type):
         """
@@ -496,7 +433,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         })
 
         # Must have two items in outbox: one for old email, another for new email
-        assert len(mail.outbox) == 2
+        self.assertEqual(len(mail.outbox), 2)
 
         use_https = self.request.is_secure()
         if settings.FEATURES['ENABLE_MKTG_SITE']:
@@ -510,7 +447,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
         # Verifying contents
         for msg in mail.outbox:
-            assert msg.subject == self.email_subject
+            self.assertEqual(msg.subject, self.email_subject)
 
             body_text = {
                 'plain_text': msg.body,
@@ -520,9 +457,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
 
             body_to_be_tested = body_text[test_body_type]
             for fragment in self.email_fragments:
-                assert fragment in body_to_be_tested
+                self.assertIn(fragment, body_to_be_tested)
 
-            assert contact_link in body_to_be_tested
+            self.assertIn(contact_link, body_to_be_tested)
 
     def test_not_pending(self):
         self.key = 'not_a_key'
@@ -541,7 +478,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.check_confirm_email_change('email_change_failed.html', {
             'email': self.user.email,
         })
-        assert ace_mail.send.call_count == 1
+        self.assertEqual(ace_mail.send.call_count, 1)
         self.assertRolledBack()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -551,7 +488,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
         self.check_confirm_email_change('email_change_failed.html', {
             'email': self.pending_change_request.new_email
         })
-        assert ace_mail.send.call_count == 2
+        self.assertEqual(ace_mail.send.call_count, 2)
         self.assertRolledBack()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
@@ -568,16 +505,19 @@ class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheI
             self.assertChangeEmailSent(test_body_type)
 
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
-        assert 'old_emails' in meta
-        assert self.user.email == meta['old_emails'][0][0]
-        assert self.pending_change_request.new_email == User.objects.get(username=self.user.username).email
-        assert PendingEmailChange.objects.count() == 0
+        self.assertIn('old_emails', meta)
+        self.assertEqual(self.user.email, meta['old_emails'][0][0])
+        self.assertEqual(
+            self.pending_change_request.new_email,
+            User.objects.get(username=self.user.username).email
+        )
+        self.assertEqual(0, PendingEmailChange.objects.count())
 
     @patch('common.djangoapps.student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
     def test_always_rollback(self):
         connection = transaction.get_connection()
         with patch.object(connection, 'rollback', wraps=connection.rollback) as mock_rollback:
-            with pytest.raises(TestException):
+            with self.assertRaises(TestException):
                 confirm_email_change(self.request, self.key)
 
             mock_rollback.assert_called_with()
@@ -590,7 +530,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
     """
 
     def setUp(self, tracker='common.djangoapps.student.views.management.tracker'):
-        super().setUp(tracker)
+        super(SecondaryEmailChangeRequestTests, self).setUp(tracker)
         self.user = UserFactory.create()
         self.new_secondary_email = 'new.secondary.email@edx.org'
         self.req_factory = RequestFactory()
@@ -608,7 +548,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         try:
             validate_new_email(self.request.user, email)
         except ValueError as err:
-            return str(err)
+            return text_type(err)
 
     def do_secondary_email_change(self, user, email, activation_key=None):
         """
@@ -626,9 +566,9 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         """
         Assert that `response_data` indicates a failed request that returns `expected_error`
         """
-        assert not response_data['success']
-        assert expected_error == response_data['error']
-        assert not self.user.email_user.called
+        self.assertFalse(response_data['success'])
+        self.assertEqual(expected_error, response_data['error'])
+        self.assertFalse(self.user.email_user.called)
 
     def test_invalid_emails(self):
         """
@@ -636,7 +576,7 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         (improperly formatted) email address.
         """
         for email in ('bad_email', 'bad_email@', '@bad_email'):
-            assert self.do_email_validation(email) == 'Valid e-mail address required.'
+            self.assertEqual(self.do_email_validation(email), 'Valid e-mail address required.')
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
     def test_email_failure(self, send_mail):
@@ -659,12 +599,12 @@ class SecondaryEmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, Ca
         self.do_secondary_email_change(self.user, new_email, registration_key)
 
         self._assert_email(
-            subject='Confirm your recovery email for édX',
+            subject=u'Confirm your recovery email for édX',
             body_fragments=[
-                'You\'ve registered this recovery email address for édX.',
-                'If you set this email address, click "confirm email."',
-                'If you didn\'t request this change, you can disregard this email.',
-                f'http://edx.org/activate_secondary_email/{registration_key}',
+                u'You\'ve registered this recovery email address for édX.',
+                u'If you set this email address, click "confirm email."',
+                u'If you didn\'t request this change, you can disregard this email.',
+                u'http://edx.org/activate_secondary_email/{key}'.format(key=registration_key),
 
             ],
         )

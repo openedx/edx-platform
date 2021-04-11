@@ -534,22 +534,22 @@ html.video-fullscreen {
 
       .pill {
         font-size: 12px;
-        line-height: 14px;
-        max-height: 16px;
+        max-height: 20px;
         padding: 2px 8px;
         border-radius: 5px;
-        margin-top: 4px;
         margin-left: 8px;
+        font-style: italic;
+        font-weight: bold;
         vertical-align: top;
 
         &.completed {
-          background-color: #f0f2f2;
-          color: #212529;
+          background-color: #f3f3f4;
+          color: #2d323e;
         }
 
         &.past-due {
-          background-color: #475b65;
-          color: #fff;
+          background-color: #d1d2d4;
+          color: black;
         }
       }
     }

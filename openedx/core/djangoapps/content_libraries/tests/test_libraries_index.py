@@ -1,11 +1,11 @@
 """
 Testing indexing of blockstore based content libraries
 """
-from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import call_command
 from django.test.utils import override_settings
+from mock import patch
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from search.search_engine_base import SearchEngine
 
@@ -38,15 +38,15 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
             library_key = LibraryLocatorV2.from_string(result['id'])
             response = ContentLibraryIndexer.get_items([library_key])[0]
 
-            assert response['id'] == result['id']
-            assert response['title'] == result['title']
-            assert response['description'] == result['description']
-            assert response['uuid'] == result['bundle_uuid']
-            assert response['num_blocks'] == 0
-            assert response['version'] == result['version']
-            assert response['last_published'] is None
-            assert response['has_unpublished_changes'] is False
-            assert response['has_unpublished_deletes'] is False
+            self.assertEqual(response['id'], result['id'])
+            self.assertEqual(response['title'], result['title'])
+            self.assertEqual(response['description'], result['description'])
+            self.assertEqual(response['uuid'], result['bundle_uuid'])
+            self.assertEqual(response['num_blocks'], 0)
+            self.assertEqual(response['version'], result['version'])
+            self.assertEqual(response['last_published'], None)
+            self.assertEqual(response['has_unpublished_changes'], False)
+            self.assertEqual(response['has_unpublished_deletes'], False)
 
     def test_schema_updates(self):
         """
@@ -56,15 +56,15 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
                    new=0):
             result = self._create_library(slug="test-lib-schemaupdates-1", title="Title 1", description="Description")
             library_key = LibraryLocatorV2.from_string(result['id'])
-            assert len(ContentLibraryIndexer.get_items([library_key])) == 1
+            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 1)
 
         with patch("openedx.core.djangoapps.content_libraries.libraries_index.ContentLibraryIndexer.SCHEMA_VERSION",
                    new=1):
-            assert len(ContentLibraryIndexer.get_items([library_key])) == 0
+            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 0)
 
             call_command("reindex_content_library", all=True, force=True)
 
-            assert len(ContentLibraryIndexer.get_items([library_key])) == 1
+            self.assertEqual(len(ContentLibraryIndexer.get_items([library_key])), 1)
 
     def test_remove_all_libraries(self):
         """
@@ -75,10 +75,10 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
         library_key1 = LibraryLocatorV2.from_string(lib1['id'])
         library_key2 = LibraryLocatorV2.from_string(lib2['id'])
 
-        assert len(ContentLibraryIndexer.get_items([library_key1, library_key2])) == 2
+        self.assertEqual(len(ContentLibraryIndexer.get_items([library_key1, library_key2])), 2)
 
         ContentLibraryIndexer.remove_all_items()
-        assert len(ContentLibraryIndexer.get_items()) == 0
+        self.assertEqual(len(ContentLibraryIndexer.get_items()), 0)
 
     def test_update_libraries(self):
         """
@@ -91,18 +91,18 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
 
         response = ContentLibraryIndexer.get_items([library_key])[0]
 
-        assert response['id'] == lib['id']
-        assert response['title'] == 'New Title'
-        assert response['description'] == 'New Title'
-        assert response['uuid'] == lib['bundle_uuid']
-        assert response['num_blocks'] == 0
-        assert response['version'] == lib['version']
-        assert response['last_published'] is None
-        assert response['has_unpublished_changes'] is False
-        assert response['has_unpublished_deletes'] is False
+        self.assertEqual(response['id'], lib['id'])
+        self.assertEqual(response['title'], "New Title")
+        self.assertEqual(response['description'], "New Title")
+        self.assertEqual(response['uuid'], lib['bundle_uuid'])
+        self.assertEqual(response['num_blocks'], 0)
+        self.assertEqual(response['version'], lib['version'])
+        self.assertEqual(response['last_published'], None)
+        self.assertEqual(response['has_unpublished_changes'], False)
+        self.assertEqual(response['has_unpublished_deletes'], False)
 
         self._delete_library(lib['id'])
-        assert ContentLibraryIndexer.get_items([library_key]) == []
+        self.assertEqual(ContentLibraryIndexer.get_items([library_key]), [])
         ContentLibraryIndexer.get_items([library_key])
 
     def test_update_library_blocks(self):
@@ -116,9 +116,9 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
             last_published = ContentLibraryIndexer.get_items([library_key])[0]['last_published']
             self._commit_library_changes(str(library_key))
             response = ContentLibraryIndexer.get_items([library_key])[0]
-            assert response['has_unpublished_changes'] is False
-            assert response['has_unpublished_deletes'] is False
-            assert response['last_published'] >= last_published
+            self.assertEqual(response['has_unpublished_changes'], False)
+            self.assertEqual(response['has_unpublished_deletes'], False)
+            self.assertGreaterEqual(response['last_published'], last_published)
             return response
 
         def verify_uncommitted_libraries(library_key, has_unpublished_changes, has_unpublished_deletes):
@@ -126,8 +126,8 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
             Verify uncommitted changes and deletes in the index
             """
             response = ContentLibraryIndexer.get_items([library_key])[0]
-            assert response['has_unpublished_changes'] == has_unpublished_changes
-            assert response['has_unpublished_deletes'] == has_unpublished_deletes
+            self.assertEqual(response['has_unpublished_changes'], has_unpublished_changes)
+            self.assertEqual(response['has_unpublished_deletes'], has_unpublished_deletes)
             return response
 
         lib = self._create_library(slug="test-lib-update-block", title="Title", description="Description")
@@ -136,20 +136,20 @@ class ContentLibraryIndexerTest(ContentLibrariesRestApiTest):
         # Verify uncommitted new blocks
         block = self._add_block_to_library(lib['id'], "problem", "problem1")
         response = verify_uncommitted_libraries(library_key, True, False)
-        assert response['last_published'] is None
-        assert response['num_blocks'] == 1
+        self.assertEqual(response['last_published'], None)
+        self.assertEqual(response['num_blocks'], 1)
         # Verify committed new blocks
         self._commit_library_changes(lib['id'])
         response = verify_uncommitted_libraries(library_key, False, False)
-        assert response['num_blocks'] == 1
+        self.assertEqual(response['num_blocks'], 1)
         # Verify uncommitted deleted blocks
         self._delete_library_block(block['id'])
         response = verify_uncommitted_libraries(library_key, True, True)
-        assert response['num_blocks'] == 0
+        self.assertEqual(response['num_blocks'], 0)
         # Verify committed deleted blocks
         self._commit_library_changes(lib['id'])
         response = verify_uncommitted_libraries(library_key, False, False)
-        assert response['num_blocks'] == 0
+        self.assertEqual(response['num_blocks'], 0)
 
         block = self._add_block_to_library(lib['id'], "problem", "problem1")
         self._commit_library_changes(lib['id'])
@@ -201,17 +201,17 @@ class LibraryBlockIndexerTest(ContentLibrariesRestApiTest):
         block1 = self._add_block_to_library(lib['id'], "problem", "problem1")
         block2 = self._add_block_to_library(lib['id'], "problem", "problem2")
 
-        assert len(LibraryBlockIndexer.get_items()) == 2
+        self.assertEqual(len(LibraryBlockIndexer.get_items()), 2)
 
         for block in [block1, block2]:
             usage_key = LibraryUsageLocatorV2.from_string(block['id'])
             response = LibraryBlockIndexer.get_items([usage_key])[0]
 
-            assert response['id'] == block['id']
-            assert response['def_key'] == block['def_key']
-            assert response['block_type'] == block['block_type']
-            assert response['display_name'] == block['display_name']
-            assert response['has_unpublished_changes'] == block['has_unpublished_changes']
+            self.assertEqual(response['id'], block['id'])
+            self.assertEqual(response['def_key'], block['def_key'])
+            self.assertEqual(response['block_type'], block['block_type'])
+            self.assertEqual(response['display_name'], block['display_name'])
+            self.assertEqual(response['has_unpublished_changes'], block['has_unpublished_changes'])
 
     def test_schema_updates(self):
         """
@@ -221,15 +221,15 @@ class LibraryBlockIndexerTest(ContentLibrariesRestApiTest):
         with patch("openedx.core.djangoapps.content_libraries.libraries_index.LibraryBlockIndexer.SCHEMA_VERSION",
                    new=0):
             block = self._add_block_to_library(lib['id'], "problem", "problem1")
-            assert len(LibraryBlockIndexer.get_items([block['id']])) == 1
+            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 1)
 
         with patch("openedx.core.djangoapps.content_libraries.libraries_index.LibraryBlockIndexer.SCHEMA_VERSION",
                    new=1):
-            assert len(LibraryBlockIndexer.get_items([block['id']])) == 0
+            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 0)
 
             call_command("reindex_content_library", all=True, force=True)
 
-            assert len(LibraryBlockIndexer.get_items([block['id']])) == 1
+            self.assertEqual(len(LibraryBlockIndexer.get_items([block['id']])), 1)
 
     def test_remove_all_items(self):
         """
@@ -238,10 +238,10 @@ class LibraryBlockIndexerTest(ContentLibrariesRestApiTest):
         lib1 = self._create_library(slug="test-lib-rm-all", title="Title 1", description="Description")
         self._add_block_to_library(lib1['id'], "problem", "problem1")
         self._add_block_to_library(lib1['id'], "problem", "problem2")
-        assert len(LibraryBlockIndexer.get_items()) == 2
+        self.assertEqual(len(LibraryBlockIndexer.get_items()), 2)
 
         LibraryBlockIndexer.remove_all_items()
-        assert len(LibraryBlockIndexer.get_items()) == 0
+        self.assertEqual(len(LibraryBlockIndexer.get_items()), 0)
 
     def test_crud_block(self):
         """
@@ -253,29 +253,29 @@ class LibraryBlockIndexerTest(ContentLibrariesRestApiTest):
         # Update OLX, verify updates in index
         self._set_library_block_olx(block["id"], '<problem display_name="new_name"/>')
         response = LibraryBlockIndexer.get_items([block['id']])[0]
-        assert response['display_name'] == 'new_name'
-        assert response['has_unpublished_changes'] is True
+        self.assertEqual(response['display_name'], "new_name")
+        self.assertEqual(response['has_unpublished_changes'], True)
 
         # Verify has_unpublished_changes after committing library
         self._commit_library_changes(lib['id'])
         response = LibraryBlockIndexer.get_items([block['id']])[0]
-        assert response['has_unpublished_changes'] is False
+        self.assertEqual(response['has_unpublished_changes'], False)
 
         # Verify has_unpublished_changes after reverting library
         self._set_library_block_asset(block["id"], "whatever.png", b"data")
         response = LibraryBlockIndexer.get_items([block['id']])[0]
-        assert response['has_unpublished_changes'] is True
+        self.assertEqual(response['has_unpublished_changes'], True)
 
         self._revert_library_changes(lib['id'])
         response = LibraryBlockIndexer.get_items([block['id']])[0]
-        assert response['has_unpublished_changes'] is False
+        self.assertEqual(response['has_unpublished_changes'], False)
 
         # Verify that deleting block removes it from index
         self._delete_library_block(block['id'])
-        assert LibraryBlockIndexer.get_items([block['id']]) == []
+        self.assertEqual(LibraryBlockIndexer.get_items([block['id']]), [])
 
         # Verify that deleting a library removes its blocks from index too
         self._add_block_to_library(lib['id'], "problem", "problem1")
         LibraryBlockIndexer.get_items([block['id']])
         self._delete_library(lib['id'])
-        assert LibraryBlockIndexer.get_items([block['id']]) == []
+        self.assertEqual(LibraryBlockIndexer.get_items([block['id']]), [])

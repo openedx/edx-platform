@@ -1,7 +1,6 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-from django.urls import reverse
 
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.js_utils import (
@@ -314,41 +313,22 @@ from openedx.core.djangolib.js_utils import (
 
       % if libraries_enabled or archived_courses:
       <ul id="course-index-tabs">
-      <li class="courses-tab ${ 'active' if active_tab == 'courses' else ''}">
-          % if split_studio_home and active_tab == 'libraries':
-            <a href="${reverse('home')}">${_("Courses")}</a>
-          % else:
-            <a href="#">${_("Courses")}</a>
-          % endif
-       </li>
+        <li class="courses-tab active"><a>${_("Courses")}</a></li>
         % if archived_courses:
-        <li class="archived-courses-tab">
-            % if split_studio_home and active_tab == 'libraries':
-                <a href="${reverse('home') + '#archived-courses-tab' } " >${_("Archived Courses")}</a>
-            % else:
-                <a href="#" >${_("Archived Courses")}</a>
-            % endif
-        </li>
+        <li class="archived-courses-tab"><a>${_("Archived Courses")}</a></li>
         % endif
-
         % if libraries_enabled:
-            % if redirect_to_library_authoring_mfe:
-            <li><a href="${library_authoring_mfe_url}">${_("Libraries")}</a></li>
-            %else:
-             <li class="libraries-tab ${ 'active' if active_tab == 'libraries' else ''}">
-                % if split_studio_home:
-                  <a href="${reverse('home_library')}">${_("Libraries")}</a>
-                % else:
-                  <a href="#" >${_("Libraries")}</a>
-                % endif
-             </li>
-            % endif
+        % if redirect_to_library_authoring_mfe:
+        <li><a href="${library_authoring_mfe_url}">${_("Libraries")}</a></li>
+        %else:
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+        % endif
         % endif
       </ul>
       % endif
 
       %if len(courses) > 0 or optimization_enabled:
-      <div class="courses courses-tab react-course-listing ${ 'active' if active_tab == 'courses' else ''}">
+      <div class="courses courses-tab react-course-listing active">
         ${static.renderReact(
           component="CourseOrLibraryListing",
           id="react-course-listing",
@@ -362,7 +342,7 @@ from openedx.core.djangolib.js_utils import (
       </div>
 
       %else:
-      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab ${ 'active' if active_tab == 'courses' else ''}">
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
             <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
@@ -478,7 +458,6 @@ from openedx.core.djangolib.js_utils import (
 
       %if archived_courses:
       <div class="archived-courses react-archived-course-listing archived-courses-tab">
-        % if type(archived_courses) is list:
         ${static.renderReact(
           component="CourseOrLibraryListing",
           id="react-archived-course-listing",
@@ -489,12 +468,11 @@ from openedx.core.djangolib.js_utils import (
             'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
           }
         )}
-        % endif
       </div>
       %endif
 
       %if len(libraries) > 0 or optimization_enabled:
-      <div class="libraries react-library-listing libraries-tab ${ 'active' if active_tab == 'libraries' else ''}">
+      <div class="libraries react-library-listing libraries-tab">
         ${static.renderReact(
           component="CourseOrLibraryListing",
           id="react-library-listing",

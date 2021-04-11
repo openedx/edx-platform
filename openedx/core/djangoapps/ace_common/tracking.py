@@ -1,9 +1,10 @@
 # pylint: disable=missing-docstring
 
-from urllib.parse import parse_qs
 
 import attr
+import six
 from django.utils.http import urlencode
+from six.moves.urllib.parse import parse_qs  # pylint: disable=import-error, ungrouped-imports
 
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 
@@ -12,7 +13,7 @@ DEFAULT_CAMPAIGN_MEDIUM = 'email'
 
 
 @attr.s
-class CampaignTrackingInfo:
+class CampaignTrackingInfo(object):
     """
     A struct for storing the set of UTM parameters that are recognized by tracking tools when included in URLs.
     """
@@ -39,14 +40,14 @@ class CampaignTrackingInfo:
         if existing_query_string is not None:
             parameters = parse_qs(existing_query_string)
 
-        for attribute, value in attr.asdict(self).items():
+        for attribute, value in six.iteritems(attr.asdict(self)):
             if value is not None:
                 parameters['utm_' + attribute] = [value]
         return urlencode(parameters, doseq=True)
 
 
 @attr.s
-class GoogleAnalyticsTrackingPixel:
+class GoogleAnalyticsTrackingPixel(object):
     """
     Implementation of the Google Analytics measurement protocol for email tracking.
 
@@ -100,14 +101,14 @@ class GoogleAnalyticsTrackingPixel:
             site=self.site,
         )
         if user_id_dimension is not None and self.user_id is not None:
-            parameter_name = f'cd{user_id_dimension}'
+            parameter_name = 'cd{0}'.format(user_id_dimension)
             parameters[parameter_name] = self.user_id
 
         if self.course_id is not None and self.event_label is None:
             param_name = fields.event_label.metadata['param_name']
-            parameters[param_name] = str(self.course_id)
+            parameters[param_name] = six.text_type(self.course_id)
 
-        return "https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
+        return u"https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
 
     def _get_tracking_id(self):
         tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)

@@ -1,11 +1,10 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.courses import get_course
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = 'Write a discussion link for a given course on standard output.'
 
     def add_arguments(self, parser):
@@ -19,7 +18,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         course = get_course(course_key)
         if not course:
-            raise CommandError(f'Invalid course id: {course_id}')
+            raise CommandError(u'Invalid course id: {}'.format(course_id))
 
         if course.discussion_link:
             self.stdout.write(course.discussion_link)

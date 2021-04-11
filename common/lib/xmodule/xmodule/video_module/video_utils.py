@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module contains utils specific for video_module but not for transcripts.
 """
@@ -5,11 +6,13 @@ Module contains utils specific for video_module but not for transcripts.
 
 import logging
 from collections import OrderedDict
-from urllib.parse import parse_qs, urlencode, urlparse, urlsplit, urlunsplit
 
+import six
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+from six.moves import zip
+from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlsplit, urlunsplit
 
 log = logging.getLogger(__name__)
 
@@ -103,7 +106,7 @@ def format_xml_exception_message(location, key, value):
     when setting xml attributes.
     """
     exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(
-        location=str(location),
+        location=six.text_type(location),
         key=key,
         value=value
     )

@@ -1,8 +1,8 @@
 """Unit tests for the Paver JavaScript testing tasks."""
 
-from unittest.mock import patch
 
 import ddt
+from mock import patch
 from paver.easy import call_task
 
 import pavelib.js_test
@@ -119,7 +119,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
 
         command_template = (
-            'node --max_old_space_size=4096 node_modules/.bin/karma start {options}'
+            'nodejs --max_old_space_size=4096 node_modules/.bin/karma start {options}'
         )
 
         for suite in suites:
@@ -141,10 +141,10 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                         suite=suite
                     )
                 if port:
-                    expected_test_tool_command += f" --port={port}"
+                    expected_test_tool_command += " --port={port}".format(port=port)
             else:
                 expected_test_tool_command = 'jest'
 
             expected_messages.append(expected_test_tool_command)
 
-        assert self.task_messages == expected_messages
+        self.assertEqual(self.task_messages, expected_messages)

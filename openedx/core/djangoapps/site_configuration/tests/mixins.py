@@ -11,7 +11,7 @@ class SiteMixin(object):
     Mixin for setting up Site framework models
     """
     def setUp(self):
-        super(SiteMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(SiteMixin, self).setUp()
 
         self.site = SiteFactory.create()
         site_config = {

@@ -5,9 +5,10 @@ Tests i18n in courseware
 
 import json
 import re
+import six
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test.client import Client
 from django.urls import reverse, reverse_lazy
 from django.utils import translation
@@ -28,19 +29,19 @@ class BaseI18nTestCase(CacheIsolationTestCase):
     url = reverse_lazy('dashboard')
 
     def setUp(self):
-        super().setUp()
+        super(BaseI18nTestCase, self).setUp()
         self.addCleanup(translation.deactivate)
         self.client = Client()
         self.create_user()
 
     def assert_tag_has_attr(self, content, tag, attname, value):
         """Assert that a tag in `content` has a certain value in a certain attribute."""
-        regex_string = r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>"""  # noqa: W605,E501
+        regex_string = six.text_type(r"""<{tag} [^>]*\b{attname}=['"]([\w\d\- ]+)['"][^>]*>""")  # noqa: W605,E501
         regex = regex_string.format(tag=tag, attname=attname)
         match = re.search(regex, content)
-        assert match, (f"Couldn't find desired tag '{tag}' with attr '{attname}' in {content!r}")
+        self.assertTrue(match, u"Couldn't find desired tag '%s' with attr '%s' in %r" % (tag, attname, content))
         attvalues = match.group(1).split()
-        assert value in attvalues
+        self.assertIn(value, attvalues)
 
     def release_languages(self, languages):
         """
@@ -79,27 +80,27 @@ class I18nTestCase(BaseI18nTestCase):
         self.release_languages('fr')
         response = self.client.get('/')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "en")
-        assert response['Content-Language'] == 'en'
+        self.assertEqual(response['Content-Language'], 'en')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_en")
 
     def test_esperanto(self):
         self.release_languages('fr, eo')
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='eo')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "eo")
-        assert response['Content-Language'] == 'eo'
+        self.assertEqual(response['Content-Language'], 'eo')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_eo")
 
     def test_switching_languages_bidi(self):
         self.release_languages('ar, eo')
         response = self.client.get('/')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "en")
-        assert response['Content-Language'] == 'en'
+        self.assertEqual(response['Content-Language'], 'en')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_en")
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "ltr")
 
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='ar')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "html", "lang", "ar")
-        assert response['Content-Language'] == 'ar'
+        self.assertEqual(response['Content-Language'], 'ar')
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "lang_ar")
         self.assert_tag_has_attr(response.content.decode('utf-8'), "body", "class", "rtl")
 
@@ -165,7 +166,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
     and use the dark lang preview functionality.
     """
     def setUp(self):
-        super().setUp()
+        super(I18nLangPrefTests, self).setUp()
         self.user_login()
 
     def set_lang_preference(self, language):
@@ -177,7 +178,7 @@ class I18nLangPrefTests(BaseI18nTestCase):
             json.dumps({LANGUAGE_KEY: language}),
             content_type="application/merge-patch+json"
         )
-        assert response.status_code == 204
+        self.assertEqual(response.status_code, 204)
 
     def test_lang_preference(self):
         # Regression test; LOC-87

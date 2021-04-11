@@ -20,7 +20,7 @@ class CourseHomePage(CoursePage):
         return self.q(css='.course-outline').present
 
     def __init__(self, browser, course_id):
-        super().__init__(browser, course_id)
+        super(CourseHomePage, self).__init__(browser, course_id)
         self.course_id = course_id
         self.preview = StaffPreviewPage(browser, self)
         # TODO: TNL-6546: Remove the following

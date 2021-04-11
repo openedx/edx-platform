@@ -2,6 +2,9 @@
 Library edit page in Studio
 """
 
+
+import six
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.studio import BASE_URL
@@ -15,7 +18,7 @@ class LibraryPage(PageObject, HelpMixin):
     Base page for Library pages. Defaults URL to the edit page.
     """
     def __init__(self, browser, locator):
-        super().__init__(browser)
+        super(LibraryPage, self).__init__(browser)
         self.locator = locator
 
     @property
@@ -23,7 +26,7 @@ class LibraryPage(PageObject, HelpMixin):
         """
         URL to the library edit page for the given library.
         """
-        return "{}/library/{}".format(BASE_URL, str(self.locator))
+        return "{}/library/{}".format(BASE_URL, six.text_type(self.locator))
 
     def is_browser_on_page(self):
         """
@@ -47,4 +50,4 @@ class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
         for improved test reliability.
         """
         self.wait_for_ajax()
-        super().wait_until_ready()
+        super(LibraryEditPage, self).wait_until_ready()

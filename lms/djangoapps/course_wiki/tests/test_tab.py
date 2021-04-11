@@ -16,7 +16,7 @@ class WikiTabTestCase(ModuleStoreTestCase):
     """Test cases for Wiki Tab."""
 
     def setUp(self):
-        super().setUp()
+        super(WikiTabTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = AdminFactory.create()
         self.user = UserFactory()
@@ -35,7 +35,7 @@ class WikiTabTestCase(ModuleStoreTestCase):
         """
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = True
-        assert self.get_wiki_tab(self.user, self.course) is not None
+        self.assertIsNotNone(self.get_wiki_tab(self.user, self.course))
 
     def test_wiki_enabled_and_not_public(self):
         """
@@ -43,23 +43,23 @@ class WikiTabTestCase(ModuleStoreTestCase):
         """
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = False
-        assert self.get_wiki_tab(self.user, self.course) is None
-        assert self.get_wiki_tab(self.instructor, self.course) is not None
+        self.assertIsNone(self.get_wiki_tab(self.user, self.course))
+        self.assertIsNotNone(self.get_wiki_tab(self.instructor, self.course))
 
     def test_wiki_enabled_false(self):
         """Test wiki tab when Enabled setting is False"""
         settings.WIKI_ENABLED = False
-        assert self.get_wiki_tab(self.user, self.course) is None
-        assert self.get_wiki_tab(self.instructor, self.course) is None
+        self.assertIsNone(self.get_wiki_tab(self.user, self.course))
+        self.assertIsNone(self.get_wiki_tab(self.instructor, self.course))
 
     def test_wiki_visibility(self):
         """Test toggling of visibility of wiki tab"""
         settings.WIKI_ENABLED = True
         self.course.allow_public_wiki_access = True
         wiki_tab = self.get_wiki_tab(self.user, self.course)
-        assert wiki_tab is not None
-        assert wiki_tab.is_hideable
+        self.assertIsNotNone(wiki_tab)
+        self.assertTrue(wiki_tab.is_hideable)
         wiki_tab.is_hidden = True
-        assert wiki_tab['is_hidden']
+        self.assertTrue(wiki_tab['is_hidden'])
         wiki_tab['is_hidden'] = False
-        assert not wiki_tab.is_hidden
+        self.assertFalse(wiki_tab.is_hidden)

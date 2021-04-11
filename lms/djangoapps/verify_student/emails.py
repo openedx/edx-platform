@@ -25,7 +25,7 @@ def send_verification_confirmation_email(context):
     try:
         with emulate_http_request(site=site, user=user):
             msg = VerificationSubmitted(context=message_context).personalize(
-                recipient=Recipient(user.id, user.email),
+                recipient=Recipient(user.username, user.email),
                 language=get_user_preference(user, LANGUAGE_KEY),
                 user_context={'full_name': user.profile.name}
             )
@@ -48,7 +48,7 @@ def send_verification_approved_email(context):
     try:
         with emulate_http_request(site=site, user=user):
             msg = VerificationApproved(context=message_context).personalize(
-                recipient=Recipient(user.id, user.email),
+                recipient=Recipient(user.username, user.email),
                 language=get_user_preference(user, LANGUAGE_KEY),
                 user_context={'full_name': user.profile.name}
             )

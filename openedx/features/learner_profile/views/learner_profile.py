@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.translation import ugettext as _  # lint-amnesty, pylint: disable=unused-import
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
@@ -20,7 +20,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from openedx.core.djangolib.markup import HTML, Text  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
 from common.djangoapps.student.models import User
@@ -46,7 +46,7 @@ def learner_profile(request, username):
         GET /account/profile
     """
     if should_redirect_to_profile_microfrontend():
-        profile_microfrontend_url = f"{settings.PROFILE_MICROFRONTEND_URL}{username}"
+        profile_microfrontend_url = "{}{}".format(settings.PROFILE_MICROFRONTEND_URL, username)
         return redirect(profile_microfrontend_url)
 
     try:
@@ -57,7 +57,7 @@ def learner_profile(request, username):
             context=context
         )
     except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
-        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Http404
 
 
 def learner_profile_context(request, profile_username, user_is_staff):

@@ -7,11 +7,13 @@ import pytest
 
 from safe_lxml import defuse_xml_libs
 
+from openedx.core.pytest_hooks import pytest_configure  # pylint: disable=unused-import
+
 defuse_xml_libs()
 
 
 @pytest.fixture(autouse=True)
-def no_webpack_loader(monkeypatch):  # lint-amnesty, pylint: disable=missing-function-docstring
+def no_webpack_loader(monkeypatch):
     monkeypatch.setattr(
         "webpack_loader.templatetags.webpack_loader.render_bundle",
         lambda entry, extension=None, config='DEFAULT', attrs='': ''

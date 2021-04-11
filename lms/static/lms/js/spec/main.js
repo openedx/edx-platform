@@ -775,7 +775,6 @@
         'js/spec/student_account/password_reset_spec.js',
         'js/spec/student_account/register_spec.js',
         'js/spec/student_account/shoppingcart_spec.js',
-        'js/spec/student_account/utils_spec.js',
         'js/spec/verify_student/image_input_spec.js',
         'js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
         'js/spec/verify_student/make_payment_step_view_spec.js',

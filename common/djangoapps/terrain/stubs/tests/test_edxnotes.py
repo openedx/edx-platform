@@ -10,6 +10,7 @@ from uuid import uuid4
 import ddt
 import requests
 import six
+from six.moves import range
 
 from ..edxnotes import StubEdxNotesService
 
@@ -23,7 +24,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        super().setUp()
+        super(StubEdxNotesServiceTest, self).setUp()
         self.server = StubEdxNotesService()
         dummy_notes = self._get_dummy_notes(count=5)
         self.server.add_notes(dummy_notes)
@@ -76,38 +77,38 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             ],
         }
         response = requests.post(self._get_url("api/v1/annotations"), data=json.dumps(dummy_note))
-        assert response.ok
+        self.assertTrue(response.ok)
         response_content = response.json()
-        assert 'id' in response_content
-        assert 'created' in response_content
-        assert 'updated' in response_content
-        assert 'annotator_schema_version' in response_content
+        self.assertIn("id", response_content)
+        self.assertIn("created", response_content)
+        self.assertIn("updated", response_content)
+        self.assertIn("annotator_schema_version", response_content)
         self.assertDictContainsSubset(dummy_note, response_content)
 
     def test_note_read(self):
         notes = self._get_notes()
         for note in notes:
             response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
-            assert response.ok
+            self.assertTrue(response.ok)
             self.assertDictEqual(note, response.json())
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def test_note_update(self):
         notes = self._get_notes()
         for note in notes:
             response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
-            assert response.ok
+            self.assertTrue(response.ok)
             self.assertDictEqual(note, response.json())
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def test_search(self):
         # Without user
         response = requests.get(self._get_url("api/v1/search"))
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
         # get response with default page and page size
         response = requests.get(self._get_url("api/v1/search"), params={
@@ -115,7 +116,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "course_id": "dummy-course-id",
         })
 
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=5,
@@ -134,7 +135,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "text": "world war 2"
         })
 
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=0,
@@ -159,42 +160,42 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             'user': 'dummy-user-id',
             'course_id': 'dummy-course-id'
         })
-        assert response.ok
+        self.assertTrue(response.ok)
         response = response.json()
         parsed = six.moves.urllib.parse.urlparse(url)
         query_params = six.moves.urllib.parse.parse_qs(parsed.query)
         query_params['usage_id'].reverse()
-        assert len(response) == len(query_params['usage_id'])
+        self.assertEqual(len(response), len(query_params['usage_id']))
         for index, usage_id in enumerate(query_params['usage_id']):
-            assert response[index]['usage_id'] == usage_id
+            self.assertEqual(response[index]['usage_id'], usage_id)
 
     def test_delete(self):
         notes = self._get_notes()
         response = requests.delete(self._get_url("api/v1/annotations/does_not_exist"))
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
         for note in notes:
             response = requests.delete(self._get_url("api/v1/annotations/" + note["id"]))
-            assert response.status_code == 204
+            self.assertEqual(response.status_code, 204)
             remaining_notes = self.server.get_all_notes()
-            assert note['id'] not in [note['id'] for note in remaining_notes]
+            self.assertNotIn(note["id"], [note["id"] for note in remaining_notes])
 
-        assert len(remaining_notes) == 0
+        self.assertEqual(len(remaining_notes), 0)
 
     def test_update(self):
         note = self._get_notes()[0]
         response = requests.put(self._get_url("api/v1/annotations/" + note["id"]), data=json.dumps({
             "text": "new test text"
         }))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         updated_note = self._get_notes()[0]
-        assert 'new test text' == updated_note['text']
-        assert note['id'] == updated_note['id']
-        self.assertCountEqual(note, updated_note)
+        self.assertEqual("new test text", updated_note["text"])
+        self.assertEqual(note["id"], updated_note["id"])
+        six.assertCountEqual(self, note, updated_note)
 
         response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     # pylint: disable=too-many-arguments
     def _verify_pagination_info(
@@ -234,13 +235,13 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             page = query_params["page"][0]
             return page if page is None else int(page)
 
-        assert response['total'] == total_notes
-        assert response['num_pages'] == num_pages
-        assert len(response['rows']) == notes_per_page
-        assert response['current_page'] == current_page
-        assert get_page_value(response['previous']) == previous_page
-        assert get_page_value(response['next']) == next_page
-        assert response['start'] == start
+        self.assertEqual(response["total"], total_notes)
+        self.assertEqual(response["num_pages"], num_pages)
+        self.assertEqual(len(response["rows"]), notes_per_page)
+        self.assertEqual(response["current_page"], current_page)
+        self.assertEqual(get_page_value(response["previous"]), previous_page)
+        self.assertEqual(get_page_value(response["next"]), next_page)
+        self.assertEqual(response["start"], start)
 
     def test_notes_collection(self):
         """
@@ -249,12 +250,12 @@ class StubEdxNotesServiceTest(unittest.TestCase):
 
         # Without user
         response = requests.get(self._get_url("api/v1/annotations"))
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
         # Without any pagination parameters
         response = requests.get(self._get_url("api/v1/annotations"), params={"user": "dummy-user-id"})
 
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=5,
@@ -273,7 +274,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "page_size": 3
         })
 
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=5,
@@ -295,7 +296,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "page_size": 10
         })
 
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=5,
@@ -317,7 +318,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
 
         # Get default page
         response = requests.get(self._get_url("api/v1/annotations"), params={"user": "dummy-user-id"})
-        assert response.ok
+        self.assertTrue(response.ok)
         self._verify_pagination_info(
             response=response.json(),
             total_notes=0,
@@ -331,36 +332,36 @@ class StubEdxNotesServiceTest(unittest.TestCase):
 
     def test_cleanup(self):
         response = requests.put(self._get_url("cleanup"))
-        assert response.ok
-        assert len(self.server.get_all_notes()) == 0
+        self.assertTrue(response.ok)
+        self.assertEqual(len(self.server.get_all_notes()), 0)
 
     def test_create_notes(self):
         dummy_notes = self._get_dummy_notes(count=2)
         response = requests.post(self._get_url("create_notes"), data=json.dumps(dummy_notes))
-        assert response.ok
-        assert len(self._get_notes()) == 7
+        self.assertTrue(response.ok)
+        self.assertEqual(len(self._get_notes()), 7)
 
         response = requests.post(self._get_url("create_notes"))
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
     def test_headers(self):
         note = self._get_notes()[0]
         response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
-        assert response.ok
-        assert response.headers.get('access-control-allow-origin') == '*'
+        self.assertTrue(response.ok)
+        self.assertEqual(response.headers.get("access-control-allow-origin"), "*")
 
         response = requests.options(self._get_url("api/v1/annotations/"))
-        assert response.ok
-        assert response.headers.get('access-control-allow-origin') == '*'
-        assert response.headers.get('access-control-allow-methods') == 'GET, POST, PUT, DELETE, OPTIONS'
-        assert 'X-CSRFToken' in response.headers.get('access-control-allow-headers')
+        self.assertTrue(response.ok)
+        self.assertEqual(response.headers.get("access-control-allow-origin"), "*")
+        self.assertEqual(response.headers.get("access-control-allow-methods"), "GET, POST, PUT, DELETE, OPTIONS")
+        self.assertIn("X-CSRFToken", response.headers.get("access-control-allow-headers"))
 
     def _get_notes(self):
         """
         Return a list of notes from the stub EdxNotes service.
         """
         notes = self.server.get_all_notes()
-        assert len(notes) > 0, 'Notes are empty.'
+        self.assertGreater(len(notes), 0, "Notes are empty.")
         return notes
 
     def _get_url(self, path):

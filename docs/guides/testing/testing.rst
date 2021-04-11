@@ -117,88 +117,143 @@ Note -
 
     paver -h
 
-Note -
-Unless otherwise mentioned, all the following commands should be run from inside lms docker container.
 
 Running Python Unit tests
 -------------------------
 
-We use `pytest`_ to run Python tests. Pytest is a testing framework for python and should be your goto for local Python unit testing.
-
-Pytest (and all of the plugins we use with it) has a lot of options. Use `pytest --help` to see all your option and pytest has good docs around testing.
+We use `pytest`_ to run the test suite.
 
 .. _pytest: https://pytest.org/
 
+For example, this command runs all the python test scripts::
+
+    paver test_python
+
+It also runs ``collectstatic``, which prepares the
+static files used by the site (for example, compiling Sass to
+CSS).
+
+You can re-run all failed python tests by running this command (see note at end of
+section)::
+
+    paver test_python --failed
+
+To test lms python tests use this command::
+
+    paver test_system -s lms
+
+To test cms python tests use this command::
+
+    paver test_system -s cms
+
+To run these tests without ``collectstatic``, which is faster, append the following argument::
+
+    paver test_system -s lms --fasttest
+
+To run cms python tests without ``collectstatic`` use this command::
+
+    paver test_system -s cms --fasttest
+
+For the sake of speed, by default the python unit test database tables
+are created directly from apps' models. If you want to run the tests
+against a database created by applying the migrations instead, use the
+``--enable-migrations`` option::
+
+    paver test_system -s lms --enable-migrations
+
+To see the migration output, use::
+
+    paver test_system -s lms --enable-migrations --verbose --disable_capture
+
+To run a single django test class use this command::
+
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest
 
 Running a Single Test
 ~~~~~~~~~~~~~~~~~~~~~
 
-When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc.
+When developing tests, it is often helpful to be able to really just run
+one single test without the overhead of PIP installs, UX builds, etc. In
+this case, it is helpful to look at the output of paver, and run just
+the specific command (optionally, stripping away coverage metrics). At
+the time of this writing, the command is the following::
 
-Various ways to run tests using pytest::
+    pytest lms/djangoapps/courseware/tests/test_courses.py
 
-    pytest path/test_m­odule.py                          # Run all tests in a module.
-    pytest path/test_m­odule.p­y:­:te­st_func               # Run a specific test within a module.
-    pytest path/test_m­odule.p­y:­:Te­stC­las­s               # Run all tests in a class
-    pytest path/test_m­odule.p­y:­:Te­stC­las­s::­tes­t_m­ethod  # Run a specific method of a class.
-    pytest path/testing/                                # Run all tests in a directory.
+
+To run a single test format the command like this::
+
+    paver test_system -t lms/djangoapps/courseware/tests/tests.py::ActivateLoginTest::test_activate_login
+
+You can use ``--randomize`` to randomize the test case sequence.  In the
+short term, this is likely to reveal bugs in our test setup and teardown;
+please fix (or at least file tickets for) any such issues you encounter.
+
+You can also enable test concurrency with the ``--processes=N`` flag (where ``N``
+is the number of processes to run tests with, and ``-1`` means one process per
+available core). Note, however, that when running concurrently, breakpoints may
+not work correctly.
+
+For example::
+
+    # This will run all tests in the order that they appear in their files, serially
+    paver test_system -s lms --no-randomize --processes=0
+
+    # This will run using only 2 processes for tests
+    paver test_system -s lms --processes=2
+
+To re-run all failing django tests from lms or cms, use the
+``--failed``,\ ``-f`` flag (see note at end of section)::
+
+    paver test_system -s lms --failed
+    paver test_system -s cms --failed
+
+There is also a ``--exitfirst``, ``-x`` option that will stop pytest
+after the first failure.
+
+common/lib tests are tested with the ``test_lib`` task, which also
+accepts the ``--failed`` and ``--exitfirst`` options::
+
+    paver test_lib -l common/lib/xmodule
+    paver test_lib -l common/lib/xmodule --failed
 
 For example, this command runs a single python unit test file::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py
 
-Note -
-edx-platorm has multiple services (lms, cms) in it. The environment for each service is different enough that we run some tests in both environments in jenkins. To make sure tests will pass in each of these environments (especially for tests in "common" directory), you will need to test in each seperately. Add --rootdir flag at end of your pytest call and specify the env you are testing in::
 
-    pytest test --rootdir <lms or cms>
-
-Various tools like ddt create tests with very complex names, rather than figuring out the name yourself, you can:
-
-1. Select tests to run based on their name, provide an expression to the `pytest -k option`_ which performs a substring match on test names::
+To select tests to run based on their name, provide an expression to the
+`pytest -k option`_ which performs a substring match on test names::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py -k test_stringify
 
 .. _pytest -k option: https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name
 .. _node ID: https://docs.pytest.org/en/latest/example/markers.html#node-id
 
+Alternatively, you can select tests based on their `node ID`_ directly,
+which is useful when you need to run only one of mutliple tests with the same
+name in different classes or files.
 
-2. Alternatively, you can the get the name of all test methods in a class, file, or project, including all ddt.data variations, by running pytest with `--collectonly`::
+This command runs any python unit test method that matches the substring
+`test_stringify` within a specified TestCase class within a specified file::
+
+    pytest common/lib/xmodule/xmodule/tests/test_stringify.py::TestCase -k test_stringify
+
+Note: if the method has an `@ddt.data` decorator, ddt will create multiple
+methods with the same prefix name and each individual data input as the suffix
+(e.g. `test_stringify_1_foo`). To test all of the ddt.data variations of the
+same test method, pass the prefix name to the pytest `-k` option.
+
+If you need to run only one of the test variations, you can the get the
+name of all test methods in a class, file, or project, including all ddt.data
+variations, by running pytest with `--collectonly`::
 
     pytest common/lib/xmodule/xmodule/tests/test_stringify.py --collectonly
 
-Testing with migrations
-***********************
 
-For the sake of speed, by default the python unit test database tables
-are created directly from apps' models. If you want to run the tests
-against a database created by applying the migrations instead, use the
-``--create-db --migrations`` option::
+This is an example of how to run a single test and get stdout shown immediately, with proper env config::
 
-    pytest test --create-db --migrations
-
-Debugging a test
-~~~~~~~~~~~~~~~~
-
-There are various ways to debug tests in Python and more specifically with pytest:
-
-- using the verbose -v or really verbose -vv flags can be helpful for displaying diffs on assertion failures
-
-- if you want to focus on one test failure at a time, the ``--exitfirst``or ``-x`` flags to have pytest stop after the first failure
-
-- by default, the plugin pytest-randomly will randomize test case sequence. This is to help reveal bugs in your test setup and teardown. If you do not want this randomness, use the --randomly-dont-reorganize flag
-
-- if you pass the ``--pdb`` flag to a pytest call, the test runner will drop you into pdb on error. This lets you go up and down the stack and see what the values of the variables are. Check out `the pdb documentation`_.  Note that this only works if you aren't collecting coverage statistics (pdb and coverage.py use the same mechanism to trace code execution).
-
-- If there is a specific point in code you would like to debug, you can add the build-in "breakpoint()" function there and it will automatically drop you at the point next time the code runs. If you check this in, your tests will hang on jenkins. Example of use::
-
-    if True:
-      # you will be dropped here in the pdb shell when running test or code
-      breakpoint()
-      a=2
-      random_variable = False
-
-.. _the pdb documentation: http://docs.python.org/library/pdb.html
-
+    pytest cms/djangoapps/contentstore/tests/test_import.py -s
 
 How to output coverage locally
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -247,7 +302,34 @@ run one of these commands::
     pytest common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 .. _YouTube stub server: https://github.com/edx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+.. _the pdb documentation: http://docs.python.org/library/pdb.html
 
+Very handy: if you pass the ``--pdb`` flag to a paver test function, or
+uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner will drop you
+into pdb on error. This lets you go up and down the stack and see what the
+values of the variables are. Check out `the pdb documentation`_.  Note that
+this only works if you aren't collecting coverage statistics (pdb and
+coverage.py use the same mechanism to trace code execution).
+
+Use this command to put a temporary debugging breakpoint in a test.
+If you check this in, your tests will hang on jenkins::
+
+    import pdb; pdb.set_trace()
+
+Note: More on the ``--failed`` functionality:
+
+* In order to use this, you must run the tests first. If you haven't already
+  run the tests, or if no tests failed in the previous run, then using the
+  ``--failed`` switch will result in **all** of the tests being run. See more
+  about this in the `pytest documentation
+  <https://docs.pytest.org/en/latest/cache.html>`__.
+
+* Note that ``paver test_python`` calls pytest separately for cms and lms.
+  This means that if tests failed only in lms on the previous run, then calling
+  ``paver test_python --failed`` will run **all of the tests for cms** in
+  addition to the previously failing lms tests. If you want it to run only the
+  failing tests for lms or cms, use the ``paver test_system -s lms --failed``
+  or ``paver test_system -s cms --failed`` commands.
 
 Debugging Unittest Flakiness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -286,20 +368,9 @@ To run JavaScript tests in a browser, run these commands::
     paver test_js_dev -s common
     paver test_js_dev -s common-requirejs
 
-Debugging Specific Javascript Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The best way to debug individual tests is to run the test suite in the browser and
-use your browser's Javascript debugger. The debug page will allow you to select
-an individual test and only view the results of that test.
-
-
-Debugging Tests in a Browser
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 To debug these tests on devstack in a local browser:
 
-* first run the appropriate test_js_dev command from above
+* first run the appropriate test_js_dev command from above which will open a browser using XQuartz
 * open http://localhost:19876/debug.html in your host system's browser of choice
 * this will run all the tests and show you the results including details of any failures
 * you can click on an individually failing test and/or suite to re-run it by itself
@@ -369,7 +440,7 @@ failed tests are captured in test\_root/log.
 Use this command to put a temporary debugging breakpoint in a test.
 If you check this in, your tests will hang on jenkins::
 
-    breakpoint()
+    import pdb; pdb.set_trace()
 
 By default, all bokchoy tests are run with the 'split' ModuleStore. To
 override the modulestore that is used, use the default\_store option.
@@ -468,7 +539,7 @@ teardown and other unmanaged state.
 
     paver test_bokchoy --serversonly
 
-   Note if setup has already been done, you can run::
+  Note if setup has already been done, you can run::
 
     paver test_bokchoy --serversonly --fasttest
 

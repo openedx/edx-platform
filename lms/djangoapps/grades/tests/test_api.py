@@ -1,13 +1,15 @@
 """ Tests calling the grades api directly """
 
 
-from unittest.mock import patch
-
 import ddt
+from mock import patch
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.grades import api
-from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from lms.djangoapps.grades.models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+)
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -20,7 +22,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super(OverrideSubsectionGradeTests, cls).setUpTestData()
         cls.user = UserFactory()
         cls.overriding_user = UserFactory()
         cls.signal_patcher = patch('lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED.send')
@@ -33,13 +35,13 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
+        super(OverrideSubsectionGradeTests, cls).tearDownClass()
         cls.signal_patcher.stop()
         cls.id_patcher.stop()
         cls.type_patcher.stop()
 
     def setUp(self):
-        super().setUp()
+        super(OverrideSubsectionGradeTests, self).setUp()
         self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course', run='Spring2019')
         self.subsection = ItemFactory.create(parent=self.course, category="subsection", display_name="Subsection")
         self.grade = PersistentSubsectionGrade.update_or_create_grade(
@@ -55,7 +57,7 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
         )
 
     def tearDown(self):
-        super().tearDown()
+        super(OverrideSubsectionGradeTests, self).tearDown()
         PersistentSubsectionGradeOverride.objects.all().delete()  # clear out all previous overrides
 
     @ddt.data(0.0, None, 3.0)
@@ -73,9 +75,9 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
             self.course.id,
             self.subsection.location
         )
-        assert override_obj is not None
-        assert override_obj.earned_graded_override == earned_graded
-        assert override_obj.override_reason == 'Test Override Comment'
+        self.assertIsNotNone(override_obj)
+        self.assertEqual(override_obj.earned_graded_override, earned_graded)
+        self.assertEqual(override_obj.override_reason, 'Test Override Comment')
 
         for i in range(3):
             override_obj.override_reason = 'this field purposefully left blank'
@@ -96,15 +98,15 @@ class OverrideSubsectionGradeTests(ModuleStoreTestCase):
             self.subsection.location
         )
 
-        assert override_obj is not None
-        assert override_obj.earned_graded_override == earned_graded
-        assert override_obj.override_reason == 'Test Override Comment 2'
+        self.assertIsNotNone(override_obj)
+        self.assertEqual(override_obj.earned_graded_override, earned_graded)
+        self.assertEqual(override_obj.override_reason, 'Test Override Comment 2')
 
-        assert 5 == len(override_obj.history.all())
+        self.assertEqual(5, len(override_obj.history.all()))
         for history_entry in override_obj.history.all():
             if history_entry.override_reason.startswith('Test Override Comment'):
-                assert self.overriding_user == history_entry.history_user
-                assert self.overriding_user.id == history_entry.history_user_id
+                self.assertEqual(self.overriding_user, history_entry.history_user)
+                self.assertEqual(self.overriding_user.id, history_entry.history_user_id)
             else:
-                assert history_entry.history_user is None
-                assert history_entry.history_user_id is None
+                self.assertIsNone(history_entry.history_user)
+                self.assertIsNone(history_entry.history_user_id)

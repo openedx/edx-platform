@@ -35,7 +35,7 @@ def rst_header(text, level, anchor=None):
     """
     rst = []
     if anchor:
-        rst.append(f".. _{anchor}:")
+        rst.append(".. _{}:".format(anchor))
         rst.append("")
     char = " #=-"[level]
     if level == 1:
@@ -102,10 +102,10 @@ def convert_swagger_to_sphinx(swagger_file, output_dir):
             with open(os.path.join(output_dir, outfile + '.rst'), 'w') as outf:
                 pr_outf = functools.partial(print, file=outf)
                 pr_outf(rst_header(segment, level=1, anchor="gen_" + outfile))
-                pr_outf(f".. openapi:: {rel_swagger_path}")
+                pr_outf(".. openapi:: {}".format(rel_swagger_path))
                 pr_outf("    :format: markdown")
                 pr_outf("    :include:")
-                pr_outf(f"        {segment}.*")
+                pr_outf("        {}.*".format(segment))
 
             pr_index(rst_header(segment, level=2))
 
@@ -115,7 +115,7 @@ def convert_swagger_to_sphinx(swagger_file, output_dir):
                     summary = ''
                     if 'summary' in op_data:
                         summary = " --- {}".format(op_data['summary'])
-                    pr_index(f":ref:`{method.upper()} {uri}<gen_{outfile}>`{summary}\n")
+                    pr_index(":ref:`{} {}<gen_{}>`{}\n".format(method.upper(), uri, outfile, summary))
 
 
 def main(args):

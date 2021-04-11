@@ -61,7 +61,7 @@ class AuthAndScopesTestMixin(object):
     user_password = 'test'
 
     def setUp(self):
-        super(AuthAndScopesTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(AuthAndScopesTestMixin, self).setUp()
         self.student = UserFactory.create(password=self.user_password)
         self.other_student = UserFactory.create(password=self.user_password)
         self.global_staff = UserFactory.create(password=self.user_password, is_staff=True)
@@ -134,23 +134,23 @@ class AuthAndScopesTestMixin(object):
         )
 
     def _assert_in_log(self, text, mock_log_method):
-        assert mock_log_method.called
-        assert text in mock_log_method.call_args_list[0][0][0]
+        self.assertTrue(mock_log_method.called)
+        self.assertIn(text, mock_log_method.call_args_list[0][0][0])
 
     def test_anonymous_user(self):
         resp = self.client.get(self.get_url(self.student.username))
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @ddt.data(*JWT_AUTH_TYPES)
     def test_self_user(self, auth_type):
         resp = self.get_response(auth_type)
-        assert resp.status_code == status.HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assert_success_response_for_student(resp)
 
     @ddt.data(*list(AuthType))
     def test_staff_user(self, auth_type):
         resp = self.get_response(auth_type, requesting_user=self.global_staff)
-        assert resp.status_code == status.HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assert_success_response_for_student(resp)
 
     @ddt.data(*list(AuthType))
@@ -158,7 +158,7 @@ class AuthAndScopesTestMixin(object):
         self.student.is_active = False
         self.student.save()
         resp = self.get_response(auth_type)
-        assert resp.status_code == status.HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*list(AuthType))
@@ -172,7 +172,10 @@ class AuthAndScopesTestMixin(object):
         # Restricted JWT tokens without the user:me filter have access to other users
         expected_jwt_access_granted = auth_type == AuthType.jwt_restricted
 
-        assert resp.status_code == (status.HTTP_200_OK if expected_jwt_access_granted else status.HTTP_403_FORBIDDEN)
+        self.assertEqual(
+            resp.status_code,
+            status.HTTP_200_OK if expected_jwt_access_granted else status.HTTP_403_FORBIDDEN,
+        )
         if not expected_jwt_access_granted:
             self._assert_in_log("IsUserInUrl", mock_log.info)
 
@@ -184,7 +187,7 @@ class AuthAndScopesTestMixin(object):
         resp = self.get_response(AuthType.jwt, token=jwt_token)
 
         is_enforced = auth_type == AuthType.jwt_restricted
-        assert resp.status_code == (status.HTTP_403_FORBIDDEN if is_enforced else status.HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN if is_enforced else status.HTTP_200_OK)
 
         if is_enforced:
             self._assert_in_log("JwtHasScope", mock_log.warning)
@@ -197,7 +200,7 @@ class AuthAndScopesTestMixin(object):
         resp = self.get_response(AuthType.jwt, token=jwt_token)
 
         is_enforced = auth_type == AuthType.jwt_restricted
-        assert resp.status_code == (status.HTTP_403_FORBIDDEN if is_enforced else status.HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN if is_enforced else status.HTTP_200_OK)
 
         if is_enforced:
             self._assert_in_log("JwtHasContentOrgFilterForRequestedCourse", mock_log.warning)
@@ -207,7 +210,7 @@ class AuthAndScopesTestMixin(object):
         jwt_token = self._create_jwt_token(self.student, auth_type, include_me_filter=True)
 
         resp = self.get_response(AuthType.jwt, token=jwt_token)
-        assert resp.status_code == status.HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     @patch('edx_rest_framework_extensions.permissions.log')
     @ddt.data(*JWT_AUTH_TYPES)
@@ -216,7 +219,7 @@ class AuthAndScopesTestMixin(object):
         jwt_token = self._create_jwt_token(self.other_student, auth_type, include_me_filter=True)
         resp = self.get_response(AuthType.jwt, token=jwt_token)
 
-        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
         if auth_type == AuthType.jwt_restricted:
             self._assert_in_log("JwtHasUserFilterForRequestedUser", mock_log.warning)
@@ -225,15 +228,15 @@ class AuthAndScopesTestMixin(object):
 
     def test_valid_oauth_token(self):
         resp = self.get_response(AuthType.oauth)
-        assert resp.status_code == status.HTTP_200_OK
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_invalid_oauth_token(self):
         resp = self.get_response(AuthType.oauth, token="fooooooooooToken")
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_expired_oauth_token(self):
         token = self._create_oauth_token(self.student)
         token.expires = utcnow() - timedelta(weeks=1)
         token.save()
         resp = self.get_response(AuthType.oauth, token=token)
-        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -61,7 +61,7 @@ class UnitBlock(XBlock):
         """
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict
-        xblock_body = super().index_dictionary()
+        xblock_body = super(UnitBlock, self).index_dictionary()
         index_body = {
             "display_name": self.display_name,
         }

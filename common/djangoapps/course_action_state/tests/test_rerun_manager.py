@@ -5,6 +5,7 @@ Tests specific to the CourseRerunState Model and Manager.
 
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
+from six import text_type
 
 from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -16,7 +17,7 @@ class TestCourseRerunStateManager(TestCase):
     Test class for testing the CourseRerunUIStateManager.
     """
     def setUp(self):
-        super().setUp()
+        super(TestCourseRerunStateManager, self).setUp()
         self.source_course_key = CourseLocator("source_org", "source_course_num", "source_run")
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
         self.created_user = UserFactory()
@@ -96,7 +97,7 @@ class TestCourseRerunStateManager(TestCase):
         exception = Exception("failure in rerunning")
         try:
             raise exception
-        except:  # lint-amnesty, pylint: disable=bare-except
+        except:
             CourseRerunState.objects.failed(course_key=self.course_key)
 
         self.expected_rerun_state.update(
@@ -104,7 +105,7 @@ class TestCourseRerunStateManager(TestCase):
         )
         self.expected_rerun_state.pop('message')
         rerun = self.verify_rerun_state()
-        assert str(exception) in rerun.message
+        self.assertIn(text_type(exception), rerun.message)
 
         # dismiss ui and verify
         self.dismiss_ui_and_verify(rerun)

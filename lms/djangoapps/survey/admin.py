@@ -12,7 +12,7 @@ from lms.djangoapps.survey.models import SurveyForm
 class SurveyFormAdminForm(forms.ModelForm):
     """Form providing validation of SurveyForm content."""
 
-    class Meta:
+    class Meta(object):
         model = SurveyForm
         fields = ('name', 'form')
 

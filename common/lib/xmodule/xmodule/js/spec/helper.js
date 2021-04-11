@@ -123,7 +123,7 @@
         }
     };
 
-    jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50', '2.0'];
+    jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50'];
 
     jasmine.stubRequests = function() {
         var spy = $.ajax;

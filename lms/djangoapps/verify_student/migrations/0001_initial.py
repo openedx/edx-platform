@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django.db.models.deletion
 import django.utils.timezone
 import model_utils.fields
@@ -72,7 +75,7 @@ class Migration(migrations.Migration):
             name='SoftwareSecurePhotoVerification',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', model_utils.fields.StatusField(default='created', max_length=100, verbose_name='status', no_check_for_status=True, choices=[('created', 'created'), ('ready', 'ready'), ('submitted', 'submitted'), ('must_retry', 'must_retry'), ('approved', 'approved'), ('denied', 'denied')])),
+                ('status', model_utils.fields.StatusField(default=u'created', max_length=100, verbose_name='status', no_check_for_status=True, choices=[(u'created', u'created'), (u'ready', u'ready'), (u'submitted', u'submitted'), (u'must_retry', u'must_retry'), (u'approved', u'approved'), (u'denied', u'denied')])),
                 ('status_changed', model_utils.fields.MonitorField(default=django.utils.timezone.now, verbose_name='status changed', monitor='status')),
                 ('name', models.CharField(max_length=255, blank=True)),
                 ('face_image_url', models.URLField(max_length=255, blank=True)),
@@ -121,7 +124,7 @@ class Migration(migrations.Migration):
             name='VerificationStatus',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('status', models.CharField(db_index=True, max_length=32, choices=[('submitted', 'submitted'), ('approved', 'approved'), ('denied', 'denied'), ('error', 'error')])),
+                ('status', models.CharField(db_index=True, max_length=32, choices=[(u'submitted', u'submitted'), (u'approved', u'approved'), (u'denied', u'denied'), (u'error', u'error')])),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
                 ('response', models.TextField(null=True, blank=True)),
                 ('error', models.TextField(null=True, blank=True)),
@@ -146,10 +149,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='verificationcheckpoint',
-            unique_together={('course_id', 'checkpoint_location')},
+            unique_together=set([('course_id', 'checkpoint_location')]),
         ),
         migrations.AlterUniqueTogether(
             name='skippedreverification',
-            unique_together={('user', 'course_id')},
+            unique_together=set([('user', 'course_id')]),
         ),
     ]

@@ -70,7 +70,7 @@ def fail_on_eslint(*args, **kwargs):
     to fail, since that is what is going to fail when we pass in a
     percentage ("p") requirement.
     """
-    if "eslint" in args[0]:  # lint-amnesty, pylint: disable=no-else-raise
+    if "eslint" in args[0]:
         raise BuildFailure('Subprocess return code: 1')
     else:
         if kwargs.get('capture', False):
@@ -91,7 +91,7 @@ def unexpected_fail_on_npm_install(*args, **kwargs):  # pylint: disable=unused-a
     For our tests, we need the call for diff-quality running pycodestyle reports to fail, since that is what
     is going to fail when we pass in a percentage ("p") requirement.
     """
-    if ["npm", "install", "--verbose"] == args[0]:  # lint-amnesty, pylint: disable=no-else-raise
+    if ["npm", "install", "--verbose"] == args[0]:
         raise BuildFailure('Subprocess return code: 50')
     else:
         return

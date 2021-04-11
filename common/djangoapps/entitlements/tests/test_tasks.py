@@ -4,9 +4,8 @@ Test entitlements tasks
 
 
 from datetime import datetime, timedelta
-from unittest import mock
 
-import pytest
+import mock
 import pytz
 from django.test import TestCase
 
@@ -16,7 +15,7 @@ from common.djangoapps.entitlements.tests.factories import CourseEntitlementFact
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-def make_entitlement(expired=False):  # lint-amnesty, pylint: disable=missing-function-docstring
+def make_entitlement(expired=False):
     age = CourseEntitlementPolicy.DEFAULT_EXPIRATION_PERIOD_DAYS
     past_datetime = datetime.now(tz=pytz.UTC) - timedelta(days=age)
     expired_at = past_datetime if expired else None
@@ -46,7 +45,7 @@ class TestExpireOldEntitlementsTask(TestCase):
         ) as mock_datetime:
             tasks.expire_old_entitlements.delay(1, 3).get()
 
-        assert mock_datetime.call_count == 2
+        self.assertEqual(mock_datetime.call_count, 2)
 
     def test_only_unexpired(self):
         """
@@ -63,7 +62,7 @@ class TestExpireOldEntitlementsTask(TestCase):
             tasks.expire_old_entitlements.delay(1, 3).get()
 
         # Make sure only the unexpired one gets used
-        assert mock_datetime.call_count == 1
+        self.assertEqual(mock_datetime.call_count, 1)
 
     def test_retry(self):
         """
@@ -79,8 +78,8 @@ class TestExpireOldEntitlementsTask(TestCase):
         ) as mock_datetime:
             task = tasks.expire_old_entitlements.delay(1, 2)
 
-        pytest.raises(Exception, task.get)
-        assert mock_datetime.call_count == (tasks.MAX_RETRIES + 1)
+        self.assertRaises(Exception, task.get)
+        self.assertEqual(mock_datetime.call_count, tasks.MAX_RETRIES + 1)
 
 
 @skip_unless_lms
@@ -96,10 +95,10 @@ class TestExpireOldEntitlementsTaskIntegration(TestCase):
         entitlement = make_entitlement()
 
         # Sanity check
-        assert entitlement.expired_at is None
+        self.assertIsNone(entitlement.expired_at)
 
         # Run enforcement
         tasks.expire_old_entitlements.delay(1, 2).get()
         entitlement.refresh_from_db()
 
-        assert entitlement.expired_at is not None
+        self.assertIsNotNone(entitlement.expired_at)

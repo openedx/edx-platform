@@ -11,6 +11,7 @@ import logging
 
 import crum
 import pytz
+import six
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from web_fragments.fragment import Fragment
@@ -43,22 +44,22 @@ def create_content_gating_partition(course):
         content_gate_scheme = UserPartition.get_scheme(CONTENT_TYPE_GATING_SCHEME)
     except UserPartitionError:
         LOG.warning(
-            "No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
+            u"No %r scheme registered, ContentTypeGatingPartitionScheme will not be created.",
             CONTENT_TYPE_GATING_SCHEME
         )
         return None
 
-    used_ids = {p.id for p in course.user_partitions}
+    used_ids = set(p.id for p in course.user_partitions)
     if CONTENT_GATING_PARTITION_ID in used_ids:
         # It's possible for course authors to add arbitrary partitions via XML import. If they do, and create a
         # partition with id 51, it will collide with the Content Gating Partition. We'll catch that here, and
         # then fix the course content as needed (or get the course team to).
         LOG.warning(
-            "Can't add %r partition, as ID %r is assigned to %r in course %s.",
+            u"Can't add %r partition, as ID %r is assigned to %r in course %s.",
             CONTENT_TYPE_GATING_SCHEME,
             CONTENT_GATING_PARTITION_ID,
             _get_partition_from_id(course.user_partitions, CONTENT_GATING_PARTITION_ID).name,
-            str(course.id),
+            six.text_type(course.id),
         )
         return None
 
@@ -66,9 +67,9 @@ def create_content_gating_partition(course):
         id=CONTENT_GATING_PARTITION_ID,
         # Content gating partition name should not be marked for translations
         # edX mobile apps expect it in english
-        name="Feature-based Enrollments",
-        description=_("Partition for segmenting users by access to gated content types"),
-        parameters={"course_id": str(course.id)}
+        name=u"Feature-based Enrollments",
+        description=_(u"Partition for segmenting users by access to gated content types"),
+        parameters={"course_id": six.text_type(course.id)}
     )
     return partition
 
@@ -114,9 +115,9 @@ class ContentTypeGatingPartition(UserPartition):
 
         request = crum.get_current_request()
         if request and is_request_from_mobile_app(request):
-            return _("Graded assessments are available to Verified Track learners.")
+            return _(u"Graded assessments are available to Verified Track learners.")
         else:
-            return _("Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
+            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
 
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
@@ -131,7 +132,7 @@ class ContentTypeGatingPartition(UserPartition):
         return block.scope_ids.usage_id.course_key
 
 
-class ContentTypeGatingPartitionScheme:
+class ContentTypeGatingPartitionScheme(object):
     """
     This scheme implements the Content Type Gating permission partitioning.
 
@@ -170,8 +171,8 @@ class ContentTypeGatingPartitionScheme:
         """
         return ContentTypeGatingPartition(
             id,
-            str(name),
-            str(description),
+            six.text_type(name),
+            six.text_type(description),
             [
                 LIMITED_ACCESS,
                 FULL_ACCESS,

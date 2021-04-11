@@ -4,15 +4,16 @@ Feature flag support for experiments
 
 import datetime
 import logging
+from contextlib import contextmanager
 
 import dateutil
 import pytz
 from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
-from common.djangoapps.track import segment
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from common.djangoapps.track import segment
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +62,6 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         def test_my_experiment(self):
             ...
     """
-
     def __init__(
             self,
             waffle_namespace,
@@ -76,37 +76,10 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         self.num_buckets = num_buckets
         self.experiment_id = experiment_id
         self.bucket_flags = [
-            CourseWaffleFlag(waffle_namespace, f'{flag_name}.{bucket}', module_name)
+            CourseWaffleFlag(waffle_namespace, '{}.{}'.format(flag_name, bucket), module_name)
             for bucket in range(num_buckets)
         ]
         self.use_course_aware_bucketing = use_course_aware_bucketing
-
-    @property
-    def _app_label(self):
-        """
-        By convention, the app label associated to an experiment waffle flag is the dotted prefix of the flag name. For
-        example: if the flag name is "grades.my.experiment.waffle.flag", then the `_app_label` will be "grades".
-        This app label replaces what was formerly known as the waffle flag namespace.
-        """
-        return self._split_name[0]
-
-    @property
-    def _experiment_name(self):
-        """
-        By convention, the app label associated to an experiment waffle flag is the first dotted suffix of the flag
-        name. For example: if the flag name name is "grades.my.experiment.waffle.flag", then the `_experiment_name`
-        will be "my.experiment.waffle.flag".
-        """
-        return self._split_name[1]
-
-    @property
-    def _split_name(self):
-        """
-        Return the flag name prefix (before the first dot) and suffix. This raises a ValueError if the flag does not
-        contain a dot ".".
-        """
-        prefix, suffix = self.name.split(".", maxsplit=1)
-        return prefix, suffix
 
     def _cache_bucket(self, key, value):
         request_cache = RequestCache('experiments')
@@ -189,25 +162,27 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
         if not request:
             return 0
 
-        if hasattr(request, 'user'):
-            user = get_specific_masquerading_user(request.user, course_key)
+        if not hasattr(request, 'user') or not request.user.id:
+            # We need username for stable bucketing and id for tracking, so just skip anonymous (not-logged-in) users
+            return 0
 
-            if user is None:
-                user = request.user
-                masquerading_as_specific_student = False
-            else:
-                masquerading_as_specific_student = True
+        user = get_specific_masquerading_user(request.user, course_key)
+        if user is None:
+            user = request.user
+            masquerading_as_specific_student = False
+        else:
+            masquerading_as_specific_student = True
 
         # If a course key is passed in, include it in the experiment name
         # in order to separate caches and analytics calls per course-run.
         # If we are using course-aware bucketing, then also append that course key
         # to `bucketing_group_name`, such that users can be hashed into different
         # buckets for different course-runs.
-        experiment_name = bucketing_group_name = self.name
+        experiment_name = bucketing_group_name = self.namespaced_flag_name
         if course_key:
-            experiment_name += f".{course_key}"
+            experiment_name += ".{}".format(course_key)
         if course_key and self.use_course_aware_bucketing:
-            bucketing_group_name += f".{course_key}"
+            bucketing_group_name += ".{}".format(course_key)
 
         # Check if we have a cache for this request already
         request_cache = RequestCache('experiments')
@@ -236,23 +211,22 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                 break
         else:
             bucket = stable_bucketing_hash_group(
-                bucketing_group_name, self.num_buckets, user
+                bucketing_group_name, self.num_buckets, user.username
             )
 
-        session_key = f'tracked.{experiment_name}'
-        anonymous = not hasattr(request, 'user') or not request.user.id
+        session_key = 'tracked.{}'.format(experiment_name)
         if (
                 track and hasattr(request, 'session') and
                 session_key not in request.session and
-                not masquerading_as_specific_student and not anonymous
+                not masquerading_as_specific_student
         ):
             segment.track(
                 user_id=user.id,
                 event_name='edx.bi.experiment.user.bucketed',
                 properties={
                     'site': request.site.domain,
-                    'app_label': self._app_label,
-                    'experiment': self._experiment_name,
+                    'app_label': self.waffle_namespace.name,
+                    'experiment': self.flag_name,
                     'course_id': str(course_key) if course_key else None,
                     'bucket': bucket,
                     'is_staff': user.is_staff,

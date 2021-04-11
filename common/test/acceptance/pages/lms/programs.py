@@ -29,7 +29,7 @@ class ProgramListingPage(PageObject):
 class ProgramDetailsPage(PageObject):
     """Program details page."""
     program_uuid = str(uuid4())
-    url = f'{BASE_URL}/dashboard/programs/{program_uuid}/'
+    url = '{base}/dashboard/programs/{program_uuid}/'.format(base=BASE_URL, program_uuid=program_uuid)
 
     def is_browser_on_page(self):
         return self.q(css='.js-program-details-wrapper').present

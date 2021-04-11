@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 # Converted from the original South migration 0002_default_rate_limit_config.py

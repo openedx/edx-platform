@@ -16,22 +16,22 @@ class InstructorConfig(AppConfig):
     """
     Application Configuration for Instructor.
     """
-    name = 'lms.djangoapps.instructor'
+    name = u'lms.djangoapps.instructor'
 
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: f'^courses/{COURSE_ID_PATTERN}/instructor/api/',
-                PluginURLs.RELATIVE_PATH: 'views.api_urls',
+                PluginURLs.NAMESPACE: u'',
+                PluginURLs.REGEX: u'^courses/{}/instructor/api/'.format(COURSE_ID_PATTERN),
+                PluginURLs.RELATIVE_PATH: u'views.api_urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: 'settings.devstack'},
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
             }
         }
     }

@@ -6,7 +6,7 @@ Grade service
 from . import api
 
 
-class GradesService:
+class GradesService(object):
     """
     Course grade service
 

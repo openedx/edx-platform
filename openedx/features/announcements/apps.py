@@ -13,20 +13,20 @@ class AnnouncementsConfig(AppConfig):
     """
     Application Configuration for Announcements
     """
-    name = 'openedx.features.announcements'
+    name = u'openedx.features.announcements'
 
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: 'announcements',
-                PluginURLs.REGEX: '^announcements/',
-                PluginURLs.RELATIVE_PATH: 'urls',
+                PluginURLs.NAMESPACE: u'announcements',
+                PluginURLs.REGEX: u'^announcements/',
+                PluginURLs.RELATIVE_PATH: u'urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
-                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: 'settings.test'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.TEST: {PluginSettings.RELATIVE_PATH: u'settings.test'},
             }
         }
     }

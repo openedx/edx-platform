@@ -4,8 +4,8 @@
 import logging
 import os
 import unittest
-from unittest.mock import Mock
 
+from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pkg_resources import resource_string
 from xblock.field_data import DictFieldData
@@ -21,7 +21,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
     """ Testing TabsEditingDescriptor"""
 
     def setUp(self):
-        super().setUp()
+        super(TabsEditingDescriptorTestCase, self).setUp()
         system = get_test_descriptor_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         self.tabs = [
@@ -70,8 +70,8 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         test_css_file = os.path.join(current_dir, 'test_files/test_tabseditingdescriptor.scss')
         with open(test_css_file) as new_css:
             added_css = new_css.read()
-        assert css['scss'].pop().decode('utf-8') == added_css
-        assert css['css'].pop().decode('utf-8') == added_css
+        self.assertEqual(css['scss'].pop().decode('utf-8'), added_css)
+        self.assertEqual(css['css'].pop().decode('utf-8'), added_css)
 
     def test_get_context(self):
         """"test get_context"""

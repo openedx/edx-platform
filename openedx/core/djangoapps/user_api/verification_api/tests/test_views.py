@@ -10,12 +10,12 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
 FROZEN_TIME = '2015-01-01'
-VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365, 'EXPIRING_SOON_WINDOW': 20}
+VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365}
 
 
 class VerificationStatusViewTestsMixin:
@@ -38,7 +38,7 @@ class VerificationStatusViewTestsMixin:
     def assert_path_not_found(self, path):
         """ Assert the path returns HTTP 404. """
         response = self.client.get(path)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def get_expected_response(self, *args, **kwargs):
         raise NotImplementedError
@@ -46,17 +46,17 @@ class VerificationStatusViewTestsMixin:
     def assert_verification_returned(self, verified=False):
         """ Assert the path returns HTTP 200 and returns appropriately-serialized data. """
         response = self.client.get(self.path)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = self.get_expected_response(verified=verified, expected_expires=expected_expires)
-        assert json.loads(response.content.decode('utf-8')) == expected
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_authentication_required(self):
         """ The endpoint should return HTTP 403 if the user is not authenticated. """
         self.client.logout()
         response = self.client.get(self.path)
-        assert response.status_code == 401
+        self.assertEqual(response.status_code, 401)
 
     def test_no_verifications(self):
         """ The endpoint should return HTTP 404 if the user has no verifications. """
@@ -81,7 +81,7 @@ class VerificationStatusViewTestsMixin:
         user = UserFactory()
         self.client.login(username=user.username, password=self.PASSWORD)
         response = self.client.get(self.path)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def test_non_existent_user(self):
         """ The endpoint should return HTTP 404 if the user does not exist. """
@@ -95,12 +95,9 @@ class PhotoVerificationStatusViewTests(VerificationStatusViewTestsMixin, TestCas
     VIEW_NAME = 'verification_status'
 
     def get_expected_response(self, *args, **kwargs):
-        verification_status = self.photo_verification.status
-        if self.photo_verification.status == 'submitted':
-            verification_status = 'pending'
         return {
-            'status': verification_status,
-            'expiration_datetime': '',
+            'status': self.photo_verification.status,
+            'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
             'is_verified': kwargs.get('verified')
         }
 
@@ -108,14 +105,6 @@ class PhotoVerificationStatusViewTests(VerificationStatusViewTestsMixin, TestCas
         """ The endpoint should return that the user is verified if the user's verification is accepted. """
         self.photo_verification.status = 'approved'
         self.photo_verification.save()
-        self.client.logout()
-        self.client.login(username=self.user.username, password=self.PASSWORD)
-        self.assert_verification_returned(verified=True)
-
-    def test_multiple_verifications(self):
-        self.photo_verification.status = 'approved'
-        self.photo_verification.save()
-        SoftwareSecurePhotoVerification.objects.create(user=self.user, status='denied')
         self.client.logout()
         self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assert_verification_returned(verified=True)
@@ -132,23 +121,22 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             'status': self.photo_verification.status,
             'expiration_datetime': '{}Z'.format(kwargs.get('expected_expires').isoformat()),
             'message': '',
-            'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-            'receipt_id': self.photo_verification.receipt_id,
+            'updated_at': '{}Z'.format(self.CREATED_AT.isoformat())
         }]
 
     def test_multiple_verification_types(self):
-        self.manual_verification = ManualVerification.objects.create(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.manual_verification = ManualVerification.objects.create(
             user=self.user,
             status='approved',
             reason='testing'
         )
-        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')
         self.photo_verification.error_msg = 'tested_error'
         self.photo_verification.error_code = 'error_code'
         self.photo_verification.status = 'denied'
         self.photo_verification.save()
         response = self.client.get(self.path)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = [
@@ -158,7 +146,6 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': self.photo_verification.receipt_id
             },
             {
                 'type': 'SSO',
@@ -166,7 +153,6 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': '',
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': None,
             },
             {
                 'type': 'Manual',
@@ -174,13 +160,12 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.manual_verification.reason,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': None,
             },
         ]
-        assert json.loads(response.content.decode('utf-8')) == expected
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)
 
     def test_multiple_verification_instances(self):
-        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.sso_verification = SSOVerificationFactory(user=self.user, status='approved')
         second_ss_photo_verification = SoftwareSecurePhotoVerification.objects.create(
             user=self.user,
             status='denied',
@@ -188,7 +173,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             error_code='plain_code'
         )
         response = self.client.get(self.path)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         expected_expires = self.CREATED_AT + datetime.timedelta(settings.VERIFY_STUDENT['DAYS_GOOD_FOR'])
 
         expected = [
@@ -198,7 +183,6 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': self.photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': self.photo_verification.receipt_id,
             },
             {
                 'type': 'Software Secure',
@@ -206,7 +190,6 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': second_ss_photo_verification.error_msg,
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': second_ss_photo_verification.receipt_id,
             },
             {
                 'type': 'SSO',
@@ -214,7 +197,6 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
                 'expiration_datetime': '{}Z'.format(expected_expires.isoformat()),
                 'message': '',
                 'updated_at': '{}Z'.format(self.CREATED_AT.isoformat()),
-                'receipt_id': None,
             },
         ]
-        assert json.loads(response.content.decode('utf-8')) == expected
+        self.assertEqual(json.loads(response.content.decode('utf-8')), expected)

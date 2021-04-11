@@ -2,10 +2,10 @@
 Tests for graph traversal generator functions.
 """
 
+
 from unittest import TestCase
 
 import ddt
-import pytest
 
 from ..grade_utils import compare_scores, round_away_from_zero
 
@@ -32,10 +32,10 @@ class TestGradeUtils(TestCase):
         assert expected_percentage_2 == percentage_2
 
     def test_compare_scores_raise_zero_division(self):
-        with pytest.raises(ZeroDivisionError):
+        with self.assertRaises(ZeroDivisionError):
             compare_scores(1, 0, 1, 2)
 
-        with pytest.raises(ZeroDivisionError):
+        with self.assertRaises(ZeroDivisionError):
             compare_scores(1, 2, 0, 0)
 
     def test_compare_scores_treat_undefined_as_zero(self):

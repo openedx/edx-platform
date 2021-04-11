@@ -4,8 +4,8 @@
 #
 #    make upgrade
 #
-certifi==2020.12.5        # via requests
-chardet==4.0.0            # via requests
+certifi==2020.11.8        # via requests
+chardet==3.0.4            # via requests
 idna==2.10                # via requests
-requests==2.25.1          # via -r scripts/xblock/requirements.in
-urllib3==1.26.4           # via requests
+requests==2.25.0          # via -r scripts/xblock/requirements.in
+urllib3==1.26.1           # via requests

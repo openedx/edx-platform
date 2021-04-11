@@ -5,19 +5,18 @@ CSV processing and generation utilities for Teams LMS app.
 import csv
 from collections import Counter
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db.models import Prefetch
 
-from common.djangoapps.student.models import CourseEnrollment
-from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.teams.api import (
-    ORGANIZATION_PROTECTED_MODES,
     OrganizationProtectionStatus,
     user_organization_protection_status,
+    ORGANIZATION_PROTECTED_MODES,
     user_protection_status_matches_team
 )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-
+from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from .utils import emit_team_event
 
 
@@ -26,7 +25,7 @@ def load_team_membership_csv(course, response):
     Load a CSV detailing course membership.
 
     Arguments:
-        course (CourseBlock): Course module for which CSV
+        course (CourseDescriptor): Course module for which CSV
             download has been requested.
         response (HttpResponse): Django response object to which
             the CSV content will be written.
@@ -142,7 +141,7 @@ def _group_teamset_memberships_by_user(course_team_memberships):
     return teamset_memberships_by_user
 
 
-class TeamMembershipImportManager:
+class TeamMembershipImportManager(object):
     """
     A manager class that is responsible the import process of csv file including validation and creation of
     team_courseteam and teams_courseteammembership objects.
@@ -171,7 +170,7 @@ class TeamMembershipImportManager:
         """
         Parse an input CSV file and pass to `set_team_memberships` for processing
         """
-        csv_reader = csv.DictReader(line.decode('utf-8-sig').strip() for line in input_file.readlines())
+        csv_reader = csv.DictReader((line.decode('utf-8-sig').strip() for line in input_file.readlines()))
         return self.set_team_memberships(csv_reader)
 
     def set_team_memberships(self, csv_reader):
@@ -300,7 +299,7 @@ class TeamMembershipImportManager:
         Ensures that username exists only once in an input file
         """
         if username in usernames_found_so_far:
-            error_message = f'Username {username} listed more than once in file.'
+            error_message = 'Username {} listed more than once in file.'.format(username)
             if self.add_error_and_check_if_max_exceeded(error_message):
                 return False
         return True
@@ -315,7 +314,7 @@ class TeamMembershipImportManager:
         This method will add a validation error and return False if this is the case.
         """
         if None in row:
-            error_message = "Team(s) {} don't have matching teamsets.".format(
+            error_message = "Team(s) {0} don't have matching teamsets.".format(
                 row[None]
             )
             if self.add_error_and_check_if_max_exceeded(error_message):
@@ -375,7 +374,7 @@ class TeamMembershipImportManager:
         if self.is_FERPA_bubble_breached(teamset_id, team_name) or \
                 not self.is_enrollment_protection_for_existing_team_matches_user(user, team_name, teamset_id):
             error_message = \
-                f'Team {team_name} cannot have Master’s track users mixed with users in other tracks.'
+                'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(team_name)
             self.add_error_and_check_if_max_exceeded(error_message)
             return False
         return True

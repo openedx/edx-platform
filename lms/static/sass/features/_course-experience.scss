@@ -140,13 +140,11 @@
           width: auto;
           flex-grow: 1;
           font-size: font-size(small);
-          color: $link-color;
-          text-decoration: underline;
-
+          color: theme-color("primary");
           cursor: pointer;
 
           &:hover {
-            color: $link-hover-color;
+            color: $black-t2;
           }
         }
       }
@@ -423,6 +421,13 @@
   }
 }
 
+#expand-collapse-outline-all-button {
+  float: right;
+  background-color: transparent;
+  color: $black;
+  cursor: pointer;
+}
+
 // extra padding for expand/collapse text change
 .expand-collapse-outline-all-extra-padding {
   padding: 0 4px;
@@ -461,7 +466,7 @@
         color: theme-color("dark");
 
         a {
-          font-size: 0.9rem;
+          font-weight: $font-semibold;
         }
       }
 
@@ -477,9 +482,9 @@
 
       .date-summary-link {
         font-weight: $font-semibold;
-        padding-top: 12px;
 
         a {
+          color: $link-color;
           font-size: 0.9rem;
         }
       }
@@ -493,10 +498,10 @@
 }
 
 .dates-tab-link {
-  padding: 12px 0 0 24px;
+  padding: 16px 0 0 24px;
 
   a {
-    font-size: 0.9rem;
+    font-weight: bold;
   }
 }
 

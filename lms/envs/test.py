@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This config file runs the simplest dev environment using sqlite, and db-based
 sessions. Assumes structure:
@@ -14,13 +15,17 @@ sessions. Assumes structure:
 
 
 import logging
+import os
 from collections import OrderedDict
+from random import choice
+from string import digits, ascii_letters, punctuation
 from uuid import uuid4
 
 import openid.oidutil
 from django.utils.translation import ugettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
+from six.moves import range
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 from openedx.core.lib.derived import derive_settings
@@ -125,7 +130,7 @@ COMMENTS_SERVICE_URL = 'http://localhost:4567'
 
 DJFS = {
     'type': 'osfs',
-    'directory_root': f'{DATA_DIR}/django-pyfs/static/django-pyfs',
+    'directory_root': '{}/django-pyfs/static/django-pyfs'.format(DATA_DIR),
     'url_root': '/static/django-pyfs',
 }
 
@@ -163,7 +168,7 @@ update_module_store_settings(
     doc_store_settings={
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': f'test_xmodule_{THIS_UUID}',
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
         'collection': 'test_modulestore',
     },
 )
@@ -172,7 +177,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': f'test_xcontent_{THIS_UUID}',
+        'db': 'test_xcontent_{}'.format(THIS_UUID),
         'port': MONGO_PORT_NUM,
     }
 }
@@ -379,8 +384,8 @@ openid.oidutil.log = lambda message, level=0: None
 
 # Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
 # UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
 SITE_NAME = "edx.org"
 
@@ -464,6 +469,9 @@ FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
 AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
 
+# ORGANIZATIONS
+FEATURES['ORGANIZATIONS_APP'] = True
+
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
 
@@ -473,7 +481,7 @@ COURSE_BLOCKS_API_EXTRA_FIELDS = [
 ]
 
 COURSE_CATALOG_URL_ROOT = 'https://catalog.example.com'
-COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
+COURSE_CATALOG_API_URL = '{}/api/v1'.format(COURSE_CATALOG_URL_ROOT)
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
@@ -530,7 +538,7 @@ JWT_AUTH.update({
         ': "RSA"}'
     ),
 })
-# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
+# pylint: enable=unicode-format-string
 ####################### Plugin Settings ##########################
 
 add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
@@ -563,26 +571,16 @@ PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 
 PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
-ACCOUNT_MICROFRONTEND_URL = "http://account-mfe"
-AUTHN_MICROFRONTEND_URL = "http://authn-mfe"
-AUTHN_MICROFRONTEND_DOMAIN = "authn-mfe"
+ACCOUNT_MICROFRONTEND_URL = "http://account-mfe/"
+LOGISTRATION_MICROFRONTEND_URL = "http://logistation-mfe"
+LOGISTRATION_MICROFRONTEND_DOMAIN = "logistation-mfe"
 LEARNING_MICROFRONTEND_URL = "http://learning-mfe"
 
 ########################## limiting dashboard courses ######################
 
 DASHBOARD_COURSE_LIMIT = 250
 
-########################## Settings for proctoring ######################
-PROCTORING_SETTINGS = {
-    'LINK_URLS': {
-        'faq': 'https://support.example.com/proctoring-faq.html'
-    }
-}
-PROCTORING_USER_OBFUSCATION_KEY = 'test_key'
-
-# Used in edx-proctoring for ID generation in lieu of SECRET_KEY - dummy value
-# (ref MST-637)
-PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+PROCTORING_SETTINGS = {}
 
 ############### Settings for Django Rate limit #####################
 
@@ -590,11 +588,6 @@ RATELIMIT_RATE = '2/m'
 
 ##### LOGISTRATION RATE LIMIT SETTINGS #####
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
-LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '6/5m'
 LOGISTRATION_API_RATELIMIT = '5/m'
 
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
-REGISTRATION_RATELIMIT = '5/minute'
-
-RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '2/m'
-RESET_PASSWORD_API_RATELIMIT = '2/m'

@@ -10,13 +10,13 @@ from time import time
 from celery import current_task
 from django.db import reset_queries
 
-from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
+from common.djangoapps.util.db import outer_atomic
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 
-class TaskProgress:
+class TaskProgress(object):
     """
     Encapsulates the current task's progress by keeping track of
     'attempted', 'succeeded', 'skipped', 'failed', 'total',
@@ -103,15 +103,15 @@ def run_main_task(entry_id, task_fcn, action_name):
     task_input = json.loads(entry.task_input)
 
     # Construct log message
-    fmt = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(task_id=task_id, entry_id=entry_id, course_id=course_id, task_input=task_input)
-    TASK_LOG.info('%s, Starting update (nothing %s yet)', task_info_string, action_name)
+    TASK_LOG.info(u'%s, Starting update (nothing %s yet)', task_info_string, action_name)
 
     # Check that the task_id submitted in the InstructorTask matches the current task
     # that is running.
     request_task_id = _get_current_task().request.id
     if task_id != request_task_id:
-        fmt = '{task_info}, Requested task did not match actual task "{actual_id}"'
+        fmt = u'{task_info}, Requested task did not match actual task "{actual_id}"'
         message = fmt.format(task_info=task_info_string, actual_id=request_task_id)
         TASK_LOG.error(message)
         raise ValueError(message)
@@ -123,7 +123,7 @@ def run_main_task(entry_id, task_fcn, action_name):
     reset_queries()
 
     # Log and exit, returning task_progress info as task result
-    TASK_LOG.info('%s, Task type: %s, Finishing task: %s', task_info_string, action_name, task_progress)
+    TASK_LOG.info(u'%s, Task type: %s, Finishing task: %s', task_info_string, action_name, task_progress)
     return task_progress
 
 

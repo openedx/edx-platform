@@ -33,7 +33,7 @@ class MongoUtilsTests(TestCase):
         db = 'test_read_preference_%s' % uuid4().hex
         # Support for read_preference given in constant name form (ie. PRIMARY, SECONDARY_PREFERRED)
         connection = connect_to_mongodb(db, host, read_preference=enum_name)
-        assert connection.client.read_preference == expected_read_preference
+        self.assertEqual(connection.client.read_preference, expected_read_preference)
         # Support for read_preference given as mongos name.
         connection = connect_to_mongodb(db, host, read_preference=mongos_name)
-        assert connection.client.read_preference == expected_read_preference
+        self.assertEqual(connection.client.read_preference, expected_read_preference)

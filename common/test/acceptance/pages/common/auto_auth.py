@@ -5,14 +5,14 @@ Auto-auth page (used to automatically log in during testing).
 
 import json
 import os
-from urllib import parse
 
+from six.moves import urllib
 from bok_choy.page_object import PageObject, unguarded
 
 # The URL used for user auth in testing
 HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
 CMS_PORT = os.environ.get('BOK_CHOY_CMS_PORT', 8031)
-AUTH_BASE_URL = os.environ.get('test_url', f'http://{HOSTNAME}:{CMS_PORT}')
+AUTH_BASE_URL = os.environ.get('test_url', 'http://{}:{}'.format(HOSTNAME, CMS_PORT))
 FULL_NAME = 'Test'
 
 
@@ -45,7 +45,7 @@ class AutoAuthPage(PageObject):
 
         Note that "global staff" is NOT the same as course staff.
         """
-        super().__init__(browser)
+        super(AutoAuthPage, self).__init__(browser)
 
         # This will eventually hold the details about the user account
         self._user_info = None
@@ -94,7 +94,7 @@ class AutoAuthPage(PageObject):
         Construct the URL.
         """
         url = AUTH_BASE_URL + "/auto_auth"
-        query_str = parse.urlencode(self._params)
+        query_str = urllib.parse.urlencode(self._params)
 
         if query_str:
             url += "?" + query_str

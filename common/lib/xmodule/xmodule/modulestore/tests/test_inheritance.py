@@ -4,10 +4,10 @@ Unit tests for testing inheritance mixins
 
 
 import unittest
-from unittest.mock import Mock
 
 import ddt
 from django.utils.timezone import now, timedelta
+from mock import Mock
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.test.tools import TestRuntime
@@ -19,7 +19,7 @@ class TestXBlock:
     """
     An empty Xblock, to be used, when creating a block with mixins.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @ddt.ddt
@@ -38,7 +38,7 @@ class TestInheritanceMixin(unittest.TestCase):
         self.xblock = runtime.construct_xblock_from_class(
             TestXBlock, ScopeIds('user', 'TestXBlock', 'def_id', 'usage_id')
         )
-        super().setUp()
+        super(TestInheritanceMixin, self).setUp()
 
     def add_submission_deadline_information(self, due_date, graceperiod, self_paced):
         """
@@ -64,4 +64,4 @@ class TestInheritanceMixin(unittest.TestCase):
         confirm if the submission deadline has passed or not.
         """
         self.add_submission_deadline_information(due_date, graceperiod, self_paced)
-        assert is_past_deadline == self.xblock.has_deadline_passed()
+        self.assertEqual(is_past_deadline, self.xblock.has_deadline_passed())

@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=django-not-configured
 """
 Management command for expiring old entitlements.
 """
@@ -8,6 +7,7 @@ import logging
 from textwrap import dedent
 
 from django.core.management import BaseCommand
+from six.moves import range
 
 from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.entitlements.tasks import expire_old_entitlements

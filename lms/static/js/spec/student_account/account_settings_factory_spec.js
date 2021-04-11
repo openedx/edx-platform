@@ -69,7 +69,7 @@ define(['backbone',
 
                 request = requests[1];
                 expect(request.method).toBe('GET');
-                expect(request.url).toBe('/api/user/v1/preferences/time_zones/?country_code=1');
+                expect(request.url).toBe('/user_api/v1/preferences/time_zones/?country_code=1');
                 AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
 
                 request = requests[2];
@@ -232,7 +232,7 @@ define(['backbone',
 
                 request = requests[1];
                 expect(request.method).toBe('GET');
-                expect(request.url).toBe('/api/user/v1/preferences/time_zones/?country_code=1');
+                expect(request.url).toBe('/user_api/v1/preferences/time_zones/?country_code=1');
                 AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
 
                 request = requests[2];

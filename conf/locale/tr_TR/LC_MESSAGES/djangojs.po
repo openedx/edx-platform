@@ -107,8 +107,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
-"PO-Revision-Date: 2020-10-30 13:02+0000\n"
+"POT-Creation-Date: 2020-10-25 20:43+0000\n"
+"PO-Revision-Date: 2020-10-14 09:26+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
@@ -8742,7 +8742,7 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Need other help signing in?"
-msgstr "Giriş yapmak için farklı bir yardıma mı ihtiyacınız var?"
+msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Create an account"
@@ -9040,8 +9040,6 @@ msgid ""
 "What if I can't see the camera image, or if I can't see my photo do "
 "determine which side is visible?"
 msgstr ""
-"Ya kamera görüntüsünü göremezsem veya hangi tarafın görünür olduğunu "
-"belirlemeye çalışırken fotoğrafımı göremezsem?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -10051,7 +10049,7 @@ msgstr "Puanlanmamış"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Onboarding Exam"
-msgstr "Test Sürüşü Sınavı"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Practice proctored Exam"
@@ -10980,7 +10978,7 @@ msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
-msgstr "Test sürüşü"
+msgstr ""
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid ""

@@ -5,6 +5,7 @@ Decorators related to edXNotes.
 
 import json
 
+import six
 from django.conf import settings
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
@@ -50,8 +51,8 @@ def edxnotes(cls):
                 ),
                 "params": {
                     # Use camelCase to name keys.
-                    "usageId": str(self.scope_ids.usage_id),
-                    "courseId": str(self.runtime.course_id),
+                    "usageId": six.text_type(self.scope_ids.usage_id),
+                    "courseId": six.text_type(self.runtime.course_id),
                     "token": get_edxnotes_id_token(user),
                     "tokenUrl": get_token_url(self.runtime.course_id),
                     "endpoint": get_public_endpoint(),

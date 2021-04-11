@@ -9,7 +9,7 @@ import logging
 import os
 from textwrap import dedent
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from oauth2_provider.models import Application
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         """
         client_id = "{service_name}-key{site_name}".format(
             service_name=service_name,
-            site_name="" if site_name == "edx" else f"-{site_name}"
+            site_name="" if site_name == "edx" else "-{}".format(site_name)
         )
         app, _ = Application.objects.update_or_create(
             client_id=client_id,
@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 ),
                 "client_type": Application.CLIENT_CONFIDENTIAL,
                 "authorization_grant_type": Application.GRANT_AUTHORIZATION_CODE,
-                "redirect_uris": f"{url}complete/edx-oauth2/",
+                "redirect_uris": "{url}complete/edx-oauth2/".format(url=url),
                 "skip_authorization": True,
             }
         )
@@ -109,17 +109,17 @@ class Command(BaseCommand):
             defaults={"name": theme_dir_name}
         )
         if created:
-            LOG.info(f"Creating '{site_domain}' SiteTheme")
+            LOG.info(u"Creating '{site_name}' SiteTheme".format(site_name=site_domain))
             SiteTheme.objects.create(site=site, theme_dir_name=theme_dir_name)
 
-            LOG.info(f"Creating '{site_domain}' SiteConfiguration")
+            LOG.info(u"Creating '{site_name}' SiteConfiguration".format(site_name=site_domain))
             SiteConfiguration.objects.create(
                 site=site,
                 site_values=site_configuration,
                 enabled=True
             )
         else:
-            LOG.info(f"'{site_domain}' site already exists")
+            LOG.info(u"'{site_domain}' site already exists".format(site_domain=site_domain))
 
     def find(self, pattern, path):
         """
@@ -172,7 +172,7 @@ class Command(BaseCommand):
         """
         site_data = {}
         for config_file in self.find(self.configuration_filename, self.theme_path):
-            LOG.info(f"Reading file from {config_file}")
+            LOG.info(u"Reading file from {file}".format(file=config_file))
             configuration_data = json.loads(
                 json.dumps(
                     json.load(
@@ -232,7 +232,7 @@ class Command(BaseCommand):
             )
             self.ecommerce_base_url_fmt = "https://ecommerce-{site_domain}/"
 
-        self.configuration_filename = f'{configuration_prefix}_configuration.json'
+        self.configuration_filename = '{}_configuration.json'.format(configuration_prefix)
         self.discovery_user = self.get_or_create_service_user("lms_catalog_service_user")
         self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
 
@@ -246,13 +246,13 @@ class Command(BaseCommand):
             discovery_url = self.discovery_base_url_fmt.format(site_domain=site_domain)
             ecommerce_url = self.ecommerce_base_url_fmt.format(site_domain=site_domain)
 
-            LOG.info(f"Creating '{site_name}' Site")
+            LOG.info(u"Creating '{site_name}' Site".format(site_name=site_name))
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
 
-            LOG.info(f"Creating discovery oauth2 client for '{site_name}' site")
+            LOG.info(u"Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(discovery_url, site_name, 'discovery', self.discovery_user)
 
-            LOG.info(f"Creating ecommerce oauth2 client for '{site_name}' site")
+            LOG.info(u"Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
 
         self._enable_commerce_configuration()

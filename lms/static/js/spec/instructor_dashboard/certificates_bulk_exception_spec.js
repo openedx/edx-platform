@@ -74,8 +74,7 @@ define([
                             data_format_error: ['user 1 in row# 1'],
                             user_not_exist: ['user 2 in row# 2'],
                             user_already_white_listed: ['user 3 in row# 3'],
-                            user_not_enrolled: ['user 4 in row# 4'],
-                            user_on_certificate_invalidation_list: ['user 5 in row# 5']
+                            user_not_enrolled: ['user 4 in row# 4']
                         },
                         success: []
                     });
@@ -90,9 +89,6 @@ define([
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner does not exist in LMS');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is already white listed');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is not enrolled in course');
-                expect($(SELECTORS.bulk_exception_results).text()).toContain(
-                    '1 learner already appears on the certificate invalidation list'
-                    );
             });
 
             it('bind the ajax call and the result will be plural form of row errors', function() {
@@ -104,8 +100,7 @@ define([
                             data_format_error: ['user 1 in row# 1', 'user 1 in row# 1'],
                             user_not_exist: ['user 2 in row# 2', 'user 2 in row# 2'],
                             user_already_white_listed: ['user 3 in row# 3', 'user 3 in row# 3'],
-                            user_not_enrolled: ['user 4 in row# 4', 'user 4 in row# 4'],
-                            user_on_certificate_invalidation_list: ['user 5 in row# 5', 'user 5 in row# 5']
+                            user_not_enrolled: ['user 4 in row# 4', 'user 4 in row# 4']
                         },
                         success: []
                     });
@@ -120,9 +115,6 @@ define([
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners do not exist in LMS');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are already white listed');
                 expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are not enrolled in course');
-                expect($(SELECTORS.bulk_exception_results).text()).toContain(
-                    '2 learners already appear on the certificate invalidation list'
-                );
             });
 
             it('toggle message details', function() {

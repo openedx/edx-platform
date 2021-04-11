@@ -2,9 +2,8 @@
 
 
 from unittest import TestCase
-from unittest.mock import Mock
 
-import pytest
+from mock import Mock
 
 from xmodule.mako_module import MakoModuleDescriptor
 
@@ -16,10 +15,10 @@ class MakoModuleTest(TestCase):
         mock_system = Mock()
         mock_system.render_template = None
 
-        with pytest.raises(TypeError):
+        with self.assertRaises(TypeError):
             MakoModuleDescriptor(mock_system, {})
 
         del mock_system.render_template
 
-        with pytest.raises(TypeError):
+        with self.assertRaises(TypeError):
             MakoModuleDescriptor(mock_system, {})

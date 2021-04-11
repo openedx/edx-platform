@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 from django.conf import settings
 from django.test import TestCase
@@ -31,7 +31,7 @@ class TestTrackerInstantiation(TestCase):
     """Test that a helper function can instantiate backends from their name."""
     def setUp(self):
         # pylint: disable=protected-access
-        super(TestTrackerInstantiation, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestTrackerInstantiation, self).setUp()
         self.get_backend = tracker._instantiate_backend_from_name
 
     def test_instatiate_backend(self):
@@ -39,8 +39,8 @@ class TestTrackerInstantiation(TestCase):
         options = {'flag': True}
         backend = self.get_backend(name, options)
 
-        assert isinstance(backend, DummyBackend)
-        assert backend.flag
+        self.assertIsInstance(backend, DummyBackend)
+        self.assertTrue(backend.flag)
 
     def test_instatiate_backends_with_invalid_values(self):
         def get_invalid_backend(name, parameters):
@@ -69,11 +69,11 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = self._reload_backends()
 
-        assert len(backends) == 1
+        self.assertEqual(len(backends), 1)
 
         tracker.send({})
 
-        assert list(backends.values())[0].count == 1
+        self.assertEqual(list(backends.values())[0].count, 1)
 
     @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS.copy())
     def test_django_multi_settings(self):
@@ -81,14 +81,14 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = list(self._reload_backends().values())
 
-        assert len(backends) == 2
+        self.assertEqual(len(backends), 2)
 
         event_count = 10
         for _ in range(event_count):
             tracker.send({})
 
-        assert backends[0].count == event_count
-        assert backends[1].count == event_count
+        self.assertEqual(backends[0].count, event_count)
+        self.assertEqual(backends[1].count, event_count)
 
     @override_settings(TRACKING_BACKENDS=MULTI_SETTINGS.copy())
     def test_django_remove_settings(self):
@@ -98,9 +98,9 @@ class TestTrackerDjangoInstantiation(TestCase):
 
         backends = self._reload_backends()
 
-        assert len(backends) == 1
+        self.assertEqual(len(backends), 1)
 
-    def _reload_backends(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _reload_backends(self):
         # pylint: disable=protected-access
 
         # Reset backends
@@ -109,9 +109,9 @@ class TestTrackerDjangoInstantiation(TestCase):
         return tracker.backends
 
 
-class DummyBackend(BaseBackend):  # lint-amnesty, pylint: disable=missing-class-docstring
+class DummyBackend(BaseBackend):
     def __init__(self, **options):
-        super(DummyBackend, self).__init__(**options)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(DummyBackend, self).__init__(**options)
         self.flag = options.get('flag', False)
         self.count = 0
 

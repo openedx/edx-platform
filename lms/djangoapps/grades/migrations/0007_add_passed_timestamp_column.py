@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
@@ -15,6 +18,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterIndexTogether(
             name='persistentcoursegrade',
-            index_together={('passed_timestamp', 'course_id')},
+            index_together=set([('passed_timestamp', 'course_id')]),
         ),
     ]

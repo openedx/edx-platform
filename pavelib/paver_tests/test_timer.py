@@ -6,7 +6,7 @@ Tests of the pavelib.utils.timer module.
 from datetime import datetime, timedelta
 from unittest import TestCase
 
-from unittest.mock import MagicMock, patch
+from mock import MagicMock, patch
 
 from pavelib.utils import timer
 
@@ -75,48 +75,48 @@ class TimedDecoratorTests(TestCase):
         self.mock_datetime.utcnow.side_effect = [start, end]
 
         messages = self.get_log_messages()
-        assert len(messages) == 1
+        self.assertEqual(len(messages), 1)
 
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
-        assert 'duration' in messages[0]
-        assert 35.6 == messages[0]['duration']
+        self.assertIn('duration', messages[0])
+        self.assertEqual(35.6, messages[0]['duration'])
 
-        assert 'started_at' in messages[0]
-        assert start.isoformat(' ') == messages[0]['started_at']
+        self.assertIn('started_at', messages[0])
+        self.assertEqual(start.isoformat(' '), messages[0]['started_at'])
 
-        assert 'ended_at' in messages[0]
-        assert end.isoformat(' ') == messages[0]['ended_at']
+        self.assertIn('ended_at', messages[0])
+        self.assertEqual(end.isoformat(' '), messages[0]['ended_at'])
 
     @patch.object(timer, 'PAVER_TIMER_LOG', None)
     def test_no_logs(self):
         messages = self.get_log_messages()
-        assert len(messages) == 0
+        self.assertEqual(len(messages), 0)
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
     def test_arguments(self):
         messages = self.get_log_messages(args=(1, 'foo'), kwargs=dict(bar='baz'))
-        assert len(messages) == 1
+        self.assertEqual(len(messages), 1)
 
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
-        assert 'args' in messages[0]
-        assert [repr(1), repr('foo')] == messages[0]['args']
-        assert 'kwargs' in messages[0]
-        assert {'bar': repr('baz')} == messages[0]['kwargs']
+        self.assertIn('args', messages[0])
+        self.assertEqual([repr(1), repr('foo')], messages[0]['args'])
+        self.assertIn('kwargs', messages[0])
+        self.assertEqual({'bar': repr('baz')}, messages[0]['kwargs'])
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
     def test_task_name(self):
         messages = self.get_log_messages()
-        assert len(messages) == 1
+        self.assertEqual(len(messages), 1)
 
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
-        assert 'task' in messages[0]
-        assert 'pavelib.paver_tests.test_timer.identity' == messages[0]['task']
+        self.assertIn('task', messages[0])
+        self.assertEqual('pavelib.paver_tests.test_timer.identity', messages[0]['task'])
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
     def test_exceptions(self):
@@ -129,13 +129,13 @@ class TimedDecoratorTests(TestCase):
             raise Exception('The Message!')
 
         messages = self.get_log_messages(task=raises, raises=Exception)
-        assert len(messages) == 1
+        self.assertEqual(len(messages), 1)
 
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
-        assert 'exception' in messages[0]
-        assert 'Exception: The Message!' == messages[0]['exception']
+        self.assertIn('exception', messages[0])
+        self.assertEqual("Exception: The Message!", messages[0]['exception'])
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log-%Y-%m-%d-%H-%M-%S.log')
     def test_date_formatting(self):
@@ -145,7 +145,7 @@ class TimedDecoratorTests(TestCase):
         self.mock_datetime.utcnow.side_effect = [start, end]
 
         messages = self.get_log_messages()
-        assert len(messages) == 1
+        self.assertEqual(len(messages), 1)
 
         MOCK_OPEN.assert_called_once_with('/tmp/some-log-2016-07-20-10-56-19.log', 'a')
 
@@ -167,24 +167,24 @@ class TimedDecoratorTests(TestCase):
         self.mock_datetime.utcnow.side_effect = [parent_start, child_start, child_end, parent_end]
 
         messages = self.get_log_messages(task=parent)
-        assert len(messages) == 2
+        self.assertEqual(len(messages), 2)
 
         # Child messages first
-        assert 'duration' in messages[0]
-        assert 40 == messages[0]['duration']
+        self.assertIn('duration', messages[0])
+        self.assertEqual(40, messages[0]['duration'])
 
-        assert 'started_at' in messages[0]
-        assert child_start.isoformat(' ') == messages[0]['started_at']
+        self.assertIn('started_at', messages[0])
+        self.assertEqual(child_start.isoformat(' '), messages[0]['started_at'])
 
-        assert 'ended_at' in messages[0]
-        assert child_end.isoformat(' ') == messages[0]['ended_at']
+        self.assertIn('ended_at', messages[0])
+        self.assertEqual(child_end.isoformat(' '), messages[0]['ended_at'])
 
         # Parent messages after
-        assert 'duration' in messages[1]
-        assert 60 == messages[1]['duration']
+        self.assertIn('duration', messages[1])
+        self.assertEqual(60, messages[1]['duration'])
 
-        assert 'started_at' in messages[1]
-        assert parent_start.isoformat(' ') == messages[1]['started_at']
+        self.assertIn('started_at', messages[1])
+        self.assertEqual(parent_start.isoformat(' '), messages[1]['started_at'])
 
-        assert 'ended_at' in messages[1]
-        assert parent_end.isoformat(' ') == messages[1]['ended_at']
+        self.assertIn('ended_at', messages[1])
+        self.assertEqual(parent_end.isoformat(' '), messages[1]['ended_at'])

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django management command for changing an enterprise user's username.
 """
@@ -5,7 +6,7 @@ Django management command for changing an enterprise user's username.
 
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.management import BaseCommand
 
 from enterprise.models import EnterpriseCustomerUser
@@ -50,11 +51,11 @@ class Command(BaseCommand):
         try:
             EnterpriseCustomerUser.objects.get(user_id=user_id)
         except EnterpriseCustomerUser.DoesNotExist:
-            LOGGER.info(f'User {user_id} must be an Enterprise User.')
+            LOGGER.info('User {} must be an Enterprise User.'.format(user_id))
             return
 
         user = User.objects.get(id=user_id)
         user.username = new_username
         user.save()
 
-        LOGGER.info(f'User {user_id} has been updated with username {new_username}.')
+        LOGGER.info('User {} has been updated with username {}.'.format(user_id, new_username))

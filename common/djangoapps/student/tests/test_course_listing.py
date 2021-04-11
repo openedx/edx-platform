@@ -6,18 +6,19 @@ by reversing group name formats.
 
 import unittest
 
-from unittest import mock
+import mock
+import six
 from django.conf import settings
 from django.test.client import Client
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.models import CourseEnrollment  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
 from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
-from xmodule.error_module import ErrorBlock
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -34,7 +35,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         """
         Add a student & teacher
         """
-        super().setUp()
+        super(TestCourseListing, self).setUp()
 
         self.student = UserFactory()
         self.teacher = UserFactory()
@@ -64,7 +65,7 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         Reverse the setup
         """
         self.client.logout()
-        super().tearDown()
+        super(TestCourseListing, self).tearDown()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_course_list(self):
@@ -76,13 +77,13 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 1
-        assert courses_list[0].course_id == course_location
+        self.assertEqual(len(courses_list), 1)
+        self.assertEqual(courses_list[0].course_id, course_location)
 
         CourseEnrollment.unenroll(self.student, course_location)
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 0
+        self.assertEqual(len(courses_list), 0)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_limited_number_of_courses_using_config(self):
@@ -94,16 +95,16 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
         # get dashboard
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 2
+        self.assertEqual(len(courses_list), 2)
 
         with self.settings(DASHBOARD_COURSE_LIMIT=1):
             course_limit = settings.DASHBOARD_COURSE_LIMIT
             courses_list = list(get_course_enrollments(self.student, None, [], course_limit))
-            assert len(courses_list) == 1
+            self.assertEqual(len(courses_list), 1)
 
     def test_errored_course_regular_access(self):
         """
-        Test the course list for regular staff when get_course returns an ErrorBlock
+        Test the course list for regular staff when get_course returns an ErrorDescriptor
         """
         # pylint: disable=protected-access
         mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
@@ -111,20 +112,20 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(course_key, default_store=ModuleStoreEnum.Type.mongo)
 
         with mock.patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', mock.Mock(side_effect=Exception)):
-            assert isinstance(modulestore().get_course(course_key), ErrorBlock)
+            self.assertIsInstance(modulestore().get_course(course_key), ErrorDescriptor)
 
             # Invalidate (e.g., delete) the corresponding CourseOverview, forcing get_course to be called.
             CourseOverview.objects.filter(id=course_key).delete()
 
             courses_list = list(get_course_enrollments(self.student, None, []))
-            assert courses_list == []
+            self.assertEqual(courses_list, [])
 
     def test_course_listing_errored_deleted_courses(self):
         """
         Create good courses, courses that won't load, and deleted courses which still have
         roles. Test course listing.
         """
-        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
+        mongo_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         good_location = mongo_store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(good_location, default_store=ModuleStoreEnum.Type.mongo)
@@ -134,8 +135,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         mongo_store.delete_course(course_location, ModuleStoreEnum.UserID.test)
 
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 1, courses_list
-        assert courses_list[0].course_id == good_location
+        self.assertEqual(len(courses_list), 1, courses_list)
+        self.assertEqual(courses_list[0].course_id, good_location)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_listing_has_pre_requisite_courses(self):
@@ -152,8 +153,8 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self._create_course_with_access_groups(pre_requisite_course_location2)
         # create a course with pre_requisite_courses
         pre_requisite_courses = [
-            str(pre_requisite_course_location),
-            str(pre_requisite_course_location2),
+            six.text_type(pre_requisite_course_location),
+            six.text_type(pre_requisite_course_location2),
         ]
         course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, {
@@ -171,4 +172,4 @@ class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
             self.student,
             courses_having_prerequisites
         )
-        assert len(courses_requirements_not_met[course_location]['courses']) == len(pre_requisite_courses)
+        self.assertEqual(len(courses_requirements_not_met[course_location]['courses']), len(pre_requisite_courses))

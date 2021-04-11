@@ -24,4 +24,4 @@ class CacheProgramsPage(PageObject):
         body = self.q(css='body').text[0]
         match = re.search(r'programs cached', body, flags=re.IGNORECASE)
 
-        return True if match else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
+        return True if match else False

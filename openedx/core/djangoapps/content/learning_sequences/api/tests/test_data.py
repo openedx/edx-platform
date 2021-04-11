@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from datetime import datetime, timezone
 from unittest import TestCase
 
@@ -23,7 +22,7 @@ class TestCourseOutlineData(TestCase):
         test as needed.
         """
         super().setUpClass()
-        normal_visibility = VisibilityData(  # lint-amnesty, pylint: disable=unused-variable
+        normal_visibility = VisibilityData(
             hide_from_toc=False,
             visible_to_staff_only=False
         )
@@ -33,7 +32,6 @@ class TestCourseOutlineData(TestCase):
             title="Exciting Test Course!",
             published_at=datetime(2020, 5, 19, tzinfo=timezone.utc),
             published_version="5ebece4b69dd593d82fe2014",
-            entrance_exam_id=None,
             days_early_for_beta=None,
             sections=generate_sections(cls.course_key, [3, 2]),
             self_paced=False,
@@ -43,16 +41,18 @@ class TestCourseOutlineData(TestCase):
     def test_deprecated_course_key(self):
         """Old-Mongo style, "Org/Course/Run" keys are not supported."""
         old_course_key = CourseKey.from_string("OpenEdX/TestCourse/TestRun")
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             attr.evolve(self.course_outline, course_key=old_course_key)
 
     def test_sequence_building(self):
         """Make sure sequences were set correctly from sections data."""
         for section in self.course_outline.sections:
             for seq in section.sequences:
-                assert seq == self.course_outline.sequences[seq.usage_key]
-        assert sum(len(section.sequences) for section in self.course_outline.sections) ==\
-               len(self.course_outline.sequences)
+                self.assertEqual(seq, self.course_outline.sequences[seq.usage_key])
+        self.assertEqual(
+            sum(len(section.sequences) for section in self.course_outline.sections),
+            len(self.course_outline.sequences),
+        )
 
     def test_duplicate_sequence(self):
         """We don't support DAGs. Sequences can only be in one Section."""
@@ -60,7 +60,7 @@ class TestCourseOutlineData(TestCase):
         section_with_dupe_seq = attr.evolve(
             self.course_outline.sections[1], title="Chapter 2 dupe",
         )
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             attr.evolve(
                 self.course_outline,
                 sections=self.course_outline.sections + [section_with_dupe_seq]
@@ -68,7 +68,7 @@ class TestCourseOutlineData(TestCase):
 
     def test_size(self):
         """Limit how large a CourseOutline is allowed to be."""
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             attr.evolve(
                 self.course_outline,
                 sections=generate_sections(self.course_key, [1001])
@@ -145,15 +145,15 @@ def generate_sections(course_key, num_sequences):
     for sec_num, seq_count in enumerate(num_sequences, 1):
         sections.append(
             CourseSectionData(
-                usage_key=course_key.make_usage_key('chapter', f'ch_{sec_num}'),
-                title=f"Chapter {sec_num}: 🔥",
+                usage_key=course_key.make_usage_key('chapter', 'ch_{}'.format(sec_num)),
+                title="Chapter {}: 🔥".format(sec_num),
                 visibility=normal_visibility,
                 sequences=[
                     CourseLearningSequenceData(
                         usage_key=course_key.make_usage_key(
-                            'sequential', f'seq_{sec_num}_{seq_num}'
+                            'sequential', 'seq_{}_{}'.format(sec_num, seq_num)
                         ),
-                        title=f"Seq {sec_num}.{seq_num}: 🔥",
+                        title="Seq {}.{}: 🔥".format(sec_num, seq_num),
                         visibility=normal_visibility,
                     )
                     for seq_num in range(seq_count)

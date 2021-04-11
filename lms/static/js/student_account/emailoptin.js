@@ -4,7 +4,7 @@
         var EmailOptInInterface = {
 
             urls: {
-                emailOptInUrl: '/api/user/v1/preferences/email_opt_in/'
+                emailOptInUrl: '/user_api/v1/preferences/email_opt_in/'
             },
 
             headers: {

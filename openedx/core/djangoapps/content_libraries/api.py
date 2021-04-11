@@ -51,6 +51,7 @@ from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from organizations.models import Organization
+import six
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
 
@@ -221,7 +222,7 @@ class LibraryBundleLink:
     opaque_key = attr.ib(type=LearningContextKey, default=None)
 
 
-class AccessLevel:  # lint-amnesty, pylint: disable=function-redefined
+class AccessLevel:
     """ Enum defining library access levels/permissions """
     ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
     AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
@@ -406,7 +407,7 @@ def create_library(
         )
     except IntegrityError:
         delete_bundle(bundle.uuid)
-        raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
+        raise LibraryAlreadyExists(slug)
     CONTENT_LIBRARY_CREATED.send(sender=None, library_key=ref.library_key)
     return ContentLibraryMetadata(
         key=ref.library_key,
@@ -551,10 +552,10 @@ def update_library(
         "slug": ref.slug,
     }
     if title is not None:
-        assert isinstance(title, str)
+        assert isinstance(title, six.string_types)
         fields["title"] = title
     if description is not None:
-        assert isinstance(description, str)
+        assert isinstance(description, six.string_types)
         fields["description"] = description
     update_bundle(ref.bundle_uuid, **fields)
     CONTENT_LIBRARY_UPDATED.send(sender=None, library_key=ref.library_key)
@@ -703,7 +704,7 @@ def set_library_block_olx(usage_key, new_olx_str):
     # Verify that the OLX parses, at least as generic XML:
     node = etree.fromstring(new_olx_str)
     if node.tag != block_type:
-        raise ValueError(f"Invalid root tag in OLX, expected {block_type}")
+        raise ValueError("Invalid root tag in OLX, expected {}".format(block_type))
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(metadata.def_key.bundle_uuid, DRAFT_NAME)
     write_draft_file(draft.uuid, metadata.def_key.olx_path, new_olx_str.encode('utf-8'))
@@ -733,7 +734,7 @@ def create_library_block(library_key, block_type, definition_id):
     total_blocks = len(lib_bundle.get_top_level_usages())
     if total_blocks + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
-            _("Library cannot have more than {} XBlocks").format(settings.MAX_BLOCKS_PER_CONTENT_LIBRARY)
+            _(u"Library cannot have more than {} XBlocks").format(settings.MAX_BLOCKS_PER_CONTENT_LIBRARY)
         )
     # Make sure the proposed ID will be valid:
     validate_unicode_slug(definition_id)
@@ -748,10 +749,10 @@ def create_library_block(library_key, block_type, definition_id):
     )
     library_context = get_learning_context_impl(usage_key)
     if library_context.definition_for_usage(usage_key) is not None:
-        raise LibraryBlockAlreadyExists(f"An XBlock with ID '{new_usage_id}' already exists")
+        raise LibraryBlockAlreadyExists("An XBlock with ID '{}' already exists".format(new_usage_id))
 
-    new_definition_xml = f'<{block_type}/>'  # xss-lint: disable=python-wrap-html
-    path = f"{block_type}/{definition_id}/definition.xml"
+    new_definition_xml = '<{}/>'.format(block_type)  # xss-lint: disable=python-wrap-html
+    path = "{}/{}/definition.xml".format(block_type, definition_id)
     # Write the new XML/OLX file into the library bundle's draft
     draft = get_or_create_bundle_draft(ref.bundle_uuid, DRAFT_NAME)
     write_draft_file(draft.uuid, path, new_definition_xml.encode('utf-8'))
@@ -870,7 +871,7 @@ def add_library_block_static_asset_file(usage_key, file_name, file_content):
         video_block = UsageKey.from_string("lb:VideoTeam:python-intro:video:1")
         add_library_block_static_asset_file(video_block, "subtitles-en.srt", subtitles.encode('utf-8'))
     """
-    assert isinstance(file_content, bytes)
+    assert isinstance(file_content, six.binary_type)
     def_key, lib_bundle = _lookup_usage_key(usage_key)
     if file_name != file_name.strip().strip('/'):
         raise InvalidNameError("file name cannot start/end with / or whitespace.")
@@ -952,7 +953,7 @@ def get_bundle_links(library_key):
     links = blockstore_cache.get_bundle_draft_direct_links_cached(ref.bundle_uuid, DRAFT_NAME)
     results = []
     # To be able to quickly get the library ID from the bundle ID for links which point to other libraries, build a map:
-    bundle_uuids = {link_data.bundle_uuid for link_data in links.values()}
+    bundle_uuids = set(link_data.bundle_uuid for link_data in links.values())
     libraries_linked = {
         lib.bundle_uuid: lib
         for lib in ContentLibrary.objects.select_related('org').filter(bundle_uuid__in=bundle_uuids)
@@ -1014,7 +1015,7 @@ def update_bundle_link(library_key, link_id, version=None, delete=False):
         try:
             link = links[link_id]
         except KeyError:
-            raise InvalidNameError("That link does not exist.")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise InvalidNameError("That link does not exist.")
         if version is None:
             version = get_bundle(link.bundle_uuid).latest_version
         set_draft_link(draft.uuid, link_id, link.bundle_uuid, version)

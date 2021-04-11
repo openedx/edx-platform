@@ -1,3 +1,4 @@
+
 """
 Discounts application configuration
 """

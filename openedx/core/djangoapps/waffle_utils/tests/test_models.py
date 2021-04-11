@@ -31,7 +31,7 @@ class WaffleFlagCourseOverrideTests(TestCase):
         override_value = WaffleFlagCourseOverrideModel.override_value(
             self.WAFFLE_TEST_NAME, self.TEST_COURSE_KEY
         )
-        assert override_value == expected_result
+        self.assertEqual(override_value, expected_result)
 
     def test_setting_override_multiple_times(self):
         RequestCache.clear_all_namespaces()
@@ -40,7 +40,7 @@ class WaffleFlagCourseOverrideTests(TestCase):
         override_value = WaffleFlagCourseOverrideModel.override_value(
             self.WAFFLE_TEST_NAME, self.TEST_COURSE_KEY
         )
-        assert override_value == self.OVERRIDE_CHOICES.off
+        self.assertEqual(override_value, self.OVERRIDE_CHOICES.off)
 
     def set_waffle_course_override(self, override_choice, is_enabled=True):
         WaffleFlagCourseOverrideModel.objects.create(

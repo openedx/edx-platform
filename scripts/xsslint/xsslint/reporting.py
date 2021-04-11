@@ -3,15 +3,15 @@ Utility classes for reporting linter results.
 """
 
 
-import json
 import os
 import re
 
+from six.moves import range
 
 from xsslint.utils import StringLines
 
 
-class RuleViolation:
+class RuleViolation(object):
     """
     Base class representing a rule violation which can be used for reporting.
     """
@@ -96,7 +96,7 @@ class RuleViolation:
             _options: ignored
             out: output file
         """
-        print(f"{self.full_path}: {self.rule.rule_id}", file=out)
+        print("{}: {}".format(self.full_path, self.rule.rule_id), file=out)
 
 
 class ExpressionRuleViolation(RuleViolation):
@@ -116,7 +116,7 @@ class ExpressionRuleViolation(RuleViolation):
             expression: The Expression that was in violation.
 
         """
-        super().__init__(rule)
+        super(ExpressionRuleViolation, self).__init__(rule)
         self.expression = expression
         self.start_line = 0
         self.start_column = 0
@@ -234,7 +234,7 @@ class ExpressionRuleViolation(RuleViolation):
             ), file=out)
 
 
-class SummaryResults:
+class SummaryResults(object):
     """
     Contains the summary results for all violations.
     """
@@ -275,46 +275,20 @@ class SummaryResults:
 
         """
         if options['list_files'] is False:
-            if options['summary_format'] == 'json':
-                self._print_json_format(options, out)
-            else:
-                self._print_eslint_format(options, out)
+            if options['rule_totals']:
+                max_rule_id_len = max(len(rule_id) for rule_id in self.totals_by_rule)
+                print("", file=out)
+                for rule_id in sorted(self.totals_by_rule.keys()):
+                    padding = " " * (max_rule_id_len - len(rule_id))
+                    print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
+                print("", file=out)
 
-    def _print_eslint_format(self, options, out):
-        """
-        Implementation of print_results with eslint-style output.
-        """
-        if options['rule_totals']:
-            max_rule_id_len = max(len(rule_id) for rule_id in self.totals_by_rule)
+            # matches output of eslint for simplicity
             print("", file=out)
-            for rule_id in sorted(self.totals_by_rule.keys()):
-                padding = " " * (max_rule_id_len - len(rule_id))
-                print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
-            print("", file=out)
-
-        # matches output of eslint for simplicity
-        print("", file=out)
-        print(f"{self.total_violations} violations total", file=out)
-
-    def _print_json_format(self, options, out):
-        """
-        Implementation of print_results with JSON output.
-        """
-        print("", file=out)
-        print("Violation counts:", file=out)
-        data = {'rules': self.totals_by_rule}
-        if options['rule_totals']:
-            data['total'] = self.total_violations
-        json.dump(data, fp=out, indent=4, sort_keys=True)
-        print("", file=out)
-        print(
-            "If you've fixed some XSS issues and these numbers have gone down, "
-            "you can use this to update scripts/xsslint_thresholds.json",
-            file=out
-        )
+            print("{} violations total".format(self.total_violations), file=out)
 
 
-class FileResults:
+class FileResults(object):
     """
     Contains the results, or violations, for a file.
     """

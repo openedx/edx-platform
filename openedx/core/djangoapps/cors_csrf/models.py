@@ -19,7 +19,7 @@ class XDomainProxyConfiguration(ConfigurationModel):
 
     whitelist = models.fields.TextField(
         help_text=_(
-            "List of domains that are allowed to make cross-domain "
+            u"List of domains that are allowed to make cross-domain "
             "requests to this site.  Please list each domain on its own line."
         )
     )

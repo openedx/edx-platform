@@ -5,8 +5,8 @@ Test for user creation from sites with configuration overrides.
 
 import json
 
-from unittest import mock
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import mock
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -53,7 +53,7 @@ def fake_get_value(name, default=None):
 class TestSite(TestCase):
     """Test for Account Creation from white labeled Sites"""
     def setUp(self):
-        super().setUp()
+        super(TestSite, self).setUp()
         self.username = "test_user"
         self.url = reverse("create_account")
         self.params = {
@@ -80,8 +80,8 @@ class TestSite(TestCase):
         saved in the UserSignupSource Table.
         """
         response = self.client.post(self.url, self.params)
-        assert response.status_code == 200
-        assert len(UserSignupSource.objects.filter(site='openedx.localhost')) > 0
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
 
     def test_user_signup_from_non_configured_site(self):
         """
@@ -89,8 +89,8 @@ class TestSite(TestCase):
         in UserSignupSource Table.
         """
         response = self.client.post(self.url, self.params)
-        assert response.status_code == 200
-        assert len(UserSignupSource.objects.filter(site='openedx.localhost')) == 0
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(UserSignupSource.objects.filter(site='openedx.localhost')), 0)
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_user_signup_missing_enhanced_profile(self):
@@ -99,7 +99,7 @@ class TestSite(TestCase):
         profile information.
         """
         response = self.client.post(self.url, self.params)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_user_signup_including_enhanced_profile(self):
@@ -108,10 +108,10 @@ class TestSite(TestCase):
         profile information.
         """
         response = self.client.post(self.url, self.extended_params)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
         meta = json.loads(user.profile.meta)
-        assert meta['address1'] == 'foo'
-        assert meta['state'] == 'foo'
-        assert meta['company'] == 'foo'
-        assert meta['title'] == 'foo'
+        self.assertEqual(meta['address1'], 'foo')
+        self.assertEqual(meta['state'], 'foo')
+        self.assertEqual(meta['company'], 'foo')
+        self.assertEqual(meta['title'], 'foo')

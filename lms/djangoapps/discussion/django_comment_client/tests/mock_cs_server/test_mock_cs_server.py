@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import json
 import threading
 import unittest
@@ -15,7 +14,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
     '''
 
     def setUp(self):
-        super().setUp()
+        super(MockCommentServiceServerTest, self).setUp()
 
         # This is a test of the test setup,
         # so it does not need to run as part of the unit test suite
@@ -44,17 +43,17 @@ class MockCommentServiceServerTest(unittest.TestCase):
         of how you would create a new user
         """
         # Send a request
-        values = {'username': 'user100',
-                  'external_id': '4', 'email': 'user100@edx.org'}
+        values = {'username': u'user100',
+                  'external_id': '4', 'email': u'user100@edx.org'}
         data = json.dumps(values)
         headers = {'Content-Type': 'application/json', 'Content-Length': len(data), 'X-Edx-Api-Key': 'TEST_API_KEY'}
-        req = six.moves.urllib.request.Request(self.server_url + '/api/v1/users/4', data, headers)  # lint-amnesty, pylint: disable=undefined-variable
+        req = six.moves.urllib.request.Request(self.server_url + '/api/v1/users/4', data, headers)
 
         # Send the request to the mock cs server
-        response = six.moves.urllib.request.urlopen(req)  # lint-amnesty, pylint: disable=undefined-variable
+        response = six.moves.urllib.request.urlopen(req)
 
         # Receive the reply from the mock cs server
         response_dict = json.loads(response.read())
 
         # You should have received the response specified in the setup above
-        assert response_dict == self.expected_response
+        self.assertEqual(response_dict, self.expected_response)

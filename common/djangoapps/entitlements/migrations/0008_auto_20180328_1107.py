@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Migration(migrations.Migration):
 
     dependencies = [
         ('entitlements', '0007_change_expiration_period_default'),
@@ -11,7 +14,7 @@ class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-
         migrations.AddField(
             model_name='courseentitlementpolicy',
             name='mode',
-            field=models.CharField(max_length=32, null=True, choices=[(None, '---------'), ('verified', 'verified'), ('professional', 'professional')]),  # lint-amnesty, pylint: disable=line-too-long
+            field=models.CharField(max_length=32, null=True, choices=[(None, u'---------'), (u'verified', u'verified'), (u'professional', u'professional')]),
         ),
         migrations.AlterField(
             model_name='courseentitlementpolicy',

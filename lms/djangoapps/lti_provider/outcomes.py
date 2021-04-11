@@ -38,9 +38,9 @@ def store_outcome_parameters(request_params, user, lti_consumer):
             # to figure out the result service URL. As it stands, though, this
             # is a badly-formed LTI request
             log.warning(
-                "Outcome Service: lis_outcome_service_url parameter missing "
-                "from scored assignment; we will be unable to return a score. "
-                "Request parameters: %s",
+                u"Outcome Service: lis_outcome_service_url parameter missing "
+                u"from scored assignment; we will be unable to return a score. "
+                u"Request parameters: %s",
                 request_params
             )
             return
@@ -71,23 +71,23 @@ def generate_replace_result_xml(result_sourcedid, score):
     """
     # Pylint doesn't recognize members in the LXML module
     elem = ElementMaker(nsmap={None: 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'})
-    xml = elem.imsx_POXEnvelopeRequest(  # lint-amnesty, pylint: disable=no-member
-        elem.imsx_POXHeader(  # lint-amnesty, pylint: disable=no-member
-            elem.imsx_POXRequestHeaderInfo(  # lint-amnesty, pylint: disable=no-member
-                elem.imsx_version('V1.0'),  # lint-amnesty, pylint: disable=no-member
-                elem.imsx_messageIdentifier(str(uuid.uuid4()))  # lint-amnesty, pylint: disable=no-member
+    xml = elem.imsx_POXEnvelopeRequest(
+        elem.imsx_POXHeader(
+            elem.imsx_POXRequestHeaderInfo(
+                elem.imsx_version('V1.0'),
+                elem.imsx_messageIdentifier(str(uuid.uuid4()))
             )
         ),
-        elem.imsx_POXBody(  # lint-amnesty, pylint: disable=no-member
-            elem.replaceResultRequest(  # lint-amnesty, pylint: disable=no-member
-                elem.resultRecord(  # lint-amnesty, pylint: disable=no-member
-                    elem.sourcedGUID(  # lint-amnesty, pylint: disable=no-member
-                        elem.sourcedId(result_sourcedid)  # lint-amnesty, pylint: disable=no-member
+        elem.imsx_POXBody(
+            elem.replaceResultRequest(
+                elem.resultRecord(
+                    elem.sourcedGUID(
+                        elem.sourcedId(result_sourcedid)
                     ),
-                    elem.result(  # lint-amnesty, pylint: disable=no-member
-                        elem.resultScore(  # lint-amnesty, pylint: disable=no-member
-                            elem.language('en'),  # lint-amnesty, pylint: disable=no-member
-                            elem.textString(str(score))  # lint-amnesty, pylint: disable=no-member
+                    elem.result(
+                        elem.resultScore(
+                            elem.language('en'),
+                            elem.textString(str(score))
                         )
                     )
                 )
@@ -141,8 +141,8 @@ def send_score_update(assignment, score):
     # necessary.
     if not (response and check_replace_result_response(response)):
         log.error(
-            "Outcome Service: Failed to update score on LTI consumer. "
-            "User: %s, course: %s, usage: %s, score: %s, status: %s, body: %s",
+            u"Outcome Service: Failed to update score on LTI consumer. "
+            u"User: %s, course: %s, usage: %s, score: %s, status: %s, body: %s",
             assignment.user,
             assignment.course_key,
             assignment.usage_key,
@@ -192,7 +192,7 @@ def check_replace_result_response(response):
     # Pylint doesn't recognize members in the LXML module
     if response.status_code != 200:
         log.error(
-            "Outcome service response: Unexpected status code %s",
+            u"Outcome service response: Unexpected status code %s",
             response.status_code
         )
         return False
@@ -201,7 +201,7 @@ def check_replace_result_response(response):
         xml = response.content
         root = etree.fromstring(xml)
     except etree.ParseError as ex:
-        log.error("Outcome service response: Failed to parse XML: %s\n %s", ex, xml)
+        log.error(u"Outcome service response: Failed to parse XML: %s\n %s", ex, xml)
         return False
 
     major_codes = root.xpath(
@@ -209,14 +209,14 @@ def check_replace_result_response(response):
         namespaces={'ns': 'http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0'})
     if len(major_codes) != 1:
         log.error(
-            "Outcome service response: Expected exactly one imsx_codeMajor field in response. Received %s",
+            u"Outcome service response: Expected exactly one imsx_codeMajor field in response. Received %s",
             major_codes
         )
         return False
 
     if major_codes[0].text != 'success':
         log.error(
-            "Outcome service response: Unexpected major code: %s.",
+            u"Outcome service response: Unexpected major code: %s.",
             major_codes[0].text
         )
         return False

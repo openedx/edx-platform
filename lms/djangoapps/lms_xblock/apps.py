@@ -12,8 +12,8 @@ class LMSXBlockConfig(AppConfig):
     """
     Default configuration for the "lms.djangoapps.lms_xblock" Django application.
     """
-    name = 'lms.djangoapps.lms_xblock'
-    verbose_name = 'LMS XBlock'
+    name = u'lms.djangoapps.lms_xblock'
+    verbose_name = u'LMS XBlock'
 
     def ready(self):
         from .runtime import handler_url, local_resource_url

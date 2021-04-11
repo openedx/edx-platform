@@ -4,9 +4,7 @@
 <p>
     {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
     <a
-    {% if reset_url %}
-        href={{reset_url}}
-    {% elif course_cta_url %}
+    {% if course_cta_url %}
         href="{% with_link_tracking course_cta_url %}"
     {% else %}
         {%if course_ids|length > 1 %}

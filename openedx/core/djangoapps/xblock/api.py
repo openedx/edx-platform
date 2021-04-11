@@ -238,7 +238,7 @@ def get_handler_url(usage_key, handler_name, user):
     """
     usage_key_str = six.text_type(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
-    if not user:  # lint-amnesty, pylint: disable=no-else-raise
+    if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
     elif user.is_authenticated:
         user_id = user.id

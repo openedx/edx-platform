@@ -12,7 +12,6 @@ and won't find the now-invalid cached data.
 from datetime import datetime
 from uuid import UUID
 
-from django.conf import settings
 from django.core.cache import caches, InvalidCacheBackendError
 from pytz import UTC
 import requests
@@ -82,7 +81,7 @@ class BundleCache(object):
         """
         assert isinstance(key_parts, (list, tuple))
         full_key = _get_versioned_cache_key(self.bundle_uuid, self.draft_name, key_parts)
-        return cache.set(full_key, value, timeout=settings.BLOCKSTORE_BUNDLE_CACHE_TIMEOUT)
+        return cache.set(full_key, value, timeout=None)
 
     def clear(self):
         """
@@ -102,7 +101,7 @@ class BundleCache(object):
         cache.delete(cache_key)
 
 
-def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _construct_versioned_cache_key(bundle_uuid, version_num, key_parts, draft_name=None):
     cache_key = str(bundle_uuid)
     if draft_name:
         cache_key += ":" + draft_name
@@ -182,7 +181,6 @@ def get_bundle_draft_files_cached(bundle_uuid, draft_name):
     get automatic cache invalidation when the draft is updated.
     """
     bundle_cache = BundleCache(bundle_uuid, draft_name)
-
     cache_key = ('bundle_draft_files', )
     result = bundle_cache.get(cache_key)
     if result is None:

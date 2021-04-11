@@ -30,9 +30,9 @@ import click
 )
 def main(log_file, test_suite):
     worker_test_dict = {}
-    with open(log_file, 'r') as console_file:
+    with io.open(log_file, 'r') as console_file:
         for line in console_file:
-            regex_search = re.search(fr'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)', line)
+            regex_search = re.search(r'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)'.format(test_suite), line)
             if regex_search:
                 worker_num_string = regex_search.group(1)
                 if worker_num_string not in worker_test_dict:
@@ -40,7 +40,7 @@ def main(log_file, test_suite):
                 test = regex_search.group(3)
                 if test_suite == "commonlib-unit":
                     if "pavelib" not in test and not test.startswith('scripts'):
-                        test = f"common/lib/{test}"
+                        test = u"common/lib/{}".format(test)
                 worker_test_dict[worker_num_string].append(test)
 
     output_folder_name = "worker_list_files"
@@ -49,8 +49,8 @@ def main(log_file, test_suite):
     os.mkdir(output_folder_name)
 
     for worker_num in worker_test_dict:
-        output_file_name = f"{output_folder_name}/{test_suite}_gw{worker_num}_test_list.txt"
-        with open(output_file_name, 'w') as output_file:
+        output_file_name = "{}/{}_gw{}_test_list.txt".format(output_folder_name, test_suite, worker_num)
+        with io.open(output_file_name, 'w') as output_file:
             for line in worker_test_dict[worker_num]:
                 output_file.write(line + "\n")
 

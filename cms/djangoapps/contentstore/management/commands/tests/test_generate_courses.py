@@ -4,9 +4,9 @@ Unittest for generate a test course in an given modulestore
 
 
 import json
-from unittest import mock
 
 import ddt
+import mock
 from django.core.management import CommandError, call_command
 
 from xmodule.modulestore.django import modulestore
@@ -120,7 +120,7 @@ class TestGenerateCourses(ModuleStoreTestCase):
         }]}
         arg = json.dumps(settings)
         call_command("generate_courses", arg)
-        mock_logger.info.assert_any_call(('invalid_field') + "is not a valid CourseField")
+        mock_logger.info.assert_any_call((u'invalid_field') + "is not a valid CourseField")
 
     @mock.patch('cms.djangoapps.contentstore.management.commands.generate_courses.logger')
     def test_invalid_date_setting(self, mock_logger):

@@ -14,16 +14,27 @@ from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.conf import settings
 from django.contrib.auth import load_backend
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.validators import ValidationError
-from django.db import IntegrityError, transaction, ProgrammingError
+from django.db import IntegrityError, transaction
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from pytz import UTC
+from six import iteritems, text_type
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
+from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
+from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
+from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_themes
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
@@ -35,16 +46,6 @@ from common.djangoapps.student.models import (
     username_exists_or_retired
 )
 from common.djangoapps.util.password_policy_validators import normalize_password
-from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
-from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
-from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.verify_student.models import VerificationDeadline
-from lms.djangoapps.verify_student.services import IDVerificationService
-from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_themes
-from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
 # Enumeration of per-course verification statuses
 # we display on the student dashboard.
@@ -213,7 +214,7 @@ def check_verify_status_by_course(user, course_enrollments):
                 }
 
     if recent_verification_datetime:
-        for key, value in status_by_course.items():  # pylint: disable=unused-variable
+        for key, value in iteritems(status_by_course):  # pylint: disable=unused-variable
             status_by_course[key]['verification_good_until'] = recent_verification_datetime.strftime("%m/%d/%Y")
 
     return status_by_course
@@ -222,18 +223,6 @@ def check_verify_status_by_course(user, course_enrollments):
 # Query string parameters that can be passed to the "finish_auth" view to manage
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
-
-
-def get_redirect_url_with_host(root_url, redirect_to):
-    """
-    Adds host to the redirect url
-    """
-    (_, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
-    if not netloc:
-        parse_root_url = urllib.parse.urlsplit(root_url)
-        redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc, path, query, fragment))
-
-    return redirect_to
 
 
 def get_next_url_for_login_page(request, include_host=False):
@@ -269,8 +258,8 @@ def get_next_url_for_login_page(request, include_host=False):
                     redirect_to = reverse(login_redirect_url)
                 except NoReverseMatch:
                     log.warning(
-                        'Default redirect after login doesn\'t exist: %(login_redirect_url)r. '
-                        'Check the value set on DEFAULT_REDIRECT_AFTER_LOGIN configuration variable.',
+                        u'Default redirect after login doesn\'t exist: %(login_redirect_url)r. '
+                        u'Check the value set on DEFAULT_REDIRECT_AFTER_LOGIN configuration variable.',
                         {"login_redirect_url": login_redirect_url}
                     )
 
@@ -282,7 +271,7 @@ def get_next_url_for_login_page(request, include_host=False):
         elif settings.ROOT_URLCONF == 'cms.urls':
             redirect_to = reverse('home')
             scheme = "https" if settings.HTTPS == "on" else "http"
-            root_url = f'{scheme}://{settings.CMS_BASE}'
+            root_url = '{}://{}'.format(scheme, settings.CMS_BASE)
 
     if any(param in request_params for param in POST_AUTH_PARAMS):
         # Before we redirect to next/dashboard, we need to handle auto-enrollment:
@@ -293,6 +282,13 @@ def get_next_url_for_login_page(request, include_host=False):
         # Note: if we are resuming a third party auth pipeline, then the next URL will already
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
+
+    if include_host:
+        (scheme, netloc, path, query, fragment) = list(urllib.parse.urlsplit(redirect_to))
+        if not netloc:
+            parse_root_url = urllib.parse.urlsplit(root_url)
+            redirect_to = urllib.parse.urlunsplit((parse_root_url.scheme, parse_root_url.netloc,
+                                                   path, query, fragment))
 
     # Append a tpa_hint query parameter, if one is configured
     tpa_hint = configuration_helpers.get_value(
@@ -309,9 +305,6 @@ def get_next_url_for_login_page(request, include_host=False):
             params['tpa_hint'] = [tpa_hint]
             query = urllib.parse.urlencode(params, doseq=True)
             redirect_to = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
-
-    if include_host:
-        return redirect_to, root_url
 
     return redirect_to
 
@@ -350,14 +343,14 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
         )
         if not safe_redirect:
             log.warning(
-                "Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
+                u"Unsafe redirect parameter detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
         elif not accepts_text_html:
             log.info(
-                "Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
-                " after login page: '%(redirect_to)s'",
+                u"Redirect to non html content '%(content_type)s' detected from '%(user_agent)s'"
+                u" after login page: '%(redirect_to)s'",
                 {
                     "redirect_to": redirect_to, "content_type": header_accept,
                     "user_agent": request_headers.get('HTTP_USER_AGENT', '')
@@ -366,13 +359,13 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             redirect_to = None
         elif mime_type:
             log.warning(
-                "Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
+                u"Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
         elif settings.STATIC_URL in redirect_to:
             log.warning(
-                "Redirect to static content detected after login page: '%(redirect_to)s'",
+                u"Redirect to static content detected after login page: '%(redirect_to)s'",
                 {"redirect_to": redirect_to}
             )
             redirect_to = None
@@ -382,13 +375,33 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             for theme in themes:
                 if theme.theme_dir_name in next_path:
                     log.warning(
-                        "Redirect to theme content detected after login page: '%(redirect_to)s'",
+                        u"Redirect to theme content detected after login page: '%(redirect_to)s'",
                         {"redirect_to": redirect_to}
                     )
                     redirect_to = None
                     break
 
     return redirect_to
+
+
+def generate_activation_email_context(user, registration):
+    """
+    Constructs a dictionary for use in activation email contexts
+
+    Arguments:
+        user (User): Currently logged-in user
+        registration (Registration): Registration object for the currently logged-in user
+    """
+    return {
+        'name': user.profile.name,
+        'key': registration.activation_key,
+        'lms_url': configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'support_url': configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
+        'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
+    }
 
 
 def create_or_set_user_attribute_created_on_site(user, site):
@@ -420,7 +433,7 @@ def authenticate_new_user(request, username, password):
     backend = load_backend(NEW_USER_AUTH_BACKEND)
     user = backend.authenticate(request=request, username=username, password=password)
     if not user:
-        log.warning(f"Unable to authenticate user: {username}")
+        log.warning("Unable to authenticate user: {username}".format(username=username))
     user.backend = NEW_USER_AUTH_BACKEND
     return user
 
@@ -429,10 +442,9 @@ class AccountValidationError(Exception):
     """
     Used in account creation views to raise exceptions with details about specific invalid fields
     """
-    def __init__(self, message, field, error_code=None):
-        super().__init__(message)
+    def __init__(self, message, field):
+        super(AccountValidationError, self).__init__(message)
         self.field = field
-        self.error_code = error_code
 
 
 def cert_info(user, course_overview):
@@ -548,7 +560,7 @@ def _cert_info(user, course_overview, cert_status):
                 status_dict['status'] = 'unavailable'
         elif 'download_url' not in cert_status:
             log.warning(
-                "User %s has a downloadable cert for %s, but no download url",
+                u"User %s has a downloadable cert for %s, but no download url",
                 user.username,
                 course_overview.id
             )
@@ -586,7 +598,7 @@ def _cert_info(user, course_overview, cert_status):
             if all(grade is None for grade in grades_input)
             else max(filter(lambda x: x is not None, grades_input))
         )
-        status_dict['grade'] = str(max_grade)
+        status_dict['grade'] = text_type(max_grade)
 
     return status_dict
 
@@ -649,17 +661,15 @@ def do_create_account(form, custom_form=None):
         # AccountValidationError and a consistent user message returned (i.e. both should
         # return "It looks like {username} belongs to an existing account. Try again with a
         # different username.")
-        if username_exists_or_retired(user.username):  # lint-amnesty, pylint: disable=no-else-raise
-            raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+        if username_exists_or_retired(user.username):
+            raise AccountValidationError(
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
-                field="username",
-                error_code='duplicate-username',
+                field="username"
             )
         elif email_exists_or_retired(user.email):
-            raise AccountValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
-                field="email",
-                error_code='duplicate-email'
+                field="email"
             )
         else:
             raise
@@ -680,7 +690,7 @@ def do_create_account(form, custom_form=None):
     try:
         profile.save()
     except Exception:
-        log.exception(f"UserProfile creation failed for user {user.id}.")
+        log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
     return user, profile, registration
@@ -713,14 +723,3 @@ def get_resume_urls_for_enrollments(user, enrollments):
             url_to_block = ''
         resume_course_urls[enrollment.course_id] = url_to_block
     return resume_course_urls
-
-
-def does_user_profile_exist(user):
-    """
-    Check if user has an associated profile.
-    Ignore errors and return False in case of errors.
-    """
-    try:
-        return hasattr(user, 'profile')
-    except (ProgrammingError, ObjectDoesNotExist):
-        return False

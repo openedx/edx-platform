@@ -1,4 +1,6 @@
 """Views for discussion forums."""
+
+
 import functools
 import json
 import logging
@@ -8,7 +10,7 @@ import time
 import eventtracking
 import six
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core import exceptions
 from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
@@ -16,10 +18,10 @@ from django.views.decorators import csrf
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 import lms.djangoapps.discussion.django_comment_client.settings as cc_settings
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -55,6 +57,7 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_voted
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
+from common.djangoapps.util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 
@@ -234,7 +237,7 @@ def create_thread(request, course_id, commentable_id):
     Given a course and commentable ID, create the thread
     """
 
-    log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
+    log.debug(u"Creating new thread in %r, id %r", course_id, commentable_id)
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
@@ -259,7 +262,7 @@ def create_thread(request, course_id, commentable_id):
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
         'commentable_id': commentable_id,
-        'course_id': str(course_key),
+        'course_id': text_type(course_key),
         'user_id': user.id,
         'thread_type': post["thread_type"],
         'body': post["body"],
@@ -377,7 +380,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         user_id=user.id,
-        course_id=str(course_key),
+        course_id=text_type(course_key),
         thread_id=thread_id,
         parent_id=parent_id,
         body=post["body"]
@@ -690,7 +693,7 @@ def un_pin_thread(request, course_id, thread_id):
 @require_POST
 @login_required
 @permitted
-def follow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
+def follow_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
@@ -701,7 +704,7 @@ def follow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: disab
 @require_POST
 @login_required
 @permitted
-def follow_commentable(request, course_id, commentable_id):  # lint-amnesty, pylint: disable=unused-argument
+def follow_commentable(request, course_id, commentable_id):
     """
     given a course_id and commentable id, follow this commentable
     ajax only
@@ -715,7 +718,7 @@ def follow_commentable(request, course_id, commentable_id):  # lint-amnesty, pyl
 @require_POST
 @login_required
 @permitted
-def unfollow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: disable=unused-argument
+def unfollow_thread(request, course_id, thread_id):
     """
     given a course id and thread id, stop following this thread
     ajax only
@@ -730,7 +733,7 @@ def unfollow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: dis
 @require_POST
 @login_required
 @permitted
-def unfollow_commentable(request, course_id, commentable_id):  # lint-amnesty, pylint: disable=unused-argument
+def unfollow_commentable(request, course_id, commentable_id):
     """
     given a course id and commentable id stop following commentable
     ajax only
@@ -745,7 +748,7 @@ def unfollow_commentable(request, course_id, commentable_id):  # lint-amnesty, p
 @login_required
 @csrf.csrf_exempt
 @xframe_options_exempt
-def upload(request, course_id):  # ajax upload file to a question or answer  # lint-amnesty, pylint: disable=unused-argument
+def upload(request, course_id):  # ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
 
@@ -768,10 +771,10 @@ def upload(request, course_id):  # ajax upload file to a question or answer  # l
         )
 
     except exceptions.PermissionDenied as err:
-        error = str(err)
+        error = six.text_type(err)
     except Exception as err:      # pylint: disable=broad-except
         print(err)
-        logging.critical(str(err))
+        logging.critical(six.text_type(err))
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
@@ -793,7 +796,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer  # l
     # Using content-type of text/plain here instead of JSON because
     # IE doesn't know how to handle the JSON response and prompts the
     # user to save the JSON as a file instead of passing it to the callback.
-    return HttpResponse(json.dumps({  # lint-amnesty, pylint: disable=http-response-with-json-dumps
+    return HttpResponse(json.dumps({
         'result': {
             'msg': result,
             'error': error,

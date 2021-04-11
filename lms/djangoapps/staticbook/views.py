@@ -8,10 +8,10 @@ from django.http import Http404
 from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.static_replace import replace_static_urls
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.static_replace import replace_static_urls
 
 
 @login_required
@@ -25,7 +25,7 @@ def index(request, course_id, book_index, page=None):
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.textbooks):
-        raise Http404(f"Invalid book index value: {book_index}")
+        raise Http404(u"Invalid book index value: {0}".format(book_index))
     textbook = course.textbooks[book_index]
     table_of_contents = textbook.table_of_contents
 
@@ -83,7 +83,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.pdf_textbooks):
-        raise Http404(f"Invalid book index value: {book_index}")
+        raise Http404(u"Invalid book index value: {0}".format(book_index))
     textbook = course.pdf_textbooks[book_index]
 
     viewer_params = '&file='
@@ -108,7 +108,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
 
     viewer_params += '#zoom=page-fit&disableRange=true'
     if page is not None:
-        viewer_params += f'&page={page}'
+        viewer_params += '&page={}'.format(page)
 
     if request.GET.get('viewer', '') == 'true':
         template = 'pdf_viewer.html'
@@ -151,7 +151,7 @@ def html_index(request, course_id, book_index, chapter=None):
 
     book_index = int(book_index)
     if book_index < 0 or book_index >= len(course.html_textbooks):
-        raise Http404(f"Invalid book index value: {book_index}")
+        raise Http404(u"Invalid book index value: {0}".format(book_index))
     textbook = course.html_textbooks[book_index]
 
     if 'url' in textbook:

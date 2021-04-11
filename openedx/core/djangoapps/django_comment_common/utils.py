@@ -4,6 +4,7 @@ Common comment client utility functions.
 """
 
 
+import six
 from contracts import new_contract
 
 from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
@@ -18,10 +19,10 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.lib.cache_utils import request_cached
 
-new_contract('basestring', str)
+new_contract('basestring', six.string_types[0])
 
 
-class ThreadContext:
+class ThreadContext(object):
     """ An enumeration that represents the context of a thread. Used primarily by the comments service. """
     STANDALONE = 'standalone'
     COURSE = 'course'
@@ -151,7 +152,7 @@ def set_course_discussion_settings(course_key, **kwargs):
         A CourseDiscussionSettings object.
     """
     fields = {
-        'division_scheme': (str,)[0],
+        'division_scheme': six.string_types[0],
         'always_divide_inline_discussions': bool,
         'divided_discussions': list,
     }
@@ -160,7 +161,7 @@ def set_course_discussion_settings(course_key, **kwargs):
     for field, field_type in fields.items():
         if field in kwargs:
             if not isinstance(kwargs[field], field_type):
-                raise ValueError(f"Incorrect field type for `{field}`. Type must be `{field_type.__name__}`")
+                raise ValueError(u"Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
             setattr(course_discussion_settings, field, kwargs[field])
 
     course_discussion_settings.save()

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
@@ -49,6 +52,6 @@ class Migration(migrations.Migration):
         # since the database column constraint already exists).
         migrations.AlterUniqueTogether(
             name='coursemode',
-            unique_together={('course', 'mode_slug', 'currency')},
+            unique_together=set([('course', 'mode_slug', 'currency')]),
         ),
     ]

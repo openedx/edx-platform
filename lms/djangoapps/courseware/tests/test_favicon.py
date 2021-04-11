@@ -16,7 +16,7 @@ class FaviconTestCase(UrlResetMixin, TestCase):
 
     def test_favicon_redirect(self):
         resp = self.client.get("/favicon.ico")
-        assert resp.status_code == 301
+        self.assertEqual(resp.status_code, 301)
         self.assertRedirects(
             resp,
             "/static/images/favicon.ico",
@@ -28,7 +28,7 @@ class FaviconTestCase(UrlResetMixin, TestCase):
         self.reset_urls()
 
         resp = self.client.get("/favicon.ico")
-        assert resp.status_code == 301
+        self.assertEqual(resp.status_code, 301)
         self.assertRedirects(
             resp,
             "/static/images/foo.ico",

@@ -14,7 +14,7 @@ class SAMLConfigurationFactory(DjangoModelFactory):
     """
     Factory or SAMLConfiguration model in third_party_auth app.
     """
-    class Meta:
+    class Meta(object):
         model = SAMLConfiguration
 
     site = SubFactory(SiteFactory)
@@ -25,7 +25,7 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
     """
     Factory or SAMLProviderConfig model in third_party_auth app.
     """
-    class Meta:
+    class Meta(object):
         model = SAMLProviderConfig
         django_get_or_create = ('slug', 'metadata_source', "entity_id")
 

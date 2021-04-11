@@ -1,12 +1,10 @@
-# lint-amnesty, pylint: disable=imported-auth-user, missing-module-docstring
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
+from django.core.management.base import BaseCommand
 
 from openedx.core.djangoapps.django_comment_common.models import Role
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = 'Assign a discussion forum role to a user.'
 
     def add_arguments(self, parser):
@@ -27,9 +25,10 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         role = Role.objects.get(name=role, course_id=course_id)
 
-        user = User.objects.filter(Q(email=name_or_email) | Q(username=name_or_email)).first()
-        if not user:
-            raise CommandError(f"User {name_or_email} does not exist.")
+        if '@' in name_or_email:
+            user = User.objects.get(email=name_or_email)
+        else:
+            user = User.objects.get(username=name_or_email)
 
         if options['remove']:
             user.roles.remove(role)

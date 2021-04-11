@@ -1,8 +1,7 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 
-from django.contrib.auth import get_user_model, logout  # lint-amnesty, pylint: disable=unused-import
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from social_django.models import UserSocialAuth
@@ -62,7 +61,7 @@ class Command(BaseCommand):
                 'trying again'
             )
             logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(error_message)
 
         user_model = get_user_model()
 
@@ -87,14 +86,14 @@ class Command(BaseCommand):
         except KeyError:
             error_message = 'Username not specified {}'.format(user)
             logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(error_message)
         except user_model.DoesNotExist:
             error_message = 'The user "{}" does not exist.'.format(user.username)
             logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(error_message)
         except Exception as exc:  # pylint: disable=broad-except
             error_message = '500 error deactivating account {}'.format(exc)
             logger.error(error_message)
-            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(error_message)
 
         logger.info("User succesfully moved to the retirment pipeline")

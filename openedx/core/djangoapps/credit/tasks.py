@@ -3,10 +3,10 @@ This file contains celery tasks for credit course views.
 """
 
 
-from celery import shared_task
+import six
+from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -19,8 +19,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 LOGGER = get_task_logger(__name__)
 
 
-@shared_task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
-@set_code_owner_attribute
+@task(default_retry_delay=settings.CREDIT_TASK_DEFAULT_RETRY_DELAY, max_retries=settings.CREDIT_TASK_MAX_RETRIES)
 def update_credit_course_requirements(course_id):
     """
     Updates course requirements table for a course.
@@ -39,10 +38,10 @@ def update_credit_course_requirements(course_id):
             requirements = _get_course_credit_requirements(course_key)
             set_credit_requirements(course_key, requirements)
     except (InvalidKeyError, ItemNotFoundError, InvalidCreditRequirements) as exc:
-        LOGGER.error('Error on adding the requirements for course %s - %s', course_id, str(exc))
+        LOGGER.error(u'Error on adding the requirements for course %s - %s', course_id, six.text_type(exc))
         raise update_credit_course_requirements.retry(args=[course_id], exc=exc)
     else:
-        LOGGER.info('Requirements added for course %s', course_id)
+        LOGGER.info(u'Requirements added for course %s', course_id)
 
 
 def _get_course_credit_requirements(course_key):
@@ -98,7 +97,7 @@ def _get_min_grade_requirement(course_key):
             }
         ]
     except AttributeError:
-        LOGGER.error("The course %s does not has minimum_grade_credit attribute", str(course.id))
+        LOGGER.error(u"The course %s does not has minimum_grade_credit attribute", six.text_type(course.id))
     else:
         return []
 
@@ -124,13 +123,13 @@ def _get_proctoring_requirements(course_key):
     from edx_proctoring.api import get_all_exams_for_course
 
     requirements = []
-    for exam in get_all_exams_for_course(str(course_key)):
+    for exam in get_all_exams_for_course(six.text_type(course_key)):
         if exam['is_proctored'] and exam['is_active'] and not exam['is_practice_exam']:
             try:
                 usage_key = UsageKey.from_string(exam['content_id'])
                 proctor_block = modulestore().get_item(usage_key)
             except (InvalidKeyError, ItemNotFoundError):
-                LOGGER.info("Invalid content_id '%s' for proctored block '%s'", exam['content_id'], exam['exam_name'])
+                LOGGER.info(u"Invalid content_id '%s' for proctored block '%s'", exam['content_id'], exam['exam_name'])
                 proctor_block = None
 
             if proctor_block:
@@ -145,7 +144,7 @@ def _get_proctoring_requirements(course_key):
 
     if requirements:
         log_msg = (
-            'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
+            u'Registering the following as \'proctored_exam\' credit requirements: {log_msg}'.format(
                 log_msg=requirements
             )
         )

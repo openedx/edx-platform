@@ -7,17 +7,18 @@ in the specified time range.
 import logging
 from datetime import datetime
 
+import six
 from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
 from submissions.models import Submission
 
-from common.djangoapps.student.models import user_by_anonymous_id
-from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
+from common.djangoapps.student.models import user_by_anonymous_id
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.util.date_utils import to_timestamp
 
 log = logging.getLogger(__name__)
 
@@ -66,12 +67,12 @@ class Command(BaseCommand):
                 continue
             task_args = {
                 "user_id": record.student_id,
-                "course_id": str(record.course_id),
-                "usage_id": str(record.module_state_key),
+                "course_id": six.text_type(record.course_id),
+                "usage_id": six.text_type(record.module_state_key),
                 "only_if_higher": False,
                 "expected_modified_time": to_timestamp(record.modified),
                 "score_deleted": False,
-                "event_transaction_id": str(event_transaction_id),
+                "event_transaction_id": six.text_type(event_transaction_id),
                 "event_transaction_type": PROBLEM_SUBMITTED_EVENT_TYPE,
                 "score_db_table": ScoreDatabaseTableEnum.courseware_student_module,
             }
@@ -85,12 +86,12 @@ class Command(BaseCommand):
             task_args = {
                 "user_id": user_by_anonymous_id(record.student_item.student_id).id,
                 "anonymous_user_id": record.student_item.student_id,
-                "course_id": str(record.student_item.course_id),
-                "usage_id": str(record.student_item.item_id),
+                "course_id": six.text_type(record.student_item.course_id),
+                "usage_id": six.text_type(record.student_item.item_id),
                 "only_if_higher": False,
                 "expected_modified_time": to_timestamp(record.created_at),
                 "score_deleted": False,
-                "event_transaction_id": str(event_transaction_id),
+                "event_transaction_id": six.text_type(event_transaction_id),
                 "event_transaction_type": PROBLEM_SUBMITTED_EVENT_TYPE,
                 "score_db_table": ScoreDatabaseTableEnum.submissions,
             }

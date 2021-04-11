@@ -27,7 +27,7 @@ class XBlockPackageStorage(Storage):
         """
         Returns a static file storage if available in the given app.
         """
-        super(XBlockPackageStorage, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(XBlockPackageStorage, self).__init__(*args, **kwargs)
         self.module = module
         self.base_dir = base_dir
 
@@ -40,7 +40,7 @@ class XBlockPackageStorage(Storage):
         """
         return resource_filename(self.module, os.path.join(self.base_dir, name))
 
-    def exists(self, path):  # lint-amnesty, pylint: disable=arguments-differ
+    def exists(self, path):
         """
         Returns True if the specified path exists.
         """
@@ -108,7 +108,7 @@ class XBlockPackageStorage(Storage):
         raise NotImplementedError("Deleting files from a package is not supported")
 
 
-class XBlockPipelineFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-method
+class XBlockPipelineFinder(BaseFinder):
     """
     A static files finder that gets static assets from xblocks.
     """
@@ -119,7 +119,7 @@ class XBlockPipelineFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstrac
         initialization happens, we just proxy all list()/find() requests by
         iterating through the XBlockPackageStorage objects.
         """
-        super(XBlockPipelineFinder, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super(XBlockPipelineFinder, self).__init__(*args, **kwargs)
 
         # xblock_resource_info holds (package_name, resources_dir) tuples. While
         # it never happens in practice, the XBlock API does allow different

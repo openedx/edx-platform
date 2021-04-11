@@ -6,6 +6,7 @@ as the discovery happens during the initial setup of Django settings.
 
 import os
 
+from django.utils.encoding import python_2_unicode_compatible
 from path import Path
 
 
@@ -105,7 +106,8 @@ def get_project_root_name_from_settings(project_root):
     return root.name
 
 
-class Theme:
+@python_2_unicode_compatible
+class Theme(object):
     """
     class to encapsulate theme related information.
     """
@@ -144,7 +146,7 @@ class Theme:
 
     def __str__(self):
         # pylint: disable=line-too-long
-        return f"<Theme: {self.name} at '{self.path}'>"  # xss-lint: disable=python-wrap-html
+        return u"<Theme: {name} at '{path}'>".format(name=self.name, path=self.path)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__str__()

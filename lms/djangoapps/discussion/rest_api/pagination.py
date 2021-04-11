@@ -7,7 +7,7 @@ from edx_rest_framework_extensions.paginators import NamespacedPageNumberPaginat
 from rest_framework.utils.urls import replace_query_param
 
 
-class _Page:
+class _Page(object):
     """
     Implements just enough of the django.core.paginator.Page interface to allow
     PaginationSerializer to work.
@@ -51,7 +51,7 @@ class DiscussionAPIPagination(NamespacedPageNumberPagination):
         self.base_url = request.build_absolute_uri()
         self.count = result_count
 
-        super().__init__()
+        super(DiscussionAPIPagination, self).__init__()
 
     def get_result_count(self):
         """

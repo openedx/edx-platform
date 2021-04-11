@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+
+
 from django.db import migrations, models
 from django.conf import settings
 import django.utils.timezone
@@ -17,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('experiment_id', models.PositiveSmallIntegerField(verbose_name='Experiment ID', db_index=True)),
+                ('experiment_id', models.PositiveSmallIntegerField(verbose_name=u'Experiment ID', db_index=True)),
                 ('key', models.CharField(max_length=255)),
                 ('value', models.TextField()),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -29,10 +33,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='experimentdata',
-            unique_together={('user', 'experiment_id', 'key')},
+            unique_together=set([('user', 'experiment_id', 'key')]),
         ),
         migrations.AlterIndexTogether(
             name='experimentdata',
-            index_together={('user', 'experiment_id')},
+            index_together=set([('user', 'experiment_id')]),
         ),
     ]

@@ -1,24 +1,23 @@
 """Tests for embargo app views. """
 
 
-from unittest.mock import patch, MagicMock
-
 import ddt
 import maxminddb
 import geoip2.database
 
 from django.urls import reverse
 from django.conf import settings
+from mock import patch, MagicMock
 
 from .factories import CountryAccessRuleFactory, RestrictedCourseFactory
 from .. import messages
-from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.student.tests.factories import UserFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps.util.testing import UrlResetMixin  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from lms.djangoapps.course_api.tests.mixins import CourseApiFactoryMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @skip_unless_lms
@@ -47,7 +46,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super().setUp()
+        super(CourseAccessMessageViewTest, self).setUp()
 
     @ddt.data(*list(messages.ENROLL_MESSAGES.keys()))
     def test_enrollment_messages(self, msg_key):
@@ -84,9 +83,17 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
             'message_key': message_key
         })
         response = self.client.get(url)
-        assert response.status_code ==\
-               expected_status, f"Unexpected status code when loading '{url}': expected {expected_status}" \
-                                f" but got {response.status_code}"
+        self.assertEqual(
+            response.status_code, expected_status,
+            msg=(
+                u"Unexpected status code when loading '{url}': "
+                u"expected {expected} but got {actual}"
+            ).format(
+                url=url,
+                expected=expected_status,
+                actual=response.status_code
+            )
+        )
 
 
 @skip_unless_lms
@@ -95,11 +102,11 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super().setUp()
+        super(CheckCourseAccessViewTest, self).setUp()
         self.url = reverse('api_embargo:v1_course_access')
         user = UserFactory(is_staff=True)
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
-        self.course_id = str(CourseFactory().id)  # lint-amnesty, pylint: disable=no-member
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
+        self.course_id = str(CourseFactory().id)
         self.request_data = {
             'course_ids': [self.course_id],
             'ip_address': '0.0.0.0',
@@ -109,8 +116,8 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
     def test_course_access_endpoint_with_unrestricted_course(self):
         response = self.client.get(self.url, data=self.request_data)
         expected_response = {'access': True}
-        assert response.status_code == 200
-        assert response.data == expected_response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
 
     def test_course_access_endpoint_with_restricted_course(self):
         CountryAccessRuleFactory(restricted_course=RestrictedCourseFactory(course_key=self.course_id))
@@ -142,26 +149,26 @@ class CheckCourseAccessViewTest(CourseApiFactoryMixin, ModuleStoreTestCase):
         response = self.client.get(self.url, data=self.request_data)
 
         expected_response = {'access': False}
-        assert response.status_code == 200
-        assert response.data == expected_response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, expected_response)
 
     def test_course_access_endpoint_with_logged_out_user(self):
         self.client.logout()
         response = self.client.get(self.url, data=self.request_data)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def test_course_access_endpoint_with_non_staff_user(self):
         user = UserFactory(is_staff=False)
-        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)  # lint-amnesty, pylint: disable=protected-access
+        self.client.login(username=user.username, password=UserFactory._DEFAULT_PASSWORD)
 
         response = self.client.get(self.url, data=self.request_data)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def test_course_access_endpoint_with_invalid_data(self):
         response = self.client.get(self.url, data=None)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
 
     def test_invalid_course_id(self):
         self.request_data['course_ids'] = ['foo']
         response = self.client.get(self.url, data=self.request_data)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)

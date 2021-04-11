@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Instructor (2) dashboard page.
 """
@@ -122,7 +123,7 @@ class CohortManagementSection(PageObject):
         cohorts_warning_title = '.message-warning .message-title'
 
         if self.q(css=cohorts_warning_title).visible:
-            return self.q(css='.message-title').text[0] == 'You currently have no cohorts configured'
+            return self.q(css='.message-title').text[0] == u'You currently have no cohorts configured'
         # The page may be in either the traditional management state, or an 'add new cohort' state.
         # Confirm the CSS class is visible because the CSS class can exist on the page even in different states.
         return self.q(css='.cohorts-state-section').visible or self.q(css='.new-cohort-form').visible
@@ -131,7 +132,7 @@ class CohortManagementSection(PageObject):
         """
         Return `selector`, but limited to the cohort management context.
         """
-        return f'.cohort-management {selector}'
+        return u'.cohort-management {}'.format(selector)
 
     def _get_cohort_options(self):
         """
@@ -584,8 +585,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns True if a {section_type} notification is displayed.
         """
-        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
-        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
+        notification_selector = u'.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, u"%s Notification" % section_type.title())
         return self.q(css=notification_selector).is_present()
 
     def first_notification_message(self, section_type):
@@ -594,8 +595,8 @@ class MembershipPageAutoEnrollSection(PageObject):
                                        MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
         Returns the first message from the list of messages in the {section_type} section.
         """
-        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
-        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
+        error_message_selector = u'.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, u"%s message" % section_type.title())
         return self.q(css=error_message_selector).text[0]
 
     def upload_correct_csv_file(self):
@@ -628,8 +629,8 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Fill in the form with the provided email and submit it.
         """
-        email_selector = f"{self.batch_enrollment_selector} textarea"
-        enrollment_button = f"{self.batch_enrollment_selector} .enrollment-button[data-action='enroll']"
+        email_selector = u"{} textarea".format(self.batch_enrollment_selector)
+        enrollment_button = u"{} .enrollment-button[data-action='enroll']".format(self.batch_enrollment_selector)
 
         # Fill the email addresses after the email selector is visible.
         self.wait_for_element_visibility(email_selector, 'Email field is visible')
@@ -645,9 +646,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         """
         Check notification div is visible and have message.
         """
-        notification_selector = f'{self.batch_enrollment_selector} .request-response'
+        notification_selector = u'{} .request-response'.format(self.batch_enrollment_selector)
         self.wait_for_element_visibility(notification_selector, 'Notification div is visible')
-        return self.q(css=f"{notification_selector} h3").text
+        return self.q(css=u"{} h3".format(notification_selector)).text
 
 
 class CertificatesPage(PageObject):

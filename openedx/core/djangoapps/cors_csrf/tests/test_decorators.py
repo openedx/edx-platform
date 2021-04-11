@@ -2,7 +2,7 @@
 
 
 import json
-from unittest import mock
+import mock
 from django.http import HttpResponse
 from django.test import TestCase
 
@@ -11,7 +11,7 @@ from ..decorators import ensure_csrf_cookie_cross_domain
 
 def fake_view(request):
     """Fake view that returns the request META as a JSON-encoded string. """
-    return HttpResponse(json.dumps(request.META))  # lint-amnesty, pylint: disable=http-response-with-json-dumps
+    return HttpResponse(json.dumps(request.META))
 
 
 class TestEnsureCsrfCookieCrossDomain(TestCase):
@@ -24,5 +24,5 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         wrapped_view = ensure_csrf_cookie_cross_domain(fake_view)
         response = wrapped_view(request)
         response_meta = json.loads(response.content.decode('utf-8'))
-        assert response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'] is True
-        assert response_meta['CSRF_COOKIE_USED'] is True
+        self.assertEqual(response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'], True)
+        self.assertEqual(response_meta['CSRF_COOKIE_USED'], True)

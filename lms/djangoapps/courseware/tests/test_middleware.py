@@ -17,7 +17,7 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CoursewareMiddlewareTestCase, cls).setUpClass()
         cls.course = CourseFactory.create()
 
     def test_process_404(self):
@@ -26,7 +26,7 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
         response = RedirectMiddleware().process_exception(
             request, Http404()
         )
-        assert response is None
+        self.assertIsNone(response)
 
     def test_redirect_exceptions(self):
         """
@@ -38,6 +38,6 @@ class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
         response = RedirectMiddleware().process_exception(
             request, exception
         )
-        assert response.status_code == 302
-        target_url = response._headers['location'][1]  # lint-amnesty, pylint: disable=protected-access
-        assert target_url.endswith(test_url)
+        self.assertEqual(response.status_code, 302)
+        target_url = response._headers['location'][1]
+        self.assertTrue(target_url.endswith(test_url))

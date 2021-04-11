@@ -6,17 +6,15 @@ SubsectionGrade Factory Class
 from collections import OrderedDict
 from logging import getLogger
 
-from django.conf import settings
 from lazy import lazy
 from submissions import api as submissions_api
 
-from common.djangoapps.student.models import anonymous_id_for_user
 from lms.djangoapps.courseware.model_data import ScoresClient
 from lms.djangoapps.grades.config import assume_zero_if_absent, should_persist_grades
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.scores import possibly_scored
-from openedx.core.djangoapps.signals.signals import COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
+from common.djangoapps.student.models import anonymous_id_for_user
 
 from .course_data import CourseData
 from .subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade, ZeroSubsectionGrade
@@ -24,7 +22,7 @@ from .subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade, ZeroSu
 log = getLogger(__name__)
 
 
-class SubsectionGradeFactory:
+class SubsectionGradeFactory(object):
     """
     Factory for Subsection Grades.
     """
@@ -44,7 +42,7 @@ class SubsectionGradeFactory:
         grade currently exists, even if the assume_zero_if_absent flag is enabled for the course.
         """
         self._log_event(
-            log.debug, f"create, read_only: {read_only}, subsection: {subsection.location}", subsection,
+            log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location), subsection,
         )
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
@@ -72,11 +70,11 @@ class SubsectionGradeFactory:
         )
         self._unsaved_subsection_grades.clear()
 
-    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False, persist_grade=True):  # lint-amnesty, pylint: disable=line-too-long
+    def update(self, subsection, only_if_higher=None, score_deleted=False, force_update_subsections=False, persist_grade=True):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
-        self._log_event(log.debug, f"update, subsection: {subsection.location}", subsection)
+        self._log_event(log.debug, u"update, subsection: {}".format(subsection.location), subsection)
 
         calculated_grade = CreateSubsectionGrade(
             subsection, self.course_data.structure, self._submissions_scores, self._csm_scores,
@@ -105,15 +103,6 @@ class SubsectionGradeFactory:
                 force_update_subsections
             )
             self._update_saved_subsection_grade(subsection.location, grade_model)
-
-            if settings.FEATURES.get('ENABLE_COURSE_ASSESSMENT_GRADE_CHANGE_SIGNAL'):
-                COURSE_ASSESSMENT_GRADE_CHANGED.send(
-                    sender=self,
-                    course_id=self.course_data.course_key,
-                    user=self.student,
-                    subsection_id=calculated_grade.location,
-                    subsection_grade=calculated_grade.graded_total.earned
-                )
 
         return calculated_grade
 
@@ -173,7 +162,7 @@ class SubsectionGradeFactory:
         """
         Logs the given statement, for this instance.
         """
-        log_func("Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
+        log_func(u"Grades: SGF.{}, course: {}, version: {}, edit: {}, user: {}".format(
             log_statement,
             self.course_data.course_key,
             getattr(subsection, 'course_version', None),

@@ -8,10 +8,11 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
 from xmodule.modulestore.django import modulestore
+
+from lms.djangoapps.grades import tasks
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +80,7 @@ class Command(BaseCommand):
         """
         Enqueue all tasks, in shuffled order.
         """
-        task_options = {'queue': options['routing_key']} if options.get('routing_key') else {}
+        task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
         for seq_id, kwargs in enumerate(self._shuffled_task_kwargs(options)):
             kwargs['seq_id'] = seq_id
             result = tasks.compute_grades_for_course_v2.apply_async(kwargs=kwargs, **task_options)
@@ -103,10 +104,10 @@ class Command(BaseCommand):
             # This is a tuple to reduce memory consumption.
             # The dictionaries with their extra overhead will be created
             # and consumed one at a time.
-            for task_arg_tuple in tasks._course_task_args(course_key, **options):  # lint-amnesty, pylint: disable=protected-access
+            for task_arg_tuple in tasks._course_task_args(course_key, **options):
                 all_args.append(task_arg_tuple)
 
-        all_args.sort(key=lambda x: hashlib.md5(f'{x!r}'.encode('utf-8')).digest())
+        all_args.sort(key=lambda x: hashlib.md5('{!r}'.format(x).encode('utf-8')).digest())
 
         for args in all_args:
             yield {

@@ -10,7 +10,7 @@ def user_info_generator(usernames, password, domain):
     for username in usernames:
         yield {
             'username': username,
-            'email': f'{username}@{domain}',
+            'email': '{username}@{domain}'.format(username=username, domain=domain),
             'password': password,
             'name': username,
         }

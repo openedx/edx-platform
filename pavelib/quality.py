@@ -40,7 +40,7 @@ def write_junit_xml(name, message=None):
         'seconds': (datetime.utcnow() - START_TIME).total_seconds(),
     }
     Env.QUALITY_DIR.makedirs_p()
-    filename = Env.QUALITY_DIR / f'{name}.xml'
+    filename = Env.QUALITY_DIR / '{}.xml'.format(name)
     with open(filename, 'w') as f:
         f.write(JUNIT_XML_TEMPLATE.format(**data))
 
@@ -106,7 +106,7 @@ def find_fixme(options):
         sh(cmd, ignore_error=True)
 
         num_fixme += _count_pylint_violations(
-            f"{report_dir}/pylint_fixme.report")
+            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
 
     print("Number of pylint fixmes: " + str(num_fixme))
 
@@ -137,13 +137,11 @@ def _get_pylint_violations(systems=ALL_SYSTEMS.split(','), errors_only=False, cl
         system_report = report_dir / 'pylint.report'
         if clean or not system_report.exists():
             sh(
-                "export DJANGO_SETTINGS_MODULE={env}.envs.test; "
                 "pylint {flags} --output-format=parseable {apps} "
                 "> {report_dir}/pylint.report".format(
                     flags=" ".join(flags),
                     apps=apps_list,
-                    report_dir=report_dir,
-                    env=('cms' if system == 'cms' else 'lms')
+                    report_dir=report_dir
                 ),
                 ignore_error=True,
             )
@@ -264,7 +262,7 @@ def _get_pep8_violations(clean=True):
     Env.METRICS_DIR.makedirs_p()
 
     if not report.exists():
-        sh(f'pycodestyle . | tee {report} -a')
+        sh('pycodestyle . | tee {} -a'.format(report))
 
     violations_list = _pep8_violations(report)
 
@@ -294,7 +292,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
     violations_list = ''.join(violations_list)
 
     # Print number of violations to log
-    violations_count_str = f"Number of PEP 8 violations: {count}"
+    violations_count_str = "Number of PEP 8 violations: {count}".format(count=count)
     print(violations_count_str)
     print(violations_list)
 
@@ -306,7 +304,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
     # Fail if any violations are found
     if count:
         failure_string = "FAILURE: Too many PEP 8 violations. " + violations_count_str
-        failure_string += f"\n\nViolations:\n{violations_list}"
+        failure_string += "\n\nViolations:\n{violations_list}".format(violations_list=violations_list)
         fail_quality('pep8', failure_string)
     else:
         write_junit_xml('pep8')
@@ -333,7 +331,7 @@ def run_eslint(options):
     violations_limit = int(getattr(options, 'limit', -1))
 
     sh(
-        "node --max_old_space_size=4096 node_modules/.bin/eslint "
+        "nodejs --max_old_space_size=4096 node_modules/.bin/eslint "
         "--ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
             eslint_report=eslint_report
         ),
@@ -492,7 +490,7 @@ def run_xsslint(options):
     # Record the metric
     _write_metric(metrics_str, metrics_report)
     # Print number of violations to log.
-    sh(f"cat {metrics_report}", ignore_error=True)
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
 
     error_message = ""
 
@@ -576,7 +574,7 @@ def run_xsscommitlint():
     metrics_report = (Env.METRICS_DIR / "xsscommitlint")
     _write_metric(violations_count_str, metrics_report)
     # Output report to console.
-    sh(f"cat {metrics_report}", ignore_error=True)
+    sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
     if num_violations:
         fail_quality(
             'xsscommitlint',
@@ -634,7 +632,7 @@ def _get_report_contents(filename, report_name, last_line_only=False):
             else:
                 return report_file.read()
     else:
-        file_not_found_message = f"FAILURE: The following log file could not be found: {filename}"
+        file_not_found_message = "FAILURE: The following log file could not be found: {file}".format(file=filename)
         fail_quality(report_name, file_not_found_message)
 
 
@@ -736,7 +734,7 @@ def _extract_missing_pii_annotations(filename):
     uncovered_models = 0
     pii_check_passed = True
     if os.path.isfile(filename):
-        with open(filename) as report_file:
+        with open(filename, 'r') as report_file:
             lines = report_file.readlines()
 
             # Find the count of uncovered models.
@@ -758,7 +756,7 @@ def _extract_missing_pii_annotations(filename):
             # Each line in lines already contains a newline.
             full_log = ''.join(lines)
     else:
-        fail_quality('pii', f'FAILURE: Log file could not be found: {filename}')
+        fail_quality('pii', 'FAILURE: Log file could not be found: {}'.format(filename))
 
     return (uncovered_models, pii_check_passed, full_log)
 
@@ -782,11 +780,11 @@ def run_pii_check(options):
     for env_name, env_settings_file in (("CMS", "cms.envs.test"), ("LMS", "lms.envs.test")):
         try:
             print()
-            print(f"Running {env_name} PII Annotation check and report")
+            print("Running {} PII Annotation check and report".format(env_name))
             print("-" * 45)
             run_output_file = str(output_file).format(env_name.lower())
             sh(
-                "mkdir -p {} && "  # lint-amnesty, pylint: disable=duplicate-string-formatting-argument
+                "mkdir -p {} && "
                 "export DJANGO_SETTINGS_MODULE={}; "
                 "code_annotations django_find_annotations "
                 "--config_file .pii_annotations.yml --report_path {} --app_name {} "
@@ -801,7 +799,7 @@ def run_pii_check(options):
             ))
 
         except BuildFailure as error_message:
-            fail_quality(pii_report_name, f'FAILURE: {error_message}')
+            fail_quality(pii_report_name, 'FAILURE: {}'.format(error_message))
 
         if not pii_check_passed_env:
             pii_check_passed = False
@@ -812,7 +810,7 @@ def run_pii_check(options):
     # Write metric file.
     if uncovered_count is None:
         uncovered_count = 0
-    metrics_str = f"Number of PII Annotation violations: {uncovered_count}\n"
+    metrics_str = "Number of PII Annotation violations: {}\n".format(uncovered_count)
     _write_metric(metrics_str, (Env.METRICS_DIR / pii_report_name))
 
     # Finally, fail the paver task if code_annotations suggests that the check failed.
@@ -828,11 +826,11 @@ def check_keywords():
     Check Django model fields for names that conflict with a list of reserved keywords
     """
     report_path = os.path.join(Env.REPORT_DIR, 'reserved_keywords')
-    sh(f"mkdir -p {report_path}")
+    sh("mkdir -p {}".format(report_path))
 
     overall_status = True
     for env, env_settings_file in [('lms', 'lms.envs.test'), ('cms', 'cms.envs.test')]:
-        report_file = f"{env}_reserved_keyword_report.csv"
+        report_file = "{}_reserved_keyword_report.csv".format(env)
         override_file = os.path.join(Env.REPO_ROOT, "db_keyword_overrides.yml")
         try:
             sh(
@@ -900,10 +898,10 @@ def run_quality(options):
         else:
             lines = []
             sep = '-------------\n'
-            title = f"Quality Report: {linter}\n"
+            title = "Quality Report: {}\n".format(linter)
             violations_str = ''.join(violations_list)
             violations_count_str = "Violations: {count}\n"
-            fail_line = f"FAILURE: {linter} count should be {limit}\n"
+            fail_line = "FAILURE: {} count should be {}\n".format(linter, limit)
 
         violations_count_str = violations_count_str.format(count=count)
 
@@ -931,15 +929,15 @@ def run_quality(options):
     # ----- Set up for diff-quality pylint call -----
     # Set the string to be used for the diff-quality --compare-branch switch.
     compare_branch = getattr(options, 'compare_branch', 'origin/master')
-    compare_commit = sh(f'git merge-base HEAD {compare_branch}', capture=True).strip()
+    compare_commit = sh('git merge-base HEAD {}'.format(compare_branch), capture=True).strip()
     if sh('git rev-parse HEAD', capture=True).strip() != compare_commit:
-        compare_branch_string = f'--compare-branch={compare_commit}'
+        compare_branch_string = '--compare-branch={}'.format(compare_commit)
 
         # Set the string, if needed, to be used for the diff-quality --fail-under switch.
         diff_threshold = int(getattr(options, 'percentage', -1))
         percentage_string = ''
         if diff_threshold > -1:
-            percentage_string = f'--fail-under={diff_threshold}'
+            percentage_string = '--fail-under={}'.format(diff_threshold)
 
         pylint_files = get_violations_reports("pylint")
         pylint_reports = ' '.join(pylint_files)
@@ -1000,7 +998,7 @@ def run_diff_quality(
         else:
             fail_quality(
                 'diff_quality',
-                f'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {failure}'
+                'FAILURE: See "Diff Quality Report" in Jenkins left-sidebar for details. {}'.format(failure)
             )
 
 
@@ -1023,6 +1021,6 @@ def get_violations_reports(violations_type):
     violations_files = []
     for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
         for f in files:
-            if f == f"{violations_type}.report":
+            if f == "{violations_type}.report".format(violations_type=violations_type):
                 violations_files.append(os.path.join(subdir, f))
     return violations_files

@@ -3,22 +3,21 @@ The views.py for this app is intentionally thin, and only exists to translate
 user input/output to and from the business logic in the `api` package.
 """
 from datetime import datetime, timezone
+import json
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import serializers
-from rest_framework.exceptions import NotFound
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import serializers
+import attr
 
 from openedx.core.lib.api.permissions import IsStaff
 from .api import get_user_course_outline_details
-from .data import CourseOutlineData
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ class CourseOutlineView(APIView):
     # For early testing, restrict this to only global staff...
     permission_classes = (IsStaff,)
 
-    class UserCourseOutlineDataSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
+    class UserCourseOutlineDataSerializer(serializers.BaseSerializer):
         """
         Read-only serializer for CourseOutlineData for this endpoint.
 
@@ -54,7 +53,7 @@ class CourseOutlineView(APIView):
         are a critical part of the internals of edx-platform, so the in-process
         API uses them, but we translate them to "ids" for REST API clients.
         """
-        def to_representation(self, user_course_outline_details):  # lint-amnesty, pylint: disable=arguments-differ
+        def to_representation(self, user_course_outline_details):
             """
             Convert to something DRF knows how to serialize (so no custom types)
 
@@ -63,7 +62,6 @@ class CourseOutlineView(APIView):
             """
             user_course_outline = user_course_outline_details.outline
             schedule = user_course_outline_details.schedule
-            exam_information = user_course_outline_details.special_exam_attempts
             return {
                 # Top level course information
                 "course_key": str(user_course_outline.course_key),
@@ -72,7 +70,6 @@ class CourseOutlineView(APIView):
                 "title": user_course_outline.title,
                 "published_at": user_course_outline.published_at,
                 "published_version": user_course_outline.published_version,
-                "entrance_exam_id": user_course_outline.entrance_exam_id,
                 "days_early_for_beta": user_course_outline.days_early_for_beta,
                 "self_paced": user_course_outline.self_paced,
 
@@ -92,7 +89,6 @@ class CourseOutlineView(APIView):
                         str(seq_usage_key): self._sequence_repr(
                             sequence,
                             schedule.sequences.get(seq_usage_key),
-                            exam_information.sequences.get(seq_usage_key, {}),
                             user_course_outline.accessible_sequences,
                         )
                         for seq_usage_key, sequence in user_course_outline.sequences.items()
@@ -100,7 +96,7 @@ class CourseOutlineView(APIView):
                 },
             }
 
-        def _sequence_repr(self, sequence, sequence_schedule, sequence_exam, accessible_sequences):
+        def _sequence_repr(self, sequence, sequence_schedule, accessible_sequences):
             """Representation of a Sequence."""
             if sequence_schedule is None:
                 schedule_item_dict = {'start': None, 'effective_start': None, 'due': None}
@@ -112,19 +108,13 @@ class CourseOutlineView(APIView):
                     'due': sequence_schedule.due,
                 }
 
-            sequence_representation = {
+            return {
                 "id": str(sequence.usage_key),
                 "title": sequence.title,
                 "accessible": sequence.usage_key in accessible_sequences,
                 "inaccessible_after_due": sequence.inaccessible_after_due,
                 **schedule_item_dict,
             }
-
-            # Only include this data if special exams are on
-            if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False):
-                sequence_representation["exam"] = sequence_exam
-
-            return sequence_representation
 
         def _section_repr(self, section, section_schedule):
             """Representation of a Section."""
@@ -150,7 +140,7 @@ class CourseOutlineView(APIView):
                 **schedule_item_dict,
             }
 
-    def get(self, request, course_key_str, format=None):  # lint-amnesty, pylint: disable=redefined-builtin, unused-argument
+    def get(self, request, course_key_str, format=None):
         """
         The CourseOutline, customized for a given user.
 
@@ -165,20 +155,16 @@ class CourseOutlineView(APIView):
         user = self._determine_user(request)
 
         # Grab the user's outline and send our response...
-        try:
-            user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
-        except CourseOutlineData.DoesNotExist as does_not_exist_err:
-            raise NotFound() from does_not_exist_err
-
+        user_course_outline_details = get_user_course_outline_details(course_key, user, at_time)
         serializer = self.UserCourseOutlineDataSerializer(user_course_outline_details)
         return Response(serializer.data)
 
-    def _validate_course_key(self, course_key_str):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _validate_course_key(self, course_key_str):
         try:
             course_key = CourseKey.from_string(course_key_str)
         except InvalidKeyError:
-            raise serializers.ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                f"{course_key_str} is not a valid CourseKey"
+            raise serializers.ValidationError(
+                "{} is not a valid CourseKey".format(course_key_str)
             )
         if course_key.deprecated:
             raise serializers.ValidationError(

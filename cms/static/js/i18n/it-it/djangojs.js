@@ -20,9 +20,29 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
+    "%(memberCount)s / %(maxMemberCount)s Member": [
+      "%(memberCount)s / %(maxMemberCount)s Membri",
+      "%(memberCount)s / %(maxMemberCount)s Membri"
+    ],
+    "%(num_questions)s question": [
+      "%(num_questions)s domanda",
+      "%(num_questions)s domande"
+    ],
+    "%(num_students)s student": [
+      "%(num_students)s studente",
+      "%(num_students)s studenti"
+    ],
+    "%(num_students)s student opened Subsection": [
+      "%(num_students)s lo studente ha aperto una Sottosezione",
+      "%(num_students)s gli studenti hanno aperto una Sottosezione"
+    ],
     "%(sel)s of %(cnt)s selected": [
       "%(sel)s di %(cnt)s selezionato",
       "%(sel)s di %(cnt)s selezionati"
+    ],
+    "%(team_count)s Team": [
+      "%(team_count)s Gruppi",
+      "%(team_count)s Gruppi"
     ],
     "%s ago": "%s fa",
     "%s from now": "%s da ora",
@@ -122,6 +142,7 @@
     "Chapter Name": "Nome Capitolo",
     "Check Your Email": "Controlla la tua casella di posta",
     "Check the highlighted fields below and try again.": "Controlla i campi evidenziati sotto e riprova.",
+    "Check your email": "Controlla la tua casella di posta",
     "Checkout": "Paga",
     "Checkout with PayPal": "Paga con PayPal",
     "Checkout with {processor}": "Paga con {processor}",
@@ -168,6 +189,7 @@
     "Copy row": "Copia riga",
     "Could not find the specified string.": "Impossibile trovare la stringa indicata.",
     "Could not find users associated with the following identifiers:": "Non \u00e8 stato possibile trovare utenti associati con i seguenti identificatori:",
+    "Could not retrieve payment information": "Non \u00e8 possibile recuperare le informazioni di pagamento",
     "Could not submit order": "Impossibile inviare l'ordine",
     "Could not submit photos": "Impossibile caricare le foto.",
     "Country": "Paese",
@@ -189,6 +211,7 @@
     "Custom...": "Personalizzato...",
     "Cut": "Taglia",
     "Cut row": "Taglia riga",
+    "Date": "Data",
     "Date Added": "Data inserimento",
     "December": "Dicembre",
     "Decrease indent": "Riduci indentazione",
@@ -200,6 +223,7 @@
     "Delete table": "Elimina tabella",
     "Delete this asset": "Cancella questa attivit\u00e0",
     "Delete this team?": "Cancellare questo team?",
+    "Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.": "La cancellazione del team \u00e8 permanente e non pu\u00f2 essere annullata. Tutti i membri verranno rimossi dal team, e le discussioni di team non saranno pi\u00f9 accessibili.",
     "Deprecated": "Obsoleta",
     "Description": "Descrizione",
     "Details": "Dettagli",
@@ -324,6 +348,7 @@
     "Horizontal space": "Spaziatura orizzontale",
     "Hyperlink (Ctrl+L)": "Ipertesto (Ctrl+L)",
     "ID": "ID",
+    "If you leave, you can no longer post in this team's discussions. Your place will be available to another learner.": "Se abbandoni, non potrai pi\u00fa fare post nelle discussioni del gruppo. Il tuo posto sar\u00e1 disponibile per un altro studente.",
     "If you make significant changes, make sure you notify members of the team before making these changes.": "Assicurati di informare i membri del gruppo prima di effettuare cambiamenti significativi. ",
     "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?": "Se usi un Editor Avanzato, questo problema sar\u00e0 convertito in XML e non sarai in grado di ritornare all'interfaccia del Editor Semplificato.\n\nProcedi all'Editor Avanzato e converti il problema in XML?",
     "Ignore": "Ignora",
@@ -366,6 +391,7 @@
     "Language": "Lingua",
     "Large": "Larga",
     "Last Activity %(date)s": "ultima attivit\u00e1 %(date)s ",
+    "Last activity %(date)s": "ultima attivit\u00e1 %(date)s",
     "Leave this team?": "Abbandonare il gruppo? ",
     "Left": "A sinistra",
     "Left to right": "Da sinistra a destra",
@@ -408,6 +434,7 @@
     "More": "Pi\u00f9",
     "Mute": "Audio disattivato",
     "Muted": "Audio disattivato",
+    "My Team": "Il mio gruppo",
     "Name": "Nome",
     "New document": "Nuovo documento",
     "New window": "Nuova finestra",
@@ -436,6 +463,7 @@
     "November": "Novembre",
     "Now": "Adesso",
     "Number Sent": "Numero di destinatari",
+    "Number of Students": "Numero di Studenti",
     "Numbered List (Ctrl+O)": "Lista Numerata (Ctrl+O)",
     "Numbered list": "Elenco numerato",
     "OK": "OK",
@@ -541,6 +569,7 @@
     "Search all posts": "Cerca tutti i messaggi",
     "Search teams": "Ricerca gruppi",
     "Section": "Sezione",
+    "See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.": "Vedi tutti i gruppi del tuo corso organizzati per argomento. Entra in un gruppo per collaborare con altri studenti che sono interessati al tuo stesso argomento.",
     "Select": "Selezionare",
     "Select a chapter": "Seleziona un capitolo",
     "Select all": "Seleziona tutto",
@@ -660,6 +689,7 @@
     "This browser cannot play .mp4, .ogg, or .webm files.": "Questo browser non pu\u00f2 riprodurre file .mp4, .ogg e .webm .",
     "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "Questa \u00e8 la lista dei %s disponibili. Puoi sceglierne alcuni selezionandoli nella casella qui sotto e poi facendo clic sulla freccia \"Scegli\" tra le due caselle.",
     "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "Questa \u00e8 la lista dei %s scelti. Puoi eliminarne alcuni selezionandoli nella casella qui sotto e poi facendo clic sulla freccia \"Elimina\" tra le due caselle.",
+    "This learner will be removed from the team, allowing another learner to take the available spot.": "Questo studente sar\u00e1 eliminato dal gruppo, facendo cos\u00ed posto per un altro studente",
     "This team does not have any members.": "Questo team non ha nessun membro",
     "This team is full.": "Questo gruppo \u00e8 completo.",
     "Time Sent": "Ora di invio",
@@ -722,9 +752,11 @@
     "Video speed: ": "Velocit\u00e0 del video:",
     "Video transcript": "Trascrizione del video",
     "View": "Visualizza",
+    "View %(span_start)s %(team_name)s %(span_end)s": "Mostra %(span_start)s %(team_name)s %(span_end)s",
     "View Archived Course": "Vedi il Corso Archiviato",
     "View Course": "Vedi il Corso",
     "View Live": "Vedi Live",
+    "View Teams in the %(topic_name)s Topic": "Visualizza i gruppi che hanno come tema %(topic_name)s ",
     "View all errors": "Vedi tutti gli errori",
     "Viewing %s course": [
       "Vedi %s corsi",
@@ -742,6 +774,7 @@
     "Words: {0}": "Parole: {0}",
     "Year of Birth": "Anno di Nascita",
     "Yesterday": "Ieri",
+    "You already belong to another team.": "Sei gi\u00e0 parte di un altro gruppo.",
     "You are not currently a member of any team.": "Al momento non fai parte di nessun gruppo.",
     "You can remove members from this team, especially if they have not participated in the team's activity.": "Puoi rimuovere i membri del gruppo, soprattutto se non hanno contribuito alle attivit\u00e1 di gruppo. ",
     "You cannot view the course as a student or beta tester before the course release date.": "Non \u00e8 possibile visualizzare il corso come studente o beta tester prima della data di uscita del corso.",

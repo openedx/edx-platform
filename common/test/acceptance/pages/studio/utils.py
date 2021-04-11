@@ -15,8 +15,8 @@ SIDE_BAR_HELP_CSS = '.external-help a, .external-help-button'
 
 
 @js_defined('window.jQuery')
-def type_in_codemirror(page, index, text, find_prefix="$"):  # lint-amnesty, pylint: disable=missing-function-docstring
-    script = """
+def type_in_codemirror(page, index, text, find_prefix="$"):
+    script = u"""
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
     CodeMirror.signal(cm, "focus", cm);
     cm.setValue(arguments[0]);
@@ -28,7 +28,7 @@ def type_in_codemirror(page, index, text, find_prefix="$"):  # lint-amnesty, pyl
 @js_defined('window.jQuery')
 def get_codemirror_value(page, index=0, find_prefix="$"):
     return page.browser.execute_script(
-        "return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();".format(
+        u"return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();".format(
             index=index, find_prefix=find_prefix
         )
     )
@@ -56,7 +56,7 @@ def set_input_value_and_save(page, css, value):
     page.wait_for_ajax()
 
 
-def verify_ordering(test_class, page, expected_orderings):  # pylint: disable=unused-argument
+def verify_ordering(test_class, page, expected_orderings):
     """
     Verifies the expected ordering of xblocks on the page.
     """
@@ -69,18 +69,17 @@ def verify_ordering(test_class, page, expected_orderings):  # pylint: disable=un
                 blocks_checked.add(parent)
                 children = xblock.children
                 expected_length = len(expected_ordering.get(parent))
-                assert expected_length == \
-                       len(children), f'Number of children incorrect for group {parent}.' \
-                                      f' Expected {expected_length} but got {len(children)}.'
-
+                test_class.assertEqual(
+                    expected_length, len(children),
+                    u"Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
                 for idx, expected in enumerate(expected_ordering.get(parent)):
-                    assert expected == children[idx].name
+                    test_class.assertEqual(expected, children[idx].name)
                     blocks_checked.add(expected)
                 break
-    assert len(blocks_checked) == len(xblocks)
+    test_class.assertEqual(len(blocks_checked), len(xblocks))
 
 
-class HelpMixin:
+class HelpMixin(object):
     """
     Mixin for testing Help links.
     """

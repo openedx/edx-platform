@@ -6,13 +6,14 @@ Test for LMS courseware app.
 from textwrap import dedent
 from unittest import TestCase
 
-from unittest import mock
+import mock
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from xmodule.error_module import ErrorBlock
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -23,14 +24,14 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
     Test logging in and logging out.
     """
     def setUp(self):
-        super().setUp()
+        super(ActivateLoginTest, self).setUp()
         self.setup_user()
 
     def test_activate_login(self):
         """
         Test login -- the setup function does all the work.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def test_logout(self):
         """
@@ -44,7 +45,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
         has 'is_from_log_out' attribute set to true.
         """
         response = self.client.get(reverse('logout'))
-        assert getattr(response.wsgi_request, 'is_from_logout', False)
+        self.assertTrue(getattr(response.wsgi_request, 'is_from_logout', False))
 
 
 class PageLoaderTestCase(LoginEnrollmentTestCase):
@@ -75,22 +76,22 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
             if descriptor.location.category == 'about':
                 self._assert_loads('about_course',
-                                   {'course_id': str(course_key)},
+                                   {'course_id': text_type(course_key)},
                                    descriptor)
 
             elif descriptor.location.category == 'static_tab':
-                kwargs = {'course_id': str(course_key),
+                kwargs = {'course_id': text_type(course_key),
                           'tab_slug': descriptor.location.name}
                 self._assert_loads('static_tab', kwargs, descriptor)
 
             elif descriptor.location.category == 'course_info':
-                self._assert_loads('info', {'course_id': str(course_key)},
+                self._assert_loads('info', {'course_id': text_type(course_key)},
                                    descriptor)
 
             else:
 
-                kwargs = {'course_id': str(course_key),
-                          'location': str(descriptor.location)}
+                kwargs = {'course_id': text_type(course_key),
+                          'location': text_type(descriptor.location)}
 
                 self._assert_loads('jump_to', kwargs, descriptor,
                                    expect_redirect=True,
@@ -110,15 +111,15 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         response = self.client.get(url, follow=True)
 
         if response.status_code != 200:
-            self.fail('Status %d for page %s' %
+            self.fail(u'Status %d for page %s' %
                       (response.status_code, descriptor.location))
 
         if expect_redirect:
-            assert response.redirect_chain[0][1] == 302
+            self.assertEqual(response.redirect_chain[0][1], 302)
 
         if check_content:
             self.assertNotContains(response, "this module is temporarily unavailable")
-            assert not isinstance(descriptor, ErrorBlock)
+            self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
@@ -128,7 +129,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
 
     def setUp(self):
-        super().setUp()
+        super(TestMongoCoursesLoad, self).setUp()
         self.setup_user()
         self.toy_course_key = ToyCourseFactory.create().id
 
@@ -141,10 +142,10 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         """).strip()
         location = self.toy_course_key.make_usage_key('course', '2012_Fall')
         course = self.store.get_item(location)
-        assert len(course.textbooks) > 0
+        self.assertGreater(len(course.textbooks), 0)
 
 
-class TestDraftModuleStore(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
 
@@ -173,5 +174,5 @@ class TestLmsFieldData(TestCase):
         base_student = mock.Mock()
         first_level = LmsFieldData(base_authored, base_student)
         second_level = LmsFieldData(first_level, base_student)
-        assert second_level._authored_data == first_level._authored_data
-        assert not isinstance(second_level._authored_data, LmsFieldData)
+        self.assertEqual(second_level._authored_data, first_level._authored_data)
+        self.assertNotIsInstance(second_level._authored_data, LmsFieldData)

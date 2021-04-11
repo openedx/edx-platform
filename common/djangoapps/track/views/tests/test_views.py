@@ -1,7 +1,6 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import ddt
 import six
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch, sentinel
@@ -16,7 +15,7 @@ TEST_USER_ID = 1000
 
 
 @ddt.ddt
-class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestTrackViews(EventTrackingTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -24,7 +23,7 @@ class TestTrackViews(EventTrackingTestCase):  # lint-amnesty, pylint: disable=mi
         User.objects.create(pk=TEST_USER_ID, username=TEST_USERNAME)
 
     def setUp(self):
-        super(TestTrackViews, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestTrackViews, self).setUp()
 
         self.request_factory = RequestFactory()
 

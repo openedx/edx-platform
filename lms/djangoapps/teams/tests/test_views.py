@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the teams API at the HTTP request level.
 """
@@ -6,31 +7,32 @@ Tests for the teams API at the HTTP request level.
 import json
 import unittest
 from datetime import datetime
-from unittest.mock import patch
 from uuid import UUID
 
 import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models.signals import post_save
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import translation
-from elasticsearch.exceptions import ConnectionError  # lint-amnesty, pylint: disable=redefined-builtin
+from elasticsearch.exceptions import ConnectionError
+from mock import patch
 from rest_framework.test import APIClient, APITestCase
 from search.search_engine_base import SearchEngine
+from six.moves import range
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.testing import EventTestMixin
 from common.test.utils import skip_signal
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import StaffFactory
-from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
+from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -48,15 +50,15 @@ class TestDashboard(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestDashboard, cls).setUpClass()
         cls.course = CourseFactory.create(
             teams_configuration=TeamsConfig({
                 "max_team_size": 10,
                 "topics": [
                     {
-                        "name": f"Topic {topic_id}",
+                        "name": u"Topic {}".format(topic_id),
                         "id": topic_id,
-                        "description": f"Description for topic {topic_id}"
+                        "description": u"Description for topic {}".format(topic_id)
                     }
                     for topic_id in range(cls.NUM_TOPICS)
                 ]
@@ -67,7 +69,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super().setUp()
+        super(TestDashboard, self).setUp()
         # will be assigned to self.client by default
         self.user = UserFactory.create(password=self.test_password)
         self.teams_url = reverse('teams_dashboard', args=[self.course.id])
@@ -77,14 +79,14 @@ class TestDashboard(SharedModuleStoreTestCase):
         dashboard, and is redirected to the login page."""
         anonymous_client = APIClient()
         response = anonymous_client.get(self.teams_url)
-        redirect_url = f'{settings.LOGIN_URL}?next={self.teams_url}'
+        redirect_url = '{0}?next={1}'.format(settings.LOGIN_URL, self.teams_url)
         self.assertRedirects(response, redirect_url)
 
     def test_not_enrolled_not_staff(self):
         """ Verifies that a student who is not enrolled cannot access the team dashboard. """
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.client.get(self.teams_url)
-        assert 404 == response.status_code
+        self.assertEqual(404, response.status_code)
 
     def test_not_enrolled_staff(self):
         """
@@ -115,7 +117,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.client.get(teams_url)
-        assert 404 == response.status_code
+        self.assertEqual(404, response.status_code)
 
     @unittest.skip("Fix this - getting unreliable query counts")
     def test_query_counts(self):
@@ -130,7 +132,7 @@ class TestDashboard(SharedModuleStoreTestCase):
         # Create some teams
         for topic_id in range(self.NUM_TOPICS):
             team = CourseTeamFactory.create(
-                name=f"Team for topic {topic_id}",
+                name=u"Team for topic {}".format(topic_id),
                 course_id=self.course.id,
                 topic_id=topic_id,
             )
@@ -151,11 +153,11 @@ class TestDashboard(SharedModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.client.get(bad_team_url)
-        assert 404 == response.status_code
+        self.assertEqual(404, response.status_code)
 
         bad_team_url = bad_team_url.replace(bad_org, "invalid/course/id")
         response = self.client.get(bad_team_url)
-        assert 404 == response.status_code
+        self.assertEqual(404, response.status_code)
 
     def get_user_course_specific_teams_list(self):
         """Gets the list of user course specific teams."""
@@ -303,34 +305,34 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
+        with super(TeamAPITestCase, cls).setUpClassAndTestData():
             base_topics = [{
-                'id': f'topic_{i}', 'name': name,
-                'description': f'Description for topic {i}.',
+                'id': 'topic_{}'.format(i), 'name': name,
+                'description': u'Description for topic {}.'.format(i),
                 'max_team_size': 3
-            } for i, name in enumerate(['Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
+            } for i, name in enumerate([u'Sólar power', 'Wind Power', 'Nuclear Power', 'Coal Power'])]
             base_topics.append(
                 {
                     'id': 'private_topic_1_id',
                     'name': 'private_topic_1_name',
-                    'description': 'Description for topic private topic 1.',
-                    'type': 'private_managed'
+                    'description': u'Description for topic private topic 1.',
+                    'type': u'private_managed'
                 }
             )
             base_topics.append(
                 {
                     'id': 'private_topic_2_id',
                     'name': 'private_topic_2_name',
-                    'description': 'Description for topic private topic 2.',
-                    'type': 'private_managed'
+                    'description': u'Description for topic private topic 2.',
+                    'type': u'private_managed'
                 }
             )
             base_topics.append(
                 {
                     'id': 'private_topic_no_teams',
                     'name': 'private_topic_no_teams_name',
-                    'description': 'Description for topic private_topic_no_teams.',
-                    'type': 'private_managed'
+                    'description': u'Description for topic private_topic_no_teams.',
+                    'type': u'private_managed'
                 }
             )
             teams_configuration_1 = TeamsConfig({
@@ -375,7 +377,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
+        super(TeamAPITestCase, cls).setUpTestData()
         cls.topics_count = 6
         cls.users = {
             'staff': AdminFactory.create(password=cls.test_password),
@@ -437,7 +439,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
             cls.solar_team = CourseTeamFactory.create(
-                name='Sólar team',
+                name=u'Sólar team',
                 course_id=cls.test_course_1.id,
                 topic_id='topic_0'
             )
@@ -470,8 +472,8 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
                 topic_id='topic_7'
             )
             cls.chinese_team = CourseTeamFactory.create(
-                name='著文企臺個',
-                description='共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
+                name=u'著文企臺個',
+                description=u'共樣地面較，件展冷不護者這與民教過住意，國制銀產物助音是勢一友',
                 country='CN',
                 language='zh_HANS',
                 course_id=cls.test_course_2.id,
@@ -612,9 +614,15 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
             response = func(url, data=data, content_type=content_type)
         else:
             response = func(url, data=data)
-        assert expected_status == response.status_code, "Expected status {expected} but got {actual}: {content}"\
-            .format(expected=expected_status, actual=response.status_code,
-                    content=response.content.decode(response.charset))
+        self.assertEqual(
+            expected_status,
+            response.status_code,
+            msg=u"Expected status {expected} but got {actual}: {content}".format(
+                expected=expected_status,
+                actual=response.status_code,
+                content=response.content.decode(response.charset),
+            )
+        )
 
         if expected_status == 200:
             return json.loads(response.content.decode('utf-8'))
@@ -641,18 +649,18 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 
         # Check that initially list of user teams in course one is empty
         team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 0
+        self.assertEqual(team_list['count'], 0)
 
         # Add user to a course one team
         self.solar_team.add_user(self.users[user])
 
         # Check that list of user teams in course one is not empty now
         team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 1
+        self.assertEqual(team_list['count'], 1)
 
         # Check that list of user teams in course two is still empty
         team_list = self.get_teams_list(user=user, expected_status=200, data=course_two_data)
-        assert team_list['count'] == 0
+        self.assertEqual(team_list['count'], 0)
 
     def build_team_data(
         self,
@@ -745,19 +753,19 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     def verify_expanded_public_user(self, user):
         """Verifies that fields exist on the returned user json indicating that it is expanded."""
         for field in ['username', 'url', 'bio', 'country', 'profile_image', 'time_zone', 'language_proficiencies']:
-            assert field in user
+            self.assertIn(field, user)
 
     def verify_expanded_private_user(self, user):
         """Verifies that fields exist on the returned user json indicating that it is expanded."""
         for field in ['username', 'url', 'profile_image']:
-            assert field in user
+            self.assertIn(field, user)
         for field in ['bio', 'country', 'time_zone', 'language_proficiencies']:
-            assert field not in user
+            self.assertNotIn(field, user)
 
     def verify_expanded_team(self, team):
         """Verifies that fields exist on the returned team json indicating that it is expanded."""
         for field in ['id', 'name', 'course_id', 'topic_id', 'date_created', 'description']:
-            assert field in team
+            self.assertIn(field, team)
 
     def reset_search_index(self):
         """Clear out the search index and reindex the teams."""
@@ -771,7 +779,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -787,7 +795,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     def test_access(self, user, status, expected_teams_count=0):
         teams = self.get_teams_list(user=user, expected_status=status)
         if status == 200:
-            assert expected_teams_count == teams['count']
+            self.assertEqual(expected_teams_count, teams['count'])
 
     def test_missing_course_id(self):
         self.get_teams_list(400, no_course_id=True)
@@ -797,7 +805,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         teams = self.get_teams_list(data=data, expected_status=status, **kwargs)
         if names is not None and 200 <= status < 300:
             results = teams['results']
-            assert sorted(names) == sorted([team['name'] for team in results])
+            self.assertEqual(sorted(names), sorted([team['name'] for team in results]))
 
     def test_filter_invalid_course_id(self):
         self.verify_names({'course_id': 'no_such_course'}, 400)
@@ -806,27 +814,27 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         self.verify_names(
             {'course_id': str(self.test_course_2.id)},
             200,
-            ['Another Team', 'Public Profile Team', 'Search', '著文企臺個'],
+            ['Another Team', 'Public Profile Team', 'Search', u'著文企臺個'],
             user='staff'
         )
 
     def test_filter_topic_id(self):
-        self.verify_names({'course_id': str(self.test_course_1.id), 'topic_id': 'topic_0'}, 200, ['Sólar team'])
+        self.verify_names({'course_id': str(self.test_course_1.id), 'topic_id': 'topic_0'}, 200, [u'Sólar team'])
 
     def test_filter_username(self):
         self.verify_names({'course_id': str(self.test_course_1.id),
-                           'username': 'student_enrolled'}, 200, ['Sólar team'])
+                           'username': 'student_enrolled'}, 200, [u'Sólar team'])
         self.verify_names({'course_id': str(self.test_course_1.id), 'username': 'staff'}, 200, [])
 
     @ddt.data(
-        (None, 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
-        ('name', 200, ['Nuclear Team', 'Sólar team', 'Wind Team']),
+        (None, 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
+        ('name', 200, ['Nuclear Team', u'Sólar team', 'Wind Team']),
         # Note that "Nuclear Team" and "Solar team" have the same open_slots.
         # "Solar team" comes first due to secondary sort by last_activity_at.
-        ('open_slots', 200, ['Wind Team', 'Sólar team', 'Nuclear Team']),
+        ('open_slots', 200, ['Wind Team', u'Sólar team', 'Nuclear Team']),
         # Note that "Wind Team" and "Nuclear Team" have the same last_activity_at.
         # "Wind Team" comes first due to secondary sort by open_slots.
-        ('last_activity_at', 200, ['Sólar team', 'Wind Team', 'Nuclear Team']),
+        ('last_activity_at', 200, [u'Sólar team', 'Wind Team', 'Nuclear Team']),
     )
     @ddt.unpack
     def test_order_by(self, field, status, names):
@@ -839,7 +847,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             sender=CourseTeam,
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
-            solar_team = self.test_team_name_id_map['Sólar team']
+            solar_team = self.test_team_name_id_map[u'Sólar team']
             solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
             solar_team.save()
 
@@ -858,7 +866,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_page_size(self):
         result = self.get_teams_list(200, {'page_size': 2})
-        assert 2 == result['num_pages']
+        self.assertEqual(2, result['num_pages'])
 
     def test_non_member_trying_to_get_private_topic(self):
         """
@@ -866,7 +874,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         a private team set, asks for information about that team set, an empty list is returned.
         """
         result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'})
-        assert [] == result['results']
+        self.assertEqual([], result['results'])
 
     def test_member_trying_to_get_private_topic(self):
         """
@@ -875,9 +883,9 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         """
         result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'},
                                      user='student_on_team_1_private_set_1')
-        assert 1 == len(result['results'])
-        assert 'private_topic_1_id' == result['results'][0]['topic_id']
-        assert [] != result['results']
+        self.assertEqual(1, len(result['results']))
+        self.assertEqual('private_topic_1_id', result['results'][0]['topic_id'])
+        self.assertNotEqual([], result['results'])
 
     def test_course_staff_getting_information_on_private_topic(self):
         """
@@ -886,7 +894,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         """
         result = self.get_teams_list(data={'topic_id': 'private_topic_1_id'},
                                      user='course_staff')
-        assert 2 == len(result['results'])
+        self.assertEqual(2, len(result['results']))
 
     @ddt.unpack
     @ddt.data(
@@ -906,7 +914,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             data={'text_search': 'master'},
             user=user,
         )
-        assert result['count'] == expected_results
+        self.assertEqual(result['count'], expected_results)
 
     @ddt.unpack
     @ddt.data(
@@ -935,13 +943,13 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             expected_teams.add(self.team_2_in_private_teamset_1.name)
         if can_see_private_2_1:
             expected_teams.add(self.team_1_in_private_teamset_2.name)
-        assert expected_teams == teams
+        self.assertEqual(expected_teams, teams)
 
     def test_page(self):
         result = self.get_teams_list(200, {'page_size': 1, 'page': 3})
-        assert 3 == result['num_pages']
-        assert result['next'] is None
-        assert result['previous'] is not None
+        self.assertEqual(3, result['num_pages'])
+        self.assertIsNone(result['next'])
+        self.assertIsNotNone(result['previous'])
 
     def test_expand_private_user(self):
         # Use the default user which is already private because to year_of_birth is set
@@ -967,7 +975,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         ('Island', ['Search']),
         ('not-a-query', []),
         ('team', ['Another Team', 'Public Profile Team']),
-        ('著文企臺個', ['著文企臺個']),
+        (u'著文企臺個', [u'著文企臺個']),
     )
     @ddt.unpack
     def test_text_search(self, text_search, expected_team_names):
@@ -1015,7 +1023,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 
     def test_delete_removed_from_search(self):
         team = CourseTeamFactory.create(
-            name='zoinks',
+            name=u'zoinks',
             course_id=self.test_course_1.id,
             topic_id='topic_0'
         )
@@ -1058,12 +1066,17 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
         teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='student_enrolled')
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
-        assert team_names == [self.solar_team.name]
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+        ])
 
         teams = self.get_teams_list(data={'topic_id': self.solar_team.topic_id}, user='staff')
         team_names = [team['name'] for team in teams['results']]
         team_names.sort()
-        assert team_names == [self.solar_team.name, self.masters_only_team.name]
+        self.assertEqual(team_names, [
+            self.solar_team.name,
+            self.masters_only_team.name,
+        ])
 
 
 @ddt.ddt
@@ -1071,7 +1084,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1088,7 +1101,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         if status == 200:
             self.verify_expected_team_id(team, 'new-team')
             teams = self.get_teams_list(user=user)
-            assert 'New Team' in [team['name'] for team in teams['results']]
+            self.assertIn("New Team", [team['name'] for team in teams['results']])
 
     def _expected_team_id(self, team, expected_prefix):
         """ Return the team id that we'd expect given this team data and this prefix. """
@@ -1096,9 +1109,9 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 
     def verify_expected_team_id(self, team, expected_prefix):
         """ Verifies that the team id starts with the specified prefix and ends with the discussion_topic_id """
-        assert 'id' in team
-        assert 'discussion_topic_id' in team
-        assert team['id'] == self._expected_team_id(team, expected_prefix)
+        self.assertIn('id', team)
+        self.assertIn('discussion_topic_id', team)
+        self.assertEqual(team['id'], self._expected_team_id(team, expected_prefix))
 
     def test_naming(self):
         new_teams = [
@@ -1108,7 +1121,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         # Check that teams with the same name have unique IDs.
         self.verify_expected_team_id(new_teams[0], 'the-best-team')
         self.verify_expected_team_id(new_teams[1], 'the-best-team')
-        assert new_teams[0]['id'] != new_teams[1]['id']
+        self.assertNotEqual(new_teams[0]['id'], new_teams[1]['id'])
 
         # Verify expected truncation behavior with names > 20 characters.
         self.verify_expected_team_id(new_teams[2], 'a-really-long-team-n')
@@ -1148,8 +1161,10 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             ),
             user='student_enrolled'
         )
-        assert 'You are already in a team in this teamset.' ==\
-               json.loads(response.content.decode('utf-8'))['user_message']
+        self.assertEqual(
+            "You are already in a team in this teamset.",
+            json.loads(response.content.decode('utf-8'))["user_message"]
+        )
 
     @patch('lms.djangoapps.teams.views.can_user_create_team_in_topic', return_value=False)
     @patch('lms.djangoapps.teams.views.has_specific_teamset_access', return_value=True)
@@ -1164,8 +1179,10 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             ),
             user='student_enrolled_not_on_team'
         )
-        assert "You can't create a team in an instructor managed topic." ==\
-               json.loads(response.content.decode('utf-8'))['user_message']
+        self.assertEqual(
+            "You can't create a team in an instructor managed topic.",
+            json.loads(response.content.decode('utf-8'))["user_message"]
+        )
 
     @ddt.data('staff', 'course_staff', 'community_ta')
     def test_privileged_create_multiple_teams(self, user):
@@ -1232,17 +1249,26 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         del team['membership']
 
         # verify that it's been set to a time today.
-        assert parser.parse(team['last_activity_at']).date() == datetime.utcnow().replace(tzinfo=pytz.utc).date()
+        self.assertEqual(
+            parser.parse(team['last_activity_at']).date(),
+            datetime.utcnow().replace(tzinfo=pytz.utc).date()
+        )
         del team['last_activity_at']
 
         # Verify that the creating user gets added to the team.
-        assert len(team_membership) == 1
+        self.assertEqual(len(team_membership), 1)
         member = team_membership[0]['user']
-        assert member['username'] == creator
+        self.assertEqual(member['username'], creator)
 
-        assert team == {'name': 'Fully specified team', 'language': 'fr', 'country': 'CA', 'topic_id': 'topic_1',
-                        'course_id': str(self.test_course_1.id), 'description': 'Another fantastic team',
-                        'organization_protected': False}
+        self.assertEqual(team, {
+            'name': 'Fully specified team',
+            'language': 'fr',
+            'country': 'CA',
+            'topic_id': 'topic_1',
+            'course_id': str(self.test_course_1.id),
+            'description': 'Another fantastic team',
+            'organization_protected': False,
+        })
 
     @ddt.data('staff', 'course_staff', 'community_ta')
     def test_membership_staff_creator(self, user):
@@ -1254,7 +1280,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             description="Another fantastic team",
         ), user=user)
 
-        assert team['membership'] == []
+        self.assertEqual(team['membership'], [])
 
     @ddt.unpack
     @ddt.data(
@@ -1284,7 +1310,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
             user=user
         )
         if msg:
-            assert msg == response.json()['user_message']
+            self.assertEqual(msg, response.json()['user_message'])
 
 
 @ddt.ddt
@@ -1304,9 +1330,9 @@ class TestDetailTeamAPI(TeamAPITestCase):
     def test_access(self, user, status):
         team = self.get_team_detail(self.solar_team.team_id, status, user=user)
         if status == 200:
-            assert team['description'] == self.solar_team.description
-            assert team['discussion_topic_id'] == self.solar_team.discussion_topic_id
-            assert parser.parse(team['last_activity_at']) == LAST_ACTIVITY_AT
+            self.assertEqual(team['description'], self.solar_team.description)
+            self.assertEqual(team['discussion_topic_id'], self.solar_team.discussion_topic_id)
+            self.assertEqual(parser.parse(team['last_activity_at']), LAST_ACTIVITY_AT)
 
     def test_does_not_exist(self):
         self.get_team_detail('no_such_team', 404)
@@ -1345,7 +1371,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
             user=requesting_user
         )
         if expected_response == 200:
-            assert team['name'] == self.masters_only_team.name
+            self.assertEqual(team['name'], self.masters_only_team.name)
 
     @ddt.unpack
     @ddt.data(
@@ -1368,7 +1394,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
             user=requesting_user
         )
         if expected_response == 200:
-            assert team['name'] == self.team_1_in_private_teamset_1.name
+            self.assertEqual(team['name'], self.team_1_in_private_teamset_1.name)
 
 
 @ddt.ddt
@@ -1376,7 +1402,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         ('staff', 204),
@@ -1388,12 +1414,12 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     def test_access(self, user, status):
         team_list = self.get_teams_list(user='course_staff', expected_status=200)
         previous_count = team_list['count']
-        assert self.solar_team.team_id in [result['id'] for result in team_list.get('results')]
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
         self.delete_team(self.solar_team.team_id, status, user=user)
 
         team_list = self.get_teams_list(user='course_staff', expected_status=200)
-        assert team_list['count'] == (previous_count - 1)
-        assert self.solar_team.team_id not in [result['id'] for result in team_list.get('results')]
+        self.assertEqual(team_list['count'], previous_count - 1)
+        self.assertNotIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
         self.assert_event_emitted(
             'edx.team.deleted',
             team_id=self.solar_team.team_id,
@@ -1413,12 +1439,12 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     def test_access_forbidden(self, user, status):
         team_list = self.get_teams_list(user='course_staff', expected_status=200)
         previous_count = team_list['count']
-        assert self.solar_team.team_id in [result['id'] for result in team_list.get('results')]
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
         self.delete_team(self.solar_team.team_id, status, user=user)
 
         team_list = self.get_teams_list(user='course_staff', expected_status=200)
-        assert team_list['count'] == previous_count
-        assert self.solar_team.team_id in [result['id'] for result in team_list.get('results')]
+        self.assertEqual(team_list['count'], previous_count)
+        self.assertIn(self.solar_team.team_id, [result['id'] for result in team_list.get('results')])
 
     @ddt.data(
         (None, 401),
@@ -1432,7 +1458,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
         self.delete_team('nonexistent', 404)
 
     def test_memberships_deleted(self):
-        assert CourseTeamMembership.objects.filter(team=self.solar_team).count() == 1
+        self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 1)
         self.delete_team(self.solar_team.team_id, 204, user='staff')
         self.assert_event_emitted(
             'edx.team.deleted',
@@ -1444,7 +1470,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
             remove_method='team_deleted',
             user_id=self.users['student_enrolled'].id
         )
-        assert CourseTeamMembership.objects.filter(team=self.solar_team).count() == 0
+        self.assertEqual(CourseTeamMembership.objects.filter(team=self.solar_team).count(), 0)
 
     @ddt.unpack
     @ddt.data(
@@ -1492,7 +1518,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -1508,7 +1534,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
         prev_name = self.solar_team.name
         team = self.patch_team_detail(self.solar_team.team_id, status, {'name': 'foo'}, user=user)
         if status == 200:
-            assert team['name'] == 'foo'
+            self.assertEqual(team['name'], 'foo')
             self.assert_event_emitted(
                 'edx.team.changed',
                 team_id=self.solar_team.team_id,
@@ -1583,7 +1609,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             user=requesting_user
         )
         if expected_status == 200:
-            assert team['name'] == 'foo'
+            self.assertEqual(team['name'], 'foo')
 
     @ddt.unpack
     @ddt.data(
@@ -1606,7 +1632,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
             user=requesting_user
         )
         if expected_status == 200:
-            assert team['name'] == 'foo'
+            self.assertEqual(team['name'], 'foo')
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_ORA_TEAM_SUBMISSIONS': True})
@@ -1675,12 +1701,12 @@ class TestTeamAssignmentsView(TeamAPITestCase):
 
         if expected_status == 200:
             # I successful, I get back the assignments for a team
-            assert len(assignments) == len(self.team_assignments)
+            self.assertEqual(len(assignments), len(self.team_assignments))
 
             # ... with the right data structure
             for assignment in assignments:
-                assert 'display_name' in assignment.keys()
-                assert 'location' in assignment.keys()
+                self.assertIn('display_name', assignment.keys())
+                self.assertIn('location', assignment.keys())
 
     def test_get_assignments_bad_team(self):
         # Given a bad team is supplied
@@ -1720,7 +1746,7 @@ class TestListTopicsAPI(TeamAPITestCase):
     def test_access(self, user, status, expected_topics_count):
         topics = self.get_topics_list(status, {'course_id': str(self.test_course_1.id)}, user=user)
         if status == 200:
-            assert topics['count'] == expected_topics_count
+            self.assertEqual(topics['count'], expected_topics_count)
 
     @ddt.data('A+BOGUS+COURSE', 'A/BOGUS/COURSE')
     def test_invalid_course_key(self, course_id):
@@ -1730,11 +1756,11 @@ class TestListTopicsAPI(TeamAPITestCase):
         self.get_topics_list(400)
 
     @ddt.data(
-        (None, 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
-        ('name', 200, ['Coal Power', 'Nuclear Power', 'Sólar power', 'Wind Power'], 'name'),
+        (None, 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
+        ('name', 200, ['Coal Power', 'Nuclear Power', u'Sólar power', 'Wind Power'], 'name'),
         # Note that "Nuclear Power" will have 2 teams. "Coal Power" "Wind Power" and "Solar Power"
         # all have 1 team. The secondary sort is alphabetical by name.
-        ('team_count', 200, ['Nuclear Power', 'Coal Power', 'Sólar power', 'Wind Power'], 'team_count'),
+        ('team_count', 200, ['Nuclear Power', 'Coal Power', u'Sólar power', 'Wind Power'], 'team_count'),
         ('no_such_field', 400, [], None),
     )
     @ddt.unpack
@@ -1747,19 +1773,19 @@ class TestListTopicsAPI(TeamAPITestCase):
         ):
             # Add a team to "Nuclear Power", so it has two teams
             CourseTeamFactory.create(
-                name='Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
+                name=u'Nuclear Team 1', course_id=self.test_course_1.id, topic_id='topic_2'
             )
             # Add a team to "Coal Power", so it has one team, same as "Wind" and "Solar"
             CourseTeamFactory.create(
-                name='Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
+                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
             )
         data = {'course_id': str(self.test_course_1.id)}
         if field:
             data['order_by'] = field
         topics = self.get_topics_list(status, data, user='student_enrolled')
         if status == 200:
-            assert names == [topic['name'] for topic in topics['results']]
-            assert topics['sort_order'] == expected_ordering
+            self.assertEqual(names, [topic['name'] for topic in topics['results']])
+            self.assertEqual(topics['sort_order'], expected_ordering)
 
     def test_order_by_team_count_secondary(self):
         """
@@ -1776,16 +1802,16 @@ class TestListTopicsAPI(TeamAPITestCase):
             # Add two wind teams, a solar team and a coal team, to bring the totals to
             # Wind: 3 Solar: 2 Coal: 1, Nuclear: 1
             CourseTeamFactory.create(
-                name='Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
+                name=u'Wind Team 1', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
-                name='Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
+                name=u'Wind Team 2', course_id=self.test_course_1.id, topic_id='topic_1'
             )
             CourseTeamFactory.create(
-                name='Solar Team 1', course_id=self.test_course_1.id, topic_id='topic_0'
+                name=u'Solar Team 1', course_id=self.test_course_1.id, topic_id='topic_0'
             )
             CourseTeamFactory.create(
-                name='Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
+                name=u'Coal Team 1', course_id=self.test_course_1.id, topic_id='topic_3'
             )
 
         # Wind power has the most teams, followed by Solar
@@ -1798,7 +1824,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             },
             user='student_enrolled'
         )
-        assert ['Wind Power', 'Sólar power'] == [topic['name'] for topic in topics['results']]
+        self.assertEqual(["Wind Power", u'Sólar power'], [topic['name'] for topic in topics['results']])
 
         # Coal and Nuclear are tied, so they are alphabetically sorted.
         topics = self.get_topics_list(
@@ -1810,7 +1836,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             },
             user='student_enrolled'
         )
-        assert ['Coal Power', 'Nuclear Power'] == [topic['name'] for topic in topics['results']]
+        self.assertEqual(["Coal Power", "Nuclear Power"], [topic['name'] for topic in topics['results']])
 
     def test_pagination(self):
         response = self.get_topics_list(
@@ -1821,15 +1847,15 @@ class TestListTopicsAPI(TeamAPITestCase):
             user='student_enrolled'
         )
 
-        assert 2 == len(response['results'])
-        assert 'next' in response
-        assert 'previous' in response
-        assert response['previous'] is None
-        assert response['next'] is not None
+        self.assertEqual(2, len(response['results']))
+        self.assertIn('next', response)
+        self.assertIn('previous', response)
+        self.assertIsNone(response['previous'])
+        self.assertIsNotNone(response['next'])
 
     def test_default_ordering(self):
         response = self.get_topics_list(data={'course_id': str(self.test_course_1.id)})
-        assert response['sort_order'] == 'name'
+        self.assertEqual(response['sort_order'], 'name')
 
     def test_team_count(self):
         """Test that team_count is included for each topic"""
@@ -1838,11 +1864,11 @@ class TestListTopicsAPI(TeamAPITestCase):
             user='student_enrolled'
         )
         for topic in response['results']:
-            assert 'team_count' in topic
+            self.assertIn('team_count', topic)
             if topic['id'] in ('topic_0', 'topic_1', 'topic_2'):
-                assert topic['team_count'] == 1
+                self.assertEqual(topic['team_count'], 1)
             else:
-                assert topic['team_count'] == 0
+                self.assertEqual(topic['team_count'], 0)
 
     @ddt.unpack
     @ddt.data(
@@ -1866,7 +1892,7 @@ class TestListTopicsAPI(TeamAPITestCase):
         private_teamsets_returned = [
             topic['name'] for topic in topics['results'] if topic['type'] == 'private_managed'
         ]
-        assert len(private_teamsets_returned) == expected_private_teamsets
+        self.assertEqual(len(private_teamsets_returned), expected_private_teamsets)
 
     @ddt.unpack
     @ddt.data(
@@ -1883,7 +1909,7 @@ class TestListTopicsAPI(TeamAPITestCase):
             user=requesting_user
         )
         private_teamset_1 = [topic for topic in topics['results'] if topic['name'] == 'private_topic_1_name'][0]
-        assert private_teamset_1['team_count'] == expected_team_count
+        self.assertEqual(private_teamset_1['team_count'], expected_team_count)
 
 
 @ddt.ddt
@@ -1904,7 +1930,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
         topic = self.get_topic_detail('topic_0', self.test_course_1.id, status, user=user)
         if status == 200:
             for field in ('id', 'name', 'description'):
-                assert field in topic
+                self.assertIn(field, topic)
 
     @ddt.data('A+BOGUS+COURSE', 'A/BOGUS/COURSE')
     def test_invalid_course_id(self, course_id):
@@ -1919,13 +1945,13 @@ class TestDetailTopicAPI(TeamAPITestCase):
     def test_team_count(self):
         """Test that team_count is included with a topic"""
         topic = self.get_topic_detail(topic_id='topic_0', course_id=self.test_course_1.id)
-        assert topic['team_count'] == 1
+        self.assertEqual(topic['team_count'], 1)
         topic = self.get_topic_detail(topic_id='topic_1', course_id=self.test_course_1.id)
-        assert topic['team_count'] == 1
+        self.assertEqual(topic['team_count'], 1)
         topic = self.get_topic_detail(topic_id='topic_2', course_id=self.test_course_1.id)
-        assert topic['team_count'] == 1
+        self.assertEqual(topic['team_count'], 1)
         topic = self.get_topic_detail(topic_id='topic_3', course_id=self.test_course_1.id)
-        assert topic['team_count'] == 0
+        self.assertEqual(topic['team_count'], 0)
 
     @ddt.unpack
     @ddt.data(
@@ -1950,8 +1976,8 @@ class TestDetailTopicAPI(TeamAPITestCase):
             user=requesting_user
         )
         if expected_status == 200:
-            assert topic['name'] == 'private_topic_1_name'
-            assert topic['team_count'] == expected_team_count
+            self.assertEqual(topic['name'], 'private_topic_1_name')
+            self.assertEqual(topic['team_count'], expected_team_count)
 
 
 @ddt.ddt
@@ -1972,8 +1998,8 @@ class TestListMembershipAPI(TeamAPITestCase):
     def test_access(self, user, status):
         membership = self.get_membership_list(status, {'team_id': self.solar_team.team_id}, user=user)
         if status == 200:
-            assert membership['count'] == 1
-            assert membership['results'][0]['user']['username'] == self.users['student_enrolled'].username
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['user']['username'], self.users['student_enrolled'].username)
 
     @ddt.data(
         (None, 401, False),
@@ -1990,10 +2016,10 @@ class TestListMembershipAPI(TeamAPITestCase):
         membership = self.get_membership_list(status, {'username': self.users['student_enrolled'].username}, user=user)
         if status == 200:
             if has_content:
-                assert membership['count'] == 1
-                assert membership['results'][0]['team']['team_id'] == self.solar_team.team_id
+                self.assertEqual(membership['count'], 1)
+                self.assertEqual(membership['results'][0]['team']['team_id'], self.solar_team.team_id)
             else:
-                assert membership['count'] == 0
+                self.assertEqual(membership['count'], 0)
 
     @ddt.data(
         ('student_masters', True),
@@ -2016,10 +2042,10 @@ class TestListMembershipAPI(TeamAPITestCase):
         """
         membership = self.get_membership_list(200, {'username': 'student_masters'}, user=user)
         if can_see_bubble_team:
-            assert membership['count'] == 1
-            assert membership['results'][0]['team']['team_id'] == self.masters_only_team.team_id
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.masters_only_team.team_id)
         else:
-            assert membership['count'] == 0
+            self.assertEqual(membership['count'], 0)
 
     @ddt.unpack
     @ddt.data(
@@ -2044,14 +2070,14 @@ class TestListMembershipAPI(TeamAPITestCase):
         memberships = self.get_membership_list(200, {'username': 'student_on_team_1_private_set_1'}, user=user)
         team_ids = [membership['team']['team_id'] for membership in memberships['results']]
         if can_see_private_team:
-            assert len(team_ids) == 2
-            assert self.team_1_in_private_teamset_1.team_id in team_ids
-            assert self.masters_only_team.team_id in team_ids
+            self.assertEqual(len(team_ids), 2)
+            self.assertIn(self.team_1_in_private_teamset_1.team_id, team_ids)
+            self.assertIn(self.masters_only_team.team_id, team_ids)
         elif can_see_any_teams:
-            assert len(team_ids) == 1
-            assert self.masters_only_team.team_id in team_ids
+            self.assertEqual(len(team_ids), 1)
+            self.assertIn(self.masters_only_team.team_id, team_ids)
         else:
-            assert len(team_ids) == 0
+            self.assertEqual(len(team_ids), 0)
 
     @ddt.unpack
     @ddt.data(
@@ -2078,12 +2104,12 @@ class TestListMembershipAPI(TeamAPITestCase):
         )
         if expected_response == 200:
             users = [membership['user']['username'] for membership in memberships['results']]
-            assert users == ['student_on_team_1_private_set_1']
+            self.assertEqual(users, ['student_on_team_1_private_set_1'])
 
     @ddt.data(
         ('student_enrolled_both_courses_other_team', 'TestX/TS101/Test_Course', 200, 'Nuclear Team'),
         ('student_enrolled_both_courses_other_team', 'MIT/6.002x/Circuits', 200, 'Another Team'),
-        ('student_enrolled', 'TestX/TS101/Test_Course', 200, 'Sólar team'),
+        ('student_enrolled', 'TestX/TS101/Test_Course', 200, u'Sólar team'),
         ('student_enrolled', 'MIT/6.002x/Circuits', 400, ''),
     )
     @ddt.unpack
@@ -2097,8 +2123,8 @@ class TestListMembershipAPI(TeamAPITestCase):
             user=user
         )
         if status == 200:
-            assert membership['count'] == 1
-            assert membership['results'][0]['team']['team_id'] == self.test_team_name_id_map[team_name].team_id
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.test_team_name_id_map[team_name].team_id)
 
     @ddt.data(
         ('TestX/TS101/Test_Course', 200),
@@ -2108,12 +2134,12 @@ class TestListMembershipAPI(TeamAPITestCase):
     def test_course_filter_with_team_id(self, course_id, status):
         membership = self.get_membership_list(status, {'team_id': self.solar_team.team_id, 'course_id': course_id})
         if status == 200:
-            assert membership['count'] == 1
-            assert membership['results'][0]['team']['team_id'] == self.solar_team.team_id
+            self.assertEqual(membership['count'], 1)
+            self.assertEqual(membership['results'][0]['team']['team_id'], self.solar_team.team_id)
 
     def test_nonexistent_user(self):
         response = self.get_membership_list(200, {'username': 'this-user-will-not-exist-&&&&#!^'})
-        assert response['count'] == 0
+        self.assertEqual(response['count'], 0)
 
     def test_bad_course_id(self):
         self.get_membership_list(404, {'course_id': 'no_such_course'})
@@ -2153,11 +2179,11 @@ class TestListMembershipAPI(TeamAPITestCase):
             filters['username'] = other_username
 
         result = self.get_membership_list(200, filters)
-        assert result['count'] == (1 if filter_username else 2)
+        self.assertEqual(result['count'], 1 if filter_username else 2)
         usernames = {enrollment['user']['username'] for enrollment in result['results']}
-        assert other_username in usernames
+        self.assertIn(other_username, usernames)
         if not filter_username:
-            assert 'student_enrolled' in usernames
+            self.assertIn('student_enrolled', usernames)
 
     def test_filter_teamset_team_id(self):
         # team_id and teamset_id are mutually exclusive
@@ -2220,7 +2246,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         )
         if expected_response == 200:
             returned_users = {membership['user']['username'] for membership in memberships['results']}
-            assert returned_users == expected_users
+            self.assertEqual(returned_users, expected_users)
 
     @ddt.unpack
     @ddt.data(
@@ -2254,7 +2280,7 @@ class TestListMembershipAPI(TeamAPITestCase):
     )
     def test_access_filter_teamset__open_teamset(self, user, expected_response, expected_usernames):
         # topic_3 has no teams
-        assert not CourseTeam.objects.filter(topic_id='topic_3').exists()
+        self.assertFalse(CourseTeam.objects.filter(topic_id='topic_3').exists())
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2264,10 +2290,10 @@ class TestListMembershipAPI(TeamAPITestCase):
             user=user
         )
         if expected_response == 200:
-            assert memberships['count'] == 0
+            self.assertEqual(memberships['count'], 0)
 
         # topic_0 has teams
-        assert CourseTeam.objects.filter(topic_id='topic_0').exists()
+        self.assertTrue(CourseTeam.objects.filter(topic_id='topic_0').exists())
         memberships = self.get_membership_list(
             expected_response,
             {
@@ -2278,7 +2304,7 @@ class TestListMembershipAPI(TeamAPITestCase):
         )
         if expected_response == 200:
             returned_users = {membership['user']['username'] for membership in memberships['results']}
-            assert returned_users == expected_usernames
+            self.assertEqual(returned_users, expected_usernames)
 
 
 @ddt.ddt
@@ -2286,7 +2312,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -2307,10 +2333,10 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user=user
         )
         if status == 200:
-            assert membership['user']['username'] == self.users['student_enrolled_not_on_team'].username
-            assert membership['team']['team_id'] == self.solar_team.team_id
+            self.assertEqual(membership['user']['username'], self.users['student_enrolled_not_on_team'].username)
+            self.assertEqual(membership['team']['team_id'], self.solar_team.team_id)
             memberships = self.get_membership_list(200, {'team_id': self.solar_team.team_id})
-            assert memberships['count'] == 2
+            self.assertEqual(memberships['count'], 2)
 
             add_method = 'joined_from_team_view' if user == 'student_enrolled_not_on_team' else 'added_by_another_user'
 
@@ -2325,11 +2351,11 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 
     def test_no_username(self):
         response = self.post_create_membership(400, {'team_id': self.solar_team.team_id})
-        assert 'username' in json.loads(response.content.decode('utf-8'))['field_errors']
+        self.assertIn('username', json.loads(response.content.decode('utf-8'))['field_errors'])
 
     def test_no_team(self):
         response = self.post_create_membership(400, {'username': self.users['student_enrolled_not_on_team'].username})
-        assert 'team_id' in json.loads(response.content.decode('utf-8'))['field_errors']
+        self.assertIn('team_id', json.loads(response.content.decode('utf-8'))['field_errors'])
 
     @ddt.data('staff', 'student_enrolled')
     def test_bad_team(self, user):
@@ -2382,7 +2408,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             user=user
         )
         if expected_message:
-            assert expected_message in json.loads(response.content.decode('utf-8'))['developer_message']
+            self.assertIn(expected_message, json.loads(response.content.decode('utf-8'))['developer_message'])
 
     @ddt.unpack
     @ddt.data(
@@ -2414,7 +2440,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_enrolled', self.solar_team),
             user=user
         )
-        assert 'already a member' in json.loads(response.content.decode('utf-8'))['developer_message']
+        self.assertIn('already a member', json.loads(response.content.decode('utf-8'))['developer_message'])
 
     def test_join_second_team_in_course(self):
         """
@@ -2434,7 +2460,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_unenrolled', self.solar_team),
             user=user
         )
-        assert 'not enrolled' in json.loads(response.content.decode('utf-8'))['developer_message']
+        self.assertIn('not enrolled', json.loads(response.content.decode('utf-8'))['developer_message'])
 
     def test_over_max_team_size_in_course_2(self):
         response = self.post_create_membership(
@@ -2442,7 +2468,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
             self.build_membership_data('student_enrolled_other_course_not_on_team', self.another_team),
             user='student_enrolled_other_course_not_on_team'
         )
-        assert 'full' in json.loads(response.content.decode('utf-8'))['developer_message']
+        self.assertIn('full', json.loads(response.content.decode('utf-8'))['developer_message'])
 
 
 @ddt.ddt
@@ -2575,7 +2601,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp('lms.djangoapps.teams.utils.tracker')
+        super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
 
     @ddt.data(
         (None, 401),
@@ -2797,7 +2823,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['message'] == '1 learners were affected.'
+        self.assertEqual(response_text['message'], '1 learners were affected.')
 
     def test_upload_invalid_teamset(self):
         self.create_and_enroll_student(username='a_user')
@@ -2837,9 +2863,12 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         response = self.make_call(reverse('team_membership_bulk_management', args=[self.good_course_id]),
                                   201, method='post', data={'csv': csv_file}, user='staff')
-        assert CourseTeam.objects.filter(name='team 2', course_id=self.test_course_1.id).count() == 1
+        self.assertEqual(
+            CourseTeam.objects.filter(name='team 2', course_id=self.test_course_1.id).count(),
+            1
+        )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['message'] == '3 learners were affected.'
+        self.assertEqual(response_text['message'], '3 learners were affected.')
 
     def test_upload_non_existing_user(self):
         csv_content = 'user,mode,topic_0' + '\n'
@@ -2931,9 +2960,9 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         self.create_and_enroll_student(username=masters_username_b, mode=CourseMode.MASTERS)
 
         csv_content = 'user,mode,topic_1' + '\n'
-        csv_content += f'{audit_username},audit,team wind power' + '\n'
-        csv_content += f'{masters_username_a},masters,team wind power' + '\n'
-        csv_content += f'{masters_username_b},masters,team wind power' + '\n'
+        csv_content += '{},audit,team wind power'.format(audit_username) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_a) + '\n'
+        csv_content += '{},masters,team wind power'.format(masters_username_b) + '\n'
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         response = self.make_call(reverse(
@@ -2944,7 +2973,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         )
         response_text = json.loads(response.content.decode('utf-8'))
         expected_error = 'Team team wind power cannot have Master’s track users mixed with users in other tracks.'
-        assert response_text['errors'][0] == expected_error
+        self.assertEqual(response_text['errors'][0], expected_error)
 
     def test_upload_learners_exceed_max_team_size(self):
         csv_content = 'user,mode,topic_0,topic_1' + '\n'
@@ -2953,7 +2982,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         for name_enum in enumerate(['a', 'b', 'c', 'd', 'e', 'f', 'g']):
             username = 'user_{}'.format(name_enum[1])
             self.create_and_enroll_student(username=username, mode=CourseMode.MASTERS)
-            csv_content += f'{username},masters,{team1},{team2}' + '\n'
+            csv_content += '{},masters,{},{}'.format(username, team1, team2) + '\n'
 
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
@@ -2964,17 +2993,23 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file}, user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['errors'][0] == 'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        self.assertEqual(
+            response_text['errors'][0],
+            'New membership for team {} would exceed max size of {}.'.format(team1, 3)
+        )
 
     def test_deletion_via_upload_csv(self):
         # create a team membership that will be used further down
         self.test_create_membership_via_upload()
         username = 'a_user'
         topic_0_id = 'topic_0'
-        assert CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id).exists()
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        ).exists())
 
-        csv_content = f'user,mode,{topic_0_id},topic_1' + '\n'
-        csv_content += f'{username},audit'
+        csv_content = 'user,mode,{},topic_1'.format(topic_0_id) + '\n'
+        csv_content += '{},audit'.format(username)
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -2984,8 +3019,10 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file},
             user='staff'
         )
-        assert not CourseTeamMembership.objects\
-            .filter(user_id=self.users[username].id, team__topic_id=topic_0_id).exists()
+        self.assertFalse(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        ).exists())
 
     def test_reassignment_via_upload_csv(self):
         # create a team membership that will be used further down
@@ -2994,10 +3031,13 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         topic_0_id = 'topic_0'
         nuclear_team_name = 'team nuclear power'
         windpower_team_name = 'team wind power'
-        assert CourseTeamMembership.objects\
-            .filter(user_id=self.users[username].id, team__topic_id=topic_0_id, team__name=windpower_team_name).exists()
-        csv_content = f'user,mode,{topic_0_id}' + '\n'
-        csv_content += f'{username},audit,{nuclear_team_name}'
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=windpower_team_name
+        ).exists())
+        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
+        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -3007,13 +3047,16 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file},
             user='staff'
         )
-        assert not CourseTeamMembership.objects.filter(user_id=self.users[username].id,
-                                                       team__topic_id=topic_0_id,
-                                                       team__name=windpower_team_name).exists()
-
-        assert CourseTeamMembership.objects.filter(user_id=self.users[username].id,
-                                                   team__topic_id=topic_0_id,
-                                                   team__name=nuclear_team_name).exists()
+        self.assertFalse(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=windpower_team_name
+        ).exists())
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id,
+            team__name=nuclear_team_name
+        ).exists())
 
     def test_upload_file_not_changed_csv(self):
         # create a team membership that will be used further down
@@ -3021,9 +3064,12 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         username = 'a_user'
         topic_0_id = 'topic_0'
         nuclear_team_name = 'team wind power'
-        assert len(CourseTeamMembership.objects.filter(user_id=self.users[username].id, team__topic_id=topic_0_id)) == 1
-        csv_content = f'user,mode,{topic_0_id}' + '\n'
-        csv_content += f'{username},audit,{nuclear_team_name}'
+        self.assertEqual(len(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__topic_id=topic_0_id
+        )), 1)
+        csv_content = 'user,mode,{}'.format(topic_0_id) + '\n'
+        csv_content += '{0},audit,{1}'.format(username, nuclear_team_name)
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username,
                           password=self.users['course_staff'].password)
@@ -3034,10 +3080,14 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             data={'csv': csv_file},
             user='staff'
         )
-        assert len(CourseTeamMembership.objects.filter(user_id=self.users[username].id,
-                                                       team__name=nuclear_team_name)) == 1
-        assert CourseTeamMembership.objects.filter(user_id=self.users[username].id,
-                                                   team__name=nuclear_team_name).exists()
+        self.assertEqual(len(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__name=nuclear_team_name
+        )), 1)
+        self.assertTrue(CourseTeamMembership.objects.filter(
+            user_id=self.users[username].id,
+            team__name=nuclear_team_name
+        ).exists())
 
     def test_create_membership_via_upload_using_external_key(self):
         self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
@@ -3053,7 +3103,7 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['message'] == '1 learners were affected.'
+        self.assertEqual(response_text['message'], '1 learners were affected.')
 
     def test_create_membership_via_upload_using_external_key_invalid(self):
         self.create_and_enroll_student(username='a_user', external_key='a_user_external_key')
@@ -3069,14 +3119,17 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         response_text = json.loads(response.content.decode('utf-8'))
-        assert response_text['errors'] == ['User name/email/external key: a_user_external_key_invalid does not exist.']
+        self.assertEqual(
+            response_text['errors'],
+            ['User name/email/external key: a_user_external_key_invalid does not exist.']
+        )
 
     def test_upload_non_ascii(self):
         csv_content = 'user,mode,topic_0' + '\n'
         team_name = '著文企臺個'
         user_name = '著著文企臺個文企臺個'
         self.create_and_enroll_student(username=user_name)
-        csv_content += f'{user_name},audit,{team_name}'
+        csv_content += '{},audit,{}'.format(user_name, team_name)
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
         self.make_call(
@@ -3086,8 +3139,14 @@ class TestBulkMembershipManagement(TeamAPITestCase):
             user='staff'
         )
         team = self.users[user_name].teams.first()
-        assert team.name == team_name
-        assert [user.username for user in team.users.all()] == [user_name]
+        self.assertEqual(
+            team.name,
+            team_name
+        )
+        self.assertEqual(
+            [user.username for user in team.users.all()],
+            [user_name]
+        )
 
     def test_upload_assign_masters_learner_to_non_protected_team(self):
         """
@@ -3097,8 +3156,8 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         masters_a = 'masters_a'
         team = self.wind_team
         self.create_and_enroll_student(username=masters_a, mode=CourseMode.MASTERS)
-        csv_content = f'user,mode,{team.topic_id}' + '\n'
-        csv_content += f'masters_a, masters,{team.name}'
+        csv_content = 'user,mode,{}'.format(team.topic_id) + '\n'
+        csv_content += 'masters_a, masters,{}'.format(team.name)
         csv_file = SimpleUploadedFile('test_file.csv', csv_content.encode('utf8'), content_type='text/csv')
         self.client.login(username=self.users['course_staff'].username, password=self.users['course_staff'].password)
 
@@ -3112,4 +3171,4 @@ class TestBulkMembershipManagement(TeamAPITestCase):
         expected_message = 'Team {} cannot have Master’s track users mixed with users in other tracks.'.format(
             team.name
         )
-        assert response_text['errors'][0] == expected_message
+        self.assertEqual(response_text['errors'][0], expected_message)

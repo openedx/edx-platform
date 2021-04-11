@@ -4,7 +4,7 @@
     import json
     import math
     import six
-
+    
     from openedx.core.djangolib.js_utils import (
         dump_js_escaped_json, js_escaped_string
     )
@@ -29,16 +29,16 @@ $(function () {
           $tooltip_div,
           edx.HtmlUtils.HTML(contents)
       );
-
+      
       edx.HtmlUtils.append(
           $('body'),
           edx.HtmlUtils.HTML($tooltip_div)
       );
-
+      
       $('#tooltip').fadeIn(200);
   }
   /* -------------------------------- Grade detail bars -------------------------------- */
-
+    
   <%
   colors = ["#b72121", "#600101", "#666666", "#333333"]
   categories = {}
@@ -56,13 +56,13 @@ $(function () {
   for section in grade_summary['section_breakdown']:
       if section.get('prominent', False):
           tickIndex += sectionSpacer
-
+            
       if section['category'] not in categories:
           colorIndex = len(categories) % len(colors)
-          categories[ section['category'] ] = {'label' : section['category'],
-                                              'data' : [],
+          categories[ section['category'] ] = {'label' : section['category'], 
+                                              'data' : [], 
                                               'color' : colors[colorIndex]}
-
+      
       categoryData = categories[ section['category'] ]
 
       ## Because this is Python (Mako) embedded in JavaScript, our xss linting script is
@@ -75,31 +75,31 @@ $(function () {
       ## to prevent ugly HTML from being shown to learners.
       ## xss-lint: disable=javascript-jquery-append
       ticks.append( [tickIndex, bleach.clean(section['label'], tags=[], strip=True)] )
-
+    
       if section['category'] in detail_tooltips:
           ## xss-lint: disable=javascript-jquery-append
           detail_tooltips[ section['category'] ].append( section['detail'] )
       else:
           detail_tooltips[ section['category'] ] = [ section['detail'], ]
-
+          
       if 'mark' in section:
           ## xss-lint: disable=javascript-jquery-append
           droppedScores.append( [tickIndex, 0.05] )
           ## xss-lint: disable=javascript-jquery-append
           dropped_score_tooltips.append( section['mark']['detail'] )
-
+        
       tickIndex += 1
-
+    
       if section.get('prominent', False):
           tickIndex += sectionSpacer
-
+          
   ## ----------------------------- Grade overview bar ------------------------- ##
   tickIndex += sectionSpacer
-
+  
   series = list(categories.values())
   overviewBarX = tickIndex
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
-
+  
   if show_grade_breakdown:
     for section in six.itervalues(grade_summary['grade_breakdown']):
         if section['percent'] > 0:
@@ -114,18 +114,18 @@ $(function () {
                 'data' : [ [overviewBarX, section['percent']] ],
                 'color' : color
             })
-
+            
             detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
-
+  
     ticks += [ [overviewBarX, "Total"] ]
     tickIndex += 1 + sectionSpacer
-
+  
   totalScore = grade_summary['percent']
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
-
-
+  
+  
   ## ----------------------------- Grade cutoffs ------------------------- ##
-
+  
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
   if show_grade_cutoffs:
     grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
@@ -137,14 +137,14 @@ $(function () {
   else:
     grade_cutoff_ticks = [ ]
   %>
-
+  
   var series = ${ series | n, dump_js_escaped_json };
   var ticks = ${ ticks | n, dump_js_escaped_json };
   var bottomTicks = ${ bottomTicks | n, dump_js_escaped_json };
   var detail_tooltips = ${ detail_tooltips | n, dump_js_escaped_json };
   var droppedScores = ${ droppedScores | n, dump_js_escaped_json };
   var grade_cutoff_ticks = ${ grade_cutoff_ticks | n, dump_js_escaped_json }
-
+  
   var yAxisTooltips={};
 
     /*
@@ -198,16 +198,15 @@ $(function () {
           edx.HtmlUtils.HTML('</span>')
       ).text;
   }
-
+    
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
-
+  
   // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
   var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; }); // Percentage point (in decimal) of each grade cutoff
   ascending_grades.sort();
 
-  // var colors = ['$gray-100', '$gray-200', '$gray-300'];
-  var colors = ['#f8f9fa', '#e9ecef', '#dee2e6'];
+  var colors = ['#f3f3f3', '#e9e9e9', '#ddd'];
   var markings = [];
   for(var i=1; i<ascending_grades.length-1; i++) // Skip the i=0 marking, which starts from 0%
     markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
@@ -267,19 +266,18 @@ $(function () {
         hoverable: true,
         clickable: true,
         borderWidth: 1,
-        borderColor: "#707070", // gray-500
         markings: markings
     },
     legend: {
         show: false
-    },
+    }
   };
-
+  
   var $grade_detail_graph = $("#${graph_div_id | n, js_escaped_string}");
   $grade_detail_graph.width($grade_detail_graph.parent().width());
   if ($grade_detail_graph.length > 0) {
     var plot = $.plot($grade_detail_graph, series, options);
-
+    
     %if show_grade_breakdown:
       var o = plot.pointOffset(
           {x: ${overviewBarX | n, dump_js_escaped_json} , y: ${totalScore | n, dump_js_escaped_json}}
@@ -315,14 +313,14 @@ $(function () {
         $("#tooltip").remove();
     });
   }
-
-
+  
+      
   var previousPoint = null;
   $grade_detail_graph.bind("plothover", function (event, pos, item) {
     if (item) {
       if (previousPoint != (item.dataIndex, item.seriesIndex)) {
         previousPoint = (item.dataIndex, item.seriesIndex);
-
+            
         if (item.series.label in detail_tooltips) {
           var series_tooltips = detail_tooltips[item.series.label];
           if (item.dataIndex < series_tooltips.length) {
@@ -333,7 +331,7 @@ $(function () {
       }
     } else {
       $("#tooltip").remove();
-      previousPoint = null;
+      previousPoint = null;            
     }
   });
 });

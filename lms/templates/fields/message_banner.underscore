@@ -1,5 +1,5 @@
-<div class="banner-msg wrapper-msg urgency-<%- urgency %> <%- type %> <% if (isRecoveryEmailMsg == true) { %> recovery-email-alert <% } %> <% if (isLearnerPortalEnabled == true) { %> learner-portal-enabled-alert <% } %>" role="alert">
-  <i <% if (hideCloseBtn == true) { %> hidden <% } %> class="fa fa-close close-icon close-btn"></i>
+<div id="banner-msg" class="wrapper-msg urgency-<%- urgency %> <%- type %> <% if (isRecoveryEmailMsg == true) { %> recovery-email-alert <% } %> <% if (isLearnerPortalEnabled == true) { %> learner-portal-enabled-alert <% } %>" role="alert">
+  <i <% if (hideCloseBtn == true) { %> hidden <% } %> id="close" class="fa fa-close close-icon"></i>
     <div class="msg">
         <div class="msg-content">
             <div class="copy">

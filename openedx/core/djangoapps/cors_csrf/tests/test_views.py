@@ -23,7 +23,7 @@ class XDomainProxyTest(TestCase):
 
     def setUp(self):
         """Clear model-based config cache. """
-        super().setUp()
+        super(XDomainProxyTest, self).setUp()
         try:
             self.url = reverse('xdomain_proxy')
         except NoReverseMatch:
@@ -34,13 +34,13 @@ class XDomainProxyTest(TestCase):
     def test_xdomain_proxy_disabled(self):
         self._configure(False)
         response = self._load_page()
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     @ddt.data(None, ['    '], [' ', ' '])
     def test_xdomain_proxy_enabled_no_whitelist(self, whitelist):
         self._configure(True, whitelist=whitelist)
         response = self._load_page()
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     @ddt.data(
         (['example.com'], ['example.com']),

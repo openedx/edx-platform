@@ -1,13 +1,13 @@
 """Utilities for writing unit tests that involve course embargos. """
 
 import contextlib
-from unittest.mock import MagicMock, patch
 
 import maxminddb
 from django.core.cache import cache
 from django.urls import reverse
 
 import geoip2.database
+from mock import MagicMock, patch
 
 from .models import Country, CountryAccessRule, RestrictedCourse
 

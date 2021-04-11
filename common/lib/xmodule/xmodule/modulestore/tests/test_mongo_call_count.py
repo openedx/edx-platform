@@ -6,10 +6,11 @@ when using the Split modulestore.
 
 from shutil import rmtree
 from tempfile import mkdtemp
-from unittest import skip
+from unittest import TestCase, skip
 
 import ddt
-from django.test import TestCase  # lint-amnesty, pylint: disable=reimported
+import six
+from django.test import TestCase
 
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.utils import (
@@ -34,7 +35,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CountMongoCallsXMLRoundtrip, self).setUp()
         self.export_dir = mkdtemp()
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
@@ -111,7 +112,7 @@ class CountMongoCallsCourseTraversal(TestCase):
         if access_all_block_fields:
             # Read the fields on each block in order to ensure each block and its definition is loaded.
             for xblock in all_blocks:
-                for __, field in xblock.fields.items():
+                for __, field in six.iteritems(xblock.fields):
                     if field.is_set_on(xblock):
                         __ = field.read_from(xblock)
 

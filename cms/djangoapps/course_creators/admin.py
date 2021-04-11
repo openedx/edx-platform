@@ -80,7 +80,7 @@ admin.site.register(CourseCreator, CourseCreatorAdmin)
 
 
 @receiver(update_creator_state, sender=CourseCreator)
-def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def update_creator_group_callback(sender, **kwargs):
     """
     Callback for when the model's creator status has changed.
     """
@@ -90,7 +90,7 @@ def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: di
 
 
 @receiver(send_user_notification, sender=CourseCreator)
-def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def send_user_notification_callback(sender, **kwargs):
     """
     Callback for notifying user about course creator status change.
     """
@@ -113,12 +113,12 @@ def send_user_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: 
 
     try:
         user.email_user(subject, message, studio_request_email)
-    except:  # lint-amnesty, pylint: disable=bare-except
-        log.warning("Unable to send course creator status e-mail to %s", user.email)
+    except:
+        log.warning(u"Unable to send course creator status e-mail to %s", user.email)
 
 
 @receiver(send_admin_notification, sender=CourseCreator)
-def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def send_admin_notification_callback(sender, **kwargs):
     """
     Callback for notifying admin of a user in the 'pending' state.
     """
@@ -140,4 +140,4 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
             fail_silently=False
         )
     except SMTPException:
-        log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
+        log.warning(u"Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)

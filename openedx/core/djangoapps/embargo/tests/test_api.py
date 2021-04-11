@@ -3,13 +3,13 @@ Tests for EmbargoMiddleware
 """
 
 from contextlib import contextmanager
-from unittest import mock
-from unittest.mock import patch, MagicMock
 
 import geoip2.database
 import maxminddb
 import ddt
-import pytest
+
+import mock
+from mock import patch, MagicMock
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -49,7 +49,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):
-        super().setUp()
+        super(EmbargoCheckAccessApiTests, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         self.restricted_course = RestrictedCourse.objects.create(course_key=self.course.id)
@@ -99,7 +99,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
         # Verify that the access rules were applied correctly
-        assert result == allow_access
+        self.assertEqual(result, allow_access)
 
     def test_no_user_has_access(self):
         CountryAccessRule.objects.create(
@@ -111,7 +111,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # The user is set to None, because the user has not been authenticated.
         with self._mock_geoip(""):
             result = embargo_api.check_course_access(self.course.id, ip_address='0.0.0.0')
-        assert result
+        self.assertTrue(result)
 
     def test_no_user_blocked(self):
         CountryAccessRule.objects.create(
@@ -123,7 +123,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         with self._mock_geoip('US'):
             # The user is set to None, because the user has not been authenticated.
             result = embargo_api.check_course_access(self.course.id, ip_address='0.0.0.0')
-            assert not result
+            self.assertFalse(result)
 
     def test_course_not_restricted(self):
         # No restricted course model for this course key,
@@ -142,7 +142,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         with self._mock_geoip('US'):
             result = embargo_api.check_course_access(self.course.id, user=self.user,
                                                      ip_address='FE80::0202:B3FF:FE1E:8329')
-        assert result
+        self.assertTrue(result)
 
     def test_country_access_fallback_to_continent_code(self):
         # Simulate Geolite2 falling back to a continent code
@@ -150,7 +150,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # allow the user access.
         with self._mock_geoip('EU'):
             result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
-            assert result
+            self.assertTrue(result)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_profile_country_db_null(self):
@@ -162,13 +162,13 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # exception when the embargo middleware treated the value as a string.
         # In order to simulate this behavior, we can't simply set `profile.country = None`.
         # (because when we save it, it will set the database field to an empty string instead of NULL)
-        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        query = u"UPDATE auth_userprofile SET country = NULL WHERE id = %s"
         connection.cursor().execute(query, [str(self.user.profile.id)])
 
         # Verify that we can check the user's access without error
         with self._mock_geoip('US'):
             result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
-        assert result
+        self.assertTrue(result)
 
     def test_caching(self):
         with self._mock_geoip('US'):
@@ -212,7 +212,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
         # Expect that the user is blocked, because the user isn't staff
-        assert not result, "User should not have access because the user isn't staff."
+        self.assertFalse(result, msg="User should not have access because the user isn't staff.")
 
         # Instantiate the role, configuring it for this course or org
         if issubclass(staff_role_cls, CourseRole):
@@ -229,7 +229,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         with self._mock_geoip('US'):
             result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
-        assert result, 'User should have access because the user is staff.'
+        self.assertTrue(result, msg="User should have access because the user is staff.")
 
     @contextmanager
     def _mock_geoip(self, country_code):
@@ -270,7 +270,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
-        super().setUp()
+        super(EmbargoMessageUrlApiTests, self).setUp()
         self.course = CourseFactory.create()
 
     @ddt.data(
@@ -283,7 +283,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
 
         # Retrieve the URL to the blocked message page
         url_path = embargo_api.message_url_path(self.course.id, access_point)
-        assert url_path == expected_url_path
+        self.assertEqual(url_path, expected_url_path)
 
     def test_message_url_path_caching(self):
         self._restrict_course(self.course.id)
@@ -303,10 +303,10 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
         url_path = embargo_api.message_url_path(self.course.id, access_point)
 
         # Use a default path
-        assert url_path == '/embargo/blocked-message/courseware/default/'
+        self.assertEqual(url_path, '/embargo/blocked-message/courseware/default/')
 
     def test_invalid_access_point(self):
-        with pytest.raises(InvalidAccessPoint):
+        with self.assertRaises(InvalidAccessPoint):
             embargo_api.message_url_path(self.course.id, "invalid")
 
     def test_message_url_stale_cache(self):
@@ -327,7 +327,7 @@ class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
         # Try again.  Even though the cache results are stale,
         # we should still get a valid URL.
         url_path = embargo_api.message_url_path(self.course.id, 'courseware')
-        assert url_path == '/embargo/blocked-message/courseware/default/'
+        self.assertEqual(url_path, '/embargo/blocked-message/courseware/default/')
 
     def _restrict_course(self, course_key):
         """Restrict the user from accessing the course. """

@@ -13,7 +13,7 @@ from django.db import transaction
 from django.utils.translation import gettext as _
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = 'Creates the specified group, if it does not exist, and sets its permissions.'
 
     def add_arguments(self, parser):
@@ -21,7 +21,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         parser.add_argument('--remove', dest='is_remove', action='store_true')
         parser.add_argument('-p', '--permissions', nargs='*', default=[])
 
-    def _handle_remove(self, group_name):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _handle_remove(self, group_name):
 
         try:
             Group.objects.get(name=group_name).delete()
@@ -30,7 +30,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             self.stderr.write(_('Did not find a group with name "{}" - skipping.').format(group_name))
 
     @transaction.atomic
-    def handle(self, group_name, is_remove, permissions=None, *args, **options):  # lint-amnesty, pylint: disable=arguments-differ, keyword-arg-before-vararg
+    def handle(self, group_name, is_remove, permissions=None, *args, **options):
 
         if is_remove:
             self._handle_remove(group_name)
@@ -47,7 +47,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 group.full_clean()
             except ValidationError as exc:
                 # give a more helpful error
-                raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(
                     _(
                         'Invalid group name: "{group_name}". {messages}'
                     ).format(
@@ -86,14 +86,14 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         group.save()
 
-    def _resolve_permissions(self, permissions):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _resolve_permissions(self, permissions):
         new_permissions = set()
         for permission in permissions:
             try:
                 app_label, model_name, codename = permission.split(':')
             except ValueError:
                 # give a more helpful error
-                raise CommandError(_(  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(_(
                     'Invalid permission option: "{}". Please specify permissions '
                     'using the format: app_label:model_name:permission_codename.'
                 ).format(permission))
@@ -101,7 +101,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             try:
                 model_class = apps.get_model(app_label, model_name)
             except LookupError as exc:
-                raise CommandError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(str(exc))
 
             content_type = ContentType.objects.get_for_model(model_class)
             try:
@@ -111,7 +111,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 )
             except Permission.DoesNotExist:
                 # give a more helpful error
-                raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError(
                     _(
                         'Invalid permission codename: "{codename}".  No such permission exists '
                         'for the model {module}.{model_name}.'

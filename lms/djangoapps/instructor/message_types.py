@@ -15,7 +15,7 @@ class AccountCreationAndEnrollment(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(AccountCreationAndEnrollment, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -26,7 +26,7 @@ class AddBetaTester(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(AddBetaTester, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -37,7 +37,7 @@ class AllowedEnroll(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(AllowedEnroll, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -48,7 +48,7 @@ class AllowedUnenroll(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(AllowedUnenroll, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -59,7 +59,7 @@ class EnrollEnrolled(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(EnrollEnrolled, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -70,7 +70,7 @@ class EnrolledUnenroll(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(EnrolledUnenroll, self).__init__(*args, **kwargs)
         self.options['transactional'] = True
 
 
@@ -81,5 +81,5 @@ class RemoveBetaTester(BaseMessageType):
     APP_LABEL = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(RemoveBetaTester, self).__init__(*args, **kwargs)
         self.options['transactional'] = True

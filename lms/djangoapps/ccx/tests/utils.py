@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=cyclic-import
+"""
 Test utils for CCX
 """
 
@@ -7,12 +7,13 @@ import datetime
 
 import pytz
 from django.conf import settings
+from six.moves import range
 
-from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -28,7 +29,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CcxTestCase, cls).setUpClass()
         cls.course = course = CourseFactory.create(enable_ccx=True)
 
         # Create a course outline
@@ -50,7 +51,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         cls.verticals = flatten([
             [
                 ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
                 ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
@@ -68,7 +69,7 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super().setUp()
+        super(CcxTestCase, self).setUp()
         # Create instructor account
         self.coach = UserFactory.create(password="test")
         # create an instance of modulestore
@@ -132,5 +133,6 @@ def iter_blocks(course):
         """ get child blocks """
         yield block
         for child in block.get_children():
-            yield from visit(child)
+            for descendant in visit(child):  # wish they'd backport yield from
+                yield descendant
     return visit(course)

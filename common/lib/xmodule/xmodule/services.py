@@ -10,7 +10,7 @@ from django.conf import settings
 from xmodule.modulestore.django import modulestore
 
 
-class SettingsService:
+class SettingsService(object):
     """
     Allows server-wide configuration of XBlocks on a per-type basis
 
@@ -61,7 +61,7 @@ class SettingsService:
     def get_settings_bucket(self, block, default=None):
         """ Gets xblock settings dictionary from settings. """
         if not block:
-            raise ValueError("Expected XBlock instance, got {} of type {}".format(block, type(block)))
+            raise ValueError("Expected XBlock instance, got {0} of type {1}".format(block, type(block)))
 
         actual_default = default if default is not None else {}
         xblock_settings_bucket = getattr(block, self.xblock_settings_bucket_selector, block.unmixed_class.__name__)
@@ -71,7 +71,7 @@ class SettingsService:
 
 # TODO: ConfigurationService and its usage will be removed as a part of EDUCATOR-121
 # reference: https://openedx.atlassian.net/browse/EDUCATOR-121
-class ConfigurationService:
+class ConfigurationService(object):
     """
     An XBlock service to talk with the Configuration Models. This service should provide
     a pathway to Configuration Model which is designed to configure the corresponding XBlock.
@@ -89,7 +89,7 @@ class ConfigurationService:
         """
         if not (inspect.isclass(configuration_model) and issubclass(configuration_model, ConfigurationModel)):
             raise ValueError(
-                "Expected ConfigurationModel got {} of type {}".format(
+                "Expected ConfigurationModel got {0} of type {1}".format(
                     configuration_model,
                     type(configuration_model)
                 )
@@ -98,7 +98,7 @@ class ConfigurationService:
         self.configuration = configuration_model
 
 
-class TeamsConfigurationService:
+class TeamsConfigurationService(object):
     """
     An XBlock service that returns the teams_configuration object for a course.
     """

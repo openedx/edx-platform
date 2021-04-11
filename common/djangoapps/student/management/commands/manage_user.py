@@ -29,7 +29,7 @@ def is_valid_django_hash(encoded):
     return True
 
 
-class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Command(BaseCommand):
     help = 'Creates the specified user, if it does not exist, and sets its groups.'
 
     def add_arguments(self, parser):
@@ -74,7 +74,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 ).format(user.username)
             )
 
-    def _handle_remove(self, username, email):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _handle_remove(self, username, email):
         try:
             user = get_user_model().objects.get(username=username)
         except get_user_model().DoesNotExist:
@@ -85,7 +85,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         user.delete()
 
     @transaction.atomic
-    def handle(self, username, email, is_remove, is_staff, is_superuser, groups,  # lint-amnesty, pylint: disable=arguments-differ
+    def handle(self, username, email, is_remove, is_staff, is_superuser, groups,
                unusable_password, initial_password_hash, *args, **options):
 
         if is_remove:
@@ -100,7 +100,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         if created:
             if initial_password_hash:
                 if not (is_password_usable(initial_password_hash) and is_valid_django_hash(initial_password_hash)):
-                    raise CommandError(f'The password hash provided for user {username} is invalid.')
+                    raise CommandError('The password hash provided for user {} is invalid.'.format(username))
                 user.password = initial_password_hash
             else:
                 # Set the password to a random, unknown, but usable password

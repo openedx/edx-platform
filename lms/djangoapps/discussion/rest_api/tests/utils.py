@@ -10,6 +10,7 @@ from contextlib import closing
 from datetime import datetime
 
 import httpretty
+import six
 from PIL import Image
 from pytz import UTC
 
@@ -67,7 +68,7 @@ def _get_comment_callback(comment_data, thread_id, parent_id):
     return callback
 
 
-class CommentsServiceMockMixin:
+class CommentsServiceMockMixin(object):
     """Mixin with utility methods for mocking the comments service"""
     def register_get_threads_response(self, threads, page, num_pages):
         """Register a mock response for GET on the CS thread list endpoint"""
@@ -127,7 +128,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            f"http://localhost:4567/api/v1/threads/{thread_id}",
+            "http://localhost:4567/api/v1/threads/{id}".format(id=thread_id),
             body="",
             status=status_code
         )
@@ -151,9 +152,9 @@ class CommentsServiceMockMixin:
         specified.
         """
         if parent_id:
-            url = f"http://localhost:4567/api/v1/comments/{parent_id}"
+            url = "http://localhost:4567/api/v1/comments/{}".format(parent_id)
         else:
-            url = f"http://localhost:4567/api/v1/threads/{thread_id}/comments"
+            url = "http://localhost:4567/api/v1/threads/{}/comments".format(thread_id)
 
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
@@ -184,7 +185,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            f"http://localhost:4567/api/v1/comments/{comment_id}",
+            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
             body="",
             status=status_code
         )
@@ -207,7 +208,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            f"http://localhost:4567/api/v1/users/{user.id}",
+            "http://localhost:4567/api/v1/users/{id}".format(id=user.id),
             body=json.dumps({
                 "id": str(user.id),
                 "subscribed_thread_ids": subscribed_thread_ids or [],
@@ -221,7 +222,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            f"http://localhost:4567/api/v1/users/{user.id}/retire",
+            "http://localhost:4567/api/v1/users/{id}/retire".format(id=user.id),
             body=body,
             status=status
         )
@@ -230,7 +231,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            f"http://localhost:4567/api/v1/users/{user.id}/replace_username",
+            "http://localhost:4567/api/v1/users/{id}/replace_username".format(id=user.id),
             body=body,
             status=status
         )
@@ -240,7 +241,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.GET,
-            f"http://localhost:4567/api/v1/users/{user.id}/subscribed_threads",
+            "http://localhost:4567/api/v1/users/{}/subscribed_threads".format(user.id),
             body=json.dumps({
                 "collection": threads,
                 "page": page,
@@ -259,7 +260,7 @@ class CommentsServiceMockMixin:
         for method in [httpretty.POST, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                f"http://localhost:4567/api/v1/users/{user.id}/subscriptions",
+                "http://localhost:4567/api/v1/users/{id}/subscriptions".format(id=user.id),
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -273,7 +274,7 @@ class CommentsServiceMockMixin:
         for method in [httpretty.PUT, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                f"http://localhost:4567/api/v1/threads/{thread_id}/votes",
+                "http://localhost:4567/api/v1/threads/{}/votes".format(thread_id),
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -287,7 +288,7 @@ class CommentsServiceMockMixin:
         for method in [httpretty.PUT, httpretty.DELETE]:
             httpretty.register_uri(
                 method,
-                f"http://localhost:4567/api/v1/comments/{comment_id}/votes",
+                "http://localhost:4567/api/v1/comments/{}/votes".format(comment_id),
                 body=json.dumps({}),  # body is unused
                 status=200
             )
@@ -314,7 +315,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.POST,
-            f"http://localhost:4567/api/v1/users/{user.id}/read",
+            "http://localhost:4567/api/v1/users/{id}/read".format(id=user.id),
             params={'source_type': content_type, 'source_id': content_id},
             body=json.dumps({}),  # body is unused
             status=200
@@ -335,7 +336,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.DELETE,
-            f"http://localhost:4567/api/v1/threads/{thread_id}",
+            "http://localhost:4567/api/v1/threads/{id}".format(id=thread_id),
             body=json.dumps({}),  # body is unused
             status=200
         )
@@ -347,7 +348,7 @@ class CommentsServiceMockMixin:
         assert httpretty.is_enabled(), 'httpretty must be enabled to mock calls.'
         httpretty.register_uri(
             httpretty.DELETE,
-            f"http://localhost:4567/api/v1/comments/{comment_id}",
+            "http://localhost:4567/api/v1/comments/{id}".format(id=comment_id),
             body=json.dumps({}),  # body is unused
             status=200
         )
@@ -358,7 +359,7 @@ class CommentsServiceMockMixin:
         """
         actual_params = dict(httpretty_request.querystring)
         actual_params.pop("request_id")  # request_id is random
-        assert actual_params == expected_params
+        self.assertEqual(actual_params, expected_params)
 
     def assert_last_query_params(self, expected_params):
         """
@@ -391,7 +392,7 @@ class CommentsServiceMockMixin:
             "voted": False,
             "vote_count": 0,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": str(self.course.id),
+            "course_id": six.text_type(self.course.id),
             "topic_id": "test_topic",
             "group_id": None,
             "group_name": None,
@@ -493,7 +494,7 @@ def make_paginated_api_response(results=None, count=0, num_pages=0, next_link=No
     }
 
 
-class ProfileImageTestMixin:
+class ProfileImageTestMixin(object):
     """
     Mixin with utility methods for user profile image
     """
@@ -518,12 +519,12 @@ class ProfileImageTestMixin:
         """
         for size, name in get_profile_image_names(user.username).items():
             if exist:
-                assert storage.exists(name)
+                self.assertTrue(storage.exists(name))
                 with closing(Image.open(storage.path(name))) as img:
-                    assert img.size == (size, size)
-                    assert img.format == 'JPEG'
+                    self.assertEqual(img.size, (size, size))
+                    self.assertEqual(img.format, 'JPEG')
             else:
-                assert not storage.exists(name)
+                self.assertFalse(storage.exists(name))
 
     def get_expected_user_profile(self, username):
         """

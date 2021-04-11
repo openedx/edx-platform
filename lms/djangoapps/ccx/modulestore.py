@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """A modulestore wrapper
 
 It will 'unwrap' ccx keys on the way in and re-wrap them on the way out
@@ -13,6 +14,7 @@ version that was passed in.
 from contextlib import contextmanager
 from functools import partial
 
+import six
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
@@ -69,7 +71,7 @@ def restore_ccx_collection(field_value, ccx_id=None):
     if isinstance(field_value, list):
         field_value = [restore_ccx(fv, ccx_id) for fv in field_value]
     elif isinstance(field_value, dict):
-        for key, val in field_value.items():
+        for key, val in six.iteritems(field_value):
             field_value[key] = restore_ccx(val, ccx_id)
     else:
         field_value = restore_ccx(field_value, ccx_id)
@@ -86,7 +88,7 @@ def remove_ccx(to_strip):
     yield stripped, partial(restore_ccx_collection, ccx_id=ccx)
 
 
-class CCXModulestoreWrapper:
+class CCXModulestoreWrapper(object):
     """This class wraps a modulestore
 
     The purpose is to remove ccx-specific identifiers during lookup and restore
@@ -112,7 +114,7 @@ class CCXModulestoreWrapper:
 
     def _clean_locator_for_mapping(self, locator):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(locator) as (locator, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(locator) as (locator, restore):
             # pylint: disable=protected-access
             return restore(
                 self._modulestore._clean_locator_for_mapping(locator)
@@ -127,7 +129,7 @@ class CCXModulestoreWrapper:
 
     def fill_in_run(self, course_key):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.fill_in_run(course_key))
 
     def has_item(self, usage_key, **kwargs):
@@ -137,26 +139,26 @@ class CCXModulestoreWrapper:
 
     def get_item(self, usage_key, depth=0, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(usage_key) as (usage_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(usage_key) as (usage_key, restore):
             return restore(
                 self._modulestore.get_item(usage_key, depth, **kwargs)
             )
 
     def get_items(self, course_key, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.get_items(course_key, **kwargs))
 
     def get_course(self, course_key, depth=0, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.get_course(
                 course_key, depth=depth, **kwargs
             ))
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_id) as (course_id, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_id) as (course_id, restore):
             return restore(self._modulestore.has_course(
                 course_id, ignore_case=ignore_case, **kwargs
             ))
@@ -170,120 +172,120 @@ class CCXModulestoreWrapper:
 
     def get_parent_location(self, location, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.get_parent_location(location, **kwargs)
             )
 
     def get_block_original_usage(self, usage_key):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(usage_key) as (usage_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(usage_key) as (usage_key, restore):
             orig_key, version = self._modulestore.get_block_original_usage(usage_key)
             return restore(orig_key), version
 
     def get_modulestore_type(self, course_id):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_id) as (course_id, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_id) as (course_id, restore):
             return restore(self._modulestore.get_modulestore_type(course_id))
 
     def get_orphans(self, course_key, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.get_orphans(course_key, **kwargs))
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(source_course_id) as (source_course_id, _):  # lint-amnesty, pylint: disable=redefined-argument-from-local
-            with remove_ccx(dest_course_id) as (dest_course_id, dest_restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(source_course_id) as (source_course_id, _):
+            with remove_ccx(dest_course_id) as (dest_course_id, dest_restore):
                 return dest_restore(self._modulestore.clone_course(
                     source_course_id, dest_course_id, user_id, fields=fields, **kwargs
                 ))
 
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.create_item(
                 user_id, course_key, block_type, block_id=block_id, fields=fields, **kwargs
             ))
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(parent_usage_key) as (parent_usage_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(parent_usage_key) as (parent_usage_key, restore):
             return restore(self._modulestore.create_child(
                 user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs
             ))
 
     def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.import_xblock(
                 user_id, course_key, block_type, block_id, fields=fields, runtime=runtime, **kwargs
             ))
 
     def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(dest_key) as (dest_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(dest_key) as (dest_key, restore):
             return restore(self._modulestore.copy_from_template(
                 source_keys, dest_key, user_id, **kwargs
             ))
 
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(xblock) as (xblock, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(xblock) as (xblock, restore):
             return restore(self._modulestore.update_item(
                 xblock, user_id, allow_not_found=allow_not_found, **kwargs
             ))
 
     def delete_item(self, location, user_id, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.delete_item(location, user_id, **kwargs)
             )
 
     def revert_to_published(self, location, user_id):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.revert_to_published(location, user_id)
             )
 
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(course_key) as (course_key, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(course_key) as (course_key, restore):
             return restore(self._modulestore.create_xblock(
                 runtime, course_key, block_type, block_id=block_id, fields=fields, **kwargs
             ))
 
     def has_published_version(self, xblock):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(xblock) as (xblock, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(xblock) as (xblock, restore):
             return restore(self._modulestore.has_published_version(xblock))
 
     def publish(self, location, user_id, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.publish(location, user_id, **kwargs)
             )
 
     def unpublish(self, location, user_id, **kwargs):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.unpublish(location, user_id, **kwargs)
             )
 
     def convert_to_draft(self, location, user_id):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(location) as (location, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(location) as (location, restore):
             return restore(
                 self._modulestore.convert_to_draft(location, user_id)
             )
 
     def has_changes(self, xblock):
         """See the docs for xmodule.modulestore.mixed.MixedModuleStore"""
-        with remove_ccx(xblock) as (xblock, restore):  # lint-amnesty, pylint: disable=redefined-argument-from-local
+        with remove_ccx(xblock) as (xblock, restore):
             return restore(self._modulestore.has_changes(xblock))
 
     def check_supports(self, course_key, method):

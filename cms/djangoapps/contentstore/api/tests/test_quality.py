@@ -45,7 +45,7 @@ class CourseQualityViewTest(BaseCourseViewTest):
                 'number_with_highlights': 0,
                 'total_visible': 1,
                 'total_number': 1,
-                'highlights_enabled': True,
+                'highlights_enabled': False,
                 'highlights_active_for_course': False,
             },
             'subsections': {

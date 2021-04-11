@@ -52,7 +52,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         Handle a GET request from the client and sends response back.
         """
         self.log_message(
-            f"Youtube provider received GET request to path {self.path}"
+            "Youtube provider received GET request to path {}".format(self.path)
         )
 
         if 'get_config' in self.path:
@@ -91,7 +91,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             youtube_id = params.path.split('/').pop()
 
             if self.server.config.get('youtube_api_private_video'):
-                self._send_private_video_response(youtube_id, "I'm youtube private video.")  # lint-amnesty, pylint: disable=too-many-function-args
+                self._send_private_video_response(youtube_id, "I'm youtube private video.")
             else:
                 self._send_video_response(youtube_id, "I'm youtube.")
 
@@ -137,7 +137,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
-        self.log_message(f"Youtube: sent response {message}")
+        self.log_message("Youtube: sent response {}".format(message))
 
     def _send_private_video_response(self, message):
         """
@@ -161,7 +161,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
-        self.log_message(f"Youtube: sent response {message}")
+        self.log_message("Youtube: sent response {}".format(message))
 
 
 class StubYouTubeService(StubHttpService):

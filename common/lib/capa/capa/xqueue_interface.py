@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+#
 #  LMS Interface to external queueing system (xqueue)
 #
 
@@ -93,7 +93,7 @@ class XQueueInterface(object):
 
         # log the send to xqueue
         header_info = json.loads(header)
-        queue_name = header_info.get('queue_name', u'')  # lint-amnesty, pylint: disable=unused-variable
+        queue_name = header_info.get('queue_name', u'')
 
         # Attempt to send to queue
         (error, msg) = self._send_to_queue(header, body, files_to_upload)
@@ -113,14 +113,14 @@ class XQueueInterface(object):
 
         return error, msg
 
-    def _login(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _login(self):
         payload = {
             'username': self.auth['username'],
             'password': self.auth['password']
         }
         return self._http_post(self.url + '/xqueue/login/', payload)
 
-    def _send_to_queue(self, header, body, files_to_upload):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _send_to_queue(self, header, body, files_to_upload):
         payload = {
             'xqueue_header': header,
             'xqueue_body': body
@@ -132,7 +132,7 @@ class XQueueInterface(object):
 
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
-    def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _http_post(self, url, data, files=None):
         try:
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)

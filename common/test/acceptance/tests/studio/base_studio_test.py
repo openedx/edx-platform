@@ -22,7 +22,7 @@ class StudioCourseTest(UniqueCourseTest):
         """
         Install a course with no content using a fixture.
         """
-        super().setUp()
+        super(StudioCourseTest, self).setUp()
         self.test_xss = test_xss
         self.install_course_fixture(is_staff)
 
@@ -38,7 +38,7 @@ class StudioCourseTest(UniqueCourseTest):
         )
         if self.test_xss:
             xss_injected_unique_id = XSS_INJECTION + self.unique_id
-            test_improper_escaping = {"value": xss_injected_unique_id}
+            test_improper_escaping = {u"value": xss_injected_unique_id}
             self.course_fixture.add_advanced_settings({
                 "advertised_start": test_improper_escaping,
                 "info_sidebar_name": test_improper_escaping,
@@ -58,7 +58,7 @@ class StudioCourseTest(UniqueCourseTest):
         """
         Populate the children of the test course fixture.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def log_in(self, user, is_staff=False):
         """
@@ -70,7 +70,7 @@ class StudioCourseTest(UniqueCourseTest):
             user(dict): dictionary containing user data: {'username': ..., 'email': ..., 'password': ...}
             is_staff(bool): register this user as staff
         """
-        self.auth_page = AutoAuthPage(  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.auth_page = AutoAuthPage(
             self.browser,
             staff=is_staff,
             username=user.get('username'),
@@ -85,12 +85,12 @@ class ContainerBase(StudioCourseTest):
     Base class for tests that do operations on the container page.
     """
 
-    def setUp(self, is_staff=False):  # lint-amnesty, pylint: disable=arguments-differ
+    def setUp(self, is_staff=False):
         """
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super().setUp(is_staff=is_staff)
+        super(ContainerBase, self).setUp(is_staff=is_staff)
 
         self.outline = CourseOutlinePage(
             self.browser,
@@ -115,7 +115,7 @@ class ContainerBase(StudioCourseTest):
         If make_draft is true, the unit page will be put into draft mode.
         """
         self.outline.visit()
-        subsection = self.outline.section(section_name).subsection(subsection_name)  # lint-amnesty, pylint: disable=no-member
+        subsection = self.outline.section(section_name).subsection(subsection_name)
         return subsection.expand_subsection().unit(unit_name).go_to()
 
     def do_action_and_verify(self, action, expected_ordering):
@@ -142,11 +142,11 @@ class StudioLibraryTest(AcceptanceTest):
         """
         Install a library with no content using a fixture.
         """
-        super().setUp()
+        super(StudioLibraryTest, self).setUp()
         fixture = LibraryFixture(
             'test_org',
             self.unique_id,
-            f'Test Library {self.unique_id}',
+            u'Test Library {}'.format(self.unique_id),
         )
         self.populate_library_fixture(fixture)
         fixture.install()
@@ -160,7 +160,7 @@ class StudioLibraryTest(AcceptanceTest):
         """
         Populate the children of the test course fixture.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def log_in(self, user, is_staff=False):
         """

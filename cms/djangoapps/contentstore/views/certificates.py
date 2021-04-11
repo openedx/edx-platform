@@ -26,6 +26,7 @@ course.certificates: {
 import json
 import logging
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -36,6 +37,7 @@ from django.views.decorators.http import require_http_methods
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
+from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -85,7 +87,7 @@ def _delete_asset(course_key, asset_key_string):
                 except InvalidKeyError:
                     # Unable to parse the asset key, log and return
                     LOGGER.info(
-                        "In course %r, unable to parse asset key %r, not attempting to delete signatory.",
+                        u"In course %r, unable to parse asset key %r, not attempting to delete signatory.",
                         course_key,
                         asset_key_string,
                     )
@@ -93,7 +95,7 @@ def _delete_asset(course_key, asset_key_string):
             else:
                 # Unable to parse the asset key, log and return
                 LOGGER.info(
-                    "In course %r, unable to parse asset key %r, not attempting to delete signatory.",
+                    u"In course %r, unable to parse asset key %r, not attempting to delete signatory.",
                     course_key,
                     asset_key_string,
                 )
@@ -111,17 +113,17 @@ class CertificateException(Exception):
     """
     Base exception for Certificates workflows
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class CertificateValidationError(CertificateException):
     """
     An exception raised when certificate information is invalid.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
-class CertificateManager:
+class CertificateManager(object):
     """
     The CertificateManager is responsible for storage, retrieval, and manipulation of Certificates
     Certificates are not stored in the Django ORM, they are a field/setting on the course descriptor
@@ -134,7 +136,7 @@ class CertificateManager:
         try:
             certificate = json.loads(json_string)
         except ValueError:
-            raise CertificateValidationError(_("invalid JSON"))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CertificateValidationError(_("invalid JSON"))
         # Include the data contract version
         certificate["version"] = CERTIFICATE_SCHEMA_VERSION
         # Ensure a signatories list is always returned
@@ -151,7 +153,7 @@ class CertificateManager:
         # Ensure the schema version meets our expectations
         if certificate_data.get("version") != CERTIFICATE_SCHEMA_VERSION:
             raise TypeError(
-                "Unsupported certificate schema version: {}.  Expected version: {}.".format(
+                u"Unsupported certificate schema version: {0}.  Expected version: {1}.".format(
                     certificate_data.get("version"),
                     CERTIFICATE_SCHEMA_VERSION
                 )
@@ -236,13 +238,13 @@ class CertificateManager:
         Deserialize from a JSON representation into a Certificate object.
         'value' should be either a Certificate instance, or a valid JSON string
         """
-        if isinstance(value, bytes):
+        if not six.PY2 and isinstance(value, bytes):
             value = value.decode('utf-8')
 
         # Ensure the schema fieldset meets our expectations
         for key in ("name", "description", "version"):
             if key not in value:
-                raise CertificateValidationError(_("Certificate dict {0} missing value key '{1}'").format(value, key))
+                raise CertificateValidationError(_(u"Certificate dict {0} missing value key '{1}'").format(value, key))
 
         # Load up the Certificate data
         certificate_data = CertificateManager.parse(value)
@@ -312,7 +314,7 @@ class CertificateManager:
         tracker.emit(event_name, event_data)
 
 
-class Certificate:
+class Certificate(object):
     """
     The logical representation of an individual course certificate
     """
@@ -347,7 +349,7 @@ def certificate_activation_handler(request, course_key_string):
     try:
         course = _get_course_and_check_access(course_key, request.user)
     except PermissionDenied:
-        msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+        msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
         return JsonResponse({"error": msg}, status=403)
 
     data = json.loads(request.body.decode('utf8'))
@@ -362,7 +364,7 @@ def certificate_activation_handler(request, course_key_string):
     store.update_item(course, request.user.id)
     cert_event_type = 'activated' if is_active else 'deactivated'
     CertificateManager.track_event(cert_event_type, {
-        'course_id': str(course.id),
+        'course_id': six.text_type(course.id),
     })
     return HttpResponse(status=200)
 
@@ -385,7 +387,7 @@ def certificates_list_handler(request, course_key_string):
         try:
             course = _get_course_and_check_access(course_key, request.user)
         except PermissionDenied:
-            msg = _('PermissionDenied: Failed in authenticating {user}').format(user=request.user)
+            msg = _(u'PermissionDenied: Failed in authenticating {user}').format(user=request.user)
             return JsonResponse({"error": msg}, status=403)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
@@ -440,7 +442,7 @@ def certificates_list_handler(request, course_key_string):
                 try:
                     new_certificate = CertificateManager.deserialize_certificate(course, request.body)
                 except CertificateValidationError as err:
-                    return JsonResponse({"error": str(err)}, status=400)
+                    return JsonResponse({"error": text_type(err)}, status=400)
                 if course.certificates.get('certificates') is None:
                     course.certificates['certificates'] = []
                 course.certificates['certificates'].append(new_certificate.certificate_data)
@@ -452,7 +454,7 @@ def certificates_list_handler(request, course_key_string):
                 )
                 store.update_item(course, request.user.id)
                 CertificateManager.track_event('created', {
-                    'course_id': str(course.id),
+                    'course_id': six.text_type(course.id),
                     'configuration_id': new_certificate.id
                 })
                 course = _get_course_and_check_access(course_key, request.user)
@@ -497,7 +499,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
         except CertificateValidationError as err:
-            return JsonResponse({"error": str(err)}, status=400)
+            return JsonResponse({"error": text_type(err)}, status=400)
 
         serialized_certificate = CertificateManager.serialize_certificate(new_certificate)
         cert_event_type = 'created'
@@ -509,7 +511,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
 
         store.update_item(course, request.user.id)
         CertificateManager.track_event(cert_event_type, {
-            'course_id': str(course.id),
+            'course_id': six.text_type(course.id),
             'configuration_id': serialized_certificate["id"]
         })
         return JsonResponse(serialized_certificate, status=201)
@@ -531,7 +533,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             certificate_id=certificate_id
         )
         CertificateManager.track_event('deleted', {
-            'course_id': str(course.id),
+            'course_id': six.text_type(course.id),
             'configuration_id': certificate_id
         })
         return JsonResponse(status=204)

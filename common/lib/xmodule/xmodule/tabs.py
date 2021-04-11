@@ -6,7 +6,9 @@ Implement CourseTab
 import logging
 from abc import ABCMeta
 
+import six
 from django.core.files.storage import get_storage_class
+from six import text_type
 from xblock.fields import List
 
 from edx_django_utils.plugins import PluginError
@@ -21,7 +23,7 @@ _ = lambda text: text
 READ_ONLY_COURSE_TAB_ATTRIBUTES = ['type']
 
 
-class CourseTab(metaclass=ABCMeta):
+class CourseTab(six.with_metaclass(ABCMeta, object)):
     """
     The Course Tab class is a data abstraction for all tabs (i.e., course navigation links) within a course.
     It is an abstract class - to be inherited by various tab types.
@@ -83,7 +85,7 @@ class CourseTab(metaclass=ABCMeta):
         Args:
             tab_dict (dict) - a dictionary of parameters used to build the tab.
         """
-        super().__init__()
+        super(CourseTab, self).__init__()
         self.name = tab_dict.get('name', self.title)
         self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
         self.course_staff_only = tab_dict.get('course_staff_only', False)
@@ -104,7 +106,7 @@ class CourseTab(metaclass=ABCMeta):
         """Returns true if this course tab is enabled in the course.
 
         Args:
-            course (CourseBlock): the course using the feature
+            course (CourseDescriptor): the course using the feature
             user (User): an optional user interacting with the course (defaults to None)
         """
         raise NotImplementedError()
@@ -127,7 +129,7 @@ class CourseTab(metaclass=ABCMeta):
         if hasattr(self, key):
             return getattr(self, key, None)
         else:
-            raise KeyError(f'Key {key} not present in tab {self.to_json()}')
+            raise KeyError('Key {0} not present in tab {1}'.format(key, self.to_json()))
 
     def __setitem__(self, key, value):
         """
@@ -139,7 +141,7 @@ class CourseTab(metaclass=ABCMeta):
         if hasattr(self, key) and key not in READ_ONLY_COURSE_TAB_ATTRIBUTES:
             setattr(self, key, value)
         else:
-            raise KeyError(f'Key {key} cannot be set in tab {self.to_json()}')
+            raise KeyError('Key {0} cannot be set in tab {1}'.format(key, self.to_json()))
 
     def __eq__(self, other):
         """
@@ -243,14 +245,14 @@ class CourseTab(metaclass=ABCMeta):
         return tab_type(tab_dict=tab_dict)
 
 
-class TabFragmentViewMixin:
+class TabFragmentViewMixin(object):
     """
     A mixin for tabs that render themselves as web fragments.
     """
     fragment_view_name = None
 
     def __init__(self, tab_dict):
-        super().__init__(tab_dict)
+        super(TabFragmentViewMixin, self).__init__(tab_dict)
         self._fragment_view = None
 
     @property
@@ -259,12 +261,12 @@ class TabFragmentViewMixin:
 
         # If a view_name is specified, then use the default link function
         if self.view_name:
-            return super().link_func
+            return super(TabFragmentViewMixin, self).link_func
 
         # If not, then use the generic course tab URL
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            return reverse_func("course_tab_view", args=[str(course.id), self.type])
+            return reverse_func("course_tab_view", args=[text_type(course.id), self.type])
 
         return link_func
 
@@ -288,7 +290,7 @@ class TabFragmentViewMixin:
         """
         Renders this tab to a web fragment.
         """
-        return self.fragment_view.render_to_fragment(request, course_id=str(course.id), **kwargs)
+        return self.fragment_view.render_to_fragment(request, course_id=six.text_type(course.id), **kwargs)
 
     def __hash__(self):
         """ Return a hash representation of Tab Object. """
@@ -306,7 +308,7 @@ class StaticTab(CourseTab):
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
             """ Returns a function that returns the static tab's URL. """
-            return reverse_func(self.type, args=[str(course.id), self.url_slug])
+            return reverse_func(self.type, args=[text_type(course.id), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
@@ -317,9 +319,9 @@ class StaticTab(CourseTab):
             tab_dict['name'] = name
 
         tab_dict['link_func'] = link_func
-        tab_dict['tab_id'] = f'static_tab_{self.url_slug}'
+        tab_dict['tab_id'] = 'static_tab_{0}'.format(self.url_slug)
 
-        super().__init__(tab_dict)
+        super(StaticTab, self).__init__(tab_dict)
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -333,29 +335,29 @@ class StaticTab(CourseTab):
         """
         Ensures that the specified tab_dict is valid.
         """
-        return (super().validate(tab_dict, raise_error)
+        return (super(StaticTab, cls).validate(tab_dict, raise_error)
                 and key_checker(['name', 'url_slug'])(tab_dict, raise_error))
 
     def __getitem__(self, key):
         if key == 'url_slug':
             return self.url_slug
         else:
-            return super().__getitem__(key)
+            return super(StaticTab, self).__getitem__(key)
 
     def __setitem__(self, key, value):
         if key == 'url_slug':
             self.url_slug = value
         else:
-            super().__setitem__(key, value)
+            super(StaticTab, self).__setitem__(key, value)
 
     def to_json(self):
         """ Return a dictionary representation of this tab. """
-        to_json_val = super().to_json()
+        to_json_val = super(StaticTab, self).to_json()
         to_json_val.update({'url_slug': self.url_slug})
         return to_json_val
 
     def __eq__(self, other):
-        if not super().__eq__(other):
+        if not super(StaticTab, self).__eq__(other):
             return False
         return self.url_slug == other.get('url_slug')
 
@@ -367,7 +369,7 @@ class StaticTab(CourseTab):
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
-    It is automatically created and can be retrieved through a CourseBlock object: course.tabs
+    It is automatically created and can be retrieved through a CourseDescriptor object: course.tabs
     """
 
     # TODO: Ideally, we'd like for this list of tabs to be dynamically
@@ -459,7 +461,8 @@ class CourseTabList(List):
                     # If rendering inline that add each item in the collection,
                     # else just show the tab itself as long as it is not empty.
                     if inline_collections:
-                        yield from tab.items(course)
+                        for item in tab.items(course):
+                            yield item
                     elif len(list(tab.items(course))) > 0:
                         yield tab
                 else:
@@ -493,15 +496,15 @@ class CourseTabList(List):
             return
 
         if len(tabs) < 2:
-            raise InvalidTabsException(f"Expected at least two tabs.  tabs: '{tabs}'")
+            raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
 
         if tabs[0].get('type') != 'course_info':
             raise InvalidTabsException(
-                f"Expected first tab to have type 'course_info'.  tabs: '{tabs}'")
+                "Expected first tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
 
         if tabs[1].get('type') != 'courseware':
             raise InvalidTabsException(
-                f"Expected second tab to have type 'courseware'.  tabs: '{tabs}'")
+                "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
 
         # the following tabs should appear only once
         # TODO: don't import openedx capabilities from common
@@ -525,7 +528,7 @@ class CourseTabList(List):
             )
             raise InvalidTabsException(msg)
 
-    def to_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
+    def to_json(self, values):
         """
         Overrides the to_json method to serialize all the CourseTab objects to a json-serializable representation.
         """
@@ -540,7 +543,7 @@ class CourseTabList(List):
                     continue
         return json_data
 
-    def from_json(self, values):  # lint-amnesty, pylint: disable=arguments-differ
+    def from_json(self, values):
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
@@ -569,9 +572,9 @@ def key_checker(expected_keys):
         missing = set(expected_keys) - set(actual_dict.keys())
         if not missing:
             return True
-        if raise_error:  # lint-amnesty, pylint: disable=no-else-raise
+        if raise_error:
             raise InvalidTabsException(
-                f"Expected keys '{expected_keys}' are not present in the given dict: {actual_dict}"
+                "Expected keys '{0}' are not present in the given dict: {1}".format(expected_keys, actual_dict)
             )
         else:
             return False
@@ -617,7 +620,7 @@ def course_reverse_func_from_name_func(reverse_name_func):
     """
     return lambda course, reverse_url_func: reverse_url_func(
         reverse_name_func(course),
-        args=[str(course.id)]
+        args=[text_type(course.id)]
     )
 
 
@@ -632,11 +635,11 @@ class InvalidTabsException(Exception):
     """
     A complaint about invalid tabs.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class UnequalTabsException(Exception):
     """
     A complaint about tab lists being unequal
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

@@ -13,8 +13,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskStatus
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.factories import StaffFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -27,7 +27,7 @@ class CourseImportViewTest(SharedModuleStoreTestCase, APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseImportViewTest, cls).setUpClass()
 
         cls.course = CourseFactory.create(display_name='test course', run="Testing_course")
         cls.course_key = cls.course.id

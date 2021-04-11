@@ -16,13 +16,13 @@ def stripXML(xml):
     return xml
 
 
-class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class FormulaTest(unittest.TestCase):
     # for readability later
     mathml_start = '<math xmlns="http://www.w3.org/1998/Math/MathML"><mstyle displaystyle="true">'
     mathml_end = '</mstyle></math>'
 
     def setUp(self):
-        super(FormulaTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(FormulaTest, self).setUp()
         self.formulaInstance = formula('')
 
     def test_replace_mathvariants(self):
@@ -43,7 +43,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        assert test.decode('utf-8') == expected
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_simple_superscripts(self):
         expr = '''
@@ -67,7 +67,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        assert test.decode('utf-8') == expected
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_complex_superscripts(self):
         expr = '''
@@ -92,7 +92,7 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        assert test.decode('utf-8') == expected
+        self.assertEqual(test.decode('utf-8'), expected)
 
     def test_fix_msubsup(self):
         expr = '''
@@ -114,4 +114,4 @@ class FormulaTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-c
         test = etree.tostring(xml)
 
         # success?
-        assert test.decode('utf-8') == expected
+        self.assertEqual(test.decode('utf-8'), expected)

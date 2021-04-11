@@ -5,11 +5,12 @@ Utilities for contentstore tests
 
 import json
 import textwrap
-from unittest.mock import Mock
 
+import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test.client import Client
+from mock import Mock
 from opaque_keys.edx.keys import AssetKey, CourseKey
 
 from cms.djangoapps.contentstore.utils import reverse_url
@@ -50,7 +51,7 @@ class AjaxEnabledTestClient(Client):
         Convenience method for client post which serializes the data into json and sets the accept type
         to json
         """
-        if not isinstance(data, str):
+        if not isinstance(data, six.string_types):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
         kwargs.setdefault("HTTP_ACCEPT", "application/json")
@@ -83,7 +84,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         afterwards.
         """
 
-        super().setUp()
+        super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -194,7 +195,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         html_module = self.store.get_item(course_id.make_usage_key('html', 'nonportable'))
         new_data = html_module.data = html_module.data.replace(
             '/static/',
-            f'/c4x/{course_id.org}/{course_id.course}/asset/'
+            '/c4x/{0}/{1}/asset/'.format(course_id.org, course_id.course)
         )
         self.store.update_item(html_module, self.user.id)
 
@@ -284,10 +285,10 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course2_items = self.store.get_items(course2_id)
         self.assertGreater(len(course1_items), 0)  # ensure it found content instead of [] == []
         if len(course1_items) != len(course2_items):
-            course1_block_ids = {item.location.block_id for item in course1_items}
-            course2_block_ids = {item.location.block_id for item in course2_items}
+            course1_block_ids = set([item.location.block_id for item in course1_items])
+            course2_block_ids = set([item.location.block_id for item in course2_items])
             raise AssertionError(
-                "Course1 extra blocks: {}; course2 extra blocks: {}".format(
+                u"Course1 extra blocks: {}; course2 extra blocks: {}".format(
                     course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids
                 )
             )
@@ -356,7 +357,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         course1_asset_attrs = content_store.get_attrs(course1_id.make_asset_key(category, filename))
         course2_asset_attrs = content_store.get_attrs(course2_id.make_asset_key(category, filename))
         self.assertEqual(len(course1_asset_attrs), len(course2_asset_attrs))
-        for key, value in course1_asset_attrs.items():
+        for key, value in six.iteritems(course1_asset_attrs):
             if key in ['_id', 'filename', 'uploadDate', 'content_son', 'thumbnail_location']:
                 pass
             else:

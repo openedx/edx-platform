@@ -1,6 +1,10 @@
 """
 Utility methods common to Studio and the LMS.
 """
+
+
+import six
+
 from common.test.acceptance.tests.helpers import disable_animations
 
 
@@ -17,7 +21,7 @@ def click_css(page, css, source_index=0):
         """Is the given element visible?"""
         # Only make the call to size once (instead of once for the height and once for the width)
         # because otherwise you will trigger a extra query on a remote element.
-        return element.is_displayed() and all(size > 0 for size in element.size.values())
+        return element.is_displayed() and all(size > 0 for size in six.itervalues(element.size))
 
     # Disable all animations for faster testing with more reliable synchronization
     disable_animations(page)
@@ -39,4 +43,4 @@ def confirm_prompt(page, cancel=False, require_notification=None):
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     require_notification = (not cancel) if require_notification is None else require_notification
-    click_css(page, confirmation_button_css, require_notification=require_notification)  # lint-amnesty, pylint: disable=unexpected-keyword-arg
+    click_css(page, confirmation_button_css, require_notification=require_notification)

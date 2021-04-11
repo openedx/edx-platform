@@ -22,22 +22,6 @@
                 }
             );
         });
-    % else:
-        // If we do not have an authenticated user, but Segment has a user id,
-        // reset the Segment user state so we start tracking fresh.
-        // This has to be wrapped in the document.readyState logic because the analytics.user()
-        // function isn't available until the analytics.js package has finished initializing.
-        if (document.readyState === 'complete') {
-            if (analytics.user().id()) {
-                analytics.reset();
-            }
-        } else {
-            document.addEventListener('readystatechange', event => {
-                if (event.target.readyState === 'complete' && analytics.user().id()) {
-                    analytics.reset();
-                }
-            });
-        }
     % endif
     </script>
     <!-- end segment footer -->

@@ -14,7 +14,7 @@ class CharListFilter(filters.CharFilter):
         if value not in (None, ''):
             value = value.split(',')
 
-        return super().filter(qs, value)
+        return super(CharListFilter, self).filter(qs, value)
 
 
 class UUIDListFilter(CharListFilter):
@@ -22,7 +22,7 @@ class UUIDListFilter(CharListFilter):
 
     def __init__(self, field_name='uuid', label=None, widget=None, method=None, lookup_expr='in', required=False,
                  distinct=False, exclude=False, **kwargs):
-        super().__init__(
+        super(UUIDListFilter, self).__init__(
             field_name=field_name,
             label=label,
             widget=widget,

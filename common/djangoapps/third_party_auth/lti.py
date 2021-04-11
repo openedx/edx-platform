@@ -7,6 +7,7 @@ import calendar
 import logging
 import time
 
+import six
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from oauthlib.common import Request
 from oauthlib.oauth1.rfc5849.signature import (
@@ -16,6 +17,7 @@ from oauthlib.oauth1.rfc5849.signature import (
     normalize_parameters,
     sign_hmac_sha1
 )
+from six import text_type
 from social_core.backends.base import BaseAuth
 from social_core.exceptions import AuthFailed
 from social_core.utils import sanitize_redirect
@@ -49,7 +51,7 @@ class LTIAuthBackend(BaseAuth):
         # Set a auth_entry here so we don't have to receive that as a custom parameter
         self.strategy.session_setdefault('auth_entry', 'login')
 
-        if not validated_lti_params:  # lint-amnesty, pylint: disable=no-else-raise
+        if not validated_lti_params:
             self.strategy.session_set(LTI_PARAMS_KEY, None)
             raise AuthFailed(self, "LTI parameters could not be validated.")
         else:
@@ -159,7 +161,7 @@ class LTIAuthBackend(BaseAuth):
             parameters_string = normalize_parameters(parameters)
             base_string = construct_base_string(request.http_method, base_uri, parameters_string)
 
-            computed_signature = sign_hmac_sha1(base_string, str(lti_consumer_secret), '')
+            computed_signature = sign_hmac_sha1(base_string, six.text_type(lti_consumer_secret), '')
             submitted_signature = request.oauth_signature
 
             data = {parameter_value_pair[0]: parameter_value_pair[1] for parameter_value_pair in parameters}
@@ -187,7 +189,7 @@ class LTIAuthBackend(BaseAuth):
             if valid:
                 return data
         except AttributeError as error:
-            log.error("'{}' not found.".format(str(error)))
+            log.error(u"'{}' not found.".format(text_type(error)))
         return None
 
     @classmethod

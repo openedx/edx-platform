@@ -36,7 +36,7 @@ class IdentityServer3(BaseOAuth2):
         """
         url = self.get_config().get_setting('user_info_url')
         # The access token returned from the service's token route.
-        header = {"Authorization": "Bearer %s" % access_token}
+        header = {"Authorization": u"Bearer %s" % access_token}
         return self.get_json(url, headers=header)
 
     def get_setting_if_exist(self, name, default):

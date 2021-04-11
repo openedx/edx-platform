@@ -114,7 +114,7 @@ var edx = edx || {};
             }
 
             // render the name of the product being paid for
-            $('div.payment-buttons span.product-name').append( // xss-lint: disable=javascript-jquery-append
+            $('div.payment-buttons span.product-name').append(
                 self._getProductText(templateContext.courseModeSlug, templateContext.upgrade)
             );
 
@@ -128,7 +128,6 @@ var edx = edx || {};
             } else {
                 // create a button for each payment processor
                 _.each(processors.reverse(), function(processorName) {
-                    // xss-lint: disable=javascript-jquery-append
                     $('div.payment-buttons').append(self._getPaymentButtonHtml(processorName));
                 });
             }
@@ -198,7 +197,7 @@ var edx = edx || {};
                     type: 'hidden',
                     name: key,
                     value: value
-                }).appendTo($form); // xss-lint: disable=javascript-jquery-insert-into-target
+                }).appendTo($form);
             });
 
             // Marketing needs a way to tell the difference between users

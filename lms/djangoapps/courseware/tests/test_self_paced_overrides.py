@@ -2,9 +2,9 @@
 
 import datetime
 
-from unittest.mock import patch
 import pytz
 from django.test.utils import override_settings
+from mock import patch
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
@@ -28,7 +28,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def setUp(self):
         self.reset_setting_cache_variables()
-        super().setUp()
+        super(SelfPacedDateOverrideTest, self).setUp()
 
         self.non_staff_user, __ = self.create_non_staff_user()
         self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -36,7 +36,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.reset_setting_cache_variables()
-        super().tearDown()
+        super(SelfPacedDateOverrideTest, self).tearDown()
 
     def reset_setting_cache_variables(self):
         """
@@ -58,7 +58,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         inject_field_overrides((course, section), course, self.user)
         return (course, section)
 
-    def create_discussion_xblocks(self, parent):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def create_discussion_xblocks(self, parent):
         # Create a released discussion xblock
         ItemFactory.create(
             parent=parent,
@@ -77,11 +77,11 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
     def test_instructor_paced_due_date(self):
         __, ip_section = self.setup_course(display_name="Instructor Paced Course", self_paced=False)
-        assert ip_section.due == self.now
+        self.assertEqual(ip_section.due, self.now)
 
     def test_self_paced_due_date(self):
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
-        assert sp_section.due is None
+        self.assertIsNone(sp_section.due)
 
     @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_access_to_beta_users(self):
@@ -100,16 +100,16 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         beta_tester = BetaTesterFactory(course_key=self_paced_course.id)
 
         # Verify course is `self_paced` and course has start date but not section.
-        assert self_paced_course.self_paced
-        assert self_paced_course.start == one_month_from_now
-        assert self_paced_section.start is None
+        self.assertTrue(self_paced_course.self_paced)
+        self.assertEqual(self_paced_course.start, one_month_from_now)
+        self.assertIsNone(self_paced_section.start)
 
         # Verify that non-staff user do not have access to the course
-        assert not has_access(self.non_staff_user, 'load', self_paced_course)
+        self.assertFalse(has_access(self.non_staff_user, 'load', self_paced_course))
 
         # Verify beta tester can access the course as well as the course sections
-        assert has_access(beta_tester, 'load', self_paced_course)
-        assert has_access(beta_tester, 'load', self_paced_section, self_paced_course.id)
+        self.assertTrue(has_access(beta_tester, 'load', self_paced_course))
+        self.assertTrue(has_access(beta_tester, 'load', self_paced_section, self_paced_course.id))
 
     @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_instructor_paced_discussion_xblock_visibility(self):
@@ -122,7 +122,9 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
         # Only the released xblocks should be visible when the course is instructor-paced.
         xblocks = get_accessible_discussion_xblocks(course, self.non_staff_user)
-        assert all((xblock.display_name == 'released') for xblock in xblocks)
+        self.assertTrue(
+            all(xblock.display_name == 'released' for xblock in xblocks)
+        )
 
     @patch.dict('lms.djangoapps.courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_self_paced_discussion_xblock_visibility(self):
@@ -135,5 +137,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
 
         # The scheduled xblocks should be visible when the course is self-paced.
         xblocks = get_accessible_discussion_xblocks(course, self.non_staff_user)
-        assert len(xblocks) == 2
-        assert any((xblock.display_name == 'scheduled') for xblock in xblocks)
+        self.assertEqual(len(xblocks), 2)
+        self.assertTrue(
+            any(xblock.display_name == 'scheduled' for xblock in xblocks)
+        )

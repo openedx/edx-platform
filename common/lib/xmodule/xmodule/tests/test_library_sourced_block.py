@@ -1,13 +1,15 @@
 """
 Tests for Source from Library XBlock
 """
+from xblockutils.resources import ResourceLoader
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from common.djangoapps.student.roles import CourseInstructorRole
+from cms.lib.xblock.runtime import handler_url
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.tests import get_test_system
-from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=unused-import
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
 class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
@@ -28,7 +30,7 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
             user_id=self.user.id,
             modulestore=self.store
         )
-        self.submit_url = f'/xblock/{self.source_block.scope_ids.usage_id}/handler/submit_studio_edits'
+        self.submit_url = '/xblock/{0}/handler/submit_studio_edits'.format(self.source_block.scope_ids.usage_id)
 
     def test_block_views(self):
         # Create a blockstore content library
@@ -45,20 +47,20 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
 
         # Check if student_view renders the children correctly
         res = self.get_block_view(self.source_block, STUDENT_VIEW)
-        assert 'Student Preview Test 1' in res
-        assert 'Student Preview Test 2' in res
+        self.assertIn('Student Preview Test 1', res)
+        self.assertIn('Student Preview Test 2', res)
 
     def test_block_limits(self):
         # Create a blockstore content library
         library = self._create_library(slug="testlib2_preview", title="Test Library 2", description="Testing XBlocks")
         # Add content to the library
-        blocks = [self._add_block_to_library(library["id"], "html", f"block_{i}")["id"] for i in range(11)]
+        blocks = [self._add_block_to_library(library["id"], "html", "block_{0}".format(i))["id"] for i in range(11)]
 
         # Import the html blocks from the library to the course
         post_data = {"values": {"source_block_ids": blocks}, "defaults": ["display_name"]}
         res = self.client.post(self.submit_url, data=post_data, format='json')
-        assert res.status_code == 400
-        assert res.json()['error']['messages'][0]['text'] == 'A maximum of 10 components may be added.'
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['error']['messages'][0]['text'], "A maximum of 10 components may be added.")
 
     def get_block_view(self, block, view, context=None):
         """

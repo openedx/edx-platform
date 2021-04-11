@@ -16,4 +16,4 @@ def get_calendar_event_id(user, block_key, date_type, hostname):
     Returns:
         event id (str)
     """
-    return f'{user.id}.{block_key}.{date_type}@{hostname}'
+    return '{}.{}.{}@{}'.format(user.id, block_key, date_type, hostname)

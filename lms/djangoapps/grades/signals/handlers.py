@@ -6,28 +6,29 @@ Grades related signals.
 from contextlib import contextmanager
 from logging import getLogger
 
+import six
 from django.dispatch import receiver
 from opaque_keys.edx.keys import LearningContextKey
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
+from lms.djangoapps.courseware.model_data import get_score, set_score
+from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
+from openedx.core.lib.grade_utils import is_score_higher_or_equal
 from common.djangoapps.student.models import user_by_anonymous_id
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.date_utils import to_timestamp
-from lms.djangoapps.courseware.model_data import get_score, set_score
-from lms.djangoapps.grades.tasks import (
-    RECALCULATE_GRADE_DELAY_SECONDS,
-    recalculate_course_and_subsection_grades_for_user,
-    recalculate_subsection_grade_v3
-)
-from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
-from openedx.core.lib.grade_utils import is_score_higher_or_equal
 
 from .. import events
 from ..constants import ScoreDatabaseTableEnum
 from ..course_grade_factory import CourseGradeFactory
 from ..scores import weighted_score
+from lms.djangoapps.grades.tasks import (
+    RECALCULATE_GRADE_DELAY_SECONDS,
+    recalculate_course_and_subsection_grades_for_user,
+    recalculate_subsection_grade_v3
+)
 from .signals import (
     PROBLEM_RAW_SCORE_CHANGED,
     PROBLEM_WEIGHTED_SCORE_CHANGED,
@@ -150,8 +151,8 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             if not is_score_higher_or_equal(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
                 update_score = False
                 log.warning(
-                    "Grades: Rescore is not higher than previous: "
-                    "user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
+                    u"Grades: Rescore is not higher than previous: "
+                    u"user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
                         user, block.location, prev_raw_earned, prev_raw_possible, raw_earned, raw_possible,
                     )
                 )
@@ -171,8 +172,8 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             raw_possible=raw_possible,
             weight=getattr(block, 'weight', None),
             user_id=user.id,
-            course_id=str(block.location.course_key),
-            usage_id=str(block.location),
+            course_id=six.text_type(block.location.course_key),
+            usage_id=six.text_type(block.location),
             only_if_higher=only_if_higher,
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
@@ -232,8 +233,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             only_if_higher=kwargs.get('only_if_higher'),
             expected_modified_time=to_timestamp(kwargs['modified']),
             score_deleted=kwargs.get('score_deleted', False),
-            event_transaction_id=str(get_event_transaction_id()),
-            event_transaction_type=str(get_event_transaction_type()),
+            event_transaction_id=six.text_type(get_event_transaction_id()),
+            event_transaction_type=six.text_type(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
             force_update_subsections=kwargs.get('force_update_subsections', False),
         ),
@@ -261,6 +262,6 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, countdown
         countdown=countdown,
         kwargs=dict(
             user_id=user.id,
-            course_key=str(course_key)
+            course_key=six.text_type(course_key)
         )
     )

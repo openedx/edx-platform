@@ -7,7 +7,7 @@ import logging
 
 from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise  # lint-amnesty, pylint: disable=unused-import
+from bok_choy.promise import EmptyPromise, Promise
 
 log = logging.getLogger('VideoPage')
 
@@ -31,7 +31,7 @@ CSS_CLASS_NAMES = {
     'captions_rendered': '.video.is-captions-rendered',
     'captions': '.subtitles',
     'captions_text': '.subtitles li span',
-    'captions_text_getter': '.subtitles li span[role="link"][data-index="{}"]',
+    'captions_text_getter': u'.subtitles li span[role="link"][data-index="{}"]',
     'closed_captions': '.closed-captions',
     'error_message': '.video .video-player .video-error',
     'video_container': '.video',
@@ -76,7 +76,7 @@ class VideoPage(PageObject):
 
     @wait_for_js
     def is_browser_on_page(self):
-        return self.q(css='div{}'.format(CSS_CLASS_NAMES['video_xmodule'])).present
+        return self.q(css='div{0}'.format(CSS_CLASS_NAMES['video_xmodule'])).present
 
     @wait_for_js
     def wait_for_video_class(self):
@@ -86,7 +86,7 @@ class VideoPage(PageObject):
         """
         self.wait_for_ajax()
 
-        video_selector = '{}'.format(CSS_CLASS_NAMES['video_container'])
+        video_selector = '{0}'.format(CSS_CLASS_NAMES['video_container'])
         self.wait_for_element_presence(video_selector, 'Video is initialized')
 
     @wait_for_js
@@ -106,7 +106,7 @@ class VideoPage(PageObject):
             video_player_buttons.append('play')
 
         for button in video_player_buttons:
-            self.wait_for_element_visibility(VIDEO_BUTTONS[button], f'{button} button is visible')
+            self.wait_for_element_visibility(VIDEO_BUTTONS[button], u'{} button is visible'.format(button))
 
         def _is_finished_loading():
             """
@@ -136,7 +136,7 @@ class VideoPage(PageObject):
         if video_display_name:
             video_display_names = self.q(css=CSS_CLASS_NAMES['video_display_name']).text
             if video_display_name not in video_display_names:
-                raise ValueError(f"Incorrect Video Display Name: '{video_display_name}'")
+                raise ValueError(u"Incorrect Video Display Name: '{0}'".format(video_display_name))
             return '.vert.vert-{}'.format(video_display_names.index(video_display_name))
         else:
             return '.vert.vert-0'
@@ -154,7 +154,7 @@ class VideoPage(PageObject):
 
         """
         if vertical:
-            return '{vertical} {video_element}'.format(
+            return u'{vertical} {video_element}'.format(
                 vertical=self.get_video_vertical_selector(self.current_video_display_name),
                 video_element=class_name)
         else:
@@ -220,8 +220,8 @@ class VideoPage(PageObject):
 
         # toggle captions visibility state if needed
         if self.is_captions_visible() != captions_new_state:
-            self.click_player_button('transcript_button')  # lint-amnesty, pylint: disable=no-member
+            self.click_player_button('transcript_button')
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
-                         f"Transcripts are {state}").fulfill()
+                         u"Transcripts are {state}".format(state=state)).fulfill()

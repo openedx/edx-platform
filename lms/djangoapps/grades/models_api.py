@@ -35,7 +35,7 @@ def clear_prefetched_course_and_subsection_grades(course_key):
     _PersistentCourseGrade.clear_prefetched_data(course_key)
 
 
-def get_recently_modified_grades(course_keys, start_date, end_date, users=None):
+def get_recently_modified_grades(course_keys, start_date, end_date, user=None):
     """
     Returns a QuerySet of PersistentCourseGrade objects filtered by the input
     parameters and ordered by modified date.
@@ -47,8 +47,8 @@ def get_recently_modified_grades(course_keys, start_date, end_date, users=None):
         grade_filter_args['modified__gte'] = start_date
     if end_date:
         grade_filter_args['modified__lte'] = end_date
-    if users:
-        grade_filter_args['user_id__in'] = [u.id for u in users]
+    if user:
+        grade_filter_args['user_id'] = user.id
 
     return _PersistentCourseGrade.objects.filter(**grade_filter_args).order_by('modified')
 

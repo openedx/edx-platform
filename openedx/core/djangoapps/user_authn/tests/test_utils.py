@@ -2,7 +2,7 @@
 
 
 from collections import namedtuple
-import pytest
+
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -20,7 +20,7 @@ class TestRedirectUtils(TestCase):
     """Test redirect utility methods."""
 
     def setUp(self):
-        super(TestRedirectUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestRedirectUtils, self).setUp()
         self.request = RequestFactory()
 
     RedirectCase = namedtuple('RedirectCase', ['url', 'host', 'req_is_secure', 'expected_is_safe'])
@@ -54,7 +54,7 @@ class TestRedirectUtils(TestCase):
         req = self.request.get('/login', HTTP_HOST=host)
         req.is_secure = lambda: req_is_secure
         actual_is_safe = self._is_safe_redirect(req, url)
-        assert actual_is_safe == expected_is_safe
+        self.assertEqual(actual_is_safe, expected_is_safe)
 
     @ddt.data(
         ('https://test.com/test', 'https://test.com/test', 'edx.org', True),
@@ -70,7 +70,7 @@ class TestRedirectUtils(TestCase):
         }
         req = self.request.get('/logout?{}'.format(urlencode(params)), HTTP_HOST=host)
         actual_is_safe = self._is_safe_redirect(req, redirect_url)
-        assert actual_is_safe == expected_is_safe
+        self.assertEqual(actual_is_safe, expected_is_safe)
 
 
 class GeneratePasswordTest(TestCase):
@@ -78,22 +78,22 @@ class GeneratePasswordTest(TestCase):
 
     def test_default_args(self):
         password = generate_password()
-        assert 12 == len(password)
-        assert any((c.isdigit for c in password))
-        assert any((c.isalpha for c in password))
+        self.assertEqual(12, len(password))
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
 
     def test_length(self):
         length = 25
-        assert length == len(generate_password(length=length))
+        self.assertEqual(length, len(generate_password(length=length)))
 
     def test_chars(self):
         char = '!'
         password = generate_password(length=12, chars=(char,))
 
-        assert any((c.isdigit for c in password))
-        assert any((c.isalpha for c in password))
-        assert (char * 10) == password[2:]
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
+        self.assertEqual(char * 10, password[2:])
 
     def test_min_length(self):
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             generate_password(length=7)

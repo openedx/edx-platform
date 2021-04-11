@@ -9,6 +9,7 @@ from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils import translation
 from django.utils.translation.trans_real import get_supported_language_variant
@@ -17,12 +18,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 import lms.djangoapps.branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
-from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
 from common.djangoapps.student import views as student_views
-from common.djangoapps.util.cache import cache_if_anonymous
-from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from common.djangoapps.util.cache import cache_if_anonymous
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -70,11 +71,11 @@ def index(request):
         return student_views.index(request, user=request.user)
     except NoReverseMatch:
         log.error(
-            f'https is not a registered namespace Request from {domain}',
-            f'request_site= {request.site.__dict__}',
-            f'enable_mktg_site= {enable_mktg_site}',
-            f'Auth Status= {request.user.is_authenticated}',
-            f'Request Meta= {request.META}'
+            'https is not a registered namespace Request from {}'.format(domain),
+            'request_site= {}'.format(request.site.__dict__),
+            'enable_mktg_site= {}'.format(enable_mktg_site),
+            'Auth Status= {}'.format(request.user.is_authenticated),
+            'Request Meta= {}'.format(request.META)
         )
         raise
 
@@ -285,7 +286,7 @@ def footer(request):
         }
         if include_language_selector:
             cache_params['language_selector_options'] = ','.join(sorted([lang.code for lang in released_languages()]))
-        cache_key = "branding.footer.{params}.html".format(params=six.moves.urllib.parse.urlencode(cache_params))
+        cache_key = u"branding.footer.{params}.html".format(params=six.moves.urllib.parse.urlencode(cache_params))
 
         content = cache.get(cache_key)
         if content is None:
@@ -297,7 +298,7 @@ def footer(request):
         return HttpResponse(content, status=200, content_type="text/html; charset=utf-8")
 
     elif 'application/json' in accepts:
-        cache_key = "branding.footer.{params}.json".format(
+        cache_key = u"branding.footer.{params}.json".format(
             params=six.moves.urllib.parse.urlencode({
                 'language': language,
                 'is_secure': request.is_secure(),
@@ -308,7 +309,7 @@ def footer(request):
             with translation.override(language):
                 footer_dict = branding_api.get_footer(is_secure=request.is_secure())
                 cache.set(cache_key, footer_dict, settings.FOOTER_CACHE_TIMEOUT)
-        return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")  # lint-amnesty, pylint: disable=redundant-content-type-for-json-response
+        return JsonResponse(footer_dict, 200, content_type="application/json; charset=utf-8")
 
     else:
         return HttpResponse(status=406)

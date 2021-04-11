@@ -1,7 +1,7 @@
 """Tests for the CORS CSRF version of Django Rest Framework's SessionAuthentication."""
 
 
-from unittest.mock import patch
+from mock import patch
 
 from django.middleware.csrf import get_token
 from django.test import TestCase
@@ -15,7 +15,7 @@ from ..authentication import SessionAuthenticationCrossDomainCsrf
 
 
 # A class to pass into django.middleware.csrf.get_token() so we can easily get a valid CSRF token to use.
-class FakeRequest:
+class FakeRequest(object):
     META = {}
 
 
@@ -26,7 +26,7 @@ class CrossDomainAuthTest(TestCase):
     REFERER = "https://www.edx.org"
 
     def setUp(self):
-        super().setUp()
+        super(CrossDomainAuthTest, self).setUp()
         self.auth = SessionAuthenticationCrossDomainCsrf()
         self.csrf_token = get_token(FakeRequest())
 
@@ -47,8 +47,8 @@ class CrossDomainAuthTest(TestCase):
     def test_skip_csrf_referer_check(self):
         request = self._fake_request()
         result = self.auth.enforce_csrf(request)
-        assert result is None
-        assert request.is_secure()
+        self.assertIs(result, None)
+        self.assertTrue(request.is_secure())
 
     def _fake_request(self):
         """Construct a fake request with a referer and CSRF token over a secure connection. """

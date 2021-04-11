@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from datetime import timedelta
 
 import django.db.models.deletion

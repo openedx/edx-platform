@@ -13,7 +13,7 @@ from pavelib.prereqs import compute_fingerprint
 from pavelib.utils.envs import Env
 
 CACHE_FOLDER = 'common/test/db_cache'
-FINGERPRINT_FILEPATH = f'{Env.REPO_ROOT}/{CACHE_FOLDER}/bok_choy_migrations.sha1'
+FINGERPRINT_FILEPATH = '{}/{}/bok_choy_migrations.sha1'.format(Env.REPO_ROOT, CACHE_FOLDER)
 
 
 def remove_files_from_folder(files, folder):
@@ -25,9 +25,9 @@ def remove_files_from_folder(files, folder):
         file_with_path = os.path.join(folder, file_name)
         try:
             os.remove(file_with_path)
-            print(f'\tRemoved {file_with_path}')
+            print('\tRemoved {}'.format(file_with_path))
         except OSError:
-            print(f'\tCould not remove {file_with_path}. Continuing.')
+            print('\tCould not remove {}. Continuing.'.format(file_with_path))
             continue
 
 
@@ -39,11 +39,11 @@ def reset_test_db(db_cache_files, update_cache_files=True, use_existing_db=False
     exist), load in the db cache files files if they exist on disk,
     and optionally apply migrations and write up-to-date cache files.
     """
-    cmd = f'{Env.REPO_ROOT}/scripts/reset-test-db.sh'
+    cmd = '{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT)
     if update_cache_files:
-        cmd = f'{cmd} --rebuild_cache'
+        cmd = '{} --rebuild_cache'.format(cmd)
     if use_existing_db:
-        cmd = f'{cmd} --use-existing-db'
+        cmd = '{} --use-existing-db'.format(cmd)
     sh(cmd)
     verify_files_exist(db_cache_files)
 
@@ -78,7 +78,7 @@ def fingerprint_bokchoy_db_files(migration_output_files, all_db_files):
     msg = "Computing the fingerprint."
     print(msg)
     fingerprint = compute_fingerprint(file_paths)
-    print(f"The fingerprint for bokchoy db files is: {fingerprint}")
+    print("The fingerprint for bokchoy db files is: {}".format(fingerprint))
     return fingerprint
 
 
@@ -101,7 +101,7 @@ def verify_files_exist(files):
     for file_name in files:
         file_path = os.path.join(CACHE_FOLDER, file_name)
         if not os.path.isfile(file_path):
-            msg = f"Did not find expected file: {file_path}"
+            msg = "Did not find expected file: {}".format(file_path)
             raise BuildFailure(msg)
 
 
@@ -113,7 +113,7 @@ def calculate_bokchoy_migrations(migration_output_files):
     NOTE: the script first clears out the database, then calculates
           what migrations need to be run, which is all of them.
     """
-    sh(f'{Env.REPO_ROOT}/scripts/reset-test-db.sh --calculate_migrations')
+    sh('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT))
     verify_files_exist(migration_output_files)
 
 
@@ -132,12 +132,12 @@ def is_fingerprint_in_bucket(fingerprint, bucket_name):
     If there is any issue reaching the bucket, show the exception but continue by
     returning False
     """
-    zipfile_name = f'{fingerprint}.tar.gz'
+    zipfile_name = '{}.tar.gz'.format(fingerprint)
     try:
         conn = boto.connect_s3(anon=True)
         bucket = conn.get_bucket(bucket_name)
     except Exception as e:  # pylint: disable=broad-except
-        print(f"Exception caught trying to reach S3 bucket {bucket_name}: {e}")
+        print("Exception caught trying to reach S3 bucket {}: {}".format(bucket_name, e))
         return False
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
     return key.exists()
@@ -159,7 +159,7 @@ def get_file_from_s3(bucket_name, zipfile_name, path):
     """
     Get the file from s3 and save it to disk.
     """
-    print(f"Retrieving {zipfile_name} from bucket {bucket_name}.")
+    print("Retrieving {} from bucket {}.".format(zipfile_name, bucket_name))
     conn = boto.connect_s3(anon=True)
     bucket = conn.get_bucket(bucket_name)
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
@@ -191,7 +191,7 @@ def refresh_bokchoy_db_cache_from_s3(fingerprint, bucket_name, bokchoy_db_files)
     """
     path = CACHE_FOLDER
     if is_fingerprint_in_bucket(fingerprint, bucket_name):
-        zipfile_name = f'{fingerprint}.tar.gz'
+        zipfile_name = '{}.tar.gz'.format(fingerprint)
         get_file_from_s3(bucket_name, zipfile_name, path)
         zipfile_path = os.path.join(path, zipfile_name)
         print("Extracting db cache files.")
@@ -203,7 +203,7 @@ def create_tarfile_from_db_cache(fingerprint, files, path):
     """
     Create a tar.gz file with the current bokchoy DB cache files.
     """
-    zipfile_name = f'{fingerprint}.tar.gz'
+    zipfile_name = '{}.tar.gz'.format(fingerprint)
     zipfile_path = os.path.join(path, zipfile_name)
     with tarfile.open(name=zipfile_path, mode='w:gz') as tar_file:
         for name in files:
@@ -215,7 +215,7 @@ def upload_to_s3(file_name, file_path, bucket_name, replace=False):
     """
     Upload the specified files to an s3 bucket.
     """
-    print(f"Uploading {file_name} to s3 bucket {bucket_name}")
+    print("Uploading {} to s3 bucket {}".format(file_name, bucket_name))
     try:
         conn = boto.connect_s3()
     except boto.exception.NoAuthHandlerFound:
@@ -231,9 +231,9 @@ def upload_to_s3(file_name, file_path, bucket_name, replace=False):
     key = boto.s3.key.Key(bucket=bucket, name=file_name)
     bytes_written = key.set_contents_from_filename(file_path, replace=replace, policy='public-read')
     if bytes_written:
-        msg = f"Wrote {bytes_written} bytes to {key.name}."
+        msg = "Wrote {} bytes to {}.".format(bytes_written, key.name)
     else:
-        msg = f"File {key.name} already existed in bucket {bucket_name}."
+        msg = "File {} already existed in bucket {}.".format(key.name, bucket_name)
     print(msg)
 
 

@@ -169,7 +169,7 @@ class ProctoredExamSettingsView(APIView):
 
         if not course_module:
             raise NotFound(
-                f'Course with course_id {course_id} does not exist.'
+                'Course with course_id {} does not exist.'.format(course_id)
             )
 
         return course_module

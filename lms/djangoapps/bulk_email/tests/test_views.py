@@ -1,21 +1,23 @@
+# -*- coding: utf-8 -*-
 """
 Test the bulk email opt out view.
 """
 
 import ddt
-import pytest
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.views import opt_out_email_updates
+from six import text_type
+
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
 from openedx.core.lib.tests import attr
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @attr(shard=1)
@@ -26,15 +28,15 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
     Check the opt out email functionality.
     """
     def setUp(self):
-        super().setUp()
+        super(OptOutEmailUpdatesViewTest, self).setUp()
         self.user = UserFactory.create(username="testuser1", email='test@example.com')
         self.course = CourseFactory.create(run='testcourse1', display_name='Test Course Title')
         self.token = UsernameCipher.encrypt('testuser1')
         self.request_factory = RequestFactory()
-        self.url = reverse('bulk_email_opt_out', args=[self.token, str(self.course.id)])
+        self.url = reverse('bulk_email_opt_out', args=[self.token, text_type(self.course.id)])
 
         # Ensure we start with no opt-out records
-        assert Optout.objects.count() == 0
+        self.assertEqual(Optout.objects.count(), 0)
 
     def test_opt_out_email_confirm(self):
         """
@@ -42,7 +44,7 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
         """
         response = self.client.get(self.url)
         self.assertContains(response, "confirm unsubscribe from")
-        assert Optout.objects.count() == 0
+        self.assertEqual(Optout.objects.count(), 0)
 
     def test_opt_out_email_unsubscribe(self):
         """
@@ -50,7 +52,7 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
         """
         response = self.client.post(self.url, {'unsubscribe': True})
         self.assertContains(response, "You have successfully unsubscribed from")
-        assert Optout.objects.count() == 1
+        self.assertEqual(Optout.objects.count(), 1)
 
     def test_opt_out_email_cancel(self):
         """
@@ -58,7 +60,7 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
         """
         response = self.client.post(self.url)
         self.assertContains(response, "You have not been unsubscribed from")
-        assert Optout.objects.count() == 0
+        self.assertEqual(Optout.objects.count(), 0)
 
     @ddt.data(
         ("ZOMG INVALID BASE64 CHARS!!!", "base64url", False),
@@ -76,6 +78,6 @@ class OptOutEmailUpdatesViewTest(ModuleStoreTestCase):
         Make sure that view returns 404 in case token is not valid
         """
         request = self.request_factory.get("dummy")
-        with pytest.raises(Http404) as err:
+        with self.assertRaises(Http404) as err:
             opt_out_email_updates(request, token, course)
-            assert message in err
+            self.assertIn(message, err)

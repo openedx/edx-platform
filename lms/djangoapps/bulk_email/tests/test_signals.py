@@ -4,27 +4,28 @@ Unit tests for student optouts from course email
 
 
 import json
-from unittest.mock import Mock, patch
 
 from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
+from mock import Mock, patch
+from six import text_type
 
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from lms.djangoapps.bulk_email.signals import force_optout_all
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
     Tests that the force_optout_all signal receiver opts the user out of course emails
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestOptoutCourseEmailsBySignal, self).setUp()
         self.course = CourseFactory.create(run='testcourse1', display_name="Test Course Title")
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
@@ -35,9 +36,9 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         self.success_content = {
-            'course_id': str(self.course.id),
+            'course_id': text_type(self.course.id),
             'success': True,
         }
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
@@ -47,14 +48,14 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         Make sure the correct row is created for a user enrolled in a course
         """
         force_optout_all(sender=self.__class__, user=self.student)
-        assert Optout.objects.filter(user=self.student, course_id=self.course.id).count() == 1
+        self.assertEqual(Optout.objects.filter(user=self.student, course_id=self.course.id).count(), 1)
 
     def send_test_email(self):
         """
         Navigate to the instructor dash's email view to send bulk email
         """
         # Pull up email view on instructor dashboard
-        url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.get(url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
 
@@ -68,7 +69,7 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
             'message': 'test message for all'
         }
         response = self.client.post(self.send_mail_url, test_email)
-        assert json.loads(response.content.decode('utf-8')) == self.success_content
+        self.assertEqual(json.loads(response.content.decode('utf-8')), self.success_content)
 
     def test_optout_course(self):
         """
@@ -82,6 +83,6 @@ class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
         self.send_test_email()
 
         # Assert that self.student.email not in mail.to, outbox should only contain "myself" target
-        assert len(mail.outbox) == 1
-        assert len(mail.outbox[0].to) == 1
-        assert mail.outbox[0].to[0] == self.instructor.email
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox[0].to), 1)
+        self.assertEqual(mail.outbox[0].to[0], self.instructor.email)

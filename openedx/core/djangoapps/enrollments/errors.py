@@ -8,7 +8,7 @@ class CourseEnrollmentError(Exception):
 
     """
     def __init__(self, msg, data=None):
-        super().__init__(msg)
+        super(CourseEnrollmentError, self).__init__(msg)
         # Corresponding information to help resolve the error.
         self.data = data
 
@@ -25,29 +25,29 @@ class CourseEnrollmentFullError(CourseEnrollmentError):
     pass
 
 
-class CourseEnrollmentExistsError(CourseEnrollmentError):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CourseEnrollmentExistsError(CourseEnrollmentError):
     enrollment = None
 
     def __init__(self, message, enrollment):
-        super().__init__(message)
+        super(CourseEnrollmentExistsError, self).__init__(message)
         self.enrollment = enrollment
 
 
 class CourseModeNotFoundError(CourseEnrollmentError):
     """The requested course mode could not be found."""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class EnrollmentNotFoundError(CourseEnrollmentError):
     """The requested enrollment could not be found."""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class EnrollmentApiLoadError(CourseEnrollmentError):
     """The data API could not be loaded."""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class InvalidEnrollmentAttribute(CourseEnrollmentError):
     """Enrollment Attributes could not be validated"""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

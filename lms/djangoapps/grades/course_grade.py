@@ -6,6 +6,7 @@ CourseGrade Class
 from abc import abstractmethod
 from collections import OrderedDict, defaultdict
 
+import six
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
@@ -21,7 +22,7 @@ from .subsection_grade_factory import SubsectionGradeFactory
 
 
 @python_2_unicode_compatible
-class CourseGradeBase:
+class CourseGradeBase(object):
     """
     Base class for Course Grades.
     """
@@ -37,8 +38,8 @@ class CourseGradeBase:
         self.force_update_subsections = force_update_subsections
 
     def __str__(self):
-        return 'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
-            str(self.percent),
+        return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
+            six.text_type(self.percent),
             self.letter_grade,
             self.passed,
         )
@@ -69,7 +70,7 @@ class CourseGradeBase:
         a dict keyed by subsection format types.
         """
         subsections_by_format = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.values():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
@@ -98,7 +99,7 @@ class CourseGradeBase:
         keyed by subsection location.
         """
         subsection_grades = defaultdict(OrderedDict)
-        for chapter in self.chapter_grades.values():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 subsection_grades[subsection_grade.location] = subsection_grade
         return subsection_grades
@@ -109,7 +110,7 @@ class CourseGradeBase:
         Returns a dict of problem scores keyed by their locations.
         """
         problem_scores = {}
-        for chapter in self.chapter_grades.values():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 problem_scores.update(subsection_grade.problem_scores)
         return problem_scores
@@ -248,7 +249,7 @@ class CourseGrade(CourseGradeBase):
     Course Grade class when grades are updated or read from storage.
     """
     def __init__(self, user, course_data, *args, **kwargs):
-        super().__init__(user, course_data, *args, **kwargs)
+        super(CourseGrade, self).__init__(user, course_data, *args, **kwargs)
         self._subsection_grade_factory = SubsectionGradeFactory(user, course_data=course_data)
 
     def update(self):
@@ -269,7 +270,7 @@ class CourseGrade(CourseGradeBase):
         return self
 
     @lazy
-    def attempted(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    def attempted(self):
         """
         Returns whether any of the subsections in this course
         have been attempted by the student.
@@ -277,7 +278,7 @@ class CourseGrade(CourseGradeBase):
         if assume_zero_if_absent(self.course_data.course_key):
             return True
 
-        for chapter in self.chapter_grades.values():
+        for chapter in six.itervalues(self.chapter_grades):
             for subsection_grade in chapter['sections']:
                 if subsection_grade.all_total.first_attempted:
                     return True

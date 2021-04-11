@@ -6,6 +6,7 @@ The following are currently implemented:
     2. LoginWithAccessTokenView:
        1st party (open-edx) OAuth 2.0 access token -> session cookie
 """
+
 import django.contrib.auth as auth
 import social_django.utils as social_utils
 from django.conf import settings
@@ -30,31 +31,30 @@ class AccessTokenExchangeBase(APIView):
     """
     View for token exchange from 3rd party OAuth access token to 1st party
     OAuth access token.
-
-    Note: This base class was originally created to support multiple libraries,
-        but we currently only support django-oauth-toolkit (DOT).
     """
-    # No CSRF protection is required because the provided 3rd party OAuth access
-    #  token is sufficient
-    authentication_classes = []
-    allowed_methods = ['POST']
-
+    @method_decorator(csrf_exempt)
     @method_decorator(social_utils.psa("social:complete"))
     def dispatch(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        return super().dispatch(*args, **kwargs)
+        return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
+
+    def get(self, request, _backend):
+        """
+        Pass through GET requests without the _backend
+        """
+        return super(AccessTokenExchangeBase, self).get(request)
 
     def post(self, request, _backend):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # lint-amnesty, pylint: disable=no-member
+        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
-            error_response = self.error_response(form.errors)  # pylint: disable=no-member
-            return error_response
+            return self.error_response(form.errors)
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
         client = form.cleaned_data["client"]
+
         return self.exchange_access_token(request, user, scope, client)
 
     def exchange_access_token(self, request, user, scope, client):
@@ -62,14 +62,9 @@ class AccessTokenExchangeBase(APIView):
         Exchange third party credentials for an edx access token, and return a
         serialized access token response.
         """
-        edx_access_token = self.create_access_token(request, user, scope, client)
-        return self.access_token_response(edx_access_token)  # lint-amnesty, pylint: disable=no-member
 
-    def _get_invalid_request_response(self, description):
-        return Response(status=400, data={
-            'error': 'invalid_request',
-            'error_description': description,
-        })
+        edx_access_token = self.create_access_token(request, user, scope, client)
+        return self.access_token_response(edx_access_token)
 
 
 class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
@@ -80,6 +75,12 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
     """
 
     oauth2_adapter = adapters.DOTAdapter()
+
+    def get(self, request, _backend):
+        return Response(status=400, data={
+            'error': 'invalid_request',
+            'error_description': 'Only POST requests allowed.',
+        })
 
     def create_access_token(self, request, user, scopes, client):
         """
@@ -146,8 +147,8 @@ class LoginWithAccessTokenView(APIView):
 
         if not self._is_grant_password(request.auth):
             raise AuthenticationFailed({
-                'error_code': 'non_supported_token',
-                'developer_message': 'Only support DOT type access token with grant type password. '
+                u'error_code': u'non_supported_token',
+                u'developer_message': u'Only support DOT type access token with grant type password. '
             })
 
         login(request, request.user)  # login generates and stores the user's cookies in the session

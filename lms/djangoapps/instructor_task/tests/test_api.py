@@ -2,16 +2,16 @@
 Test for LMS instructor background task queue management
 """
 
-from unittest.mock import MagicMock, Mock, patch
 
-import pytest
 import ddt
 from celery.states import FAILURE
+from mock import MagicMock, Mock, patch
+from six.moves import range
 
-from common.test.utils import normalize_repr
 from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
+from common.test.utils import normalize_repr
 from lms.djangoapps.courseware.tests.factories import UserFactory
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
     generate_certificates_for_students,
@@ -33,13 +33,11 @@ from lms.djangoapps.instructor_task.api import (
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
-    submit_reset_problem_attempts_in_entrance_exam,
-    generate_anonymous_ids
+    submit_reset_problem_attempts_in_entrance_exam
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files, \
-    generate_anonymous_ids_for_course
+from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -62,7 +60,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
         task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_KEY)]
-        assert set(task_ids) == set(progress_task_ids)
+        self.assertEqual(set(task_ids), set(progress_task_ids))
 
     def test_get_instructor_task_history(self):
         # when fetching historical tasks, we get all tasks, including running tasks
@@ -73,7 +71,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
             expected_ids.append(self._create_progress_entry().task_id)
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(TEST_COURSE_KEY, usage_key=self.problem_url)]
-        assert set(task_ids) == set(expected_ids)
+        self.assertEqual(set(task_ids), set(expected_ids))
         # make the same call using explicit task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -81,7 +79,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='rescore_problem'
                     )]
-        assert set(task_ids) == set(expected_ids)
+        self.assertEqual(set(task_ids), set(expected_ids))
         # make the same call using a non-existent task_type:
         task_ids = [instructor_task.task_id for instructor_task
                     in get_instructor_task_history(
@@ -89,7 +87,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
                         usage_key=self.problem_url,
                         task_type='dummy_type'
                     )]
-        assert set(task_ids) == set()
+        self.assertEqual(set(task_ids), set())
 
 
 @ddt.ddt
@@ -97,7 +95,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
     def setUp(self):
-        super().setUp()
+        super(InstructorTaskModuleSubmitTest, self).setUp()
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
@@ -107,13 +105,13 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         # confirm that a rescore of a non-existent module returns an exception
         problem_url = InstructorTaskModuleTestCase.problem_location("NonexistentProblem")
         request = None
-        with pytest.raises(ItemNotFoundError):
+        with self.assertRaises(ItemNotFoundError):
             submit_rescore_problem_for_student(request, problem_url, self.student)
-        with pytest.raises(ItemNotFoundError):
+        with self.assertRaises(ItemNotFoundError):
             submit_rescore_problem_for_all_students(request, problem_url)
-        with pytest.raises(ItemNotFoundError):
+        with self.assertRaises(ItemNotFoundError):
             submit_reset_problem_attempts_for_all_students(request, problem_url)
-        with pytest.raises(ItemNotFoundError):
+        with self.assertRaises(ItemNotFoundError):
             submit_delete_problem_state_for_all_students(request, problem_url)
 
     def test_submit_nonrescorable_modules(self):
@@ -122,9 +120,9 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         # where we are creating real modules.)
         problem_url = self.problem_section.location
         request = None
-        with pytest.raises(NotImplementedError):
+        with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_student(request, problem_url, self.student)
-        with pytest.raises(NotImplementedError):
+        with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, problem_url)
 
     @ddt.data(
@@ -172,31 +170,31 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             error = Exception()
             apply_async.side_effect = error
 
-            with pytest.raises(QueueConnectionError):
+            with self.assertRaises(QueueConnectionError):
                 instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
 
             most_recent_task = InstructorTask.objects.latest('id')
-            assert most_recent_task.task_state == FAILURE
+            self.assertEqual(most_recent_task.task_state, FAILURE)
 
         # successful submission
         instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
-        assert instructor_task.task_type == expected_task_type
+        self.assertEqual(instructor_task.task_type, expected_task_type)
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         instructor_task.task_state = PROGRESS
         instructor_task.save()
 
-        with pytest.raises(AlreadyRunningError):
+        with self.assertRaises(AlreadyRunningError):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
-        super().setUp()
+        super(InstructorTaskCourseSubmitTest, self).setUp()
 
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
@@ -225,7 +223,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         instructor_task.task_state = PROGRESS
         instructor_task.save()
-        with pytest.raises(AlreadyRunningError):
+        with self.assertRaises(AlreadyRunningError):
             api_call()
 
     def test_submit_bulk_email_all(self):
@@ -271,7 +269,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         api_call = lambda: submit_cohort_students(
             self.create_task_request(self.instructor),
             self.course.id,
-            file_name='filename.csv'
+            file_name=u'filename.csv'
         )
         self._test_resubmission(api_call)
 
@@ -330,7 +328,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         """
         Raises ValueError when student_set is 'specific_student' and 'specific_student_id' is None.
         """
-        with pytest.raises(SpecificStudentIdMissingError):
+        with self.assertRaises(SpecificStudentIdMissingError):
             generate_certificates_for_students(
                 self.create_task_request(self.instructor),
                 self.course.id,
@@ -354,7 +352,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
 
         # Validate that record was added to CertificateGenerationHistory
-        assert certificate_generation_history.exists()
+        self.assertTrue(certificate_generation_history.exists())
 
         instructor_task = regenerate_certificates(
             self.create_task_request(self.instructor),
@@ -369,20 +367,4 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         )
 
         # Validate that record was added to CertificateGenerationHistory
-        assert certificate_generation_history.exists()
-
-    def test_submit_anonymized_id_report_generation(self):
-        request = self.create_task_request(self.instructor)
-
-        with patch('lms.djangoapps.instructor_task.api.submit_task') as mock_submit_task:
-            mock_submit_task.return_value = MagicMock()
-            generate_anonymous_ids(request, self.course.id)
-
-            mock_submit_task.assert_called_once_with(
-                request,
-                'generate_anonymous_ids_for_course',
-                generate_anonymous_ids_for_course,
-                self.course.id,
-                {},
-                ''
-            )
+        self.assertTrue(certificate_generation_history.exists())

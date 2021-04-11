@@ -44,7 +44,7 @@ def require_params(method, *required_keys):
             elif method == "POST":
                 params = self.post_dict
             else:
-                raise ValueError(f"Unsupported method '{method}'")
+                raise ValueError("Unsupported method '{method}'".format(method=method))
 
             # Check for required values
             missing = []
@@ -63,7 +63,7 @@ def require_params(method, *required_keys):
     return decorator
 
 
-class StubHttpRequestHandler(BaseHTTPRequestHandler):
+class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
     """
     Handler for the stub HTTP service.
     """
@@ -117,7 +117,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
                 for key, list_val in post_dict.items()
             }
 
-        except:  # lint-amnesty, pylint: disable=bare-except
+        except:
             return dict()
 
     @lazy
@@ -157,15 +157,15 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
         if self.path == "/set_config" or self.path == "/set_config/":
 
             if len(self.post_dict) > 0:
-                for key, value in self.post_dict.items():
+                for key, value in six.iteritems(self.post_dict):
 
-                    self.log_message(f"Set config '{key}' to '{value}'")
+                    self.log_message(u"Set config '{0}' to '{1}'".format(key, value))
 
                     try:
                         value = json.loads(value)
 
                     except ValueError:
-                        self.log_message(f"Could not parse JSON: {value}")
+                        self.log_message(u"Could not parse JSON: {0}".format(value))
                         self.send_response(400)
 
                     else:
@@ -185,7 +185,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
         `content` (str) and `headers` (dict).
         """
         self.log_message(
-            f"Sent HTTP response: {status_code} with content '{content}' and headers {headers}"
+            "Sent HTTP response: {0} with content '{1}' and headers {2}".format(status_code, content, headers)
         )
 
         if headers is None:
@@ -202,7 +202,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
         if content is not None:
-            if not six.PY2 and isinstance(content, str):
+            if not six.PY2 and isinstance(content, six.text_type):
                 content = content.encode('utf-8')
             self.wfile.write(content)
 
@@ -221,7 +221,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
         """
         if not args:
             format_str = six.moves.urllib.parse.unquote(format_str)
-        return "{} - - [{}] {}\n".format(
+        return u"{0} - - [{1}] {2}\n".format(
             self.client_address[0],
             self.log_date_time_string(),
             format_str % args
@@ -234,7 +234,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
 
 
-class StubHttpService(ThreadingMixIn, HTTPServer):
+class StubHttpService(ThreadingMixIn, HTTPServer, object):
     """
     Stub HTTP service implementation.
     """
@@ -260,7 +260,7 @@ class StubHttpService(ThreadingMixIn, HTTPServer):
         server_thread.start()
 
         # Log the port we're using to help identify port conflict errors
-        LOGGER.debug(f'Starting service on port {self.port}')
+        LOGGER.debug('Starting service on port {0}'.format(self.port))
 
     def shutdown(self):
         """

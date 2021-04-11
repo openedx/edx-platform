@@ -17,7 +17,7 @@ from .cohorts import get_cohort, get_group_info_for_cohort
 log = logging.getLogger(__name__)
 
 
-class CohortPartitionScheme:
+class CohortPartitionScheme(object):
     """
     This scheme uses lms cohorts (CourseUserGroups) and cohort-partition
     mappings (CourseUserGroupPartitionGroup) to map lms users into Partition
@@ -62,7 +62,7 @@ class CohortPartitionScheme:
             # one it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warning(
-                "partition mismatch in CohortPartitionScheme: %r",
+                u"partition mismatch in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "found_partition_id": partition_id,
@@ -80,7 +80,7 @@ class CohortPartitionScheme:
             # it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
             log.warning(
-                "group not found in CohortPartitionScheme: %r",
+                u"group not found in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
                     "requested_group_id": group_id,

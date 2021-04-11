@@ -12,9 +12,9 @@ jQuery.extend({
   },
     createUploadIframe: function(id, uri){
         //create frame
-        var frameId = 'jUploadFrame' + id;
+        var frameId = 'jUploadFrame' + id;           
         if(window.ActiveXObject) {
-            var io = document.createElement('<iframe id="' + frameId + '" name="' + frameId + '" />'); // xss-lint: disable=javascript-concat-html
+            var io = document.createElement('<iframe id="' + frameId + '" name="' + frameId + '" />');
             if(typeof uri== 'boolean'){
                 io.src = 'javascript:false';
             }
@@ -36,68 +36,68 @@ jQuery.extend({
     },
     createUploadForm: function(id, fileElementId)
 	{
-		//create form
+		//create form	
 		var formId = 'jUploadForm' + id;
 		var fileId = 'jUploadFile' + id;
-		var form = $('<form  action="" method="POST" name="' + formId + '" id="' + formId // xss-lint: disable=javascript-concat-html
-            + '" enctype="multipart/form-data"></form>'); // xss-lint: disable=javascript-concat-html
+		var form = $('<form  action="" method="POST" name="' + formId + '" id="' + formId 
+            + '" enctype="multipart/form-data"></form>');	
 		var oldElement = $('#' + fileElementId);
 		var newElement = $(oldElement).clone();
 		$(oldElement).attr('id', fileId);
-		$(oldElement).before(newElement); // xss-lint: disable=javascript-jquery-insertion
-		$(oldElement).appendTo(form); // xss-lint: disable=javascript-jquery-insert-into-target
+		$(oldElement).before(newElement);
+		$(oldElement).appendTo(form);
 		//set attributes
 		$(form).css('position', 'absolute');
 		$(form).css('top', '-1200px');
 		$(form).css('left', '-1200px');
-		$(form).appendTo('body'); // xss-lint: disable=javascript-jquery-insert-into-target
+		$(form).appendTo('body');		
 		return form;
     },
 
     ajaxFileUpload: function(s) {
-        // TODO introduce global settings, allowing the client to modify them for all requests, not only timeout
+        // TODO introduce global settings, allowing the client to modify them for all requests, not only timeout		
         s = jQuery.extend({}, jQuery.ajaxSettings, s);
-        var id = new Date().getTime()
+        var id = new Date().getTime()        
 		var form = jQuery.createUploadForm(id, s.fileElementId);
 		var io = jQuery.createUploadIframe(id, s.secureuri);
 		var frameId = 'jUploadFrame' + id;
-		var formId = 'jUploadForm' + id;
+		var formId = 'jUploadForm' + id;		
         // Watch for a new set of requests
         if ( s.global && ! jQuery.active++ )
 		{
 			jQuery.event.trigger( "ajaxStart" );
-		}
+		}            
         var requestDone = false;
         // Create the request object
-        var xml = {}
+        var xml = {}   
         if ( s.global )
             jQuery.event.trigger("ajaxSend", [xml, s]);
         // Wait for a response to come back
         var uploadCallback = function(isTimeout)
-		{
+		{			
 			var io = document.getElementById(frameId);
-            try {
+            try {				
 				if(io.contentWindow){
-					 xml.responseText = io.contentWindow.document.body ?
+					 xml.responseText = io.contentWindow.document.body ? 
                       io.contentWindow.document.body.textContent || io.contentWindow.document.body.innerText : null;
-                	 xml.responseXML = io.contentWindow.document.XMLDocument ?
+                	 xml.responseXML = io.contentWindow.document.XMLDocument ? 
                         io.contentWindow.document.XMLDocument : io.contentWindow.document;
-
+					 
 				}
                 else if(io.contentDocument)
 				{
-					xml.responseText = io.contentDocument.document.body ?
+					xml.responseText = io.contentDocument.document.body ? 
                         io.contentDocument.document.body.textContent || document.body.innerText : null;
-                	xml.responseXML = io.contentDocument.document.XMLDocument ?
+                	xml.responseXML = io.contentDocument.document.XMLDocument ? 
                         io.contentDocument.document.XMLDocument : io.contentDocument.document;
-				}
+				}						
             }
             catch(e)
 			{
 				jQuery.handleError(s, xml, null, e);
 			}
-            if ( xml || isTimeout == "timeout")
-			{
+            if ( xml || isTimeout == "timeout") 
+			{				
                 requestDone = true;
                 var status;
                 try {
@@ -106,17 +106,17 @@ jQuery.extend({
                     if ( status != "error" )
 					{
                         // process the data (runs the xml through httpData regardless of callback)
-                        var data = jQuery.uploadHttpData( xml, s.dataType );
+                        var data = jQuery.uploadHttpData( xml, s.dataType );    
                         // If a local callback was specified, fire it and pass it the data
                         if ( s.success )
                             s.success( data, status );
-
+    
                         // Fire the global callback
                         if( s.global )
                             jQuery.event.trigger( "ajaxSuccess", [xml, s] );
                     } else
                         jQuery.handleError(s, xml, status);
-                } catch(e)
+                } catch(e) 
 				{
                     status = "error";
                     jQuery.handleError(s, xml, status, e);
@@ -137,14 +137,14 @@ jQuery.extend({
                 jQuery(io).unbind();
 
                 setTimeout(function()
-                    {	try
+                    {	try 
                         {
                             $(io).remove();
-                            $(form).remove();
-
+                            $(form).remove();	
+                            
                         } catch(e) {
                             jQuery.handleError(s, xml, null, e);
-                        }
+                        }									
                     }, 100)
                 xml = null;
             }
@@ -156,7 +156,7 @@ jQuery.extend({
                 if( !requestDone ) uploadCallback( "timeout" );
             }, s.timeout);
         }
-        try
+        try 
 		{
            // var io = $('#' + frameId);
 			var form = $('#' + formId);
@@ -165,16 +165,16 @@ jQuery.extend({
 			$(form).attr('target', frameId);
             if(form.encoding)
 			{
-                form.encoding = 'multipart/form-data';
+                form.encoding = 'multipart/form-data';				
             }
             else
-			{
+			{				
                 form.enctype = 'multipart/form-data';
-            }
+            }			
             $(form).submit();
 
-        } catch(e)
-		{
+        } catch(e) 
+		{			
             jQuery.handleError(s, xml, null, e);
         }
         if(window.attachEvent){
@@ -182,8 +182,8 @@ jQuery.extend({
         }
         else{
             document.getElementById(frameId).addEventListener('load', uploadCallback, false);
-        }
-        return {abort: function () {}};
+        } 		
+        return {abort: function () {}};	
 
     },
 
@@ -198,7 +198,7 @@ jQuery.extend({
             eval( "data = " + data );
         // evaluate scripts within html
         if ( type == "html" )
-            jQuery("<div>").html(data).evalScripts(); // xss-lint: disable=javascript-jquery-html
+            jQuery("<div>").html(data).evalScripts();
 			//alert($('param', data).each(function(){alert($(this).attr('value'));}));
         return data;
     }

@@ -23,8 +23,8 @@
         <%- gettext("You can view your information or unlink from {enterprise_name} anytime in your Account Settings.").replace(/{enterprise_name}/g, context.enterpriseName) %>
     </p>
     <p><%- gettext("To continue learning with this account, sign in below.") %></p>
-<% } else if (!context.is_require_third_party_auth_enabled) { %>
-    <h1 class="section-title"><%- gettext("Sign In") %></h1>
+<% } else { %>
+    <h2><%- gettext("Sign In") %></h2>
 <% } %>
 
 <form id="login" class="login-form" tabindex="-1" method="POST">
@@ -50,11 +50,9 @@
         </div>
     <% } %>
 
-    <% if (!context.is_require_third_party_auth_enabled) { %>
-        <%= HtmlUtils.HTML(context.fields) %>
+    <%= HtmlUtils.HTML(context.fields) %>
 
-        <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
-    <% } %>
+    <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
 
     <% if ( context.providers.length > 0 && !context.currentProvider) { %>
     <div class="login-providers">

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests of the Capa XModule
 """
@@ -10,17 +11,18 @@ import os
 import random
 import textwrap
 import unittest
-from unittest.mock import DEFAULT, Mock, patch
 
-import pytest
 import ddt
 import requests
+import six
 import webob
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
+from mock import DEFAULT, Mock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
+from six.moves import range, zip
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -38,7 +40,7 @@ from ..capa_base import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
 
-class CapaFactory:
+class CapaFactory(object):
     """
     A helper class to create problem modules with various parameters for testing.
     """
@@ -98,7 +100,7 @@ class CapaFactory:
         location = BlockUsageLocator(
             CourseLocator("edX", "capa_test", "2012_Fall", deprecated=True),
             "problem",
-            f"SampleProblem{cls.next_num()}",
+            "SampleProblem{0}".format(cls.next_num()),
             deprecated=True,
         )
         if xml is None:
@@ -176,10 +178,10 @@ if submission[0] == '':
 
 
 @ddt.ddt
-class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ProblemBlockTest(unittest.TestCase):
 
     def setUp(self):
-        super().setUp()
+        super(ProblemBlockTest, self).setUp()
 
         now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
@@ -192,21 +194,22 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_import(self):
         module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
+        self.assertEqual(module.get_score().raw_earned, 0)
 
         other_module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
-        assert module.url_name != other_module.url_name, 'Factory should be creating unique names for each problem'
+        self.assertEqual(module.get_score().raw_earned, 0)
+        self.assertNotEqual(module.url_name, other_module.url_name,
+                            "Factory should be creating unique names for each problem")
 
     def test_correct(self):
         """
         Check that the factory creates correct and incorrect problems properly.
         """
         module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
+        self.assertEqual(module.get_score().raw_earned, 0)
 
         other_module = CapaFactory.create(correct=True)
-        assert other_module.get_score().raw_earned == 1
+        self.assertEqual(other_module.get_score().raw_earned, 1)
 
     def test_get_score(self):
         """
@@ -219,17 +222,17 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(correct=True, override_get_score=False)
         module.lcp.correct_map = correct_map
         module.lcp.student_answers = student_answers
-        assert module.get_score().raw_earned == 0.0
+        self.assertEqual(module.get_score().raw_earned, 0.0)
         module.set_score(module.score_from_lcp(module.lcp))
-        assert module.get_score().raw_earned == 0.9
+        self.assertEqual(module.get_score().raw_earned, 0.9)
 
         other_correct_map = CorrectMap(answer_id='1_2_1', correctness="incorrect", npoints=0.1)
         other_module = CapaFactory.create(correct=False, override_get_score=False)
         other_module.lcp.correct_map = other_correct_map
         other_module.lcp.student_answers = student_answers
-        assert other_module.get_score().raw_earned == 0.0
+        self.assertEqual(other_module.get_score().raw_earned, 0.0)
         other_module.set_score(other_module.score_from_lcp(other_module.lcp))
-        assert other_module.get_score().raw_earned == 0.1
+        self.assertEqual(other_module.get_score().raw_earned, 0.1)
 
     def test_showanswer_default(self):
         """
@@ -238,7 +241,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # default, no due date, showanswer 'closed', so problem is open, and show_answer
         # not visible.
         problem = CapaFactory.create()
-        assert not problem.answer_available()
+        self.assertFalse(problem.answer_available())
 
     @ddt.data(
         (requests.exceptions.ReadTimeout, (1, 'failed to read from the server')),
@@ -254,13 +257,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         with patch.object(xqueue_interface.session, 'post', side_effect=exception):
             # pylint: disable = protected-access
             response = xqueue_interface._http_post('http://some/fake/url', {})
-            assert response == result
+            self.assertEqual(response, result)
 
     def test_showanswer_attempted(self):
         problem = CapaFactory.create(showanswer='attempted')
-        assert not problem.answer_available()
+        self.assertFalse(problem.answer_available())
         problem.attempts = 1
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     @ddt.data(
         # If show_correctness=always, Answer is visible after attempted
@@ -282,9 +285,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         if 'due' in problem_data:
             problem_data['due'] = getattr(self, problem_data['due'])
         problem = CapaFactory.create(**problem_data)
-        assert problem.answer_available() == answer_available_no_attempt
+        self.assertEqual(problem.answer_available(), answer_available_no_attempt)
         problem.attempts = 1
-        assert problem.answer_available() == answer_available_after_attempt
+        self.assertEqual(problem.answer_available(), answer_available_after_attempt)
 
     def test_showanswer_closed(self):
 
@@ -293,7 +296,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                                max_attempts="1",
                                                attempts="1",
                                                due=self.tomorrow_str)
-        assert used_all_attempts.answer_available()
+        self.assertTrue(used_all_attempts.answer_available())
 
         # can see after due date
         after_due_date = CapaFactory.create(showanswer='closed',
@@ -301,14 +304,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="0",
                                             due=self.yesterday_str)
 
-        assert after_due_date.answer_available()
+        self.assertTrue(after_due_date.answer_available())
 
         # can't see because attempts left
         attempts_left_open = CapaFactory.create(showanswer='closed',
                                                 max_attempts="1",
                                                 attempts="0",
                                                 due=self.tomorrow_str)
-        assert not attempts_left_open.answer_available()
+        self.assertFalse(attempts_left_open.answer_available())
 
         # Can't see because grace period hasn't expired
         still_in_grace = CapaFactory.create(showanswer='closed',
@@ -316,7 +319,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="0",
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
-        assert not still_in_grace.answer_available()
+        self.assertFalse(still_in_grace.answer_available())
 
     def test_showanswer_correct_or_past_due(self):
         """
@@ -330,14 +333,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="0",
                                             due=self.tomorrow_str,
                                             correct=True)
-        assert answer_correct.answer_available()
+        self.assertTrue(answer_correct.answer_available())
 
         # can see after due date, even when answer isn't correct
         past_due_date = CapaFactory.create(showanswer='correct_or_past_due',
                                            max_attempts="1",
                                            attempts="0",
                                            due=self.yesterday_str)
-        assert past_due_date.answer_available()
+        self.assertTrue(past_due_date.answer_available())
 
         # can also see after due date when answer _is_ correct
         past_due_date_correct = CapaFactory.create(showanswer='correct_or_past_due',
@@ -345,7 +348,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                                    attempts="0",
                                                    due=self.yesterday_str,
                                                    correct=True)
-        assert past_due_date_correct.answer_available()
+        self.assertTrue(past_due_date_correct.answer_available())
 
         # Can't see because grace period hasn't expired and answer isn't correct
         still_in_grace = CapaFactory.create(showanswer='correct_or_past_due',
@@ -353,7 +356,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="1",
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
-        assert not still_in_grace.answer_available()
+        self.assertFalse(still_in_grace.answer_available())
 
     def test_showanswer_past_due(self):
         """
@@ -366,21 +369,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                                max_attempts="1",
                                                attempts="1",
                                                due=self.tomorrow_str)
-        assert not used_all_attempts.answer_available()
+        self.assertFalse(used_all_attempts.answer_available())
 
         # can see after due date
         past_due_date = CapaFactory.create(showanswer='past_due',
                                            max_attempts="1",
                                            attempts="0",
                                            due=self.yesterday_str)
-        assert past_due_date.answer_available()
+        self.assertTrue(past_due_date.answer_available())
 
         # can't see because attempts left
         attempts_left_open = CapaFactory.create(showanswer='past_due',
                                                 max_attempts="1",
                                                 attempts="0",
                                                 due=self.tomorrow_str)
-        assert not attempts_left_open.answer_available()
+        self.assertFalse(attempts_left_open.answer_available())
 
         # Can't see because grace period hasn't expired, even though have no more
         # attempts.
@@ -389,7 +392,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="1",
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
-        assert not still_in_grace.answer_available()
+        self.assertFalse(still_in_grace.answer_available())
 
     def test_showanswer_after_attempts_with_max(self):
         """
@@ -405,7 +408,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             attempts_before_showanswer_button='3',
             max_attempts='5',
         )
-        assert not problem.answer_available()
+        self.assertFalse(problem.answer_available())
 
     def test_showanswer_after_attempts_no_max(self):
         """
@@ -420,7 +423,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             attempts='2',
             attempts_before_showanswer_button='3',
         )
-        assert not problem.answer_available()
+        self.assertFalse(problem.answer_available())
 
     def test_showanswer_after_attempts_used_all_attempts(self):
         """
@@ -437,7 +440,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             attempts='3',
             due=self.tomorrow_str,
         )
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     def test_showanswer_after_attempts_past_due_date(self):
         """
@@ -452,7 +455,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             attempts='2',
             due=self.yesterday_str,
         )
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     def test_showanswer_after_attempts_still_in_grace(self):
         """
@@ -468,7 +471,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             due=self.yesterday_str,
             graceperiod=self.two_day_delta_str,
         )
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     def test_showanswer_after_attempts_large(self):
         """
@@ -484,7 +487,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             max_attempts='3',
             attempts='3',
         )
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     def test_showanswer_after_attempts_zero(self):
         """
@@ -498,7 +501,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             attempts_before_showanswer_button='0',
             attempts='0',
         )
-        assert problem.answer_available()
+        self.assertTrue(problem.answer_available())
 
     def test_showanswer_finished(self):
         """
@@ -511,21 +514,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                                max_attempts="1",
                                                attempts="1",
                                                due=self.tomorrow_str)
-        assert used_all_attempts.answer_available()
+        self.assertTrue(used_all_attempts.answer_available())
 
         # can see after due date
         past_due_date = CapaFactory.create(showanswer='finished',
                                            max_attempts="1",
                                            attempts="0",
                                            due=self.yesterday_str)
-        assert past_due_date.answer_available()
+        self.assertTrue(past_due_date.answer_available())
 
         # can't see because attempts left and wrong
         attempts_left_open = CapaFactory.create(showanswer='finished',
                                                 max_attempts="1",
                                                 attempts="0",
                                                 due=self.tomorrow_str)
-        assert not attempts_left_open.answer_available()
+        self.assertFalse(attempts_left_open.answer_available())
 
         # _can_ see because attempts left and right
         correct_ans = CapaFactory.create(showanswer='finished',
@@ -533,7 +536,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                          attempts="0",
                                          due=self.tomorrow_str,
                                          correct=True)
-        assert correct_ans.answer_available()
+        self.assertTrue(correct_ans.answer_available())
 
         # Can see even though grace period hasn't expired, because have no more
         # attempts.
@@ -542,7 +545,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                             attempts="1",
                                             due=self.yesterday_str,
                                             graceperiod=self.two_day_delta_str)
-        assert still_in_grace.answer_available()
+        self.assertTrue(still_in_grace.answer_available())
 
     def test_showanswer_answered(self):
         """
@@ -557,7 +560,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             due=self.tomorrow_str,
             correct=False
         )
-        assert not answer_wrong.answer_available()
+        self.assertFalse(answer_wrong.answer_available())
 
         # Expect to see "Show Answer" when answer is correct
         answer_correct = CapaFactory.create(
@@ -567,7 +570,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             due=self.tomorrow_str,
             correct=True
         )
-        assert answer_correct.answer_available()
+        self.assertTrue(answer_correct.answer_available())
 
     @ddt.data('', 'other-value')
     def test_show_correctness_other(self, show_correctness):
@@ -576,21 +579,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         from SHOW_CORRECTNESS constant.
         """
         problem = CapaFactory.create(show_correctness=show_correctness)
-        assert problem.correctness_available()
+        self.assertTrue(problem.correctness_available())
 
     def test_show_correctness_default(self):
         """
         Test that correctness is visible by default.
         """
         problem = CapaFactory.create()
-        assert problem.correctness_available()
+        self.assertTrue(problem.correctness_available())
 
     def test_show_correctness_never(self):
         """
         Test that correctness is hidden when show_correctness turned off.
         """
         problem = CapaFactory.create(show_correctness='never')
-        assert not problem.correctness_available()
+        self.assertFalse(problem.correctness_available())
 
     @ddt.data(
         # Correctness not visible if due date in the future, even after using up all attempts
@@ -613,34 +616,34 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         if 'graceperiod' in problem_data:
             problem_data['graceperiod'] = getattr(self, problem_data['graceperiod'])
         problem = CapaFactory.create(**problem_data)
-        assert problem.correctness_available() == expected_result
+        self.assertEqual(problem.correctness_available(), expected_result)
 
     def test_closed(self):
 
         # Attempts < Max attempts --> NOT closed
         module = CapaFactory.create(max_attempts="1", attempts="0")
-        assert not module.closed()
+        self.assertFalse(module.closed())
 
         # Attempts < Max attempts --> NOT closed
         module = CapaFactory.create(max_attempts="2", attempts="1")
-        assert not module.closed()
+        self.assertFalse(module.closed())
 
         # Attempts = Max attempts --> closed
         module = CapaFactory.create(max_attempts="1", attempts="1")
-        assert module.closed()
+        self.assertTrue(module.closed())
 
         # Attempts > Max attempts --> closed
         module = CapaFactory.create(max_attempts="1", attempts="2")
-        assert module.closed()
+        self.assertTrue(module.closed())
 
         # Max attempts = 0 --> closed
         module = CapaFactory.create(max_attempts="0", attempts="2")
-        assert module.closed()
+        self.assertTrue(module.closed())
 
         # Past due --> closed
         module = CapaFactory.create(max_attempts="1", attempts="0",
                                     due=self.yesterday_str)
-        assert module.closed()
+        self.assertTrue(module.closed())
 
     def test_parse_get_params(self):
 
@@ -659,27 +662,27 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Expect that we get a dict with "input" stripped from key names
         # and that we get the same values back
-        for key in result.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for key in result.keys():
             original_key = "input_" + key
-            assert original_key in valid_get_dict, ('Output dict should have key %s' % original_key)
-            assert valid_get_dict[original_key] == result[key]
+            self.assertIn(original_key, valid_get_dict, "Output dict should have key %s" % original_key)
+            self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
         # Each tuple represents a single parameter in the query string
         valid_get_dict = MultiDict((('input_2[]', 'test1'), ('input_2[]', 'test2')))
         result = ProblemBlock.make_dict_of_responses(valid_get_dict)
-        assert '2' in result
-        assert ['test1', 'test2'] == result['2']
+        self.assertIn('2', result)
+        self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
         # get a list, even if there's just one value
         valid_get_dict = MultiDict({'input_1[]': 'test'})
         result = ProblemBlock.make_dict_of_responses(valid_get_dict)
-        assert result['1'] == ['test']
+        self.assertEqual(result['1'], ['test'])
 
         # If we have no underscores in the name, then the key is invalid
         invalid_get_dict = MultiDict({'input': 'test'})
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             result = ProblemBlock.make_dict_of_responses(invalid_get_dict)
 
         # Two equivalent names (one list, one non-list)
@@ -687,7 +690,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and raise an exception
         invalid_get_dict = MultiDict({'input_1[]': 'test 1',
                                       'input_1': 'test 2'})
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             result = ProblemBlock.make_dict_of_responses(invalid_get_dict)
 
     def test_submit_problem_correct(self):
@@ -707,15 +710,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
-        assert result['success'] == 'correct'
+        self.assertEqual(result['success'], 'correct')
 
         # Expect that we get the (mocked) HTML
-        assert result['contents'] == 'Test HTML'
+        self.assertEqual(result['contents'], 'Test HTML')
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 2
+        self.assertEqual(module.attempts, 2)
         # and that this was considered attempt number 2 for grading purposes
-        assert module.lcp.context['attempt'] == 2
+        self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_incorrect(self):
 
@@ -730,12 +733,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
-        assert result['success'] == 'incorrect'
+        self.assertEqual(result['success'], 'incorrect')
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 1
+        self.assertEqual(module.attempts, 1)
         # and that this is considered the first attempt
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_submit_problem_closed(self):
         module = CapaFactory.create(attempts=3)
@@ -744,12 +747,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Simulate that ProblemBlock.closed() always returns True
         with patch('xmodule.capa_module.ProblemBlock.closed') as mock_closed:
             mock_closed.return_value = True
-            with pytest.raises(xmodule.exceptions.NotFoundError):
+            with self.assertRaises(xmodule.exceptions.NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 module.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
-        assert module.attempts == 3
+        self.assertEqual(module.attempts, 3)
 
     @ddt.data(
         RANDOMIZATION.ALWAYS,
@@ -763,12 +766,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module.done = True
 
         # Expect that we cannot submit
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with self.assertRaises(xmodule.exceptions.NotFoundError):
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             module.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
-        assert module.attempts == 0
+        self.assertEqual(module.attempts, 0)
 
     @ddt.data(
         RANDOMIZATION.NEVER,
@@ -783,11 +786,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         get_request_dict = {CapaFactory.input_key(): '3.14'}
         result = module.submit_problem(get_request_dict)
 
-        assert result['success'] == 'correct'
+        self.assertEqual(result['success'], 'correct')
 
         # Expect that number of attempts IS incremented, still same attempt
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.attempts, 1)
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_submit_problem_queued(self):
         module = CapaFactory.create(attempts=1)
@@ -806,10 +809,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            assert 'You must wait' in result['success']
+            self.assertIn('You must wait', result['success'])
 
         # Expect that the number of attempts is NOT incremented
-        assert module.attempts == 1
+        self.assertEqual(module.attempts, 1)
 
     def test_submit_problem_with_files(self):
         # Check a problem with uploaded files, using the submit_problem API.
@@ -856,11 +859,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         #   )
         # pylint: enable=line-too-long
 
-        assert xqueue_interface._http_post.call_count == 1
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args
-        self.assertCountEqual(fpaths, list(kwargs['files'].keys()))
-        for fpath, fileobj in kwargs['files'].items():
-            assert fpath == fileobj.name
+        six.assertCountEqual(self, fpaths, list(kwargs['files'].keys()))
+        for fpath, fileobj in six.iteritems(kwargs['files']):
+            self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_with_files_as_xblock(self):
         # Check a problem with uploaded files, using the XBlock API.
@@ -889,11 +892,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         module.handle('xmodule_handler', request, 'problem_check')
 
-        assert xqueue_interface._http_post.call_count == 1
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args
-        self.assertCountEqual(fnames, list(kwargs['files'].keys()))
-        for fpath, fileobj in kwargs['files'].items():
-            assert fpath == fileobj.name
+        six.assertCountEqual(self, fnames, list(kwargs['files'].keys()))
+        for fpath, fileobj in six.iteritems(kwargs['files']):
+            self.assertEqual(fpath, fileobj.name)
 
     def test_submit_problem_error(self):
 
@@ -915,12 +918,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             # Expect an AJAX alert message in 'success'
             expected_msg = 'test error'
 
-            assert expected_msg == result['success']
+            self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            self.assertEqual(module.attempts, 1)
             # but that this was considered attempt number 2 for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_error_with_codejail_exception(self):
 
@@ -944,18 +947,18 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                         '  File "<string>", line 65, in check_func\\n'
                         'Exception: Couldn\'t execute jailed code\\n\' with status code: 1', )
                 except ResponseError as err:
-                    mock_grade.side_effect = exception_class(str(err))
+                    mock_grade.side_effect = exception_class(six.text_type(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success' without the text of the stack trace
             expected_msg = 'Couldn\'t execute jailed code'
-            assert expected_msg == result['success']
+            self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            self.assertEqual(module.attempts, 1)
             # but that this was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_other_errors(self):
         """
@@ -971,14 +974,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-            error_msg = "Superterrible error happened: ☠"
+            error_msg = u"Superterrible error happened: ☠"
             mock_grade.side_effect = Exception(error_msg)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.submit_problem(get_request_dict)
 
         # Expect an AJAX alert message in 'success'
-        assert error_msg in result['success']
+        self.assertIn(error_msg, result['success'])
 
     def test_submit_problem_zero_max_grade(self):
         """
@@ -1006,20 +1009,20 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Simulate answering a problem that raises the exception
             with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
-                mock_grade.side_effect = exception_class("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+                mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            expected_msg = 'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
+            expected_msg = u'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
 
-            assert expected_msg == result['success']
+            self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            self.assertEqual(module.attempts, 1)
             # but that this was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_error_with_staff_user(self):
 
@@ -1038,15 +1041,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 result = module.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            assert 'test error' in result['success']
+            self.assertIn('test error', result['success'])
 
             # We DO include traceback information for staff users
-            assert 'Traceback' in result['success']
+            self.assertIn('Traceback', result['success'])
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            self.assertEqual(module.attempts, 1)
             # but that it was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            self.assertEqual(module.lcp.context['attempt'], 2)
 
     @ddt.data(
         ("never", True, None, 'submitted'),
@@ -1072,12 +1075,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = json.loads(json_result)
 
         # Expect that the AJAX result withholds correctness and score
-        assert result['current_score'] == expected_score
-        assert result['success'] == expected_success
+        self.assertEqual(result['current_score'], expected_score)
+        self.assertEqual(result['success'], expected_success)
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.attempts, 1)
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
@@ -1093,11 +1096,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = module.reset_problem(get_request_dict)
 
         # Expect that the request was successful
-        assert (('success' in result) and result['success'])
+        self.assertTrue('success' in result and result['success'])
 
         # Expect that the problem HTML is retrieved
-        assert 'html' in result
-        assert result['html'] == '<div>Test HTML</div>'
+        self.assertIn('html', result)
+        self.assertEqual(result['html'], "<div>Test HTML</div>")
 
         # Expect that the problem was reset
         module.new_lcp.assert_called_once_with(None)
@@ -1115,7 +1118,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = module.reset_problem(get_request_dict)
 
         # Expect that the problem was NOT reset
-        assert (('success' in result) and (not result['success']))
+        self.assertTrue('success' in result and not result['success'])
 
     def test_reset_problem_not_done(self):
         # Simulate that the problem is NOT done
@@ -1126,7 +1129,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         result = module.reset_problem(get_request_dict)
 
         # Expect that the problem was NOT reset
-        assert (('success' in result) and (not result['success']))
+        self.assertTrue('success' in result and not result['success'])
 
     def test_rescore_problem_correct(self):
 
@@ -1149,12 +1152,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.rescore(only_if_higher=False)
 
         # Expect that the problem is marked correct
-        assert module.is_correct() is True
+        self.assertEqual(module.is_correct(), True)
 
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 1
+        self.assertEqual(module.attempts, 1)
         # and that this was considered attempt number 1 for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_additional_correct(self):
         # make sure it also works when new correct answer has been added
@@ -1166,13 +1169,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked incorrect and user didn't earn score
-        assert result['success'] == 'incorrect'
-        assert module.get_score() == (0, 1)
-        assert module.correct_map[answer_id]['correctness'] == 'incorrect'
+        self.assertEqual(result['success'], 'incorrect')
+        self.assertEqual(module.get_score(), (0, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'incorrect')
 
         # Expect that the number of attempts has incremented to 1
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.attempts, 1)
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
         # Simulate that after making an incorrect answer to the correct answer
         # the new calculated score is (1,1)
@@ -1188,12 +1191,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 module.rescore(only_if_higher=True)
 
         # Expect that the problem is marked correct and user earned the score
-        assert module.get_score() == (1, 1)
-        assert module.correct_map[answer_id]['correctness'] == 'correct'
+        self.assertEqual(module.get_score(), (1, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'correct')
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 1
+        self.assertEqual(module.attempts, 1)
         # and hence that this was still considered the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_incorrect(self):
         # make sure it also works when attempts have been reset,
@@ -1207,19 +1210,19 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.rescore(only_if_higher=False)
 
         # Expect that the problem is marked incorrect
-        assert module.is_correct() is False
+        self.assertEqual(module.is_correct(), False)
 
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 0
+        self.assertEqual(module.attempts, 0)
         # and that this is treated as the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
         module = CapaFactory.create(done=False)
 
         # Try to rescore the problem, and get exception
-        with pytest.raises(xmodule.exceptions.NotFoundError):
+        with self.assertRaises(xmodule.exceptions.NotFoundError):
             module.rescore(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):
@@ -1228,7 +1231,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Try to rescore the problem, and get exception
         with patch('capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
             mock_supports_rescoring.return_value = False
-            with pytest.raises(NotImplementedError):
+            with self.assertRaises(NotImplementedError):
                 module.rescore(only_if_higher=False)
 
     def _rescore_problem_error_helper(self, exception_class):
@@ -1238,14 +1241,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
-            mock_rescore.side_effect = exception_class('test error \u03a9')
-            with pytest.raises(exception_class):
+            mock_rescore.side_effect = exception_class(u'test error \u03a9')
+            with self.assertRaises(exception_class):
                 module.rescore(only_if_higher=False)
 
         # Expect that the number of attempts is NOT incremented
-        assert module.attempts == 1
+        self.assertEqual(module.attempts, 1)
         # and that this was considered the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_student_input_error(self):
         self._rescore_problem_error_helper(StudentInputError)
@@ -1265,10 +1268,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Expect that answers are saved to the problem
         expected_answers = {CapaFactory.answer_key(): '3.14'}
-        assert module.lcp.student_answers == expected_answers
+        self.assertEqual(module.lcp.student_answers, expected_answers)
 
         # Expect that the result is success
-        assert (('success' in result) and result['success'])
+        self.assertTrue('success' in result and result['success'])
 
     def test_save_problem_closed(self):
         module = CapaFactory.create(done=False)
@@ -1282,7 +1285,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             result = module.save_problem(get_request_dict)
 
         # Expect that the result is failure
-        assert (('success' in result) and (not result['success']))
+        self.assertTrue('success' in result and not result['success'])
 
     @ddt.data(
         RANDOMIZATION.ALWAYS,
@@ -1297,7 +1300,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         result = module.save_problem(get_request_dict)
 
         # Expect that we cannot save
-        assert (('success' in result) and (not result['success']))
+        self.assertTrue('success' in result and not result['success'])
 
     @ddt.data(
         RANDOMIZATION.NEVER,
@@ -1313,15 +1316,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         result = module.save_problem(get_request_dict)
 
         # Expect that we succeed
-        assert (('success' in result) and result['success'])
+        self.assertTrue('success' in result and result['success'])
 
     def test_submit_button_name(self):
         module = CapaFactory.create(attempts=0)
-        assert module.submit_button_name() == 'Submit'
+        self.assertEqual(module.submit_button_name(), "Submit")
 
     def test_submit_button_submitting_name(self):
         module = CapaFactory.create(attempts=1, max_attempts=10)
-        assert module.submit_button_submitting_name() == 'Submitting'
+        self.assertEqual(module.submit_button_submitting_name(), "Submitting")
 
     def test_should_enable_submit_button(self):
 
@@ -1329,41 +1332,41 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # If we're after the deadline, disable the submit button
         module = CapaFactory.create(due=self.yesterday_str)
-        assert not module.should_enable_submit_button()
+        self.assertFalse(module.should_enable_submit_button())
 
         # If user is out of attempts, disable the submit button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        assert not module.should_enable_submit_button()
+        self.assertFalse(module.should_enable_submit_button())
 
         # If survey question (max_attempts = 0), disable the submit button
         module = CapaFactory.create(max_attempts=0)
-        assert not module.should_enable_submit_button()
+        self.assertFalse(module.should_enable_submit_button())
 
         # If user submitted a problem but hasn't reset,
         # disable the submit button
         # Note:  we can only reset when rerandomize="always" or "true"
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert not module.should_enable_submit_button()
+        self.assertFalse(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="true", done=True)
-        assert not module.should_enable_submit_button()
+        self.assertFalse(module.should_enable_submit_button())
 
         # Otherwise, enable the submit button
         module = CapaFactory.create()
-        assert module.should_enable_submit_button()
+        self.assertTrue(module.should_enable_submit_button())
 
         # If the user has submitted the problem
         # and we do NOT have a reset button, then we can enable the submit button
         # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)
-        assert module.should_enable_submit_button()
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize="false", done=True)
-        assert module.should_enable_submit_button()
+        self.assertTrue(module.should_enable_submit_button())
 
         module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        assert module.should_enable_submit_button()
+        self.assertTrue(module.should_enable_submit_button())
 
     def test_should_show_reset_button(self):
 
@@ -1371,43 +1374,43 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # If we're after the deadline, do NOT show the reset button
         module = CapaFactory.create(due=self.yesterday_str, done=True)
-        assert not module.should_show_reset_button()
+        self.assertFalse(module.should_show_reset_button())
 
         # If the user is out of attempts, do NOT show the reset button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
-        assert not module.should_show_reset_button()
+        self.assertFalse(module.should_show_reset_button())
 
         # pre studio default value, DO show the reset button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert module.should_show_reset_button()
+        self.assertTrue(module.should_show_reset_button())
 
         # If survey question for capa (max_attempts = 0),
         # DO show the reset button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True)
-        assert module.should_show_reset_button()
+        self.assertTrue(module.should_show_reset_button())
 
         # If the question is not correct
         # DO show the reset button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=False)
-        assert module.should_show_reset_button()
+        self.assertTrue(module.should_show_reset_button())
 
         # If the question is correct and randomization is never
         # DO not show the reset button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=0, done=True, correct=True)
-        assert not module.should_show_reset_button()
+        self.assertFalse(module.should_show_reset_button())
 
         # If the question is correct and randomization is always
         # Show the reset button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=True)
-        assert module.should_show_reset_button()
+        self.assertTrue(module.should_show_reset_button())
 
         # Don't show reset button if randomization is turned on and the question is not done
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=False)
-        assert not module.should_show_reset_button()
+        self.assertFalse(module.should_show_reset_button())
 
         # Show reset button if randomization is turned on and the problem is done
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=True)
-        assert module.should_show_reset_button()
+        self.assertTrue(module.should_show_reset_button())
 
     def test_should_show_save_button(self):
 
@@ -1415,49 +1418,49 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # If we're after the deadline, do NOT show the save button
         module = CapaFactory.create(due=self.yesterday_str, done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # If the user is out of attempts, do NOT show the save button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # If user submitted a problem but hasn't reset, do NOT show the save button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         module = CapaFactory.create(rerandomize="true", done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # If the user has unlimited attempts and we are not randomizing,
         # then do NOT show a save button
         # because they can keep using "Check"
         module = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.NEVER, done=False)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         module = CapaFactory.create(max_attempts=None, rerandomize="false", done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         module = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # pre-studio default, DO show the save button
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=False)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
         # If we're not randomizing and we have limited attempts,  then we can save
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
         module = CapaFactory.create(rerandomize="false", max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
         module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
         # If survey question for capa (max_attempts = 0),
         # DO show the save button
         module = CapaFactory.create(max_attempts=0, done=False)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
     def test_should_show_save_button_force_save_button(self):
         # If we're after the deadline, do NOT show the save button
@@ -1465,7 +1468,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(due=self.yesterday_str,
                                     force_save_button="true",
                                     done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # If the user is out of attempts, do NOT show the save button
         attempts = random.randint(1, 10)
@@ -1473,7 +1476,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                     max_attempts=attempts,
                                     force_save_button="true",
                                     done=True)
-        assert not module.should_show_save_button()
+        self.assertFalse(module.should_show_save_button())
 
         # Otherwise, if we force the save button,
         # then show it even if we would ordinarily
@@ -1481,17 +1484,17 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(force_save_button="true",
                                     rerandomize=RANDOMIZATION.ALWAYS,
                                     done=True)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
         module = CapaFactory.create(force_save_button="true",
                                     rerandomize="true",
                                     done=True)
-        assert module.should_show_save_button()
+        self.assertTrue(module.should_show_save_button())
 
     def test_no_max_attempts(self):
         module = CapaFactory.create(max_attempts='')
         html = module.get_problem_html()
-        assert html is not None
+        self.assertIsNotNone(html)
         # assert that we got here without exploding
 
     def test_get_problem_html(self):
@@ -1521,24 +1524,24 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             html_encapsulated = module.get_problem_html(encapsulate=True)
 
         # Expect that we get the rendered template back
-        assert html == '<div>Test Template HTML</div>'
+        self.assertEqual(html, "<div>Test Template HTML</div>")
 
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
-        assert len(render_args) == 2
+        self.assertEqual(len(render_args), 2)
 
         template_name = render_args[0]
-        assert template_name == 'problem.html'
+        self.assertEqual(template_name, "problem.html")
 
         context = render_args[1]
-        assert context['problem']['html'] == '<div>Test Problem HTML</div>'
-        assert bool(context['should_enable_submit_button']) == enable_submit_button
-        assert bool(context['reset_button']) == show_reset_button
-        assert bool(context['save_button']) == show_save_button
-        assert not context['demand_hint_possible']
+        self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
+        self.assertEqual(bool(context['should_enable_submit_button']), enable_submit_button)
+        self.assertEqual(bool(context['reset_button']), show_reset_button)
+        self.assertEqual(bool(context['save_button']), show_save_button)
+        self.assertFalse(context['demand_hint_possible'])
 
         # Assert that the encapsulated html contains the original html
-        assert html in html_encapsulated
+        self.assertIn(html, html_encapsulated)
 
     demand_xml = """
         <problem>
@@ -1562,21 +1565,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(xml=self.demand_xml)
         module.get_problem_html()  # ignoring html result
         context = module.system.render_template.call_args[0][1]
-        assert context['demand_hint_possible']
-        assert context['should_enable_next_hint']
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
 
         # Check the AJAX call that gets the hint by index
         result = module.get_demand_hint(0)
-        assert result['hint_index'] == 0
-        assert result['should_enable_next_hint']
+        self.assertEqual(result['hint_index'], 0)
+        self.assertTrue(result['should_enable_next_hint'])
 
         result = module.get_demand_hint(1)
-        assert result['hint_index'] == 1
-        assert not result['should_enable_next_hint']
+        self.assertEqual(result['hint_index'], 1)
+        self.assertFalse(result['should_enable_next_hint'])
 
         result = module.get_demand_hint(2)  # here the server wraps around to index 0
-        assert result['hint_index'] == 0
-        assert result['should_enable_next_hint']
+        self.assertEqual(result['hint_index'], 0)
+        self.assertTrue(result['should_enable_next_hint'])
 
     def test_single_demand_hint(self):
         """
@@ -1599,13 +1602,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(xml=test_xml)
         module.get_problem_html()  # ignoring html result
         context = module.system.render_template.call_args[0][1]
-        assert context['demand_hint_possible']
-        assert context['should_enable_next_hint']
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
 
         # Check the AJAX call that gets the hint by index
         result = module.get_demand_hint(0)
-        assert result['hint_index'] == 0
-        assert not result['should_enable_next_hint']
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
 
     def test_image_hint(self):
         """
@@ -1630,25 +1633,35 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create(xml=test_xml)
         module.get_problem_html()  # ignoring html result
         context = module.system.render_template.call_args[0][1]
-        assert context['demand_hint_possible']
-        assert context['should_enable_next_hint']
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
 
         # Check the AJAX call that gets the hint by index
         result = module.get_demand_hint(0)
-        assert result['hint_index'] == 0
-        assert not result['should_enable_next_hint']
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
-        """
-        Test calling get_demand_hunt() results in an event being published.
-        """
+        def mock_location_text(self):
+            """
+            Mock implementation of __unicode__ or __str__ for the module's location.
+            """
+            return u'i4x://edX/capa_test/problem/meh'
+
         module = CapaFactory.create(xml=self.demand_xml)
+        # Re-mock the module_id to a fixed string, so we can check the logging
+        module.location = Mock(module.location)
+        if six.PY2:
+            module.location.__unicode__ = mock_location_text
+        else:
+            module.location.__str__ = mock_location_text
+
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.get_problem_html()
             module.get_demand_hint(0)
             mock_track_function.assert_called_with(
                 module, 'edx.problem.hint.demandhint_displayed',
-                {'hint_index': 0, 'module_id': str(module.location),
+                {'hint_index': 0, 'module_id': u'i4x://edX/capa_test/problem/meh',
                  'hint_text': 'Demand 1', 'hint_len': 2}
             )
 
@@ -1658,12 +1671,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # check to make sure that the input_state and the keys have the same values
         module1.set_state_from_lcp()
-        assert list(module1.lcp.inputs.keys()) == list(module1.input_state.keys())
+        self.assertEqual(list(module1.lcp.inputs.keys()), list(module1.input_state.keys()))
 
         module2.set_state_from_lcp()
 
         intersection = set(module2.input_state.keys()).intersection(set(module1.input_state.keys()))
-        assert len(intersection) == 0
+        self.assertEqual(len(intersection), 0)
 
     def test_get_problem_html_error(self):
         """
@@ -1689,15 +1702,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Try to render the module with DEBUG turned off
         html = module.get_problem_html()
 
-        assert html is not None
+        self.assertIsNotNone(html)
 
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        assert 'error' in context['problem']['html']
+        self.assertIn("error", context['problem']['html'])
 
         # Expect that the module has created a new dummy problem with the error
-        assert original_problem != module.lcp
+        self.assertNotEqual(original_problem, module.lcp)
 
     def test_get_problem_html_error_w_debug(self):
         """
@@ -1707,7 +1720,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
-        error_msg = "Superterrible error happened: ☠"
+        error_msg = u"Superterrible error happened: ☠"
         module.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
         # Stub out the get_test_system rendering function
@@ -1719,12 +1732,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Try to render the module with DEBUG turned on
         html = module.get_problem_html()
 
-        assert html is not None
+        self.assertIsNotNone(html)
 
         # Check the rendering context
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        assert error_msg in context['problem']['html']
+        self.assertIn(error_msg, context['problem']['html'])
 
     @ddt.data(
         'false',
@@ -1743,25 +1756,26 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        assert seed is not None
+        self.assertIsNotNone(seed)
 
         # If we're not rerandomizing, the seed is always set
         # to the same value (1)
         if rerandomize == RANDOMIZATION.NEVER:
-            assert seed == 1, "Seed should always be 1 when rerandomize='%s'" % rerandomize
+            self.assertEqual(seed, 1,
+                             msg="Seed should always be 1 when rerandomize='%s'" % rerandomize)
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
         module.submit_problem(get_request_dict)
 
         # Expect that the seed is the same
-        assert seed == module.seed
+        self.assertEqual(seed, module.seed)
 
         # Save the problem
         module.save_problem(get_request_dict)
 
         # Expect that the seed is the same
-        assert seed == module.seed
+        self.assertEqual(seed, module.seed)
 
     @ddt.data(
         'false',
@@ -1813,7 +1827,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        assert seed is not None
+        self.assertIsNotNone(seed)
 
         # We do NOT want the seed to reset if rerandomize
         # is set to 'never' -- it should still be 1
@@ -1822,7 +1836,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         if rerandomize in [RANDOMIZATION.NEVER,
                            'false',
                            RANDOMIZATION.PER_STUDENT]:
-            assert seed == _reset_and_get_seed(module)
+            self.assertEqual(seed, _reset_and_get_seed(module))
 
         # Otherwise, we expect the seed to change
         # to another valid seed
@@ -1833,9 +1847,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             # to generate a different seed
             success = _retry_and_check(10, lambda: _reset_and_get_seed(module) != seed)
 
-            assert module.seed is not None
+            self.assertIsNotNone(module.seed)
             msg = 'Could not get a new seed from reset after 10 tries'
-            assert success, msg
+            self.assertTrue(success, msg)
 
     @ddt.data(
         'false',
@@ -1867,10 +1881,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Get the seed
         # By this point, the module should have persisted the seed
         seed = module.seed
-        assert seed is not None
+        self.assertIsNotNone(seed)
 
         # the seed should never change because the student hasn't finished the problem
-        assert seed == _reset_and_get_seed(module)
+        self.assertEqual(seed, _reset_and_get_seed(module))
 
     @ddt.data(
         RANDOMIZATION.ALWAYS,
@@ -1897,7 +1911,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for error_type in error_types:
             mock_progress.side_effect = error_type
             module = CapaFactory.create()
-            assert module.get_progress() is None
+            self.assertIsNone(module.get_progress())
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
@@ -1910,8 +1924,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module = CapaFactory.create()
         module.weight = 0
         progress = module.get_progress()
-        assert progress is None
-        assert not mock_progress.called
+        self.assertIsNone(progress)
+        self.assertFalse(mock_progress.called)
 
     @patch('xmodule.capa_base.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
@@ -1946,8 +1960,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                     due=self.tomorrow_str)
         module.weight = 1
         score, total = module.get_display_progress()
-        assert score == expected_score
-        assert total == 1
+        self.assertEqual(score, expected_score)
+        self.assertEqual(total, 1)
 
     def test_get_html(self):
         """
@@ -1963,7 +1977,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Check that get_problem() returns the expected dictionary.
         """
         module = CapaFactory.create()
-        assert module.get_problem('data') == {'html': module.get_problem_html(encapsulate=False)}
+        self.assertEqual(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
     # Standard question with shuffle="true" used by a few tests
     common_shuffle_xml = textwrap.dedent("""
@@ -1990,11 +2004,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.submit_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[1]
             event_info = mock_call[1][2]
-            assert event_info['answers'][CapaFactory.answer_key()] == 'choice_3'
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_3')
             # 'permutation' key added to record how problem was shown
-            assert event_info['permutation'][CapaFactory.answer_key()] ==\
-                   ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0'])
-            assert event_info['success'] == 'correct'
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
+                             ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0']))
+            self.assertEqual(event_info['success'], 'correct')
 
     @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
@@ -2005,8 +2019,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.save_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
     def test_reset_unmask(self):
@@ -2019,9 +2033,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.reset_problem(None)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            assert mock_call[1][0] == 'reset_problem'
-            assert event_info['old_state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
+            self.assertEqual(mock_call[1][0], 'reset_problem')
+            self.assertEqual(event_info['old_state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     @unittest.skip("masking temporarily disabled")
     def test_rescore_unmask(self):
@@ -2031,12 +2045,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            module.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
+            module.rescore_problem(only_if_higher=False)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
-            assert mock_call[1][0] == 'problem_rescore'
-            assert event_info['state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
+            self.assertEqual(mock_call[1][0], 'problem_rescore')
+            self.assertEqual(event_info['state']['student_answers'][CapaFactory.answer_key()], 'choice_2')
+            self.assertIsNotNone(event_info['permutation'][CapaFactory.answer_key()])
 
     def test_check_unmask_answerpool(self):
         """Check answer-pool question track_function uses unmasked names"""
@@ -2058,11 +2072,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             module.submit_problem(get_request_dict)
             mock_call = mock_track_function.mock_calls[1]
             event_info = mock_call[1][2]
-            assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
+            self.assertEqual(event_info['answers'][CapaFactory.answer_key()], 'choice_2')
             # 'permutation' key added to record how problem was shown
-            assert event_info['permutation'][CapaFactory.answer_key()] ==\
-                   ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0'])
-            assert event_info['success'] == 'incorrect'
+            self.assertEqual(event_info['permutation'][CapaFactory.answer_key()],
+                             ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
+            self.assertEqual(event_info['success'], 'incorrect')
 
     @ddt.unpack
     @ddt.data(
@@ -2076,7 +2090,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Verify that display_name_with_default works as expected.
         """
         module = CapaFactory.create(display_name=display_name)
-        assert module.display_name_with_default == expected_display_name
+        self.assertEqual(module.display_name_with_default, expected_display_name)
 
     @ddt.data(
         '',
@@ -2090,11 +2104,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         module.get_problem_html()
         render_args, _ = module.system.render_template.call_args
         context = render_args[1]
-        assert context['problem']['name'] == module.location.block_type
+        self.assertEqual(context['problem']['name'], module.location.block_type)
 
 
 @ddt.ddt
-class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ProblemBlockXMLTest(unittest.TestCase):
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
             <p>Title</p>
@@ -2462,11 +2476,15 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         xml = "<problem><{response_tag}></{response_tag}></problem>".format(response_tag=response_tag)
         name = "Some Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        assert descriptor.problem_types == {response_tag}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': [response_tag],
-                'content': {'display_name': name, 'capa_content': ''}}
+        self.assertEqual(descriptor.problem_types, {response_tag})
+        self.assertEqual(descriptor.index_dictionary(), {
+            'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+            'problem_types': [response_tag],
+            'content': {
+                'display_name': name,
+                'capa_content': ''
+            }
+        })
 
     def test_response_types_ignores_non_response_tags(self):
         xml = textwrap.dedent("""
@@ -2485,11 +2503,15 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        assert descriptor.problem_types == {'multiplechoiceresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': ' Label Some comment Apple Banana Chocolate Donut '}}
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(descriptor.index_dictionary(), {
+            'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+            'problem_types': ["multiplechoiceresponse"],
+            'content': {
+                'display_name': name,
+                'capa_content': ' Label Some comment Apple Banana Chocolate Donut '
+            }
+        })
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -2513,7 +2535,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Other Test Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        assert descriptor.problem_types == {'multiplechoiceresponse', 'optionresponse'}
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse", "optionresponse"})
 
         # We are converting problem_types to a set to compare it later without taking into account the order
         # the reasoning behind is that the problem_types (property) is represented by dict and when it is converted
@@ -2524,7 +2546,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         self.assertDictEqual(
             indexing_result, {
                 'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': {"optionresponse", "multiplechoiceresponse"},
+                'problem_types': set(["optionresponse", "multiplechoiceresponse"]),
                 'content': {
                     'display_name': name,
                     'capa_content': " Label Some comment Donut Buggy '1','2' "
@@ -2558,15 +2580,21 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Blank Common Capa Problem"
         descriptor = self._create_descriptor(xml, name=name)
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': ' '}}
+                'content': {
+                    'display_name': name,
+                    'capa_content': ' '
+                }
+            }
+        )
 
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
         descriptor = self._create_descriptor(self.sample_checkbox_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
+        capa_content = textwrap.dedent(u"""
             Title
             Description
             Example
@@ -2578,11 +2606,18 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             Hungarian
             Note: Make sure you select all of the correct options—there may be more than one!
         """)
-        assert descriptor.problem_types == {'choiceresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(),
+            {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["choiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_dropdown(self):
         name = "Dropdown"
@@ -2593,11 +2628,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             You can use the following example problem as a model.
             Which of the following countries celebrates its independence on August 15? 'India','Spain','China','Bermuda'
         """)
-        assert descriptor.problem_types == {'optionresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["optionresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_multiple_choice(self):
         name = "Multiple Choice"
@@ -2612,11 +2653,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             Indonesia
             Russia
         """)
-        assert descriptor.problem_types == {'multiplechoiceresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_numerical_input(self):
         name = "Numerical Input"
@@ -2634,11 +2681,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             How many miles away from Earth is the sun? Use scientific notation to answer.
             The square of what number is -100?
         """)
-        assert descriptor.problem_types == {'numericalresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["numericalresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_text_input(self):
         name = "Text Input"
@@ -2653,11 +2706,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             You can use the following example problem as a model.
             What was the first post-secondary school in China to allow both male and female students?
         """)
-        assert descriptor.problem_types == {'stringresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["stringresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_non_latin_problem(self):
         sample_text_input_problem_xml = textwrap.dedent("""
@@ -2671,7 +2730,9 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         capa_content = " FX1_VAL='Καλημέρα' Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
 
         descriptor_dict = descriptor.index_dictionary()
-        assert descriptor_dict['content']['capa_content'] == smart_text(capa_content)
+        self.assertEqual(
+            descriptor_dict['content']['capa_content'], smart_text(capa_content)
+        )
 
     def test_indexing_checkboxes_with_hints_and_feedback(self):
         name = "Checkboxes with Hints and Feedback"
@@ -2691,11 +2752,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             potato
             tomato
         """)
-        assert descriptor.problem_types == {'choiceresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"choiceresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["choiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_dropdown_with_hints_and_feedback(self):
         name = "Dropdown with Hints and Feedback"
@@ -2711,11 +2778,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             potato
             tomato
         """)
-        assert descriptor.problem_types == {'optionresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"optionresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["optionresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_multiple_choice_with_hints_and_feedback(self):
         name = "Multiple Choice with Hints and Feedback"
@@ -2731,11 +2804,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             potato
             tomato
         """)
-        assert descriptor.problem_types == {'multiplechoiceresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"multiplechoiceresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["multiplechoiceresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_numerical_input_with_hints_and_feedback(self):
         name = "Numerical Input with Hints and Feedback"
@@ -2749,11 +2828,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             Use the following example problem as a model.
             What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)
         """)
-        assert descriptor.problem_types == {'numericalresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"numericalresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["numericalresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_text_input_with_hints_and_feedback(self):
         name = "Text Input with Hints and Feedback"
@@ -2767,11 +2852,17 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             Use the following example problem as a model.
             Which U.S. state has the largest land area?
         """)
-        assert descriptor.problem_types == {'stringresponse'}
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
-                'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+        self.assertEqual(descriptor.problem_types, {"stringresponse"})
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+                'problem_types': ["stringresponse"],
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_indexing_problem_with_html_tags(self):
         sample_problem_xml = textwrap.dedent("""
@@ -2794,10 +2885,16 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             This has HTML comment in it.
             HTML end.
         """)
-        assert descriptor.index_dictionary() ==\
-               {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+        self.assertEqual(
+            descriptor.index_dictionary(), {
+                'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {
+                    'display_name': name,
+                    'capa_content': capa_content.replace("\n", " ")
+                }
+            }
+        )
 
     def test_invalid_xml_handling(self):
         """
@@ -2808,7 +2905,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             <problem>
             </proble-oh no my finger broke and I can't close the problem tag properly...
         """)
-        with pytest.raises(etree.XMLSyntaxError):
+        with self.assertRaises(etree.XMLSyntaxError):
             self._create_descriptor(sample_invalid_xml, name="Invalid XML")
 
     def test_invalid_dropdown_xml(self):
@@ -2818,8 +2915,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         problem_xml = textwrap.dedent("""
         <problem>
             <optionresponse>
-              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown
-               problems. Edit this component to replace this template with your own assessment.</p>
+              <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown problems. Edit this component to replace this template with your own assessment.</p>
             <label>Add the question text, or prompt, here. This text is required.</label>
             <description>You can add an optional tip or note related to the prompt like this. </description>
             <optioninput>
@@ -2830,11 +2926,11 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
             </optionresponse>
         </problem>
         """)
-        with pytest.raises(Exception):
+        with self.assertRaises(Exception):
             CapaFactory.create(xml=problem_xml)
 
 
-class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class ComplexEncoderTest(unittest.TestCase):
 
     def test_default(self):
         """
@@ -2843,8 +2939,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
         complex_num = 1 - 1j
         expected_str = '1-1*j'
         json_str = json.dumps(complex_num, cls=ComplexEncoder)
-        assert expected_str == json_str[1:(- 1)]
-        # ignore quotes
+        self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes
 
 
 class ProblemCheckTrackingTest(unittest.TestCase):
@@ -2853,7 +2948,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ProblemCheckTrackingTest, self).setUp()
         self.maxDiff = None
 
     def test_choice_answer_text(self):
@@ -2898,29 +2993,37 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
         event = self.get_event_for_answers(module, answer_input_dict)
 
-        assert event['submission'] ==\
-               {factory.answer_key(2): {'question': 'What color is the open ocean on a sunny day?',
-                                        'answer': 'blue', 'response_type': 'optionresponse',
-                                        'input_type': 'optioninput',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(3): {'question': 'Which piece of furniture is built for sitting?',
-                                        'answer': '<text>a table</text>',
-                                        'response_type': 'multiplechoiceresponse',
-                                        'input_type': 'choicegroup',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(4): {'question': 'Which of the following are musical instruments?',
-                                        'answer': ['a piano', 'a tree'],
-                                        'response_type': 'choiceresponse',
-                                        'input_type': 'checkboxgroup',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2): {
+                'question': 'What color is the open ocean on a sunny day?',
+                'answer': 'blue',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'group_label': '',
+                'variant': '',
+            },
+            factory.answer_key(3): {
+                'question': 'Which piece of furniture is built for sitting?',
+                'answer': u'<text>a table</text>',
+                'response_type': 'multiplechoiceresponse',
+                'input_type': 'choicegroup',
+                'correct': False,
+                'group_label': '',
+                'variant': '',
+            },
+            factory.answer_key(4): {
+                'question': 'Which of the following are musical instruments?',
+                'answer': [u'a piano', u'a tree'],
+                'response_type': 'choiceresponse',
+                'input_type': 'checkboxgroup',
+                'correct': False,
+                'group_label': '',
+                'variant': '',
+            },
+        })
 
-    def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def capa_factory_for_problem_xml(self, xml):
         class CustomCapaFactory(CapaFactory):
             """
             A factory for creating a Capa problem with arbitrary xml.
@@ -2929,11 +3032,11 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         return CustomCapaFactory
 
-    def get_event_for_answers(self, module, answer_input_dict):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_event_for_answers(self, module, answer_input_dict):
         with patch.object(module.runtime, 'publish') as mock_track_function:
             module.submit_problem(answer_input_dict)
 
-            assert len(mock_track_function.mock_calls) >= 2
+            self.assertGreaterEqual(len(mock_track_function.mock_calls), 2)
             # There are potentially 2 track logs: answers and hint. [-1]=answers.
             mock_call = mock_track_function.mock_calls[-1]
             event = mock_call[1][2]
@@ -2949,13 +3052,17 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '', 'answer': '3.14',
-                                        'response_type': 'numericalresponse',
-                                        'input_type': 'textline',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': ''}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': '3.14',
+                'response_type': 'numericalresponse',
+                'input_type': 'textline',
+                'correct': True,
+                'group_label': '',
+                'variant': '',
+            }
+        })
 
     def test_multiple_inputs(self):
         group_label = 'Choose the correct color'
@@ -2977,19 +3084,26 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        assert event['submission'] ==\
-               {factory.answer_key(2, 1): {'group_label': group_label,
-                                           'question': input1_label,
-                                           'answer': 'blue',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': True, 'variant': ''},
-                factory.answer_key(2, 2): {'group_label': group_label,
-                                           'question': input2_label,
-                                           'answer': 'yellow',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': False, 'variant': ''}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2, 1): {
+                'group_label': group_label,
+                'question': input1_label,
+                'answer': 'blue',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'group_label': group_label,
+                'question': input2_label,
+                'answer': 'yellow',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
 
     def test_optioninput_extended_xml(self):
         """Test the new XML form of writing with <option> tag instead of options= attribute."""
@@ -3040,19 +3154,26 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        assert event['submission'] ==\
-               {factory.answer_key(2, 1): {'group_label': group_label,
-                                           'question': input1_label,
-                                           'answer': 'apple',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': True, 'variant': ''},
-                factory.answer_key(2, 2): {'group_label': group_label,
-                                           'question': input2_label,
-                                           'answer': 'cucumber',
-                                           'response_type': 'optionresponse',
-                                           'input_type': 'optioninput',
-                                           'correct': False, 'variant': ''}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2, 1): {
+                'group_label': group_label,
+                'question': input1_label,
+                'answer': 'apple',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'group_label': group_label,
+                'question': input2_label,
+                'answer': 'cucumber',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
 
     def test_rerandomized_inputs(self):
         factory = CapaFactory
@@ -3063,14 +3184,17 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '',
-                                        'answer': '3.14',
-                                        'response_type': 'numericalresponse',
-                                        'input_type': 'textline',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'variant': module.seed}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': '3.14',
+                'response_type': 'numericalresponse',
+                'input_type': 'textline',
+                'correct': True,
+                'group_label': '',
+                'variant': module.seed,
+            }
+        })
 
     def test_file_inputs(self):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -3093,21 +3217,26 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         }
 
         event = self.get_event_for_answers(module, answer_input_dict)
-        assert event['submission'] ==\
-               {factory.answer_key(2): {'question': '',
-                                        'answer': fpaths,
-                                        'response_type': 'coderesponse',
-                                        'input_type': 'filesubmission',
-                                        'correct': False,
-                                        'group_label': '',
-                                        'variant': ''},
-                factory.answer_key(3): {'answer': 'None',
-                                        'correct': True,
-                                        'group_label': '',
-                                        'question': '',
-                                        'response_type': 'customresponse',
-                                        'input_type': 'textline',
-                                        'variant': ''}}
+        self.assertEqual(event['submission'], {
+            factory.answer_key(2): {
+                'question': '',
+                'answer': fpaths,
+                'response_type': 'coderesponse',
+                'input_type': 'filesubmission',
+                'correct': False,
+                'group_label': '',
+                'variant': '',
+            },
+            factory.answer_key(3): {
+                'answer': 'None',
+                'correct': True,
+                'group_label': '',
+                'question': '',
+                'response_type': 'customresponse',
+                'input_type': 'textline',
+                'variant': ''
+            }
+        })
 
     def test_get_answer_with_jump_to_id_urls(self):
         """
@@ -3133,7 +3262,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         problem = CapaFactory.create(showanswer='always', xml=problem_xml)
         problem.runtime.replace_jump_to_id_urls = Mock()
         problem.get_answer(data)
-        assert problem.runtime.replace_jump_to_id_urls.called
+        self.assertTrue(problem.runtime.replace_jump_to_id_urls.called)
 
 
 class ProblemBlockReportGenerationTest(unittest.TestCase):
@@ -3141,7 +3270,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     Ensure that Capa report generation works correctly
     """
 
-    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
+    def setUp(self):
         self.find_question_label_patcher = patch(
             'capa.capa_problem.LoncapaProblem.find_question_label',
             lambda self, answer_id: answer_id
@@ -3157,14 +3286,14 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
 
     def _mock_user_state_generator(self, user_count=1, response_count=10):
         for uid in range(user_count):
-            yield self._user_state(username=f'user{uid}', response_count=response_count)
+            yield self._user_state(username='user{}'.format(uid), response_count=response_count)
 
     def _user_state(self, username='testuser', response_count=10, suffix=''):
         return XBlockUserState(
             username=username,
             state={
                 'student_answers': {
-                    f'{username}_answerid_{aid}{suffix}': f'{username}_answer_{aid}'
+                    '{}_answerid_{}{}'.format(username, aid, suffix): '{}_answer_{}'.format(username, aid)
                     for aid in range(response_count)
                 },
                 'seed': 1,
@@ -3175,7 +3304,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
             scope=None,
         )
 
-    def _get_descriptor(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _get_descriptor(self):
         scope_ids = Mock(block_type='problem')
         descriptor = ProblemBlock(get_test_system(), scope_ids=scope_ids)
         descriptor.runtime = Mock()
@@ -3185,13 +3314,13 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
     def test_generate_report_data_not_implemented(self):
         scope_ids = Mock(block_type='noproblem')
         descriptor = ProblemBlock(get_test_system(), scope_ids=scope_ids)
-        with pytest.raises(NotImplementedError):
+        with self.assertRaises(NotImplementedError):
             next(descriptor.generate_report_data(iter([])))
 
     def test_generate_report_data_limit_responses(self):
         descriptor = self._get_descriptor()
         report_data = list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
-        assert 2 == len(report_data)
+        self.assertEqual(2, len(report_data))
 
     def test_generate_report_data_dont_limit_responses(self):
         descriptor = self._get_descriptor()
@@ -3203,10 +3332,10 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
                 response_count=response_count,
             )
         ))
-        assert (user_count * response_count) == len(report_data)
+        self.assertEqual(user_count * response_count, len(report_data))
 
     def test_generate_report_data_skip_dynamath(self):
         descriptor = self._get_descriptor()
         iterator = iter([self._user_state(suffix='_dynamath')])
         report_data = list(descriptor.generate_report_data(iterator))
-        assert 0 == len(report_data)
+        self.assertEqual(0, len(report_data))

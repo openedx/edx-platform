@@ -3,15 +3,15 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 
 
-from unittest.mock import MagicMock, patch
-
 import ddt
+import six
 from django.test import TestCase
+from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 import lms.djangoapps.lti_provider.tasks as tasks
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class BaseOutcomeTest(TestCase):
@@ -19,7 +19,7 @@ class BaseOutcomeTest(TestCase):
     Super type for tests of both the leaf and composite outcome celery tasks.
     """
     def setUp(self):
-        super().setUp()
+        super(BaseOutcomeTest, self).setUp()
         self.course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -96,7 +96,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     """
 
     def setUp(self):
-        super().setUp()
+        super(SendCompositeOutcomeTest, self).setUp()
         self.descriptor = MagicMock()
         self.descriptor.location = BlockUsageLocator(
             course_key=self.course_key,
@@ -123,7 +123,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     def test_outcome_with_score_score(self, earned, possible, expected):
         self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
         tasks.send_composite_outcome(
-            self.user.id, str(self.course_key), self.assignment.id, 1
+            self.user.id, six.text_type(self.course_key), self.assignment.id, 1
         )
         self.send_score_update_mock.assert_called_once_with(self.assignment, expected)
 
@@ -131,6 +131,6 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
         self.assignment.version_number = 2
         self.assignment.save()
         tasks.send_composite_outcome(
-            self.user.id, str(self.course_key), self.assignment.id, 1
+            self.user.id, six.text_type(self.course_key), self.assignment.id, 1
         )
-        assert self.course_grade_mock.call_count == 0
+        self.assertEqual(self.course_grade_mock.call_count, 0)

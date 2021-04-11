@@ -4,17 +4,17 @@ Tests for django admin command `populate_expiry_date` in the verify_student modu
 
 
 from datetime import timedelta
-from unittest.mock import patch
 
 from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
+from mock import patch
 from testfixtures import LogCapture
 
-from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import MockS3BotoMixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests.test_models import FAKE_SETTINGS, mock_software_secure_post
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.populate_expiry_date'
 
@@ -50,7 +50,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
         # Check that the expiry_date for approved verification is not changed when it is already present
         verification_expiry_date = SoftwareSecurePhotoVerification.objects.get(pk=verification.pk).expiry_date
 
-        assert verification_expiry_date == expiry_date
+        self.assertEqual(verification_expiry_date, expiry_date)
 
     def test_recent_approved_verification(self):
         """
@@ -74,7 +74,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
 
         # Check that the expiry_date date set for verification is not for the outdated approved verification
         expiry_date = SoftwareSecurePhotoVerification.objects.get(pk=outdated_verification.pk).expiry_date
-        assert expiry_date is None
+        self.assertIsNone(expiry_date)
 
     def test_approved_verification_expiry_date(self):
         """
@@ -102,7 +102,7 @@ class TestPopulateExpiryDate(MockS3BotoMixin, TestCase):
 
         # Confirm that expiry_date set for approved verification is correct
         approved_verification = SoftwareSecurePhotoVerification.objects.get(pk=approved_verification.pk)
-        assert approved_verification.expiry_date == expected_date
+        self.assertEqual(approved_verification.expiry_date, expected_date)
 
     def test_no_approved_verification_found(self):
         """

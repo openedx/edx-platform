@@ -5,6 +5,7 @@ Code related to the handling of Proctored Exams in Studio
 
 import logging
 
+import six
 from django.conf import settings
 from edx_proctoring.api import (
     create_exam,
@@ -38,7 +39,7 @@ def register_special_exams(course_key):
 
     course = modulestore().get_course(course_key)
     if course is None:
-        raise ItemNotFoundError("Course {} does not exist", str(course_key))  # lint-amnesty, pylint: disable=raising-format-tuple
+        raise ItemNotFoundError(u"Course {} does not exist", six.text_type(course_key))
 
     if not course.enable_proctored_exams and not course.enable_timed_exams:
         # likewise if course does not have these features turned on
@@ -67,8 +68,8 @@ def register_special_exams(course_key):
     # add/update any exam entries in edx-proctoring
     for timed_exam in timed_exams:
         msg = (
-            'Found {location} as a timed-exam in course structure. Inspecting...'.format(
-                location=str(timed_exam.location)
+            u'Found {location} as a timed-exam in course structure. Inspecting...'.format(
+                location=six.text_type(timed_exam.location)
             )
         )
         log.info(msg)
@@ -86,20 +87,20 @@ def register_special_exams(course_key):
         }
 
         try:
-            exam = get_exam_by_content_id(str(course_key), str(timed_exam.location))
+            exam = get_exam_by_content_id(six.text_type(course_key), six.text_type(timed_exam.location))
             # update case, make sure everything is synced
             exam_metadata['exam_id'] = exam['id']
 
             exam_id = update_exam(**exam_metadata)
-            msg = 'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
+            msg = u'Updated timed exam {exam_id}'.format(exam_id=exam['id'])
             log.info(msg)
 
         except ProctoredExamNotFoundException:
-            exam_metadata['course_id'] = str(course_key)
-            exam_metadata['content_id'] = str(timed_exam.location)
+            exam_metadata['course_id'] = six.text_type(course_key)
+            exam_metadata['content_id'] = six.text_type(timed_exam.location)
 
             exam_id = create_exam(**exam_metadata)
-            msg = f'Created new timed exam {exam_id}'
+            msg = u'Created new timed exam {exam_id}'.format(exam_id=exam_id)
             log.info(msg)
 
         exam_review_policy_metadata = {
@@ -115,7 +116,7 @@ def register_special_exams(course_key):
             except ProctoredExamReviewPolicyNotFoundException:
                 if timed_exam.exam_review_rules:  # won't save an empty rule.
                     create_exam_review_policy(**exam_review_policy_metadata)
-                    msg = f'Created new exam review policy with exam_id {exam_id}'
+                    msg = u'Created new exam review policy with exam_id {exam_id}'.format(exam_id=exam_id)
                     log.info(msg)
         else:
             try:
@@ -134,12 +135,12 @@ def register_special_exams(course_key):
 
             search = [
                 timed_exam for timed_exam in timed_exams if
-                str(timed_exam.location) == exam['content_id']
+                six.text_type(timed_exam.location) == exam['content_id']
             ]
             if not search:
                 # This means it was turned off in Studio, we need to mark
                 # the exam as inactive (we don't delete!)
-                msg = 'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
+                msg = u'Disabling timed exam {exam_id}'.format(exam_id=exam['id'])
                 log.info(msg)
                 update_exam(
                     exam_id=exam['id'],

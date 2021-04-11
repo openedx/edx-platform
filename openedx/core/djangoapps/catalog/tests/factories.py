@@ -58,7 +58,7 @@ class DictFactoryBase(factory.Factory):
     Subclass this to make factories that can be used to produce fake API response
     bodies for testing.
     """
-    class Meta:
+    class Meta(object):
         model = dict
 
     def __getitem__(self, item):
@@ -286,4 +286,4 @@ class PathwayFactory(DictFactoryBase):
     name = factory.Faker('sentence')
     org_name = factory.Faker('company')
     programs = factory.LazyFunction(partial(generate_instances, ProgramFactory))
-    pathway_type = FuzzyChoice(path_type.value for path_type in PathwayType)
+    pathway_type = FuzzyChoice((path_type.value for path_type in PathwayType))

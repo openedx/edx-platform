@@ -66,7 +66,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def setUp(self):
-        super(TestCrowdsourceHinter, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCrowdsourceHinter, self).setUp()
         for idx, student in enumerate(self.STUDENTS):
             username = "u{}".format(idx)
             self.create_account(username, student['email'], student['password'])
@@ -132,7 +132,7 @@ class TestCrowdsourceHinter(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestCrowdsourceHinter.XBLOCK_NAMES[0]
         resp = self.call_event(handler, resource, xblock_name)
-        assert resp[resp_key] == resp_val
+        self.assertEqual(resp[resp_key], resp_val)
         self.assert_request_status_code(200, self.course_url)
 
 
@@ -150,7 +150,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'}, 'crowdsourcehinter')
         expected = {'BestHint': 'Sorry, there are no hints for this answer.', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': False}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_add_new_hint(self):
         """
@@ -162,7 +162,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('add_new_hint', data)
         expected = {'success': True,
                     'result': 'Hint added'}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_get_hint(self):
         """
@@ -175,7 +175,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'new hint for answer 1', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': 'ErrorResponse'}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_rate_hint_upvote(self):
         """
@@ -192,7 +192,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'success': True}
         result = self.call_event('rate_hint', data)
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_rate_hint_downvote(self):
         """
@@ -209,7 +209,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'success': True}
         result = self.call_event('rate_hint', data)
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_report_hint(self):
         """
@@ -226,7 +226,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         }
         expected = {'rating': 'reported', 'hint': 'new hint for answer 1'}
         result = self.call_event('rate_hint', data)
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_dont_show_reported_hint(self):
         """
@@ -245,7 +245,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'Sorry, there are no hints for this answer.', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': False}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_get_used_hint_answer_data(self):
         """
@@ -260,7 +260,7 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         result = self.call_event('get_used_hint_answer_data', "")
         expected = {'new hint for answer 1': 'incorrect answer 1'}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)
 
     def test_show_best_hint(self):
         """
@@ -288,4 +288,4 @@ class TestHinterFunctions(TestCrowdsourceHinter):
         result = self.call_event('get_hint', {'submittedanswer': 'ans=incorrect+answer+1'})
         expected = {'BestHint': 'new hint for answer 1', 'StudentAnswer': 'incorrect answer 1',
                     'HintCategory': 'ErrorResponse'}
-        assert json.loads(result.content) == expected
+        self.assertEqual(json.loads(result.content), expected)

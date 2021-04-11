@@ -7,8 +7,8 @@ import os
 import subprocess
 import sys
 import time
-from http.client import HTTPConnection
 
+import six
 from paver import tasks
 from paver.easy import cmdopts, needs, sh, task
 
@@ -89,7 +89,7 @@ def wait_for_server(server, port):
 
     while attempts < 120:
         try:
-            connection = HTTPConnection(server, port, timeout=10)
+            connection = six.moves.http_client.HTTPConnection(server, port, timeout=10)
             connection.request('GET', '/')
             response = connection.getresponse()
 
@@ -115,7 +115,7 @@ def wait_for_test_servers():
         if not ready:
             msg = colorize(
                 "red",
-                f"Could not contact {service} test server"
+                "Could not contact {} test server".format(service)
             )
             print(msg)
             sys.exit(1)
@@ -127,7 +127,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen(f'mongo --host {Env.MONGO_HOST} --eval "print(\'running\')"').read()
+    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -146,7 +146,7 @@ def is_mysql_running():
     """
     # We need to check whether or not mysql is running as a process
     # even if it is not daemonized.
-    with open(os.devnull, 'w') as os_devnull:  # lint-amnesty, pylint: disable=bad-option-value
+    with open(os.devnull, 'w') as os_devnull:  # pylint: disable=W6005
         #pgrep returns the PID, which we send to /dev/null
         returncode = subprocess.call("pgrep mysqld", stdout=os_devnull, shell=True)
     return returncode == 0
@@ -212,4 +212,4 @@ def check_services():
     """
     Check that all required services are running
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

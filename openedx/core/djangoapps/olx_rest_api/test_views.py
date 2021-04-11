@@ -50,10 +50,10 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
             xml_str = re.sub(r'(\s)\s+', r'\1', xml_str)
             xml_bytes = xml_str.encode('utf8')
             return minidom.parseString(xml_bytes).toprettyxml()
-        assert clean(xml_str_a) == clean(xml_str_b)
+        self.assertEqual(clean(xml_str_a), clean(xml_str_b))
 
     def get_olx_response_for_block(self, block_id):
-        return self.client.get(f'/api/olx-export/v1/xblock/{block_id}/')
+        return self.client.get('/api/olx-export/v1/xblock/{}/'.format(block_id))
 
     # Actual tests:
 
@@ -63,9 +63,11 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         team) should not be able to use the API.
         """
         response = self.get_olx_response_for_block(self.unit_key)
-        assert response.status_code == 403
-        assert response.json()['detail'] ==\
-               'You must be a member of the course team in Studio to export OLX using this API.'
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.json()['detail'],
+            'You must be a member of the course team in Studio to export OLX using this API.'
+        )
 
     def test_export(self):
         """
@@ -75,8 +77,11 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         CourseStaffRole(self.course.id).add_users(self.user)
 
         response = self.get_olx_response_for_block(self.unit_key)
-        assert response.status_code == 200
-        assert response.json()['root_block_id'] == str(self.unit_key)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()['root_block_id'],
+            str(self.unit_key),
+        )
         blocks = response.json()['blocks']
         # Check the OLX of the root block:
         self.assertXmlEqual(
@@ -105,8 +110,8 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
 
         block_id = str(self.course.id.make_usage_key('html', 'just_img'))
         response = self.get_olx_response_for_block(block_id)
-        assert response.status_code == 200
-        assert response.json()['root_block_id'] == block_id
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['root_block_id'], block_id)
         block_data = response.json()['blocks'][block_id]
         self.assertXmlEqual(
             block_data['olx'],
@@ -116,7 +121,7 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
             ]]></html>
             '''
         )
-        assert 'static_files' in block_data
-        assert 'foo_bar.jpg' in block_data['static_files']
+        self.assertIn('static_files', block_data)
+        self.assertIn('foo_bar.jpg', block_data['static_files'])
         url = block_data['static_files']['foo_bar.jpg']['url']
-        assert url == 'http://testserver/asset-v1:edX+toy+2012_Fall+type@asset+block@foo_bar.jpg'
+        self.assertEqual(url, 'http://testserver/asset-v1:edX+toy+2012_Fall+type@asset+block@foo_bar.jpg')

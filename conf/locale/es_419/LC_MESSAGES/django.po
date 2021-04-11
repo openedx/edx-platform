@@ -16,7 +16,6 @@
 # BS GRUPO <soporte@bsgrupo.com>, 2018
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
-# kikeramirz <danart474@gmail.com>, 2020
 # David Salazar <imdjsg@gmail.com>, 2014
 # dzepeda <davitzepeda@hotmail.com>, 2014
 # diegobe <diegobe@iadb.org>, 2014
@@ -260,7 +259,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
+"POT-Creation-Date: 2020-10-18 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -811,10 +810,21 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid ""
-"Your organization ID (if your organization has an existing page on LinkedIn)"
-" e.g 1337. If not provided, will default to sending Platform Name (e.g. edX)"
-" instead."
+"The company identifier for the LinkedIn Add-to-Profile button e.g "
+"0_0dPSPyS070e0HsE9HNz_13_d11_"
 msgstr ""
+"El identificador de empresa para el botón de añadir al perfil de LinkedIn. "
+"Ej: 0_0dPSPyS070e0HsE9HNz_13_d11_"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"Short identifier for the LinkedIn partner used in the tracking code.  "
+"(Example: 'edx')  If no value is provided, tracking codes will not be sent "
+"to LinkedIn."
+msgstr ""
+"Identificador corto para partner de LinkedIn usando en el código de rastreo."
+" (Ejemplo: 'edx') Si ningún valor se provee, los código de rastreo no serán "
+"enviados a LinkedIn."
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -909,8 +919,11 @@ msgstr ""
 msgid ""
 "It expect that the data will be provided in a csv file format with"
 "                     first row being the header and columns will be as "
-"follows:                     username, current_email, desired_email"
+"follows:                     username, email, new_email"
 msgstr ""
+"Se espera que los datos se proporcionen en un formato de archivo csv con la "
+"primera fila como encabezado y las columnas serán las siguientes: nombre de "
+"usuario, correo electrónico, correo electrónico nuevo"
 
 #: common/djangoapps/student/models.py
 msgid "Add a reason"
@@ -2400,6 +2413,7 @@ msgstr "Vencido"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Mostrar respuesta"
 
@@ -7103,6 +7117,15 @@ msgid "Total number of users"
 msgstr "Número total de usuarios"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
+msgid "username"
+msgstr "nombre de usuario"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "email"
+msgstr "correo electrónico"
+
+#: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
 msgstr "Crear Resultados de Usuario"
 
@@ -7171,6 +7194,14 @@ msgstr "instructores"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
 msgstr "Información de inscripción para todos los cursos"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "role"
+msgstr "rol"
+
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "full_name"
+msgstr "nombre_completo"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -8485,10 +8516,6 @@ msgstr ""
 "Encuentre información relacionada con las inscripciones en el programa de un"
 " alumno"
 
-#: lms/djangoapps/support/views/manage_user.py lms/templates/tracking_log.html
-msgid "username"
-msgstr "nombre de usuario"
-
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "user_support_url"
@@ -9220,7 +9247,7 @@ msgstr ""
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
@@ -10169,13 +10196,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
 msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -11466,13 +11486,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 "Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más "
@@ -11485,14 +11498,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -11516,6 +11521,10 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "La dirección de correo electrónico que utilizó para registrarse con "
 "{platform_name}"
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr "Crear cuenta"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -11778,10 +11787,6 @@ msgid ""
 msgstr ""
 "Acepto los {tos_link_start}{terms_of_service}{tos_link_end} de "
 "{platform_name} "
-
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
-msgstr "Crear cuenta"
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -12891,8 +12896,9 @@ msgstr "No se especificó ningún 'rol'."
 
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
-msgid "User {email} has registered but has not yet activated their account."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
+"El usuario {email} está registrado pero todavía no ha activado su cuenta."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -13841,7 +13847,7 @@ msgid "Welcome to {platform_name}"
 msgstr "Bienvenido a la plataforma {platform_name}"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See http://open.edx.org for more information.
 #: lms/templates/index_overlay.html
 msgid "It works! Powered by Open edX{registered_trademark}"
 msgstr "¡Funciona! Impulsado por Open edX{registered_trademark}"
@@ -14042,22 +14048,6 @@ msgid "View in Insights"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "Hint"
-msgstr "Consejo"
-
-#: lms/templates/problem.html
-msgid "Save your answer"
-msgstr "Guardar respuesta"
-
-#: lms/templates/problem.html
-msgid "Reset your answer"
-msgstr "Restablecer respuesta"
-
-#: lms/templates/problem.html
-msgid "Show answer"
-msgstr ""
-
-#: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "Ha realizado {num_used} de {num_total} intento"
@@ -14071,6 +14061,18 @@ msgstr ""
 "Algunos problemas tienen opciones como guardar, restablecer, sugerencias o "
 "mostrar respuesta. Estas opciones aparecen después de oprimir el botón "
 "Enviar."
+
+#: lms/templates/problem.html
+msgid "Hint"
+msgstr "Consejo"
+
+#: lms/templates/problem.html
+msgid "Save your answer"
+msgstr "Guardar respuesta"
+
+#: lms/templates/problem.html
+msgid "Reset your answer"
+msgstr "Restablecer respuesta"
 
 #: lms/templates/problem.html
 msgid "Answers are displayed within the problem"
@@ -14377,10 +14379,6 @@ msgid "Git Logs"
 msgstr "Registros de Git"
 
 #: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
 msgstr "Administración de Usuarios"
 
@@ -14397,12 +14395,28 @@ msgid "Create user"
 msgstr "Crear Usuario"
 
 #: lms/templates/sysadmin_dashboard.html
+msgid "Download list of all users (csv file)"
+msgstr "Descargar la lista de todos los usuarios (.csv)"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Check and repair external authentication map"
+msgstr "Revisar y reparar registros de autenticación externa"
+
+#: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
 "Ir al panel de control de los instructores de cada curso para administrar "
 "los registros "
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Manage course staff and instructors"
+msgstr "Administrar el equipo del curso y los instructores"
+
+#: lms/templates/sysadmin_dashboard.html
+msgid "Download staff and instructor list (csv file)"
+msgstr "Descargar la lista del personal del curso e instructores (.csv)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -17975,9 +17989,8 @@ msgstr "¡Felicidades! Su proceso de verificación de ID fue exitoso."
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
-msgstr ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr "Tu verificación es efectiva por un año. Expirará el {expiry_date}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -18465,10 +18478,6 @@ msgstr "Honor"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
 msgstr "Profesional"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Executive Education"
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -20602,6 +20611,10 @@ msgstr "Este curso no tiene actualizaciones."
 msgid "Latest Update"
 msgstr "Última actualización"
 
+#: openedx/features/course_experience/templates/course_experience/next-up-banner-fragment.html
+msgid "Get started on what's next: "
+msgstr "Comience con los siguientes pasos:"
+
 #: openedx/features/course_experience/templates/course_experience/welcome-message-fragment.html
 msgid "Show More"
 msgstr "Mostrar más"
@@ -20686,6 +20699,14 @@ msgstr ""
 #: themes/edx.org/cms/templates/widgets/sock.html
 msgid "edX Partner Portal"
 msgstr "Portal de Socios de edX"
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Want to make edX better for everyone?"
+msgstr ""
+
+#: themes/edx.org/lms/templates/dashboard.html
+msgid "Get started"
+msgstr ""
 
 #: themes/edx.org/lms/templates/dashboard.html
 msgid ""
@@ -23611,10 +23632,14 @@ msgstr "A ritmo propio."
 
 #: cms/templates/settings.html
 msgid ""
-"Self-paced courses offer suggested due dates for assignments or exams based "
-"on the learner’s enrollment date and the expected course duration. These "
-"courses offer learners flexibility to modify the assignment dates as needed."
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
 msgstr ""
+"Los cursos que van a ritmo propio no tienen fechas de publicación para el "
+"contenido ni fechas límites para las tareas.  Los estudiantes pueden "
+"completar los materiales y actividades en cualquier momento antes de la "
+"fecha de fin del curso."
 
 #: cms/templates/settings.html
 msgid "Course Schedule"

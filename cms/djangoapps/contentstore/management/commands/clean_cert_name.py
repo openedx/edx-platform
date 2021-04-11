@@ -7,6 +7,8 @@ erroneous certificate names.
 from collections import namedtuple
 
 from django.core.management.base import BaseCommand
+from six import text_type
+from six.moves import input, range, zip
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -19,7 +21,7 @@ class Command(BaseCommand):
     A management command that provides an interactive way to remove erroneous cert_name_long and
     cert_name_short course attributes across both the Split and Mongo modulestores.
     """
-    help = 'Allows manual clean-up of invalid cert_name_short and cert_name_long entries on CourseBlocks'
+    help = 'Allows manual clean-up of invalid cert_name_short and cert_name_long entries on CourseModules'
 
     def _mongo_results(self):
         """
@@ -151,11 +153,11 @@ class Command(BaseCommand):
         """
         headers = ["Course Key", "cert_name_short", "cert_name_short", "Should clean?"]
         col_widths = [
-            max(len(str(result[col])) for result in results + [headers])
+            max(len(text_type(result[col])) for result in results + [headers])
             for col in range(len(results[0]))
         ]
-        id_format = "{{:>{}}} |".format(len(str(len(results))))
-        col_format = "| {{:>{}}} |"
+        id_format = u"{{:>{}}} |".format(len(text_type(len(results))))
+        col_format = u"| {{:>{}}} |"
 
         self.stdout.write(id_format.format(""), ending='')
         for header, width in zip(headers, col_widths):
@@ -166,7 +168,7 @@ class Command(BaseCommand):
         for idx, result in enumerate(results):
             self.stdout.write(id_format.format(idx), ending='')
             for col, width in zip(result, col_widths):
-                self.stdout.write(col_format.format(width).format(str(col)), ending='')
+                self.stdout.write(col_format.format(width).format(text_type(col)), ending='')
             self.stdout.write("")
 
     def _commit(self, results):

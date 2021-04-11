@@ -17,21 +17,21 @@ class DiscussionConfig(AppConfig):
     Application Configuration for Discussion.
     """
 
-    name = 'lms.djangoapps.discussion'
+    name = u'lms.djangoapps.discussion'
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: fr'^courses/{COURSE_ID_PATTERN}/discussion/forum/',
-                PluginURLs.RELATIVE_PATH: 'urls',
+                PluginURLs.NAMESPACE: u'',
+                PluginURLs.REGEX: r'^courses/{}/discussion/forum/'.format(COURSE_ID_PATTERN),
+                PluginURLs.RELATIVE_PATH: u'urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.CMS: {
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
             },
             ProjectType.LMS: {
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
             },
         }
     }

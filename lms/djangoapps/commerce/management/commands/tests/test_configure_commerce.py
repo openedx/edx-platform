@@ -25,10 +25,10 @@ class TestCommerceConfigurationCommand(TestCase):
         # Verify commerce configuration is enabled with appropriate values
         commerce_configuration = CommerceConfiguration.current()
 
-        assert commerce_configuration.enabled
-        assert commerce_configuration.checkout_on_ecommerce_service
-        assert commerce_configuration.basket_checkout_page == '/basket/add/'
-        assert commerce_configuration.cache_ttl == 0
+        self.assertTrue(commerce_configuration.enabled)
+        self.assertTrue(commerce_configuration.checkout_on_ecommerce_service)
+        self.assertEqual(commerce_configuration.basket_checkout_page, "/basket/add/")
+        self.assertEqual(commerce_configuration.cache_ttl, 0)
 
         # Verify commerce configuration can be disabled from command
         call_command(
@@ -37,7 +37,7 @@ class TestCommerceConfigurationCommand(TestCase):
         )
 
         commerce_configuration = CommerceConfiguration.current()
-        assert not commerce_configuration.enabled
+        self.assertFalse(commerce_configuration.enabled)
 
         # Verify commerce configuration can be disabled from command
         call_command(
@@ -46,7 +46,7 @@ class TestCommerceConfigurationCommand(TestCase):
         )
 
         commerce_configuration = CommerceConfiguration.current()
-        assert not commerce_configuration.checkout_on_ecommerce_service
+        self.assertFalse(commerce_configuration.checkout_on_ecommerce_service)
 
     def test_site_associated_commerce_configuration(self):
         """
@@ -55,5 +55,7 @@ class TestCommerceConfigurationCommand(TestCase):
         This is done to make sure that this command gets updated once site_id field is added to
         CommerceConfiguration model.
         """
-        assert not hasattr(CommerceConfiguration, 'site'),\
-            'Update configure_commerce command to account for site specific configurations.'
+        self.assertFalse(
+            hasattr(CommerceConfiguration, "site"),
+            "Update configure_commerce command to account for site specific configurations.",
+        )

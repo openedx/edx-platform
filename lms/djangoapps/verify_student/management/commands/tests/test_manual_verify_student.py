@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=cyclic-import
+"""
 Tests for django admin commands in the verify_student module
 
 """
@@ -8,14 +8,14 @@ import logging
 import os
 import tempfile
 
-import pytest
+import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 from testfixtures import LogCapture
 
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import ManualVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'lms.djangoapps.verify_student.management.commands.manual_verifications'
 
@@ -27,11 +27,11 @@ class TestVerifyStudentCommand(TestCase):
     tmp_file_path = os.path.join(tempfile.gettempdir(), 'tmp-emails.txt')
 
     def setUp(self):
-        super().setUp()
+        super(TestVerifyStudentCommand, self).setUp()
         self.user1 = UserFactory.create()
         self.user2 = UserFactory.create()
         self.user3 = UserFactory.create()
-        self.invalid_email = 'unknown@unknown.com'
+        self.invalid_email = six.text_type('unknown@unknown.com')
 
         self.create_email_ids_file(
             self.tmp_file_path,
@@ -50,11 +50,11 @@ class TestVerifyStudentCommand(TestCase):
         """
         Tests that the manual_verifications management command executes successfully
         """
-        assert ManualVerification.objects.filter(status='approved').count() == 0
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 0)
 
         call_command('manual_verifications', '--email-ids-file', self.tmp_file_path)
 
-        assert ManualVerification.objects.filter(status='approved').count() == 3
+        self.assertEqual(ManualVerification.objects.filter(status='approved').count(), 3)
 
     def test_manual_verifications_created_date(self):
         """
@@ -87,15 +87,15 @@ class TestVerifyStudentCommand(TestCase):
         expected_log = (
             (LOGGER_NAME,
              'INFO',
-             'Creating manual verification for 4 emails.'
+             u'Creating manual verification for 4 emails.'
              ),
             (LOGGER_NAME,
              'ERROR',
-             'Tried to verify email unknown@unknown.com, but user not found'
+             u'Tried to verify email unknown@unknown.com, but user not found'
              ),
             (LOGGER_NAME,
              'ERROR',
-             'Completed manual verification. 1 of 4 failed.'
+             u'Completed manual verification. 1 of 4 failed.'
              ),
             (LOGGER_NAME,
              'ERROR',
@@ -113,5 +113,5 @@ class TestVerifyStudentCommand(TestCase):
         """
         Verify command raises the CommandError for invalid file path.
         """
-        with pytest.raises(CommandError):
+        with self.assertRaises(CommandError):
             call_command('manual_verifications', '--email-ids-file', u'invalid/email_id/file/path')

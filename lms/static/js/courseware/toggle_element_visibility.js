@@ -16,14 +16,14 @@
 
                     if (elementIsHidden) {
                         if (hide_text) {
-                            actionElement.html(actionElement.data('hide')); // xss-lint: disable=javascript-jquery-html
+                            actionElement.html(actionElement.data('hide'));
                         } else {
                             actionElement.hide();
                             first_hidden_update.focus();
                         }
                     } else {
                         if (show_text) {
-                            actionElement.html(actionElement.data('show')); // xss-lint: disable=javascript-jquery-html
+                            actionElement.html(actionElement.data('show'));
                         }
                     }
                 };

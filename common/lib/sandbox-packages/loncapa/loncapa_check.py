@@ -1,4 +1,4 @@
-#!/usr/bin/python  # lint-amnesty, pylint: disable=missing-module-docstring
+#!/usr/bin/python
 #
 # File:  mitx/lib/loncapa/loncapa_check.py
 #
@@ -26,9 +26,9 @@ def lc_choose(index, *args):
     '''
     try:
         return args[int(index) - 1]
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except, unused-variable
+    except Exception as err:
         pass
-    if len(args):  # lint-amnesty, pylint: disable=len-as-condition
+    if len(args):
         return args[0]
     raise Exception(
         "loncapa_check.lc_choose error, index={index}, args={args}".format(

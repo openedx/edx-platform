@@ -3,8 +3,8 @@
 
 from django.test import TestCase
 
-from common.djangoapps.student.tests.factories import UserFactory
 from openedx.features.calendar_sync import get_calendar_event_id
+from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_PASSWORD = 'test'
 
@@ -12,7 +12,7 @@ TEST_PASSWORD = 'test'
 class TestCalendarSyncInit(TestCase):
     """ Tests for the contents of __init__.py """
     def setUp(self):
-        super().setUp()
+        super(TestCalendarSyncInit, self).setUp()
         self.user = UserFactory(password=TEST_PASSWORD)
 
     def test_get_calendar_event_id(self):
@@ -23,4 +23,4 @@ class TestCalendarSyncInit(TestCase):
         expected = '{user_id}.{block_key}.{date_type}@{hostname}'.format(
             user_id=self.user.id, block_key=block_key, date_type=date_type, hostname=hostname
         )
-        assert event_id == expected
+        self.assertEqual(event_id, expected)

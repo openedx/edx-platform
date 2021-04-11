@@ -23,8 +23,8 @@ class XBlockAsidesConfig(ConfigurationModel):
         app_label = "lms_xblock"
 
     disabled_blocks = TextField(
-        default="about course_info static_tab",
-        help_text="Space-separated list of XBlocks on which XBlockAsides should never render."
+        default=u"about course_info static_tab",
+        help_text=u"Space-separated list of XBlocks on which XBlockAsides should never render."
     )
 
     @classmethod

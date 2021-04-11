@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.cache import cache
 
 
-class CourseCatalogServiceMockMixin:
+class CourseCatalogServiceMockMixin(object):
     """
     Mocks for the Open edX service 'Course Catalog Service' responses.
     """
@@ -19,7 +19,7 @@ class CourseCatalogServiceMockMixin:
     )
 
     def setUp(self):
-        super().setUp()
+        super(CourseCatalogServiceMockMixin, self).setUp()
         cache.clear()
 
     def mock_course_discovery_api_for_catalog_contains(self, catalog_id=1, course_run_ids=None):

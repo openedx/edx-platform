@@ -3,11 +3,11 @@ Test signal handlers for the survey app
 """
 
 
+from lms.djangoapps.survey.signals import _listen_for_lms_retire
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.survey.models import SurveyAnswer
-from lms.djangoapps.survey.signals import _listen_for_lms_retire
 from lms.djangoapps.survey.tests.factories import SurveyAnswerFactory
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -25,7 +25,7 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
 
         # All values for this user should now be empty string
-        assert not SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists()
+        self.assertFalse(SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists())
 
     def test_success_no_answers(self):
         """
@@ -46,4 +46,4 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
 
         # All values for this user should still be here and just be an empty string
-        assert not SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists()
+        self.assertFalse(SurveyAnswer.objects.filter(user=answer.user).exclude(field_value='').exists())

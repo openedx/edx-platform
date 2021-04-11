@@ -11,9 +11,11 @@ import sys
 from collections import OrderedDict
 from datetime import datetime
 
+import six
 from contracts import contract
 from pytz import UTC
 from django.utils.translation import ugettext_lazy as _
+from six.moves import range
 
 from xmodule.util.misc import get_short_labeler
 
@@ -21,7 +23,7 @@ from xmodule.util.misc import get_short_labeler
 log = logging.getLogger("edx.courseware")
 
 
-class ScoreBase(metaclass=abc.ABCMeta):  # pylint: disable=eq-without-hash
+class ScoreBase(six.with_metaclass(abc.ABCMeta, object)):
     """
     Abstract base class for encapsulating fields of values scores.
     """
@@ -49,7 +51,7 @@ class ScoreBase(metaclass=abc.ABCMeta):  # pylint: disable=eq-without-hash
         return not self.__eq__(other)
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.__dict__})"
+        return u"{class_name}({fields})".format(class_name=self.__class__.__name__, fields=self.__dict__)
 
 
 class ProblemScore(ScoreBase):
@@ -76,7 +78,7 @@ class ProblemScore(ScoreBase):
             :param weight: Weight of this problem
             :type weight: int|float|None
         """
-        super().__init__(*args, **kwargs)
+        super(ProblemScore, self).__init__(*args, **kwargs)
         self.raw_earned = float(raw_earned) if raw_earned is not None else None
         self.raw_possible = float(raw_possible) if raw_possible is not None else None
         self.earned = float(weighted_earned) if weighted_earned is not None else None
@@ -99,7 +101,7 @@ class AggregatedScore(ScoreBase):
             :param tw_possible: Total aggregated sum of all weighted possible values
             :type tw_possible: int|float|None
         """
-        super().__init__(*args, **kwargs)
+        super(AggregatedScore, self).__init__(*args, **kwargs)
         self.earned = float(tw_earned) if tw_earned is not None else None
         self.possible = float(tw_possible) if tw_possible is not None else None
 
@@ -178,7 +180,7 @@ def grader_from_conf(conf):
 
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
             if bad_args:
-                log.warning("Invalid arguments for a subgrader: %s", bad_args)
+                log.warning(u"Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:
                     del subgraderconf[key]
 
@@ -190,12 +192,12 @@ def grader_from_conf(conf):
             msg = ("Unable to parse grader configuration:\n    " +
                    str(subgraderconf) +
                    "\n    Error was:\n    " + str(error))
-            raise ValueError(msg).with_traceback(sys.exc_info()[2])
+            six.reraise(ValueError, ValueError(msg), sys.exc_info()[2])
 
     return WeightedSubsectionsGrader(subgraders)
 
 
-class CourseGrader(metaclass=abc.ABCMeta):
+class CourseGrader(six.with_metaclass(abc.ABCMeta, object)):
     """
     A course grader takes the totaled scores for each graded section (that a student has
     started) in the course. From these scores, the grader calculates an overall percentage
@@ -258,11 +260,11 @@ class WeightedSubsectionsGrader(CourseGrader):
     a value > 1, the student may end up with a percent > 100%. This allows for sections that
     are extra credit.
     """
-    def __init__(self, subgraders):  # pylint: disable=super-init-not-called
+    def __init__(self, subgraders):
         self.subgraders = subgraders
 
     @property
-    def sum_of_weights(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def sum_of_weights(self):
         result = 0
         for _, _, weight in self.subgraders:
             result += weight
@@ -277,7 +279,7 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = _("{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
+            section_detail = _(u"{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
                 assignment_type=assignment_type,
                 weighted_percent=weighted_percent,
                 weight=weight)
@@ -331,7 +333,7 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(  # lint-amnesty, pylint: disable=super-init-not-called
+    def __init__(
             self,
             type,  # pylint: disable=redefined-builtin
             min_count,
@@ -391,7 +393,7 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].display_name
 
                 percentage = scores[i].percent_graded
-                summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
+                summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,
                     section_type=self.section_type,
@@ -403,7 +405,7 @@ class AssignmentFormatGrader(CourseGrader):
             else:
                 percentage = 0.0
                 # Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been released for viewing.
-                summary = _("{section_type} {index} Unreleased - 0% (?/?)").format(
+                summary = _(u"{section_type} {index} Unreleased - 0% (?/?)").format(
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
@@ -416,7 +418,7 @@ class AssignmentFormatGrader(CourseGrader):
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {
-                'detail': _("The lowest {drop_count} {section_type} scores are dropped.").format(
+                'detail': _(u"The lowest {drop_count} {section_type} scores are dropped.").format(
                     drop_count=self.drop_count,
                     section_type=self.section_type
                 )
@@ -425,21 +427,21 @@ class AssignmentFormatGrader(CourseGrader):
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
             # and just display a single entry for the section.
-            total_detail = "{section_type} = {percent:.0%}".format(
+            total_detail = u"{section_type} = {percent:.0%}".format(
                 percent=total_percent,
                 section_type=self.section_type,
             )
-            total_label = f"{self.short_label}"
+            total_label = u"{short_label}".format(short_label=self.short_label)
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
             # Translators: "Homework Average = 0%"
-            total_detail = _("{section_type} Average = {percent:.0%}").format(
+            total_detail = _(u"{section_type} Average = {percent:.0%}").format(
                 percent=total_percent,
                 section_type=self.section_type
             )
             # Translators: Avg is short for Average
-            total_label = _("{short_label} Avg").format(short_label=self.short_label)
+            total_label = _(u"{short_label} Avg").format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
@@ -474,7 +476,7 @@ def _min_or_none(itr):
         return None
 
 
-class ShowCorrectness:
+class ShowCorrectness(object):
     """
     Helper class for determining whether correctness is currently hidden for a block.
 

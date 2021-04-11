@@ -6,7 +6,6 @@
 import logging
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import httpretty
@@ -17,15 +16,17 @@ from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
+from mock import patch
+from six.moves import range
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -45,12 +46,12 @@ class RefundableTest(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(RefundableTest, cls).setUpClass()
         cls.course = CourseFactory.create()
 
     def setUp(self):
         """ Setup components used by each refund test."""
-        super().setUp()
+        super(RefundableTest, self).setUp()
         self.user = UserFactory.create(password=self.USER_PASSWORD)
         self.verified_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -68,7 +69,7 @@ class RefundableTest(SharedModuleStoreTestCase):
     def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
-        assert self.enrollment.refundable()
+        self.assertTrue(self.enrollment.refundable())
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_expired_verification(self, cutoff_date):
@@ -76,7 +77,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         self.verified_mode.save()
-        assert self.enrollment.refundable()
+        self.assertTrue(self.enrollment.refundable())
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_when_certificate_exists(self, cutoff_date):
@@ -84,7 +85,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
 
-        assert self.enrollment.refundable()
+        self.assertTrue(self.enrollment.refundable())
 
         GeneratedCertificateFactory.create(
             user=self.user,
@@ -93,28 +94,33 @@ class RefundableTest(SharedModuleStoreTestCase):
             mode='verified'
         )
 
-        assert not self.enrollment.refundable()
-        assert not self.enrollment.\
-            refundable(user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user))
+        self.assertFalse(self.enrollment.refundable())
+        self.assertFalse(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
+        )
 
         # Assert that can_refund overrides this and allows refund
         self.enrollment.can_refund = True
-        assert self.enrollment.refundable()
-        assert self.enrollment.refundable(
-            user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+        self.assertTrue(self.enrollment.refundable())
+        self.assertTrue(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
         )
 
     @patch('common.djangoapps.student.models.CourseEnrollment.refund_cutoff_date')
     def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
-        assert self.enrollment.refundable()
+        self.assertTrue(self.enrollment.refundable())
 
         cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
-        assert not self.enrollment.refundable()
+        self.assertFalse(self.enrollment.refundable())
 
         cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(minutes=5)
-        assert self.enrollment.refundable()
+        self.assertTrue(self.enrollment.refundable())
 
     @ddt.data(
         (timedelta(days=1), timedelta(days=2), timedelta(days=2), 14),
@@ -135,11 +141,11 @@ class RefundableTest(SharedModuleStoreTestCase):
         expected_date = now + expected_date_delta
         refund_period = timedelta(days=days)
         date_placed = order_date.strftime(ECOMMERCE_DATE_FORMAT)
-        expected_content = f'{{"date_placed": "{date_placed}"}}'
+        expected_content = '{{"date_placed": "{date}"}}'.format(date=date_placed)
 
         httpretty.register_uri(
             httpretty.GET,
-            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )
@@ -155,7 +161,10 @@ class RefundableTest(SharedModuleStoreTestCase):
         with patch('common.djangoapps.student.models.EnrollmentRefundConfiguration.current') as config:
             instance = config.return_value
             instance.refund_window = refund_period
-            assert self.enrollment.refund_cutoff_date() == (expected_date + refund_period)
+            self.assertEqual(
+                self.enrollment.refund_cutoff_date(),
+                expected_date + refund_period
+            )
 
             expected_date_placed_attr = {
                 "namespace": "order",
@@ -163,11 +172,14 @@ class RefundableTest(SharedModuleStoreTestCase):
                 "value": date_placed,
             }
 
-            assert expected_date_placed_attr in CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
+            self.assertIn(
+                expected_date_placed_attr,
+                CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
+            )
 
     def test_refund_cutoff_date_no_attributes(self):
         """ Assert that the None is returned when no order number attribute is found."""
-        assert self.enrollment.refund_cutoff_date() is None
+        self.assertIsNone(self.enrollment.refund_cutoff_date())
 
     @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
     def test_refund_cutoff_date_with_date_placed_attr(self, mock_ecommerce_api_client):
@@ -188,7 +200,10 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         refund_config = EnrollmentRefundConfiguration.current()
-        assert self.enrollment.refund_cutoff_date() == (order_date + refund_config.refund_window)
+        self.assertEqual(
+            self.enrollment.refund_cutoff_date(),
+            order_date + refund_config.refund_window
+        )
         mock_ecommerce_api_client.assert_not_called()
 
     @httpretty.activate
@@ -201,7 +216,7 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         httpretty.register_uri(
             httpretty.GET,
-            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            '{url}/orders/{order}/'.format(url=TEST_API_URL, order=self.ORDER_NUMBER),
             status=200, body=expected_content,
             adding_headers={'Content-Type': JSON}
         )
@@ -217,4 +232,4 @@ class RefundableTest(SharedModuleStoreTestCase):
 
         self.client.login(username=self.user.username, password=self.USER_PASSWORD)
         resp = self.client.post(reverse('dashboard', args=[]))
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)

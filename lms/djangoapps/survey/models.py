@@ -13,9 +13,9 @@ from lxml import etree
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
+from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.models import User
 from lms.djangoapps.survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
-from openedx.core.djangolib.markup import HTML
 
 log = logging.getLogger("edx.survey")
 
@@ -33,7 +33,7 @@ class SurveyForm(TimeStampedModel):
     name = models.CharField(max_length=255, db_index=True, unique=True)
     form = models.TextField()
 
-    class Meta:
+    class Meta(object):
         app_label = 'survey'
 
     def __str__(self):
@@ -48,7 +48,7 @@ class SurveyForm(TimeStampedModel):
         self.validate_form_html(self.form)
 
         # now call the actual save method
-        super().save(*args, **kwargs)
+        super(SurveyForm, self).save(*args, **kwargs)
 
     @classmethod
     def validate_form_html(cls, html):
@@ -58,10 +58,10 @@ class SurveyForm(TimeStampedModel):
         try:
             fields = cls.get_field_names_from_html(html)
         except Exception as ex:
-            log.exception(f"Cannot parse SurveyForm html: {ex}")
-            raise ValidationError(f"Cannot parse SurveyForm as HTML: {ex}")  # lint-amnesty, pylint: disable=raise-missing-from
+            log.exception(u"Cannot parse SurveyForm html: {}".format(ex))
+            raise ValidationError(u"Cannot parse SurveyForm as HTML: {}".format(ex))
 
-        if not len(fields):  # lint-amnesty, pylint: disable=len-as-condition
+        if not len(fields):
             raise ValidationError("SurveyForms must contain at least one form input field")
 
     @classmethod
@@ -152,7 +152,7 @@ class SurveyForm(TimeStampedModel):
         # make sure the form is wrap in some outer single element
         # otherwise lxml can't parse it
         # NOTE: This wrapping doesn't change the ability to query it
-        tree = etree.fromstring(HTML('<div>{}</div>').format(HTML(html)))
+        tree = etree.fromstring(HTML(u'<div>{}</div>').format(HTML(html)))
 
         input_fields = (
             tree.findall('.//input') + tree.findall('.//select') +
@@ -183,7 +183,7 @@ class SurveyAnswer(TimeStampedModel):
     # since it didn't exist in the beginning, it is nullable
     course_key = CourseKeyField(max_length=255, db_index=True, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'survey'
 
     @classmethod

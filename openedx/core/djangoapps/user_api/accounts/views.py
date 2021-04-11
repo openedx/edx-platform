@@ -34,6 +34,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import iteritems, text_type
 from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
@@ -51,7 +52,7 @@ from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
-from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.models import (
     AccountRecovery,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -114,7 +115,7 @@ def request_requires_username(function):
         if not username:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
-                data={'message': 'The user was not specified.'}
+                data={'message': text_type('The user was not specified.')}
             )
         return function(self, request)
     return wrapper
@@ -163,13 +164,11 @@ class AccountViewSet(ViewSet):
             "OK" response is returned. The response contains the following
             values.
 
-            * id: numerical lms user id in db
             * bio: null or textual representation of user biographical
               information ("about me").
             * country: An ISO 3166 country code or null.
             * date_joined: The date the account was created, in the string
               format provided by datetime. For example, "2014-08-26T17:52:11Z".
-            * last_login: The latest date the user logged in, in the string datetime format.
             * email: Email address for the user. New email addresses must be confirmed
               via a confirmation email, so GET does not reflect the change until
               the address has been confirmed.
@@ -455,7 +454,7 @@ class DeactivateLogoutView(APIView):
                         default=settings.LANGUAGE_CODE
                     )
                     notification = DeletionNotificationMessage().personalize(
-                        recipient=Recipient(lms_user_id=0, email_address=user_email),
+                        recipient=Recipient(username='', email_address=user_email),
                         language=language_code,
                         user_context=notification_context,
                     )
@@ -468,16 +467,16 @@ class DeactivateLogoutView(APIView):
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except KeyError:
-            log.exception(f'Username not specified {request.user}')
-            return Response('Username not specified.', status=status.HTTP_404_NOT_FOUND)
+            log.exception('Username not specified {}'.format(request.user))
+            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
         except user_model.DoesNotExist:
-            log.exception(f'The user "{request.user.username}" does not exist.')
+            log.exception('The user "{}" does not exist.'.format(request.user.username))
             return Response(
-                f'The user "{request.user.username}" does not exist.', status=status.HTTP_404_NOT_FOUND
+                u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
             )
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception(f'500 error deactivating account {exc}')
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            log.exception('500 error deactivating account {}'.format(exc))
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def _verify_user_password(self, request):
         """
@@ -498,11 +497,11 @@ class DeactivateLogoutView(APIView):
                 self._handle_failed_authentication(request.user)
         except AuthFailedError as err:
             log.exception(
-                f"The user password to deactivate was incorrect. {request.user.username}"
+                "The user password to deactivate was incorrect. {}".format(request.user.username)
             )
-            return Response(str(err), status=status.HTTP_403_FORBIDDEN)
+            return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
         except Exception as err:  # pylint: disable=broad-except
-            return Response(f"Could not verify user password: {err}", status=status.HTTP_400_BAD_REQUEST)
+            return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
 
     def _check_excessive_login_attempts(self, user):
         """
@@ -712,9 +711,9 @@ class AccountRetirementPartnerReportView(ViewSet):
         # to disambiguate them in Python, which will respect case in the comparison.
         if len(usernames) != len(retirement_statuses_clean):
             return Response(
-                '{} original_usernames given, {} found!\n'
-                'Given usernames:\n{}\n'
-                'Found UserRetirementReportingStatuses:\n{}'.format(
+                u'{} original_usernames given, {} found!\n'
+                u'Given usernames:\n{}\n'
+                u'Found UserRetirementReportingStatuses:\n{}'.format(
                     len(usernames),
                     len(retirement_statuses_clean),
                     usernames,
@@ -757,7 +756,7 @@ class AccountRetirementStatusView(ViewSet):
             state_objs = RetirementState.objects.filter(state_name__in=states)
             if state_objs.count() != len(states):
                 found = [s.state_name for s in state_objs]
-                raise RetirementStateError(f'Unknown state. Requested: {states} Found: {found}')
+                raise RetirementStateError(u'Unknown state. Requested: {} Found: {}'.format(states, found))
 
             earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
 
@@ -774,10 +773,10 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)),
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
     def retirements_by_status_and_date(self, request):
         """
@@ -814,14 +813,14 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response('Invalid start or end date: {}'.format(str(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(u'Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(u'Missing required parameter: {}'.format(text_type(exc)),
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, username):  # pylint: disable=unused-argument
         """
@@ -869,7 +868,7 @@ class AccountRetirementStatusView(ViewSet):
             # than one row returned here (due to our MySQL collation being case-insensitive), and need
             # to disambiguate them in Python, which will respect case in the comparison.
             retirement = None
-            if len(retirements) < 1:  # lint-amnesty, pylint: disable=no-else-raise
+            if len(retirements) < 1:
                 raise UserRetirementStatus.DoesNotExist()
             elif len(retirements) >= 1:
                 for r in retirements:
@@ -885,9 +884,9 @@ class AccountRetirementStatusView(ViewSet):
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def cleanup(self, request):
         """
@@ -920,9 +919,9 @@ class AccountRetirementStatusView(ViewSet):
             retirements.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except (RetirementStateError, UserRetirementStatus.DoesNotExist, TypeError) as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LMSAccountRetirementView(ViewSet):
@@ -974,9 +973,9 @@ class LMSAccountRetirementView(ViewSet):
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -1044,9 +1043,9 @@ class AccountRetirementView(ViewSet):
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
-            return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
         except Exception as exc:  # pylint: disable=broad-except
-            return Response(str(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -1056,7 +1055,7 @@ class AccountRetirementView(ViewSet):
         For the given user, sets all of the user's profile fields to some retired value.
         This also deletes all ``SocialLink`` objects associated with this user's profile.
         """
-        for model_field, value_to_assign in USER_PROFILE_PII.items():
+        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
             setattr(user.profile, model_field, value_to_assign)
 
         user.profile.save()
@@ -1078,7 +1077,7 @@ class AccountRetirementView(ViewSet):
         DataSharingConsent.objects.filter(username=username).update(username=retired_username)
 
     @staticmethod
-    def retire_sapsf_data_transmission(user):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def retire_sapsf_data_transmission(user):
         for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
             for enrollment in EnterpriseCourseEnrollment.objects.filter(
                 enterprise_customer_user=ent_user
@@ -1089,7 +1088,7 @@ class AccountRetirementView(ViewSet):
                 audits.update(sapsf_user_id='')
 
     @staticmethod
-    def retire_degreed_data_transmission(user):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def retire_degreed_data_transmission(user):
         for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
             for enrollment in EnterpriseCourseEnrollment.objects.filter(
                 enterprise_customer_user=ent_user
@@ -1259,7 +1258,7 @@ class UsernameReplacementView(APIView):
                     )
         except Exception as exc:  # pylint: disable=broad-except
             log.exception(
-                "Unable to change username from %s to %s. Failed on table %s because %s",
+                u"Unable to change username from %s to %s. Failed on table %s because %s",
                 current_username,
                 new_username,
                 model.__class__.__name__,  # Retrieves the model name that it failed on
@@ -1268,14 +1267,14 @@ class UsernameReplacementView(APIView):
             return False
         if num_rows_changed == 0:
             log.info(
-                "Unable to change username from %s to %s because %s doesn't exist.",
+                u"Unable to change username from %s to %s because %s doesn't exist.",
                 current_username,
                 new_username,
                 current_username,
             )
         else:
             log.info(
-                "Successfully changed username from %s to %s.",
+                u"Successfully changed username from %s to %s.",
                 current_username,
                 new_username,
             )

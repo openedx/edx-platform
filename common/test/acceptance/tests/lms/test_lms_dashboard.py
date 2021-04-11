@@ -1,13 +1,17 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for the main LMS Dashboard (aka, Student Dashboard).
 """
+
+import six
+
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, generate_course_key
 
-DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
-TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
+DEFAULT_SHORT_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year}'
+TEST_DATE_FORMAT = u'{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
 
 
 class BaseLmsDashboardTestMultiple(UniqueCourseTest):
@@ -19,7 +23,7 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         """
         # Some parameters are provided by the parent setUp() routine, such as the following:
         # self.course_id, self.course_info, self.unique_id
-        super().setUp()
+        super(BaseLmsDashboardTestMultiple, self).setUp()
 
         # Load page objects for use by the tests
         self.dashboard_page = DashboardPage(self.browser)
@@ -53,12 +57,12 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
         }
 
         self.username = "test_{uuid}".format(uuid=self.unique_id[0:6])
-        self.email = f"{self.username}@example.com"
+        self.email = "{user}@example.com".format(user=self.username)
 
         self.course_keys = {}
         self.course_fixtures = {}
 
-        for key, value in self.courses.items():
+        for key, value in six.iteritems(self.courses):
             course_key = generate_course_key(
                 value['org'],
                 value['number'],
@@ -73,8 +77,8 @@ class BaseLmsDashboardTestMultiple(UniqueCourseTest):
             )
 
             course_fixture.add_advanced_settings({
-                "social_sharing_url": {"value": "http://custom/course/url"},
-                "cert_name_long": {"value": value['cert_name_long']}
+                u"social_sharing_url": {u"value": "http://custom/course/url"},
+                u"cert_name_long": {u"value": value['cert_name_long']}
             })
             course_fixture.add_children(
                 XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
@@ -131,5 +135,5 @@ class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
             ]
         })
         course_listings = self.dashboard_page.get_courses()
-        assert len(course_listings) == 3
+        self.assertEqual(len(course_listings), 3)
         self.dashboard_page.a11y_audit.check_for_accessibility_errors()

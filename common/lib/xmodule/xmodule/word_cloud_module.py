@@ -12,6 +12,8 @@ import logging
 
 from pkg_resources import resource_string
 
+import six
+from six.moves import map
 from web_fragments.fragment import Fragment
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_module import EditingMixin
@@ -139,7 +141,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     def get_state(self):
         """Return success json answer for client."""
         if self.submitted:
-            total_count = sum(self.all_words.values())
+            total_count = sum(six.itervalues(self.all_words))
             return json.dumps({
                 'status': 'success',
                 'submitted': True,
@@ -272,7 +274,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
                 'error': 'Unknown Command!'
             })
 
-    def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
+    def student_view(self, context):
         """
         Renders the output that a student will see.
         """
@@ -316,7 +318,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         # values may be numeric / string or dict
         # default implementation is an empty dict
 
-        xblock_body = super().index_dictionary()
+        xblock_body = super(WordCloudBlock, self).index_dictionary()
 
         index_body = {
             "display_name": self.display_name,

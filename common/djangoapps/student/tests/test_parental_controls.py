@@ -17,7 +17,7 @@ class ProfileParentalControlsTest(TestCase):
     password = "test"
 
     def setUp(self):
-        super().setUp()
+        super(ProfileParentalControlsTest, self).setUp()
         self.user = UserFactory.create(password=self.password)
         self.profile = UserProfile.objects.get(id=self.user.id)
 
@@ -30,28 +30,28 @@ class ProfileParentalControlsTest(TestCase):
 
     def test_no_year_of_birth(self):
         """Verify the behavior for users with no specified year of birth."""
-        assert self.profile.requires_parental_consent()
-        assert self.profile.requires_parental_consent(default_requires_consent=True)
-        assert not self.profile.requires_parental_consent(default_requires_consent=False)
+        self.assertTrue(self.profile.requires_parental_consent())
+        self.assertTrue(self.profile.requires_parental_consent(default_requires_consent=True))
+        self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=False))
 
     @override_settings(PARENTAL_CONSENT_AGE_LIMIT=None)
     def test_no_parental_controls(self):
         """Verify the behavior for all users when parental controls are not enabled."""
-        assert not self.profile.requires_parental_consent()
-        assert not self.profile.requires_parental_consent(default_requires_consent=True)
-        assert not self.profile.requires_parental_consent(default_requires_consent=False)
+        self.assertFalse(self.profile.requires_parental_consent())
+        self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=True))
+        self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=False))
 
         # Verify that even a child does not require parental consent
         current_year = now().year
         self.set_year_of_birth(current_year - 10)
-        assert not self.profile.requires_parental_consent()
+        self.assertFalse(self.profile.requires_parental_consent())
 
     def test_adult_user(self):
         """Verify the behavior for an adult."""
         current_year = now().year
         self.set_year_of_birth(current_year - 20)
-        assert not self.profile.requires_parental_consent()
-        assert self.profile.requires_parental_consent(age_limit=21)
+        self.assertFalse(self.profile.requires_parental_consent())
+        self.assertTrue(self.profile.requires_parental_consent(age_limit=21))
 
     def test_child_user(self):
         """Verify the behavior for a child."""
@@ -59,14 +59,14 @@ class ProfileParentalControlsTest(TestCase):
 
         # Verify for a child born 13 years agp
         self.set_year_of_birth(current_year - 13)
-        assert self.profile.requires_parental_consent()
-        assert self.profile.requires_parental_consent(date=datetime.date(current_year, 12, 31))
-        assert not self.profile.requires_parental_consent(date=datetime.date((current_year + 1), 1, 1))
+        self.assertTrue(self.profile.requires_parental_consent())
+        self.assertTrue(self.profile.requires_parental_consent(date=datetime.date(current_year, 12, 31)))
+        self.assertFalse(self.profile.requires_parental_consent(date=datetime.date(current_year + 1, 1, 1)))
 
         # Verify for a child born 14 years ago
         self.set_year_of_birth(current_year - 14)
-        assert not self.profile.requires_parental_consent()
-        assert not self.profile.requires_parental_consent(date=datetime.date(current_year, 1, 1))
+        self.assertFalse(self.profile.requires_parental_consent())
+        self.assertFalse(self.profile.requires_parental_consent(date=datetime.date(current_year, 1, 1)))
 
     def test_profile_image(self):
         """Verify that a profile's image obeys parental controls."""
@@ -74,16 +74,16 @@ class ProfileParentalControlsTest(TestCase):
         # Verify that an image cannot be set for a user with no year of birth set
         self.profile.profile_image_uploaded_at = now()
         self.profile.save()
-        assert not self.profile.has_profile_image
+        self.assertFalse(self.profile.has_profile_image)
 
         # Verify that an image can be set for an adult user
         current_year = now().year
         self.set_year_of_birth(current_year - 20)
         self.profile.profile_image_uploaded_at = now()
         self.profile.save()
-        assert self.profile.has_profile_image
+        self.assertTrue(self.profile.has_profile_image)
 
         # verify that a user's profile image is removed when they switch to requiring parental controls
         self.set_year_of_birth(current_year - 10)
         self.profile.save()
-        assert not self.profile.has_profile_image
+        self.assertFalse(self.profile.has_profile_image)

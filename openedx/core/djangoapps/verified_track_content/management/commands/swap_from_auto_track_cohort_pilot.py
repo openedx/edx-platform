@@ -26,7 +26,7 @@ class Command(BaseCommand):
     """
     help = dedent(__doc__).strip()
 
-    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
+    def handle(self, *args, **options):
 
         errors = []
 
@@ -103,7 +103,7 @@ class Command(BaseCommand):
         try:
             verified_track_cohorted_course = VerifiedTrackCohortedCourse.objects.get(course_key=old_course_key)
         except VerifiedTrackCohortedCourse.DoesNotExist:
-            raise CommandError(u"No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(u"No VerifiedTrackCohortedCourse found for course: '%s'" % old_course_key)
 
         if not verified_track_cohorted_course.enabled:
             raise CommandError(u"VerifiedTrackCohortedCourse not enabled for course: '%s'" % old_course_key)
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                 name=verified_track_cohorted_course.verified_cohort_name
             )
         except CourseUserGroup.DoesNotExist:
-            raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(
                 u"No Verified CourseUserGroup found for course_id='%s' with group_type='%s' for names='%s'"
                 % (old_course_key, CourseUserGroup.COHORT, verified_track_cohorted_course.verified_cohort_name)
             )
@@ -127,7 +127,7 @@ class Command(BaseCommand):
                 course_user_group_id=verified_course_user_group.id
             )
         except CourseUserGroupPartitionGroup.DoesNotExist:
-            raise CommandError(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(
                 u"No Verified CourseUserGroupPartitionGroup found for course_user_group_ids='%s'"
                 % random_audit_course_user_group_ids
             )
@@ -139,7 +139,7 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.AUDIT
             )
         except CourseMode.DoesNotExist:
-            raise CommandError(u"Audit CourseMode is not defined for course: '%s'" % rerun_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(u"Audit CourseMode is not defined for course: '%s'" % rerun_course_key)
 
         try:
             CourseMode.objects.get(
@@ -147,7 +147,7 @@ class Command(BaseCommand):
                 mode_slug=CourseMode.VERIFIED
             )
         except CourseMode.DoesNotExist:
-            raise CommandError(u"Verified CourseMode is not defined for course: '%s'" % rerun_course_key)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(u"Verified CourseMode is not defined for course: '%s'" % rerun_course_key)
 
         items = module_store.get_items(rerun_course_key)
         if not items:
@@ -233,7 +233,7 @@ class Command(BaseCommand):
         # Check if we should delete any partition groups if there are no errors.
         # If there are errors, none of the xblock items will have been updated,
         # so this section will throw errors for each partition in use
-        if partitions_to_delete and not errors:  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        if partitions_to_delete and not errors:
             partition_service = PartitionService(rerun_course_key)
             course = partition_service.get_course()
             for partition_to_delete in partitions_to_delete:

@@ -6,12 +6,13 @@ Tests for the maintenance app views.
 import json
 
 import ddt
+import six
 from django.conf import settings
 from django.urls import reverse
 
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
-from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from openedx.features.announcements.models import Announcement
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,7 +30,7 @@ class TestMaintenanceIndex(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestMaintenanceIndex, self).setUp()
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
         self.assertTrue(login_success)
@@ -55,7 +56,7 @@ class MaintenanceViewTestCase(ModuleStoreTestCase):
     view_url = ''
 
     def setUp(self):
-        super().setUp()
+        super(MaintenanceViewTestCase, self).setUp()
         self.user = AdminFactory()
         login_success = self.client.login(username=self.user.username, password='test')
         self.assertTrue(login_success)
@@ -72,7 +73,7 @@ class MaintenanceViewTestCase(ModuleStoreTestCase):
         Reverse the setup.
         """
         self.client.logout()
-        super().tearDown()
+        super(MaintenanceViewTestCase, self).tearDown()
 
 
 @ddt.ddt
@@ -118,7 +119,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            f'Must be {settings.PLATFORM_NAME} staff to perform this action.',
+            u'Must be {platform_name} staff to perform this action.'.format(platform_name=settings.PLATFORM_NAME),
             status_code=403
         )
 
@@ -130,7 +131,7 @@ class TestForcePublish(MaintenanceViewTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestForcePublish, self).setUp()
         self.view_url = reverse('maintenance:force_publish_course')
 
     def setup_test_course(self):
@@ -176,7 +177,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': str(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
 
@@ -188,7 +189,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # validate non split error message
         course = CourseFactory.create(org='e', number='d', run='X', default_store=ModuleStoreEnum.Type.mongo)
         self.verify_error_message(
-            data={'course-id': str(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Force publishing course is not supported with old mongo courses.'
         )
         # Now search for the course key in split version.
@@ -209,7 +210,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # now course is published, we should get `already published course` error.
         self.verify_error_message(
-            data={'course-id': str(course.id)},
+            data={'course-id': six.text_type(course.id)},
             error_message='Course is already in published state.'
         )
 
@@ -221,7 +222,7 @@ class TestForcePublish(MaintenanceViewTestCase):
             course (object): a course object.
         """
         # get draft and publish branch versions
-        versions = get_course_versions(str(course.id))
+        versions = get_course_versions(six.text_type(course.id))
 
         # verify that draft and publish point to different versions
         self.assertNotEqual(versions['draft-branch'], versions['published-branch'])
@@ -241,7 +242,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # force publish course view
         data = {
-            'course-id': str(course.id)
+            'course-id': six.text_type(course.id)
         }
         response = self.client.post(self.view_url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         response_data = json.loads(response.content.decode('utf-8'))
@@ -270,7 +271,7 @@ class TestAnnouncementsViews(MaintenanceViewTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestAnnouncementsViews, self).setUp()
         self.admin = AdminFactory.create(
             email='staff@edx.org',
             username='admin',

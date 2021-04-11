@@ -19,7 +19,7 @@ class TestLangPrefView(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestLangPrefView, self).setUp()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/somewhere')
@@ -30,11 +30,11 @@ class TestLangPrefView(TestCase):
         # test language session updating correctly.
         self.request.session[LANGUAGE_SESSION_KEY] = 'ar'
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'eo'}))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.client.get('/')
-        assert get_language() == 'eo'
+        self.assertEqual(get_language(), 'eo')
 
         response = self.client.patch(reverse("session_language"), json.dumps({'pref-lang': 'en'}))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.client.get('/')
-        assert get_language() == 'en'
+        self.assertEqual(get_language(), 'en')

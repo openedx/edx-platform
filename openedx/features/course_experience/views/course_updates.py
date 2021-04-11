@@ -2,6 +2,9 @@
 Views that handle course updates.
 """
 
+
+from datetime import datetime
+
 import six
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
@@ -16,7 +19,37 @@ from lms.djangoapps.courseware.courses import get_course_info_section_module, ge
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from openedx.features.course_experience.course_updates import get_ordered_updates
+
+STATUS_VISIBLE = 'visible'
+STATUS_DELETED = 'deleted'
+
+
+def get_ordered_updates(request, course):
+    """
+    Returns any course updates in reverse chronological order.
+    """
+    info_module = get_course_info_section_module(request, request.user, course, 'updates')
+
+    updates = info_module.items if info_module else []
+    info_block = getattr(info_module, '_xmodule', info_module) if info_module else None
+    ordered_updates = [update for update in updates if update.get('status') == STATUS_VISIBLE]
+    ordered_updates.sort(
+        key=lambda item: (safe_parse_date(item['date']), item['id']),
+        reverse=True
+    )
+    for update in ordered_updates:
+        update['content'] = info_block.system.replace_urls(update['content'])
+    return ordered_updates
+
+
+def safe_parse_date(date):
+    """
+    Since this is used solely for ordering purposes, use today's date as a default
+    """
+    try:
+        return datetime.strptime(date, u'%B %d, %Y')
+    except ValueError:  # occurs for ill-formatted date values
+        return datetime.today()
 
 
 class CourseUpdatesView(CourseTabView):
@@ -25,13 +58,13 @@ class CourseUpdatesView(CourseTabView):
     """
     @method_decorator(login_required)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
-    def get(self, request, course_id, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def get(self, request, course_id, **kwargs):
         """
         Displays the home page for the specified course.
         """
-        return super(CourseUpdatesView, self).get(request, course_id, 'courseware', **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super(CourseUpdatesView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
         return updates_fragment_view.render_to_fragment(request, course_id=course_id, **kwargs)
@@ -42,7 +75,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
     A fragment to render the updates page for a course.
     """
 
-    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course's home page as a fragment.
         """
@@ -69,11 +102,11 @@ class CourseUpdatesFragmentView(EdxFragmentView):
         return Fragment(html)
 
     @classmethod
-    def has_updates(self, request, course):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def has_updates(self, request, course):
         return len(get_ordered_updates(request, course)) > 0
 
     @classmethod
-    def get_plain_html_updates(self, request, course):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def get_plain_html_updates(self, request, course):
         """
         Returns any course updates in an html chunk. Used
         for older implementations and a few tests that store

@@ -2,20 +2,20 @@
 
 
 import datetime
-from unittest.mock import patch  # lint-amnesty, pylint: disable=unused-import
 
 import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from organizations.api import add_organization, get_course_organizations
 from rest_framework.test import APIClient
 
+from openedx.core.lib.courses import course_image_url
 from common.djangoapps.student.models import CourseAccessRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
-from openedx.core.lib.courses import course_image_url
+from common.djangoapps.util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -35,7 +35,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
     list_url = reverse('api:v1:course_run-list')
 
     def setUp(self):
-        super().setUp()
+        super(CourseRunViewSetTests, self).setUp()
         self.client = APIClient()
         user = AdminFactory()
         self.client.login(username=user.username, password=TEST_PASSWORD)
@@ -321,7 +321,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         # There should now be an image stored
         contentstore().find(content_key)
 
-    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     @ddt.data(
         ('instructor_paced', False, 'NotOriginalNumber1x'),
         ('self_paced', True, None),
@@ -331,7 +331,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         original_course_run = ToyCourseFactory()
         add_organization({
             'name': 'Test Organization',
-            'short_name': original_course_run.id.org,  # lint-amnesty, pylint: disable=no-member
+            'short_name': original_course_run.id.org,
             'description': 'Testing Organization Description',
         })
         start = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -339,7 +339,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         user = UserFactory()
         role = 'instructor'
         run = '3T2017'
-        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})  # lint-amnesty, pylint: disable=no-member
+        url = reverse('api:v1:course_run-rerun', kwargs={'pk': str(original_course_run.id)})
         data = {
             'run': run,
             'schedule': {
@@ -369,16 +369,16 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
 
         if number:
             assert course_run.id.course == number
-            assert course_run.id.course != original_course_run.id.course  # lint-amnesty, pylint: disable=no-member
+            assert course_run.id.course != original_course_run.id.course
         else:
-            assert course_run.id.course == original_course_run.id.course  # lint-amnesty, pylint: disable=no-member
+            assert course_run.id.course == original_course_run.id.course
 
         self.assert_course_run_schedule(course_run, start, end)
         self.assert_access_role(course_run, user, role)
         self.assert_course_access_role_count(course_run, 1)
         course_orgs = get_course_organizations(course_run_key)
         self.assertEqual(len(course_orgs), 1)
-        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)  # lint-amnesty, pylint: disable=no-member
+        self.assertEqual(course_orgs[0]['short_name'], original_course_run.id.org)
 
     def test_rerun_duplicate_run(self):
         course_run = ToyCourseFactory()
@@ -388,7 +388,7 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         }
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
-        assert response.data == {'run': [f'Course run {course_run.id} already exists']}
+        assert response.data == {'run': [u'Course run {key} already exists'.format(key=course_run.id)]}
 
     def test_rerun_invalid_number(self):
         course_run = ToyCourseFactory()
@@ -400,5 +400,5 @@ class CourseRunViewSetTests(ModuleStoreTestCase):
         response = self.client.post(url, data, format='json')
         assert response.status_code == 400
         assert response.data == {'non_field_errors': [
-            'Invalid key supplied. Ensure there are no special characters in the Course Number.'
+            u'Invalid key supplied. Ensure there are no special characters in the Course Number.'
         ]}

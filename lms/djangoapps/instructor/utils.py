@@ -8,12 +8,12 @@ from lms.djangoapps.courseware.module_render import get_module
 from xmodule.modulestore.django import modulestore
 
 
-class DummyRequest:
+class DummyRequest(object):
     """Dummy request"""
 
     META = {}
 
-    def __init__(self):  # lint-amnesty, pylint: disable=useless-return
+    def __init__(self):
         self.session = {}
         self.user = None
         return

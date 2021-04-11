@@ -63,7 +63,7 @@ def clean_dir(directory):
     """
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
-    sh(f'find {directory} -type f -delete')
+    sh('find {dir} -type f -delete'.format(dir=directory))
 
 
 @task

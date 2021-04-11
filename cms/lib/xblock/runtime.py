@@ -4,6 +4,7 @@ XBlock runtime implementations for edX Studio
 
 import logging
 
+import six
 from django.urls import reverse
 
 log = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         log.warning("edX Studio doesn't support third-party handler urls for XBlock %s", type(block))
 
     url = reverse('component_handler', kwargs={
-        'usage_key_string': str(block.scope_ids.usage_id),
+        'usage_key_string': six.text_type(block.scope_ids.usage_id),
         'handler': handler_name,
         'suffix': suffix,
     }).rstrip('/')

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Blockstore-based Content Libraries
 """
@@ -5,10 +6,10 @@ from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
 import unittest
-from unittest.mock import patch
 
 from django.conf import settings
 from django.test.utils import override_settings
+from mock import patch
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
 from search.search_engine_base import SearchEngine
@@ -67,6 +68,7 @@ def elasticsearch_test(func):
         def mock_perform(cls, filter_terms, text_search):
             # pylint: disable=no-member
             return SearchEngine.get_search_engine(cls.INDEX_NAME).search(
+                doc_type=cls.DOCUMENT_TYPE,
                 field_dictionary=filter_terms,
                 query_string=text_search,
                 size=MAX_SIZE
@@ -137,7 +139,7 @@ class ContentLibrariesRestApiTest(APITestCase):
         Like python 2's assertDictContainsSubset, but with the arguments in the
         correct order.
         """
-        assert big_dict.items() >= subset_dict.items()
+        self.assertGreaterEqual(big_dict.items(), subset_dict.items())
 
     # API helpers
 
@@ -146,8 +148,10 @@ class ContentLibrariesRestApiTest(APITestCase):
         Call a REST API
         """
         response = getattr(self.client, method)(url, data, format="json")
-        assert response.status_code == expect_response,\
-            'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
+        self.assertEqual(
+            response.status_code, expect_response,
+            "Unexpected response code {}:\n{}".format(response.status_code, getattr(response, 'data', '(no data)')),
+        )
         return response.data
 
     @contextmanager
@@ -320,8 +324,10 @@ class ContentLibrariesRestApiTest(APITestCase):
         file_handle = BytesIO(content)
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         response = self.client.put(url, data={"content": file_handle})
-        assert response.status_code == expect_response,\
-            'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
+        self.assertEqual(
+            response.status_code, expect_response,
+            "Unexpected response code {}:\n{}".format(response.status_code, getattr(response, 'data', '(no data)')),
+        )
 
     def _delete_library_block_asset(self, block_key, file_name, expect_response=200):
         """ Delete a static asset file. """

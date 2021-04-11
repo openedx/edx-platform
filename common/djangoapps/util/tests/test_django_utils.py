@@ -13,13 +13,13 @@ from django.core.cache import caches
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 
 
-class CacheCheckMixin:
+class CacheCheckMixin(object):
     """Base mixin that does our cache check."""
 
     def check_caches(self, key):
         """Check that caches are empty, and add values."""
         for cache in caches.all():
-            assert cache.get(key) is None
+            self.assertIsNone(cache.get(key))
             cache.set(key, "Not None")
 
 

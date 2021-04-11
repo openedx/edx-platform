@@ -18,7 +18,6 @@ from edx_ace import ace
 from edx_ace.recipient import Recipient
 
 from common.djangoapps.student.models import AccountRecoveryConfiguration
-from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -105,16 +104,12 @@ class Command(BaseCommand):
         """
         message_context = get_base_template_context(site)
         email = user.email
-        if should_redirect_to_authn_microfrontend():
-            site_url = settings.AUTHN_MICROFRONTEND_URL
-        else:
-            site_url = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
         message_context.update({
             'email': email,
             'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            'reset_link': '{protocol}://{site_url}{link}?track=pwreset'.format(
+            'reset_link': '{protocol}://{site}{link}?track=pwreset'.format(
                 protocol='http',
-                site_url=site_url,
+                site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
                 link=reverse('password_reset_confirm', kwargs={
                     'uidb36': int_to_base36(user.id),
                     'token': default_token_generator.make_token(user),
@@ -124,7 +119,7 @@ class Command(BaseCommand):
 
         with emulate_http_request(site, user):
             msg = PasswordReset().personalize(
-                recipient=Recipient(user.id, email),
+                recipient=Recipient(user.username, email),
                 language=get_user_preference(user, LANGUAGE_KEY),
                 user_context=message_context,
             )

@@ -36,7 +36,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_key'])
         except InvalidKeyError:
-            raise CommandError("Invalid course key.")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError("Invalid course key.")
 
         if not modulestore().get_course(course_key):
             raise CommandError("Course not found.")
@@ -45,10 +45,10 @@ class Command(BaseCommand):
         owning_store = modulestore()._get_modulestore_for_courselike(course_key)  # pylint: disable=protected-access
         if hasattr(owning_store, 'force_publish_course'):
             versions = get_course_versions(options['course_key'])
-            print(f"Course versions : {versions}")
+            print(u"Course versions : {0}".format(versions))
 
             if options['commit']:
-                if query_yes_no(f"Are you sure to publish the {course_key} course forcefully?", default="no"):
+                if query_yes_no(u"Are you sure to publish the {0} course forcefully?".format(course_key), default="no"):
                     # publish course forcefully
                     updated_versions = owning_store.force_publish_course(
                         course_key, ModuleStoreEnum.UserID.mgmt_command, options['commit']
@@ -56,20 +56,20 @@ class Command(BaseCommand):
                     if updated_versions:
                         # if publish and draft were different
                         if versions['published-branch'] != versions['draft-branch']:
-                            print(f"Success! Published the course '{course_key}' forcefully.")
-                            print(f"Updated course versions : \n{updated_versions}")
+                            print(u"Success! Published the course '{0}' forcefully.".format(course_key))
+                            print(u"Updated course versions : \n{0}".format(updated_versions))
                         else:
-                            print(f"Course '{course_key}' is already in published state.")
+                            print(u"Course '{0}' is already in published state.".format(course_key))
                     else:
-                        print(f"Error! Could not publish course {course_key}.")
+                        print(u"Error! Could not publish course {0}.".format(course_key))
             else:
                 # if publish and draft were different
                 if versions['published-branch'] != versions['draft-branch']:
                     print("Dry run. Following would have been changed : ")
-                    print("Published branch version {} changed to draft branch version {}".format(
+                    print(u"Published branch version {0} changed to draft branch version {1}".format(
                         versions['published-branch'], versions['draft-branch'])
                     )
                 else:
-                    print(f"Dry run. Course '{course_key}' is already in published state.")
+                    print(u"Dry run. Course '{0}' is already in published state.".format(course_key))
         else:
             raise CommandError("The owning modulestore does not support this command.")

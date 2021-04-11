@@ -3,7 +3,7 @@ Test for contentstore signals receiver
 """
 
 
-from unittest import mock
+import mock
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -26,7 +26,7 @@ class CCXConSignalTestCase(TestCase):
         mock_response = mock.MagicMock(return_value=None)
         mock_upc.return_value = mock_response
 
-        course_id = 'course-v1:OrgFoo+CN199+CR-FALL01'
+        course_id = u'course-v1:OrgFoo+CN199+CR-FALL01'
         course_key = CourseKey.from_string(course_id)
 
         signal_handler = SignalHandler(modulestore())

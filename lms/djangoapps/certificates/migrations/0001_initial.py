@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django.db.models.deletion
 import django.utils.timezone
 import jsonfield.fields
@@ -68,7 +71,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('change_date', models.DateTimeField(auto_now_add=True, verbose_name='Change date')),
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
-                ('configuration', models.TextField(help_text='Certificate HTML View Parameters (JSON)')),
+                ('configuration', models.TextField(help_text=u'Certificate HTML View Parameters (JSON)')),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={
@@ -129,7 +132,7 @@ class Migration(migrations.Migration):
                 ('access_key', models.CharField(default=cert_models._make_uuid, help_text='An access key for the example certificate.  This is used when we receive a response from the queue to validate that the sender is the same entity we asked to generate the certificate.', max_length=255, db_index=True)),
                 ('full_name', models.CharField(default='John Do\xeb', help_text='The full name that will appear on the certificate.', max_length=255)),
                 ('template', models.CharField(help_text='The template file to use when generating the certificate.', max_length=255)),
-                ('status', models.CharField(default='started', help_text='The status of the example certificate.', max_length=255, choices=[('started', 'Started'), ('success', 'Success'), ('error', 'Error')])),
+                ('status', models.CharField(default=u'started', help_text='The status of the example certificate.', max_length=255, choices=[(u'started', u'Started'), (u'success', u'Success'), (u'error', u'Error')])),
                 ('error_reason', models.TextField(default=None, help_text='The reason an error occurred during certificate generation.', null=True)),
                 ('download_url', models.CharField(default=None, max_length=255, null=True, help_text='The download URL for the generated certificate.')),
             ],
@@ -151,18 +154,18 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
-                ('verify_uuid', models.CharField(default='', max_length=32, blank=True)),
-                ('download_uuid', models.CharField(default='', max_length=32, blank=True)),
-                ('download_url', models.CharField(default='', max_length=128, blank=True)),
-                ('grade', models.CharField(default='', max_length=5, blank=True)),
-                ('key', models.CharField(default='', max_length=32, blank=True)),
+                ('verify_uuid', models.CharField(default=u'', max_length=32, blank=True)),
+                ('download_uuid', models.CharField(default=u'', max_length=32, blank=True)),
+                ('download_url', models.CharField(default=u'', max_length=128, blank=True)),
+                ('grade', models.CharField(default=u'', max_length=5, blank=True)),
+                ('key', models.CharField(default=u'', max_length=32, blank=True)),
                 ('distinction', models.BooleanField(default=False)),
-                ('status', models.CharField(default='unavailable', max_length=32)),
-                ('mode', models.CharField(default='honor', max_length=32, choices=[('verified', 'verified'), ('honor', 'honor'), ('audit', 'audit'), ('professional', 'professional'), ('no-id-professional', 'no-id-professional')])),
+                ('status', models.CharField(default=u'unavailable', max_length=32)),
+                ('mode', models.CharField(default=u'honor', max_length=32, choices=[(u'verified', u'verified'), (u'honor', u'honor'), (u'audit', u'audit'), (u'professional', u'professional'), (u'no-id-professional', u'no-id-professional')])),
                 ('name', models.CharField(max_length=255, blank=True)),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('error_reason', models.CharField(default='', max_length=512, blank=True)),
+                ('error_reason', models.CharField(default=u'', max_length=512, blank=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
@@ -173,14 +176,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='certificatetemplate',
-            unique_together={('organization_id', 'course_key', 'mode')},
+            unique_together=set([('organization_id', 'course_key', 'mode')]),
         ),
         migrations.AlterUniqueTogether(
             name='generatedcertificate',
-            unique_together={('user', 'course_id')},
+            unique_together=set([('user', 'course_id')]),
         ),
         migrations.AlterUniqueTogether(
             name='badgeassertion',
-            unique_together={('course_id', 'user', 'mode')},
+            unique_together=set([('course_id', 'user', 'mode')]),
         ),
     ]

@@ -36,7 +36,7 @@ class TranslateDateTest(unittest.TestCase):
         Tests that date is correctly translating in spanish language
         """
         date_in_spanish = translate_date(date_to_translate, 'es')
-        assert date_in_spanish == expected_translated_date
+        self.assertEqual(date_in_spanish, expected_translated_date)
 
     @ddt.data(
         (datetime.datetime(2018, 1, 21), u'Jan. 21, 2018'),
@@ -58,4 +58,4 @@ class TranslateDateTest(unittest.TestCase):
         Tests that date is correctly translating to default when language is not specified.
         """
         date_in_spanish = translate_date(date_to_translate, language=None)
-        assert date_in_spanish == expected_translated_date
+        self.assertEqual(date_in_spanish, expected_translated_date)

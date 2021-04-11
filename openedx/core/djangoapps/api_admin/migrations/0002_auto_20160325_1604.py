@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 API_GROUP_NAME = 'API Access Request Approvers'

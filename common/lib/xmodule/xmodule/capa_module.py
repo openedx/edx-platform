@@ -6,6 +6,7 @@ import logging
 import re
 import sys
 
+import six
 from bleach.sanitizer import Cleaner
 from lxml import etree
 from pkg_resources import resource_string
@@ -29,7 +30,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_module import XmlMixin
 
-from .capa_base import CapaMixin, ComplexEncoder, _  # lint-amnesty, pylint: disable=unused-import
+from .capa_base import CapaMixin, ComplexEncoder, _
 
 log = logging.getLogger("edx.courseware")
 
@@ -94,8 +95,8 @@ class ProblemBlock(
         ]
     }
 
-    def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
-        super().bind_for_student(*args, **kwargs)
+    def bind_for_student(self, *args, **kwargs):
+        super(ProblemBlock, self).bind_for_student(*args, **kwargs)
 
         # Capa was an XModule. When bind_for_student() was called on it with a new runtime, a new CapaModule object
         # was initialized when XModuleDescriptor._xmodule() was called next. self.lcp was constructed in CapaModule
@@ -110,7 +111,7 @@ class ProblemBlock(
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
         try:
             self.lcp
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:
             html = self.handle_fatal_lcp_error(err if show_detailed_errors else None)
         else:
             html = self.get_html()
@@ -131,7 +132,7 @@ class ProblemBlock(
             return self.student_view(context)
         else:
             # Show a message that this content requires users to login/enroll.
-            return super().public_view(context)
+            return super(ProblemBlock, self).public_view(context)
 
     def author_view(self, context):
         """
@@ -162,7 +163,7 @@ class ProblemBlock(
           <other request-specific values here > }
         """
         # self.score is initialized in self.lcp but in this method is accessed before self.lcp so just call it first.
-        self.lcp  # lint-amnesty, pylint: disable=pointless-statement
+        self.lcp
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
@@ -188,7 +189,7 @@ class ProblemBlock(
         )
 
         if dispatch not in handlers:
-            return f'Error: {dispatch} is not a known capa action'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
         before_attempts = self.attempts
@@ -196,7 +197,7 @@ class ProblemBlock(
         try:
             result = handlers[dispatch](data)
 
-        except NotFoundError as ex:
+        except NotFoundError:
             log.info(
                 "Unable to find data when dispatching %s to %s for user %s",
                 dispatch,
@@ -204,9 +205,9 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError(not_found_error_message).with_traceback(traceback_obj) from ex
+            six.reraise(ProcessingError, ProcessingError(not_found_error_message), traceback_obj)
 
-        except Exception as ex:  # lint-amnesty, pylint: disable=broad-except
+        except Exception:
             log.exception(
                 "Unknown error when dispatching %s to %s for user %s",
                 dispatch,
@@ -214,7 +215,7 @@ class ProblemBlock(
                 self.scope_ids.user_id
             )
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError(generic_error_message).with_traceback(traceback_obj) from ex
+            six.reraise(ProcessingError, ProcessingError(generic_error_message), traceback_obj)
 
         after = self.get_progress()
         after_attempts = self.attempts
@@ -274,7 +275,7 @@ class ProblemBlock(
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields = super(ProblemBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
             ProblemBlock.due,
             ProblemBlock.graceperiod,
@@ -291,7 +292,7 @@ class ProblemBlock(
         try:
             tree = etree.XML(self.data)
         except etree.XMLSyntaxError:
-            log.error(f'Error parsing problem types from xml for capa module {self.display_name}')
+            log.error('Error parsing problem types from xml for capa module {}'.format(self.display_name))
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
@@ -300,7 +301,7 @@ class ProblemBlock(
         """
         Return dictionary prepared with module content and type for indexing.
         """
-        xblock_body = super().index_dictionary()
+        xblock_body = super(ProblemBlock, self).index_dictionary()
 
         # Make optioninput's options index friendly by replacing the actual tag with the values
         capa_content = re.sub(r'<optioninput options="\(([^"]+)\)".*?>\s*|\S*<\/optioninput>', r'\1', self.data)
@@ -383,7 +384,7 @@ class ProblemBlock(
                 minimal_init=True,
             )
         except responsetypes.LoncapaProblemError:
-            log.exception("LcpFatalError for block {} while getting max score".format(str(self.location)))
+            log.exception(u"LcpFatalError for block {} while getting max score".format(str(self.location)))
             maximum_score = 0
         else:
             maximum_score = lcp.get_max_score()

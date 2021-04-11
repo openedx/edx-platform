@@ -6,8 +6,8 @@ Tests for SplitTestTransformer.
 import ddt
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.partitions_service import get_user_partition_groups
@@ -29,7 +29,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
         """
         Setup course structure and create user for split test transformer test.
         """
-        super().setUp()
+        super(SplitTestTransformerTestCase, self).setUp()
 
         # Set up user partitions and groups.
         self.groups = [Group(0, 'Group 0'), Group(1, 'Group 1'), Group(2, 'Group 2')]
@@ -197,14 +197,17 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
             self.course.location,
             self.transformers,
         )
-        assert set(block_structure1.get_block_keys()) == set(self.get_block_key_set(self.blocks, *expected_blocks))
+        self.assertEqual(
+            set(block_structure1.get_block_keys()),
+            set(self.get_block_key_set(self.blocks, *expected_blocks)),
+        )
 
     def test_user_randomly_assigned(self):
         # user was randomly assigned to one of the groups
         user_groups = get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user, 'id'
         )
-        assert len(user_groups) == 1
+        self.assertEqual(len(user_groups), 1)
 
         # calling twice should result in the same block set
         block_structure1 = get_course_blocks(
@@ -218,4 +221,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
                 self.course.location,
                 self.transformers,
             )
-        assert set(block_structure1.get_block_keys()) == set(block_structure2.get_block_keys())
+        self.assertEqual(
+            set(block_structure1.get_block_keys()),
+            set(block_structure2.get_block_keys()),
+        )

@@ -208,6 +208,9 @@ class RenderForm extends React.Component {
 
         {/* Note: not using Paragon bc component shows in the DOM but not rendered, even when using
          version 2.6.4. */}
+        <div className="alert alert-warning" role="alert" style={{ marginBottom: '1rem', padding: '1.5rem', left: '0px', fontSize: '16px', backgroundColor: '#fffaed', color: '#171C29', border: '1px solid #FFD875', borderRadius: '0.3rem' }}>
+          <div>{gettext('Due to the recent increase in interest in online education and edX, we are currently experiencing an unusually high volume of support requests. We appreciate your patience as we work to review each request. Please check the ')}<a href="https://support.edx.org/hc/en-us" className="alert-link">Help Center</a>{gettext(' as many questions may have already been answered.')}</div>
+        </div>
 
         <div className="row">
           <div className="col-sm-12">

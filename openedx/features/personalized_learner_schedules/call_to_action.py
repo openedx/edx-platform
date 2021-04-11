@@ -1,32 +1,25 @@
-"""
-Creates Call to Actions for resetting a Personalized Learner Schedule for use inside of Courseware.
-"""
-
 import logging
 
 from crum import get_current_request
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import ngettext, gettext as _
+from django.utils.translation import gettext as _
 
-from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from lms.djangoapps.course_home_api.utils import is_request_from_learning_mfe
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.course_experience.url_helpers import is_request_from_learning_mfe
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 log = logging.getLogger(__name__)
 
 
 class PersonalizedLearnerScheduleCallToAction:
-    """
-    Creates Call to Actions for resetting a Personalized Learner Schedule for use inside of Courseware.
-    """
     CAPA_SUBMIT_DISABLED = 'capa_submit_disabled'
     VERTICAL_BANNER = 'vertical_banner'
+
     past_due_class_warnings = set()
 
-    def get_ctas(self, xblock, category, completed):
+    def get_ctas(self, xblock, category):
         """
         Return the calls to action associated with the specified category for the given xblock.
 
@@ -50,19 +43,19 @@ class PersonalizedLearnerScheduleCallToAction:
         if category == self.CAPA_SUBMIT_DISABLED:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
             # schedule due date being missed, and if so, we can offer to shift it.
-            if self._is_block_shiftable(xblock, category):
-                ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
+            if self._is_block_shiftable(xblock):
+                ctas.append(self._make_reset_deadlines_cta(xblock, is_learning_mfe))
 
-        elif category == self.VERTICAL_BANNER and not completed:
+        elif category == self.VERTICAL_BANNER:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
-            if any(self._is_block_shiftable(item, category) for item in xblock.get_display_items()):
-                ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
+            if any(self._is_block_shiftable(item) for item in xblock.get_display_items()):
+                ctas.append(self._make_reset_deadlines_cta(xblock, is_learning_mfe))
 
         return ctas
 
-    @classmethod
-    def _is_block_shiftable(cls, xblock, category):
+    @staticmethod
+    def _is_block_shiftable(xblock):
         """
         Test if the xblock would be solvable if we were to shift dates.
 
@@ -82,21 +75,10 @@ class PersonalizedLearnerScheduleCallToAction:
             PersonalizedLearnerScheduleCallToAction._log_past_due_warning(type(xblock).__name__)
             is_past_due = xblock.is_past_due
 
-        can_shift = xblock.self_paced and can_attempt and is_past_due
-
-        # Note: we will still show the CTA at the xblock level (next to the submit button) regardless
-        # of if the xblock is an assignment (meaning graded *and* scored)
-        if category == cls.VERTICAL_BANNER:
-            can_shift = can_shift and is_xblock_an_assignment(xblock)
-
-        return can_shift
+        return xblock.self_paced and can_attempt and is_past_due
 
     @staticmethod
     def _log_past_due_warning(name):
-        """
-        Logs out if an xblock has is_past_due defined as a property
-        (since we want to move to using it as a function everywhere)
-        """
         if name in PersonalizedLearnerScheduleCallToAction.past_due_class_warnings:
             return
 
@@ -105,11 +87,8 @@ class PersonalizedLearnerScheduleCallToAction:
                     '%s.is_past_due into a method.', name)
         PersonalizedLearnerScheduleCallToAction.past_due_class_warnings.add(name)
 
-    @classmethod
-    def _make_reset_deadlines_cta(cls, xblock, category, is_learning_mfe=False):
-        """
-        Constructs a call to action object containing the necessary information for the view
-        """
+    @staticmethod
+    def _make_reset_deadlines_cta(xblock, is_learning_mfe=False):
         from lms.urls import RESET_COURSE_DEADLINES_NAME
         course_key = xblock.scope_ids.usage_id.context_key
 
@@ -124,24 +103,6 @@ class PersonalizedLearnerScheduleCallToAction:
                              'any of your progress.'),
         }
 
-        has_attempts = hasattr(xblock, 'attempts') and hasattr(xblock, 'max_attempts')
-
-        if category == cls.CAPA_SUBMIT_DISABLED and has_attempts and xblock.attempts:
-            if xblock.max_attempts:
-                cta_data['link_name'] = ngettext('Try again ({attempts} attempt remaining)',
-                                                 'Try again ({attempts} attempts remaining)',
-                                                 (xblock.max_attempts - xblock.attempts)).format(
-                    attempts=(xblock.max_attempts - xblock.attempts)
-                )
-                cta_data['description'] = (_('You have used {attempts} of {max_attempts} attempts for this '
-                                             'problem.').format(
-                    attempts=xblock.attempts, max_attempts=xblock.max_attempts
-                ) + ' ' + cta_data['description'])
-            else:
-                cta_data['link_name'] = _('Try again (unlimited attempts)')
-                cta_data['description'] = _('You have used {attempts} of unlimited attempts for this '
-                                            'problem.').format(attempts=xblock.attempts) + ' ' + cta_data['description']
-
         if is_learning_mfe:
             cta_data['event_data'] = {
                 'event_name': 'post_event',
@@ -150,10 +111,6 @@ class PersonalizedLearnerScheduleCallToAction:
                         'course_id': str(course_key),
                     },
                     'url': '{}{}'.format(settings.LMS_ROOT_URL, reverse('course-experience-reset-course-deadlines')),
-                },
-                'research_event_data': {
-                    'block_id': str(xblock.location),
-                    'location': f'{xblock.category}-view',
                 },
             }
 

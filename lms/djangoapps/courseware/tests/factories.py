@@ -1,4 +1,4 @@
-# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
+# Factories are self documenting
 
 
 import json
@@ -31,7 +31,7 @@ from common.djangoapps.student.tests.factories import UserProfileFactory as Stud
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name
 course_id = CourseKey.from_string('edX/test_course/test')
-location = partial(course_id.make_usage_key, 'problem')
+location = partial(course_id.make_usage_key, u'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
@@ -125,8 +125,8 @@ class GlobalStaffFactory(UserFactory):
 # pylint: enable=unused-argument
 
 
-class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class StudentModuleFactory(DjangoModelFactory):
+    class Meta(object):
         model = StudentModule
 
     module_type = "problem"
@@ -138,8 +138,8 @@ class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable
     done = 'na'
 
 
-class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class UserStateSummaryFactory(DjangoModelFactory):
+    class Meta(object):
         model = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
@@ -147,8 +147,8 @@ class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
     usage_id = location('usage_id')
 
 
-class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class StudentPrefsFactory(DjangoModelFactory):
+    class Meta(object):
         model = XModuleStudentPrefsField
 
     field_name = 'existing_field'
@@ -157,8 +157,8 @@ class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=
     module_type = 'mock_problem'
 
 
-class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class StudentInfoFactory(DjangoModelFactory):
+    class Meta(object):
         model = XModuleStudentInfoField
 
     field_name = 'existing_field'
@@ -171,6 +171,6 @@ class RequestFactoryNoCsrf(RequestFactory):
     RequestFactory, which disables csrf checks.
     """
     def request(self, **kwargs):
-        request = super().request(**kwargs)
+        request = super(RequestFactoryNoCsrf, self).request(**kwargs)
         setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
         return request

@@ -2,7 +2,7 @@
 Utilities related to API views
 """
 
-from collections import Sequence  # lint-amnesty, pylint: disable=no-name-in-module
+from collections import Sequence
 from functools import wraps
 
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
@@ -35,7 +35,7 @@ class DeveloperErrorResponseException(Exception):
     Intended to be used with and by DeveloperErrorViewMixin.
     """
     def __init__(self, response):
-        super(DeveloperErrorResponseException, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(DeveloperErrorResponseException, self).__init__()
         self.response = response
 
 
@@ -92,12 +92,12 @@ class DeveloperErrorViewMixin(object):
             return exc.response
         elif isinstance(exc, APIException):
             return self._make_error_response(exc.status_code, exc.detail)
-        elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):  # lint-amnesty, pylint: disable=consider-merging-isinstance
+        elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):
             return self._make_error_response(404, text_type(exc) or "Not found.")
         elif isinstance(exc, ValidationError):
             return self._make_validation_error_response(exc)
         else:
-            raise  # lint-amnesty, pylint: disable=misplaced-bare-raise
+            raise
 
 
 class ExpandableFieldViewMixin(object):
@@ -105,7 +105,7 @@ class ExpandableFieldViewMixin(object):
 
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
-        result = super(ExpandableFieldViewMixin, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        result = super(ExpandableFieldViewMixin, self).get_serializer_context()
         result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
         return result
 
@@ -156,7 +156,7 @@ def add_serializer_errors(serializer, data, field_errors):
         for key, error in iteritems(errors):
             error = clean_errors(error)
             if key == 'bio':
-                user_message = _(u"The about me field must be at most {} characters long.".format(BIO_MAX_LENGTH))  # lint-amnesty, pylint: disable=translation-of-non-string
+                user_message = _(u"The about me field must be at most {} characters long.".format(BIO_MAX_LENGTH))
             else:
                 user_message = _(u"This value is invalid.")
 
@@ -180,7 +180,7 @@ def build_api_error(message, **kwargs):
     """
     return {
         'developer_message': message.format(**kwargs),
-        'user_message': _(message).format(**kwargs),  # lint-amnesty, pylint: disable=translation-of-non-string
+        'user_message': _(message).format(**kwargs),
     }
 
 
@@ -290,7 +290,7 @@ class LazySequence(Sequence):
                     self._data.append(next(self.iterable))
                 except StopIteration:
                     self._exhausted = True
-                    raise IndexError("Underlying sequence exhausted")  # lint-amnesty, pylint: disable=raise-missing-from
+                    raise IndexError("Underlying sequence exhausted")
 
             return self._data[index]
         elif isinstance(index, slice):
@@ -346,10 +346,10 @@ class PaginatedAPIView(APIView):
         The paginator instance associated with the view, or `None`.
         """
         if not hasattr(self, '_paginator'):
-            if self.pagination_class is None:  # lint-amnesty, pylint: disable=no-member
+            if self.pagination_class is None:
                 self._paginator = None
             else:
-                self._paginator = self.pagination_class()  # lint-amnesty, pylint: disable=no-member
+                self._paginator = self.pagination_class()
         return self._paginator
 
     def paginate_queryset(self, queryset):
@@ -417,7 +417,7 @@ def verify_course_exists(view_func):
         try:
             course_key = get_course_key(request, kwargs.get('course_id'))
         except InvalidKeyError:
-            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The provided course key cannot be parsed.',
                 error_code='invalid_course_key'

@@ -21,7 +21,7 @@ class ApiAccessFormTest(TestCase):
     @ddt.unpack
     def test_form_valid(self, data, is_valid):
         form = ApiAccessRequestForm(data)
-        assert form.is_valid() == is_valid
+        self.assertEqual(form.is_valid(), is_valid)
 
 
 @skip_unless_lms
@@ -37,14 +37,14 @@ class ViewersWidgetTest(TestCase):
         extra_formating = ''
         if django.VERSION < (2, 1):
             extra_formating = ' /'
-        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}"{extra_formating}>'.format(  # lint-amnesty, pylint: disable=line-too-long
+        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}"{extra_formating}>'.format(
             input_field_name=input_field_name,
             serialized_value=dummy_string_value,
             extra_formating=extra_formating,
         )
         output = self.widget.render(name=input_field_name, value=dummy_string_value)
-        assert expected_widget_html == output
+        self.assertEqual(expected_widget_html, output)
 
         dummy_list_value = ['staff', 'verified']
         output = self.widget.render(name=input_field_name, value=dummy_list_value)
-        assert expected_widget_html == output
+        self.assertEqual(expected_widget_html, output)

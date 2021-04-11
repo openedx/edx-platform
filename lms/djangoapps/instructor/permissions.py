@@ -4,8 +4,8 @@ Permissions for the instructor dashboard and associated actions
 
 from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
-
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
+
 
 ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM = 'instructor.allow_student_to_bypass_entrance_exam'
 ASSIGN_TO_COHORTS = 'instructor.assign_to_cohorts'

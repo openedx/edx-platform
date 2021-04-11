@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=protected-access
 """
 Tests for import_course_from_xml using the mongo modulestore.
@@ -5,13 +6,14 @@ Tests for import_course_from_xml using the mongo modulestore.
 
 
 import copy
-from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
+import six
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
+from mock import patch
 
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -35,7 +37,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-        super().setUp()
+        super(ContentStoreImportTest, self).setUp()
 
         self.client = Client()
         self.client.login(username=self.user.username, password=self.user_password)
@@ -46,7 +48,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def tearDown(self):
         self.task_patcher.stop()
-        super().tearDown()
+        super(ContentStoreImportTest, self).tearDown()
 
     def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''
@@ -95,7 +97,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # Test with the split modulestore because store.has_course fails in old mongo with unicode characters.
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             module_store = modulestore()
-            course_id = module_store.make_course_key('Юникода', 'unicode_course', 'échantillon')
+            course_id = module_store.make_course_key(u'Юникода', u'unicode_course', u'échantillon')
             import_course_from_xml(
                 module_store,
                 self.user.id,
@@ -109,7 +111,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.assertIsNotNone(course)
 
             # test that course 'display_name' same as imported course 'display_name'
-            self.assertEqual(course.display_name, "Φυσικά το όνομα Unicode")
+            self.assertEqual(course.display_name, u"Φυσικά το όνομα Unicode")
 
     def test_static_import(self):
         '''
@@ -133,7 +135,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(content)
 
         # make sure course.static_asset_path is correct
-        print(f"static_asset_path = {course.static_asset_path}")
+        print(u"static_asset_path = {0}".format(course.static_asset_path))
         self.assertEqual(course.static_asset_path, 'test_import_course')
 
     def test_asset_import_nostatic(self):
@@ -172,7 +174,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_tab_name_imports_correctly(self):
         _module_store, _content_store, course = self.load_test_import_course()
-        print(f"course tabs = {course.tabs}")
+        print(u"course tabs = {0}".format(course.tabs))
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
     def test_import_performance_mongo(self):
@@ -250,7 +252,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             {"0": '9f0941d021414798836ef140fb5f6841', "1": '0faf29473cf1497baa33fcc828b179cd'},
         )
 
-    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):
         module_store = modulestore()
         target_id = module_store.make_course_key('testX', target_course_name, 'copy_run')
         import_course_from_xml(
@@ -267,7 +269,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.items()
+            key: target_id.make_usage_key('vertical', value) for key, value in six.iteritems(groups_to_verticals)
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

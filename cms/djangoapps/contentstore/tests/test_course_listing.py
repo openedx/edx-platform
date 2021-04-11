@@ -5,13 +5,14 @@ by reversing group name formats.
 
 
 import random
-from unittest.mock import Mock, patch
 
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.test import RequestFactory
+from mock import Mock, patch
 from opaque_keys.edx.locations import CourseLocator
+from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course
@@ -50,7 +51,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super().setUp()
+        super(TestCourseListing, self).setUp()
         # create and log in a staff user.
         # create and log in a non-staff user
         self.user = UserFactory()
@@ -90,7 +91,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test on empty course listing, studio name is properly displayed
         """
-        message = f"Are you staff on an existing {settings.STUDIO_SHORT_NAME} course?"
+        message = u"Are you staff on an existing {studio_name} course?".format(studio_name=settings.STUDIO_SHORT_NAME)
         response = self.client.get('/home')
         self.assertContains(response, message)
 
@@ -255,9 +256,9 @@ class TestCourseListing(ModuleStoreTestCase):
         # create courses and assign those to the user which have their number in user_course_ids
         with self.store.default_store(store):
             for number in range(TOTAL_COURSES_COUNT):
-                org = f'Org{number}'
-                course = f'Course{number}'
-                run = f'Run{number}'
+                org = 'Org{0}'.format(number)
+                course = 'Course{0}'.format(number)
+                run = 'Run{0}'.format(number)
                 course_location = self.store.make_course_key(org, course, run)
                 if number in user_course_ids:
                     self._create_course_with_access_groups(course_location, self.user, store=store)
@@ -368,7 +369,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # verify return values
         def _set_of_course_keys(course_list, key_attribute_name='id'):
             """Returns a python set of course keys by accessing the key with the given attribute name."""
-            return {getattr(c, key_attribute_name) for c in course_list}
+            return set(getattr(c, key_attribute_name) for c in course_list)
 
         found_courses, unsucceeded_course_actions = _accessible_courses_iter_for_tests(self.request)
         self.assertSetEqual(_set_of_course_keys(courses + courses_in_progress), _set_of_course_keys(found_courses))

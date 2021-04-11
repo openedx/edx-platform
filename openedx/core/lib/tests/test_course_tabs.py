@@ -1,7 +1,8 @@
 """ Tests of specific tabs. """
+
+
 from unittest import TestCase
 
-import pytest
 from mock import Mock, patch
 
 import xmodule.tabs as xmodule_tabs
@@ -31,16 +32,17 @@ class CourseTabPluginManagerTestCase(TestCase):
             "Third": create_mock_plugin(tab_type="Third", priority=3),
         }
         get_available_plugins.return_value = mock_plugins
-        assert [plugin.type for plugin in CourseTabPluginManager.get_tab_types()] == [
-            'First', 'Second', 'Third', 'Duplicate', 'Duplicate', 'Last'
-        ]
+        self.assertEqual(
+            [plugin.type for plugin in CourseTabPluginManager.get_tab_types()],
+            ["First", "Second", "Third", "Duplicate", "Duplicate", "Last"]
+        )
 
 
 class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
 
     def setUp(self):
-        super(KeyCheckerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(KeyCheckerTestCase, self).setUp()
 
         self.valid_keys = ['a', 'b']
         self.invalid_keys = ['a', 'v', 'g']
@@ -48,9 +50,9 @@ class KeyCheckerTestCase(TestCase):
 
     def test_key_checker(self):
 
-        assert xmodule_tabs.key_checker(self.valid_keys)(self.dict_value, raise_error=False)
-        assert not xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value, raise_error=False)
-        with pytest.raises(xmodule_tabs.InvalidTabsException):
+        self.assertTrue(xmodule_tabs.key_checker(self.valid_keys)(self.dict_value, raise_error=False))
+        self.assertFalse(xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value, raise_error=False))
+        with self.assertRaises(xmodule_tabs.InvalidTabsException):
             xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value)
 
 
@@ -58,7 +60,7 @@ class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
 
     def setUp(self):
-        super(NeedNameTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(NeedNameTestCase, self).setUp()
 
         self.valid_dict1 = {'a': 1, 'name': 2}
         self.valid_dict2 = {'name': 1}
@@ -66,8 +68,8 @@ class NeedNameTestCase(TestCase):
         self.invalid_dict = {'a': 1, 'b': 2}
 
     def test_need_name(self):
-        assert xmodule_tabs.need_name(self.valid_dict1)
-        assert xmodule_tabs.need_name(self.valid_dict2)
-        assert xmodule_tabs.need_name(self.valid_dict3)
-        with pytest.raises(xmodule_tabs.InvalidTabsException):
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict1))
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict2))
+        self.assertTrue(xmodule_tabs.need_name(self.valid_dict3))
+        with self.assertRaises(xmodule_tabs.InvalidTabsException):
             xmodule_tabs.need_name(self.invalid_dict)

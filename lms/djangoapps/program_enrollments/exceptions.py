@@ -15,7 +15,7 @@ class ProgramDoesNotExistException(Exception):
         self.program_uuid = program_uuid
 
     def __str__(self):
-        return f'Unable to find catalog program matching uuid {self.program_uuid}'
+        return 'Unable to find catalog program matching uuid {}'.format(self.program_uuid)
 
 
 class OrganizationDoesNotExistException(Exception):

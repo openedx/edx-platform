@@ -2,9 +2,9 @@
 Test cases for create_sites_and_configurations command.
 """
 
-from unittest import mock
-import pytest
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+
+import mock
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.management import CommandError, call_command
 from django.test import TestCase
@@ -27,7 +27,7 @@ def _generate_site_config(dns_name, site_domain, devstack=False):
 
     return {
         "lms_url": lms_url_fmt.format(domain=site_domain, dns_name=dns_name),
-        "platform_name": f"{site_domain}-{dns_name}"
+        "platform_name": "{domain}-{dns_name}".format(domain=site_domain, dns_name=dns_name)
     }
 
 
@@ -43,7 +43,7 @@ def _get_sites(dns_name, devstack=False):
     for site in SITES:
         sites.update({
             site: {
-                "theme_dir_name": f"{site}_dir_name",
+                "theme_dir_name": "{}_dir_name".format(site),
                 "configuration": _generate_site_config(dns_name, site),
                 "site_domain": site_domain_fmt.format(site=site, dns_name=dns_name)
             }
@@ -54,7 +54,7 @@ def _get_sites(dns_name, devstack=False):
 class TestCreateSiteAndConfiguration(TestCase):
     """ Test the create_site_and_configuration command """
     def setUp(self):
-        super().setUp()
+        super(TestCreateSiteAndConfiguration, self).setUp()
 
         self.dns_name = "dummy_dns"
         self.theme_path = "/dummyA/dummyB/"
@@ -64,27 +64,30 @@ class TestCreateSiteAndConfiguration(TestCase):
         Checks that data of all sites is valid
         """
         sites = Site.objects.filter(domain__contains=self.dns_name)
-        assert len(sites) == len(SITES)
+        self.assertEqual(len(sites), len(SITES))
         for site in sites:
             if site.name in SITES:
                 site_theme = SiteTheme.objects.get(site=site)
 
-                assert site_theme.theme_dir_name == f'{site.name}_dir_name'
+                self.assertEqual(
+                    site_theme.theme_dir_name,
+                    "{}_dir_name".format(site.name)
+                )
 
                 self.assertDictEqual(
                     dict(site.configuration.values),
                     _generate_site_config(self.dns_name, site.name)
                 )
 
-    def _assert_service_user_is_valid(self, username):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _assert_service_user_is_valid(self, username):
         service_user = User.objects.filter(username=username)
-        assert len(service_user) == 1
-        assert service_user[0].is_active
-        assert service_user[0].is_staff
-        assert service_user[0].is_superuser
+        self.assertEqual(len(service_user), 1)
+        self.assertTrue(service_user[0].is_active)
+        self.assertTrue(service_user[0].is_staff)
+        self.assertTrue(service_user[0].is_superuser)
 
         user_profile = UserProfile.objects.filter(user=service_user[0])
-        assert len(user_profile) == 1
+        self.assertEqual(len(user_profile), 1)
         return service_user
 
     def _assert_ecommerce_clients_are_valid(self, devstack=False):
@@ -95,24 +98,33 @@ class TestCreateSiteAndConfiguration(TestCase):
 
         clients = Application.objects.filter(user=service_user[0])
 
-        assert len(clients) == len(SITES)
+        self.assertEqual(len(clients), len(SITES))
 
         if devstack:
-            ecommerce_url_fmt = "http://ecommerce-{site_name}-{dns_name}.e2e.devstack:18130/"
+            ecommerce_url_fmt = u"http://ecommerce-{site_name}-{dns_name}.e2e.devstack:18130/"
         else:
-            ecommerce_url_fmt = "https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/"
+            ecommerce_url_fmt = u"https://ecommerce-{site_name}-{dns_name}.sandbox.edx.org/"
 
         for client in clients:
-            assert client.user.username == service_user[0].username
+            self.assertEqual(client.user.username, service_user[0].username)
             site_name = [name for name in SITES if name in client.name][0]
             ecommerce_url = ecommerce_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
-            assert client.redirect_uris == f'{ecommerce_url}complete/edx-oauth2/'
-            assert client.client_id == f'ecommerce-key-{site_name}'
+            self.assertEqual(
+                client.redirect_uris,
+                "{ecommerce_url}complete/edx-oauth2/".format(ecommerce_url=ecommerce_url)
+            )
+            self.assertEqual(
+                client.client_id,
+                "ecommerce-key-{site_name}".format(site_name=site_name)
+            )
             access = ApplicationAccess.objects.filter(application_id=client.id).first()
-            assert access.scopes == ['user_id']
+            self.assertEqual(
+                access.scopes,
+                ["user_id"]
+            )
 
     def _assert_discovery_clients_are_valid(self, devstack=False):
         """
@@ -122,29 +134,38 @@ class TestCreateSiteAndConfiguration(TestCase):
 
         clients = Application.objects.filter(user=service_user[0])
 
-        assert len(clients) == len(SITES)
+        self.assertEqual(len(clients), len(SITES))
 
         if devstack:
-            discovery_url_fmt = "http://discovery-{site_name}-{dns_name}.e2e.devstack:18381/"
+            discovery_url_fmt = u"http://discovery-{site_name}-{dns_name}.e2e.devstack:18381/"
         else:
-            discovery_url_fmt = "https://discovery-{site_name}-{dns_name}.sandbox.edx.org/"
+            discovery_url_fmt = u"https://discovery-{site_name}-{dns_name}.sandbox.edx.org/"
 
         for client in clients:
-            assert client.user.username == service_user[0].username
+            self.assertEqual(client.user.username, service_user[0].username)
             site_name = [name for name in SITES if name in client.name][0]
             discovery_url = discovery_url_fmt.format(
                 site_name=site_name,
                 dns_name=self.dns_name
             )
 
-            assert client.redirect_uris == f'{discovery_url}complete/edx-oauth2/'
-            assert client.client_id == f'discovery-key-{site_name}'
+            self.assertEqual(
+                client.redirect_uris,
+                "{discovery_url}complete/edx-oauth2/".format(discovery_url=discovery_url)
+            )
+            self.assertEqual(
+                client.client_id,
+                "discovery-key-{site_name}".format(site_name=site_name)
+            )
             access = ApplicationAccess.objects.filter(application_id=client.id).first()
-            assert access.scopes == ['user_id']
+            self.assertEqual(
+                access.scopes,
+                ["user_id"]
+            )
 
     def test_without_dns(self):
         """ Test the command without dns_name """
-        with pytest.raises(CommandError):
+        with self.assertRaises(CommandError):
             call_command(
                 "create_sites_and_configurations"
             )

@@ -8,7 +8,7 @@ import git
 
 # -- Project information -----------------------------------------------------
 
-project = "edx-platform Technical Reference"
+project = "edx-platform technical reference"
 copyright = edx_theme.COPYRIGHT  # pylint: disable=redefined-builtin
 author = edx_theme.AUTHOR
 release = ""

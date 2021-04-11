@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
@@ -13,13 +16,13 @@ class Migration(migrations.Migration):
             name='Target',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('target_type', models.CharField(max_length=64, choices=[('myself', 'Myself'), ('staff', 'Staff and instructors'), ('learners', 'All students'), ('cohort', 'Specific cohort')])),
+                ('target_type', models.CharField(max_length=64, choices=[(u'myself', u'Myself'), (u'staff', u'Staff and instructors'), (u'learners', u'All students'), (u'cohort', u'Specific cohort')])),
             ],
         ),
         migrations.AlterField(
             model_name='courseemail',
             name='to_option',
-            field=models.CharField(max_length=64, choices=[('deprecated', 'deprecated')]),
+            field=models.CharField(max_length=64, choices=[(u'deprecated', u'deprecated')]),
         ),
         migrations.CreateModel(
             name='CohortTarget',

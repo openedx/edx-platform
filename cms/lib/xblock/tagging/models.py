@@ -17,14 +17,14 @@ class TagCategories(models.Model):
     name = models.CharField(max_length=255, unique=True)
     title = models.CharField(max_length=255)
 
-    class Meta:
+    class Meta(object):
         app_label = "tagging"
         ordering = ('title',)
         verbose_name = "tag category"
         verbose_name_plural = "tag categories"
 
     def __str__(self):
-        return f"[TagCategories] {self.name}: {self.title}"
+        return "[TagCategories] {}: {}".format(self.name, self.title)
 
     def get_values(self):
         """
@@ -43,10 +43,10 @@ class TagAvailableValues(models.Model):
     category = models.ForeignKey(TagCategories, db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
 
-    class Meta:
+    class Meta(object):
         app_label = "tagging"
         ordering = ('id',)
         verbose_name = "available tag value"
 
     def __str__(self):
-        return f"[TagAvailableValues] {self.category}: {self.value}"
+        return "[TagAvailableValues] {}: {}".format(self.category, self.value)

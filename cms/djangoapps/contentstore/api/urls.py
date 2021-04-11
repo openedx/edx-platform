@@ -9,10 +9,10 @@ from cms.djangoapps.contentstore.api.views import course_import, course_quality,
 app_name = 'contentstore'
 
 urlpatterns = [
-    url(fr'^v0/import/{settings.COURSE_ID_PATTERN}/$',
+    url(r'^v0/import/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),
         course_import.CourseImportView.as_view(), name='course_import'),
-    url(fr'^v1/validation/{settings.COURSE_ID_PATTERN}/$',
+    url(r'^v1/validation/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),
         course_validation.CourseValidationView.as_view(), name='course_validation'),
-    url(fr'^v1/quality/{settings.COURSE_ID_PATTERN}/$',
+    url(r'^v1/quality/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN,),
         course_quality.CourseQualityView.as_view(), name='course_quality'),
 ]

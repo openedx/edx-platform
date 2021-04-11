@@ -6,16 +6,16 @@ Test view handler for rerun (and eventually create)
 import datetime
 
 import ddt
-from django.test import override_settings
+import six
 from django.test.client import RequestFactory
 from django.urls import reverse
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
-from organizations.api import add_organization, get_course_organizations, get_organization_by_short_name
-from organizations.exceptions import InvalidOrganizationException
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.organizations_helpers import add_organization, get_course_organizations
 from xmodule.course_module import CourseFields
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -32,7 +32,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Add a user and a course
         """
-        super().setUp()
+        super(TestCourseListing, self).setUp()
         # create and log in a staff user.
         # create and log in a non-staff user
         self.user = UserFactory()
@@ -66,6 +66,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     def test_rerun(self):
         """
         Just testing the functionality the view handler adds over the tasks tested in test_clone_course
@@ -76,7 +77,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'description': 'Testing Organization Description',
         })
         response = self.client.ajax_post(self.course_create_rerun_url, {
-            'source_course_key': str(self.source_course_key),
+            'source_course_key': six.text_type(self.source_course_key),
             'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
             'display_name': 'not the same old name',
         })
@@ -113,15 +114,13 @@ class TestCourseListing(ModuleStoreTestCase):
             course = self.store.get_course(new_course_key)
             self.assertTrue(course.cert_html_view_enabled)
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': False})
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_creation_for_unknown_organization_relaxed(self, store):
+    def test_course_creation_without_org_app_enabled(self, store):
         """
-        Tests that when ORGANIZATIONS_AUTOCREATE is True,
-        creating a course-run with an unknown org slug will create an organization
-        and organization-course linkage in the system.
+        Tests course creation workflow should not create course to org
+        link if organizations_app is not enabled.
         """
-        with self.assertRaises(InvalidOrganizationException):
-            get_organization_by_short_name("orgX")
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': 'orgX',
@@ -130,19 +129,17 @@ class TestCourseListing(ModuleStoreTestCase):
                 'run': '2015_T2'
             })
             self.assertEqual(response.status_code, 200)
-            self.assertIsNotNone(get_organization_by_short_name("orgX"))
             data = parse_json(response)
             new_course_key = CourseKey.from_string(data['course_key'])
             course_orgs = get_course_organizations(new_course_key)
-            self.assertEqual(len(course_orgs), 1)
-            self.assertEqual(course_orgs[0]['short_name'], 'orgX')
+            self.assertEqual(course_orgs, [])
 
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
-    def test_course_creation_for_unknown_organization_strict(self, store):
+    def test_course_creation_with_org_not_in_system(self, store):
         """
-        Tests that when ORGANIZATIONS_AUTOCREATE is False,
-        creating a course-run with an unknown org slug will raise a validation error.
+        Tests course creation workflow when course organization does not exist
+        in system.
         """
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
@@ -152,13 +149,12 @@ class TestCourseListing(ModuleStoreTestCase):
                 'run': '2015_T2'
             })
             self.assertEqual(response.status_code, 400)
-            with self.assertRaises(InvalidOrganizationException):
-                get_organization_by_short_name("orgX")
             data = parse_json(response)
-            self.assertIn('Organization you selected does not exist in the system', data['error'])
+            self.assertIn(u'Organization you selected does not exist in the system', data['error'])
 
-    @ddt.data(True, False)
-    def test_course_creation_for_known_organization(self, organizations_autocreate):
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_creation_with_org_in_system(self, store):
         """
         Tests course creation workflow when course organization exist in system.
         """
@@ -167,7 +163,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'short_name': 'orgX',
             'description': 'Testing Organization Description',
         })
-        with override_settings(ORGANIZATIONS_AUTOCREATE=organizations_autocreate):
+        with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': 'orgX',
                 'number': 'CS101',

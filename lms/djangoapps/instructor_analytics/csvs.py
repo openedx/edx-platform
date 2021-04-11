@@ -7,6 +7,8 @@ Format and create csv responses
 
 import csv
 
+import six
+from six.moves import map
 from django.http import HttpResponse
 
 
@@ -22,18 +24,18 @@ def create_csv_response(filename, header, datarows):
 
     """
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename={filename}'
+    response['Content-Disposition'] = u'attachment; filename={0}'.format(filename)
     csvwriter = csv.writer(
         response,
         dialect='excel',
         quotechar='"',
         quoting=csv.QUOTE_ALL)
 
-    encoded_header = [str(s) for s in header]
+    encoded_header = [six.text_type(s) for s in header]
     csvwriter.writerow(encoded_header)
 
     for datarow in datarows:
-        encoded_row = [str(s) for s in datarow]
+        encoded_row = [six.text_type(s) for s in datarow]
         csvwriter.writerow(encoded_row)
 
     return response

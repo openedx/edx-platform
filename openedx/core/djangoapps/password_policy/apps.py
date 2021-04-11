@@ -3,6 +3,7 @@ Configuration for password_policy Django app
 """
 
 import logging
+import six
 from dateutil.parser import parse as parse_date
 from django.apps import AppConfig
 from django.conf import settings
@@ -24,14 +25,14 @@ class PasswordPolicyConfig(AppConfig):
     plugin_app = {
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: 'settings.devstack'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
             },
             ProjectType.CMS: {
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
-                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: 'settings.devstack'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
+                SettingsType.DEVSTACK: {PluginSettings.RELATIVE_PATH: u'settings.devstack'},
             }
         }
     }
@@ -54,8 +55,8 @@ class PasswordPolicyConfig(AppConfig):
         """
         deadline = config.get(setting)
         try:
-            if isinstance(deadline, str):
+            if isinstance(deadline, six.string_types):
                 config[setting] = parse_date(deadline)
         except (ValueError, OverflowError):
-            log.exception("Could not parse %s password policy rollout value of '%s'.", setting, deadline)
+            log.exception(u"Could not parse %s password policy rollout value of '%s'.", setting, deadline)
             config[setting] = None

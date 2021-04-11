@@ -23,24 +23,13 @@ urlpatterns = [
     url(r'^create_account$', register.RegistrationView.as_view(), name='create_account'),
 
     # Moved from user_api/legacy_urls.py
-    url(
-        r'^api/user/v1/account/registration/$',
-        register.RegistrationView.as_view(),
-        name="user_api_registration"
-    ),
     # `user_api` prefix is preserved for backwards compatibility.
     url(r'^user_api/v1/account/registration/$', register.RegistrationView.as_view(),
-        name="user_api_registration_legacy"),
+        name="user_api_registration"),
 
     # V2 is created to avoid backward compatibility issue with confirm_email
-    url(
-        r'^api/user/v2/account/registration/$',
-        register.RegistrationView.as_view(),
-        name="user_api_registration_v2"
-    ),
-    # legacy url
     url(r'^user_api/v2/account/registration/$', register.RegistrationView.as_view(),
-        name="user_api_registration_v2_legacy"),
+        name="user_api_registration_v2"),
 
     # Moved from user_api/urls.py
     # `api/user` prefix is preserved for backwards compatibility.
@@ -53,14 +42,9 @@ urlpatterns = [
     url(r'^login_ajax$', login.login_user, name="login_api"),
 
     # Moved from user_api/legacy_urls.py
-    url(
-        r'^api/user/v1/account/login_session/$',
-        login.LoginSessionView.as_view(),
-        name="user_api_login_session"
-    ),
     # `user_api` prefix is preserved for backwards compatibility.
     url(r'^user_api/v1/account/login_session/$', login.LoginSessionView.as_view(),
-        name="user_api_login_session_legacy"),
+        name="user_api_login_session"),
 
     # Login Refresh of JWT Cookies
     url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
@@ -68,14 +52,8 @@ urlpatterns = [
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
 
     # Moved from user_api/legacy_urls.py
-    url(
-        r'^api/user/v1/account/password_reset/$',
-        password_reset.PasswordResetView.as_view(),
-        name="user_api_password_reset"
-    ),
-    # legacy url
     url(r'^user_api/v1/account/password_reset/$', password_reset.PasswordResetView.as_view(),
-        name="user_api_password_reset_legacy"),
+        name="user_api_password_reset"),
 
     # Password reset api views.
     url(r'^password_reset/$', password_reset.password_reset, name='password_reset'),
@@ -86,20 +64,14 @@ urlpatterns = [
     ),
     url(r'^account/password$', password_reset.password_change_request_handler, name='password_change_request'),
 
-    # authn MFE flow
-    url(
-        r'^api/user/v1/account/password_reset/token/validate/$',
-        password_reset.PasswordResetTokenValidation.as_view(),
-        name="user_api_password_reset_token_validate"
-    ),
-    # legacy url
-    url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.PasswordResetTokenValidation.as_view(),
-        name="user_api_password_reset_token_validate_legacy"),
+    # logistration MFE flow
+    url(r'^user_api/v1/account/password_reset/token/validate/$', password_reset.password_reset_token_validate,
+        name="user_api_password_reset_token_validate"),
 
-    # authn MFE reset flow
+    # logistration MFE reset flow
     url(
         r'^password/reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        password_reset.LogistrationPasswordResetView.as_view(),
+        password_reset.password_reset_logistration,
         name='logistration_password_reset',
     ),
 ]

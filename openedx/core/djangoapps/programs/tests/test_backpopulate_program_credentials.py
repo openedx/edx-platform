@@ -1,11 +1,12 @@
 """Tests for the backpopulate_program_credentials management command."""
 
-from unittest import mock
 
 import ddt
+import mock
 from django.core.management import call_command
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
@@ -41,7 +42,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
     SAME_COURSE = 'same_course'
 
     def setUp(self):
-        super().setUp()
+        super(BackpopulateProgramCredentialsTests, self).setUp()
 
         self.alice = UserFactory()
         self.bob = UserFactory()
@@ -288,8 +289,8 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         passing_status = CertificateStatuses.downloadable
         failing_status = CertificateStatuses.notpassing
 
-        assert passing_status in CertificateStatuses.PASSED_STATUSES
-        assert failing_status not in CertificateStatuses.PASSED_STATUSES
+        self.assertIn(passing_status, CertificateStatuses.PASSED_STATUSES)
+        self.assertNotIn(failing_status, CertificateStatuses.PASSED_STATUSES)
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -381,7 +382,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         call_command('backpopulate_program_credentials', commit=True)
 
-        assert mock_log.called
+        self.assertTrue(mock_log.called)
 
         calls = [
             mock.call(self.alice.username),

@@ -1,6 +1,6 @@
 <div class="course-highlights-setting">
 <h2 id="highlights-enabled-label" class="status-highlights-enabled-label">
-  <%- gettext('Course Highlight Emails') %>
+  <%- gettext('Weekly Highlight Emails') %>
 </h2>
 <br>
 <% if (highlights_enabled_for_messaging) { %>

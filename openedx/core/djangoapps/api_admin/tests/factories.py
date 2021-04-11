@@ -15,7 +15,7 @@ Application = get_application_model()  # pylint: disable=invalid-name
 
 class ApiAccessRequestFactory(DjangoModelFactory):
     """Factory for ApiAccessRequest objects."""
-    class Meta:
+    class Meta(object):
         model = ApiAccessRequest
 
     user = factory.SubFactory(UserFactory)
@@ -24,7 +24,7 @@ class ApiAccessRequestFactory(DjangoModelFactory):
 
 class ApplicationFactory(DjangoModelFactory):
     """Factory for OAuth Application objects."""
-    class Meta:
+    class Meta(object):
         model = Application
 
     authorization_grant_type = Application.GRANT_CLIENT_CREDENTIALS
@@ -34,7 +34,7 @@ class ApplicationFactory(DjangoModelFactory):
 class CatalogFactory(DjangoModelFactory):
     """Factory for Catalog objects."""
 
-    class Meta:
+    class Meta(object):
         model = Catalog
 
     id = FuzzyInteger(0, 999)  # pylint: disable=invalid-name

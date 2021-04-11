@@ -95,8 +95,7 @@
         tinyMCE incorrectly decides that the suffix should be "", which means it fails to load files.
          */
         tinyMCE.suffix = ".min";
-
-        var tinyMceConfig = {
+        this.tiny_mce_textarea = $(".tiny-mce", this.element).tinymce({
           script_url: baseUrl + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js",
           font_formats: _getFonts(),
           theme: "modern",
@@ -172,41 +171,7 @@
            */
           init_instance_callback: this.initInstanceCallback,
           browser_spellcheck: true
-        };
-
-        if (typeof process != "undefined" && process.env.JS_ENV_EXTRA_CONFIG) {
-          var tinyMceAdditionalPlugins = process.env.JS_ENV_EXTRA_CONFIG.TINYMCE_ADDITIONAL_PLUGINS;
-          // check if we have any additional plugins passed
-          if (tinyMceAdditionalPlugins) {
-            // go over each plugin
-            tinyMceAdditionalPlugins.forEach(function (tinyMcePlugin) {
-              // check if plugins is not empty (ie there are existing plugins)
-              if (tinyMceConfig.plugins.trim()) {
-                tinyMceConfig.plugins += ', ';
-              }
-
-              // add the plugin to the list of plugins
-              tinyMceConfig.plugins += tinyMcePlugin.name;
-
-              // check if the plugin should be included in the toolbar
-              if (tinyMcePlugin.toolbar) {
-                // check if toolbar is not empty (ie there are already items in the toolbar)
-                if (tinyMceConfig.toolbar.trim()) {
-                  tinyMceConfig.toolbar += ' | ';
-                }
-
-                tinyMceConfig.toolbar += tinyMcePlugin.name;
-              }
-
-              // add the additional settings for each plugin (if there is any)
-              if (tinyMcePlugin.extra_settings) {
-                tinyMceConfig[tinyMcePlugin.name] = tinyMcePlugin.extra_settings;
-              }
-            });
-          }
-        }
-
-        this.tiny_mce_textarea = $(".tiny-mce", this.element).tinymce(tinyMceConfig);
+        });
         tinymce.addI18n('en', {
 
           /*

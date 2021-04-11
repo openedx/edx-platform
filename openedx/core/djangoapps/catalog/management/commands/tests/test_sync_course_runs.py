@@ -1,9 +1,10 @@
 """
 Tests for the sync course runs management command.
 """
-from unittest import mock
 
 import ddt
+import mock
+
 from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory
@@ -11,6 +12,7 @@ from openedx.core.djangoapps.catalog.management.commands.sync_course_runs import
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import six
 
 COMMAND_MODULE = 'openedx.core.djangoapps.catalog.management.commands.sync_course_runs'
 
@@ -22,14 +24,14 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
     Test for the sync course runs management command.
     """
     def setUp(self):
-        super().setUp()
+        super(TestSyncCourseRunsCommand, self).setUp()
         # create mongo course
         self.course = CourseFactory.create()
         # load this course into course overview
         self.course_overview = CourseOverview.get_from_id(self.course.id)
         # create a catalog course run with the same course id.
         self.catalog_course_run = CourseRunFactory(
-            key=str(self.course.id),
+            key=six.text_type(self.course.id),
             marketing_url='test_marketing_url',
             eligible_for_financial_aid=False
         )
@@ -53,9 +55,15 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
             updated_course_overview_value = getattr(updated_course_overview, course_overview_field_name)
 
             # course overview value matches catalog value
-            assert updated_course_overview_value == self.catalog_course_run.get(catalog_field_name)  # pylint: disable=no-member, line-too-long
+            self.assertEqual(
+                updated_course_overview_value,
+                self.catalog_course_run.get(catalog_field_name),
+            )
             # new value doesn't match old value
-            assert updated_course_overview_value != previous_course_overview_value
+            self.assertNotEqual(
+                updated_course_overview_value,
+                previous_course_overview_value,
+            )
 
     @mock.patch(COMMAND_MODULE + '.log.info')
     def test_course_overview_does_not_exist(self, mock_log_info, mock_catalog_course_runs):
@@ -68,11 +76,11 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         call_command('sync_course_runs')
 
         mock_log_info.assert_any_call(
-            '[sync_course_runs] course overview record not found for course run: %s',
+            u'[sync_course_runs] course overview record not found for course run: %s',
             nonexistent_course_run['key'],
         )
         updated_marketing_url = CourseOverview.objects.get(id=self.course.id).marketing_url
-        assert updated_marketing_url == 'test_marketing_url'
+        self.assertEqual(updated_marketing_url, 'test_marketing_url')
 
     @mock.patch(COMMAND_MODULE + '.log.info')
     def test_starting_and_ending_logs(self, mock_log_info, mock_catalog_course_runs):
@@ -82,8 +90,8 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
         def _assert_logs(num_updates):
             mock_log_info.assert_any_call('[sync_course_runs] Fetching course runs from catalog service.')
             mock_log_info.assert_any_call(
-                '[sync_course_runs] course runs found in catalog: %d, course runs found in course overview: %d,'
-                ' course runs not found in course overview: %d, course overviews updated: %d',
+                u'[sync_course_runs] course runs found in catalog: %d, course runs found in course overview: %d,'
+                u' course runs not found in course overview: %d, course overviews updated: %d',
                 3,
                 1,
                 2,

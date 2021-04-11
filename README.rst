@@ -86,5 +86,5 @@ Reporting Security Issues
 Please do not report security issues in public. Please email
 security@edx.org.
 
-.. _individual contributor agreement: https://openedx.org/cla
+.. _individual contributor agreement: https://openedx.org/wp-content/uploads/2019/01/individual-contributor-agreement.pdf
 .. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst

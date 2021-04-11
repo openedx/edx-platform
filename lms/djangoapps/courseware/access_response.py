@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 
-class AccessResponse:  # pylint: disable=eq-without-hash
+class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
     def __init__(self, has_access, error_code=None, developer_message=None, user_message=None,
                  additional_context_user_message=None, user_fragment=None):
@@ -115,8 +115,8 @@ class AccessError(AccessResponse):
             user_fragment (:py:class:`~web_fragments.fragment.Fragment`): HTML to show the user
 
         """
-        super().__init__(False, error_code, developer_message,
-                         user_message, additional_context_user_message, user_fragment)
+        super(AccessError, self).__init__(False, error_code, developer_message, user_message,
+                                          additional_context_user_message, user_fragment)
 
 
 class StartDateError(AccessError):
@@ -131,13 +131,13 @@ class StartDateError(AccessError):
         """
         error_code = "course_not_started"
         if start_date == DEFAULT_START_DATE:
-            developer_message = "Course has not started"
-            user_message = _("Course has not started")
+            developer_message = u"Course has not started"
+            user_message = _(u"Course has not started")
         else:
-            developer_message = f"Course does not start until {start_date}"
-            user_message = _("Course does not start until {}"  # lint-amnesty, pylint: disable=translation-of-non-string
-                             .format(f"{start_date:%B %d, %Y}"))
-        super().__init__(
+            developer_message = u"Course does not start until {}".format(start_date)
+            user_message = _(u"Course does not start until {}"
+                             .format(u"{:%B %d, %Y}".format(start_date)))
+        super(StartDateError, self).__init__(
             error_code,
             developer_message,
             user_message if display_error_to_user else None
@@ -150,9 +150,9 @@ class MilestoneAccessError(AccessError):
     """
     def __init__(self):
         error_code = "unfulfilled_milestones"
-        developer_message = "User has unfulfilled milestones"
-        user_message = _("You have unfulfilled milestones")
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u"User has unfulfilled milestones"
+        user_message = _(u"You have unfulfilled milestones")
+        super(MilestoneAccessError, self).__init__(error_code, developer_message, user_message)
 
 
 class VisibilityError(AccessError):
@@ -167,9 +167,9 @@ class VisibilityError(AccessError):
                 be shown to the user?
         """
         error_code = "not_visible_to_user"
-        developer_message = "Course is not visible to this user"
-        user_message = _("You do not have access to this course")
-        super().__init__(
+        developer_message = u"Course is not visible to this user"
+        user_message = _(u"You do not have access to this course")
+        super(VisibilityError, self).__init__(
             error_code,
             developer_message,
             user_message if display_error_to_user else None
@@ -182,9 +182,9 @@ class MobileAvailabilityError(AccessError):
     """
     def __init__(self):
         error_code = "mobile_unavailable"
-        developer_message = "Course is not available on mobile for this user"
-        user_message = _("You do not have access to this course on a mobile device")
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u"Course is not available on mobile for this user"
+        user_message = _(u"You do not have access to this course on a mobile device")
+        super(MobileAvailabilityError, self).__init__(error_code, developer_message, user_message)
 
 
 class IncorrectPartitionGroupError(AccessError):
@@ -193,12 +193,12 @@ class IncorrectPartitionGroupError(AccessError):
     """
     def __init__(self, partition, user_group, allowed_groups, user_message=None, user_fragment=None):
         error_code = "incorrect_user_group"
-        developer_message = "In partition {}, user was in group {}, but only {} are allowed access".format(
+        developer_message = u"In partition {}, user was in group {}, but only {} are allowed access".format(
             partition.name,
             user_group.name if user_group is not None else user_group,
-            ", ".join(group.name for group in allowed_groups),
+            u", ".join(group.name for group in allowed_groups),
         )
-        super().__init__(
+        super(IncorrectPartitionGroupError, self).__init__(
             error_code=error_code,
             developer_message=developer_message,
             user_message=user_message,
@@ -212,8 +212,8 @@ class NoAllowedPartitionGroupsError(AccessError):
     """
     def __init__(self, partition, user_message=None, user_fragment=None):
         error_code = "no_allowed_user_groups"
-        developer_message = f"Group access for {partition.name} excludes all students"
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u"Group access for {} excludes all students".format(partition.name)
+        super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)
 
 
 class EnrollmentRequiredAccessError(AccessError):
@@ -222,9 +222,9 @@ class EnrollmentRequiredAccessError(AccessError):
     """
     def __init__(self):
         error_code = "enrollment_required"
-        developer_message = "User must be enrolled in the course"
-        user_message = _("You must be enrolled in the course")
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u"User must be enrolled in the course"
+        user_message = _(u"You must be enrolled in the course")
+        super(EnrollmentRequiredAccessError, self).__init__(error_code, developer_message, user_message)
 
 
 class AuthenticationRequiredAccessError(AccessError):
@@ -233,9 +233,9 @@ class AuthenticationRequiredAccessError(AccessError):
     """
     def __init__(self):
         error_code = "authentication_required"
-        developer_message = "User must be authenticated to view the course"
-        user_message = _("You must be logged in to see this course")
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u"User must be authenticated to view the course"
+        user_message = _(u"You must be logged in to see this course")
+        super(AuthenticationRequiredAccessError, self).__init__(error_code, developer_message, user_message)
 
 
 class CoursewareMicrofrontendDisabledAccessError(AccessError):
@@ -244,6 +244,6 @@ class CoursewareMicrofrontendDisabledAccessError(AccessError):
     """
     def __init__(self):
         error_code = 'microfrontend_disabled'
-        developer_message = 'Micro-frontend is disabled for this user'
-        user_message = _('Please view your course in the existing experience')
-        super().__init__(error_code, developer_message, user_message)
+        developer_message = u'Micro-frontend is disabled for this user'
+        user_message = _(u'Please view your course in the existing experience')
+        super(CoursewareMicrofrontendDisabledAccessError, self).__init__(error_code, developer_message, user_message)

@@ -4,6 +4,9 @@ Models used by Studio XBlock infrastructure.
 Includes:
     StudioConfig: A ConfigurationModel for managing Studio.
 """
+
+
+import six
 from config_models.models import ConfigurationModel
 from django.db.models import TextField
 from django.utils.encoding import python_2_unicode_compatible
@@ -19,8 +22,8 @@ class StudioConfig(ConfigurationModel):
     .. no_pii:
     """
     disabled_blocks = TextField(
-        default="about course_info static_tab",
-        help_text="Space-separated list of XBlocks on which XBlockAsides should never render in studio",
+        default=u"about course_info static_tab",
+        help_text=u"Space-separated list of XBlocks on which XBlockAsides should never render in studio",
     )
 
     @classmethod
@@ -80,7 +83,7 @@ class CourseEditLTIFieldsEnabledFlag(ConfigurationModel):
         if self.enabled:
             en = ""
 
-        return "Course '{course_id}': Edit LTI access to Learner information {en}Enabled".format(
-            course_id=str(self.course_id),
+        return u"Course '{course_id}': Edit LTI access to Learner information {en}Enabled".format(
+            course_id=six.text_type(self.course_id),
             en=en,
         )

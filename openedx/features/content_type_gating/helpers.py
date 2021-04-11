@@ -56,8 +56,8 @@ def correct_modes_for_fbe(course_key=None, enrollment=None, user=None, course=No
             )
             if course_mode is None:
                 LOG.error(
-                    "User %s is in an unknown CourseMode '%s'"
-                    " for course %s. Granting full access to content for this user",
+                    u"User %s is in an unknown CourseMode '%s'"
+                    u" for course %s. Granting full access to content for this user",
                     user.username,
                     mode_slug,
                     course_key,

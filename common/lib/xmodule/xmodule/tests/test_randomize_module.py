@@ -1,118 +1,109 @@
 """
 Test cases covering workflows and behaviors for the Randomize XModule
 """
-from unittest.mock import Mock
-
-from fs.memoryfs import MemoryFS
-from lxml import etree
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.randomize_module import RandomizeBlock
-from xmodule.tests import get_test_system
-
-from .test_course_module import DummySystem as TestImportSystem
 
 
-class RandomizeBlockTest(MixedSplitTestCase):
-    """
-    Base class for tests of LibraryContentModule (library_content_module.py)
-    """
-    maxDiff = None
+import unittest
+from datetime import datetime, timedelta
+
+from opaque_keys.edx.locator import BlockUsageLocator
+from pytz import UTC
+from xblock.fields import ScopeIds
+
+from xmodule.randomize_module import RandomizeModule
+
+from .test_course_module import DummySystem as DummyImportSystem
+
+ORG = 'test_org'
+COURSE = 'test_course'
+
+START = '2013-01-01T01:00:00'
+_TODAY = datetime.now(UTC)
+_LAST_WEEK = _TODAY - timedelta(days=7)
+_NEXT_WEEK = _TODAY + timedelta(days=7)
+
+
+class RandomizeModuleTestCase(unittest.TestCase):
+    """Make sure the randomize module works"""
 
     def setUp(self):
-        super().setUp()
+        """
+        Initialize dummy testing course.
+        """
+        super(RandomizeModuleTestCase, self).setUp()
+        self.system = DummyImportSystem(load_error_modules=True)
+        self.system.seed = None
+        self.course = self.get_dummy_course()
+        self.modulestore = self.system.modulestore
 
-        self.course = CourseFactory.create(modulestore=self.store)
-        self.chapter = self.make_block("chapter", self.course)
-        self.sequential = self.make_block("sequential", self.chapter)
-        self.vertical = self.make_block("vertical", self.sequential)
-        self.randomize_block = self.make_block(
-            "randomize",
-            self.vertical,
-            display_name="Hello Randomize",
+    def get_dummy_course(self, start=_TODAY):
+        """Get a dummy course"""
+
+        self.start_xml = '''
+         <course org="{org}" course="{course}"
+                graceperiod="1 day" url_name="test"
+                start="{start}">
+            <chapter url="ch1" url_name="chapter1" display_name="CH1">
+                <randomize url_name="my_randomize">
+                <html url_name="a" display_name="A">Two houses, ...</html>
+                <html url_name="b" display_name="B">Three houses, ...</html>
+                </randomize>
+            </chapter>
+            <chapter url="ch2" url_name="chapter2" display_name="CH2">
+            </chapter>
+         </course>
+         '''.format(org=ORG, course=COURSE, start=start)
+
+        return self.system.process_xml(self.start_xml)
+
+    def test_import(self):
+        """
+        Just make sure descriptor loads without error
+        """
+        self.get_dummy_course(START)
+
+    def test_course_has_started(self):
+        """
+        Test CourseDescriptor.has_started.
+        """
+        self.course.start = _LAST_WEEK
+        self.assertTrue(self.course.has_started())
+        self.course.start = _NEXT_WEEK
+        self.assertFalse(self.course.has_started())
+
+    def test_children(self):
+        """ Check course/randomize module works fine """
+
+        self.assertTrue(self.course.has_children)
+        self.assertEqual(len(self.course.get_children()), 2)
+
+        def inner_get_module(descriptor):
+            """
+            Override systems.get_module
+                This method will be called when any call is made to self.system.get_module
+            """
+            if isinstance(descriptor, BlockUsageLocator):
+                location = descriptor
+                descriptor = self.modulestore.get_item(location, depth=None)
+            descriptor.xmodule_runtime = self.get_dummy_course()
+            descriptor.xmodule_runtime.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
+            descriptor.xmodule_runtime.get_module = inner_get_module
+            return descriptor
+
+        self.system.get_module = inner_get_module
+
+        # Get randomize_descriptor from the course & verify its children
+        randomize_descriptor = inner_get_module(self.course.id.make_usage_key('randomize', 'my_randomize'))
+        self.assertTrue(randomize_descriptor.has_children)
+        self.assertEqual(len(randomize_descriptor.get_children()), 2)
+
+        # Call RandomizeModule which will select an element from the list of available items
+        randomize_module = RandomizeModule(
+            randomize_descriptor,
+            self.system,
+            scope_ids=ScopeIds(None, None, self.course.id, self.course.id)
         )
-        self.child_blocks = [
-            self.make_block("html", self.randomize_block, display_name=f"Hello HTML {i}")
-            for i in range(1, 4)
-        ]
 
-    def _bind_module_system(self, block, user_id):
-        """
-        Bind module system to block so we can access student-specific data.
-        """
-        user = Mock(name='get_test_system.user', id=user_id, is_staff=False)
-        module_system = get_test_system(course_id=block.location.course_key, user=user)
-        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
-        block.xmodule_runtime = module_system
-
-    def test_xml_export_import_cycle(self):
-        """
-        Test the export-import cycle.
-        """
-        randomize_block = self.store.get_item(self.randomize_block.location)
-
-        expected_olx = (
-            '<randomize display_name="{block.display_name}">\n'
-            '  <html url_name="{block.children[0].block_id}"/>\n'
-            '  <html url_name="{block.children[1].block_id}"/>\n'
-            '  <html url_name="{block.children[2].block_id}"/>\n'
-            '</randomize>\n'
-        ).format(
-            block=randomize_block,
-        )
-
-        export_fs = MemoryFS()
-        # Set the virtual FS to export the olx to.
-        randomize_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
-
-        # Export the olx.
-        node = etree.Element("unknown_root")
-        randomize_block.add_xml_to_node(node)
-
-        # Read it back
-        with export_fs.open('{dir}/{file_name}.xml'.format(
-            dir=randomize_block.scope_ids.usage_id.block_type,
-            file_name=randomize_block.scope_ids.usage_id.block_id
-        )) as f:
-            exported_olx = f.read()
-
-        # And compare.
-        assert exported_olx == expected_olx
-
-        runtime = TestImportSystem(load_error_modules=True, course_id=randomize_block.location.course_key)
-        runtime.resources_fs = export_fs
-
-        # Now import it.
-        olx_element = etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_randomize_block = RandomizeBlock.parse_xml(olx_element, runtime, None, id_generator)
-
-        # Check the new XBlock has the same properties as the old one.
-        assert imported_randomize_block.display_name == randomize_block.display_name
-        assert len(imported_randomize_block.children) == 3
-        assert imported_randomize_block.children == randomize_block.children
-
-    def test_children_seen_by_a_user(self):
-        """
-        Test that each student sees only one block as a child of the LibraryContent block.
-        """
-        randomize_block = self.store.get_item(self.randomize_block.location)
-        self._bind_module_system(randomize_block, 3)
-
-        # Make sure the runtime knows that the block's children vary per-user:
-        assert randomize_block.has_dynamic_children()
-
-        assert len(randomize_block.children) == 3
-
-        # Check how many children each user will see:
-        assert len(randomize_block.get_child_descriptors()) == 1
-        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 1'
-        # Check that get_content_titles() doesn't return titles for hidden/unused children
-        # get_content_titles() is not overridden in RandomizeBlock so titles of the 3 children are returned.
-        assert len(randomize_block.get_content_titles()) == 3
-
-        # Bind to another user and check a different child block is displayed to user.
-        randomize_block = self.store.get_item(self.randomize_block.location)
-        self._bind_module_system(randomize_block, 1)
-        assert randomize_block.get_child_descriptors()[0].display_name == 'Hello HTML 2'
+        # Verify the selected child
+        self.assertEqual(len(randomize_module.get_child_descriptors()), 1, "No child is chosen")
+        self.assertIn(randomize_module.child.display_name, ['A', 'B'], "Unwanted child selected")

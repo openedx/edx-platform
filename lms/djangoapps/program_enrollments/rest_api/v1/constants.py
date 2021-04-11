@@ -17,7 +17,7 @@ REQUEST_STUDENT_KEY = 'student_key'
 ENABLE_ENROLLMENT_RESET_FLAG = 'ENABLE_ENROLLMENT_RESET'
 
 
-class CourseRunProgressStatuses:
+class CourseRunProgressStatuses(object):
     """
     Statuses that a course run can be in with respect to user progress.
     """

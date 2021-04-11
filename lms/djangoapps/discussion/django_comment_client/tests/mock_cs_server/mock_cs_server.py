@@ -30,7 +30,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         # Log the request
         # pylint: disable=logging-format-interpolation
         logger.debug(
-            "Comment Service received POST request {} to path {}"
+            u"Comment Service received POST request {0} to path {1}"
             .format(json.dumps(post_dict), self.path)
         )
 
@@ -38,7 +38,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         if 'X-Edx-Api-Key' in self.headers:
             response = self.server._response_str
             # Log the response
-            logger.debug("Comment Service: sending response %s", json.dumps(response))
+            logger.debug(u"Comment Service: sending response %s", json.dumps(response))
 
             # Send a response back to the client
             self.send_response(200)
@@ -68,7 +68,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         # Log the request
         # pylint: disable=logging-format-interpolation
         logger.debug(
-            "Comment Service received PUT request {} to path {}"
+            u"Comment Service received PUT request {0} to path {1}"
             .format(json.dumps(post_dict), self.path)
         )
 
@@ -76,7 +76,7 @@ class MockCommentServiceRequestHandler(BaseHTTPRequestHandler):
         if 'X-Edx-Api-Key' in self.headers:
             response = self.server._response_str
             # Log the response
-            logger.debug("Comment Service: sending response %s", json.dumps(response))
+            logger.debug(u"Comment Service: sending response %s", json.dumps(response))
 
             # Send a response back to the client
             self.send_response(200)

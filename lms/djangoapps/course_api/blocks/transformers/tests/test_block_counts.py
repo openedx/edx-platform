@@ -18,7 +18,7 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestBlockCountsTransformer, self).setUp()
         self.course_key = SampleCourseFactory.create().id
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)
@@ -41,13 +41,13 @@ class TestBlockCountsTransformer(ModuleStoreTestCase):
         )
 
         # verify count of chapters
-        assert block_counts_for_course.chapter == 2
+        self.assertEqual(block_counts_for_course.chapter, 2)
 
         # verify count of problems
-        assert block_counts_for_course.problem == 6
-        assert block_counts_for_chapter_x.problem == 3
+        self.assertEqual(block_counts_for_course.problem, 6)
+        self.assertEqual(block_counts_for_chapter_x.problem, 3)
 
         # verify other block types are not counted
         for block_type in ['course', 'html', 'video']:
-            assert not hasattr(block_counts_for_course, block_type)
-            assert not hasattr(block_counts_for_chapter_x, block_type)
+            self.assertFalse(hasattr(block_counts_for_course, block_type))
+            self.assertFalse(hasattr(block_counts_for_chapter_x, block_type))

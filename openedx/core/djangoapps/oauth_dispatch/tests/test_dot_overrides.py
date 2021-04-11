@@ -9,7 +9,7 @@ import datetime
 import unittest
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
@@ -32,7 +32,7 @@ class AuthenticateTestCase(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(AuthenticateTestCase, self).setUp()
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -42,11 +42,17 @@ class AuthenticateTestCase(TestCase):
 
     def test_authenticate_with_username(self):
         user = self.validator._authenticate(username='darkhelmet', password='12345')
-        assert self.user == user
+        self.assertEqual(
+            self.user,
+            user
+        )
 
     def test_authenticate_with_email(self):
         user = self.validator._authenticate(username='darkhelmet@spaceball_one.org', password='12345')
-        assert self.user == user
+        self.assertEqual(
+            self.user,
+            user
+        )
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -57,7 +63,7 @@ class CustomValidationTestCase(TestCase):
     In particular, inactive users should be able to validate.
     """
     def setUp(self):
-        super().setUp()
+        super(CustomValidationTestCase, self).setUp()
         self.user = User.objects.create_user(
             username='darkhelmet',
             password='12345',
@@ -67,15 +73,15 @@ class CustomValidationTestCase(TestCase):
         self.request_factory = RequestFactory()
 
     def test_active_user_validates(self):
-        assert self.user.is_active
+        self.assertTrue(self.user.is_active)
         request = self.request_factory.get('/')
-        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
+        self.assertTrue(self.validator.validate_user('darkhelmet', '12345', client=None, request=request))
 
     def test_inactive_user_validates(self):
         self.user.is_active = False
         self.user.save()
         request = self.request_factory.get('/')
-        assert self.validator.validate_user('darkhelmet', '12345', client=None, request=request)
+        self.assertTrue(self.validator.validate_user('darkhelmet', '12345', client=None, request=request))
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -88,7 +94,7 @@ class CustomAuthorizationViewTestCase(TestCase):
     (This is a temporary override until Auth Scopes is implemented.)
     """
     def setUp(self):
-        super().setUp()
+        super(CustomAuthorizationViewTestCase, self).setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
@@ -96,7 +102,7 @@ class CustomAuthorizationViewTestCase(TestCase):
         self.restricted_dot_app = self._create_restricted_app()
         self._create_expired_token(self.restricted_dot_app)
 
-    def _create_restricted_app(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _create_restricted_app(self):
         restricted_app = self.dot_adapter.create_confidential_client(
             name='test restricted dot application',
             user=self.user,
@@ -131,11 +137,11 @@ class CustomAuthorizationViewTestCase(TestCase):
 
     def test_no_reprompting(self):
         response = self._get_authorize(scope='profile')
-        assert response.status_code == 302
-        assert response.url.startswith(DUMMY_REDIRECT_URL)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith(DUMMY_REDIRECT_URL))
 
     def test_prompting_with_new_scope(self):
         response = self._get_authorize(scope='email')
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, settings.OAUTH2_PROVIDER['SCOPES']['email'])
         self.assertNotContains(response, settings.OAUTH2_PROVIDER['SCOPES']['profile'])

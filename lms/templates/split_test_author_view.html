@@ -7,7 +7,7 @@
 
 <%
 split_test = context.get('split_test')
-user_partition = split_test.get_selected_partition()
+user_partition = split_test.descriptor.get_selected_partition()
 show_link = group_configuration_url is not None
 %>
 

@@ -8,7 +8,6 @@ from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlunparse
 
-from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
@@ -30,7 +29,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestBlocksView, cls).setUpClass()
 
         # create a toy course
         cls.course = ToyCourseFactory.create(
@@ -40,15 +39,15 @@ class TestBlocksView(SharedModuleStoreTestCase):
         cls.course_key = cls.course.id
         cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
 
-        cls.non_orphaned_block_usage_keys = {
+        cls.non_orphaned_block_usage_keys = set(
             str(item.location)
             for item in cls.store.get_items(cls.course_key)
             # remove all orphaned items in the course, except for the root 'course' block
             if cls.store.get_parent_location(item.location) or item.category == 'course'
-        }
+        )
 
     def setUp(self):
-        super().setUp()
+        super(TestBlocksView, self).setUp()
 
         # create and enroll user in the toy course
         self.user = UserFactory.create()
@@ -81,7 +80,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         if params:
             self.query_params.update(params)
         response = self.client.get(url or self.url, self.query_params)
-        assert response.status_code == expected_status_code, str(response.content)
+        self.assertEqual(response.status_code, expected_status_code, str(response.content))
         if cacheable:
             assert response.get('Cache-Control', None) == 'max-age={}'.format(
                 settings.CACHE_MIDDLEWARE_SECONDS
@@ -122,11 +121,11 @@ class TestBlocksView(SharedModuleStoreTestCase):
             self.assert_in_iff('format', block_data, xblock.format is not None)
             self.assert_in_iff('due', block_data, xblock.due is not None)
             self.assert_true_iff(block_data['student_view_multi_device'], block_data['type'] == 'html')
-            assert 'not_a_field' not in block_data
+            self.assertNotIn('not_a_field', block_data)
 
             if xblock.has_children:
                 self.assertSetEqual(
-                    {str(child.location) for child in xblock.get_children()},
+                    set(str(child.location) for child in xblock.get_children()),
                     set(block_data['children']),
                 )
 
@@ -140,9 +139,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
             predicate - an expression, tested for truthiness
         """
         if predicate:
-            assert member in container
+            self.assertIn(member, container)
         else:
-            assert member not in container
+            self.assertNotIn(member, container)
 
     def assert_true_iff(self, expression, predicate):
         """
@@ -154,9 +153,9 @@ class TestBlocksView(SharedModuleStoreTestCase):
         """
 
         if predicate:
-            assert expression
+            self.assertTrue(expression)
         else:
-            assert not expression
+            self.assertFalse(expression)
 
     def test_not_authenticated_non_public_course_with_other_username(self):
         """
@@ -269,13 +268,13 @@ class TestBlocksView(SharedModuleStoreTestCase):
 
     def test_basic(self):
         response = self.verify_response()
-        assert response.data['root'] == str(self.course_usage_key)
+        self.assertEqual(response.data['root'], str(self.course_usage_key))
         self.verify_response_block_dict(response)
         for block_key_string, block_data in response.data['blocks'].items():
             block_key = deserialize_usage_key(block_key_string, self.course_key)
-            assert block_data['id'] == block_key_string
-            assert block_data['type'] == block_key.block_type
-            assert block_data['display_name'] == (self.store.get_item(block_key).display_name or '')
+            self.assertEqual(block_data['id'], block_key_string)
+            self.assertEqual(block_data['type'], block_key.block_type)
+            self.assertEqual(block_data['display_name'], self.store.get_item(block_key).display_name or '')
 
     def test_return_type_param(self):
         response = self.verify_response(params={'return_type': 'list'})
@@ -285,9 +284,18 @@ class TestBlocksView(SharedModuleStoreTestCase):
         response = self.verify_response(params={'block_counts': ['course', 'chapter']})
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            assert block_data['block_counts']['course'] == (1 if (block_data['type'] == 'course') else 0)
-            assert block_data['block_counts']['chapter'] == (1 if (block_data['type'] == 'chapter') else
-                                                             (5 if (block_data['type'] == 'course') else 0))
+            self.assertEqual(
+                block_data['block_counts']['course'],
+                1 if block_data['type'] == 'course' else 0,
+            )
+            self.assertEqual(
+                block_data['block_counts']['chapter'],
+                (
+                    1 if block_data['type'] == 'chapter' else
+                    5 if block_data['type'] == 'course' else
+                    0
+                )
+            )
 
     def test_student_view_data_param(self):
         response = self.verify_response(params={
@@ -351,7 +359,10 @@ class TestBlocksView(SharedModuleStoreTestCase):
         })
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            assert 'other_course_settings' not in block_data
+            self.assertNotIn(
+                'other_course_settings',
+                block_data
+            )
 
             self.assert_in_iff(
                 'course_visibility',
@@ -363,7 +374,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         response = self.verify_response(params={'nav_depth': 10})
         self.verify_response_block_dict(response)
         for block_data in response.data['blocks'].values():
-            assert 'descendants' in block_data
+            self.assertIn('descendants', block_data)
 
     def test_requested_fields_param(self):
         response = self.verify_response(
@@ -384,22 +395,15 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
-class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pylint: disable=test-inherits-tests
+class TestBlocksInCourseView(TestBlocksView):
     """
     Test class for BlocksInCourseView
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestBlocksInCourseView, self).setUp()
         self.url = reverse('blocks_in_course')
         self.query_params['course_id'] = str(self.course_key)
-        self.override_waffle_switch(True)
-        self.non_orphaned_raw_block_usage_keys = {
-            item.location
-            for item in self.store.get_items(self.course_key)
-            # remove all orphaned items in the course, except for the root 'course' block
-            if self.store.get_parent_location(item.location) or item.category == 'course'
-        }
 
     def test_no_course_id(self):
         self.query_params.pop('course_id')
@@ -410,70 +414,3 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
 
     def test_non_existent_course(self):
         self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
-
-    def test_non_existent_course_anonymous(self):
-        self.client.logout()
-        self.query_params['username'] = ''
-        self.verify_response(403, params={'course_id': str(CourseLocator('non', 'existent', 'course'))})
-
-    def test_completion_one_unit(self):
-        for item in self.store.get_items(self.course_key):
-            if item.category == 'html':
-                block_usage_key = item.location
-                break
-
-        submit_completions_for_testing(self.user, [block_usage_key])
-        response = self.verify_response(params={
-            'depth': 'all',
-            'requested_fields': ['completion', 'children'],
-        })
-
-        completion = response.data['blocks'][str(block_usage_key)].get('completion')
-        assert completion
-
-    def test_completion_all_course(self):
-        for block in self.non_orphaned_raw_block_usage_keys:
-            submit_completions_for_testing(self.user, [block])
-
-        response = self.verify_response(params={
-            'depth': 'all',
-            'requested_fields': ['completion', 'children'],
-        })
-        for block_id in self.non_orphaned_block_usage_keys:
-            assert response.data['blocks'][block_id].get('completion')
-
-    def test_completion_all_course_with_list_return_type(self):
-        for block in self.non_orphaned_raw_block_usage_keys:
-            submit_completions_for_testing(self.user, [block])
-
-        response = self.verify_response(params={
-            'depth': 'all',
-            'return_type': 'list',
-            'requested_fields': ['completion', 'children'],
-        })
-        for block in response.data:
-            if block['block_id'] in self.non_orphaned_block_usage_keys:
-                assert block.get('completion')
-
-    def test_completion_all_course_with_requested_fields_as_string(self):
-        for block in self.non_orphaned_raw_block_usage_keys:
-            submit_completions_for_testing(self.user, [block])
-
-        response = self.verify_response(params={
-            'depth': 'all',
-            'requested_fields': 'completion,children',
-        })
-        for block_id in self.non_orphaned_block_usage_keys:
-            assert response.data['blocks'][block_id].get('completion')
-
-    def test_completion_all_course_with_nav_depth(self):
-        # when we include nav_depth we get descendants in parent nodes
-        for block in self.non_orphaned_raw_block_usage_keys:
-            submit_completions_for_testing(self.user, [block])
-        response = self.verify_response(params={
-            'depth': 'all',
-            'nav_depth': 3,
-            'requested_fields': ['completion'],
-        })
-        for block_id in self.non_orphaned_block_usage_keys:
-            assert response.data['blocks'][block_id].get('completion')

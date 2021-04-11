@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+# -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -24,14 +24,14 @@ import edx_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'Open edX REST APIs'
-copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
+project = u'Open edX REST APIs'
+copyright = edx_theme.COPYRIGHT
 author = edx_theme.AUTHOR
 
 # The short X.Y version
-version = ''
+version = u''
 # The full version, including alpha/beta/rc tags
-release = ''
+release = u''
 
 
 # -- General configuration ---------------------------------------------------
@@ -72,7 +72,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -143,8 +143,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'api-docs.tex', 'api-docs Documentation',
-     'Nobody', 'manual'),
+    (master_doc, 'api-docs.tex', u'api-docs Documentation',
+     u'Nobody', 'manual'),
 ]
 
 
@@ -153,7 +153,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'api-docs', 'api-docs Documentation',
+    (master_doc, 'api-docs', u'api-docs Documentation',
      [author], 1)
 ]
 
@@ -164,7 +164,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'api-docs', 'api-docs Documentation',
+    (master_doc, 'api-docs', u'api-docs Documentation',
      author, 'api-docs', 'One line description of project.',
      'Miscellaneous'),
 ]

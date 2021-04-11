@@ -2,13 +2,11 @@
 Unit Tests for the Certificate service
 """
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 
-from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -19,16 +17,16 @@ class CertificateServiceTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CertificateServiceTests, self).setUp()
         self.service = CertificateService()
         self.course = CourseFactory()
         self.user = UserFactory()
         self.user_id = self.user.id
-        self.course_id = self.course.id  # pylint: disable=no-member
+        self.course_id = self.course.id
         GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.course.id,  # pylint: disable=no-member
+            course_id=self.course.id,
             grade=1.0
         )
 
@@ -48,9 +46,7 @@ class CertificateServiceTests(ModuleStoreTestCase):
         """
         Verify that CertificateService invalidates the user certificate
         """
-        success = self.service.invalidate_certificate(self.user_id, self.course_id)
-        assert success
-
+        self.service.invalidate_certificate(self.user_id, self.course_id)
         invalid_generated_certificate = GeneratedCertificate.objects.get(
             user=self.user_id,
             course_id=self.course_id
@@ -65,27 +61,3 @@ class CertificateServiceTests(ModuleStoreTestCase):
                 'status': CertificateStatuses.unavailable
             }
         )
-
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
-    def test_invalidate_certificate_allowlist(self):
-        """
-        Verify that CertificateService does not invalidate the certificate if it is allowlisted
-        """
-        u = UserFactory.create()
-        c = CourseFactory()
-        course_key = c.id  # pylint: disable=no-member
-        GeneratedCertificateFactory.create(
-            status=CertificateStatuses.downloadable,
-            user=u,
-            course_id=course_key,
-            grade=1.0
-        )
-        CertificateWhitelistFactory(
-            user=u,
-            course_id=course_key
-        )
-        success = self.service.invalidate_certificate(u.id, course_key)
-        assert not success
-
-        cert = GeneratedCertificate.objects.get(user=u.id, course_id=course_key)
-        assert cert.status == CertificateStatuses.downloadable

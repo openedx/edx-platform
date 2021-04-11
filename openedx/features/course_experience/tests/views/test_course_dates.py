@@ -20,7 +20,7 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
     """Tests for the course dates fragment view."""
 
     def setUp(self):
-        super(TestCourseDatesFragmentView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseDatesFragmentView, self).setUp()
         with self.store.default_store(ModuleStoreEnum.Type.split):
             self.course = CourseFactory.create(
                 org='edX',
@@ -45,4 +45,4 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
 
         self.client.logout()
         response = self.client.get(self.dates_fragment_url)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)

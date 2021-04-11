@@ -4,8 +4,9 @@ Test the partitions and partitions service
 """
 
 
-from unittest.mock import patch
 import django.test
+from mock import patch
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -34,7 +35,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super().setUp()
+        super(TestCohortPartitionScheme, self).setUp()
 
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
@@ -55,10 +56,15 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         Utility for checking that our test student comes up as assigned to the
         specified partition (or, if None, no partition at all)
         """
-        assert CohortPartitionScheme.get_group_for_user(self.course_key,
-                                                        self.student,
-                                                        (partition or self.user_partition),
-                                                        use_cached=False) == group
+        self.assertEqual(
+            CohortPartitionScheme.get_group_for_user(
+                self.course_key,
+                self.student,
+                partition or self.user_partition,
+                use_cached=False
+            ),
+            group
+        )
 
     def test_student_cohort_assignment(self):
         """
@@ -222,7 +228,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # warning)
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            assert mock_log.warning.called
+            self.assertTrue(mock_log.warning.called)
             self.assertRegex(mock_log.warning.call_args[0][0], 'group not found')
 
     def test_missing_partition(self):
@@ -247,7 +253,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         # scheme returns None (and logs a warning).
         with patch('openedx.core.djangoapps.course_groups.partition_scheme.log') as mock_log:
             self.assert_student_in_group(None, new_user_partition)
-            assert mock_log.warning.called
+            self.assertTrue(mock_log.warning.called)
             self.assertRegex(mock_log.warning.call_args[0][0], 'partition mismatch')
 
 
@@ -258,7 +264,7 @@ class TestExtension(django.test.TestCase):
     """
 
     def test_get_scheme(self):
-        assert UserPartition.get_scheme('cohort') == CohortPartitionScheme
+        self.assertEqual(UserPartition.get_scheme('cohort'), CohortPartitionScheme)
         with self.assertRaisesRegex(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')
 
@@ -274,7 +280,7 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
-        super().setUp()
+        super(TestGetCohortedUserPartition, self).setUp()
         self.course_key = ToyCourseFactory.create().id
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()
@@ -310,14 +316,14 @@ class TestGetCohortedUserPartition(ModuleStoreTestCase):
         self.course.user_partitions.append(self.random_user_partition)
         self.course.user_partitions.append(self.cohort_user_partition)
         self.course.user_partitions.append(self.second_cohort_user_partition)
-        assert self.cohort_user_partition == get_cohorted_user_partition(self.course)
+        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course))
 
     def test_no_cohort_user_partitions(self):
         """
         Test get_cohorted_user_partition returns None when there are no cohorted user partitions.
         """
         self.course.user_partitions.append(self.random_user_partition)
-        assert get_cohorted_user_partition(self.course) is None
+        self.assertIsNone(get_cohorted_user_partition(self.course))
 
 
 class TestMasqueradedGroup(StaffMasqueradeTestCase):
@@ -325,7 +331,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
     Check for staff being able to masquerade as belonging to a group.
     """
     def setUp(self):
-        super().setUp()
+        super(TestMasqueradedGroup, self).setUp()
         self.user_partition = UserPartition(
             0, 'Test User Partition', '',
             [Group(0, 'Group 1'), Group(1, 'Group 2')],
@@ -344,7 +350,10 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         )
 
         scheme = self.user_partition.scheme
-        assert scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition) == group
+        self.assertEqual(
+            scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
+            group
+        )
 
     def _verify_masquerade_for_all_groups(self):
         """

@@ -1,9 +1,11 @@
 """
 Tests for keyword_substitution.py
 """
-from unittest.mock import patch
 
+
+import six
 from ddt import ddt, file_data
+from mock import patch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util import keyword_substitution as Ks
@@ -19,7 +21,7 @@ class KeywordSubTest(ModuleStoreTestCase):
     CREATE_USER = False
 
     def setUp(self):
-        super().setUp()
+        super(KeywordSubTest, self).setUp()
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",
@@ -46,8 +48,8 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        assert course_name in result
-        assert result == expected
+        self.assertIn(course_name, result)
+        self.assertEqual(result, expected)
 
     def test_anonymous_id_sub(self):
         """
@@ -58,8 +60,8 @@ class KeywordSubTest(ModuleStoreTestCase):
         result = Ks.substitute_keywords_with_data(
             test_string, self.context,
         )
-        assert '%%USER_ID%%' not in result
-        assert anonymous_id in result
+        self.assertNotIn('%%USER_ID%%', result)
+        self.assertIn(anonymous_id, result)
 
     def test_name_sub(self):
         """
@@ -71,8 +73,8 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        assert '%%USER_FULLNAME%%' not in result
-        assert user_name in result
+        self.assertNotIn('%%USER_FULLNAME%%', result)
+        self.assertIn(user_name, result)
 
     def test_illegal_subtag(self):
         """
@@ -83,7 +85,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        assert test_string == result
+        self.assertEqual(test_string, result)
 
     def test_should_not_sub(self):
         """
@@ -94,7 +96,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        assert test_string == result
+        self.assertEqual(test_string, result)
 
     @file_data('fixtures/test_keywordsub_multiple_tags.json')
     def test_sub_multiple_tags(self, test_string, expected):
@@ -105,7 +107,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             result = Ks.substitute_keywords_with_data(
                 test_string, self.context,
             )
-            assert result == expected
+            self.assertEqual(result, expected)
 
     def test_subbing_no_userid_or_courseid(self):
         """
@@ -113,14 +115,14 @@ class KeywordSubTest(ModuleStoreTestCase):
         """
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
-        no_course_context = {
-            key: value for key, value in self.context.items() if key != 'course_title'
-        }
+        no_course_context = dict(
+            (key, value) for key, value in six.iteritems(self.context) if key != 'course_title'
+        )
         result = Ks.substitute_keywords_with_data(test_string, no_course_context)
-        assert test_string == result
+        self.assertEqual(test_string, result)
 
-        no_user_id_context = {
-            key: value for key, value in self.context.items() if key != 'user_id'
-        }
+        no_user_id_context = dict(
+            (key, value) for key, value in six.iteritems(self.context) if key != 'user_id'
+        )
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
-        assert test_string == result
+        self.assertEqual(test_string, result)

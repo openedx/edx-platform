@@ -7,6 +7,7 @@ framework.
 
 
 import hashlib
+import hmac
 import json
 import logging
 import re
@@ -16,7 +17,7 @@ import six
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from eventtracking import tracker
-from ipware.ip import get_client_ip
+from ipware.ip import get_ip
 
 from common.djangoapps.track import contexts, views
 
@@ -40,7 +41,7 @@ class TrackMiddleware(MiddlewareMixin):
     emitted events.
     """
 
-    def process_request(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def process_request(self, request):
         try:
             self.enter_request_context(request)
 
@@ -81,7 +82,7 @@ class TrackMiddleware(MiddlewareMixin):
             event = event[:512]
 
             views.server_track(request, request.META['PATH_INFO'], event)
-        except:  # lint-amnesty, pylint: disable=bare-except
+        except:
             ## Why do we have the overly broad except?
             ##
             ## I added instrumentation so if we drop events on the
@@ -93,7 +94,7 @@ class TrackMiddleware(MiddlewareMixin):
             event = {'event-type': 'exception', 'exception': repr(sys.exc_info()[0])}
             try:
                 views.server_track(request, request.META['PATH_INFO'], event)
-            except:  # lint-amnesty, pylint: disable=bare-except
+            except:
                 # At this point, things are really broken. We really
                 # should fail return a 500 to the user here.  However,
                 # the interim decision is to just fail in order to be
@@ -163,55 +164,31 @@ class TrackMiddleware(MiddlewareMixin):
         )
 
     def get_session_key(self, request):
-        """
-        Gets a key suitable for representing this Django session for tracking purposes.
-
-        Returns an empty string if there is no active session.
-        """
+        """ Gets and encrypts the Django session key from the request or an empty string if it isn't found."""
         try:
-            return self.substitute_session_key(request.session.session_key)
+            return self.encrypt_session_key(request.session.session_key)
         except AttributeError:
-            # NB: This can hide a missing SECRET_KEY
             return ''
 
-    def substitute_session_key(self, session_key):
-        """
-        Deterministically generate a tracking session key from the real one.
-
-        If a session key is not provided, returns empty string.
-
-        The tracking session ID is a 32-character hexadecimal string (matching
-        Django session key format for convenience, and in case something
-        downstream makes assumptions.) The tracking ID does not allow recovery
-        of the original session key but will always be the same unless server
-        secrets are changed, and will be unique for each session key.
-        """
+    def encrypt_session_key(self, session_key):
+        """Encrypts a Django session key to another 32-character hex value."""
         if not session_key:
             return ''
-        # Prevent confirmation attacks by using SECRET_KEY as a pepper (see
-        # ADR: docs/decisions/0008-secret-key-usage.rst).
-        # Tracking ID and session key will only be linkable
-        # by someone in possession of the pepper.
-        #
-        # This assumes that session_key is high-entropy and unpredictable (which
-        # it should be anyway.)
-        #
-        # Use SHAKE256 from SHA-3 hash family to generate a hash of arbitrary
-        # length.
-        hasher = hashlib.shake_128()
-        # This is one of several uses of SECRET_KEY.
-        #
-        # Impact of exposure: Could result in identifying the tracking data for
-        # users if their actual session keys are already known.
-        #
-        # Rotation process: Can be rotated at will. Results in a one-time
-        # discontinuity in tracking metrics and should be accompanied by a
-        # heads-up to data researchers.
-        hasher.update(settings.SECRET_KEY.encode())
-        hasher.update(session_key.encode())
-        # pylint doesn't know that SHAKE's hexdigest takes an arg:
-        # https://github.com/PyCQA/pylint/issues/4039
-        return hasher.hexdigest(16)  # pylint: disable=too-many-function-args
+
+        # Follow the model of django.utils.crypto.salted_hmac() and
+        # django.contrib.sessions.backends.base._hash() but use MD5
+        # instead of SHA1 so that the result has the same length (32)
+        # as the original session_key.
+
+        # TODO: Switch to SHA224, which is secure.
+        # If necessary, drop the last little bit of the hash to make it the same length.
+        # Using a known-insecure hash to shorten is silly.
+        # Also, why do we need same length?
+        key_salt = "common.djangoapps.track" + self.__class__.__name__
+        key_bytes = (key_salt + settings.SECRET_KEY).encode('utf-8')
+        key = hashlib.md5(key_bytes).digest()
+        encrypted_session_key = hmac.new(key, msg=session_key.encode('utf-8'), digestmod=hashlib.md5).hexdigest()
+        return encrypted_session_key
 
     def get_user_primary_key(self, request):
         """Gets the primary key of the logged in Django user"""
@@ -229,7 +206,7 @@ class TrackMiddleware(MiddlewareMixin):
 
     def get_request_ip_address(self, request):
         """Gets the IP address of the request"""
-        ip_address = get_client_ip(request)[0]
+        ip_address = get_ip(request)
         if ip_address is not None:
             return ip_address
         else:

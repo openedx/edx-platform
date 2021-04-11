@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django Admin pages for CourseDurationLimitConfig.
 """

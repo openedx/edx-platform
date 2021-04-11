@@ -3,7 +3,7 @@ List of valid  ISO 3166-1 Alpha-2 country codes, used for
 validating entries on entered country codes on django-admin page.
 """
 
-COUNTRY_CODES = {
+COUNTRY_CODES = set([
     "AC", "AD", "AE", "AF", "AG", "AI", "AL", "AM", "AN", "AO", "AQ", "AR", "AS", "AT",
     "AU", "AW", "AX", "AZ", "BA", "BB", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BM",
     "BN", "BO", "BR", "BS", "BT", "BV", "BW", "BY", "BZ", "CA", "CC", "CD", "CF", "CG",
@@ -22,4 +22,4 @@ COUNTRY_CODES = {
     "TF", "TG", "TH", "TJ", "TK", "TL", "TM", "TN", "TO", "TR", "TT", "TV", "TW", "TZ",
     "UA", "UG", "UM", "US", "UY", "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF",
     "WS", "YE", "YT", "ZA", "ZM", "ZW"
-}
+])

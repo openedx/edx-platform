@@ -20,7 +20,7 @@
     <tr>
         <td>
             <h1>
-                {% trans "Account activation" as header_msg %}{{ header_msg | force_escape }}
+                {% trans "Account Activation" as header_msg %}{{ header_msg | force_escape }}
             </h1>
             <p style="color: rgba(0,0,0,.75);">
                 {% filter force_escape %}
@@ -30,7 +30,7 @@
             </p>
 
             {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Activate your account{% endblocktrans %}
+                {% blocktrans asvar course_cta_text %}Activate Your Account{% endblocktrans %}
             {% endfilter %}
             {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_activation_link %}
         </td>

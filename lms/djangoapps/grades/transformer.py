@@ -40,14 +40,14 @@ class GradesTransformer(BlockStructureTransformer):
     WRITE_VERSION = 4
     READ_VERSION = 4
     FIELDS_TO_COLLECT = [
-        'due',
-        'format',
-        'graded',
-        'has_score',
-        'weight',
-        'course_version',
-        'subtree_edited_on',
-        'show_correctness',
+        u'due',
+        u'format',
+        u'graded',
+        u'has_score',
+        u'weight',
+        u'course_version',
+        u'subtree_edited_on',
+        u'show_correctness',
     ]
 
     EXPLICIT_GRADED_FIELD_NAME = 'explicit_graded'
@@ -58,7 +58,7 @@ class GradesTransformer(BlockStructureTransformer):
         Unique identifier for the transformer's class;
         same identifier used in setup.py.
         """
-        return 'grades'
+        return u'grades'
 
     @classmethod
     def collect(cls, block_structure):
@@ -77,11 +77,11 @@ class GradesTransformer(BlockStructureTransformer):
         cls._collect_explicit_graded(block_structure)
         cls._collect_grading_policy_hash(block_structure)
 
-    def transform(self, block_structure, usage_context):  # lint-amnesty, pylint: disable=arguments-differ
+    def transform(self, block_structure, usage_context):
         """
         Perform no transformations.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     @classmethod
     def grading_policy_hash(cls, course):
@@ -152,7 +152,7 @@ class GradesTransformer(BlockStructureTransformer):
         max_score = module.max_score()
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
         if max_score is None:
-            log.warning(f"GradesTransformer: max_score is None for {module.location}")
+            log.warning(u"GradesTransformer: max_score is None for {}".format(module.location))
 
     @classmethod
     def _collect_grading_policy_hash(cls, block_structure):

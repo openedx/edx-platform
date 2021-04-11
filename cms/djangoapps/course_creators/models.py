@@ -3,7 +3,7 @@ Table for storing information about whether or not Studio users have course crea
 """
 
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.dispatch import Signal, receiver
@@ -28,21 +28,21 @@ class CourseCreator(models.Model):
 
     .. no_pii:
     """
-    UNREQUESTED = 'unrequested'
-    PENDING = 'pending'
-    GRANTED = 'granted'
-    DENIED = 'denied'
+    UNREQUESTED = u'unrequested'
+    PENDING = u'pending'
+    GRANTED = u'granted'
+    DENIED = u'denied'
 
     # Second value is the "human-readable" version.
     STATES = (
-        (UNREQUESTED, _('unrequested')),
-        (PENDING, _('pending')),
-        (GRANTED, _('granted')),
-        (DENIED, _('denied')),
+        (UNREQUESTED, _(u'unrequested')),
+        (PENDING, _(u'pending')),
+        (GRANTED, _(u'granted')),
+        (DENIED, _(u'denied')),
     )
 
     user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
-    state_changed = models.DateTimeField('state last updated', auto_now_add=True,
+    state_changed = models.DateTimeField(u'state last updated', auto_now_add=True,
                                          help_text=_("The date when state was last updated"))
     state = models.CharField(max_length=24, blank=False, choices=STATES, default=UNREQUESTED,
                              help_text=_("Current course creator state"))
@@ -50,11 +50,11 @@ class CourseCreator(models.Model):
                                                                     "why course creation access was denied)"))
 
     def __str__(self):
-        return f"{self.user} | {self.state} [{self.state_changed}]"
+        return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
 
 
 @receiver(post_init, sender=CourseCreator)
-def post_init_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def post_init_callback(sender, **kwargs):
     """
     Extend to store previous state.
     """

@@ -12,7 +12,7 @@ from .utils import mock_get_score
 
 
 @ddt
-class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SubsectionGradeTest(GradeTestBase):
 
     @data((50, 100, .50), (59.49, 100, .59), (59.51, 100, .60), (59.50, 100, .60), (60.5, 100, .60))
     @unpack
@@ -22,15 +22,15 @@ class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missi
             created_grade = CreateSubsectionGrade(
                 self.sequence,
                 self.course_structure,
-                self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
-                self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
+                self.subsection_grade_factory._submissions_scores,
+                self.subsection_grade_factory._csm_scores,
             )
-            assert PersistentSubsectionGrade.objects.count() == 0
-            assert created_grade.percent_graded == expected_result
+            self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
+            self.assertEqual(created_grade.percent_graded, expected_result)
 
             # save to db, and verify object is in database
             created_grade.update_or_create_model(self.request.user)
-            assert PersistentSubsectionGrade.objects.count() == 1
+            self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
 
             # read from db, and ensure output matches input
             saved_model = PersistentSubsectionGrade.read_grade(
@@ -43,17 +43,17 @@ class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missi
                 self.subsection_grade_factory
             )
 
-            assert created_grade.url_name == read_grade.url_name
+            self.assertEqual(created_grade.url_name, read_grade.url_name)
             read_grade.all_total.first_attempted = created_grade.all_total.first_attempted = None
-            assert created_grade.all_total == read_grade.all_total
-            assert created_grade.percent_graded == expected_result
+            self.assertEqual(created_grade.all_total, read_grade.all_total)
+            self.assertEqual(created_grade.percent_graded, expected_result)
 
     def test_zero(self):
         with mock_get_score(1, 0):
             grade = CreateSubsectionGrade(
                 self.sequence,
                 self.course_structure,
-                self.subsection_grade_factory._submissions_scores,  # lint-amnesty, pylint: disable=protected-access
-                self.subsection_grade_factory._csm_scores,  # lint-amnesty, pylint: disable=protected-access
+                self.subsection_grade_factory._submissions_scores,
+                self.subsection_grade_factory._csm_scores,
             )
-            assert grade.percent_graded == 0.0
+            self.assertEqual(grade.percent_graded, 0.0)

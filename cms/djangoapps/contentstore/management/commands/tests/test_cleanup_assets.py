@@ -28,7 +28,7 @@ class ExportAllCourses(ModuleStoreTestCase):
 
     def setUp(self):
         """ Common setup. """
-        super().setUp()
+        super(ExportAllCourses, self).setUp()
         self.content_store = contentstore()
         # pylint: disable=protected-access
         self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
@@ -56,27 +56,27 @@ class ExportAllCourses(ModuleStoreTestCase):
         # check that there are two assets ['example.txt', '.example.txt'] in contentstore for imported course
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})
+        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))
 
         # manually add redundant assets (file ".DS_Store" and filename starts with "._")
         course_filter = course.id.make_asset_key("asset", None)
         query = location_to_query(course_filter, wildcard=True, tag=XASSET_LOCATION_TAG)
         query['_id.name'] = all_assets[0]['_id']['name']
         asset_doc = self.content_store.fs_files.find_one(query)
-        asset_doc['_id']['name'] = '._example_test.txt'
+        asset_doc['_id']['name'] = u'._example_test.txt'
         self.content_store.fs_files.insert_one(asset_doc)
-        asset_doc['_id']['name'] = '.DS_Store'
+        asset_doc['_id']['name'] = u'.DS_Store'
         self.content_store.fs_files.insert_one(asset_doc)
 
         # check that now course has four assets
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 4)
         self.assertEqual(
-            {asset['_id']['name'] for asset in all_assets},
-            {'.example.txt', 'example.txt', '._example_test.txt', '.DS_Store'}
+            set([asset['_id']['name'] for asset in all_assets]),
+            set([u'.example.txt', u'example.txt', u'._example_test.txt', u'.DS_Store'])
         )
         # now call asset_cleanup command and check that there is only two proper assets in contentstore for the course
         call_command('cleanup_assets')
         all_assets, count = self.content_store.get_all_content_for_course(course.id)
         self.assertEqual(count, 2)
-        self.assertEqual({asset['_id']['name'] for asset in all_assets}, {'.example.txt', 'example.txt'})
+        self.assertEqual(set([asset['_id']['name'] for asset in all_assets]), set([u'.example.txt', u'example.txt']))

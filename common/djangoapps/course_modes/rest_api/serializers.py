@@ -29,7 +29,7 @@ class CourseModeSerializer(serializers.Serializer):
     sku = serializers.CharField(required=False)
     bulk_sku = serializers.CharField(required=False)
 
-    class Meta:
+    class Meta(object):
         # For disambiguating within the drf-yasg swagger schema
         ref_name = 'course_modes.CourseMode'
 

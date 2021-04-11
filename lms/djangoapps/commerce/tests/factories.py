@@ -7,7 +7,7 @@ from factory.fuzzy import FuzzyText
 
 class OrderFactory(factory.Factory):
     """ Factory for stubbing orders resources from Ecommerce (v2). """
-    class Meta:
+    class Meta(object):
         model = dict
 
     number = factory.Sequence(lambda n: 'edx-%d' % n)
@@ -20,7 +20,7 @@ class OrderFactory(factory.Factory):
 
 class OrderLineFactory(factory.Factory):
     """ Factory for stubbing order lines resources from Ecommerce (v2). """
-    class Meta:
+    class Meta(object):
         model = dict
 
     title = FuzzyText(prefix='Seat in ')
@@ -34,7 +34,7 @@ class OrderLineFactory(factory.Factory):
 
 class ProductFactory(factory.Factory):
     """ Factory for stubbing Product resources from Ecommerce (v2). """
-    class Meta:
+    class Meta(object):
         model = dict
 
     id = factory.Sequence(lambda n: n)  # pylint: disable=invalid-name
@@ -49,7 +49,7 @@ class ProductAttributeFactory(factory.Factory):
     """ Factory for stubbing product attribute resources from
     Ecommerce (v2).
     """
-    class Meta:
+    class Meta(object):
         model = dict
 
     name = FuzzyText()

@@ -25,8 +25,7 @@
                 data_format_error: 'data-format-error',
                 user_not_exist: 'user-not-exist',
                 user_already_white_listed: 'user-already-white-listed',
-                user_not_enrolled: 'user-not-enrolled',
-                user_on_certificate_invalidation_list: 'user-on-certificate-invalidation-list'
+                user_not_enrolled: 'user-not-enrolled'
             };
 
             return Backbone.View.extend({
@@ -44,7 +43,7 @@
 
                 render: function() {
                     var template = this.loadTemplate('certificate-bulk-white-list');
-                    this.$el.html(template()); // xss-lint: disable=javascript-jquery-html
+                    this.$el.html(template());
                 },
 
                 loadTemplate: function(name) {
@@ -74,91 +73,12 @@
                 },
 
                 display_response: function(data_from_server) {
-                    var UserOnCertificateInvalidationList;
-
                     $('.bulk-exception-results').removeClass('hidden').empty();
-
-                    function generateDiv(group, heading, displayData) {
-                        // inner function generate div and display response messages.
-                        $('<div/>', {
-                            class: 'message ' + group
-                        }).appendTo('.bulk-exception-results').prepend( // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
-                                "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading) // eslint-disable-line max-len, xss-lint: disable=javascript-concat-html
-                        .append($('<ul/>', {
-                            class: group
-                        }));
-
-                        for (var i = 0; i < displayData.length; i++) { // eslint-disable-line vars-on-top
-                            $('<li/>', {
-                                text: displayData[i]
-                            }).appendTo('div.message > .' + group); // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
-                        }
-                        $('div.message > .' + group).hide();
-                    }
-
-                    function getDisplayText(qty, group) {
-                        // inner function to display appropriate heading text
-                        var text;
-
-                        switch (group) {
-                        case MESSAGE_GROUP.successfully_added:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners are successfully added to exception list') :
-                                gettext(qty + ' learner is successfully added to the exception list');
-                            break;
-
-                        case MESSAGE_GROUP.data_format_error:
-                            text = qty > 1 ?
-                                gettext(qty + ' records are not in correct format and not added to' +
-                                    ' the exception list') :
-                                gettext(qty + ' record is not in correct format and not added to the exception' +
-                                    ' list');
-                            break;
-
-                        case MESSAGE_GROUP.user_not_exist:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners do not exist in LMS and not added to the' +
-                                    ' exception list') :
-                                gettext(qty + ' learner does not exist in LMS and not added to the exception' +
-                                    ' list');
-                            break;
-
-                        case MESSAGE_GROUP.user_already_white_listed:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners are already white listed and not added to' +
-                                    ' the exception list') :
-                                gettext(qty + ' learner is already white listed and not added to the exception' +
-                                    ' list');
-                            break;
-
-                        case MESSAGE_GROUP.user_not_enrolled:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners are not enrolled in course and not added to' +
-                                    ' the exception list') :
-                                gettext(qty + ' learner is not enrolled in course and not added to the exception' +
-                                    ' list');
-                            break;
-
-                        case MESSAGE_GROUP.user_on_certificate_invalidation_list:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners already appear on the certificate invalidation list') :
-                                gettext(qty + ' learner already appears on the certificate invalidation list');
-                            break;
-
-                        default:
-                            text = qty > 1 ?
-                                gettext(qty + ' learners encountered unknown errors') :
-                                gettext(qty + ' learner encountered an unknown error');
-                            break;
-                        }
-
-                        return text;
-                    }
 
                     // Display general error messages
                     if (data_from_server.general_errors.length) {
                         var errors = data_from_server.general_errors;
-                        generateDiv(
+                        generate_div(
                             MESSAGE_GROUP.general_errors,
                             gettext('Uploaded file issues. Click on "+" to view.'),
                             errors
@@ -168,9 +88,9 @@
                     // Display success message
                     if (data_from_server.success.length) {
                         var success_data = data_from_server.success;
-                        generateDiv(
+                        generate_div(
                             MESSAGE_GROUP.successfully_added,
-                            getDisplayText(success_data.length, MESSAGE_GROUP.successfully_added),
+                            get_text(success_data.length, MESSAGE_GROUP.successfully_added),
                             success_data
                         );
                     }
@@ -181,51 +101,93 @@
 
                         if (row_errors.data_format_error.length) {
                             var format_errors = row_errors.data_format_error;
-                            generateDiv(
+                            generate_div(
                                 MESSAGE_GROUP.data_format_error,
-                                getDisplayText(format_errors.length, MESSAGE_GROUP.data_format_error),
+                                get_text(format_errors.length, MESSAGE_GROUP.data_format_error),
                                 format_errors
                             );
                         }
                         if (row_errors.user_not_exist.length) {
                             var user_not_exist = row_errors.user_not_exist;
-                            generateDiv(
+                            generate_div(
                                 MESSAGE_GROUP.user_not_exist,
-                                getDisplayText(user_not_exist.length, MESSAGE_GROUP.user_not_exist),
+                                get_text(user_not_exist.length, MESSAGE_GROUP.user_not_exist),
                                 user_not_exist
                             );
                         }
                         if (row_errors.user_already_white_listed.length) {
                             var user_already_white_listed = row_errors.user_already_white_listed;
-                            generateDiv(
+                            generate_div(
                                 MESSAGE_GROUP.user_already_white_listed,
-                                getDisplayText(
-                                    user_already_white_listed.length,
-                                    MESSAGE_GROUP.user_already_white_listed
-                                ),
+                                get_text(user_already_white_listed.length, MESSAGE_GROUP.user_already_white_listed),
                                 user_already_white_listed
                             );
                         }
                         if (row_errors.user_not_enrolled.length) {
                             var user_not_enrolled = row_errors.user_not_enrolled;
-                            generateDiv(
+                            generate_div(
                                 MESSAGE_GROUP.user_not_enrolled,
-                                getDisplayText(user_not_enrolled.length, MESSAGE_GROUP.user_not_enrolled),
+                                get_text(user_not_enrolled.length, MESSAGE_GROUP.user_not_enrolled),
                                 user_not_enrolled
                             );
                         }
-                        if (row_errors.user_on_certificate_invalidation_list.length) {
-                            UserOnCertificateInvalidationList =
-                                row_errors.user_on_certificate_invalidation_list;
-                            generateDiv(
-                                MESSAGE_GROUP.user_on_certificate_invalidation_list,
-                                getDisplayText(
-                                    UserOnCertificateInvalidationList.length,
-                                    MESSAGE_GROUP.user_on_certificate_invalidation_list
-                                ),
-                                UserOnCertificateInvalidationList
-                            );
+                    }
+
+                    function generate_div(group, heading, display_data) {
+                        // inner function generate div and display response messages.
+                        $('<div/>', {
+                            class: 'message ' + group
+                        }).appendTo('.bulk-exception-results').prepend(
+                                "<button type='button' id= '" + group + "' class='arrow'> + </button>" + heading
+                        ).append($('<ul/>', {
+                            class: group
+                        }));
+
+                        for (var i = 0; i < display_data.length; i++) {
+                            $('<li/>', {
+                                text: display_data[i]
+                            }).appendTo('div.message > .' + group);
                         }
+                        $('div.message > .' + group).hide();
+                    }
+
+                    function get_text(qty, group) {
+                        // inner function to display appropriate heading text
+                        var text;
+                        switch (group) {
+                        case MESSAGE_GROUP.successfully_added:
+                            text = qty > 1 ? gettext(qty + ' learners are successfully added to exception list') :
+                                    gettext(qty + ' learner is successfully added to the exception list');
+                            break;
+
+                        case MESSAGE_GROUP.data_format_error:
+                            text = qty > 1 ? gettext(qty + ' records are not in correct format and not added to' +
+                                    ' the exception list') :
+                                    gettext(qty + ' record is not in correct format and not added to the exception' +
+                                        ' list');
+                            break;
+
+                        case MESSAGE_GROUP.user_not_exist:
+                            text = qty > 1 ? gettext(qty + ' learners do not exist in LMS and not added to the' +
+                                    ' exception list') :
+                                    gettext(qty + ' learner does not exist in LMS and not added to the exception list');
+                            break;
+
+                        case MESSAGE_GROUP.user_already_white_listed:
+                            text = qty > 1 ? gettext(qty + ' learners are already white listed and not added to' +
+                                    ' the exception list') :
+                                    gettext(qty + ' learner is already white listed and not added to the exception ' +
+                                        'list');
+                            break;
+
+                        case MESSAGE_GROUP.user_not_enrolled:
+                            text = qty > 1 ? gettext(qty + ' learners are not enrolled in course and not added to' +
+                                    ' the exception list') :
+                                    gettext(qty + ' learner is not enrolled in course and not added to the exception' +
+                                        ' list');
+                            break;
+                        }
+                        return text;
                     }
                 },
 

@@ -3,7 +3,7 @@ Unit tests for third_party_auth SAML auth providers
 """
 
 
-from unittest import mock
+import mock
 
 from common.djangoapps.third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 from common.djangoapps.third_party_auth.tests.data.saml_identity_provider_mock_data import (
@@ -23,12 +23,12 @@ class TestEdXSAMLIdentityProvider(SAMLTestCase):
         error_mock = log_mock.error
         idp_class = get_saml_idp_class('fake_idp_class_option')
         error_mock.assert_called_once_with(
-            '[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
-            'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider='fake_idp_class_option')
+            u'[THIRD_PARTY_AUTH] Invalid EdXSAMLIdentityProvider subclass--'
+            u'using EdXSAMLIdentityProvider base class. Provider: {provider}'.format(provider='fake_idp_class_option')
         )
-        assert idp_class is EdXSAMLIdentityProvider
+        self.assertIs(idp_class, EdXSAMLIdentityProvider)
 
     def test_get_user_details(self):
         """ test get_attr and get_user_details of EdXSAMLIdentityProvider"""
         edx_saml_identity_provider = EdXSAMLIdentityProvider('demo', **mock_conf)
-        assert edx_saml_identity_provider.get_user_details(mock_attributes) == expected_user_details
+        self.assertEqual(edx_saml_identity_provider.get_user_details(mock_attributes), expected_user_details)

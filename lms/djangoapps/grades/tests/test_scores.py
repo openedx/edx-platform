@@ -2,10 +2,10 @@
 Tests for grades.scores module.
 """
 
-# pylint: disable=protected-access
+
 import itertools
+# pylint: disable=protected-access
 from collections import namedtuple
-import pytest
 
 import ddt
 from django.test import TestCase
@@ -27,7 +27,7 @@ def submission_value_repr(self):
     the "created_at" attribute that changes with each execution.  Needed for
     consistency of ddt-generated test methods across pytest-xdist workers.
     """
-    return f'<SubmissionValue exists={self.exists}>'
+    return u'<SubmissionValue exists={}>'.format(self.exists)
 
 
 def csm_value_repr(self):
@@ -36,7 +36,7 @@ def csm_value_repr(self):
     the "created" attribute that changes with each execution.  Needed for
     consistency of ddt-generated test methods across pytest-xdist workers.
     """
-    return f'<CSMValue exists={self.exists} raw_earned={self.raw_earned}>'
+    return u'<CSMValue exists={} raw_earned={}>'.format(self.exists, self.raw_earned)
 
 
 def expected_result_repr(self):
@@ -47,7 +47,7 @@ def expected_result_repr(self):
     """
     included = ('raw_earned', 'raw_possible', 'weighted_earned', 'weighted_possible', 'weight', 'graded')
     attributes = ['{}={}'.format(name, getattr(self, name)) for name in included]
-    return '<ExpectedResult {}>'.format(' '.join(attributes))
+    return u'<ExpectedResult {}>'.format(' '.join(attributes))
 
 
 class TestScoredBlockTypes(TestCase):
@@ -62,13 +62,13 @@ class TestScoredBlockTypes(TestCase):
     }
 
     def test_block_types_possibly_scored(self):
-        assert self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored())
+        self.assertTrue(self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored()))
 
     def test_possibly_scored(self):
-        course_key = CourseLocator('org', 'course', 'run')
+        course_key = CourseLocator(u'org', u'course', u'run')
         for block_type in self.possibly_scored_block_types:
             usage_key = BlockUsageLocator(course_key, block_type, 'mock_block_id')
-            assert scores.possibly_scored(usage_key)
+            self.assertTrue(scores.possibly_scored(usage_key))
 
 
 @ddt.ddt
@@ -77,7 +77,7 @@ class TestGetScore(TestCase):
     Tests for get_score
     """
     display_name = 'test_name'
-    course_key = CourseLocator('org', 'course', 'run')
+    course_key = CourseLocator(u'org', u'course', u'run')
     location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     SubmissionValue = namedtuple('SubmissionValue', 'exists, points_earned, points_possible, created_at')
@@ -221,7 +221,7 @@ class TestGetScore(TestCase):
             self._create_block(block_value),
         )
         expected_score = ProblemScore(**expected_result._asdict())
-        assert score == expected_score
+        self.assertEqual(score, expected_score)
 
 
 @ddt.ddt
@@ -240,7 +240,10 @@ class TestWeightedScore(TestCase):
     )
     @ddt.unpack
     def test_cannot_compute(self, raw_earned, raw_possible, weight):
-        assert scores.weighted_score(raw_earned, raw_possible, weight) == (raw_earned, raw_possible)
+        self.assertEqual(
+            scores.weighted_score(raw_earned, raw_possible, weight),
+            (raw_earned, raw_possible),
+        )
 
     @ddt.data(
         (0, 5, 0, (0, 0)),
@@ -252,10 +255,13 @@ class TestWeightedScore(TestCase):
     )
     @ddt.unpack
     def test_computed(self, raw_earned, raw_possible, weight, expected_score):
-        assert scores.weighted_score(raw_earned, raw_possible, weight) == expected_score
+        self.assertEqual(
+            scores.weighted_score(raw_earned, raw_possible, weight),
+            expected_score,
+        )
 
     def test_assert_on_invalid_r_possible(self):
-        with pytest.raises(AssertionError):
+        with self.assertRaises(AssertionError):
             scores.weighted_score(raw_earned=1, raw_possible=None, weight=1)
 
 
@@ -281,7 +287,10 @@ class TestInternalGetGraded(TestCase):
     @ddt.data(None, True, False)
     def test_with_no_persisted_block(self, explicitly_graded_value):
         block = self._create_block(explicitly_graded_value)
-        assert scores._get_graded_from_block(None, block) == (explicitly_graded_value is not False)
+        self.assertEqual(
+            scores._get_graded_from_block(None, block),
+            explicitly_graded_value is not False,  # defaults to True unless explicitly False
+        )
 
     @ddt.data(
         *itertools.product((True, False), (True, False, None))
@@ -290,7 +299,10 @@ class TestInternalGetGraded(TestCase):
     def test_with_persisted_block(self, persisted_block_value, block_value):
         block = self._create_block(block_value)
         block_record = BlockRecord(block.location, 0, 0, persisted_block_value)
-        assert scores._get_graded_from_block(block_record, block) == block_record.graded
+        self.assertEqual(
+            scores._get_graded_from_block(block_record, block),
+            block_record.graded,  # persisted value takes precedence
+        )
 
 
 @ddt.ddt
@@ -298,7 +310,7 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
-    course_key = CourseLocator('org', 'course', 'run')
+    course_key = CourseLocator(u'org', u'course', u'run')
     location = BlockUsageLocator(course_key, 'problem', 'mock_block_id')
 
     def _create_block(self, raw_possible):
@@ -318,14 +330,14 @@ class TestInternalGetScoreFromBlock(TestCase):
             raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted
         ) = scores._get_score_from_persisted_or_latest_block(persisted_block, block, weight)
 
-        assert raw_earned == 0.0
-        assert raw_possible == expected_r_possible
-        assert weighted_earned == 0.0
+        self.assertEqual(raw_earned, 0.0)
+        self.assertEqual(raw_possible, expected_r_possible)
+        self.assertEqual(weighted_earned, 0.0)
         if weight is None or expected_r_possible == 0:
-            assert weighted_possible == expected_r_possible
+            self.assertEqual(weighted_possible, expected_r_possible)
         else:
-            assert weighted_possible == weight
-        assert first_attempted is None
+            self.assertEqual(weighted_possible, weight)
+        self.assertIsNone(first_attempted)
 
     @ddt.data(
         *itertools.product((0, 1, 5), (None, 0, 1, 5))

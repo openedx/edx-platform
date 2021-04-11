@@ -8,14 +8,12 @@ from django.conf.urls import url
 
 from lms.djangoapps.verify_student import views
 
-IDV_RECEIPT_ID_PATTERN = r'(?P<receipt_id>[0-9a-z]{8}-([0-9a-z]{4}-){3}[0-9a-z]{12})'
-
 urlpatterns = [
     # The user is starting the verification / payment process,
     # most likely after enrolling in a course and selecting
     # a "verified" track.
     url(
-        fr'^start-flow/{settings.COURSE_ID_PATTERN}/$',
+        r'^start-flow/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         # Pylint seems to dislike the as_view() method because as_view() is
         # decorated with `classonlymethod` instead of `classmethod`.
         views.PayAndVerifyView.as_view(),
@@ -27,7 +25,7 @@ urlpatterns = [
 
     # This is for A/B testing.
     url(
-        fr'^begin-flow/{settings.COURSE_ID_PATTERN}/$',
+        r'^begin-flow/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         views.PayAndVerifyView.as_view(),
         name="verify_student_begin_flow",
         kwargs={
@@ -39,7 +37,7 @@ urlpatterns = [
     # This is the same as the "start verification" flow,
     # except with slight messaging changes.
     url(
-        fr'^upgrade/{settings.COURSE_ID_PATTERN}/$',
+        r'^upgrade/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         views.PayAndVerifyView.as_view(),
         name="verify_student_upgrade_and_verify",
         kwargs={
@@ -54,7 +52,7 @@ urlpatterns = [
     # Note that if the user has already verified, this will redirect
     # to the dashboard.
     url(
-        fr'^verify-now/{settings.COURSE_ID_PATTERN}/$',
+        r'^verify-now/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
         views.PayAndVerifyView.as_view(),
         name="verify_student_verify_now",
         kwargs={
@@ -99,24 +97,6 @@ urlpatterns = [
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
-    ),
-
-    url(
-        fr'^photo-urls/{IDV_RECEIPT_ID_PATTERN}$',
-        views.PhotoUrlsView.as_view(),
-        name="verification_photo_urls"
-    ),
-
-    url(
-        fr'^decrypt-idv-images/face/{IDV_RECEIPT_ID_PATTERN}$',
-        views.DecryptFaceImageView.as_view(),
-        name="verification_decrypt_face_image"
-    ),
-
-    url(
-        fr'^decrypt-idv-images/photo-id/{IDV_RECEIPT_ID_PATTERN}$',
-        views.DecryptPhotoIDImageView.as_view(),
-        name="verification_decrypt_photo_id_image"
     ),
 ]
 

@@ -19,7 +19,7 @@ class ZendeskProxyThrottle(SimpleRateThrottle):
     """
     def __init__(self):
         self.rate = '{}/hour'.format(ZENDESK_REQUESTS_PER_HOUR)
-        super(ZendeskProxyThrottle, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ZendeskProxyThrottle, self).__init__()
 
     def get_cache_key(self, request, view):
         """

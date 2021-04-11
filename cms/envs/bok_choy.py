@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running Studio.
 
@@ -32,7 +33,7 @@ CONFIG_ROOT = path(__file__).abspath().dirname()
 os.environ['STUDIO_CFG'] = str.format("{config_root}/{service_variant}.yml",
                                       config_root=CONFIG_ROOT,
                                       service_variant=os.environ['SERVICE_VARIANT'])
-os.environ['REVISION_CFG'] = f"{CONFIG_ROOT}/revisions.yml"
+os.environ['REVISION_CFG'] = "{config_root}/revisions.yml".format(config_root=CONFIG_ROOT)
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
@@ -63,10 +64,10 @@ XBLOCK_SETTINGS.update({'VideoBlock': {'licensing_enabled': True}})
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
 
-PLATFORM_NAME = ugettext_lazy("édX")
-PLATFORM_DESCRIPTION = ugettext_lazy("Open édX Platform")
-STUDIO_NAME = ugettext_lazy("Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
-STUDIO_SHORT_NAME = ugettext_lazy("𝓢𝓽𝓾𝓭𝓲𝓸")
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
 
 ############################ STATIC FILES #############################
 
@@ -138,16 +139,15 @@ FEATURES['ENABLE_SPECIAL_EXAMS'] = True
 YOUTUBE_PORT = 9080
 YOUTUBE['TEST_TIMEOUT'] = 5000
 YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
-YOUTUBE['API'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/get_youtube_api/"
-YOUTUBE['METADATA_URL'] = f"http://{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_youtube/"
-YOUTUBE['TEXT_API']['url'] = f"{YOUTUBE_HOSTNAME}:{YOUTUBE_PORT}/test_transcripts_youtube/"
+YOUTUBE['API'] = "http://{0}:{1}/get_youtube_api/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
+YOUTUBE['METADATA_URL'] = "http://{0}:{1}/test_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_HOSTNAME, YOUTUBE_PORT)
 
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
 FEATURES['ENABLE_CONTENT_LIBRARY_INDEX'] = False
 
-ORGANIZATIONS_AUTOCREATE = False
-
+FEATURES['ORGANIZATIONS_APP'] = True
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
 MOCK_SEARCH_BACKING_FILE = (

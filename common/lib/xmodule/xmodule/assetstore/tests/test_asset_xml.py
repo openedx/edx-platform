@@ -4,12 +4,12 @@ Test for asset XML generation / parsing.
 
 
 import unittest
-import pytest
 
 from contracts import ContractNotRespected
 from lxml import etree
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
+from six.moves import zip
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.tests.test_assetstore import AssetStoreTestData
@@ -21,7 +21,7 @@ class TestAssetXml(unittest.TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestAssetXml, self).setUp()
 
         xsd_filename = "assets.xsd"
 
@@ -59,7 +59,7 @@ class TestAssetXml(unittest.TestCase):
                 continue
             orig_value = getattr(asset_md, attr)
             new_value = getattr(new_asset_md, attr)
-            assert orig_value == new_value
+            self.assertEqual(orig_value, new_value)
 
     def test_export_with_None_value(self):
         """
@@ -87,7 +87,7 @@ class TestAssetXml(unittest.TestCase):
         Ensure full asset sections with the wrong tag are detected.
         """
         root = etree.Element("glassets")
-        with pytest.raises(ContractNotRespected):
+        with self.assertRaises(ContractNotRespected):
             AssetMetadata.add_all_assets_as_xml(root, self.course_assets)
 
     def test_wrong_node_type_single(self):
@@ -97,5 +97,5 @@ class TestAssetXml(unittest.TestCase):
         asset_md = self.course_assets[0]
         root = etree.Element("assets")
         asset = etree.SubElement(root, "smashset")
-        with pytest.raises(ContractNotRespected):
+        with self.assertRaises(ContractNotRespected):
             asset_md.to_xml(asset)

@@ -28,7 +28,7 @@ class StaffPreviewPage(PageObject):
             parent_page: None if this is being used as a subclass.  Otherwise,
                 the parent_page the contains this staff preview page fragment.
         """
-        super().__init__(browser)
+        super(StaffPreviewPage, self).__init__(browser)
         self.parent_page = parent_page
 
     def is_browser_on_page(self):

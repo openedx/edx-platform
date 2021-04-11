@@ -1,3 +1,5 @@
+
+
 import argparse
 import csv
 import json
@@ -6,6 +8,7 @@ import sys
 from datetime import datetime
 
 import requests
+from six import text_type
 
 # Keys for the CSV and JSON interpretation
 PAGINATION_KEY = 'pagination'
@@ -160,14 +163,14 @@ def _get_block_types_from_json_file(xblock_json_file):
     if not os.path.isfile(xblock_json_file):
         print('xBlock configuration file does not exist: %s' % xblock_json_file)
         sys.exit(2)
-    with open(xblock_json_file) as json_file:
+    with open(xblock_json_file, 'r') as json_file:
         type_set = set()
         try:
             json_data = json.loads(json_file.read())
         except ValueError as e:
             print('xBlock configuration file does not match the expected layout and is '
                   'missing "data" list: %s' % xblock_json_file)
-            sys.exit(str(e))
+            sys.exit(text_type(e))
         if 'data' in json_data:
             xblock_type_list = json_data['data']
             for xblock in xblock_type_list:
@@ -210,11 +213,11 @@ def _get_course_block_counts(auth_token, block_url):
     Returns:
         dict: A dictionary containing the Block counts
     """
-    headers = {'Authorization': f'Bearer {auth_token}'}
+    headers = {'Authorization': 'Bearer {}'.format(auth_token)}
 
     response = requests.get(block_url, headers=headers)
     if response.status_code != 200:
-        print(f"url {block_url} returned status code {response.status_code}")
+        print("url {} returned status code {}".format(block_url, response.status_code))
         return {}
     response_json = response.json()
 
@@ -383,4 +386,4 @@ if __name__ == "__main__":
     if len(course_data) > 0:
         write_block_summary_report(course_data)
         write_course_block_detail_report(course_data)
-    print('Start time: {} Total run time: {}'.format(str(start_time), str(datetime.now() - start_time)))
+    print('Start time: %s Total run time: %s' % (str(start_time), str(datetime.now() - start_time)))

@@ -1,14 +1,13 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
-from unittest.mock import patch
-
 import ddt
+import six
 from crum import set_current_request
 from django.conf import settings
-from edx_toggles.toggles.testutils import override_waffle_switch
+from mock import patch
 
+from edx_toggles.toggles.testutils import override_waffle_switch
+from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -38,10 +37,10 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.values():
-                        assert score.earned == 0
-                        assert score.first_attempted is None
-                    assert section.all_total.earned == 0
+                    for score in six.itervalues(section.problem_scores):
+                        self.assertEqual(score.earned, 0)
+                        self.assertEqual(score.first_attempted, None)
+                    self.assertEqual(section.all_total.earned, 0)
 
     @ddt.data(True, False)
     def test_zero_null_scores(self, assume_zero_enabled):
@@ -53,9 +52,9 @@ class ZeroGradeTest(GradeTestBase):
                 course_data = CourseData(self.request.user, structure=self.course_structure)
                 chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
                 for chapter in chapter_grades:
-                    assert {} != chapter_grades[chapter]['sections']
+                    self.assertNotEqual({}, chapter_grades[chapter]['sections'])
                     for section in chapter_grades[chapter]['sections']:
-                        assert {} == section.problem_scores
+                        self.assertEqual({}, section.problem_scores)
 
 
 class TestScoreForModule(SharedModuleStoreTestCase):
@@ -76,7 +75,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestScoreForModule, cls).setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.a = ItemFactory.create(parent=cls.course, category="chapter", display_name="a")
@@ -107,50 +106,50 @@ class TestScoreForModule(SharedModuleStoreTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
+        super(TestScoreForModule, cls).tearDownClass()
         set_current_request(None)
 
     def test_score_chapter(self):
         earned, possible = self.course_grade.score_for_module(self.a.location)
-        assert earned == 9
-        assert possible == 24
+        self.assertEqual(earned, 9)
+        self.assertEqual(possible, 24)
 
     def test_score_section_many_leaves(self):
         earned, possible = self.course_grade.score_for_module(self.b.location)
-        assert earned == 6
-        assert possible == 14
+        self.assertEqual(earned, 6)
+        self.assertEqual(possible, 14)
 
     def test_score_section_one_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.c.location)
-        assert earned == 3
-        assert possible == 10
+        self.assertEqual(earned, 3)
+        self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves(self):
         earned, possible = self.course_grade.score_for_module(self.d.location)
-        assert earned == 5
-        assert possible == 10
+        self.assertEqual(earned, 5)
+        self.assertEqual(possible, 10)
 
     def test_score_vertical_two_leaves_one_unscored(self):
         earned, possible = self.course_grade.score_for_module(self.e.location)
-        assert earned == 1
-        assert possible == 4
+        self.assertEqual(earned, 1)
+        self.assertEqual(possible, 4)
 
     def test_score_vertical_no_score(self):
         earned, possible = self.course_grade.score_for_module(self.f.location)
-        assert earned == 0
-        assert possible == 0
+        self.assertEqual(earned, 0)
+        self.assertEqual(possible, 0)
 
     def test_score_vertical_one_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.g.location)
-        assert earned == 3
-        assert possible == 10
+        self.assertEqual(earned, 3)
+        self.assertEqual(possible, 10)
 
     def test_score_leaf(self):
         earned, possible = self.course_grade.score_for_module(self.h.location)
-        assert earned == 2
-        assert possible == 5
+        self.assertEqual(earned, 2)
+        self.assertEqual(possible, 5)
 
     def test_score_leaf_no_score(self):
         earned, possible = self.course_grade.score_for_module(self.m.location)
-        assert earned == 0
-        assert possible == 0
+        self.assertEqual(earned, 0)
+        self.assertEqual(possible, 0)

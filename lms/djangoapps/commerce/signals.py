@@ -9,8 +9,8 @@ from crum import get_current_request
 from django.contrib.auth.models import AnonymousUser
 from django.dispatch import receiver
 
-from common.djangoapps.student.signals import REFUND_ORDER
 from openedx.core.djangoapps.commerce.utils import is_commerce_service_configured
+from common.djangoapps.student.signals import REFUND_ORDER
 
 from .utils import refund_seat
 

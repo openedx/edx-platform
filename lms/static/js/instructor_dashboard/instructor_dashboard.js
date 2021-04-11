@@ -204,9 +204,6 @@ such that the value can be defined later than this assignment (file load order).
                     constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView,
                     $element: idashContent.find('.' + CSS_IDASH_SECTION + '#special_exams')
                 }, {
-                    constructor: edx.instructor_dashboard.proctoring.ProctoredExamOnboardingView,
-                    $element: idashContent.find('.' + CSS_IDASH_SECTION + '#special_exams')
-                }, {
                     constructor: edx.instructor_dashboard.proctoring.ProctoredExamAttemptView,
                     $element: idashContent.find('.' + CSS_IDASH_SECTION + '#special_exams')
                 }, {

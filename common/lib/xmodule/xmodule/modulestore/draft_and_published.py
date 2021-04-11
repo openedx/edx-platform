@@ -8,6 +8,9 @@ import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
+import six
+from six import text_type
+
 from . import BulkOperationsMixin, ModuleStoreEnum
 from .exceptions import ItemNotFoundError
 
@@ -17,7 +20,7 @@ DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_ta
 log = logging.getLogger(__name__)
 
 
-class BranchSettingMixin:
+class BranchSettingMixin(object):
     """
     A mixin to manage a module store's branch setting.
     The order of override is (from higher precedence to lower):
@@ -35,7 +38,7 @@ class BranchSettingMixin:
             'branch_setting_func',
             lambda: ModuleStoreEnum.Branch.published_only
         )
-        super().__init__(*args, **kwargs)
+        super(BranchSettingMixin, self).__init__(*args, **kwargs)
 
         # cache the branch setting on a local thread to support a multi-threaded environment
         self.thread_cache = threading.local()
@@ -68,7 +71,7 @@ class BranchSettingMixin:
             return self.default_branch_setting_func()
 
 
-class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, metaclass=ABCMeta):
+class ModuleStoreDraftAndPublished(six.with_metaclass(ABCMeta, BranchSettingMixin, BulkOperationsMixin)):
     """
     A mixin for a read-write database backend that supports two branches, Draft and Published, with
     options to prefer Draft and fallback to Published.
@@ -158,7 +161,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, meta
             old_parent_item = self.get_item(old_parent_location)    # pylint: disable=no-member
             new_parent_item = self.get_item(new_parent_location)    # pylint: disable=no-member
         except ItemNotFoundError as exception:
-            log.error('Unable to find the item : %s', str(exception))
+            log.error('Unable to find the item : %s', text_type(exception))
             return
 
         # Remove item from the list of children of old parent.
@@ -167,8 +170,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, meta
             self.update_item(old_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s removed from %s children',
-                str(source_item.location),
-                str(old_parent_item.location)
+                text_type(source_item.location),
+                text_type(old_parent_item.location)
             )
 
         # Add item to new parent at particular location.
@@ -180,8 +183,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, meta
             self.update_item(new_parent_item, user_id)  # pylint: disable=no-member
             log.info(
                 '%s added to %s children',
-                str(source_item.location),
-                str(new_parent_item.location)
+                text_type(source_item.location),
+                text_type(new_parent_item.location)
             )
 
         # Update parent attribute of the item block
@@ -189,8 +192,8 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin, meta
         self.update_item(source_item, user_id)  # pylint: disable=no-member
         log.info(
             '%s parent updated to %s',
-            str(source_item.location),
-            str(new_parent_item.location)
+            text_type(source_item.location),
+            text_type(new_parent_item.location)
         )
         return source_item.location
 
@@ -206,4 +209,4 @@ class UnsupportedRevisionError(ValueError):
                 ModuleStoreEnum.RevisionOption.published_only,
                 ModuleStoreEnum.RevisionOption.draft_only
             ]
-        super().__init__(f'revision not one of {allowed_revisions}')
+        super(UnsupportedRevisionError, self).__init__('revision not one of {}'.format(allowed_revisions))

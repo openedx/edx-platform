@@ -11,8 +11,8 @@ from datetime import timedelta
 
 import ddt
 from django.conf import settings
-from django.conf.urls import include, url  # lint-amnesty, pylint: disable=unused-import
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.conf.urls import include, url
+from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -58,11 +58,11 @@ urlpatterns = [
 @ddt.ddt  # pylint: disable=missing-docstring
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
-class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class OAuth2AllowInActiveUsersTests(TestCase):
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
-        super(OAuth2AllowInActiveUsersTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(OAuth2AllowInActiveUsersTests, self).setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
         self.username = 'john'
@@ -121,8 +121,8 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
         the expected error_code in the JSON response body.
         """
         response_dict = json.loads(response.content.decode('utf-8'))
-        assert response.status_code == status_code
-        assert response_dict['error_code'] == error_code
+        self.assertEqual(response.status_code, status_code)
+        self.assertEqual(response_dict['error_code'], error_code)
 
     @ddt.data(None, {})
     def test_get_form_with_wrong_authorization_header_token_type_failing(self, params):
@@ -132,31 +132,31 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
             params,
             HTTP_AUTHORIZATION='Wrong token-type-obviously'
         )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # If no Authorization header is provided that contains a bearer token,
         # authorization passes to the next registered authorization class, or
         # (in this case) to standard DRF fallback code, so no error_code is
         # provided (yet).
-        assert 'error_code' not in json.loads(response.content.decode('utf-8'))
+        self.assertNotIn('error_code', json.loads(response.content.decode('utf-8')))
 
     def test_get_form_passing_auth_with_dot(self):
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_form_failing_auth_url_transport(self):
         """Ensure GETing form over OAuth with correct client credentials in query fails when DEBUG is False"""
         query = urlencode({'access_token': self.dot_access_token.token})
         response = self.csrf_client.get(self.OAUTH2_BASE_TESTING_URL + '?%s' % query)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # This case is handled directly by DRF so no error_code is provided (yet).
-        assert 'error_code' not in json.loads(response.content.decode('utf-8'))
+        self.assertNotIn('error_code', json.loads(response.content.decode('utf-8')))
 
     def test_post_form_passing_auth(self):
         """Ensure POSTing form over OAuth with correct credentials passes and does not require CSRF"""
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_form_token_removed_failing_auth(self):
         """Ensure POSTing when there is no OAuth access token in db fails"""
@@ -219,12 +219,12 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
         self.check_error_codes(response, status_code=status.HTTP_401_UNAUTHORIZED, error_code=token_error.error_code)
 
 
-class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # lint-amnesty, pylint: disable=missing-class-docstring, test-inherits-tests
+class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # pylint: disable=test-inherits-tests
 
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(BearerAuthenticationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(BearerAuthenticationTests, self).setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()
@@ -248,14 +248,14 @@ class OAuthDenyDisabledUsers(OAuth2AllowInActiveUsersTests):  # pylint: disable=
          Asserts response with disabled user with DOT App
         """
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_post_form_passing_auth(self):
         """
          Asserts response with disabled user with DOT App
         """
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
-        assert response.status_code == status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_form_without_oauth_app(self):
         """
@@ -263,7 +263,7 @@ class OAuthDenyDisabledUsers(OAuth2AllowInActiveUsersTests):  # pylint: disable=
         """
         dot_models.Application.objects.filter(user_id=self.user.id).delete()
         response = self.get_with_bearer_token(self.OAUTH2_BASE_TESTING_URL, token=self.dot_access_token.token)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_post_form_without_oauth_app(self):
         """
@@ -271,4 +271,4 @@ class OAuthDenyDisabledUsers(OAuth2AllowInActiveUsersTests):  # pylint: disable=
         """
         dot_models.Application.objects.filter(user_id=self.user.id).delete()
         response = self.post_with_bearer_token(self.OAUTH2_BASE_TESTING_URL)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

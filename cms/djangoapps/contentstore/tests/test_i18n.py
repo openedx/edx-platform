@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 """
 Tests for validate Internationalization and Module i18n service.
 """
 
 
 import gettext
-from unittest import mock, skip
+from unittest import skip
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import mock
+from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import get_language
 
@@ -60,7 +62,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super().setUp()
+        super(TestModuleI18nService, self).setUp()
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
@@ -87,7 +89,7 @@ class TestModuleI18nService(ModuleStoreTestCase):
         Test django translation service works fine.
         """
 
-        class wrap_ugettext_with_xyz:  # pylint: disable=invalid-name
+        class wrap_ugettext_with_xyz(object):  # pylint: disable=invalid-name
             """
             A context manager function that just adds 'XYZ ' to the front
             of all strings of the module ugettext function.
@@ -185,7 +187,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        super().setUp()
+        super(InternationalizationTest, self).setUp()
 
         self.uname = 'testuser'
         self.email = 'test+courses@edx.org'
@@ -209,18 +211,18 @@ class InternationalizationTest(ModuleStoreTestCase):
 
     def test_course_plain_english(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
     def test_course_explicit_english(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html(
@@ -230,7 +232,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            '<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
+                            u'<h1 class="page-header">𝓢𝓽𝓾𝓭𝓲𝓸 Home</h1>',
                             status_code=200,
                             html=True)
 
@@ -245,7 +247,7 @@ class InternationalizationTest(ModuleStoreTestCase):
     @skip
     def test_course_with_accents(self):
         """Test viewing the index page with no courses"""
-        self.client = AjaxEnabledTestClient()  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
         resp = self.client.get_html(
@@ -255,9 +257,9 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         TEST_STRING = (
-            '<h1 class="title-1">'
-            'My \xc7\xf6\xfcrs\xe9s L#'
-            '</h1>'
+            u'<h1 class="title-1">'
+            u'My \xc7\xf6\xfcrs\xe9s L#'
+            u'</h1>'
         )
 
         self.assertContains(resp,

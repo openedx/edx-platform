@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 """
 Certificates Tests.
 """
@@ -5,12 +7,14 @@ Certificates Tests.
 
 import itertools
 import json
-from unittest import mock
 
 import ddt
+import mock
+import six
 from django.conf import settings
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import AssetKey
+from six.moves import range
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
@@ -29,19 +33,19 @@ FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 CERTIFICATE_JSON = {
-    'name': 'Test certificate',
-    'description': 'Test description',
-    'is_active': True,
-    'version': CERTIFICATE_SCHEMA_VERSION,
+    u'name': u'Test certificate',
+    u'description': u'Test description',
+    u'is_active': True,
+    u'version': CERTIFICATE_SCHEMA_VERSION,
 }
 
 CERTIFICATE_JSON_WITH_SIGNATORIES = {
-    'name': 'Test certificate',
-    'description': 'Test description',
-    'version': CERTIFICATE_SCHEMA_VERSION,
-    'course_title': 'Course Title Override',
-    'is_active': True,
-    'signatories': [
+    u'name': u'Test certificate',
+    u'description': u'Test description',
+    u'version': CERTIFICATE_SCHEMA_VERSION,
+    u'course_title': 'Course Title Override',
+    u'is_active': True,
+    u'signatories': [
         {
             "name": "Bob Smith",
             "title": "The DEAN.",
@@ -55,7 +59,7 @@ SIGNATORY_PATH = 'asset-v1:test+CSS101+SP2017+type@asset+block@Signature{}.png'
 
 
 # pylint: disable=no-member
-class HelperMethods:
+class HelperMethods(object):
     """
     Mixin that provides useful methods for certificate configuration tests.
     """
@@ -103,7 +107,7 @@ class HelperMethods:
 
 
 # pylint: disable=no-member
-class CertificatesBaseTestCase:
+class CertificatesBaseTestCase(object):
     """
     Mixin with base test cases for the certificates.
     """
@@ -124,8 +128,8 @@ class CertificatesBaseTestCase:
         bad_jsons = [
             # must have name of the certificate
             {
-                'description': 'Test description',
-                'version': CERTIFICATE_SCHEMA_VERSION
+                u'description': 'Test description',
+                u'version': CERTIFICATE_SCHEMA_VERSION
             },
 
             # an empty json
@@ -151,8 +155,8 @@ class CertificatesBaseTestCase:
         Test invalid json handling.
         """
         # Invalid JSON.
-        invalid_json = "{u'name': 'Test Name', u'description': 'Test description'," \
-                       " u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
+        invalid_json = u"{u'name': 'Test Name', u'description': 'Test description'," \
+                       u" u'version': " + str(CERTIFICATE_SCHEMA_VERSION) + ", []}"
 
         response = self.client.post(
             self._url(),
@@ -170,9 +174,9 @@ class CertificatesBaseTestCase:
     def test_certificate_data_validation(self):
         #Test certificate schema version
         json_data_1 = {
-            'version': 100,
-            'name': 'Test certificate',
-            'description': 'Test description'
+            u'version': 100,
+            u'name': u'Test certificate',
+            u'description': u'Test description'
         }
 
         with self.assertRaises(Exception) as context:
@@ -185,8 +189,8 @@ class CertificatesBaseTestCase:
 
         #Test certificate name is missing
         json_data_2 = {
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'description': 'Test description'
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'description': u'Test description'
         }
 
         with self.assertRaises(Exception) as context:
@@ -204,11 +208,11 @@ class CertificatesListHandlerTestCase(
     Test cases for certificates_list_handler.
     """
 
-    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
+    def setUp(self):
         """
         Set up CertificatesListHandlerTestCase.
         """
-        super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super(CertificatesListHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self):
@@ -222,11 +226,11 @@ class CertificatesListHandlerTestCase(
         Test that you can create a certificate.
         """
         expected = {
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'Test certificate',
-            'description': 'Test description',
-            'is_active': True,
-            'signatories': []
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'Test certificate',
+            u'description': u'Test description',
+            u'is_active': True,
+            u'signatories': []
         }
         response = self.client.ajax_post(
             self._url(),
@@ -240,7 +244,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=certificate_id,
         )
 
@@ -268,7 +272,7 @@ class CertificatesListHandlerTestCase(
     @override_settings(LMS_BASE="lms_base_url")
     def test_lms_link_for_certificate_web_view(self):
         test_url = "//lms_base_url/certificates/" \
-                   "course/" + str(self.course.id) + '?preview=honor'
+                   "course/" + six.text_type(self.course.id) + '?preview=honor'
         link = get_lms_link_for_certificate_web_view(
             course_key=self.course.id,
             mode='honor'
@@ -399,11 +403,11 @@ class CertificatesListHandlerTestCase(
         """
         self._add_course_certificates(count=2)
         json_data = {
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'New test certificate',
-            'description': 'New test description',
-            'is_active': True,
-            'signatories': []
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'is_active': True,
+            u'signatories': []
         }
 
         response = self.client.post(
@@ -433,7 +437,7 @@ class CertificatesDetailHandlerTestCase(
         """
         Set up CertificatesDetailHandlerTestCase.
         """
-        super().setUp('cms.djangoapps.contentstore.views.certificates.tracker')
+        super(CertificatesDetailHandlerTestCase, self).setUp('cms.djangoapps.contentstore.views.certificates.tracker')
         self.reset_urls()
 
     def _url(self, cid=-1):
@@ -452,13 +456,13 @@ class CertificatesDetailHandlerTestCase(
         PUT/POST new certificate.
         """
         expected = {
-            'id': 666,
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'Test certificate',
-            'description': 'Test description',
-            'is_active': True,
-            'course_title': 'Course Title Override',
-            'signatories': []
+            u'id': 666,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'Test certificate',
+            u'description': u'Test description',
+            u'is_active': True,
+            u'course_title': u'Course Title Override',
+            u'signatories': []
         }
 
         response = self.client.put(
@@ -472,7 +476,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=666,
         )
 
@@ -483,13 +487,13 @@ class CertificatesDetailHandlerTestCase(
         self._add_course_certificates(count=2)
 
         expected = {
-            'id': 1,
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'New test certificate',
-            'description': 'New test description',
-            'is_active': True,
-            'course_title': 'Course Title Override',
-            'signatories': []
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'is_active': True,
+            u'course_title': u'Course Title Override',
+            u'signatories': []
 
         }
 
@@ -504,7 +508,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.modified',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id=1,
         )
         self.reload_course()
@@ -512,7 +516,7 @@ class CertificatesDetailHandlerTestCase(
         # Verify that certificate is properly updated in the course.
         course_certificates = self.course.certificates['certificates']
         self.assertEqual(len(course_certificates), 2)
-        self.assertEqual(course_certificates[1].get('name'), 'New test certificate')
+        self.assertEqual(course_certificates[1].get('name'), u'New test certificate')
         self.assertEqual(course_certificates[1].get('description'), 'New test description')
 
     def test_can_edit_certificate_without_is_active(self):
@@ -533,13 +537,13 @@ class CertificatesDetailHandlerTestCase(
         self.save_course()
 
         expected = {
-            'id': 1,
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'New test certificate',
-            'description': 'New test description',
-            'is_active': True,
-            'course_title': 'Course Title Override',
-            'signatories': []
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'is_active': True,
+            u'course_title': u'Course Title Override',
+            u'signatories': []
 
         }
 
@@ -569,7 +573,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -593,7 +597,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -618,7 +622,7 @@ class CertificatesDetailHandlerTestCase(
         self.assertEqual(response.status_code, 204)
         self.assert_event_emitted(
             'edx.certificate.configuration.deleted',
-            course_id=str(self.course.id),
+            course_id=six.text_type(self.course.id),
             configuration_id='1',
         )
         self.reload_course()
@@ -669,14 +673,14 @@ class CertificatesDetailHandlerTestCase(
         """
         self._add_course_certificates(count=2, signatory_count=1, is_active=True, asset_path_format=signatory_path)
         cert_data = {
-            'id': 1,
-            'version': CERTIFICATE_SCHEMA_VERSION,
-            'name': 'New test certificate',
-            'description': 'New test description',
-            'course_title': 'Course Title Override',
-            'org_logo_path': '',
-            'is_active': False,
-            'signatories': []
+            u'id': 1,
+            u'version': CERTIFICATE_SCHEMA_VERSION,
+            u'name': u'New test certificate',
+            u'description': u'New test description',
+            u'course_title': u'Course Title Override',
+            u'org_logo_path': '',
+            u'is_active': False,
+            u'signatories': []
         }
         user = UserFactory()
         for role in [CourseInstructorRole, CourseStaffRole]:
@@ -786,7 +790,7 @@ class CertificatesDetailHandlerTestCase(
             cert_event_type = 'activated' if is_active else 'deactivated'
             self.assert_event_emitted(
                 '.'.join(['edx.certificate.configuration', cert_event_type]),
-                course_id=str(self.course.id),
+                course_id=six.text_type(self.course.id),
             )
 
     @ddt.data(*itertools.product([True, False], [C4X_SIGNATORY_PATH, SIGNATORY_PATH]))

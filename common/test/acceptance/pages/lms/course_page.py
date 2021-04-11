@@ -9,7 +9,7 @@ from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 
-class CoursePage(PageObject):  # lint-amnesty, pylint: disable=abstract-method
+class CoursePage(PageObject):
     """
     Abstract base class for page objects within a course.
     """
@@ -23,7 +23,7 @@ class CoursePage(PageObject):  # lint-amnesty, pylint: disable=abstract-method
         Course ID is currently of the form "edx/999/2013_Spring"
         but this format could change.
         """
-        super().__init__(browser)
+        super(CoursePage, self).__init__(browser)
         self.course_id = course_id
 
     @property

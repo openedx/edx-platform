@@ -1,13 +1,15 @@
 """
 Unit tests for the API module
 """
-import datetime
-from unittest import mock
-from urllib import parse
 
-import pytest
+
+import datetime
+
+import mock
 import pytz
+import six.moves.urllib.parse  # pylint: disable=import-error
 from opaque_keys.edx.keys import CourseKey
+from six.moves import range
 
 from openedx.core.djangoapps.ccxcon import api as ccxconapi
 from common.djangoapps.student.tests.factories import AdminFactory
@@ -40,7 +42,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(APIsTestCase, cls).setUpClass()
         cls.course = course = CourseFactory.create()
         cls.course_key = cls.course.location.course_key
 
@@ -63,7 +65,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         cls.verticals = flatten([
             [
                 ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category='vertical'
+                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
                 ) for _ in range(2)
             ] for sequential in cls.sequentials
         ])
@@ -81,7 +83,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         """
         Set up tests
         """
-        super().setUp()
+        super(APIsTestCase, self).setUp()
         # Create instructor account
         self.instructor = AdminFactory.create()
         # create an instance of modulestore
@@ -102,8 +104,8 @@ class APIsTestCase(SharedModuleStoreTestCase):
         Test for an invalid course key
         """
         missing_course_key = CourseKey.from_string('course-v1:FakeOrganization+CN999+CR-FALL99')
-        assert ccxconapi.course_info_to_ccxcon(missing_course_key) is None
-        assert mock_post.call_count == 0
+        self.assertIsNone(ccxconapi.course_info_to_ccxcon(missing_course_key))
+        self.assertEqual(mock_post.call_count, 0)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')
@@ -113,8 +115,8 @@ class APIsTestCase(SharedModuleStoreTestCase):
         """
         self.course.enable_ccx = False
         self.mstore.update_item(self.course, self.instructor.id)
-        assert ccxconapi.course_info_to_ccxcon(self.course_key) is None
-        assert mock_post.call_count == 0
+        self.assertIsNone(ccxconapi.course_info_to_ccxcon(self.course_key))
+        self.assertEqual(mock_post.call_count, 0)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')
@@ -125,13 +127,13 @@ class APIsTestCase(SharedModuleStoreTestCase):
         # no connector at all
         self.course.ccx_connector = ""
         self.mstore.update_item(self.course, self.instructor.id)
-        assert ccxconapi.course_info_to_ccxcon(self.course_key) is None
-        assert mock_post.call_count == 0
+        self.assertIsNone(ccxconapi.course_info_to_ccxcon(self.course_key))
+        self.assertEqual(mock_post.call_count, 0)
         # invalid url
         self.course.ccx_connector = "www.foo"
         self.mstore.update_item(self.course, self.instructor.id)
-        assert ccxconapi.course_info_to_ccxcon(self.course_key) is None
-        assert mock_post.call_count == 0
+        self.assertIsNone(ccxconapi.course_info_to_ccxcon(self.course_key))
+        self.assertEqual(mock_post.call_count, 0)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')
@@ -141,8 +143,8 @@ class APIsTestCase(SharedModuleStoreTestCase):
         """
         self.course.ccx_connector = "https://www.foo.com"
         self.mstore.update_item(self.course, self.instructor.id)
-        assert ccxconapi.course_info_to_ccxcon(self.course_key) is None
-        assert mock_post.call_count == 0
+        self.assertIsNone(ccxconapi.course_info_to_ccxcon(self.course_key))
+        self.assertEqual(mock_post.call_count, 0)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')
@@ -156,12 +158,14 @@ class APIsTestCase(SharedModuleStoreTestCase):
 
         ccxconapi.course_info_to_ccxcon(self.course_key)
 
-        assert mock_post.call_count == 1
+        self.assertEqual(mock_post.call_count, 1)
         k_args, k_kwargs = mock_post.call_args
         # no args used for the call
-        assert k_args == tuple()
-        assert k_kwargs.get('url') ==\
-               parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+        self.assertEqual(k_args, tuple())
+        self.assertEqual(
+            k_kwargs.get('url'),
+            six.moves.urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+        )
 
         # second call with different status code
         mock_response.status_code = 200
@@ -169,12 +173,14 @@ class APIsTestCase(SharedModuleStoreTestCase):
 
         ccxconapi.course_info_to_ccxcon(self.course_key)
 
-        assert mock_post.call_count == 2
+        self.assertEqual(mock_post.call_count, 2)
         k_args, k_kwargs = mock_post.call_args
         # no args used for the call
-        assert k_args == tuple()
-        assert k_kwargs.get('url') ==\
-               parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+        self.assertEqual(k_args, tuple())
+        self.assertEqual(
+            k_kwargs.get('url'),
+            six.moves.urllib.parse.urljoin(self.course.ccx_connector, ccxconapi.CCXCON_COURSEXS_URL)
+        )
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.post')
@@ -186,7 +192,7 @@ class APIsTestCase(SharedModuleStoreTestCase):
         mock_response.status_code = 500
         mock_post.return_value = mock_response
 
-        with pytest.raises(ccxconapi.CCXConnServerError):
+        with self.assertRaises(ccxconapi.CCXConnServerError):
             ccxconapi.course_info_to_ccxcon(self.course_key)
 
     @mock.patch('requests_oauthlib.oauth2_session.OAuth2Session.fetch_token', fetch_token_mock)
@@ -200,4 +206,4 @@ class APIsTestCase(SharedModuleStoreTestCase):
         for status_code in (204, 300, 304, 400, 404):
             mock_response.status_code = status_code
             mock_post.return_value = mock_response
-            assert ccxconapi.course_info_to_ccxcon(self.course_key) is None
+            self.assertIsNone(ccxconapi.course_info_to_ccxcon(self.course_key))

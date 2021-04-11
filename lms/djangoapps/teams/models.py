@@ -7,7 +7,7 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytz
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
@@ -18,7 +18,6 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from common.djangoapps.student.models import CourseEnrollment, LanguageField
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
 from openedx.core.djangoapps.django_comment_common.signals import (
@@ -34,12 +33,13 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_unfollowed,
     thread_voted
 )
+from common.djangoapps.student.models import CourseEnrollment, LanguageField
 
 from .errors import (
-    AddToIncompatibleTeamError,
     AlreadyOnTeamInTeamset,
     ImmutableMembershipFieldException,
-    NotEnrolledInCourseForTeam
+    NotEnrolledInCourseForTeam,
+    AddToIncompatibleTeamError
 )
 
 
@@ -112,10 +112,10 @@ class CourseTeam(models.Model):
     .. no_pii:
     """
     def __str__(self):
-        return f"{self.name} in {self.course_id}"
+        return "{} in {}".format(self.name, self.course_id)
 
     def __repr__(self):
-        return (  # lint-amnesty, pylint: disable=missing-format-attribute
+        return (
             "<CourseTeam"
             " id={0.id}"
             " team_id={0.team_id}"
@@ -125,7 +125,7 @@ class CourseTeam(models.Model):
             ">"
         ).format(self)
 
-    class Meta:
+    class Meta(object):
         app_label = "teams"
 
     team_id = models.SlugField(max_length=255, unique=True)
@@ -233,10 +233,10 @@ class CourseTeamMembership(models.Model):
     """
 
     def __str__(self):
-        return f"{self.user.username} is member of {self.team}"
+        return "{} is member of {}".format(self.user.username, self.team)
 
     def __repr__(self):
-        return (  # lint-amnesty, pylint: disable=missing-format-attribute
+        return (
             "<CourseTeamMembership"
             " id={0.id}"
             " user_id={0.user.id}"
@@ -244,7 +244,7 @@ class CourseTeamMembership(models.Model):
             ">"
         ).format(self)
 
-    class Meta:
+    class Meta(object):
         app_label = "teams"
         unique_together = (('user', 'team'),)
 
@@ -275,11 +275,11 @@ class CourseTeamMembership(models.Model):
                 # Allow it *only* if the current value is None.
                 if current_value is not None:
                     raise ImmutableMembershipFieldException(
-                        f"Field {name!r} shouldn't change from {current_value!r} to {value!r}"
+                        u"Field %r shouldn't change from %r to %r" % (name, current_value, value)
                     )
-        super().__setattr__(name, value)
+        super(CourseTeamMembership, self).__setattr__(name, value)
 
-    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Customize save method to set the last_activity_at if it does not
         currently exist. Also resets the team's size if this model is
         being created.
@@ -289,13 +289,13 @@ class CourseTeamMembership(models.Model):
             should_reset_team_size = True
         if not self.last_activity_at:
             self.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
-        super().save(*args, **kwargs)
+        super(CourseTeamMembership, self).save(*args, **kwargs)
         if should_reset_team_size:
             self.team.reset_team_size()
 
-    def delete(self, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, signature-differs
+    def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Recompute the related team's team_size after deleting a membership"""
-        super().delete(*args, **kwargs)
+        super(CourseTeamMembership, self).delete(*args, **kwargs)
         self.team.reset_team_size()
 
     @classmethod

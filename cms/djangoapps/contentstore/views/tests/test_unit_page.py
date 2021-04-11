@@ -16,7 +16,7 @@ class UnitPageTestCase(StudioPageTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(UnitPageTestCase, self).setUp()
         self.vertical = ItemFactory.create(parent_location=self.sequential.location,
                                            category='vertical', display_name='Unit')
         self.video = ItemFactory.create(parent_location=self.vertical.location,
@@ -27,7 +27,7 @@ class UnitPageTestCase(StudioPageTestCase):
         """
         Verify that a public xblock's preview returns the expected HTML.
         """
-        published_video = self.store.publish(self.video.location, self.user.id)  # lint-amnesty, pylint: disable=unused-variable
+        published_video = self.store.publish(self.video.location, self.user.id)
         self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
 
     def test_draft_component_preview_html(self):

@@ -126,7 +126,7 @@ class DarkLangMiddleware(MiddlewareMixin):
             fuzzy_code = self._fuzzy_match(lang.lower())
             if fuzzy_code:
                 # Formats lang and priority into a valid accept header fragment.
-                new_accept.append(f"{fuzzy_code};q={priority}")
+                new_accept.append("{};q={}".format(fuzzy_code, priority))
 
         new_accept = ", ".join(new_accept)
 

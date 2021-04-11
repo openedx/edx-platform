@@ -2,6 +2,12 @@
 <h3 class="modal-section-title" id="highlights_label"><%- gettext('Section Highlights') %></h3>
     <div class="highlights-info">
 
+<% if (highlights_preview_only) { %>
+    <p><b>
+    <%- gettext('This feature is currently in testing. Course teams can enter highlights, but learners will not receive email messages.') %>
+    </b></p>
+<% } %>
+
 <%- gettext('Enter 3-5 highlights to include in the email message that learners receive for this section (250 character limit).') %>
 
 <p>

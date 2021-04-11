@@ -6,30 +6,26 @@ Views used by XQueue certificate generation.
 import json
 import logging
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
-from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
-from lms.djangoapps.certificates.api import (
-    can_generate_certificate_task,
-    generate_certificate_task,
-    generate_user_certificates
-)
+from capa.xqueue_interface import XQUEUE_METRIC_NAME
+from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
 )
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.request_rate_limiter import BadRequestRateLimiter
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
-User = get_user_model()
 
 
 # Grades can potentially be written - if so, let grading manage the transaction.
@@ -51,16 +47,12 @@ def request_certificate(request):
             course = modulestore().get_course(course_key, depth=2)
 
             status = certificate_status_for_student(student, course_key)['status']
-            if can_generate_certificate_task(student, course_key):
-                log.info(f'{course_key} is using V2 course certificates. Attempt will be made to generate a V2 '
-                         f'certificate for user {student.id}.')
-                generate_certificate_task(student, course_key)
-            elif status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                log_msg = 'Grading and certification requested for user %s in course %s via /request_certificate call'
+            if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
+                log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
                 log.info(log_msg, username, course_key)
                 status = generate_user_certificates(student, course_key, course=course)
-            return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+            return HttpResponse(json.dumps({'add_status': status}), content_type='application/json')
+        return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), content_type='application/json')
 
 
 @csrf_exempt
@@ -68,6 +60,8 @@ def update_certificate(request):
     """
     Will update GeneratedCertificate for a new certificate or
     modify an existing certificate entry.
+
+    See models.py for a state diagram of certificate states
 
     This view should only ever be accessed by the xqueue server
     """
@@ -89,28 +83,16 @@ def update_certificate(request):
         except GeneratedCertificate.DoesNotExist:
             log.critical(
                 'Unable to lookup certificate\n'
-                'xqueue_body: %s\n'
-                'xqueue_header: %s',
+                u'xqueue_body: %s\n'
+                u'xqueue_header: %s',
                 xqueue_body,
                 xqueue_header
             )
 
-            return HttpResponse(json.dumps({  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+            return HttpResponse(json.dumps({
                 'return_code': 1,
                 'content': 'unable to lookup key'
             }), content_type='application/json')
-
-        user = cert.user
-        if can_generate_certificate_task(user, course_key):
-            log.warning(f'{course_key} is using V2 certificates. Request to update the certificate for user {user.id} '
-                        f'will be ignored.')
-            return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
-                json.dumps({
-                    'return_code': 1,
-                    'content': 'allowlist certificate'
-                }),
-                content_type='application/json'
-            )
 
         if 'error' in xqueue_body:
             cert.status = status.error
@@ -137,9 +119,9 @@ def update_certificate(request):
                 cert.status = status.deleted
             else:
                 log.critical(
-                    'Invalid state for cert update: %s', cert.status
+                    u'Invalid state for cert update: %s', cert.status
                 )
-                return HttpResponse(  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+                return HttpResponse(
                     json.dumps({
                         'return_code': 1,
                         'content': 'invalid cert status'
@@ -148,7 +130,7 @@ def update_certificate(request):
                 )
 
         cert.save()
-        return HttpResponse(json.dumps({'return_code': 0}),  # pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
+        return HttpResponse(json.dumps({'return_code': 0}),
                             content_type='application/json')
 
 
@@ -177,23 +159,23 @@ def update_example_certificate(request):
         HttpResponse (404): Invalid certificate identifier or access key.
 
     """
-    log.info("Received response for example certificate from XQueue.")
+    log.info(u"Received response for example certificate from XQueue.")
 
     rate_limiter = BadRequestRateLimiter()
 
     # Check the parameters and rate limits
     # If these are invalid, return an error response.
     if rate_limiter.is_rate_limit_exceeded(request):
-        log.info("Bad request rate limit exceeded for update example certificate end-point.")
+        log.info(u"Bad request rate limit exceeded for update example certificate end-point.")
         return HttpResponseForbidden("Rate limit exceeded")
 
     if 'xqueue_body' not in request.POST:
-        log.info("Missing parameter 'xqueue_body' for update example certificate end-point")
+        log.info(u"Missing parameter 'xqueue_body' for update example certificate end-point")
         rate_limiter.tick_request_counter(request)
         return JsonResponseBadRequest("Parameter 'xqueue_body' is required.")
 
     if 'xqueue_header' not in request.POST:
-        log.info("Missing parameter 'xqueue_header' for update example certificate end-point")
+        log.info(u"Missing parameter 'xqueue_header' for update example certificate end-point")
         rate_limiter.tick_request_counter(request)
         return JsonResponseBadRequest("Parameter 'xqueue_header' is required.")
 
@@ -201,7 +183,7 @@ def update_example_certificate(request):
         xqueue_body = json.loads(request.POST['xqueue_body'])
         xqueue_header = json.loads(request.POST['xqueue_header'])
     except (ValueError, TypeError):
-        log.info("Could not decode params to example certificate end-point as JSON.")
+        log.info(u"Could not decode params to example certificate end-point as JSON.")
         rate_limiter.tick_request_counter(request)
         return JsonResponseBadRequest("Parameters must be JSON-serialized.")
 
@@ -211,14 +193,14 @@ def update_example_certificate(request):
         uuid = xqueue_body.get('username')
         access_key = xqueue_header.get('lms_key')
         cert = ExampleCertificate.objects.get(uuid=uuid, access_key=access_key)
-    except ExampleCertificate.DoesNotExist as e:
+    except ExampleCertificate.DoesNotExist:
         # If we are unable to retrieve the record, it means the uuid or access key
         # were not valid.  This most likely means that the request is NOT coming
         # from the XQueue.  Return a 404 and increase the bad request counter
         # to protect against a DDOS attack.
-        log.info("Could not find example certificate with uuid '%s' and access key '%s'", uuid, access_key)
+        log.info(u"Could not find example certificate with uuid '%s' and access key '%s'", uuid, access_key)
         rate_limiter.tick_request_counter(request)
-        raise Http404 from e
+        raise Http404
 
     if 'error' in xqueue_body:
         # If an error occurs, save the error message so we can fix the issue.
@@ -226,8 +208,8 @@ def update_example_certificate(request):
         cert.update_status(ExampleCertificate.STATUS_ERROR, error_reason=error_reason)
         log.warning(
             (
-                "Error occurred during example certificate generation for uuid '%s'.  "
-                "The error response was '%s'."
+                u"Error occurred during example certificate generation for uuid '%s'.  "
+                u"The error response was '%s'."
             ), uuid, error_reason
         )
     else:
@@ -236,13 +218,13 @@ def update_example_certificate(request):
         download_url = xqueue_body.get('url')
         if download_url is None:
             rate_limiter.tick_request_counter(request)
-            log.warning("No download URL provided for example certificate with uuid '%s'.", uuid)
+            log.warning(u"No download URL provided for example certificate with uuid '%s'.", uuid)
             return JsonResponseBadRequest(
                 "Parameter 'download_url' is required for successfully generated certificates."
             )
         else:
             cert.update_status(ExampleCertificate.STATUS_SUCCESS, download_url=download_url)
-            log.info("Successfully updated example certificate with uuid '%s'.", uuid)
+            log.info(u"Successfully updated example certificate with uuid '%s'.", uuid)
 
     # Let the XQueue know that we handled the response
     return JsonResponse({'return_code': 0})

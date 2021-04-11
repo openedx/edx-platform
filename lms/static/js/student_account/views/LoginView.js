@@ -57,7 +57,6 @@
                 this.pipelineUserDetails = data.pipelineUserDetails;
                 this.enterpriseName = data.enterpriseName;
                 this.enterpriseSlugLoginURL = data.enterpriseSlugLoginURL;
-                this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled || false;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
@@ -83,8 +82,7 @@
                                 platformName: this.platformName,
                                 createAccountOption: this.createAccountOption,
                                 pipelineUserDetails: this.pipelineUserDetails,
-                                enterpriseName: this.enterpriseName,
-                                is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled
+                                enterpriseName: this.enterpriseName
                             }
                         })
                     )

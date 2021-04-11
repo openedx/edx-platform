@@ -3,21 +3,21 @@
 
 import unittest
 from datetime import timedelta
-from unittest.mock import patch
 from uuid import uuid4
 
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
+from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -33,7 +33,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
     Series of tests for the helper methods in the CourseEntitlement Model Class.
     """
     def setUp(self):
-        super().setUp()
+        super(TestCourseEntitlementModelHelpers, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
@@ -93,7 +93,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
 
         new_course = CourseFactory()
         CourseModeFactory(
-            course_id=new_course.id,  # lint-amnesty, pylint: disable=no-member
+            course_id=new_course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
             expiration_datetime=now() + timedelta(days=1)
@@ -109,7 +109,7 @@ class TestCourseEntitlementModelHelpers(ModuleStoreTestCase):
             )
             assert not CourseEnrollment.is_enrolled(user=self.user, course_key=new_course.id)
         except AttributeError as error:
-            self.fail(error.message)  # lint-amnesty, pylint: disable=no-member
+            self.fail(error.message)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -117,7 +117,7 @@ class TestModels(TestCase):
     """Test entitlement with policy model functions."""
 
     def setUp(self):
-        super().setUp()
+        super(TestModels, self).setUp()
         self.course = CourseOverviewFactory.create(
             start=now()
         )
@@ -231,7 +231,7 @@ class TestModels(TestCase):
         # or the exact same as the original expiration_period_days if somehow no time has passed
         assert entitlement.get_days_until_expiration() <= entitlement.policy.expiration_period.days
 
-    def test_expired_at_datetime(self):  # lint-amnesty, pylint: disable=too-many-statements
+    def test_expired_at_datetime(self):
         """
         Tests that using the getter method properly updates the expired_at field for an entitlement
         """

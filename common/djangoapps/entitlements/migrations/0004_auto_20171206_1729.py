@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
+
 import uuid
 
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Migration(migrations.Migration):
 
     dependencies = [
         ('entitlements', '0003_auto_20171205_1431'),

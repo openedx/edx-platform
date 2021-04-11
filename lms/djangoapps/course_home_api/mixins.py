@@ -3,13 +3,13 @@
 Course Home Mixins.
 """
 
-from opaque_keys.edx.keys import CourseKey
+
 from rest_framework import serializers
 
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
-from openedx.core.djangoapps.courseware_api.utils import serialize_upgrade_info
+from opaque_keys.edx.keys import CourseKey
+
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 
@@ -42,24 +42,3 @@ class DatesBannerSerializerMixin(serializers.Serializer):
             )
             info['verified_upgrade_link'] = verified_upgrade_deadline_link(request.user, course_id=course_key)
         return info
-
-
-class VerifiedModeSerializerMixin(serializers.Serializer):
-    """
-    Serializer Mixin for displaying verified mode upgrade information.
-
-    Requires 'course_overview', 'enrollment', and 'request' from self.context.
-    """
-    can_show_upgrade_sock = serializers.SerializerMethodField()
-    verified_mode = serializers.SerializerMethodField()
-
-    def get_can_show_upgrade_sock(self, _):
-        course_overview = self.context['course_overview']
-        return DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_overview.id)
-
-    def get_verified_mode(self, _):
-        """Return verified mode information, or None."""
-        course_overview = self.context['course_overview']
-        enrollment = self.context['enrollment']
-        request = self.context['request']
-        return serialize_upgrade_info(request.user, course_overview, enrollment)

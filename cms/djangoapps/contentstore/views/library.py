@@ -17,8 +17,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
-from organizations.api import ensure_organization
-from organizations.exceptions import InvalidOrganizationException
+from six import text_type
 
 from cms.djangoapps.course_creators.views import get_course_creator_status
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -122,14 +121,14 @@ def _display_library(library_key_string, request):
         raise Http404  # This is not a library
     if not has_studio_read_access(request.user, library_key):
         log.exception(
-            "User %s tried to access library %s without permission",
-            request.user.username, str(library_key)
+            u"User %s tried to access library %s without permission",
+            request.user.username, text_type(library_key)
         )
         raise PermissionDenied()
 
     library = modulestore().get_library(library_key)
     if library is None:
-        log.exception("Library %s not found", str(library_key))
+        log.exception(u"Library %s not found", text_type(library_key))
         raise Http404
 
     response_format = 'html'
@@ -160,7 +159,7 @@ def _list_libraries(request):
     lib_info = [
         {
             "display_name": lib.display_name,
-            "library_key": str(lib.location.library_key),
+            "library_key": text_type(lib.location.library_key),
         }
         for lib in libraries
         if (
@@ -184,7 +183,6 @@ def _create_library(request):
     try:
         display_name = request.json['display_name']
         org = request.json['org']
-        ensure_organization(org)
         library = request.json.get('number', None)
         if library is None:
             library = request.json['library']
@@ -201,12 +199,12 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=str(error))
+            "ErrMsg": _(u"Unable to create library - missing required field '{field}'").format(field=text_type(error))
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=str(error))
+            "ErrMsg": _(u"Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
         })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")
@@ -217,15 +215,8 @@ def _create_library(request):
                 'change your library code so that it is unique within your organization.'
             )
         })
-    except InvalidOrganizationException:
-        log.exception("Unable to create library - %s is not a valid org short_name.", org)
-        return JsonResponseBadRequest({
-            'ErrMsg': _(
-                "'{organization_key}' is not a valid organization identifier."
-            ).format(organization_key=org)
-        })
 
-    lib_key_str = str(new_lib.location.library_key)
+    lib_key_str = text_type(new_lib.location.library_key)
     return JsonResponse({
         'url': reverse_library_url('library_handler', lib_key_str),
         'library_key': lib_key_str,
@@ -251,10 +242,10 @@ def library_blocks_view(library, user, response_format):
         prev_version = library.runtime.course_entry.structure['previous_version']
         return JsonResponse({
             "display_name": library.display_name,
-            "library_id": str(library.location.library_key),
-            "version": str(library.runtime.course_entry.course_key.version_guid),
-            "previous_version": str(prev_version) if prev_version else None,
-            "blocks": [str(x) for x in children],
+            "library_id": text_type(library.location.library_key),
+            "version": text_type(library.runtime.course_entry.course_key.version_guid),
+            "previous_version": text_type(prev_version) if prev_version else None,
+            "blocks": [text_type(x) for x in children],
         })
 
     can_edit = has_studio_write_access(user, library.location.library_key)
@@ -304,7 +295,7 @@ def manage_library_users(request, library_key_string):
         'context_library': library,
         'users': formatted_users,
         'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
-        'library_key': str(library_key),
+        'library_key': text_type(library_key),
         'lib_users_url': reverse_library_url('manage_library_users', library_key_string),
         'show_children_previews': library.show_children_previews
     })

@@ -14,7 +14,7 @@ class CourseOverviewField(forms.ModelChoiceField):
     def to_python(self, value):
         if value in self.empty_values:
             return None
-        return super().to_python(CourseKey.from_string(value))
+        return super(CourseOverviewField, self).to_python(CourseKey.from_string(value))
 
 
 class StackedConfigModelAdminForm(forms.ModelForm):
@@ -77,6 +77,6 @@ class StackedConfigModelAdmin(ConfigurationModelAdmin):
         """
         Return all field names, excluding reverse foreign key relationships.
         """
-        names = super().get_displayable_field_names()
+        names = super(StackedConfigModelAdmin, self).get_displayable_field_names()
         fixed_names = ['id', 'change_date', 'changed_by'] + list(self.model.KEY_FIELDS)
         return fixed_names + [name for name in names if name not in fixed_names]

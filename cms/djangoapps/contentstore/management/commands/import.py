@@ -50,10 +50,10 @@ class Command(BaseCommand):
         python_lib_filename = options.get('python_lib_filename')
 
         output = (
-            "Importing...\n"
-            "    data_dir={data}, source_dirs={courses}\n"
-            "    Importing static content? {import_static}\n"
-            "    Importing python lib? {import_python_lib}"
+            u"Importing...\n"
+            u"    data_dir={data}, source_dirs={courses}\n"
+            u"    Importing static content? {import_static}\n"
+            u"    Importing python lib? {import_python_lib}"
         ).format(
             data=data_dir,
             courses=source_dirs,
@@ -74,5 +74,5 @@ class Command(BaseCommand):
         for course in course_items:
             course_id = course.id
             if not are_permissions_roles_seeded(course_id):
-                self.stdout.write(f'Seeding forum roles for course {course_id}\n')
+                self.stdout.write(u'Seeding forum roles for course {0}\n'.format(course_id))
                 seed_permissions_roles(course_id)

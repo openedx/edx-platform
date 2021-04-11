@@ -30,7 +30,7 @@ additional_styling_class = 'on-mobile' if is_mobile_app else 'has-button'
                 <form method="post" action="${reset_deadlines_url}">
                     <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
                     <input type="hidden" name="course_id" value="${course.id}">
-                    <button class="btn btn-outline-primary">${_("Shift due dates")}</button>
+                    <button class="btn">${_("Shift due dates")}</button>
                 </form>
             </div>
         % endif

@@ -9,7 +9,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import login as django_login
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied
 from django.core.validators import ValidationError
 from django.db import transaction
@@ -21,8 +21,7 @@ from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
-from edx_django_utils.monitoring import set_custom_attribute
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
+from edx_toggles.toggles import WaffleFlag, WaffleFlagNamespace
 from pytz import UTC
 from ratelimit.decorators import ratelimit
 from requests import HTTPError
@@ -35,7 +34,7 @@ from social_django import utils as social_utils
 from common.djangoapps import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
-from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -58,7 +57,6 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory,
     get_registration_extension_form
 )
-from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from common.djangoapps.student.helpers import (
     AccountValidationError,
     authenticate_new_user,
@@ -105,8 +103,9 @@ REGISTER_USER = Signal(providing_args=["user", "registration"])
 # .. toggle_creation_date: 2020-04-30
 # .. toggle_target_removal_date: 2020-06-01
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-REGISTRATION_FAILURE_LOGGING_FLAG = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=u'registration'),
+# .. toggle_tickets: None
+REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag(
+    waffle_namespace=WaffleFlagNamespace(name=u'registration'),
     flag_name=u'enable_failure_logging',
     module_name=__name__,
 )
@@ -177,17 +176,12 @@ def create_account_with_params(request, params):
     # error message
     if is_third_party_auth_enabled and ('social_auth_provider' in params and not pipeline.running(request)):
         raise ValidationError(
-            {
-                'session_expired': [
-                    _(u"Registration using {provider} has timed out.").format(
-                        provider=params.get('social_auth_provider'))
-                ],
-                'error_code': 'tpa-session-expired',
-            }
+            {'session_expired': [
+                _(u"Registration using {provider} has timed out.").format(
+                    provider=params.get('social_auth_provider'))
+            ]}
         )
 
-    if is_third_party_auth_enabled:
-        set_custom_attribute('register_user_tpa', pipeline.running(request))
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
     # Can't have terms of service for certain SHIB users, like at Stanford
     registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
@@ -290,25 +284,21 @@ def _link_user_to_third_party_provider(
                     _(u"An access_token is required when passing value ({}) for provider.").format(
                         params['provider']
                     )
-                ],
-                'error_code': 'tpa-missing-access-token'
+                ]
             })
         request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_REGISTER_API
         pipeline_user = None
         error_message = ""
-        error_code = None
         try:
             pipeline_user = request.backend.do_auth(social_access_token, user=user)
         except AuthAlreadyAssociated:
             error_message = _("The provided access_token is already associated with another user.")
-            error_code = 'tpa-token-already-associated'
         except (HTTPError, AuthException):
             error_message = _("The provided access_token is not valid.")
-            error_code = 'tpa-invalid-access-token'
         if not pipeline_user or not isinstance(pipeline_user, User):
             # Ensure user does not re-enter the pipeline
             request.social_strategy.clean_partial_pipeline(social_access_token)
-            raise ValidationError({'access_token': [error_message], 'error_code': error_code})
+            raise ValidationError({'access_token': [error_message]})
 
     # If the user is registering via 3rd party auth, track which provider they use
     if is_third_party_auth_enabled and pipeline.running(request):
@@ -340,30 +330,16 @@ def _track_user_registration(user, profile, params, third_party_provider):
         # .. pii_types: email_address, username, name, birth_date, location, gender
         # .. pii_retirement: third_party
         segment.identify(*identity_args)
-        properties = {
-            'category': 'conversion',
-            # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
-            'email': user.email,
-            'label': params.get('course_id'),
-            'provider': third_party_provider.name if third_party_provider else None,
-            'is_gender_selected': bool(profile.gender_display),
-            'is_year_of_birth_selected': bool(profile.year_of_birth),
-            'is_education_selected': bool(profile.level_of_education_display),
-            'is_goal_set': bool(profile.goals),
-            'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
-        }
-        # DENG-803: For segment events forwarded along to Hubspot, duplicate the `properties` section of
-        # the event payload into the `traits` section so that they can be received. This is a temporary
-        # fix until we implement this behavior outside of the LMS.
-        # TODO: DENG-805: remove the properties duplication in the event traits.
-        segment_traits = dict(properties)
-        segment_traits['user_id'] = user.id
-        segment_traits['joined_date'] = user.date_joined.strftime("%Y-%m-%d")
         segment.track(
             user.id,
             "edx.bi.user.account.registered",
-            properties=properties,
-            traits=segment_traits,
+            {
+                'category': 'conversion',
+                # ..pii: Learner email is sent to Segment in following line and will be associated with analytics data.
+                'email': user.email,
+                'label': params.get('course_id'),
+                'provider': third_party_provider.name if third_party_provider else None
+            },
         )
 
 
@@ -483,15 +459,14 @@ class RegistrationView(APIView):
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
-        return super(RegistrationView, self).dispatch(request, *args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super(RegistrationView, self).dispatch(request, *args, **kwargs)
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        return HttpResponse(RegistrationFormFactory().get_registration_form(request).to_json(),  # lint-amnesty, pylint: disable=http-response-with-content-type-json
+        return HttpResponse(RegistrationFormFactory().get_registration_form(request).to_json(),
                             content_type="application/json")
 
     @method_decorator(csrf_exempt)
-    @method_decorator(ratelimit(key=REAL_IP_KEY, rate=settings.REGISTRATION_RATELIMIT, method='POST'))
     def post(self, request):
         """Create the user's account.
 
@@ -510,16 +485,6 @@ class RegistrationView(APIView):
                 address already exists
             HttpResponse: 403 operation not allowed
         """
-        should_be_rate_limited = getattr(request, 'limited', False)
-        if should_be_rate_limited:
-            return JsonResponse({'error_code': 'forbidden-request'}, status=403)
-
-        if is_require_third_party_auth_enabled() and not pipeline.running(request):
-            # if request is not running a third-party auth pipeline
-            return HttpResponseForbidden(
-                "Third party authentication is required to register. Username and password were received instead."
-            )
-
         data = request.POST.copy()
         self._handle_terms_of_service(data)
 
@@ -531,8 +496,7 @@ class RegistrationView(APIView):
         if response:
             return response
 
-        redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
-        redirect_url = get_redirect_url_with_host(root_url, redirect_to)
+        redirect_url = get_next_url_for_login_page(request, include_host=True)
         response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
         return response
@@ -544,17 +508,14 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
-        error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
-            error_code += '-email'
             errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
         if username is not None and username_exists_or_retired(username):
-            error_code += '-username'
             errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
 
         if errors:
-            return self._create_response(request, errors, status_code=409, error_code=error_code)
+            return self._create_response(request, errors, status_code=409)
 
     def _handle_terms_of_service(self, data):
         # Backwards compatibility: the student view expects both
@@ -575,26 +536,22 @@ class RegistrationView(APIView):
             errors = {
                 err.field: [{"user_message": text_type(err)}]
             }
-            response = self._create_response(request, errors, status_code=409, error_code=err.error_code)
+            response = self._create_response(request, errors, status_code=409)
         except ValidationError as err:
             # Should only get field errors from this exception
             assert NON_FIELD_ERRORS not in err.message_dict
-
-            # Error messages are returned as arrays from ValidationError
-            error_code = err.message_dict.get('error_code', ['validation-error'])[0]
-
             # Only return first error for each field
             errors = {
                 field: [{"user_message": error} for error in error_list]
-                for field, error_list in err.message_dict.items() if field != 'error_code'
+                for field, error_list in err.message_dict.items()
             }
-            response = self._create_response(request, errors, status_code=400, error_code=error_code)
+            response = self._create_response(request, errors, status_code=400)
         except PermissionDenied:
             response = HttpResponseForbidden(_("Account creation not allowed."))
 
         return response, user
 
-    def _create_response(self, request, response_dict, status_code, redirect_url=None, error_code=None):
+    def _create_response(self, request, response_dict, status_code, redirect_url=None):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
@@ -602,9 +559,6 @@ class RegistrationView(APIView):
             self._log_validation_errors(request, response_dict, status_code)
         if redirect_url:
             response_dict['redirect_url'] = redirect_url
-        if error_code:
-            response_dict['error_code'] = error_code
-            set_custom_attribute('register_error_code', error_code)
         return JsonResponse(response_dict, status=status_code)
 
     def _log_validation_errors(self, request, errors, status_code):
@@ -612,7 +566,7 @@ class RegistrationView(APIView):
             return
 
         try:
-            for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
+            for field_key, errors in errors.items():
                 for error in errors:
                     log.info(
                         'message=registration_failed, status_code=%d, agent="%s", field="%s", error="%s"',
@@ -623,7 +577,7 @@ class RegistrationView(APIView):
                     )
         except:  # pylint: disable=bare-except
             log.exception("Failed to log registration validation error")
-            pass  # lint-amnesty, pylint: disable=unnecessary-pass
+            pass
 
 
 # pylint: disable=line-too-long
@@ -794,10 +748,4 @@ class RegistrationValidationView(APIView):
                 validation_decisions.update({
                     form_field_key: handler(self, request)
                 })
-
-        field_name = request.data.get('fieldName')  # adding field name for authn MFE use case
-        if field_name:
-            validation_decisions.update({
-                'fieldName': field_name
-            })
         return Response({"validation_decisions": validation_decisions})

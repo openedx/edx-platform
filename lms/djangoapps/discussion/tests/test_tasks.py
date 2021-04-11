@@ -6,9 +6,10 @@ Tests the execution of forum notification tasks.
 import json
 import math
 from datetime import datetime, timedelta
-from unittest import mock
 
 import ddt
+import mock
+import six
 from django.contrib.sites.models import Site
 from edx_ace.channel import ChannelType, get_channel_for_message
 from edx_ace.recipient import Recipient
@@ -16,7 +17,6 @@ from edx_ace.renderers import EmailRenderer
 from edx_ace.utils import date
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 from lms.djangoapps.discussion.tasks import _should_send_message, _track_notification_sent
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -25,6 +25,7 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 NOW = datetime.utcnow()
@@ -32,8 +33,8 @@ ONE_HOUR_AGO = NOW - timedelta(hours=1)
 TWO_HOURS_AGO = NOW - timedelta(hours=2)
 
 
-def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_data=None, per_page=1):  # lint-amnesty, pylint: disable=missing-function-docstring
-    def mock_subscribed_threads(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_data=None, per_page=1):
+    def mock_subscribed_threads(method, url, **kwargs):
         subscribed_thread_collection = [
             {'id': thread_id} for thread_id in subscribed_thread_ids
         ]
@@ -48,10 +49,10 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
         }
         return mock.Mock(status_code=200, text=json.dumps(data), json=mock.Mock(return_value=data))
 
-    def mock_comment_find(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    def mock_comment_find(method, url, **kwargs):
         return mock.Mock(status_code=200, text=json.dumps(comment_data), json=mock.Mock(return_value=comment_data))
 
-    def mock_thread_find(method, url, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    def mock_thread_find(method, url, **kwargs):
         return mock.Mock(status_code=200, text=json.dumps(thread_data), json=mock.Mock(return_value=thread_data))
 
     def mock_request(method, url, **kwargs):
@@ -66,12 +67,12 @@ def make_mock_responder(subscribed_thread_ids=None, thread_data=None, comment_da
 
 
 @ddt.ddt
-class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TaskTestCase(ModuleStoreTestCase):
 
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
-        super().setUpClass()
+        super(TaskTestCase, cls).setUpClass()
         cls.discussion_id = 'dummy_discussion_id'
         cls.course = CourseOverviewFactory.create(language='fr')
 
@@ -105,10 +106,10 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         cls.create_thread_and_comments()
 
     @classmethod
-    def create_thread_and_comments(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def create_thread_and_comments(cls):
         cls.thread = {
             'id': cls.discussion_id,
-            'course_id': str(cls.course.id),
+            'course_id': six.text_type(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -146,7 +147,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         cls.comment['child_count'] = 1
         cls.thread2 = {
             'id': cls.discussion_id,
-            'course_id': str(cls.course.id),
+            'course_id': six.text_type(cls.course.id),
             'created_at': date.serialize(TWO_HOURS_AGO),
             'title': 'thread-title',
             'user_id': cls.thread_author.id,
@@ -155,7 +156,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         }
 
     def setUp(self):
-        super().setUp()
+        super(TaskTestCase, self).setUp()
         self.request_patcher = mock.patch('requests.request')
         self.mock_request = self.request_patcher.start()
 
@@ -167,7 +168,7 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
         self.mock_permalink = self.permalink_patcher.start()
 
     def tearDown(self):
-        super().tearDown()
+        super(TaskTestCase, self).tearDown()
         self.request_patcher.stop()
         self.ace_send_patcher.stop()
         self.permalink_patcher.stop()
@@ -212,21 +213,21 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
                 'thread_title': 'thread-title',
                 'thread_username': self.thread_author.username,
                 'thread_commentable_id': self.thread['commentable_id'],
-                'post_link': 'https://{}{}'.format(site.domain, self.mock_permalink.return_value),
+                'post_link': self.mock_permalink.return_value,
                 'site': site,
                 'site_id': site.id
             })
-            expected_recipient = Recipient(self.thread_author.id, self.thread_author.email)
+            expected_recipient = Recipient(self.thread_author.username, self.thread_author.email)
             actual_message = self.mock_ace_send.call_args_list[0][0][0]
-            assert expected_message_context == actual_message.context
-            assert expected_recipient == actual_message.recipient
-            assert self.course.language == actual_message.language
+            self.assertEqual(expected_message_context, actual_message.context)
+            self.assertEqual(expected_recipient, actual_message.recipient)
+            self.assertEqual(self.course.language, actual_message.language)
             self._assert_rendered_email(actual_message)
 
         else:
-            assert not self.mock_ace_send.called
+            self.assertFalse(self.mock_ace_send.called)
 
-    def _assert_rendered_email(self, message):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _assert_rendered_email(self, message):
         # check that we can actually render the message
         with emulate_http_request(
             site=message.context['site'], user=self.thread_author
@@ -256,8 +257,8 @@ class TaskTestCase(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missin
             'comment_id': comment_dict['id'],
             'thread_id': thread['id'],
         })
-        assert actual_result is False
-        assert not self.mock_ace_send.called
+        self.assertEqual(actual_result, False)
+        self.assertFalse(self.mock_ace_send.called)
 
     def test_subcomment_should_not_send_email(self):
         self.run_should_not_send_email_test(self.thread, self.subcomment)

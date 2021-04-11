@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for the wrapping layer that provides the XBlock API using XModule/Descriptor
 functionality
@@ -7,7 +8,6 @@ functionality
 
 
 from unittest.case import SkipTest, TestCase
-from unittest.mock import Mock
 
 import ddt
 import webob
@@ -23,18 +23,20 @@ from factory import (
 )
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from mock import Mock
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from six.moves import range
 from xblock.core import XBlock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.annotatable_module import AnnotatableBlock
-from xmodule.conditional_module import ConditionalBlock
-from xmodule.course_module import CourseBlock
+from xmodule.annotatable_module import AnnotatableDescriptor
+from xmodule.conditional_module import ConditionalDescriptor
+from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlBlock
-from xmodule.poll_module import PollBlock
-from xmodule.randomize_module import RandomizeBlock
-from xmodule.seq_module import SequenceBlock
+from xmodule.poll_module import PollDescriptor
+from xmodule.randomize_module import RandomizeDescriptor
+from xmodule.seq_module import SequenceDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 from xmodule.vertical_block import VerticalBlock
 from xmodule.word_cloud_module import WordCloudBlock
@@ -53,9 +55,9 @@ from xmodule.x_module import (
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 LEAF_XMODULES = {
-    AnnotatableBlock: [{}],
+    AnnotatableDescriptor: [{}],
     HtmlBlock: [{}],
-    PollBlock: [{'display_name': 'Poll Display Name'}],
+    PollDescriptor: [{'display_name': 'Poll Display Name'}],
     WordCloudBlock: [{}],
 }
 
@@ -64,17 +66,17 @@ LEAF_XMODULES = {
 # to a list of sample field values to test with.
 # TODO: Add more types of sample data
 CONTAINER_XMODULES = {
-    ConditionalBlock: [{}],
-    CourseBlock: [{}],
-    RandomizeBlock: [{'display_name': 'Test String Display'}],
-    SequenceBlock: [{'display_name': 'Test Unicode हिंदी Display'}],
+    ConditionalDescriptor: [{}],
+    CourseDescriptor: [{}],
+    RandomizeDescriptor: [{'display_name': 'Test String Display'}],
+    SequenceDescriptor: [{'display_name': u'Test Unicode हिंदी Display'}],
     VerticalBlock: [{}],
     WrapperBlock: [{}],
 }
 
 # These modules are not editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    PollBlock,
+    PollDescriptor,
 )
 
 
@@ -96,11 +98,11 @@ class ModuleSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta:
+    class Meta(object):
         model = ModuleSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
         """See documentation from :meth:`factory.Factory._build`"""
         return get_test_system(*args, **kwargs)
 
@@ -112,11 +114,11 @@ class DescriptorSystemFactory(Factory):
     performed by :func:`xmodule.tests.get_test_descriptor_system`, so
     arguments for that function are valid factory attributes.
     """
-    class Meta:
+    class Meta(object):
         model = DescriptorSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
         """See documentation from :meth:`factory.Factory._build`"""
         return get_test_descriptor_system(*args, **kwargs)
 
@@ -183,7 +185,7 @@ class LeafDescriptorFactory(Factory):
     Factory to generate leaf XModuleDescriptors.
     """
 
-    class Meta:
+    class Meta(object):
         model = XModuleDescriptor
 
     runtime = SubFactory(DescriptorSystemFactory)
@@ -206,7 +208,7 @@ class LeafDescriptorFactory(Factory):
         return self.location
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
         runtime = kwargs.pop('runtime')
         desc_cls = kwargs.pop('descriptor_cls')
         block_type = kwargs.pop('block_type')
@@ -253,12 +255,12 @@ class ContainerModuleFactory(LeafModuleFactory):
     and are ready to act as XModules.
     """
     @lazy_attribute
-    def xmodule_runtime(self):  # lint-amnesty, pylint: disable=arguments-differ
+    def xmodule_runtime(self):
         return ContainerModuleRuntimeFactory(depth=self.depth)  # pylint: disable=no-member
 
 
 @ddt.ddt
-class XBlockWrapperTestMixin:
+class XBlockWrapperTestMixin(object):
     """
     This is a mixin for building tests of the implementation of the XBlock
     api by wrapping XModule native functions.
@@ -271,7 +273,7 @@ class XBlockWrapperTestMixin:
         """
         Raise SkipTest if this descriptor_cls shouldn't be tested.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def check_property(self, descriptor):
         """
@@ -338,7 +340,10 @@ class TestStudentView(XBlockWrapperTestMixin, TestCase):
         """
         Assert that both student_view and get_html render the same.
         """
-        assert descriptor._xmodule.get_html() == descriptor.render(STUDENT_VIEW).content
+        self.assertEqual(
+            descriptor._xmodule.get_html(),
+            descriptor.render(STUDENT_VIEW).content
+        )
 
 
 class TestStudioView(XBlockWrapperTestMixin, TestCase):
@@ -351,7 +356,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
 
         pure_xblock_class = issubclass(descriptor_cls, XBlock) and not issubclass(descriptor_cls, XModuleDescriptor)
-        if pure_xblock_class:  # lint-amnesty, pylint: disable=no-else-raise
+        if pure_xblock_class:
             raise SkipTest(descriptor_cls.__name__ + " is a pure XBlock and implements studio_view")
         elif descriptor_cls.studio_view != XModuleDescriptor.studio_view:
             raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
@@ -362,7 +367,7 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         """
         html = descriptor.get_html()
         rendered_content = descriptor.render(STUDIO_VIEW).content
-        assert html == rendered_content
+        self.assertEqual(html, rendered_content)
 
 
 @ddt.ddt
@@ -372,7 +377,7 @@ class TestXModuleHandler(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestXModuleHandler, self).setUp()
         self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
         self.module.handle_ajax = Mock(return_value='{}')
         self.request = webob.Request({})
@@ -387,11 +392,11 @@ class TestXModuleHandler(TestCase):
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
-        assert isinstance(response, webob.Response)
-        assert response.body.decode('utf-8') == '{}'
+        self.assertIsInstance(response, webob.Response)
+        self.assertEqual(response.body.decode('utf-8'), '{}')
 
     @ddt.data(
-        '{"test_key": "test_value"}',
+        u'{"test_key": "test_value"}',
         '{"test_key": "test_value"}',
     )
     def test_xmodule_handler_with_data(self, response_data):
@@ -402,8 +407,8 @@ class TestXModuleHandler(TestCase):
 
         self.module.handle_ajax = Mock(return_value=response_data)
         response = self.module.xmodule_handler(self.request)
-        assert isinstance(response, webob.Response)
-        assert response.body.decode('utf-8') == '{"test_key": "test_value"}'
+        self.assertIsInstance(response, webob.Response)
+        self.assertEqual(response.body.decode('utf-8'), '{"test_key": "test_value"}')
 
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
@@ -425,8 +430,8 @@ class TestXmlExport(XBlockWrapperTestMixin, TestCase):
 
         xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
 
-        assert list(xmodule_api_fs.walk()) == list(xblock_api_fs.walk())
-        assert etree.tostring(xmodule_node) == etree.tostring(xblock_node)
+        self.assertEqual(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
+        self.assertEqual(etree.tostring(xmodule_node), etree.tostring(xblock_node))
 
 
 class TestPublicView(XBlockWrapperTestMixin, TestCase):
@@ -448,6 +453,12 @@ class TestPublicView(XBlockWrapperTestMixin, TestCase):
         Assert that public_view contains correct message.
         """
         if descriptor.display_name:
-            assert descriptor.display_name in descriptor.render(PUBLIC_VIEW).content
+            self.assertIn(
+                descriptor.display_name,
+                descriptor.render(PUBLIC_VIEW).content
+            )
         else:
-            assert 'This content is only accessible' in descriptor.render(PUBLIC_VIEW).content
+            self.assertIn(
+                "This content is only accessible",
+                descriptor.render(PUBLIC_VIEW).content
+            )

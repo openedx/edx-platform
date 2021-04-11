@@ -1,21 +1,22 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Python APIs of the Teams app
 """
 
-from unittest import mock
 from uuid import uuid4
 
 import ddt
+import mock
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import AnonymousUserId, CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.teams import api as teams_api
 from lms.djangoapps.teams.models import CourseTeam
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
+from common.djangoapps.student.models import CourseEnrollment, AnonymousUserId
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -35,7 +36,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(PythonAPITests, cls).setUpClass()
         cls.user1 = UserFactory.create(username='user1')
         cls.user2 = UserFactory.create(username='user2')
         cls.user3 = UserFactory.create(username='user3')
@@ -102,51 +103,51 @@ class PythonAPITests(SharedModuleStoreTestCase):
         cls.team2a.add_user(cls.user4)
 
     def test_get_team_by_team_id_non_existence(self):
-        assert teams_api.get_team_by_team_id('DO_NOT_EXIST') is None
+        self.assertIsNone(teams_api.get_team_by_team_id('DO_NOT_EXIST'))
 
     def test_get_team_by_team_id_exists(self):
         team = teams_api.get_team_by_team_id(self.team1.team_id)
-        assert team == self.team1
+        self.assertEqual(team, self.team1)
 
     def test_get_team_by_discussion_non_existence(self):
-        assert teams_api.get_team_by_discussion('DO_NOT_EXIST') is None
+        self.assertIsNone(teams_api.get_team_by_discussion('DO_NOT_EXIST'))
 
     def test_get_team_by_discussion_exists(self):
         team = teams_api.get_team_by_discussion(DISCUSSION_TOPIC_ID)
-        assert team == self.team1
+        self.assertEqual(team, self.team1)
 
     def test_is_team_discussion_private_is_private(self):
-        assert teams_api.is_team_discussion_private(self.team1)
+        self.assertTrue(teams_api.is_team_discussion_private(self.team1))
 
     def test_is_team_discussion_private_is_public(self):
-        assert not teams_api.is_team_discussion_private(None)
-        assert not teams_api.is_team_discussion_private(self.team2)
-        assert not teams_api.is_team_discussion_private(self.team3)
+        self.assertFalse(teams_api.is_team_discussion_private(None))
+        self.assertFalse(teams_api.is_team_discussion_private(self.team2))
+        self.assertFalse(teams_api.is_team_discussion_private(self.team3))
 
     def test_is_instructor_managed_team(self):
-        assert teams_api.is_instructor_managed_team(self.team1)
-        assert not teams_api.is_instructor_managed_team(self.team2)
-        assert teams_api.is_instructor_managed_team(self.team3)
+        self.assertTrue(teams_api.is_instructor_managed_team(self.team1))
+        self.assertFalse(teams_api.is_instructor_managed_team(self.team2))
+        self.assertTrue(teams_api.is_instructor_managed_team(self.team3))
 
     def test_is_instructor_managed_topic(self):
-        assert teams_api.is_instructor_managed_topic(COURSE_KEY1, TOPIC1)
-        assert not teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC2)
-        assert teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC3)
+        self.assertTrue(teams_api.is_instructor_managed_topic(COURSE_KEY1, TOPIC1))
+        self.assertFalse(teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC2))
+        self.assertTrue(teams_api.is_instructor_managed_topic(COURSE_KEY2, TOPIC3))
 
     def test_user_is_a_team_member(self):
-        assert teams_api.user_is_a_team_member(self.user1, self.team1)
-        assert not teams_api.user_is_a_team_member(self.user1, None)
-        assert not teams_api.user_is_a_team_member(self.user1, self.team2)
+        self.assertTrue(teams_api.user_is_a_team_member(self.user1, self.team1))
+        self.assertFalse(teams_api.user_is_a_team_member(self.user1, None))
+        self.assertFalse(teams_api.user_is_a_team_member(self.user1, self.team2))
 
     def test_private_discussion_visible_by_user(self):
-        assert teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user1)
-        assert teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user2)
+        self.assertTrue(teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user1))
+        self.assertTrue(teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user2))
         # self.assertFalse(teams_api.discussion_visible_by_user(DISCUSSION_TOPIC_ID, self.user3))
 
     def test_public_discussion_visible_by_user(self):
-        assert teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user1)
-        assert teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user2)
-        assert teams_api.discussion_visible_by_user('DO_NOT_EXISTS', self.user3)
+        self.assertTrue(teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user1))
+        self.assertTrue(teams_api.discussion_visible_by_user(self.team2.discussion_topic_id, self.user2))
+        self.assertTrue(teams_api.discussion_visible_by_user('DO_NOT_EXISTS', self.user3))
 
     @ddt.unpack
     @ddt.data(
@@ -161,10 +162,10 @@ class PythonAPITests(SharedModuleStoreTestCase):
         user3_team = teams_api.get_team_for_user_course_topic(self.user3, str(course_key), topic_id)
         user4_team = teams_api.get_team_for_user_course_topic(self.user4, str(course_key), topic_id)
 
-        assert (user1_team.team_id if user1_team else None) == expected_team_ids[0]
-        assert (user2_team.team_id if user2_team else None) == expected_team_ids[1]
-        assert (user3_team.team_id if user3_team else None) == expected_team_ids[2]
-        assert (user4_team.team_id if user4_team else None) == expected_team_ids[3]
+        self.assertEqual(user1_team.team_id if user1_team else None, expected_team_ids[0])
+        self.assertEqual(user2_team.team_id if user2_team else None, expected_team_ids[1])
+        self.assertEqual(user3_team.team_id if user3_team else None, expected_team_ids[2])
+        self.assertEqual(user4_team.team_id if user4_team else None, expected_team_ids[3])
 
     @mock.patch('lms.djangoapps.teams.api.CourseTeam.objects')
     def test_get_team_multiple_teams(self, mocked_manager):
@@ -179,11 +180,11 @@ class PythonAPITests(SharedModuleStoreTestCase):
         mock_qs.first.return_value = expected_result
         mocked_manager.filter.return_value = mock_qs
         result = teams_api.get_team_for_user_course_topic(self.user1, str(COURSE_KEY1), TOPIC1)
-        assert result == expected_result
+        self.assertEqual(result, expected_result)
 
     def test_get_team_course_not_found(self):
         team = teams_api.get_team_for_user_course_topic(self.user1, 'nonsense/garbage/nonexistant', 'topic')
-        assert team is None
+        self.assertIsNone(team)
 
     def test_get_team_invalid_course(self):
         invalid_course_id = 'lol!()#^$&course'
@@ -196,8 +197,8 @@ class PythonAPITests(SharedModuleStoreTestCase):
         A learner should be able to get the anonymous user IDs of their team members
         """
         team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(self.user1, self.team1)
-        assert AnonymousUserId.objects.get(user=self.user1, course_id=self.team1.course_id)
-        assert len(self.team1.users.all()) == len(team_anonymous_user_ids)
+        self.assertTrue(AnonymousUserId.objects.get(user=self.user1, course_id=self.team1.course_id))
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
 
     def test_anonymous_user_ids_for_team_not_on_team(self):
         """
@@ -220,7 +221,7 @@ class PythonAPITests(SharedModuleStoreTestCase):
         CourseStaffRole(COURSE_KEY1).add_users(user_staff)
 
         team_anonymous_user_ids = teams_api.anonymous_user_ids_for_team(user_staff, self.team1)
-        assert len(self.team1.users.all()) == len(team_anonymous_user_ids)
+        self.assertEqual(len(self.team1.users.all()), len(team_anonymous_user_ids))
 
 
 @ddt.ddt
@@ -230,7 +231,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TeamAccessTests, cls).setUpClass()
         cls.user_audit = UserFactory.create(username='user_audit')
         cls.user_staff = UserFactory.create(username='user_staff')
         cls.user_masters = UserFactory.create(username='user_masters')
@@ -295,7 +296,10 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     @ddt.unpack
     def test_has_team_api_access(self, username, expected_have_access):
         user = self.users[username]
-        assert expected_have_access == teams_api.has_team_api_access(user, COURSE_KEY1)
+        self.assertEqual(
+            expected_have_access,
+            teams_api.has_team_api_access(user, COURSE_KEY1)
+        )
 
     @ddt.data(
         ('user_audit', teams_api.OrganizationProtectionStatus.unprotected),
@@ -307,9 +311,12 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     def test_user_organization_protection_status(self, username, expected_protection_status):
         user = self.users[username]
         try:
-            assert expected_protection_status == teams_api.user_organization_protection_status(user, COURSE_KEY1)
+            self.assertEqual(
+                expected_protection_status,
+                teams_api.user_organization_protection_status(user, COURSE_KEY1)
+            )
         except ValueError:
-            assert not CourseEnrollment.is_enrolled(user, COURSE_KEY1)
+            self.assertFalse(CourseEnrollment.is_enrolled(user, COURSE_KEY1))
 
     @ddt.data(
         ('user_audit', True),
@@ -321,9 +328,12 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     def test_has_specific_team_access_unprotected_team(self, username, expected_return):
         user = self.users[username]
         try:
-            assert expected_return == teams_api.has_specific_team_access(user, self.team_unprotected_1)
+            self.assertEqual(
+                expected_return,
+                teams_api.has_specific_team_access(user, self.team_unprotected_1)
+            )
         except ValueError:
-            assert not CourseEnrollment.is_enrolled(user, self.team_unprotected_1.course_id)
+            self.assertFalse(CourseEnrollment.is_enrolled(user, self.team_unprotected_1.course_id))
 
     @ddt.data(
         ('user_audit', False),
@@ -335,9 +345,12 @@ class TeamAccessTests(SharedModuleStoreTestCase):
     def test_has_specific_team_access_protected_team(self, username, expected_return):
         user = self.users[username]
         try:
-            assert expected_return == teams_api.has_specific_team_access(user, self.team_protected_1)
+            self.assertEqual(
+                expected_return,
+                teams_api.has_specific_team_access(user, self.team_protected_1)
+            )
         except ValueError:
-            assert not CourseEnrollment.is_enrolled(user, self.team_protected_1.course_id)
+            self.assertFalse(CourseEnrollment.is_enrolled(user, self.team_protected_1.course_id))
 
     @ddt.data(
         ('user_audit', 3),
@@ -354,7 +367,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
                 COURSE_KEY1
             )
         except ValueError:
-            assert not CourseEnrollment.is_enrolled(user, COURSE_KEY1)
+            self.assertFalse(CourseEnrollment.is_enrolled(user, COURSE_KEY1))
             return
         teams_query_set = teams_api.get_teams_accessible_by_user(
             user,
@@ -362,7 +375,10 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             COURSE_KEY1,
             organization_protection_status
         )
-        assert expected_count == teams_query_set.count()
+        self.assertEqual(
+            expected_count,
+            teams_query_set.count()
+        )
 
     @ddt.data(
         ('user_audit', 3),
@@ -379,7 +395,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
                 COURSE_KEY1
             )
         except ValueError:
-            assert not CourseEnrollment.is_enrolled(user, COURSE_KEY1)
+            self.assertFalse(CourseEnrollment.is_enrolled(user, COURSE_KEY1))
             return
         topic = {
             'id': self.topic_id
@@ -390,4 +406,7 @@ class TeamAccessTests(SharedModuleStoreTestCase):
             COURSE_KEY1,
             organization_protection_status
         )
-        assert expected_team_count == topic.get('team_count')
+        self.assertEqual(
+            expected_team_count,
+            topic.get('team_count')
+        )

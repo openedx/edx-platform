@@ -21,7 +21,9 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
         details = lti.get_user_details({LTI_PARAMS_KEY: {
             'lis_person_name_full': 'Full name'
         }})
-        assert details == {'fullname': 'Full name'}
+        self.assertEqual(details, {
+            'fullname': 'Full name'
+        })
 
     def test_get_user_details_extra_keys(self):
         lti = LTIAuthBackend()
@@ -32,8 +34,12 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             'email': 'user@example.com',
             'other': 'something else'
         }})
-        assert details == {'fullname': 'Full name', 'first_name': 'Given',
-                           'last_name': 'Family', 'email': 'user@example.com'}
+        self.assertEqual(details, {
+            'fullname': 'Full name',
+            'first_name': 'Given',
+            'last_name': 'Family',
+            'email': 'user@example.com'
+        })
 
     def test_get_user_id(self):
         lti = LTIAuthBackend()
@@ -41,7 +47,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             'oauth_consumer_key': 'consumer',
             'user_id': 'user'
         }})
-        assert user_id == 'consumer:user'
+        self.assertEqual(user_id, 'consumer:user')
 
     def test_validate_lti_valid_request(self):
         request = Request(
@@ -54,7 +60,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert parameters
+        self.assertTrue(parameters)
         self.assertDictContainsSubset({
             'custom_extra': 'parameter',
             'user_id': '292832126'
@@ -71,7 +77,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert parameters
+        self.assertTrue(parameters)
         self.assertDictContainsSubset({
             'custom_extra': 'parameter',
             'user_id': '292832126'
@@ -88,7 +94,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert not parameters
+        self.assertFalse(parameters)
 
     def test_validate_lti_invalid_signature(self):
         request = Request(
@@ -101,7 +107,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert not parameters
+        self.assertFalse(parameters)
 
     def test_validate_lti_cannot_add_get_params(self):
         request = Request(
@@ -114,7 +120,7 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert not parameters
+        self.assertFalse(parameters)
 
     def test_validate_lti_garbage(self):
         request = Request(
@@ -127,4 +133,4 @@ class UnitTestLTI(unittest.TestCase, ThirdPartyAuthTestMixin):
             lti_consumer_valid=True, lti_consumer_secret='secret',
             lti_max_timestamp_age=10
         )
-        assert not parameters
+        self.assertFalse(parameters)

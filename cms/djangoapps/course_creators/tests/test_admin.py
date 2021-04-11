@@ -3,13 +3,13 @@ Tests course_creators.admin.py.
 """
 
 
-from unittest import mock
-
+import mock
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
+from six.moves import range
 
 from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
@@ -29,7 +29,7 @@ class CourseCreatorAdminTest(TestCase):
 
     def setUp(self):
         """ Test case setup """
-        super().setUp()
+        super(CourseCreatorAdminTest, self).setUp()
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
         self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()
@@ -113,7 +113,7 @@ class CourseCreatorAdminTest(TestCase):
             # message sent. Admin message will follow.
             base_num_emails = 1 if expect_sent_to_user else 0
             if expect_sent_to_admin:
-                context = {'user_name': 'test_user', 'user_email': 'test_user+courses@edx.org'}
+                context = {'user_name': u'test_user', 'user_email': u'test_user+courses@edx.org'}
 
                 self.assertEqual(base_num_emails + 1, len(mail.outbox), 'Expected admin message to be sent')
                 sent_mail = mail.outbox[base_num_emails]

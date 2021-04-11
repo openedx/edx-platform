@@ -3,19 +3,19 @@ Milestone related tests for the mobile_api
 """
 
 
-from unittest.mock import patch
-
+import six
 from crum import set_current_request
 from django.conf import settings
+from mock import patch
 
-from common.djangoapps.util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from lms.djangoapps.courseware.access_response import MilestoneAccessError
 from lms.djangoapps.courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
+from common.djangoapps.util.milestones_helpers import add_prerequisite_course, fulfill_course_milestone
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class MobileAPIMilestonesMixin:
+class MobileAPIMilestonesMixin(object):
     """
     Tests the Mobile API decorators for milestones.
 
@@ -114,7 +114,7 @@ class MobileAPIMilestonesMixin:
             add_entrance_exam_milestone(self.course, self.entrance_exam)
 
             self.course.entrance_exam_minimum_score_pct = 0.50
-            self.course.entrance_exam_id = str(self.entrance_exam.location)
+            self.course.entrance_exam_id = six.text_type(self.entrance_exam.location)
             self.store.update_item(self.course, self.user.id)
 
     def _add_prerequisite_course(self):
@@ -141,4 +141,4 @@ class MobileAPIMilestonesMixin:
             self.api_response()
         else:
             response = self.api_response(expected_response_code=404)
-            assert response.data == MilestoneAccessError().to_json()
+            self.assertEqual(response.data, MilestoneAccessError().to_json())

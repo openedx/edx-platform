@@ -4,7 +4,7 @@ new Show Answer values that remove the Past Due check (keeping the rest intact)
 """
 
 
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.conf import settings
 
 from common.lib.xmodule.xmodule.capa_base import SHOWANSWER
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider

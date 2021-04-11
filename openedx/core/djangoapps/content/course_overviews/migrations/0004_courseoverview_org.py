@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
@@ -11,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseoverview',
             name='org',
-            field=models.TextField(default='outdated_entry', max_length=255),
+            field=models.TextField(default=u'outdated_entry', max_length=255),
         ),
     ]

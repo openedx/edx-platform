@@ -4,10 +4,10 @@
 import copy
 import logging
 
-from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Q
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.utils import badges_enabled
@@ -15,7 +15,6 @@ from lms.djangoapps.certificates.api import regenerate_user_certificates
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
-User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -65,29 +64,29 @@ class Command(BaseCommand):
             cleaned_options['username'] = '<USERNAME>'
         LOGGER.info(
             (
-                "Starting to create tasks to regenerate certificates "
-                "with arguments %s and options %s"
+                u"Starting to create tasks to regenerate certificates "
+                u"with arguments %s and options %s"
             ),
-            str(args),
-            str(cleaned_options)
+            text_type(args),
+            text_type(cleaned_options)
         )
 
         # try to parse out the course from the serialized form
         course_id = CourseKey.from_string(options['course'])
         user = options['username']
 
-        kwargs = (Q(username=user) | Q(email=user)) & Q(courseenrollment__course_id=course_id)
-        student = User.objects.filter(kwargs).first()
-        if not student:
-            raise CommandError(f"User {user} does not exist.")
+        if '@' in user:
+            student = User.objects.get(email=user, courseenrollment__course_id=course_id)
+        else:
+            student = User.objects.get(username=user, courseenrollment__course_id=course_id)
 
         course = modulestore().get_course(course_id, depth=2)
 
         if not options['noop']:
             LOGGER.info(
                 (
-                    "Adding task to the XQueue to generate a certificate "
-                    "for student %s in course '%s'."
+                    u"Adding task to the XQueue to generate a certificate "
+                    u"for student %s in course '%s'."
                 ),
                 student.id,
                 course_id
@@ -99,10 +98,10 @@ class Command(BaseCommand):
 
                 if badge:
                     badge.delete()
-                    LOGGER.info("Cleared badge for student %s.", student.id)
+                    LOGGER.info(u"Cleared badge for student %s.", student.id)
 
             # Add the certificate request to the queue
-            regenerate_user_certificates(
+            ret = regenerate_user_certificates(
                 student, course_id, course=course,
                 forced_grade=options['grade_value'],
                 template_file=options['template_file'],
@@ -111,29 +110,31 @@ class Command(BaseCommand):
 
             LOGGER.info(
                 (
-                    "Added a certificate regeneration task to the XQueue "
-                    "for student %s in course '%s'."
+                    u"Added a certificate regeneration task to the XQueue "
+                    u"for student %s in course '%s'. "
+                    u"The new certificate status is '%s'."
                 ),
                 student.id,
-                str(course_id)
+                text_type(course_id),
+                ret
             )
 
         else:
             LOGGER.info(
                 (
-                    "Skipping certificate generation for "
-                    "student %s in course '%s' "
-                    "because the noop flag is set."
+                    u"Skipping certificate generation for "
+                    u"student %s in course '%s' "
+                    u"because the noop flag is set."
                 ),
                 student.id,
-                str(course_id)
+                text_type(course_id)
             )
 
         LOGGER.info(
             (
-                "Finished regenerating certificates command for "
-                "user %s and course '%s'."
+                u"Finished regenerating certificates command for "
+                u"user %s and course '%s'."
             ),
             student.id,
-            str(course_id)
+            text_type(course_id)
         )

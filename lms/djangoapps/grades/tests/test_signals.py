@@ -5,12 +5,11 @@ Tests for the score change signals defined in the courseware models module.
 
 import re
 from datetime import datetime
-from unittest.mock import MagicMock, patch
 
 import ddt
-import pytest
 import pytz
 from django.test import TestCase
+from mock import MagicMock, patch
 from submissions.models import score_reset, score_set
 
 from common.djangoapps.util.date_utils import to_timestamp
@@ -24,7 +23,7 @@ from ..signals.handlers import (
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
-UUID_REGEX = re.compile('{hex}{{8}}-{hex}{{4}}-{hex}{{4}}-{hex}{{4}}-{hex}{{12}}'.format(hex='[0-9a-f]'))
+UUID_REGEX = re.compile(u'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
 
 FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
 FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
@@ -104,7 +103,7 @@ class ScoreChangedSignalRelayTest(TestCase):
         """
         Configure mocks for all the dependencies of the render method
         """
-        super().setUp()
+        super(ScoreChangedSignalRelayTest, self).setUp()
         self.signal_mock = self.setup_patch(
             'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send',
             None,
@@ -185,7 +184,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             local_kwargs = SUBMISSION_KWARGS[kwargs].copy()
             del local_kwargs[missing]
 
-            with pytest.raises(KeyError):
+            with self.assertRaises(KeyError):
                 handler(None, **local_kwargs)
             self.signal_mock.assert_not_called()
 
@@ -256,6 +255,6 @@ class ScoreChangedSignalRelayTest(TestCase):
         """
         Tests that the disconnect context manager errors when given an invalid signal.
         """
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             with disconnect_submissions_signal_receiver(PROBLEM_RAW_SCORE_CHANGED):
                 pass

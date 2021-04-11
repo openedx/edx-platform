@@ -2,16 +2,15 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
-from unittest.mock import patch
-
 import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
+from mock import patch
+from six import text_type
+
 from edx_proctoring.api import create_exam
 from edx_proctoring.backends.tests.test_backend import TestBackendProvider
-from edx_toggles.toggles.testutils import override_waffle_flag
-
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -27,12 +26,12 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
-        button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'  # lint-amnesty, pylint: disable=line-too-long
+        super(TestProctoringDashboardViews, cls).setUpClass()
+        button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'
         cls.proctoring_link = button
 
     def setUp(self):
-        super().setUp()
+        super(TestProctoringDashboardViews, self).setUp()
 
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -42,13 +41,13 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         """
         Create URL for instructor dashboard
         """
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': str(course.id)})  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})
 
     def setup_course(self, enable_proctored_exams, enable_timed_exams):
         """
         Create course based on proctored exams and timed exams values
         """
-        self.course = CourseFactory.create(enable_proctored_exams=enable_proctored_exams,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(enable_proctored_exams=enable_proctored_exams,
                                            enable_timed_exams=enable_timed_exams)
         self.setup_course_url(self.course)
 

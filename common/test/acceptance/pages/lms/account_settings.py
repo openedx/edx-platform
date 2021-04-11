@@ -63,7 +63,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         """
         Switch between the different account settings tabs.
         """
-        self.q(css=f'#{tab_id}').click()
+        self.q(css='#{}'.format(tab_id)).click()
 
     @property
     def is_order_history_tab_visible(self):
@@ -72,14 +72,14 @@ class AccountSettingsPage(FieldsMixin, PageObject):
 
     def get_value_of_order_history_row_item(self, field_id, field_name):
         """ Return the text value of the provided order field name."""
-        query = self.q(css=f'.u-field-{field_id} .u-field-order-{field_name}')
+        query = self.q(css=u'.u-field-{} .u-field-order-{}'.format(field_id, field_name))
         return query.text if query.present else None
 
     def order_button_is_visible(self, field_id):
         """ Check that if hovering over the order history row shows the
         order detail link or not.
         """
-        return self.q(css='.u-field-{} .u-field-{}'.format(field_id, 'link')).visible
+        return self.q(css=u'.u-field-{} .u-field-{}'.format(field_id, 'link')).visible
 
     @property
     def is_delete_button_visible(self):

@@ -3,6 +3,7 @@ Subclass of oauthlib's RequestValidator that checks an OAuth signature.
 """
 
 
+import six
 from oauthlib.oauth1 import RequestValidator, SignatureOnlyEndpoint
 
 
@@ -17,7 +18,7 @@ class SignatureValidator(RequestValidator):
     """
 
     def __init__(self, lti_consumer):
-        super().__init__()
+        super(SignatureValidator, self).__init__()
         self.endpoint = SignatureOnlyEndpoint(self)
         self.lti_consumer = lti_consumer
 
@@ -30,7 +31,7 @@ class SignatureValidator(RequestValidator):
     # on the platform.
     enforce_ssl = False
 
-    def check_client_key(self, key):  # lint-amnesty, pylint: disable=arguments-differ
+    def check_client_key(self, key):
         """
         Verify that the key supplied by the LTI consumer is valid for an LTI
         launch. This method is only concerned with the structure of the key;
@@ -98,7 +99,7 @@ class SignatureValidator(RequestValidator):
         :return: True if the signature matches, False if it does not.
         """
 
-        method = str(request.method)
+        method = six.text_type(request.method)
         url = request.build_absolute_uri()
         body = request.body
 
@@ -140,13 +141,13 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_access_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    def dummy_access_token(self):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def dummy_client(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    def dummy_client(self):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -171,7 +172,7 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def dummy_request_token(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    def dummy_request_token(self):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """

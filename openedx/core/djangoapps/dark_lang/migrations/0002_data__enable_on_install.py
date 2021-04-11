@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 # Converted from the original South migration 0002_enable_on_install.py
 #
 from django.db import migrations, models

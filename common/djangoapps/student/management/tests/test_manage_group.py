@@ -4,9 +4,8 @@ Unit tests for user_management management commands.
 
 
 import sys
-import pytest
-import ddt
 
+import ddt
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import CommandError, call_command
@@ -59,13 +58,16 @@ class TestManageGroupCommand(TestCase):
         """
         DRY helper.
         """
-        assert set(group_names) == {g.name for g in Group.objects.all()}
+        self.assertEqual(set(group_names), {g.name for g in Group.objects.all()})
 
     def check_permissions(self, group_name, permission_codenames):
         """
         DRY helper.
         """
-        assert set(permission_codenames) == {p.codename for p in Group.objects.get(name=group_name).permissions.all()}
+        self.assertEqual(
+            set(permission_codenames),
+            {p.codename for p in Group.objects.get(name=group_name).permissions.all()}
+        )
 
     @ddt.data(
         *(
@@ -87,9 +89,9 @@ class TestManageGroupCommand(TestCase):
         """
         self.set_group_permissions(initial_group_permissions)
 
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', *command_args)
-        assert exception_message in str(exc_context.value).lower()
+        self.assertIn(exception_message, str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
     @ddt.data(*TEST_DATA)
@@ -101,35 +103,35 @@ class TestManageGroupCommand(TestCase):
         self.set_group_permissions(initial_group_permissions)
 
         # not parseable
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', TEST_GROUP, '--permissions', 'fail')
-        assert 'invalid permission option' in str(exc_context.value).lower()
+        self.assertIn('invalid permission option', str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
         # not parseable
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', TEST_GROUP, '--permissions', 'f:a:i:l')
-        assert 'invalid permission option' in str(exc_context.value).lower()
+        self.assertIn('invalid permission option', str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
         # invalid app label
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', TEST_GROUP, '--permissions', 'nonexistent-label:dummy-model:dummy-perm')
-        assert 'no installed app' in str(exc_context.value).lower()
-        assert 'nonexistent-label' in str(exc_context.value).lower()
+        self.assertIn('no installed app', str(exc_context.exception).lower())
+        self.assertIn('nonexistent-label', str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
         # invalid model name
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', TEST_GROUP, '--permissions', 'auth:nonexistent-model:dummy-perm')
-        assert 'nonexistent-model' in str(exc_context.value).lower()
+        self.assertIn('nonexistent-model', str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
         # invalid model name
-        with pytest.raises(CommandError) as exc_context:
+        with self.assertRaises(CommandError) as exc_context:
             call_command('manage_group', TEST_GROUP, '--permissions', 'auth:Group:nonexistent-perm')
-        assert 'invalid permission codename' in str(exc_context.value).lower()
-        assert 'nonexistent-perm' in str(exc_context.value).lower()
+        self.assertIn('invalid permission codename', str(exc_context.exception).lower())
+        self.assertIn('nonexistent-perm', str(exc_context.exception).lower())
         self.check_group_permissions(initial_group_permissions)
 
     def test_group(self):

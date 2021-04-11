@@ -4,9 +4,10 @@ Tests for contentstore.views.preview.py
 
 
 import re
-from unittest import mock
 
 import ddt
+import mock
+import six
 from django.test.client import Client, RequestFactory
 from xblock.core import XBlock, XBlockAside
 
@@ -60,11 +61,11 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
 
         # Verify student view html is returned, and the usage ID is as expected.
         html_pattern = re.escape(
-            str(course.id.make_usage_key('html', 'replaceme'))
+            six.text_type(course.id.make_usage_key('html', 'replaceme'))
         ).replace('replaceme', r'html_[0-9]*')
         self.assertRegex(
             html,
-            f'data-usage-id="{html_pattern}"'
+            'data-usage-id="{}"'.format(html_pattern)
         )
         self.assertRegex(html, '<html>foobar</html>')
         self.assertRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
@@ -109,10 +110,10 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertNotRegex(html, r"data-block-type=[\"\']test_aside[\"\']")
         self.assertNotRegex(html, "Aside rendered")
 
-    @mock.patch('xmodule.conditional_module.ConditionalBlock.is_condition_satisfied')
+    @mock.patch('xmodule.conditional_module.ConditionalModule.is_condition_satisfied')
     def test_preview_conditional_module_children_context(self, mock_is_condition_satisfied):
         """
-        Tests that when empty context is pass to children of ConditionalBlock it will not raise KeyError.
+        Testst that when empty context is pass to children of ConditionalModule it will not raise KeyError.
         """
         mock_is_condition_satisfied.return_value = True
         client = Client()
@@ -173,7 +174,7 @@ class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @ddt.ddt
@@ -185,7 +186,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Set up the user and request that will be used.
         """
-        super().setUp()
+        super(StudioXBlockServiceBindingTest, self).setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.request = mock.Mock()

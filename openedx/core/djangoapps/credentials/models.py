@@ -3,17 +3,15 @@ Models for credentials support for the LMS and Studio.
 """
 
 
-from urllib.parse import urljoin  # pylint: disable=import-error
-
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from six.moves.urllib.parse import urljoin  # pylint: disable=import-error
 
 from openedx.core.djangoapps.site_configuration import helpers
-
-from .helpers import is_learner_records_enabled
 
 API_VERSION = 'v2'
 
@@ -27,7 +25,7 @@ class CredentialsApiConfig(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta:
+    class Meta(object):
         app_label = 'credentials'
 
     OAUTH2_CLIENT_NAME = 'credentials'
@@ -36,11 +34,11 @@ class CredentialsApiConfig(ConfigurationModel):
 
     internal_service_url = models.URLField(
         verbose_name=_('Internal Service URL'),
-        help_text='DEPRECATED: Use the setting CREDENTIALS_INTERNAL_SERVICE_URL.'
+        help_text=u'DEPRECATED: Use the setting CREDENTIALS_INTERNAL_SERVICE_URL.'
     )
     public_service_url = models.URLField(
         verbose_name=_('Public Service URL'),
-        help_text='DEPRECATED: Use the setting CREDENTIALS_PUBLIC_SERVICE_URL.'
+        help_text=u'DEPRECATED: Use the setting CREDENTIALS_PUBLIC_SERVICE_URL.'
     )
 
     enable_learner_issuance = models.BooleanField(
@@ -74,7 +72,7 @@ class CredentialsApiConfig(ConfigurationModel):
         Internally-accessible API URL root, looked up based on the current request.
         """
         root = helpers.get_value('CREDENTIALS_INTERNAL_SERVICE_URL', settings.CREDENTIALS_INTERNAL_SERVICE_URL)
-        return urljoin(root, f'/api/{API_VERSION}/')
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @staticmethod
     def get_internal_api_url_for_org(org):
@@ -83,7 +81,7 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         root = helpers.get_value_for_org(org, 'CREDENTIALS_INTERNAL_SERVICE_URL',
                                          settings.CREDENTIALS_INTERNAL_SERVICE_URL)
-        return urljoin(root, f'/api/{API_VERSION}/')
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @property
     def public_api_url(self):
@@ -91,7 +89,7 @@ class CredentialsApiConfig(ConfigurationModel):
         Publicly-accessible API URL root.
         """
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
-        return urljoin(root, f'/api/{API_VERSION}/')
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @property
     def public_records_url(self):
@@ -99,7 +97,7 @@ class CredentialsApiConfig(ConfigurationModel):
         Publicly-accessible Records URL root.
         """
         # Not every site wants the Learner Records feature, so we allow opting out.
-        if not is_learner_records_enabled():
+        if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
             return None
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/records/')
@@ -125,7 +123,7 @@ class NotifyCredentialsConfig(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta:
+    class Meta(object):
         app_label = 'credentials'
         verbose_name = 'notify_credentials argument'
 
@@ -136,4 +134,4 @@ class NotifyCredentialsConfig(ConfigurationModel):
     )
 
     def __str__(self):
-        return str(self.arguments)
+        return six.text_type(self.arguments)

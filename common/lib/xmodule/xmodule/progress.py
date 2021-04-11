@@ -9,7 +9,7 @@ frac() and __str__().
 import numbers
 
 
-class Progress:  # pylint: disable=eq-without-hash
+class Progress(object):
     '''Represents a progress of a/b (a out of b done)
 
     a and b must be numeric, but not necessarily integer, with
@@ -29,7 +29,7 @@ class Progress:  # pylint: disable=eq-without-hash
         # Want to do all checking at construction time, so explicitly check types
         if not (isinstance(a, numbers.Number) and
                 isinstance(b, numbers.Number)):
-            raise TypeError(f'a and b must be numbers.  Passed {a}/{b}')
+            raise TypeError('a and b must be numbers.  Passed {0}/{1}'.format(a, b))
 
         if a > b:
             a = b
@@ -38,7 +38,7 @@ class Progress:  # pylint: disable=eq-without-hash
             a = 0
 
         if b <= 0:
-            raise ValueError(f'fraction a/b = {a}/{b} must have b > 0')
+            raise ValueError('fraction a/b = {0}/{1} must have b > 0'.format(a, b))
 
         self._a = a
         self._b = b
@@ -71,7 +71,7 @@ class Progress:  # pylint: disable=eq-without-hash
         checking is done at construction time.
         '''
         (a, b) = self.frac()
-        return a > 0 and a < b  # lint-amnesty, pylint: disable=chained-comparison
+        return a > 0 and a < b
 
     def done(self):
         ''' Return True if this represents done.
@@ -116,8 +116,8 @@ class Progress:  # pylint: disable=eq-without-hash
 
         '''
         (a, b) = self.frac()
-        display = lambda n: f'{n:.2f}'.rstrip('0').rstrip('.')
-        return "{}/{}".format(display(a), display(b))
+        display = lambda n: '{:.2f}'.format(n).rstrip('0').rstrip('.')
+        return "{0}/{1}".format(display(a), display(b))
 
     @staticmethod
     def add_counts(a, b):

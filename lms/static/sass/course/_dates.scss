@@ -40,7 +40,7 @@
       background-color: #f5f5f5;
 
       &.past-due {
-        background-color: #475b65;
+        background-color: #d1d2d4;
       }
     }
 
@@ -147,12 +147,13 @@
     padding: 2px 8px;
     border-radius: 5px;
     margin-left: 8px;
-    font-weight: normal;
+    font-style: italic;
+    font-weight: bold;
     vertical-align: top;
 
     &.completed {
-      background-color: #f0f2f2;
-      color: #212529;
+      background-color: #f3f3f4;
+      color: #2d323e;
     }
 
     &.due-next {
@@ -169,8 +170,7 @@
     }
 
     &.past-due {
-      background-color: #475b65;
-      color: #fff;
+      background-color: #d1d2d4;
     }
 
     &.today {

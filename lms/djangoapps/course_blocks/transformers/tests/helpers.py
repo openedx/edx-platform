@@ -3,13 +3,15 @@ Test helpers for testing course block transformers.
 """
 
 
-from unittest.mock import patch
+import six
+from six.moves import range
+from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.content.block_structure.tests.helpers import clear_registered_transformers_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -18,13 +20,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ...api import get_course_blocks
 
 
-class TransformerRegistryTestMixin:
+class TransformerRegistryTestMixin(object):
     """
     Mixin that overrides the TransformerRegistry so that it returns
     TRANSFORMER_CLASS_TO_TEST as a registered transformer.
     """
     def setUp(self):
-        super().setUp()
+        super(TransformerRegistryTestMixin, self).setUp()
         self.patcher = patch(
             'openedx.core.djangoapps.content.block_structure.transformer_registry.'
             'TransformerRegistry.get_registered_transformers'
@@ -46,7 +48,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         """
         Create users.
         """
-        super().setUp()
+        super(CourseStructureTestCase, self).setUp()
         # Set up users.
         self.password = 'test'
         self.user = UserFactory.create(password=self.password)
@@ -58,7 +60,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         course structures for the given block type and block reference
         string.
         """
-        return f'{block_type}_{block_ref}'
+        return '{}_{}'.format(block_type, block_ref)
 
     def build_xblock(self, block_hierarchy, block_map, parent):
         """
@@ -75,7 +77,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         block_type = block_hierarchy['#type']
         block_ref = block_hierarchy['#ref']
         factory = (CourseFactory if block_type == 'course' else ItemFactory)
-        kwargs = {key: value for key, value in block_hierarchy.items() if key[0] != '#'}
+        kwargs = {key: value for key, value in six.iteritems(block_hierarchy) if key[0] != '#'}
 
         if block_type != 'course':
             kwargs['category'] = block_type
@@ -197,7 +199,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         Returns: set[UsageKey]
         """
         xblocks = (blocks[ref] for ref in refs)
-        return {xblock.location for xblock in xblocks}  # lint-amnesty, pylint: disable=consider-using-set-comprehension
+        return set([xblock.location for xblock in xblocks])
 
 
 class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase):
@@ -219,7 +221,7 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
     parents_map = [[], [0], [0], [1], [1], [2], [2, 4]]
 
     def setUp(self):
-        super().setUp()
+        super(BlockParentsMapTestCase, self).setUp()
 
         # create the course
         self.course = CourseFactory.create()
@@ -322,21 +324,33 @@ class BlockParentsMapTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             block_structure_result = xblock_key in block_structure
 
             # compare with expected value
-            assert block_structure_result == (i in expected_accessible_blocks), \
-                f'block_structure return value {block_structure_result} not equal to expected value for block' \
-                f' {i} for user {user.username}'
+            self.assertEqual(
+                block_structure_result,
+                i in expected_accessible_blocks,
+                u"block_structure return value {0} not equal to expected value for block {1} for user {2}".format(
+                    block_structure_result, i, user.username
+                )
+            )
 
             if blocks_with_differing_access:
                 # compare with has_access_result
                 has_access_result = bool(has_access(user, 'load', self.get_block(i), course_key=self.course.id))
                 if i in blocks_with_differing_access:
-                    assert block_structure_result != has_access_result, \
-                        f'block structure ({block_structure_result}) & has_access ({has_access_result})' \
-                        f' results are equal for block {i} for user {user.username}'
+                    self.assertNotEqual(
+                        block_structure_result,
+                        has_access_result,
+                        u"block structure ({0}) & has_access ({1}) results are equal for block {2} for user {3}".format(
+                            block_structure_result, has_access_result, i, user.username
+                        )
+                    )
                 else:
-                    assert block_structure_result == has_access_result, \
-                        f'block structure ({block_structure_result}) & has_access ({has_access_result})' \
-                        f' results not equal for block {i} for user {user.username}'
+                    self.assertEqual(
+                        block_structure_result,
+                        has_access_result,
+                        u"block structure ({0}) & has_access ({1}) results not equal for block {2} for user {3}".format(
+                            block_structure_result, has_access_result, i, user.username
+                        )
+                    )
 
         self.client.logout()
 

@@ -1,10 +1,9 @@
-# lint-amnesty, pylint: disable=django-not-configured
+# -*- coding: utf-8 -*-
 """Tests for course home page date summary blocks."""
 
 
 from datetime import datetime, timedelta
 
-from unittest.mock import patch
 import crum
 import ddt
 import waffle
@@ -12,11 +11,12 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from mock import patch
 from pytz import utc
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
+from freezegun import freeze_time
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_DATES_TAB
 from lms.djangoapps.courseware.courses import get_course_date_blocks
@@ -37,11 +37,11 @@ from lms.djangoapps.courseware.models import (
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.signals import CREATE_SCHEDULE_WAFFLE_FLAG
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory  # pylint: disable=unused-import
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
@@ -52,17 +52,16 @@ from openedx.features.course_experience import (
 )
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
 class CourseDateSummaryTest(SharedModuleStoreTestCase):
     """Tests for course date summary blocks."""
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
-        super().setUp()
+        super(CourseDateSummaryTest, self).setUp()
         SelfPacedConfiguration.objects.create(enable_course_home_improvements=True)
 
     def make_request(self, user):
@@ -88,14 +87,14 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course = create_course_run()
         url = reverse('openedx.course_experience.course_home', args=(course.id,))
         response = self.client.get(url)
-        assert 200 == response.status_code
+        self.assertEqual(200, response.status_code)
 
     # Tests for which blocks are enabled
     def assert_block_types(self, course, user, expected_blocks):
         """Assert that the enabled block types for this course are as expected."""
         blocks = get_course_date_blocks(course, user)
-        assert len(blocks) == len(expected_blocks)
-        assert {type(b) for b in blocks} == set(expected_blocks)
+        self.assertEqual(len(blocks), len(expected_blocks))
+        self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
 
     @ddt.data(
         # Verified enrollment with no photo-verification before course start
@@ -240,24 +239,22 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             TodaysDate, CourseAssignmentDate, CourseAssignmentDate, CourseEndDate, VerificationDeadlineDate
         )
         blocks = get_course_date_blocks(course, user, request, num_assignments=2)
-        assert len(blocks) == len(expected_blocks)
-        assert {type(b) for b in blocks} == set(expected_blocks)
-        assignment_blocks = filter(  # pylint: disable=filter-builtin-not-iterating
-            lambda b: isinstance(b, CourseAssignmentDate), blocks
-        )
+        self.assertEqual(len(blocks), len(expected_blocks))
+        self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+        assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
         for assignment in assignment_blocks:
             assignment_title = str(assignment.title_html) or str(assignment.title)
-            assert assignment_title != 'Third nearest assignment'
-            assert assignment_title != 'Past due date'
-            assert assignment_title != 'Not returned since we do not get non-graded subsections'
+            self.assertNotEqual(assignment_title, 'Third nearest assignment')
+            self.assertNotEqual(assignment_title, 'Past due date')
+            self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
             # checking if it is _in_ the title instead of being the title since released assignments
             # are actually links. Unreleased assignments are just the string of the title.
             if 'Released' in assignment_title:
                 for html_tag in assignment_title_html:
-                    assert html_tag in assignment_title
+                    self.assertIn(html_tag, assignment_title)
             elif assignment_title == 'Not released':
                 for html_tag in assignment_title_html:
-                    assert html_tag not in assignment_title
+                    self.assertNotIn(html_tag, assignment_title)
 
         # No restrictions on number of assignments to return
         expected_blocks = (
@@ -266,48 +263,46 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             VerificationDeadlineDate
         )
         blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
-        assert len(blocks) == len(expected_blocks)
-        assert {type(b) for b in blocks} == set(expected_blocks)
-        assignment_blocks = filter(  # pylint: disable=filter-builtin-not-iterating
-            lambda b: isinstance(b, CourseAssignmentDate), blocks
-        )
+        self.assertEqual(len(blocks), len(expected_blocks))
+        self.assertEqual(set(type(b) for b in blocks), set(expected_blocks))
+        assignment_blocks = filter(lambda b: isinstance(b, CourseAssignmentDate), blocks)
         for assignment in assignment_blocks:
             assignment_title = str(assignment.title_html) or str(assignment.title)
-            assert assignment_title != 'Not returned since we do not get non-graded subsections'
+            self.assertNotEqual(assignment_title, 'Not returned since we do not get non-graded subsections')
 
             assignment_type = str(assignment.assignment_type)
             # checking if it is _in_ the title instead of being the title since released assignments
             # are actually links. Unreleased assignments are just the string of the title.
             # also checking that the assignment type is returned for graded subsections
             if 'Released' in assignment_title:
-                assert assignment_type == 'Homework'
+                self.assertEqual(assignment_type, 'Homework')
                 for html_tag in assignment_title_html:
-                    assert html_tag in assignment_title
+                    self.assertIn(html_tag, assignment_title)
             elif assignment_title == 'Not released':
-                assert assignment_type == 'Homework'
+                self.assertEqual(assignment_type, 'Homework')
                 for html_tag in assignment_title_html:
-                    assert html_tag not in assignment_title
+                    self.assertNotIn(html_tag, assignment_title)
             elif assignment_title == 'Third nearest assignment':
-                assert assignment_type == 'Exam'
+                self.assertEqual(assignment_type, 'Exam')
                 # It's still not released
                 for html_tag in assignment_title_html:
-                    assert html_tag not in assignment_title
+                    self.assertNotIn(html_tag, assignment_title)
             elif 'Past due date' in assignment_title:
-                assert now > assignment.date
-                assert assignment_type == 'Exam'
+                self.assertGreater(now, assignment.date)
+                self.assertEqual(assignment_type, 'Exam')
                 for html_tag in assignment_title_html:
-                    assert html_tag in assignment_title
+                    self.assertIn(html_tag, assignment_title)
             elif 'No start date' == assignment_title:
-                assert assignment_type == 'Speech'
+                self.assertEqual(assignment_type, 'Speech')
                 # Can't determine if it is released so it does not get a link
                 for html_tag in assignment_title_html:
-                    assert html_tag not in assignment_title
+                    self.assertNotIn(html_tag, assignment_title)
             # This is the item with no display name where we set one ourselves.
             elif 'Assignment' in assignment_title:
-                assert assignment_type is None
+                self.assertEqual(assignment_type, None)
                 # Can't determine if it is released so it does not get a link
                 for html_tag in assignment_title_html:
-                    assert html_tag in assignment_title
+                    self.assertIn(html_tag, assignment_title)
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @ddt.data(
@@ -373,7 +368,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             submission_end=(now + timedelta(days=7)).isoformat(),
         )
         blocks = get_course_date_blocks(course, user, request, include_past_dates=True)
-        assert len(blocks) == date_block_count
+        self.assertEqual(len(blocks), date_block_count)
 
     @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_enabled_block_types_with_expired_course(self):
@@ -420,10 +415,10 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             course = create_course_run()
             user = create_user()
             block = TodaysDate(course, user)
-            assert block.is_enabled
-            assert block.is_allowed
-            assert block.date == datetime.now(utc)
-            assert block.title == 'current_datetime'
+            self.assertTrue(block.is_enabled)
+            self.assertTrue(block.is_allowed)
+            self.assertEqual(block.date, datetime.now(utc))
+            self.assertEqual(block.title, 'current_datetime')
 
     @ddt.data(
         'info',
@@ -475,7 +470,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course = create_course_run()
         user = create_user()
         block = CourseStartDate(course, user)
-        assert block.date == course.start
+        self.assertEqual(block.date, course.start)
 
     @ddt.data(
         'info',
@@ -521,24 +516,32 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
-        assert block.description == 'To earn a certificate, you must complete all requirements before this date.'
+        self.assertEqual(
+            block.description,
+            'To earn a certificate, you must complete all requirements before this date.'
+        )
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CourseEndDate(course, user)
-        assert block.description == 'After this date, course content will be archived.'
-        assert block.title == 'Course End'
+        self.assertEqual(
+            block.description,
+            'After this date, course content will be archived.'
+        )
+        self.assertEqual(block.title, 'Course End')
 
     def test_course_end_date_after_course(self):
         course = create_course_run(days_till_start=-2, days_till_end=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
-        assert block.description ==\
-               'This course is archived, which means you can review course content but it is no longer active.'
-        assert block.title == 'Course End'
+        self.assertEqual(
+            block.description,
+            'This course is archived, which means you can review course content but it is no longer active.'
+        )
+        self.assertEqual(block.title, 'Course End')
 
     @ddt.data(
         {'weeks_to_complete': 7},  # Weeks to complete > time til end (end date shown)
@@ -562,11 +565,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         with patch('lms.djangoapps.courseware.date_summary.get_course_run_details') as mock_get_cr_details:
             mock_get_cr_details.return_value = cr_details
             block = CourseEndDate(course, user)
-            assert block.title == 'Course End'
+            self.assertEqual(block.title, 'Course End')
             if cr_details['weeks_to_complete'] > end_timedelta_number:
-                assert block.date == course.end
+                self.assertEqual(block.date, course.end)
             else:
-                assert block.date is None
+                self.assertIsNone(block.date)
 
     def test_ecommerce_checkout_redirect(self):
         """Verify the block link redirects to ecommerce checkout if it's enabled."""
@@ -580,7 +583,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
         block = VerifiedUpgradeDeadlineDate(course, user)
-        assert block.link == f'{configuration.basket_checkout_page}?sku={sku}'
+        self.assertEqual(block.link, '{}?sku={}'.format(configuration.basket_checkout_page, sku))
 
     ## CertificateAvailableDate
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
@@ -589,8 +592,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = CertificateAvailableDate(course, user)
-        assert block.date is None
-        assert not block.is_allowed
+        self.assertEqual(block.date, None)
+        self.assertFalse(block.is_allowed)
 
     ## CertificateAvailableDate
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
@@ -601,8 +604,8 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
         course.save()
         block = CertificateAvailableDate(course, verified_user)
-        assert block.date is not None
-        assert not block.is_allowed
+        self.assertNotEqual(block.date, None)
+        self.assertFalse(block.is_allowed)
 
     def test_no_certificate_available_date_for_audit_course(self):
         """
@@ -616,16 +619,16 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         CourseEnrollmentFactory(course_id=course.id, user=audit_user, mode=CourseMode.AUDIT)
         CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).delete()
         all_course_modes = CourseMode.modes_for_course(course.id)
-        assert len(all_course_modes) == 1
-        assert all_course_modes[0].slug == CourseMode.AUDIT
+        self.assertEqual(len(all_course_modes), 1)
+        self.assertEqual(all_course_modes[0].slug, CourseMode.AUDIT)
 
         course.certificate_available_date = datetime.now(utc) + timedelta(days=7)
         course.save()
 
         # Verify Certificate Available Date is not enabled for learner.
         block = CertificateAvailableDate(course, audit_user)
-        assert not block.is_allowed
-        assert block.date is not None
+        self.assertFalse(block.is_allowed)
+        self.assertNotEqual(block.date, None)
 
     @waffle.testutils.override_switch('certificates.auto_certificate_generation', True)
     def test_certificate_available_date_defined(self):
@@ -641,9 +644,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         ]
         self.assert_block_types(course, verified_user, expected_blocks)
         for block in (CertificateAvailableDate(course, audit_user), CertificateAvailableDate(course, verified_user)):
-            assert course.certificate_available_date is not None
-            assert block.date == course.certificate_available_date
-            assert block.is_allowed
+            self.assertIsNotNone(course.certificate_available_date)
+            self.assertEqual(block.date, course.certificate_available_date)
+            self.assertTrue(block.is_allowed)
 
     ## VerificationDeadlineDate
     def test_no_verification_deadline(self):
@@ -651,15 +654,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = VerificationDeadlineDate(course, user)
-        assert block.date is None
-        assert block.is_allowed
+        self.assertIsNone(block.date)
+        self.assertTrue(block.is_allowed)
 
     def test_no_verified_enrollment(self):
         course = create_course_run(days_till_start=-1)
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.AUDIT)
         block = VerificationDeadlineDate(course, user)
-        assert not block.is_allowed
+        self.assertFalse(block.is_allowed)
 
     def test_verification_deadline_date_upcoming(self):
         with freeze_time('2015-01-02'):
@@ -668,13 +671,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
-            assert block.css_class == 'verification-deadline-upcoming'
-            assert block.title == 'Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=14))
-            assert block.description ==\
-                   'You must successfully complete verification before this date to qualify for a Verified Certificate.'
-            assert block.link_text == 'Verify My Identity'
-            assert block.link == IDVerificationService.get_verify_location(course.id)
+            self.assertEqual(block.css_class, 'verification-deadline-upcoming')
+            self.assertEqual(block.title, 'Verification Deadline')
+            self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
+            self.assertEqual(
+                block.description,
+                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+            )
+            self.assertEqual(block.link_text, 'Verify My Identity')
+            self.assertEqual(block.link, reverse('verify_student_verify_now', args=(course.id,)))
 
     def test_verification_deadline_date_retry(self):
         with freeze_time('2015-01-02'):
@@ -683,13 +688,15 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
-            assert block.css_class == 'verification-deadline-retry'
-            assert block.title == 'Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=14))
-            assert block.description ==\
-                   'You must successfully complete verification before this date to qualify for a Verified Certificate.'
-            assert block.link_text == 'Retry Verification'
-            assert block.link == IDVerificationService.get_verify_location()
+            self.assertEqual(block.css_class, 'verification-deadline-retry')
+            self.assertEqual(block.title, 'Verification Deadline')
+            self.assertEqual(block.date, datetime.now(utc) + timedelta(days=14))
+            self.assertEqual(
+                block.description,
+                'You must successfully complete verification before this date to qualify for a Verified Certificate.'
+            )
+            self.assertEqual(block.link_text, 'Retry Verification')
+            self.assertEqual(block.link, reverse('verify_student_reverify'))
 
     def test_verification_deadline_date_denied(self):
         with freeze_time('2015-01-02'):
@@ -698,16 +705,19 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
-            assert block.css_class == 'verification-deadline-passed'
-            assert block.title == 'Missed Verification Deadline'
-            assert block.date == (datetime.now(utc) + timedelta(days=(- 1)))
-            assert block.description == "Unfortunately you missed this course's deadline for a successful verification."
-            assert block.link_text == 'Learn More'
-            assert block.link == ''
+            self.assertEqual(block.css_class, 'verification-deadline-passed')
+            self.assertEqual(block.title, 'Missed Verification Deadline')
+            self.assertEqual(block.date, datetime.now(utc) + timedelta(days=-1))
+            self.assertEqual(
+                block.description,
+                "Unfortunately you missed this course's deadline for a successful verification."
+            )
+            self.assertEqual(block.link_text, 'Learn More')
+            self.assertEqual(block.link, '')
 
     @ddt.data(
-        (-1, '1 day ago - {date}'),
-        (1, 'in 1 day - {date}')
+        (-1, u'1 day ago - {date}'),
+        (1, u'in 1 day - {date}')
     )
     @ddt.unpack
     def test_render_date_string_past(self, delta, expected_date_string):
@@ -717,7 +727,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
             CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
 
             block = VerificationDeadlineDate(course, user)
-            assert block.relative_datestring == expected_date_string
+            self.assertEqual(block.relative_datestring, expected_date_string)
 
     @ddt.data(
         ('info', True),
@@ -774,7 +784,7 @@ class TestDateAlerts(SharedModuleStoreTestCase):
     Unit tests for date alerts.
     """
     def setUp(self):
-        super().setUp()
+        super(TestDateAlerts, self).setUp()
         with freeze_time('2017-07-01 09:00:00'):
             self.course = create_course_run(days_till_start=0)
             self.course.certificate_available_date = self.course.start + timedelta(days=21)
@@ -786,11 +796,11 @@ class TestDateAlerts(SharedModuleStoreTestCase):
             MessageMiddleware().process_request(self.request)
 
     @ddt.data(
-        ['2017-01-01 09:00:00', 'in 6 months on <span class="date localized-datetime" data-format="shortDate"'],
-        ['2017-06-17 09:00:00', 'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
-        ['2017-06-30 10:00:00', 'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
-        ['2017-07-01 08:00:00', 'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
-        ['2017-07-01 08:55:00', 'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-01-01 09:00:00', u'in 6 months on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-06-17 09:00:00', u'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-06-30 10:00:00', u'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 08:00:00', u'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 08:55:00', u'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
         ['2017-07-01 09:00:00', None],
         ['2017-08-01 09:00:00', None],
     )
@@ -804,17 +814,17 @@ class TestDateAlerts(SharedModuleStoreTestCase):
             block.register_alerts(self.request, self.course)
             messages = list(CourseHomeMessages.user_messages(self.request))
             if expected_message_html:
-                assert len(messages) == 1
-                assert expected_message_html in messages[0].message_html
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
             else:
-                assert len(messages) == 0
+                self.assertEqual(len(messages), 0)
 
     @ddt.data(
         ['2017-06-30 09:00:00', None],
-        ['2017-07-01 09:00:00', 'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
-        ['2017-07-14 10:00:00', 'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
-        ['2017-07-15 08:00:00', 'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
-        ['2017-07-15 08:55:00', 'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-01 09:00:00', u'in 2 weeks on <span class="date localized-datetime" data-format="shortDate"'],
+        ['2017-07-14 10:00:00', u'in 1 day at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-15 08:00:00', u'in 1 hour at <span class="date localized-datetime" data-format="shortTime"'],
+        ['2017-07-15 08:55:00', u'in 5 minutes at <span class="date localized-datetime" data-format="shortTime"'],
         ['2017-07-15 09:00:00', None],
         ['2017-08-15 09:00:00', None],
     )
@@ -828,17 +838,17 @@ class TestDateAlerts(SharedModuleStoreTestCase):
             block.register_alerts(self.request, self.course)
             messages = list(CourseHomeMessages.user_messages(self.request))
             if expected_message_html:
-                assert len(messages) == 1
-                assert expected_message_html in messages[0].message_html
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
             else:
-                assert len(messages) == 0
+                self.assertEqual(len(messages), 0)
 
     @ddt.data(
         ['2017-06-20 09:00:00', None],
-        ['2017-06-21 09:00:00', 'Don&#39;t forget, you have 2 weeks left to upgrade to a Verified Certificate.'],
-        ['2017-07-04 10:00:00', 'Don&#39;t forget, you have 1 day left to upgrade to a Verified Certificate.'],
-        ['2017-07-05 08:00:00', 'Don&#39;t forget, you have 1 hour left to upgrade to a Verified Certificate.'],
-        ['2017-07-05 08:55:00', 'Don&#39;t forget, you have 5 minutes left to upgrade to a Verified Certificate.'],
+        ['2017-06-21 09:00:00', u'Don&#39;t forget, you have 2 weeks left to upgrade to a Verified Certificate.'],
+        ['2017-07-04 10:00:00', u'Don&#39;t forget, you have 1 day left to upgrade to a Verified Certificate.'],
+        ['2017-07-05 08:00:00', u'Don&#39;t forget, you have 1 hour left to upgrade to a Verified Certificate.'],
+        ['2017-07-05 08:55:00', u'Don&#39;t forget, you have 5 minutes left to upgrade to a Verified Certificate.'],
         ['2017-07-05 09:00:00', None],
         ['2017-08-05 09:00:00', None],
     )
@@ -853,16 +863,16 @@ class TestDateAlerts(SharedModuleStoreTestCase):
             block.register_alerts(self.request, self.course)
             messages = list(CourseHomeMessages.user_messages(self.request))
             if expected_message_html:
-                assert len(messages) == 1
-                assert expected_message_html in messages[0].message_html
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
             else:
-                assert len(messages) == 0
+                self.assertEqual(len(messages), 0)
 
     @ddt.data(
         ['2017-07-15 08:00:00', None],
-        ['2017-07-15 09:00:00', 'If you have earned a certificate, you will be able to access it 1 week from now.'],
-        ['2017-07-21 09:00:00', 'If you have earned a certificate, you will be able to access it 1 day from now.'],
-        ['2017-07-22 08:00:00', 'If you have earned a certificate, you will be able to access it 1 hour from now.'],
+        ['2017-07-15 09:00:00', u'If you have earned a certificate, you will be able to access it 1 week from now.'],
+        ['2017-07-21 09:00:00', u'If you have earned a certificate, you will be able to access it 1 day from now.'],
+        ['2017-07-22 08:00:00', u'If you have earned a certificate, you will be able to access it 1 hour from now.'],
         ['2017-07-22 09:00:00', None],
         ['2017-07-23 09:00:00', None],
     )
@@ -877,16 +887,26 @@ class TestDateAlerts(SharedModuleStoreTestCase):
             block.register_alerts(self.request, self.course)
             messages = list(CourseHomeMessages.user_messages(self.request))
             if expected_message_html:
-                assert len(messages) == 1
-                assert expected_message_html in messages[0].message_html
+                self.assertEqual(len(messages), 1)
+                self.assertIn(expected_message_html, messages[0].message_html)
             else:
-                assert len(messages) == 0
+                self.assertEqual(len(messages), 0)
 
 
 @ddt.ddt
 class TestScheduleOverrides(SharedModuleStoreTestCase):
     """ Tests for Schedule Overrides """
 
+    def setUp(self):
+        super(TestScheduleOverrides, self).setUp()
+
+        patcher = patch('openedx.core.djangoapps.schedules.signals.get_current_site')
+        mock_get_current_site = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        mock_get_current_site.return_value = SiteFactory.create()
+
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_before_course_start(self):
         """ Enrolling before a course begins should result in the upgrade deadline being set relative to the
         course start date. """
@@ -896,17 +916,20 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         expected = overview.start + timedelta(days=global_config.deadline_days)
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
         self._check_text(block)
 
     def _check_text(self, upgrade_date_summary):
         """ Validates the text on an upgrade_date_summary """
-        assert upgrade_date_summary.title == 'Upgrade to Verified Certificate'
-        assert upgrade_date_summary.description ==\
-               "Don't miss the opportunity to highlight your new knowledge and skills by earning a verified" \
-               " certificate."
-        assert upgrade_date_summary.relative_datestring == 'by {date}'
+        self.assertEqual(upgrade_date_summary.title, 'Upgrade to Verified Certificate')
+        self.assertEqual(
+            upgrade_date_summary.description,
+            'Don\'t miss the opportunity to highlight your new knowledge and skills by earning a verified'
+            ' certificate.'
+        )
+        self.assertEqual(upgrade_date_summary.relative_datestring, u'by {date}')
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_with_enrollment_after_course_start(self):
         """ Enrolling after a course begins should result in the upgrade deadline being set relative to the
         enrollment date.
@@ -919,7 +942,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=global_config.deadline_days)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
         # Orgs should be able to override the deadline
         org_config = OrgDynamicUpgradeDeadlineConfiguration.objects.create(
@@ -928,7 +951,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=org_config.deadline_days)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
         # Courses should be able to override the deadline (and the org-level override)
         course_config = CourseDynamicUpgradeDeadlineConfiguration.objects.create(
@@ -937,8 +960,9 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = enrollment.created + timedelta(days=course_config.deadline_days)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_self_paced_without_dynamic_upgrade_deadline(self):
         """ Disabling the dynamic upgrade deadline functionality should result in the verified mode's
         expiration date being returned. """
@@ -947,8 +971,9 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_existing_schedule(self):
         """ If a schedule is created while deadlines are disabled, they shouldn't magically appear once the feature is
         turned on. """
@@ -958,18 +983,18 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT)
 
         # The enrollment has a schedule, but the upgrade deadline should be None
-        assert enrollment.schedule.upgrade_deadline is None
+        self.assertIsNone(enrollment.schedule.upgrade_deadline)
 
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
         expected = CourseMode.objects.get(course_id=course.id, mode_slug=CourseMode.VERIFIED).expiration_datetime
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
         # Now if we turn on the feature for this course, this existing enrollment should be unaffected
         course_config.enabled = True
         course_config.save()
 
         block = VerifiedUpgradeDeadlineDate(course, enrollment.user)
-        assert block.date == expected
+        self.assertEqual(block.date, expected)
 
     @ddt.data(
         # (enroll before configs, org enabled, org opt-out, course enabled, course opt-out, expected dynamic deadline)
@@ -1008,6 +1033,7 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         (True, True, True, True, True, False),
     )
     @ddt.unpack
+    @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_date_with_org_and_course_config_overrides(self, enroll_first, org_config_enabled, org_config_opt_out,
                                                        course_config_enabled, course_config_opt_out,
                                                        expected_dynamic_deadline):
@@ -1028,9 +1054,9 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
 
         # The enrollment has a schedule, and the upgrade_deadline is set when expected_dynamic_deadline is True
         if not enroll_first:
-            assert (enrollment.schedule.upgrade_deadline is not None) == expected_dynamic_deadline
+            self.assertEqual(enrollment.schedule.upgrade_deadline is not None, expected_dynamic_deadline)
         # The CourseEnrollment.upgrade_deadline property method is checking the configs
-        assert (enrollment.dynamic_upgrade_deadline is not None) == expected_dynamic_deadline
+        self.assertEqual(enrollment.dynamic_upgrade_deadline is not None, expected_dynamic_deadline)
 
 
 def create_user(verification_status=None):
@@ -1120,10 +1146,10 @@ def enable_course_certificates(course):
     Enable course certificate configuration.
     """
     course.certificates = {
-        'certificates': [{
-            'course_title': 'Test',
-            'name': '',
-            'is_active': True,
+        u'certificates': [{
+            u'course_title': u'Test',
+            u'name': u'',
+            u'is_active': True,
         }]
     }
     course.save()

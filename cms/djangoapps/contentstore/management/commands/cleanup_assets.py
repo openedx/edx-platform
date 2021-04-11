@@ -32,11 +32,11 @@ class Command(BaseCommand):
             # Remove all redundant Mac OS metadata files
             assets_deleted = content_store.remove_redundant_content_for_courses()
             success = True
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-            log.info("=" * 30 + "> failed to cleanup")  # lint-amnesty, pylint: disable=logging-not-lazy
+        except Exception as err:
+            log.info("=" * 30 + u"> failed to cleanup")
             log.info("Error:")
             log.info(err)
 
         if success:
             log.info("=" * 80)
-            log.info(f"Total number of assets deleted: {assets_deleted}")
+            log.info(u"Total number of assets deleted: {0}".format(assets_deleted))

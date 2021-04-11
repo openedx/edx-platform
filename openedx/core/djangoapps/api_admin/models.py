@@ -3,11 +3,10 @@
 
 import logging
 from smtplib import SMTPException
-from urllib.parse import urlunsplit
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.db import models
@@ -19,6 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import python_2_unicode_compatible
 
 from model_utils.models import TimeStampedModel
+from six.moves.urllib.parse import urlunsplit  # pylint: disable=import-error
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -36,9 +36,9 @@ class ApiAccessRequest(TimeStampedModel):
     .. pii_retirement: local_api
     """
 
-    PENDING = 'pending'
-    DENIED = 'denied'
-    APPROVED = 'approved'
+    PENDING = u'pending'
+    DENIED = u'denied'
+    APPROVED = u'approved'
     STATUS_CHOICES = (
         (PENDING, _('Pending')),
         (DENIED, _('Denied')),
@@ -54,8 +54,8 @@ class ApiAccessRequest(TimeStampedModel):
     )
     website = models.URLField(help_text=_('The URL of the website associated with this API user.'))
     reason = models.TextField(help_text=_('The reason this user wants to access the API.'))
-    company_name = models.CharField(max_length=255, default='')
-    company_address = models.CharField(max_length=255, default='')
+    company_name = models.CharField(max_length=255, default=u'')
+    company_address = models.CharField(max_length=255, default=u'')
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
     contacted = models.BooleanField(default=False)
 
@@ -118,18 +118,18 @@ class ApiAccessRequest(TimeStampedModel):
 
     def approve(self):
         """Approve this request."""
-        log.info('Approving API request from user [%s].', self.user.id)
+        log.info(u'Approving API request from user [%s].', self.user.id)
         self.status = self.APPROVED
         self.save()
 
     def deny(self):
         """Deny this request."""
-        log.info('Denying API request from user [%s].', self.user.id)
+        log.info(u'Denying API request from user [%s].', self.user.id)
         self.status = self.DENIED
         self.save()
 
     def __str__(self):
-        return f'ApiAccessRequest {self.website} [{self.status}]'
+        return u'ApiAccessRequest {website} [{status}]'.format(website=self.website, status=self.status)
 
 
 @python_2_unicode_compatible
@@ -141,7 +141,7 @@ class ApiAccessConfig(ConfigurationModel):
     """
 
     def __str__(self):
-        return f'ApiAccessConfig [enabled={self.enabled}]'
+        return 'ApiAccessConfig [enabled={}]'.format(self.enabled)
 
 
 @receiver(post_save, sender=ApiAccessRequest, dispatch_uid="api_access_request_post_save_email")
@@ -178,14 +178,14 @@ def _send_new_pending_email(instance):
     message = render_to_string('api_admin/api_access_request_email_new_request.txt', context)
     try:
         send_mail(
-            _u('API access request from {company}').format(company=instance.company_name),
+            _u(u'API access request from {company}').format(company=instance.company_name),
             message,
             settings.API_ACCESS_FROM_EMAIL,
             [settings.API_ACCESS_MANAGER_EMAIL],
             fail_silently=False
         )
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 def _send_decision_email(instance):
@@ -208,7 +208,7 @@ def _send_decision_email(instance):
     }
 
     message = render_to_string(
-        f'api_admin/api_access_request_email_{instance.status}.txt',
+        'api_admin/api_access_request_email_{status}.txt'.format(status=instance.status),
         context
     )
     try:
@@ -221,7 +221,7 @@ def _send_decision_email(instance):
         )
         instance.contacted = True
     except SMTPException:
-        log.exception('Error sending API user notification email for request [%s].', instance.id)
+        log.exception(u'Error sending API user notification email for request [%s].', instance.id)
 
 
 @python_2_unicode_compatible
@@ -237,7 +237,7 @@ class Catalog(models.Model):
     query = models.TextField(null=False, blank=False)
     viewers = models.TextField()
 
-    class Meta:
+    class Meta(object):
         # Catalogs live in course discovery, so we do not create any
         # tables in LMS. Instead we override the save method to not
         # touch the database, and use our API client to communicate
@@ -252,9 +252,9 @@ class Catalog(models.Model):
             self.query = attributes['query']
             self.viewers = attributes['viewers']
         else:
-            super().__init__(*args, **kwargs)
+            super(Catalog, self).__init__(*args, **kwargs)
 
-    def save(self, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def save(self, **kwargs):  # pylint: disable=unused-argument
         return None
 
     @property
@@ -268,4 +268,4 @@ class Catalog(models.Model):
         }
 
     def __str__(self):
-        return f'Catalog {self.name} [{self.query}]'
+        return u'Catalog {name} [{query}]'.format(name=self.name, query=self.query)

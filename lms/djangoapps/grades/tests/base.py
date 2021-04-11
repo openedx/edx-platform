@@ -6,10 +6,10 @@ Base file for Grades tests
 from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -23,7 +23,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(GradeTestBase, cls).setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.chapter = ItemFactory.create(
@@ -78,7 +78,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.store.update_item(cls.chapter_2, UserFactory().id)
 
     def setUp(self):
-        super().setUp()
+        super(GradeTestBase, self).setUp()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")

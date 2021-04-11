@@ -1,7 +1,9 @@
 """
 Tests for the lms_result_processor
 """
-import pytest
+
+
+import six
 
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.lib.courseware_search.lms_result_processor import LmsSearchResultProcessor
@@ -61,27 +63,30 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
     def setUp(self):
-        super().setUp()
+        super(LmsSearchResultProcessorTestCase, self).setUp()
         self.build_course()
 
     def test_url_parameter(self):
         fake_url = ""
         srp = LmsSearchResultProcessor({}, "test")
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             fake_url = srp.url
-        assert fake_url == ''
+        self.assertEqual(fake_url, "")
 
         srp = LmsSearchResultProcessor(
             {
-                "course": str(self.course.id),
-                "id": str(self.html.scope_ids.usage_id),
+                "course": six.text_type(self.course.id),
+                "id": six.text_type(self.html.scope_ids.usage_id),
                 "content": {"text": "This is the html text"}
             },
             "test"
         )
 
-        assert srp.url == '/courses/{}/jump_to/{}'.format(str(self.course.id),
-                                                          str(self.html.scope_ids.usage_id))
+        self.assertEqual(
+            srp.url, "/courses/{}/jump_to/{}".format(
+                six.text_type(self.course.id),
+                six.text_type(self.html.scope_ids.usage_id))
+        )
 
     def test_should_remove(self):
         """
@@ -89,11 +94,11 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         """
         srp = LmsSearchResultProcessor(
             {
-                "course": str(self.course.id),
-                "id": str(self.html.scope_ids.usage_id),
+                "course": six.text_type(self.course.id),
+                "id": six.text_type(self.html.scope_ids.usage_id),
                 "content": {"text": "This is html test text"}
             },
             "test"
         )
 
-        assert srp.should_remove(self.global_staff) is False
+        self.assertEqual(srp.should_remove(self.global_staff), False)

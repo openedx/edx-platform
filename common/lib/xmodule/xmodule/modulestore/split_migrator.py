@@ -10,7 +10,9 @@ manipulate storage but use existing api's.
 
 import logging
 
+import six
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -19,13 +21,13 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger(__name__)
 
 
-class SplitMigrator:
+class SplitMigrator(object):
     """
     Copies courses from old mongo to split mongo and sets up location mapping so any references to the old
     name will be able to find the new elements.
     """
     def __init__(self, split_modulestore, source_modulestore):
-        super().__init__()
+        super(SplitMigrator, self).__init__()
         self.split_modulestore = split_modulestore
         self.source_modulestore = source_modulestore
 
@@ -48,10 +50,10 @@ class SplitMigrator:
         # layer and kvs's know how to store it.
         # locations are in location, children, conditionals, course.tab
 
-        # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'  # lint-amnesty, pylint: disable=line-too-long
+        # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
         original_course = self.source_modulestore.get_course(source_course_key, **kwargs)
         if original_course is None:
-            raise ItemNotFoundError(str(source_course_key))
+            raise ItemNotFoundError(six.text_type(source_course_key))
 
         if new_org is None:
             new_org = source_course_key.org
@@ -92,7 +94,7 @@ class SplitMigrator:
         """
         course_version_locator = new_course.id.version_agnostic()
 
-        # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,  # lint-amnesty, pylint: disable=line-too-long
+        # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)
         for module in self.source_modulestore.get_items(
             source_course_key, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs
@@ -142,12 +144,12 @@ class SplitMigrator:
                 # was in 'direct' so draft is a new version
                 split_module = self.split_modulestore.get_item(new_locator, **kwargs)
                 # need to remove any no-longer-explicitly-set values and add/update any now set values.
-                for name, field in split_module.fields.items():
+                for name, field in six.iteritems(split_module.fields):
                     if field.is_set_on(split_module) and not module.fields[name].is_set_on(module):
                         field.delete_from(split_module)
-                for field, value in self._get_fields_translate_references(
+                for field, value in six.iteritems(self._get_fields_translate_references(
                         module, new_draft_course_loc, published_course_usage_key.block_id, field_names=False
-                ).items():
+                )):
                     field.write_to(split_module, value)
 
                 _new_module = self.split_modulestore.update_item(split_module, user_id, **kwargs)
@@ -163,12 +165,12 @@ class SplitMigrator:
                     **kwargs
                 )
                 awaiting_adoption[module.location] = new_locator
-        for draft_location, new_locator in awaiting_adoption.items():
+        for draft_location, new_locator in six.iteritems(awaiting_adoption):
             parent_loc = self.source_modulestore.get_parent_location(
                 draft_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred, **kwargs
             )
             if parent_loc is None:
-                log.warning('No parent found in source course for %s', draft_location)
+                log.warning(u'No parent found in source course for %s', draft_location)
                 continue
             old_parent = self.source_modulestore.get_item(parent_loc, **kwargs)
             split_parent_loc = new_draft_course_loc.make_usage_key(
@@ -210,7 +212,7 @@ class SplitMigrator:
             )
 
         result = {}
-        for field_name, field in xblock.fields.items():
+        for field_name, field in six.iteritems(xblock.fields):
             if field.is_set_on(xblock):
                 field_value = field.read_from(xblock)
                 field_key = field_name if field_names else field
@@ -223,7 +225,7 @@ class SplitMigrator:
                 elif isinstance(field, ReferenceValueDict):
                     result[field_key] = {
                         key: get_translation(subvalue)
-                        for key, subvalue in field_value.items()
+                        for key, subvalue in six.iteritems(field_value)
                     }
                 else:
                     result[field_key] = field_value

@@ -38,7 +38,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":  # lint-amnesty, pylint: disable=consider-using-in
+    if key == "ROOT" or key == "COURSES":
         continue
 
     # The MKTG_URL_LINK_MAP key specifies the template filename
@@ -46,7 +46,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
     if '.' not in template:
         # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
         # no file extension was specified in the key
-        template = f"{template}.{settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION}"
+        template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
 
     # Make the assumption that the URL we want is the lowercased
     # version of the map key

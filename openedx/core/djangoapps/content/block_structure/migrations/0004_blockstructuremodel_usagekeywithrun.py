@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 import openedx.core.djangoapps.xmodule_django.models
 

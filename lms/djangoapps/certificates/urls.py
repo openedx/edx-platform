@@ -12,13 +12,13 @@ app_name = 'certificates'
 urlpatterns = [
     # Certificates HTML view end point to render web certs by user and course
     url(
-        fr'^user/(?P<user_id>[^/]*)/course/{settings.COURSE_ID_PATTERN}',
+        r'^user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
         views.unsupported_url,
         name='unsupported_url'
     ),
 
     url(
-        fr'^course/{settings.COURSE_ID_PATTERN}',
+        r'^course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
         views.render_preview_certificate,
         name='preview_cert'
     ),

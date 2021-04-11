@@ -8,7 +8,8 @@ import logging
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import six
+from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.lib.cache_utils import get_cache
@@ -32,16 +33,16 @@ def register_access_role(cls):
         role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
-        log.exception("Unable to register Access Role with attribute 'ROLE'.")
+        log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
     return cls
 
 
-class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
-    CACHE_NAMESPACE = "student.roles.BulkRoleCache"
-    CACHE_KEY = 'roles_by_user'
+class BulkRoleCache(object):
+    CACHE_NAMESPACE = u"student.roles.BulkRoleCache"
+    CACHE_KEY = u'roles_by_user'
 
     @classmethod
-    def prefetch(cls, users):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def prefetch(cls, users):
         roles_by_user = defaultdict(set)
         get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY] = roles_by_user
 
@@ -57,7 +58,7 @@ class BulkRoleCache:  # lint-amnesty, pylint: disable=missing-class-docstring
         return get_cache(cls.CACHE_NAMESPACE)[cls.CACHE_KEY][user.id]
 
 
-class RoleCache:
+class RoleCache(object):
     """
     A cache of the CourseAccessRoles held by a particular user
     """
@@ -81,7 +82,7 @@ class RoleCache:
         )
 
 
-class AccessRole(metaclass=ABCMeta):
+class AccessRole(six.with_metaclass(ABCMeta, object)):
     """
     Object representing a role with particular access to a resource
     """
@@ -98,14 +99,14 @@ class AccessRole(metaclass=ABCMeta):
         """
         Add the role to the supplied django users.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     @abstractmethod
     def remove_users(self, *users):
         """
         Remove the role from the supplied django users.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     @abstractmethod
     def users_with_role(self):
@@ -149,7 +150,7 @@ class RoleBase(AccessRole):
         an org. Provide org and course if constrained to a course. Although, you should use the subclasses
         for all of these.
         """
-        super().__init__()
+        super(RoleBase, self).__init__()
 
         self.org = org
         self.course_key = course_key
@@ -184,7 +185,7 @@ class RoleBase(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        from common.djangoapps.student.models import CourseAccessRole  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
+        from common.djangoapps.student.models import CourseAccessRole
         for user in users:
             if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
@@ -228,14 +229,14 @@ class CourseRole(RoleBase):
         Args:
             course_key (CourseKey)
         """
-        super().__init__(role, course_key.org, course_key)
+        super(CourseRole, self).__init__(role, course_key.org, course_key)
 
     @classmethod
-    def course_group_already_exists(self, course_key):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def course_group_already_exists(self, course_key):
         return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}: course_key={self.course_key}>'
+        return '<{}: course_key={}>'.format(self.__class__.__name__, self.course_key)
 
 
 class OrgRole(RoleBase):
@@ -243,7 +244,7 @@ class OrgRole(RoleBase):
     A named role in a particular org independent of course
     """
     def __repr__(self):
-        return f'<{self.__class__.__name__}>'
+        return '<{}>'.format(self.__class__.__name__)
 
 
 @register_access_role
@@ -252,7 +253,7 @@ class CourseStaffRole(CourseRole):
     ROLE = 'staff'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -261,7 +262,7 @@ class CourseInstructorRole(CourseRole):
     ROLE = 'instructor'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseInstructorRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -270,7 +271,7 @@ class CourseFinanceAdminRole(CourseRole):
     ROLE = 'finance_admin'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -279,7 +280,7 @@ class CourseSalesAdminRole(CourseRole):
     ROLE = 'sales_admin'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseSalesAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -288,7 +289,7 @@ class CourseBetaTesterRole(CourseRole):
     ROLE = 'beta_testers'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -300,7 +301,7 @@ class LibraryUserRole(CourseRole):
     ROLE = 'library_user'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(LibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class CourseCcxCoachRole(CourseRole):
@@ -308,7 +309,7 @@ class CourseCcxCoachRole(CourseRole):
     ROLE = 'ccx_coach'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseCcxCoachRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -317,19 +318,19 @@ class CourseDataResearcherRole(CourseRole):
     ROLE = 'data_researcher'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
     def __init__(self, *args, **kwargs):
-        super().__init__('staff', *args, **kwargs)
+        super(OrgStaffRole, self).__init__('staff', *args, **kwargs)
 
 
 class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
-        super().__init__('instructor', *args, **kwargs)
+        super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
 
 
 class OrgLibraryUserRole(OrgRole):
@@ -340,7 +341,7 @@ class OrgLibraryUserRole(OrgRole):
     ROLE = LibraryUserRole.ROLE
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgDataResearcherRole(OrgRole):
@@ -348,7 +349,7 @@ class OrgDataResearcherRole(OrgRole):
     ROLE = 'data_researcher'
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(OrgDataResearcherRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -360,7 +361,7 @@ class CourseCreatorRole(RoleBase):
     ROLE = "course_creator_group"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -371,10 +372,10 @@ class SupportStaffRole(RoleBase):
     ROLE = "support"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(self.ROLE, *args, **kwargs)
+        super(SupportStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
-class UserBasedRole:
+class UserBasedRole(object):
     """
     Backward mapping: given a user, manipulate the courses and roles
     """

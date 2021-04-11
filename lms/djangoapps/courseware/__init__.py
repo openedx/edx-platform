@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import warnings
 
 if __name__ == 'courseware':

@@ -3,7 +3,7 @@ Defines the URL routes for this app.
 """
 
 
-from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.conf import settings
 from django.conf.urls import include, url
 from rest_framework import routers
 
@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^account/settings$', account_settings, name='account_settings'),
     url(r'^user_api/v1/', include(USER_API_ROUTER.urls)),
     url(
-        fr'^user_api/v1/preferences/(?P<pref_key>{UserPreference.KEY_REGEX})/users/$',
+        r'^user_api/v1/preferences/(?P<pref_key>{})/users/$'.format(UserPreference.KEY_REGEX),
         user_api_views.PreferenceUsersListView.as_view()
     ),
     url(
@@ -30,7 +30,7 @@ urlpatterns = [
     url(
         r'^user_api/v1/preferences/email_opt_in/$',
         user_api_views.UpdateEmailOptInPreference.as_view(),
-        name="preferences_email_opt_in_legacy"
+        name="preferences_email_opt_in"
     ),
     url(
         r'^user_api/v1/preferences/time_zones/$',

@@ -1,8 +1,8 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import json
 import logging
 
 from django.utils.deprecation import MiddlewareMixin
+from six import text_type
 
 from lms.djangoapps.discussion.django_comment_client.utils import JsonError
 from openedx.core.djangoapps.django_comment_common.comment_client import CommentClientRequestError
@@ -22,7 +22,7 @@ class AjaxExceptionMiddleware(MiddlewareMixin):
         """
         if isinstance(exception, CommentClientRequestError) and request.is_ajax():
             try:
-                return JsonError(json.loads(str(exception)), exception.status_code)
+                return JsonError(json.loads(text_type(exception)), exception.status_code)
             except ValueError:
-                return JsonError(str(exception), exception.status_code)
+                return JsonError(text_type(exception), exception.status_code)
         return None

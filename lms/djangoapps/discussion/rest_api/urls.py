@@ -39,14 +39,14 @@ urlpatterns = [
         name="discussion_course_roles",
     ),
     url(
-        fr"^v1/courses/{settings.COURSE_ID_PATTERN}",
+        r"^v1/courses/{}".format(settings.COURSE_ID_PATTERN),
         CourseView.as_view(),
         name="discussion_course"
     ),
     url(r"^v1/accounts/retire_forum", RetireUserView.as_view(), name="retire_discussion_user"),
     url(r"^v1/accounts/replace_username", ReplaceUsernamesView.as_view(), name="replace_discussion_username"),
     url(
-        fr"^v1/course_topics/{settings.COURSE_ID_PATTERN}",
+        r"^v1/course_topics/{}".format(settings.COURSE_ID_PATTERN),
         CourseTopicsView.as_view(),
         name="course_topics"
     ),

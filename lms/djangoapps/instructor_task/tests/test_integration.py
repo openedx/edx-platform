@@ -11,15 +11,16 @@ import json
 import logging
 import textwrap
 from collections import namedtuple
-from unittest.mock import patch
 
-import pytest
 import ddt
+import six
 from celery.states import FAILURE, SUCCESS
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
+from six import text_type
+from six.moves import range
 
 from capa.responsetypes import StudentInputError
 from capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
@@ -55,18 +56,18 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
     def _assert_task_failure(self, entry_id, task_type, problem_url_name, expected_message):
         """Confirm that expected values are stored in InstructorTask on task failure."""
         instructor_task = InstructorTask.objects.get(id=entry_id)
-        assert instructor_task.task_state == FAILURE
-        assert instructor_task.requester.username == 'instructor'
-        assert instructor_task.task_type == task_type
+        self.assertEqual(instructor_task.task_state, FAILURE)
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, task_type)
         task_input = json.loads(instructor_task.task_input)
-        assert 'student' not in task_input
-        assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        self.assertNotIn('student', task_input)
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
-        assert status['exception'] == 'ZeroDivisionError'
-        assert status['message'] == expected_message
+        self.assertEqual(status['exception'], 'ZeroDivisionError')
+        self.assertEqual(status['message'], expected_message)
         # check status returned:
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        assert status['message'] == expected_message
+        self.assertEqual(status['message'], expected_message)
 
 
 @ddt.ddt
@@ -79,7 +80,7 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestRescoringTask, self).setUp()
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -102,8 +103,8 @@ class TestRescoringTask(TestIntegrationTask):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': str(self.course.id),
-            'usage_id': quote_slashes(str(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
+            'course_id': text_type(self.course.id),
+            'usage_id': quote_slashes(text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name))),
             'handler': 'xmodule_handler',
             'suffix': 'problem_get',
         })
@@ -119,24 +120,26 @@ class TestRescoringTask(TestIntegrationTask):
         Values checked include the number of attempts, the score, and the max score for a problem.
         """
         module = self.get_student_module(user.username, descriptor)
-        assert module.grade == expected_score
-        assert module.max_grade == expected_max_score
+        self.assertEqual(module.grade, expected_score)
+        self.assertEqual(module.max_grade, expected_max_score)
         state = json.loads(module.state)
         attempts = state['attempts']
-        assert attempts == expected_attempts
+        self.assertEqual(attempts, expected_attempts)
         if attempts > 0:
-            assert 'correct_map' in state
-            assert 'student_answers' in state
-            assert len(state['correct_map']) > 0
-            assert len(state['student_answers']) > 0
+            self.assertIn('correct_map', state)
+            self.assertIn('student_answers', state)
+            self.assertGreater(len(state['correct_map']), 0)
+            self.assertGreater(len(state['student_answers']), 0)
 
         # assume only one problem in the subsection and the grades
         # are in sync.
         expected_subsection_grade = expected_score
 
         course_grade = CourseGradeFactory().read(user, self.course)
-        assert course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned\
-               == expected_subsection_grade
+        self.assertEqual(
+            course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
+            expected_subsection_grade,
+        )
 
     def submit_rescore_all_student_answers(self, instructor, problem_url_name, only_if_higher=False):
         """Submits the particular problem for rescoring"""
@@ -290,23 +293,23 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
 
         # return an input error as if it were a numerical response, with an embedded unicode character:
-        expected_message = "Could not interpret '2/3\u03a9' as a number"
+        expected_message = u"Could not interpret '2/3\u03a9' as a number"
         with patch('capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = StudentInputError(expected_message)
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # check instructor_task returned
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        assert instructor_task.task_state == 'SUCCESS'
-        assert instructor_task.requester.username == 'instructor'
-        assert instructor_task.task_type == 'rescore_problem'
+        self.assertEqual(instructor_task.task_state, 'SUCCESS')
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
-        assert 'student' not in task_input
-        assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        self.assertNotIn('student', task_input)
+        self.assertEqual(task_input['problem_url'], text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name)))
         status = json.loads(instructor_task.task_output)
-        assert status['attempted'] == 1
-        assert status['succeeded'] == 0
-        assert status['total'] == 1
+        self.assertEqual(status['attempted'], 1)
+        self.assertEqual(status['succeeded'], 0)
+        self.assertEqual(status['total'], 1)
 
     def define_code_response_problem(self, problem_url_name):
         """
@@ -337,13 +340,13 @@ class TestRescoringTask(TestIntegrationTask):
         instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        assert instructor_task.task_state == FAILURE
+        self.assertEqual(instructor_task.task_state, FAILURE)
         status = json.loads(instructor_task.task_output)
-        assert status['exception'] == 'NotImplementedError'
-        assert status['message'] == "Problem's definition does not support rescoring."
+        self.assertEqual(status['exception'], 'NotImplementedError')
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        assert status['message'] == "Problem's definition does not support rescoring."
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """
@@ -356,7 +359,7 @@ class TestRescoringTask(TestIntegrationTask):
         to not-equals).
         """
         factory = CustomResponseXMLFactory()
-        script = textwrap.dedent("""
+        script = textwrap.dedent(u"""
                 def check_func(expect, answer_given):
                     expected = str(random.randint(0, 100))
                     return {'ok': answer_given %s expected, 'msg': expected}
@@ -367,7 +370,7 @@ class TestRescoringTask(TestIntegrationTask):
                 InstructorTaskModuleTestCase.problem_location(problem_url_name)
             )
             descriptor.data = problem_xml
-            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):  # lint-amnesty, pylint: disable=line-too-long
+            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):
                 self.module_store.update_item(descriptor, self.user.id)
                 self.module_store.publish(descriptor.location, self.user.id)
         else:
@@ -402,7 +405,7 @@ class TestRescoringTask(TestIntegrationTask):
             module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
-            log.info("Correct Map: %s", correct_map)
+            log.info(u"Correct Map: %s", correct_map)
             # only one response, so pull it out:
             answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
@@ -441,7 +444,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super().setUp()
+        super(TestResetAttemptsTask, self).setUp()
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -473,12 +476,12 @@ class TestResetAttemptsTask(TestIntegrationTask):
                 self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
 
         for username in self.userlist:
-            assert self.get_num_attempts(username, descriptor) == num_attempts
+            self.assertEqual(self.get_num_attempts(username, descriptor), num_attempts)
 
         self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
-            assert self.get_num_attempts(username, descriptor) == 0
+            self.assertEqual(self.get_num_attempts(username, descriptor), 0)
 
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""
@@ -498,7 +501,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         location = self.problem_section.location
         instructor_task = self.reset_problem_attempts('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        assert instructor_task.task_state == SUCCESS
+        self.assertEqual(instructor_task.task_state, SUCCESS)
 
 
 class TestDeleteProblemTask(TestIntegrationTask):
@@ -510,7 +513,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
-        super().setUp()
+        super(TestDeleteProblemTask, self).setUp()
 
         self.initialize_course()
         self.create_instructor('instructor')
@@ -534,12 +537,12 @@ class TestDeleteProblemTask(TestIntegrationTask):
             self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
         # confirm that state exists:
         for username in self.userlist:
-            assert self.get_student_module(username, descriptor) is not None
+            self.assertIsNotNone(self.get_student_module(username, descriptor))
         # run delete task:
         self.delete_problem_state('instructor', location)
         # confirm that no state can be found:
         for username in self.userlist:
-            with pytest.raises(StudentModule.DoesNotExist):
+            with self.assertRaises(StudentModule.DoesNotExist):
                 self.get_student_module(username, descriptor)
 
     def test_delete_failure(self):
@@ -560,7 +563,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         location = self.problem_section.location
         instructor_task = self.delete_problem_state('instructor', location)
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
-        assert instructor_task.task_state == SUCCESS
+        self.assertEqual(instructor_task.task_state, SUCCESS)
 
 
 class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent, TestIntegrationTask):
@@ -595,11 +598,11 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             Arguments:
                 dicts: tuple of dicts
             """
-            return dict([item for d in dicts for item in d.items()])  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
+            return dict([item for d in dicts for item in d.items()])
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = 'Experiment Group ({})'
+            group_config_hdr_tpl = u'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(
                     self.course.id, user, self.partition
@@ -613,7 +616,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     grades,
                     user_partition_group(student)
                 )
-                for student_grades in students_grades for student, grades in student_grades.items()
+                for student_grades in students_grades for student, grades in six.iteritems(student_grades)
             ],
             ignore_other_columns=ignore_other_columns,
         )
@@ -641,14 +644,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            'Grade': '1.0',
-                            'Homework': '1.0',
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
                         }
                     },
                     {
                         self.student_b: {
-                            'Grade': '0.5',
-                            'Homework': '0.5',
+                            u'Grade': '0.5',
+                            u'Homework': '0.5',
                         }
                     },
                 ],
@@ -674,14 +677,14 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                 [
                     {
                         self.student_a: {
-                            'Grade': '1.0',
-                            'Homework': '1.0',
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
                         },
                     },
                     {
                         self.student_b: {
-                            'Grade': '0.0',
-                            'Homework': 'Not Attempted',
+                            u'Grade': '0.0',
+                            u'Homework': u'Not Attempted',
                         }
                     },
                 ],

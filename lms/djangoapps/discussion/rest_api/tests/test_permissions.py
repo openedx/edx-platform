@@ -48,7 +48,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         }
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     @ddt.data(*itertools.product([True, False], ["question", "discussion"], [True, False]))
     @ddt.unpack
@@ -64,7 +64,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         }
         if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
 
 @ddt.ddt
@@ -85,7 +85,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             expected |= {"topic_id", "type", "title", "raw_body"}
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     @ddt.data(*itertools.product([True, False], [True, False], ["question", "discussion"], [True, False]))
     @ddt.unpack
@@ -102,7 +102,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             expected |= {"raw_body"}
         if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
 
 @ddt.ddt
@@ -113,7 +113,7 @@ class CanDeleteTest(ModuleStoreTestCase):
     def test_thread(self, is_author, is_privileged):
         thread = Thread(user_id="5" if is_author else "6")
         context = _get_context(requester_id="5", is_requester_privileged=is_privileged)
-        assert can_delete(thread, context) == (is_author or is_privileged)
+        self.assertEqual(can_delete(thread, context), is_author or is_privileged)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
     @ddt.unpack
@@ -124,4 +124,4 @@ class CanDeleteTest(ModuleStoreTestCase):
             is_requester_privileged=is_privileged,
             thread=Thread(user_id="5" if is_thread_author else "6")
         )
-        assert can_delete(comment, context) == (is_author or is_privileged)
+        self.assertEqual(can_delete(comment, context), is_author or is_privileged)

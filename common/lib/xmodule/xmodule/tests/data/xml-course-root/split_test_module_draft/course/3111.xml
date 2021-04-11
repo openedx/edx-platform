@@ -1,4 +1,0 @@
-<course advanced_modules="[&quot;split_test&quot;]" display_name="split export test" user_partitions="[{&quot;name&quot;: &quot;Experiment 0,1&quot;, &quot;version&quot;: 1, &quot;description&quot;: &quot;Experiment 1&quot;, &quot;groups&quot;: [{&quot;version&quot;: 1, &quot;id&quot;: 0, &quot;name&quot;: &quot;group 0&quot;}, {&quot;version&quot;: 1, &quot;id&quot;: 1, &quot;name&quot;: &quot;group 1&quot;}], &quot;id&quot;: 0}, {&quot;name&quot;: &quot;Experiment A,B,C&quot;, &quot;version&quot;: 1, &quot;description&quot;: &quot;Experiment 2&quot;, &quot;groups&quot;: [{&quot;version&quot;: 1, &quot;id&quot;: 0, &quot;name&quot;: &quot;group A&quot;}, {&quot;version&quot;: 1, &quot;id&quot;: 1, &quot;name&quot;: &quot;group B&quot;}, {&quot;version&quot;: 1, &quot;id&quot;: 2, &quot;name&quot;: &quot;group C&quot;}], &quot;id&quot;: 1}]">
-  <chapter url_name="7ba42782322541d29a4d1be1eae4e4e8"/>
-  <wiki slug="foo.1111.3111"/>
-</course>

@@ -10,13 +10,8 @@ from django.core.files.base import ContentFile
 from factory import DjangoModelFactory
 from factory.django import ImageField
 
+from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.badges.models import (  # lint-amnesty, pylint: disable=line-too-long
-    BadgeAssertion,
-    BadgeClass,
-    CourseCompleteImageConfiguration,
-    CourseEventBadgesConfiguration
-)
 
 
 def generate_dummy_image(_unused):
@@ -34,7 +29,7 @@ class CourseCompleteImageConfigurationFactory(DjangoModelFactory):
     """
     Factory for BadgeImageConfigurations
     """
-    class Meta:
+    class Meta(object):
         model = CourseCompleteImageConfiguration
 
     mode = 'honor'
@@ -45,7 +40,7 @@ class BadgeClassFactory(DjangoModelFactory):
     """
     Factory for BadgeClass
     """
-    class Meta:
+    class Meta(object):
         model = BadgeClass
 
     slug = 'test_slug'
@@ -68,7 +63,7 @@ class BadgeAssertionFactory(DjangoModelFactory):
     """
     Factory for BadgeAssertions
     """
-    class Meta:
+    class Meta(object):
         model = BadgeAssertion
 
     user = factory.SubFactory(UserFactory)
@@ -82,7 +77,7 @@ class CourseEventBadgesConfigurationFactory(DjangoModelFactory):
     """
     Factory for CourseEventsBadgesConfiguration
     """
-    class Meta:
+    class Meta(object):
         model = CourseEventBadgesConfiguration
 
     enabled = True

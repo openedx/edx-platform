@@ -36,7 +36,7 @@ class SoftwareSecureFakeView(View):
         access_key = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["API_ACCESS_KEY"]
         context = {
             'receipt_id': None,
-            'authorization_code': f'SIS {access_key}:0000',
+            'authorization_code': u'SIS {}:0000'.format(access_key),
             'results_callback': reverse('verify_student_results_callback')
         }
 

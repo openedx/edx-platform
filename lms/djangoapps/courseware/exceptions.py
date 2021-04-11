@@ -8,7 +8,7 @@ class Redirect(Exception):
     Exception class that requires redirecting to a URL.
     """
     def __init__(self, url):
-        super().__init__()
+        super(Redirect, self).__init__()
         self.url = url
 
 
@@ -23,21 +23,5 @@ class CourseAccessRedirect(Redirect):
             the user was denied access. These strings can then be exposed to the user.
     """
     def __init__(self, url, access_error=None):
-        super().__init__(url)
+        super(CourseAccessRedirect, self).__init__(url)
         self.access_error = access_error
-
-
-class CourseRunNotFound(ValueError):
-    """
-    Indicate that a supplied course run key does not map to a course run in the system.
-    """
-
-    def __init__(self, course_key):
-        """
-        Initialize CourseRunNotFound exception.
-
-        Arguments:
-            course_key (CourseKey|str):
-                course run key or stringified version thereof.
-        """
-        super().__init__(f"Course run not found: {course_key}")

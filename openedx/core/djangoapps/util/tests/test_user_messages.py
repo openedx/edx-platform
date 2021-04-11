@@ -22,7 +22,7 @@ class UserMessagesTestCase(TestCase):
     Unit tests for page level user messages.
     """
     def setUp(self):
-        super(UserMessagesTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(UserMessagesTestCase, self).setUp()
         self.student = UserFactory.create()
         self.request = RequestFactory().request()
         self.request.session = {}
@@ -41,8 +41,8 @@ class UserMessagesTestCase(TestCase):
         """
         PageLevelMessages.register_user_message(self.request, UserMessageType.INFO, message)
         messages = list(PageLevelMessages.user_messages(self.request))
-        assert len(messages) == 1
-        assert messages[0].message_html == expected_message_html
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].message_html, expected_message_html)
 
     @ddt.data(
         (UserMessageType.ERROR, 'alert-danger', 'fa fa-warning'),
@@ -57,9 +57,9 @@ class UserMessagesTestCase(TestCase):
         """
         PageLevelMessages.register_user_message(self.request, message_type, TEST_MESSAGE)
         messages = list(PageLevelMessages.user_messages(self.request))
-        assert len(messages) == 1
-        assert messages[0].css_class == expected_css_class
-        assert messages[0].icon_class == expected_icon_class
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].css_class, expected_css_class)
+        self.assertEqual(messages[0].icon_class, expected_icon_class)
 
     @ddt.data(
         (normalize_repr(PageLevelMessages.register_error_message), UserMessageType.ERROR),
@@ -74,5 +74,5 @@ class UserMessagesTestCase(TestCase):
         """
         register_message_function(self.request, TEST_MESSAGE)
         messages = list(PageLevelMessages.user_messages(self.request))
-        assert len(messages) == 1
-        assert messages[0].type == expected_message_type
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].type, expected_message_type)

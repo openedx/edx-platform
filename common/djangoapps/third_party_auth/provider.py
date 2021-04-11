@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
-from common.djangoapps.third_party_auth.models import (
+from .models import (
     _LTI_BACKENDS,
     _PSA_OAUTH2_BACKENDS,
     _PSA_SAML_BACKENDS,
@@ -18,7 +18,7 @@ from common.djangoapps.third_party_auth.models import (
 )
 
 
-class Registry:
+class Registry(object):
     """
     API for querying third-party auth ProviderConfig objects.
 

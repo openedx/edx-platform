@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import decimal
 import json
@@ -31,7 +31,7 @@ class EDXJSONEncoder(DjangoJSONEncoder):
                 return int(o)
             return float(o)
         else:
-            return super().default(o)
+            return super(EDXJSONEncoder, self).default(o)
 
 
 def expect_json(view_function):
@@ -61,7 +61,7 @@ class JsonResponse(HttpResponse):
     """
     Django HttpResponse subclass that has sensible defaults for outputting JSON.
     """
-    def __init__(self, resp_obj=None, status=None, encoder=EDXJSONEncoder,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+    def __init__(self, resp_obj=None, status=None, encoder=EDXJSONEncoder,
                  *args, **kwargs):
         if resp_obj in (None, ""):
             content = ""
@@ -73,7 +73,7 @@ class JsonResponse(HttpResponse):
         kwargs.setdefault("content_type", "application/json")
         if status:
             kwargs["status"] = status
-        super().__init__(content, *args, **kwargs)
+        super(JsonResponse, self).__init__(content, *args, **kwargs)
 
 
 class JsonResponseBadRequest(HttpResponseBadRequest):
@@ -86,11 +86,11 @@ class JsonResponseBadRequest(HttpResponseBadRequest):
         status: 400
         encoder: DjangoJSONEncoder
     """
-    def __init__(self, obj=None, status=400, encoder=DjangoJSONEncoder, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+    def __init__(self, obj=None, status=400, encoder=DjangoJSONEncoder, *args, **kwargs):
         if obj in (None, ""):
             content = ""
         else:
             content = json.dumps(obj, cls=encoder, indent=2, ensure_ascii=False)
         kwargs.setdefault("content_type", "application/json")
         kwargs["status"] = status
-        super().__init__(content, *args, **kwargs)
+        super(JsonResponseBadRequest, self).__init__(content, *args, **kwargs)

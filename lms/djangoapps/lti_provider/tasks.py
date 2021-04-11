@@ -5,7 +5,7 @@ Asynchronous tasks for the LTI provider app.
 
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 
 import lms.djangoapps.lti_provider.outcomes as outcomes
@@ -46,7 +46,7 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     assignment = GradedAssignment.objects.get(id=assignment_id)
     if version != assignment.version_number:
         log.info(
-            "Score passback for GradedAssignment %s skipped. More recent score available.",
+            u"Score passback for GradedAssignment %s skipped. More recent score available.",
             assignment.id
         )
         return

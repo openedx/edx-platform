@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -67,16 +68,16 @@ class Command(BaseCommand):
             try:
                 course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
-                raise CommandError(f'Course ID {course_id} is invalid.')  # lint-amnesty, pylint: disable=raise-missing-from
+                raise CommandError('Course ID {} is invalid.'.format(course_id))
 
             if modulestore().get_course(course_key) is None:
-                raise CommandError(f'The given course {course_id} does not exist.')
+                raise CommandError('The given course {} does not exist.'.format(course_id))
 
             course_keys.append(course_key)
         else:
             course_keys = [course.id for course in CourseOverview.get_all_courses(orgs=[org])]
             if not course_keys:
-                raise CommandError(f'No courses exist for the org "{org}".')
+                raise CommandError('No courses exist for the org "{}".'.format(org))
 
         for course_key in course_keys:
             self.move_users_for_course(course_key, from_mode, to_mode, commit)
@@ -95,9 +96,9 @@ class Command(BaseCommand):
             commit (bool): required to make the change to the database. Otherwise
                                      just a count will be displayed.
         """
-        unicode_course_key = str(course_key)
+        unicode_course_key = text_type(course_key)
         if CourseMode.mode_for_course(course_key, to_mode) is None:
-            logger.info(f'Mode ({to_mode}) does not exist for course ({unicode_course_key}).')
+            logger.info('Mode ({}) does not exist for course ({}).'.format(to_mode, unicode_course_key))
             return
 
         course_enrollments = CourseEnrollment.objects.filter(course_id=course_key, mode=from_mode)

@@ -13,23 +13,24 @@ Test utilities for mobile API tests:
 
 
 import datetime
-from unittest.mock import patch
 
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student import auth
-from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from lms.djangoapps.mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 from lms.djangoapps.mobile_api.utils import API_V1
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -42,7 +43,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     They may also override any of the methods defined in this class to control the behavior of the TestMixins.
     """
     def setUp(self):
-        super().setUp()
+        super(MobileAPITestCase, self).setUp()
         self.course = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
@@ -56,7 +57,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
-        super().tearDown()
+        super(MobileAPITestCase, self).tearDown()
         self.logout()
 
     def login(self):
@@ -88,14 +89,14 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         url = self.reverse_url(reverse_args, **kwargs)
         response = self.url_method(url, data=data, **kwargs)
         if expected_response_code is not None:
-            assert response.status_code == expected_response_code
+            self.assertEqual(response.status_code, expected_response_code)
         return response
 
     def reverse_url(self, reverse_args=None, **kwargs):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:
-            reverse_args.update({'course_id': str(kwargs.get('course_id', self.course.id))})
+            reverse_args.update({'course_id': six.text_type(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
         if 'api_version' in self.REVERSE_INFO['params']:
@@ -107,7 +108,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         return self.client.get(url, data=data)
 
 
-class MobileAuthTestMixin:
+class MobileAuthTestMixin(object):
     """
     Test Mixin for testing APIs decorated with mobile_view.
     """
@@ -152,13 +153,13 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def verify_failure(self, response, error_type=None):
         """Base implementation of verifying a failed response."""
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
         if error_type:
-            assert response.data == error_type.to_json()
+            self.assertEqual(response.data, error_type.to_json())
 
     def init_course_access(self, course_id=None):
         """Base implementation of initializing the user for each test."""

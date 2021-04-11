@@ -4,12 +4,11 @@ waffle switches for the Grades app.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleFlagNamespace, LegacyWaffleSwitch, LegacyWaffleSwitchNamespace
-
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitch, WaffleSwitchNamespace
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
-WAFFLE_NAMESPACE = 'grades'
+WAFFLE_NAMESPACE = u'grades'
 
 # Switches
 
@@ -21,19 +20,20 @@ WAFFLE_NAMESPACE = 'grades'
 #   for all courses.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-04-11
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/14771
 # .. toggle_warnings: This requires the PersistentGradesEnabledFlag to be enabled.
-# TODO: Replace with WaffleSwitch(). See waffle_switch(name) docstring.
-ASSUME_ZERO_GRADE_IF_ABSENT = 'assume_zero_grade_if_absent'
+ASSUME_ZERO_GRADE_IF_ABSENT = u'assume_zero_grade_if_absent'
 # .. toggle_name: grades.disable_regrade_on_policy_change
 # .. toggle_implementation: WaffleSwitch
 # .. toggle_default: False
 # .. toggle_description: When enabled, a change in grading policy will not trigger re-grading.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2017-08-03
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/15733
-# TODO: Replace with WaffleSwitch(). See waffle_switch(name) docstring.
-DISABLE_REGRADE_ON_POLICY_CHANGE = 'disable_regrade_on_policy_change'
+DISABLE_REGRADE_ON_POLICY_CHANGE = u'disable_regrade_on_policy_change'
 
 # Course Flags
 
@@ -44,9 +44,10 @@ DISABLE_REGRADE_ON_POLICY_CHANGE = 'disable_regrade_on_policy_change'
 #   in edx-platform, but only in edx-proctoring.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-05-29
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/20719
-# TODO: Replace with CourseWaffleFlag() from below. See waffle_flag(name) docstring.
-REJECTED_EXAM_OVERRIDES_GRADE = 'rejected_exam_overrides_grade'
+REJECTED_EXAM_OVERRIDES_GRADE = u'rejected_exam_overrides_grade'
 # .. toggle_name: grades.rejected_exam_overrides_grade
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -54,9 +55,10 @@ REJECTED_EXAM_OVERRIDES_GRADE = 'rejected_exam_overrides_grade'
 #   is only valid for courses which actually have an end date.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-01
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19026
-# TODO: Replace with CourseWaffleFlag() from below. See waffle_flag(name) docstring.
-ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = 'enforce_freeze_grade_after_course_end'
+ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = u'enforce_freeze_grade_after_course_end'
 
 # .. toggle_name: grades.writable_gradebook
 # .. toggle_implementation: CourseWaffleFlag
@@ -65,10 +67,10 @@ ENFORCE_FREEZE_GRADE_AFTER_COURSE_END = 'enforce_freeze_grade_after_course_end'
 #   the writable gradebook is added to the instructor dashboard.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2018-10-03
+# .. toggle_target_removal_date: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/19054
 # .. toggle_warnings: Enabling this requires that the `WRITABLE_GRADEBOOK_URL` setting be properly defined.
-# TODO: Replace with CourseWaffleFlag() from below. See waffle_flag(name) docstring.
-WRITABLE_GRADEBOOK = 'writable_gradebook'
+WRITABLE_GRADEBOOK = u'writable_gradebook'
 
 # .. toggle_name: grades.bulk_management
 # .. toggle_implementation: CourseWaffleFlag
@@ -77,43 +79,37 @@ WRITABLE_GRADEBOOK = 'writable_gradebook'
 #   as we understand, this feature is now unused and obsolete.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-08-20
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: None
 # .. toggle_tickets: https://github.com/edx/edx-platform/pull/21389
-# TODO: Replace with CourseWaffleFlag() from below. See waffle_flag(name) docstring.
-BULK_MANAGEMENT = 'bulk_management'
+BULK_MANAGEMENT = u'bulk_management'
 
 
 def waffle():
     """
-    Deprecated: Returns the namespaced, cached, audited Waffle class for Grades.
-
-    Note: Replace uses of this function with direct references to each switch.
-      See waffle_switch(name) docstring for details.
+    Returns the namespaced, cached, audited Waffle class for Grades.
     """
-    return LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix='Grades: ')
+    return WaffleSwitchNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
 
 
 def waffle_switch(name):
     """
-    Deprecated: Return the corresponding namespaced waffle switch.
+    Return the corresponding namespaced waffle switch.
 
-    IMPORTANT: Do NOT copy this pattern and do NOT use this to reference new switches.
-      Instead, replace the string constants above with the actual switch instances.
-      For example::
-
-        ASSUME_ZERO_GRADE_IF_ABSENT = WaffleSwitch(f'{WAFFLE_NAMESPACE}.assume_zero_grade_if_absent')
+    WARNING: do not replicate this pattern. Instead of declaring waffle switch names as strings, you should create
+    WaffleSwitch objects as top-level constants.
     """
-    return LegacyWaffleSwitch(waffle(), name, module_name=__name__)
+    return WaffleSwitch(waffle(), name, module_name=__name__)
 
 
 def waffle_flags():
     """
-    Deprecated: Returns the namespaced, cached, audited Waffle flags dictionary for Grades.
+    Returns the namespaced, cached, audited Waffle flags dictionary for Grades.
 
-    IMPORTANT: Do NOT copy this pattern and do NOT use this to reference new flags.
-      Instead, replace the string constants above with the flag declarations below, and use
-      them directly.
+    WARNING: do not replicate this pattern. Instead of declaring waffle flag names as strings, you should create
+    WaffleFlag and CourseWaffleFlag objects as top-level constants.
     """
-    namespace = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Grades: ')
+    namespace = WaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix=u'Grades: ')
     return {
         # By default, enable rejected exam grade overrides. Can be disabled on a course-by-course basis.
         # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.

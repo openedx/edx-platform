@@ -3,17 +3,16 @@ Unittests for populate_created_on_site_user_attribute management command.
 """
 
 
-from unittest import mock
-
 import ddt
-import pytest
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import mock
+from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+from six.moves import range
 
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from common.djangoapps.student.models import Registration, UserAttribute
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 CREATED_ON_SITE = 'created_on_site'
 
@@ -25,7 +24,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestPopulateUserAttribute, self).setUp()
 
         self._create_sample_data()
         self.users = User.objects.all()
@@ -51,7 +50,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         )
 
         for user in self.users:
-            assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) == self.site.domain
+            self.assertEqual(UserAttribute.get_user_attribute(user, CREATED_ON_SITE), self.site.domain)
 
         # Populate 'created_on_site' attribute with different site domain
         call_command(
@@ -62,7 +61,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
 
         for user in self.users:
             # 'created_on_site' attribute already exists. Attribute's value will not change
-            assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) != self.site_other.domain
+            self.assertNotEqual(UserAttribute.get_user_attribute(user, CREATED_ON_SITE), self.site_other.domain)
 
     def test_command_by_activation_keys(self):
         """
@@ -75,7 +74,7 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         )
 
         for register_user in self.registered_users:
-            assert UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE) == self.site.domain
+            self.assertEqual(UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE), self.site.domain)
 
         # Populate 'created_on_site' attribute with different site domain
         call_command(
@@ -86,13 +85,16 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
 
         for register_user in self.registered_users:
             # 'created_on_site' attribute already exists. Attribute's value will not change
-            assert UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE) != self.site_other.domain
+            self.assertNotEqual(
+                UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE),
+                self.site_other.domain
+            )
 
     def test_command_with_incomplete_argument(self):
         """
         Test management command raises CommandError without '--users' and '--activation_keys' arguments.
         """
-        with pytest.raises(CommandError):
+        with self.assertRaises(CommandError):
             call_command(
                 "populate_created_on_site_user_attribute",
                 "--site-domain", self.site.domain
@@ -105,24 +107,24 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
         user = self.users[0]
         call_command(
             "populate_created_on_site_user_attribute",
-            "--users", f'9{user.id}',  # invalid id
+            "--users", '9{id}'.format(id=user.id),  # invalid id
             "--site-domain", self.site.domain
         )
-        assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) is None
+        self.assertIsNone(UserAttribute.get_user_attribute(user, CREATED_ON_SITE))
 
         register_user = self.registered_users[0]
         call_command(
             "populate_created_on_site_user_attribute",
-            "--activation-keys", f"invalid-{register_user.activation_key}",  # invalid key
+            "--activation-keys", "invalid-{key}".format(key=register_user.activation_key),  # invalid key
             "--site-domain", self.site.domain
         )
-        assert UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE) is None
+        self.assertIsNone(UserAttribute.get_user_attribute(register_user.user, CREATED_ON_SITE))
 
     def test_command_without_site_domain(self):
         """
         Test management command raises CommandError without '--site-domain' argument.
         """
-        with pytest.raises(CommandError):
+        with self.assertRaises(CommandError):
             call_command(
                 "populate_created_on_site_user_attribute",
                 "--user", self.user_ids,
@@ -144,6 +146,6 @@ class TestPopulateUserAttribute(SiteMixin, TestCase):
 
         for user in self.users:
             if populate == 'y':
-                assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) == fake_site_domain
+                self.assertEqual(UserAttribute.get_user_attribute(user, CREATED_ON_SITE), fake_site_domain)
             else:
-                assert UserAttribute.get_user_attribute(user, CREATED_ON_SITE) is None
+                self.assertIsNone(UserAttribute.get_user_attribute(user, CREATED_ON_SITE))

@@ -6,6 +6,8 @@ persist the assignments.
 
 
 import logging
+
+import six
 from django.conf import settings
 
 from openedx.core.lib.cache_utils import request_cached
@@ -81,7 +83,7 @@ def _get_dynamic_partitions(course):
     return generated_partitions
 
 
-class PartitionService:
+class PartitionService(object):
     """
     This is an XBlock service that returns information about the user partitions associated
     with a given course.
@@ -136,8 +138,8 @@ class PartitionService:
         user_partition = self.get_user_partition(user_partition_id)
         if user_partition is None:
             raise ValueError(
-                "Configuration problem!  No user_partition with id {} "
-                "in course {}".format(user_partition_id, self._course_id)
+                "Configuration problem!  No user_partition with id {0} "
+                "in course {1}".format(user_partition_id, self._course_id)
             )
 
         group = self.get_group(user, user_partition)

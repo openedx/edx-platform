@@ -8,7 +8,6 @@ from django.utils.translation import ugettext_noop
 
 import lms.djangoapps.discussion.django_comment_client.utils as utils
 from lms.djangoapps.courseware.tabs import EnrolledTab
-from openedx.features.lti_course_tab.tab import DiscussionLtiCourseTab
 from xmodule.tabs import TabFragmentViewMixin
 
 
@@ -29,9 +28,6 @@ class DiscussionTab(TabFragmentViewMixin, EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        if not super().is_enabled(course, user):
-            return False
-        # Disable the regular discussion tab if LTI-based external Discussion forum is enabled
-        if DiscussionLtiCourseTab.is_enabled(course, user):
+        if not super(DiscussionTab, cls).is_enabled(course, user):
             return False
         return utils.is_discussion_enabled(course.id)

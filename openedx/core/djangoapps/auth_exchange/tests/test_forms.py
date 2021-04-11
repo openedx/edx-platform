@@ -13,7 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from social_django.models import Partial
 
-from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 
 from ..forms import AccessTokenExchangeForm
 from .mixins import DOTAdapterMixin
@@ -25,7 +25,7 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
     Mixin that defines test cases for AccessTokenExchangeForm
     """
     def setUp(self):
-        super().setUp()
+        super(AccessTokenExchangeFormTest, self).setUp()
         self.request = RequestFactory().post("dummy_url")
         redirect_uri = 'dummy_redirect_url'
         SessionMiddleware().process_request(self.request)
@@ -34,19 +34,22 @@ class AccessTokenExchangeFormTest(AccessTokenExchangeTestMixin):
         self.request.backend = social_utils.load_backend(self.request.social_strategy, self.BACKEND, redirect_uri)
 
     def tearDown(self):
-        super().tearDown()
+        super(AccessTokenExchangeFormTest, self).tearDown()
         Partial.objects.all().delete()
 
-    def _assert_error(self, data, expected_error, expected_error_description):  # lint-amnesty, pylint: disable=arguments-differ
+    def _assert_error(self, data, expected_error, expected_error_description):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
-        assert form.errors == {'error': expected_error, 'error_description': expected_error_description}
+        self.assertEqual(
+            form.errors,
+            {"error": expected_error, "error_description": expected_error_description}
+        )
 
-    def _assert_success(self, data, expected_scopes, expected_logged_in_user=None):
+    def _assert_success(self, data, expected_scopes):
         form = AccessTokenExchangeForm(request=self.request, oauth2_adapter=self.oauth2_adapter, data=data)
-        assert form.is_valid()
-        assert form.cleaned_data['user'] == self.user
-        assert form.cleaned_data['client'] == self.oauth_client
-        assert set(form.cleaned_data['scope']) == set(expected_scopes)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["user"], self.user)
+        self.assertEqual(form.cleaned_data["client"], self.oauth_client)
+        self.assertEqual(set(form.cleaned_data["scope"]), set(expected_scopes))
 
 
 # This is necessary because cms does not implement third party auth
@@ -62,7 +65,7 @@ class DOTAccessTokenExchangeFormTestFacebook(
     Tests for AccessTokenExchangeForm used with Facebook, tested against
     django-oauth-toolkit (DOT).
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 # This is necessary because cms does not implement third party auth
@@ -78,4 +81,4 @@ class DOTAccessTokenExchangeFormTestGoogle(
     Tests for AccessTokenExchangeForm used with Google, tested against
     django-oauth-toolkit (DOT).
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

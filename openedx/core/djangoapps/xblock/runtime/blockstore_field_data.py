@@ -103,7 +103,7 @@ class BlockstoreFieldData(FieldData):
         # (see _get_active_block()) and the value is an ActiveBlock object
         # (which holds olx_hash and changed_fields)
         self.active_blocks = WeakKeyDictionary()
-        super(BlockstoreFieldData, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(BlockstoreFieldData, self).__init__()
 
     def _getfield(self, block, name):
         """
@@ -125,7 +125,7 @@ class BlockstoreFieldData(FieldData):
         if name == CHILDREN_INCLUDES:
             return  # This is a pseudo-field used in conjunction with BlockstoreChildrenData
         field = self._getfield(block, name)
-        if field.scope in (Scope.children, Scope.parent):  # lint-amnesty, pylint: disable=no-else-raise
+        if field.scope in (Scope.children, Scope.parent):
             # This field data store is focused on definition-level field data, and children/parent is mostly
             # relevant at the usage level. Scope.parent doesn't even seem to be used?
             raise NotImplementedError("Setting Scope.children/parent is not supported by BlockstoreFieldData.")
@@ -278,7 +278,7 @@ class BlockstoreChildrenData(FieldData):
         """
         # The data store that holds Scope.usage and Scope.definition data:
         self.authored_data_store = blockstore_field_data
-        super(BlockstoreChildrenData, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(BlockstoreChildrenData, self).__init__()
 
     def _check_field(self, block, name):  # pylint: disable=unused-argument
         """

@@ -2,8 +2,6 @@
 
 
 import json
-from unittest.mock import patch
-from urllib.parse import urlencode
 
 import ddt
 import httpretty
@@ -11,17 +9,19 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -49,7 +49,7 @@ class AuditLogTests(TestCase):
         # Verify that the logged message contains comma-separated
         # key-value pairs ordered alphabetically by key.
         message = 'foo: bar="baz", qux="quux"'
-        assert mock_log.info.called_with(message)
+        self.assertTrue(mock_log.info.called_with(message))
 
 
 @ddt.ddt
@@ -61,18 +61,18 @@ class EcommerceServiceTests(TestCase):
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
         update_commerce_config(enabled=True)
-        super().setUp()
+        super(EcommerceServiceTests, self).setUp()
 
     def test_is_enabled(self):
         """Verify that is_enabled() returns True when ecomm checkout is enabled. """
         is_enabled = EcommerceService().is_enabled(self.user)
-        assert is_enabled
+        self.assertTrue(is_enabled)
 
         config = CommerceConfiguration.current()
         config.checkout_on_ecommerce_service = False
         config.save()
         is_not_enabled = EcommerceService().is_enabled(self.user)
-        assert not is_not_enabled
+        self.assertFalse(is_not_enabled)
 
     @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
     def test_is_enabled_activation_requirement_disabled(self):
@@ -80,40 +80,40 @@ class EcommerceServiceTests(TestCase):
         self.user.is_active = False
         self.user.save()
         is_enabled = EcommerceService().is_enabled(self.user)
-        assert is_enabled
+        self.assertTrue(is_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_sites(self, is_site):
         """Verify that is_enabled() returns True if used for a site."""
         is_site.return_value = True
         is_enabled = EcommerceService().is_enabled(self.user)
-        assert is_enabled
+        self.assertTrue(is_enabled)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_ecommerce_url_root(self):
         """Verify that the proper root URL is returned."""
-        assert EcommerceService().ecommerce_url_root == 'http://ecommerce_url'
+        self.assertEqual(EcommerceService().ecommerce_url_root, 'http://ecommerce_url')
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_absolute_ecommerce_url(self):
         """Verify that the proper URL is returned."""
         url = EcommerceService().get_absolute_ecommerce_url('/test_basket/')
-        assert url == 'http://ecommerce_url/test_basket/'
+        self.assertEqual(url, 'http://ecommerce_url/test_basket/')
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_receipt_page_url(self):
         """Verify that the proper Receipt page URL is returned."""
         order_number = 'ORDER1'
         url = EcommerceService().get_receipt_page_url(order_number)
-        expected_url = f'http://ecommerce_url/checkout/receipt/?order_number={order_number}'
-        assert url == expected_url
+        expected_url = 'http://ecommerce_url/checkout/receipt/?order_number={}'.format(order_number)
+        self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     def test_get_order_dashboard_url(self):
         """Verify that the proper order dashboard url is returned."""
         url = EcommerceService().get_order_dashboard_url()
         expected_url = 'http://ecommerce_url/dashboard/orders/'
-        assert url == expected_url
+        self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(
@@ -146,7 +146,7 @@ class EcommerceServiceTests(TestCase):
                 expected_url=expected_url,
                 program_uuid=program_uuid
             )
-        assert url == expected_url
+        self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(
@@ -178,7 +178,7 @@ class EcommerceServiceTests(TestCase):
             skus=urlencode(query, doseq=True),
         )
 
-        assert url == expected_url
+        self.assertEqual(url, expected_url)
 
 
 @ddt.ddt
@@ -187,7 +187,7 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
     """Tests for Refund Utilities"""
 
     def setUp(self):
-        super().setUp()
+        super(RefundUtilMethodTests, self).setUp()
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 
@@ -375,4 +375,4 @@ class RefundUtilMethodTests(ModuleStoreTestCase):
         enrollment = CourseEnrollment.get_or_create_enrollment(self.user, course_id)
 
         assert refund_success
-        assert enrollment.mode == new_mode
+        self.assertEqual(enrollment.mode, new_mode)

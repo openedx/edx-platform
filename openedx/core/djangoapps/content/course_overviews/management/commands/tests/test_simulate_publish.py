@@ -1,6 +1,10 @@
 """
 Tests the simulate_publish management command.
 """
+
+
+import six
+
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from testfixtures import LogCapture
@@ -28,7 +32,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         Modulestore signals are suppressed by ModuleStoreIsolationMixin, so this
         method should not trigger things like CourseOverview creation.
         """
-        super().setUpClass()
+        super(TestSimulatePublish, cls).setUpClass()
         cls.command = Command()
         # org.0/course_0/Run_0
         cls.course_key_1 = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo).id
@@ -43,7 +47,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         might look like you can move this to setUpClass, but be very careful if
         doing so, to make sure side-effects don't leak out between tests.
         """
-        super().setUp()
+        super(TestSimulatePublish, self).setUp()
 
         # Instead of using the process global SignalHandler.course_published, we
         # create our own SwitchedSignal to manually send to.
@@ -75,7 +79,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         )
         Command.course_published_signal.disconnect(self.sample_receiver_1)
         Command.course_published_signal.disconnect(self.sample_receiver_2)
-        super().tearDown()
+        super(TestSimulatePublish, self).tearDown()
 
     def options(self, **kwargs):
         """
@@ -108,13 +112,13 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
         """Test sending only to specific courses."""
         self.command.handle(
             **self.options(
-                courses=[str(self.course_key_1), str(self.course_key_2)]
+                courses=[six.text_type(self.course_key_1), six.text_type(self.course_key_2)]
             )
         )
-        assert self.course_key_1 in self.received_1
-        assert self.course_key_2 in self.received_1
-        assert self.course_key_3 not in self.received_1
-        assert self.received_1 == self.received_2
+        self.assertIn(self.course_key_1, self.received_1)
+        self.assertIn(self.course_key_2, self.received_1)
+        self.assertNotIn(self.course_key_3, self.received_1)
+        self.assertEqual(self.received_1, self.received_2)
 
     def test_specific_receivers(self):
         """Test sending only to specific receivers."""
@@ -123,14 +127,14 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 receivers=[name_from_fn(self.sample_receiver_1)]
             )
         )
-        assert self.course_key_1 in self.received_1
-        assert self.course_key_2 in self.received_1
-        assert self.course_key_3 in self.received_1
-        assert self.received_2 == []
+        self.assertIn(self.course_key_1, self.received_1)
+        self.assertIn(self.course_key_2, self.received_1)
+        self.assertIn(self.course_key_3, self.received_1)
+        self.assertEqual(self.received_2, [])
 
     def test_course_overviews(self):
         """Integration test with CourseOverviews."""
-        assert CourseOverview.objects.all().count() == 0
+        self.assertEqual(CourseOverview.objects.all().count(), 0)
         # pylint: disable=protected-access
         self.command.handle(
             **self.options(
@@ -139,9 +143,9 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
                 ]
             )
         )
-        assert CourseOverview.objects.all().count() == 3
-        assert self.received_1 == []
-        assert self.received_2 == []
+        self.assertEqual(CourseOverview.objects.all().count(), 3)
+        self.assertEqual(self.received_1, [])
+        self.assertEqual(self.received_2, [])
 
     def sample_receiver_1(self, sender, course_key, **kwargs):  # pylint: disable=unused-argument
         """Custom receiver for testing."""
@@ -169,7 +173,7 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
             log.check_present(
                 (
                     LOGGER_NAME, 'INFO',
-                    "simulate_publish starting, dry-run={}, delay={} seconds".format('False', '0')
+                    u"simulate_publish starting, dry-run={}, delay={} seconds".format('False', '0')
                 ),
             )
 
@@ -179,6 +183,6 @@ class TestSimulatePublish(SharedModuleStoreTestCase):
             log.check_present(
                 (
                     LOGGER_NAME, 'INFO',
-                    "simulate_publish starting, dry-run={}, delay={} seconds".format('True', '20')
+                    u"simulate_publish starting, dry-run={}, delay={} seconds".format('True', '20')
                 ),
             )

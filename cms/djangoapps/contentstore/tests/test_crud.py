@@ -3,13 +3,13 @@
 
 from xmodule import templates
 from xmodule.capa_module import ProblemBlock
-from xmodule.course_module import CourseBlock
+from xmodule.course_module import CourseDescriptor
 from xmodule.html_module import HtmlBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.seq_module import SequenceBlock
+from xmodule.seq_module import SequenceDescriptor
 
 
 class TemplateTests(ModuleStoreTestCase):
@@ -42,9 +42,9 @@ class TemplateTests(ModuleStoreTestCase):
         self.assertRegex(dropdown['data'], r'<problem>\s*<optionresponse>\s*<p>.*dropdown problems.*')
 
     def test_get_some_templates(self):
-        self.assertEqual(len(SequenceBlock.templates()), 0)
+        self.assertEqual(len(SequenceDescriptor.templates()), 0)
         self.assertGreater(len(HtmlBlock.templates()), 0)
-        self.assertIsNone(SequenceBlock.get_template('doesntexist.yaml'))
+        self.assertIsNone(SequenceDescriptor.get_template('doesntexist.yaml'))
         self.assertIsNone(HtmlBlock.get_template('doesntexist.yaml'))
         self.assertIsNotNone(HtmlBlock.get_template('announcement.yaml'))
 
@@ -56,7 +56,7 @@ class TemplateTests(ModuleStoreTestCase):
             display_name='fun test course',
             user_id='testbot'
         )
-        self.assertIsInstance(test_course, CourseBlock)
+        self.assertIsInstance(test_course, CourseDescriptor)
         self.assertEqual(test_course.display_name, 'fun test course')
         course_from_store = self.store.get_course(test_course.id)
         self.assertEqual(course_from_store.id.org, 'testx')
@@ -68,7 +68,7 @@ class TemplateTests(ModuleStoreTestCase):
             category='chapter',
             display_name='chapter 1'
         )
-        self.assertIsInstance(test_chapter, SequenceBlock)
+        self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = self.store.get_course(test_course.id.version_agnostic())
         self.assertIn(test_chapter.location, test_course.children)
@@ -95,7 +95,7 @@ class TemplateTests(ModuleStoreTestCase):
             test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
             parent_xblock=test_course
         )
-        self.assertIsInstance(test_chapter, SequenceBlock)
+        self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
         self.assertIn(test_chapter, test_course.get_children())
 
@@ -126,13 +126,13 @@ class TemplateTests(ModuleStoreTestCase):
 
         id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
         # verify it can be retrieved by id
-        self.assertIsInstance(self.store.get_course(id_locator), CourseBlock)
+        self.assertIsInstance(self.store.get_course(id_locator), CourseDescriptor)
         # TODO reenable when split_draft supports getting specific versions
         # guid_locator = test_course.location.course_agnostic()
         # Verify it can be retrieved by guid
-        # self.assertIsInstance(self.store.get_item(guid_locator), CourseBlock)
+        # self.assertIsInstance(self.store.get_item(guid_locator), CourseDescriptor)
         self.store.delete_course(id_locator, 'testbot')
         # Test can no longer retrieve by id.
         self.assertIsNone(self.store.get_course(id_locator))
         # But can retrieve by guid -- same TODO as above
-        # self.assertIsInstance(self.store.get_item(guid_locator), CourseBlock)
+        # self.assertIsInstance(self.store.get_item(guid_locator), CourseDescriptor)

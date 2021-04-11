@@ -8,9 +8,9 @@ from django.http import Http404
 from django.views.generic import View
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support import api as enterprise_api
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class ContactUsView(View):
@@ -18,7 +18,7 @@ class ContactUsView(View):
     View for viewing and submitting contact us form.
     """
 
-    def get(self, request):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get(self, request):
         if not configuration_helpers.get_value('CONTACT_US_PAGE', True):
             raise Http404
 
@@ -35,7 +35,7 @@ class ContactUsView(View):
         current_site_name = configuration_helpers.get_value("SITE_NAME")
         if current_site_name:
             current_site_name = current_site_name.replace(".", "_")
-            tags.append(f"site_name_{current_site_name}")
+            tags.append("site_name_{site}".format(site=current_site_name))
 
         if request.user.is_authenticated:
             context['course_id'] = request.session.get('course_id', '')

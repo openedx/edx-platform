@@ -21,9 +21,9 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @skip_unless_lms
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
-class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):
     def setUp(self):
-        super(TestBinnedScheduleMessageBaseTask, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestBinnedScheduleMessageBaseTask, self).setUp()
 
         self.site = SiteFactory.create()
         self.schedule_config = ScheduleConfigFactory.create(site=self.site)

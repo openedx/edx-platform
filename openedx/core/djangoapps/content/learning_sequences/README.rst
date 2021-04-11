@@ -9,8 +9,6 @@ users through the LMS, though it is also available to Studio for pushing data
 into the system. The first API this app implements is computing the Course
 Outline.
 
-This package should _not_ depend on the modulestore directly.
-
 ---------------
 Direction: Keep
 ---------------
@@ -88,4 +86,4 @@ I want to pull data from ModuleStore or Block Structures.
 
 Making any synchronous calls to these systems will break the performance goals
 of this app. If you need data from these systems, please find a way to push that
-data into smaller models at course publish time.
+data into smaller mdoels at course publish time.

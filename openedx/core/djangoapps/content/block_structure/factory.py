@@ -4,7 +4,7 @@ Module for factory class for BlockStructure objects.
 from .block_structure import BlockStructureBlockData, BlockStructureModulestoreData
 
 
-class BlockStructureFactory:
+class BlockStructureFactory(object):
     """
     Factory class for BlockStructure objects.
     """

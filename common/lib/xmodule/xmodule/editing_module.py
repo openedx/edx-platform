@@ -11,7 +11,7 @@ from xmodule.mako_module import MakoModuleDescriptor, MakoTemplateBlockBase
 log = logging.getLogger(__name__)
 
 
-class EditingFields:
+class EditingFields(object):
     """Contains specific template information (the raw data body)"""
     data = String(scope=Scope.content, default='')
 
@@ -32,7 +32,7 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         """
         `data` should not be editable in the Studio settings editor.
         """
-        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields = super(EditingMixin, self).non_editable_metadata_fields
         non_editable_fields.append(self.fields['data'])
         return non_editable_fields
 
@@ -46,7 +46,7 @@ class EditingMixin(EditingFields, MakoTemplateBlockBase):
         return _context
 
 
-class EditingDescriptor(EditingMixin, MakoModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class EditingDescriptor(EditingMixin, MakoModuleDescriptor):
     pass
 
 
@@ -72,7 +72,7 @@ class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
         return _context
 
     @classmethod
-    def get_css(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def get_css(cls):
         # load every tab's css
         for tab in cls.tabs:
             tab_styles = tab.get('css', {})
@@ -84,7 +84,7 @@ class TabsEditingMixin(EditingFields, MakoTemplateBlockBase):
         return cls.css
 
 
-class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It does not
     perform any validation on its definition---just passes it along to the browser.
@@ -95,10 +95,10 @@ class TabsEditingDescriptor(TabsEditingMixin, MakoModuleDescriptor):  # lint-amn
     template to be always loaded, so don't forget to include
     settings tab in your module descriptor.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
-class XMLEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class XMLEditingDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of its data as XML. It does not perform
     any validation of its definition
@@ -110,7 +110,7 @@ class XMLEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=
     js_module_name = "XMLEditingDescriptor"
 
 
-class MetadataOnlyEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class MetadataOnlyEditingDescriptor(EditingDescriptor):
     """
     Module which only provides an editing interface for the metadata, it does
     not expose a UI for editing the module data
@@ -122,7 +122,7 @@ class MetadataOnlyEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint:
     mako_template = "widgets/metadata-only-edit.html"
 
 
-class JSONEditingDescriptor(EditingDescriptor):  # lint-amnesty, pylint: disable=abstract-method
+class JSONEditingDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of its data as XML. It does not perform
     any validation of its definition

@@ -2587,11 +2587,9 @@ input[name="subject"] {
 }
 
 .special-allowance-container,
-.student-onboarding-status-container,
 .student-proctored-exam-container {
   .allowance-table,
-  .exam-attempts-table,
-  .onboarding-status-table {
+  .exam-attempts-table {
     width: 100%;
 
     tr:nth-child(even) {
@@ -2599,18 +2597,8 @@ input[name="subject"] {
       border-bottom: 1px solid #f3f3f3;
     }
 
-    tbody.even {
-      background-color: $gray-l6;
-      border-bottom: 1px solid #f3f3f3;
-    }
-
-    tbody.accordion-trigger {
-      cursor: pointer;
-    }
-
     .allowance-headings,
-    .exam-attempt-headings,
-    .onboarding-status-headings {
+    .exam-attempt-headings {
       height: 40px;
       border-bottom: 1px solid #bebebe;
 
@@ -2635,12 +2623,10 @@ input[name="subject"] {
 
         &.attempt-type {
           width: 90px;
-          text-align: center;
         }
 
         &.attempt-started-at {
           width: 170px;
-          text-align: center;
         }
 
         &.attempt-completed-at {
@@ -2657,15 +2643,13 @@ input[name="subject"] {
           width: 150px;
         }
 
-        &.more {
-          width: 30px;
-        }
-
         &.username {
           width: 140px;
         }
 
         &.email {
+          @include text-align(center);
+
           width: ($baseline*8);
           word-wrap: break-word;
         }
@@ -2701,7 +2685,7 @@ input[name="subject"] {
         @include padding-left($baseline);
       }
 
-      td:nth-child(3) {
+      td:nth-child(2) {
         line-height: 22px;
 
         @include padding-right(0);
@@ -2709,20 +2693,20 @@ input[name="subject"] {
         word-wrap: break-word;
       }
 
-      td:nth-child(6),
       td:nth-child(5),
-      td:nth-child(7) {
+      td:nth-child(4),
+      td:nth-child(6) {
         @include padding-left(0);
 
         text-align: center;
       }
 
-      td:nth-child(4) {
+      td:nth-child(3) {
         word-wrap: break-word;
         text-align: center;
       }
 
-      td:nth-child(8) {
+      td:nth-child(7) {
         word-wrap: break-word;
         text-align: center;
       }
@@ -2734,8 +2718,7 @@ input[name="subject"] {
   }
 
   .exam-attempts-content,
-  .exam-allowances-content,
-  .onboarding-status-content {
+  .exam-allowances-content {
     padding-left: 0;
     padding-right: 0;
   }
@@ -2744,8 +2727,7 @@ input[name="subject"] {
     margin-top: -30px;
     margin-bottom: 20px;
 
-    .search-attempts,
-    .search-onboarding {
+    .search-attempts {
       border: 1px solid #ccc;
       display: inline-block;
       border-radius: 5px;

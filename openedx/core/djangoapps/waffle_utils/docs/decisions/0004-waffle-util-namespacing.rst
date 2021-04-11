@@ -24,7 +24,7 @@ Decision
 
 Change the interface to WaffleFlag and WaffleSwitch to simply take the complete flag name, rather than a Namespace object.
 
-The constructor can assert that the name includes a dot (``.``) to help remind people to use some form of prefixed namespace. Waffle objects which do not include a dot in their name should be converted to ``NonNamespacedWaffleFlag`` or ``NonNamespacedWaffleSwitch`` objects, enabling a simpler transition for existing flags and switches that don't meet this requirement.
+The constructor can assert that the name includes a `.` to help remind people to use some form of prefixed namespace.  However, an optional argument with a name like `skip_namespace_assertion=True` could be used to skip this assertion, enabling a simpler transition for existing flags and switches that don't meet this requirement.
 
 Consequences
 ============

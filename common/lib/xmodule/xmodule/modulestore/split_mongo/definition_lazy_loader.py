@@ -1,11 +1,11 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import copy
 
 from opaque_keys.edx.locator import DefinitionLocator
 
 
-class DefinitionLazyLoader:
+class DefinitionLazyLoader(object):
     """
     A placeholder to put into an xblock in place of its definition which
     when accessed knows how to get its content. Only useful if the containing

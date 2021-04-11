@@ -3,8 +3,7 @@ Unit tests for the ProgramEnrollment admin classes.
 """
 
 
-from unittest import mock
-
+import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
 
@@ -19,7 +18,7 @@ class ProgramEnrollmentAdminTests(TestCase):
     new fields, etc.
     """
     def setUp(self):
-        super().setUp()
+        super(ProgramEnrollmentAdminTests, self).setUp()
         self.program_admin = ProgramEnrollmentAdmin(ProgramEnrollment, AdminSite())
         self.program_course_admin = ProgramCourseEnrollmentAdmin(ProgramCourseEnrollment, AdminSite())
 

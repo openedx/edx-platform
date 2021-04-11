@@ -48,7 +48,7 @@ class BigAutoField(models.AutoField):
         elif "postgres" in conn_module:
             return "bigserial"
         else:
-            return super(BigAutoField, self).db_type(connection)  # lint-amnesty, pylint: disable=super-with-arguments
+            return super(BigAutoField, self).db_type(connection)
 
     def rel_db_type(self, connection):
         """

@@ -5,7 +5,7 @@ Tests for verified track content views.
 
 import json
 import six
-import pytest
+
 from django.http import Http404
 from django.test.client import RequestFactory
 
@@ -35,7 +35,7 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         """
         request = RequestFactory().get("dummy_url")
         request.user = UserFactory()
-        with pytest.raises(Http404):
+        with self.assertRaises(Http404):
             cohorting_settings(request, six.text_type(self.course.id))
 
     def test_cohorting_settings_enabled(self):
@@ -67,5 +67,5 @@ class CohortingSettingsTestCase(SharedModuleStoreTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = AdminFactory()
         response = cohorting_settings(request, six.text_type(self.course.id))
-        assert 200 == response.status_code
-        assert expected_response == json.loads(response.content.decode('utf-8'))
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(expected_response, json.loads(response.content.decode('utf-8')))

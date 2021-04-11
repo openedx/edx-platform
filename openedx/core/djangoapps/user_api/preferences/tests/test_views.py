@@ -30,7 +30,7 @@ class TestPreferencesAPI(UserAPITestCase):
     Unit tests /api/user/v1/accounts/{username}/
     """
     def setUp(self):
-        super(TestPreferencesAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestPreferencesAPI, self).setUp()
         self.url_endpoint_name = "preferences_api"
         self.url = reverse(self.url_endpoint_name, kwargs={'username': self.user.username})
 
@@ -46,9 +46,9 @@ class TestPreferencesAPI(UserAPITestCase):
         Test that DELETE, POST, and PUT are not supported.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        assert 405 == self.client.put(self.url).status_code
-        assert 405 == self.client.post(self.url).status_code
-        assert 405 == self.client.delete(self.url).status_code
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.post(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
 
     def test_get_different_user(self):
         """
@@ -68,7 +68,7 @@ class TestPreferencesAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, username)
         response = client.get(reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}))
-        assert (404 if (username == 'staff_user') else 403) == response.status_code
+        self.assertEqual(404 if username == "staff_user" else 403, response.status_code)
 
     def test_get_preferences_default(self):
         """
@@ -77,7 +77,7 @@ class TestPreferencesAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
-        assert {} == response.data
+        self.assertEqual({}, response.data)
 
     @ddt.data(
         ("client", "user"),
@@ -96,7 +96,8 @@ class TestPreferencesAPI(UserAPITestCase):
         # Log in the client and do the GET.
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        assert {'dict_pref': "{'int_key': 10}", 'string_pref': 'value', 'time_zone': 'Asia/Tokyo'} == response.data
+        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value", "time_zone": "Asia/Tokyo"},  # pylint: disable=unicode-format-string
+                         response.data)
 
     @ddt.data(
         ("client", "user"),
@@ -112,7 +113,7 @@ class TestPreferencesAPI(UserAPITestCase):
             reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}),
             data=json.dumps({"string_pref": "value"}), content_type="application/merge-patch+json"
         )
-        assert 403 == response.status_code
+        self.assertEqual(403, response.status_code)
 
     def test_patch_bad_content_type(self):
         """
@@ -154,9 +155,9 @@ class TestPreferencesAPI(UserAPITestCase):
         if six.PY2:
             pref_dict = {u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}
         else:
-            # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+            # pylint: disable=unicode-format-string
             pref_dict = {"dict_pref": "{'int_key': 10}", "string_pref": "value"}
-        assert pref_dict == response.data
+        self.assertEqual(pref_dict, response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -203,12 +204,12 @@ class TestPreferencesAPI(UserAPITestCase):
         # Verify that GET returns the updated preferences
         response = self.send_get(self.client)
         expected_preferences = {
-            "dict_pref": "{'int_key': 10}",  # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+            "dict_pref": "{'int_key': 10}",  # pylint: disable=unicode-format-string
             "string_pref": "updated_value",
             "new_pref": "new_value",
             "time_zone": "Europe/London",
         }
-        assert expected_preferences == response.data
+        self.assertEqual(expected_preferences, response.data)
 
     def test_update_preferences_bad_data(self):
         """
@@ -233,9 +234,30 @@ class TestPreferencesAPI(UserAPITestCase):
             },
             expected_status=400
         )
-        assert response.data.get('field_errors', None)
+        self.assertTrue(response.data.get("field_errors", None))
         field_errors = response.data["field_errors"]
-        assert field_errors == {TOO_LONG_PREFERENCE_KEY: {'developer_message': get_expected_validation_developer_message(TOO_LONG_PREFERENCE_KEY, 'new_value'), 'user_message': get_expected_key_error_user_message(TOO_LONG_PREFERENCE_KEY, 'new_value')}, u'empty_pref_ȻħȺɍłɇs': {'developer_message': u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.", 'user_message': u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value."}, 'time_zone': {'developer_message': u"Value 'Asia/Africa' not valid for preference 'time_zone': Not in timezone set.", 'user_message': u"Value 'Asia/Africa' is not a valid time zone selection."}}  # pylint: disable=line-too-long
+        self.assertEqual(
+            field_errors,
+            {
+                TOO_LONG_PREFERENCE_KEY: {
+                    "developer_message": get_expected_validation_developer_message(
+                        TOO_LONG_PREFERENCE_KEY, "new_value"
+                    ),
+                    "user_message": get_expected_key_error_user_message(
+                        TOO_LONG_PREFERENCE_KEY, "new_value"
+                    ),
+                },
+                u"empty_pref_ȻħȺɍłɇs": {
+                    "developer_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
+                    "user_message": u"Preference 'empty_pref_ȻħȺɍłɇs' cannot be set to an empty value.",
+                },
+                "time_zone": {
+                    "developer_message": u"Value 'Asia/Africa' not valid for preference 'time_zone': Not in "
+                                         u"timezone set.",
+                    "user_message": u"Value 'Asia/Africa' is not a valid time zone selection."
+                },
+            }
+        )
 
         # Verify that GET returns the original preferences
         response = self.send_get(self.client)
@@ -245,7 +267,7 @@ class TestPreferencesAPI(UserAPITestCase):
             "extra_pref": u"extra_value",
             "time_zone": u"Pacific/Midway",
         }
-        assert expected_preferences == response.data
+        self.assertEqual(expected_preferences, response.data)
 
     def test_update_preferences_bad_request(self):
         """
@@ -255,15 +277,23 @@ class TestPreferencesAPI(UserAPITestCase):
 
         # Verify a non-dict request
         response = self.send_patch(self.client, "non_dict_request", expected_status=400)
-        assert response.data ==\
-               {'developer_message': u'No data provided for user preference update',
-                'user_message': u'No data provided for user preference update'}
+        self.assertEqual(
+            response.data,
+            {
+                "developer_message": u"No data provided for user preference update",
+                "user_message": u"No data provided for user preference update"
+            }
+        )
 
         # Verify an empty dict request
         response = self.send_patch(self.client, {}, expected_status=400)
-        assert response.data ==\
-               {'developer_message': u'No data provided for user preference update',
-                'user_message': u'No data provided for user preference update'}
+        self.assertEqual(
+            response.data,
+            {
+                "developer_message": u"No data provided for user preference update",
+                "user_message": u"No data provided for user preference update"
+            }
+        )
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -300,7 +330,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
     test_password = "test"
 
     def setUp(self):
-        super(TestPreferencesAPITransactions, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestPreferencesAPITransactions, self).setUp()
         self.client = APIClient()
         self.user = UserFactory.create(password=TEST_PASSWORD)
         self.url = reverse("preferences_api", kwargs={'username': self.user.username})
@@ -326,7 +356,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
             "c": "1",
         }
         response = self.client.patch(self.url, data=json.dumps(json_data), content_type="application/merge-patch+json")
-        assert 400 == response.status_code
+        self.assertEqual(400, response.status_code)
 
         # Verify that GET returns the original preferences
         response = self.client.get(self.url)
@@ -335,7 +365,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
             "b": "2",
             "c": "3",
         }
-        assert expected_preferences == response.data
+        self.assertEqual(expected_preferences, response.data)
 
 
 @ddt.ddt
@@ -345,7 +375,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
     Unit tests /api/user/v1/accounts/{username}/{preference_key}
     """
     def setUp(self):
-        super(TestPreferencesDetailAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestPreferencesDetailAPI, self).setUp()
         self.test_pref_key = "test_key"
         self.test_pref_value = "test_value"
         set_user_preference(self.user, self.test_pref_key, self.test_pref_value)
@@ -374,8 +404,8 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         Test that POST and PATCH are not supported.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        assert 405 == self.client.post(self.url).status_code
-        assert 405 == self.client.patch(self.url).status_code
+        self.assertEqual(405, self.client.post(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)
 
     def test_different_user_access(self):
         """
@@ -399,7 +429,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         response = client.get(
             reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist", 'preference_key': self.test_pref_key})
         )
-        assert (404 if (username == 'staff_user') else 403) == response.status_code
+        self.assertEqual(404 if username == "staff_user" else 403, response.status_code)
 
     def test_get_preference_does_not_exist(self):
         """
@@ -408,7 +438,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url("does_not_exist")
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client, expected_status=404)
-        assert response.data is None
+        self.assertIsNone(response.data)
 
     @ddt.data(
         ("client", "user"),
@@ -422,13 +452,13 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = self.send_get(client)
-        assert self.test_pref_value == response.data
+        self.assertEqual(self.test_pref_value, response.data)
 
         # Test a different value.
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
         self._set_url("dict_pref")
         response = self.send_get(client)
-        assert u"{'int_key': 10}" == response.data
+        self.assertEqual(u"{'int_key': 10}", response.data)
 
     def test_create_preference(self):
         """
@@ -454,7 +484,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         new_value = "new value"
         self.send_put(self.client, new_value)
         response = self.send_get(self.client)
-        assert new_value == response.data
+        self.assertEqual(new_value, response.data)
 
     @ddt.data(
         (None,),
@@ -469,9 +499,13 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url("new_key")
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_put(self.client, preference_value, expected_status=400)
-        assert response.data ==\
-               {'developer_message': u"Preference 'new_key' cannot be set to an empty value.",
-                'user_message': u"Preference 'new_key' cannot be set to an empty value."}
+        self.assertEqual(
+            response.data,
+            {
+                "developer_message": u"Preference 'new_key' cannot be set to an empty value.",
+                "user_message": u"Preference 'new_key' cannot be set to an empty value."
+            }
+        )
         self.send_get(self.client, expected_status=404)
 
     def test_create_preference_too_long_key(self):
@@ -484,9 +518,13 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         new_value = "new value"
         self._set_url(too_long_preference_key)
         response = self.send_put(self.client, new_value, expected_status=400)
-        assert response.data ==\
-               {'developer_message': get_expected_validation_developer_message(too_long_preference_key, new_value),
-                'user_message': get_expected_key_error_user_message(too_long_preference_key, new_value)}
+        self.assertEqual(
+            response.data,
+            {
+                "developer_message": get_expected_validation_developer_message(too_long_preference_key, new_value),
+                "user_message": get_expected_key_error_user_message(too_long_preference_key, new_value),
+            }
+        )
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -516,7 +554,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.send_put(self.client, preference_value)
         response = self.send_get(self.client)
-        assert six.text_type(preference_value) == response.data
+        self.assertEqual(six.text_type(preference_value), response.data)
 
     @ddt.data(
         ("different_client", "different_user"),
@@ -543,10 +581,15 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_put(self.client, preference_value, expected_status=400)
-        assert response.data == {'developer_message': u"Preference 'test_key' cannot be set to an empty value.",
-                                 'user_message': u"Preference 'test_key' cannot be set to an empty value."}
+        self.assertEqual(
+            response.data,
+            {
+                "developer_message": u"Preference 'test_key' cannot be set to an empty value.",
+                "user_message": u"Preference 'test_key' cannot be set to an empty value."
+            }
+        )
         response = self.send_get(self.client)
-        assert self.test_pref_value == response.data
+        self.assertEqual(self.test_pref_value, response.data)
 
     def test_delete_preference(self):
         """

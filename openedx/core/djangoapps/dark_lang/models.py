@@ -17,19 +17,19 @@ class DarkLangConfig(ConfigurationModel):
     """
     released_languages = models.TextField(
         blank=True,
-        help_text="A comma-separated list of language codes to release to the public."
+        help_text=u"A comma-separated list of language codes to release to the public."
     )
     enable_beta_languages = models.BooleanField(
         default=False,
-        help_text="Enable partially supported languages to display in language drop down."
+        help_text=u"Enable partially supported languages to display in language drop down."
     )
     beta_languages = models.TextField(
         blank=True,
-        help_text="A comma-separated list of language codes to release to the public as beta languages."
+        help_text=u"A comma-separated list of language codes to release to the public as beta languages."
     )
 
     def __str__(self):
-        return "DarkLangConfig()"
+        return u"DarkLangConfig()"
 
     @property
     def released_languages_list(self):

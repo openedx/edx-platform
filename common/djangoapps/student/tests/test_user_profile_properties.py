@@ -2,7 +2,7 @@
 
 
 import datetime
-import pytest
+
 import ddt
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -21,7 +21,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super().setUp()
+        super(UserProfilePropertiesTest, self).setUp()
         self.user = UserFactory.create(password=self.password)
         self.profile = self.user.profile
 
@@ -56,11 +56,11 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         # year younger than that in that same year.  We calculate age based off of
         # the youngest you could be that year.
         age = years_ago - 1
-        assert self.profile.age == age
+        self.assertEqual(self.profile.age, age)
 
     def test_age_no_birth_year(self):
         """Verify nothing is returned."""
-        assert self.profile.age is None
+        self.assertIsNone(self.profile.age)
 
     @ddt.data(*UserProfile.LEVEL_OF_EDUCATION_CHOICES)
     @ddt.unpack
@@ -68,11 +68,11 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         """Verify the level of education is displayed correctly."""
         self._set_level_of_education(level_enum)
 
-        assert self.profile.level_of_education_display == display_level
+        self.assertEqual(self.profile.level_of_education_display, display_level)
 
     def test_display_level_of_education_none_set(self):
         """Verify nothing is returned."""
-        assert self.profile.level_of_education_display is None
+        self.assertIsNone(self.profile.level_of_education_display)
 
     @ddt.data(*UserProfile.GENDER_CHOICES)
     @ddt.unpack
@@ -80,13 +80,13 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         """Verify the gender displayed correctly."""
         self._set_gender(gender_enum)
 
-        assert self.profile.gender_display == display_gender
+        self.assertEqual(self.profile.gender_display, display_gender)
 
     def test_display_gender_none_set(self):
         """Verify nothing is returned."""
         self._set_gender(None)
 
-        assert self.profile.gender_display is None
+        self.assertIsNone(self.profile.gender_display)
 
     def test_invalidate_cache_user_profile_country_updated(self):
 
@@ -95,32 +95,32 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         self.profile.save()
 
         cache_key = UserProfile.country_cache_key_name(self.user.id)
-        assert cache.get(cache_key) is None
+        self.assertIsNone(cache.get(cache_key))
 
         cache.set(cache_key, self.profile.country)
-        assert cache.get(cache_key) == country
+        self.assertEqual(cache.get(cache_key), country)
 
         country = 'bd'
         self.profile.country = country
         self.profile.save()
 
-        assert cache.get(cache_key) != country
-        assert cache.get(cache_key) is None
+        self.assertNotEqual(cache.get(cache_key), country)
+        self.assertIsNone(cache.get(cache_key))
 
     def test_phone_number_can_only_contain_digits(self):
         # validating the profile will fail, because there are letters
         # in the phone number
         self.profile.phone_number = 'abc'
-        pytest.raises(ValidationError, self.profile.full_clean)
+        self.assertRaises(ValidationError, self.profile.full_clean)
         # fail if mixed digits/letters
         self.profile.phone_number = '1234gb'
-        pytest.raises(ValidationError, self.profile.full_clean)
+        self.assertRaises(ValidationError, self.profile.full_clean)
         # fail if whitespace
         self.profile.phone_number = '   123'
-        pytest.raises(ValidationError, self.profile.full_clean)
+        self.assertRaises(ValidationError, self.profile.full_clean)
         # fail with special characters
         self.profile.phone_number = '123!@#$%^&*'
-        pytest.raises(ValidationError, self.profile.full_clean)
+        self.assertRaises(ValidationError, self.profile.full_clean)
         # valid phone number
         self.profile.phone_number = '123456789'
         try:

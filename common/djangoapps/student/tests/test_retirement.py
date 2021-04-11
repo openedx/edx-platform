@@ -9,7 +9,7 @@ import ddt
 import pytest
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -61,7 +61,7 @@ def retirement_status(retirement_user):  # pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
-def two_users_same_username_different_case(retirement_status):  # lint-amnesty, pylint: disable=missing-function-docstring, redefined-outer-name, unused-argument
+def two_users_same_username_different_case(retirement_status):
     user1 = UserFactory.create(username='TestUser')
     user2 = UserFactory.create(username='testuser')
     UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
@@ -88,7 +88,7 @@ def check_email_against_fmt(hashed_email):
     assert hashed_email.endswith(settings.RETIRED_EMAIL_DOMAIN)
 
 
-def test_get_retired_username(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_retired_username(retirement_user):
     """
     Basic testing of getting retired usernames. The hasher is opaque
     to us, we just care that it's succeeding and using our format.
@@ -107,7 +107,7 @@ def test_get_retired_username_status_exists(retirement_user, retirement_status):
     assert retirement_status.retired_username == hashed_username
 
 
-def test_get_all_retired_usernames_by_username(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_all_retired_usernames_by_username(retirement_user):
     """
     Check that all salts are used for this method and return expected
     formats.
@@ -122,7 +122,7 @@ def test_get_all_retired_usernames_by_username(retirement_user):  # lint-amnesty
     assert len(hashed_usernames) == len(set(hashed_usernames))
 
 
-def test_is_username_retired_is_retired(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_is_username_retired_is_retired(retirement_user):
     """
     Check functionality of is_username_retired when username is retired
     """
@@ -136,14 +136,14 @@ def test_is_username_retired_is_retired(retirement_user):  # lint-amnesty, pylin
     assert is_username_retired(original_username)
 
 
-def test_is_username_retired_not_retired(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_is_username_retired_not_retired(retirement_user):
     """
     Check functionality of is_username_retired when username is not retired
     """
     assert not is_username_retired(retirement_user.username)
 
 
-def test_is_email_retired_is_retired(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_is_email_retired_is_retired(retirement_user):
     """
     Check functionality of is_email_retired when email is retired
     """
@@ -157,14 +157,14 @@ def test_is_email_retired_is_retired(retirement_user):  # lint-amnesty, pylint: 
     assert is_email_retired(original_email)
 
 
-def test_is_email_retired_not_retired(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_is_email_retired_not_retired(retirement_user):
     """
     Check functionality of is_email_retired when email is not retired
     """
     assert not is_email_retired(retirement_user.email)
 
 
-def test_get_retired_email(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_retired_email(retirement_user):
     """
     Basic testing of retired emails.
     """
@@ -182,7 +182,7 @@ def test_get_retired_email_status_exists(retirement_user, retirement_status):  #
     assert retirement_status.retired_email == hashed_email
 
 
-def test_get_all_retired_email_by_email(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_all_retired_email_by_email(retirement_user):
     """
     Check that all salts are used for this method and return expected
     formats.
@@ -197,27 +197,27 @@ def test_get_all_retired_email_by_email(retirement_user):  # lint-amnesty, pylin
     assert len(hashed_emails) == len(set(hashed_emails))
 
 
-def test_get_correct_user_varying_by_case_only(two_users_same_username_different_case):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_correct_user_varying_by_case_only(two_users_same_username_different_case):
     """
     Check that two users - one retired, one active - with the same username except for case can be found.
     """
-    retired_status, retired_user, active_user = two_users_same_username_different_case  # lint-amnesty, pylint: disable=unused-variable
+    retired_status, retired_user, active_user = two_users_same_username_different_case
     first_user = get_potentially_retired_user_by_username(retired_status.original_username)
     second_user = get_potentially_retired_user_by_username(active_user.username)
     assert first_user.username != second_user.username
     assert second_user.username == active_user.username
 
 
-def test_get_potentially_retired_user_username_match(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_potentially_retired_user_username_match(retirement_user):
     """
     Check that we can pass in an un-retired username and get the
     user-to-be-retired back.
     """
     hashed_username = get_retired_username_by_username(retirement_user.username)
-    assert get_potentially_retired_user_by_username_and_hash(retirement_user.username, hashed_username) == retirement_user  # lint-amnesty, pylint: disable=line-too-long
+    assert get_potentially_retired_user_by_username_and_hash(retirement_user.username, hashed_username) == retirement_user
 
 
-def test_get_potentially_retired_user_hashed_match(retirement_user):  # lint-amnesty, pylint: disable=redefined-outer-name
+def test_get_potentially_retired_user_hashed_match(retirement_user):
     """
     Check that we can pass in a hashed username and get the
     user-to-be-retired back.
@@ -270,7 +270,7 @@ class TestRegisterRetiredUsername(TestCase):
     INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
 
     def setUp(self):
-        super().setUp()
+        super(TestRegisterRetiredUsername, self).setUp()
         self.url = reverse('user_api_registration')
         self.url_params = {
             'username': 'username',
@@ -281,7 +281,7 @@ class TestRegisterRetiredUsername(TestCase):
             'honor_code': 'true',
         }
 
-    def _validate_exiting_username_response(self, orig_username, response, start_msg=INVALID_ACCT_ERR_MSG[0], end_msg=INVALID_ACCT_ERR_MSG[1]):  # lint-amnesty, pylint: disable=line-too-long
+    def _validate_exiting_username_response(self, orig_username, response, start_msg=INVALID_ACCT_ERR_MSG[0], end_msg=INVALID_ACCT_ERR_MSG[1]):
         """
         Validates a response stating that a username already exists -or- is invalid.
         """
@@ -307,7 +307,7 @@ class TestRegisterRetiredUsername(TestCase):
         # Attempt to create another account with the same username that's been retired.
         self.url_params['username'] = orig_username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG[0], self.INVALID_ERR_MSG[1])  # lint-amnesty, pylint: disable=line-too-long
+        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG[0], self.INVALID_ERR_MSG[1])
 
     def test_username_close_to_retired_format_active(self):
         """

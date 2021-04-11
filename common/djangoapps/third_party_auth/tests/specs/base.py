@@ -6,18 +6,16 @@ Base integration test for provider implementations.
 import json
 import unittest
 from contextlib import contextmanager
-from unittest import mock
 
-import pytest
+import mock
 from django import test
-from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
 from django.urls import reverse
 from django.test import utils as django_utils
-from django.conf import settings as django_settings  # lint-amnesty, pylint: disable=reimported
+from django.conf import settings as django_settings
 from social_core import actions, exceptions
 from social_django import utils as social_utils
 from social_django import views as social_views
@@ -26,7 +24,6 @@ from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.user_authn.views.login import login_user
 from openedx.core.djangoapps.user_authn.views.login_form import login_and_registration_form
 from openedx.core.djangoapps.user_authn.views.register import RegistrationView
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context
 from common.djangoapps.student import models as student_models
@@ -40,7 +37,7 @@ def create_account(request):
     return RegistrationView().post(request)
 
 
-class HelperMixin:
+class HelperMixin(object):
     """
     Contains helper methods for IntegrationTestMixin and IntegrationTest classes below.
     """
@@ -56,10 +53,10 @@ class HelperMixin:
         implementations may optionally strengthen this assertion with, for
         example, more details about the format of the Location header.
         """
-        assert 302 == response.status_code
-        assert response.has_header('Location')
+        self.assertEqual(302, response.status_code)
+        self.assertTrue(response.has_header('Location'))
 
-    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs, required_fields):  # lint-amnesty, pylint: disable=invalid-name
+    def assert_register_response_in_pipeline_looks_correct(self, response, pipeline_kwargs, required_fields):
         """Performs spot checks of the rendered register.html page.
 
         When we display the new account registration form after the user signs
@@ -73,11 +70,11 @@ class HelperMixin:
         # Check that the correct provider was selected.
         self.assertContains(
             response,
-            '"errorMessage": null'
+            u'"errorMessage": null'
         )
         self.assertContains(
             response,
-            f'"currentProvider": "{self.provider.name}"',
+            u'"currentProvider": "{}"'.format(self.provider.name),
         )
         # Expect that each truthy value we've prepopulated the register form
         # with is actually present.
@@ -96,16 +93,16 @@ class HelperMixin:
         its connected state is correct.
         """
         if duplicate:
-            assert context['duplicate_provider'] == self.provider.backend_name
+            self.assertEqual(context['duplicate_provider'], self.provider.backend_name)
         else:
-            assert context['duplicate_provider'] is None
+            self.assertIsNone(context['duplicate_provider'])
 
         if linked is not None:
             expected_provider = [
                 provider for provider in context['auth']['providers'] if provider['name'] == self.provider.name
             ][0]
-            assert expected_provider is not None
-            assert expected_provider['connected'] == linked
+            self.assertIsNotNone(expected_provider)
+            self.assertEqual(expected_provider['connected'], linked)
 
     def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):
         """Tests middleware conditional redirection.
@@ -119,45 +116,39 @@ class HelperMixin:
             request, exceptions.AuthCanceled(request.backend))
         location = response.get('Location')
 
-        assert 302 == response.status_code
-        assert 'canceled' in location
-        assert self.backend_name in location
-        assert location.startswith(expected_uri + '?')
+        self.assertEqual(302, response.status_code)
+        self.assertIn('canceled', location)
+        self.assertIn(self.backend_name, location)
+        self.assertTrue(location.startswith(expected_uri + '?'))
 
     def assert_json_failure_response_is_inactive_account(self, response):
         """Asserts failure on /login for inactive account looks right."""
-        assert 400 == response.status_code
+        self.assertEqual(400, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
-        context = {
-            'platformName': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-            'supportLink': configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
-        }
-
-        assert not payload.get('success')
-        assert 'inactive-user' in payload.get('error_code')
-        assert context == payload.get('context')
+        self.assertFalse(payload.get('success'))
+        self.assertIn('inactive-user', payload.get('error_code'))
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        assert 403 == response.status_code
+        self.assertEqual(403, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
-        assert not payload.get('success')
-        assert payload.get('error_code') == 'third-party-auth-with-no-linked-account'
+        self.assertFalse(payload.get('success'))
+        self.assertEqual(payload.get('error_code'), 'third-party-auth-with-no-linked-account')
 
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
-        assert 409 == response.status_code
+        self.assertEqual(409, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
-        assert not payload.get('success')
-        assert 'belongs to an existing account' in payload['username'][0]['user_message']
+        self.assertFalse(payload.get('success'))
+        self.assertIn('belongs to an existing account', payload['username'][0]['user_message'])
 
     def assert_json_success_response_looks_correct(self, response, verify_redirect_url):
         """Asserts the json response indicates success and redirection."""
-        assert 200 == response.status_code
+        self.assertEqual(200, response.status_code)
         payload = json.loads(response.content.decode('utf-8'))
-        assert payload.get('success')
+        self.assertTrue(payload.get('success'))
         if verify_redirect_url:
-            assert pipeline.get_complete_url(self.provider.backend_name) == payload.get('redirect_url')
+            self.assertEqual(pipeline.get_complete_url(self.provider.backend_name), payload.get('redirect_url'))
 
     def assert_login_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /login not in the pipeline looks correct."""
@@ -168,37 +159,37 @@ class HelperMixin:
 
     def assert_login_response_in_pipeline_looks_correct(self, response):
         """Asserts a GET of /login in the pipeline looks correct."""
-        assert 200 == response.status_code
+        self.assertEqual(200, response.status_code)
 
     def assert_password_overridden_by_pipeline(self, username, password):
         """Verifies that the given password is not correct.
 
         The pipeline overrides POST['password'], if any, with random data.
         """
-        assert auth.authenticate(password=password, username=username) is None
+        self.assertIsNone(auth.authenticate(password=password, username=username))
 
     def assert_pipeline_running(self, request):
         """Makes sure the given request is running an auth pipeline."""
-        assert pipeline.running(request)
+        self.assertTrue(pipeline.running(request))
 
     def assert_redirect_after_pipeline_completes(self, response, expected_redirect_url=None):
         """Asserts a response would redirect to the expected_redirect_url or SOCIAL_AUTH_LOGIN_REDIRECT_URL."""
-        assert 302 == response.status_code
+        self.assertEqual(302, response.status_code)
         # NOTE: Ideally we should use assertRedirects(), however it errors out due to the hostname, testserver,
         # not being properly set. This may be an issue with the call made by PSA, but we are not certain.
-        assert response.get('Location').endswith(
-            expected_redirect_url or django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL
-        )
+        self.assertTrue(response.get('Location').endswith(
+            expected_redirect_url or django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL,
+        ))
 
     def assert_redirect_to_login_looks_correct(self, response):
         """Asserts a response would redirect to /login."""
-        assert 302 == response.status_code
-        assert '/login' == response.get('Location')
+        self.assertEqual(302, response.status_code)
+        self.assertEqual('/login', response.get('Location'))
 
     def assert_redirect_to_register_looks_correct(self, response):
         """Asserts a response would redirect to /register."""
-        assert 302 == response.status_code
-        assert '/register' == response.get('Location')
+        self.assertEqual(302, response.status_code)
+        self.assertEqual('/register', response.get('Location'))
 
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
@@ -211,21 +202,24 @@ class HelperMixin:
         """Asserts a user does not have an auth with the expected provider."""
         social_auths = strategy.storage.user.get_social_auth_for_user(
             user, provider=self.provider.backend_name)
-        assert 0 == len(social_auths)
+        self.assertEqual(0, len(social_auths))
 
     def assert_social_auth_exists_for_user(self, user, strategy):
         """Asserts a user has a social auth with the expected provider."""
         social_auths = strategy.storage.user.get_social_auth_for_user(
             user, provider=self.provider.backend_name)
-        assert 1 == len(social_auths)
-        assert self.backend_name == social_auths[0].provider
+        self.assertEqual(1, len(social_auths))
+        self.assertEqual(self.backend_name, social_auths[0].provider)
 
     def assert_logged_in_cookie_redirect(self, response):
         """Verify that the user was redirected in order to set the logged in cookie. """
-        assert response.status_code == 302
-        assert response['Location'] == pipeline.get_complete_url(self.provider.backend_name)
-        assert response.cookies[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME].value == 'true'
-        assert django_settings.EDXMKTG_USER_INFO_COOKIE_NAME in response.cookies
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response["Location"],
+            pipeline.get_complete_url(self.provider.backend_name)
+        )
+        self.assertEqual(response.cookies[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME].value, 'true')
+        self.assertIn(django_settings.EDXMKTG_USER_INFO_COOKIE_NAME, response.cookies)
 
     @property
     def backend_name(self):
@@ -364,7 +358,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
     USER_USERNAME = "override"
 
     def setUp(self):
-        super().setUp()
+        super(IntegrationTestMixin, self).setUp()
 
         self.request_factory = test.RequestFactory()
         self.login_page_url = reverse('signin_user')
@@ -382,24 +376,24 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         # The user clicks on the Dummy button:
         try_login_response = self.client.get(provider_register_url)
         # The user should be redirected to the provider's login page:
-        assert try_login_response.status_code == 302
+        self.assertEqual(try_login_response.status_code, 302)
         provider_response = self.do_provider_login(try_login_response['Location'])
         # We should be redirected to the register screen since this account is not linked to an edX account:
-        assert provider_response.status_code == 302
-        assert provider_response['Location'] == self.register_page_url
+        self.assertEqual(provider_response.status_code, 302)
+        self.assertEqual(provider_response['Location'], self.register_page_url)
         register_response = self.client.get(self.register_page_url)
         tpa_context = register_response.context["data"]["third_party_auth"]
-        assert tpa_context['errorMessage'] is None
+        self.assertEqual(tpa_context["errorMessage"], None)
         # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
-        assert tpa_context['currentProvider'] == self.PROVIDER_NAME
+        self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
         # Check that the data (e.g. email) from the provider is displayed in the form:
         form_data = register_response.context['data']['registration_form_desc']
         form_fields = {field['name']: field for field in form_data['fields']}
-        assert form_fields['email']['defaultValue'] == self.USER_EMAIL
-        assert form_fields['name']['defaultValue'] == self.USER_NAME
-        assert form_fields['username']['defaultValue'] == self.USER_USERNAME
+        self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
+        self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
+        self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
         for field_name, value in extra_defaults.items():
-            assert form_fields[field_name]['defaultValue'] == value
+            self.assertEqual(form_fields[field_name]['defaultValue'], value)
         registration_values = {
             'email': 'email-edited@tpa-test.none',
             'name': 'My Customized Name',
@@ -411,12 +405,12 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
             reverse('user_api_registration'),
             registration_values
         )
-        assert ajax_register_response.status_code == 200
+        self.assertEqual(ajax_register_response.status_code, 200)
         # Then the AJAX will finish the third party auth:
         continue_response = self.client.get(tpa_context["finishAuthUrl"])
         # And we should be redirected to the dashboard:
-        assert continue_response.status_code == 302
-        assert continue_response['Location'] == reverse('dashboard')
+        self.assertEqual(continue_response.status_code, 302)
+        self.assertEqual(continue_response['Location'], reverse('dashboard'))
 
         # Now check that we can login again, whether or not we have yet verified the account:
         self.client.logout()
@@ -435,28 +429,28 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         # The user clicks on the provider's button:
         try_login_response = self.client.get(provider_login_url)
         # The user should be redirected to the provider's login page:
-        assert try_login_response.status_code == 302
+        self.assertEqual(try_login_response.status_code, 302)
         complete_response = self.do_provider_login(try_login_response['Location'])
         # We should be redirected to the login screen since this account is not linked to an edX account:
-        assert complete_response.status_code == 302
-        assert complete_response['Location'] == self.login_page_url
+        self.assertEqual(complete_response.status_code, 302)
+        self.assertEqual(complete_response['Location'], self.login_page_url)
         login_response = self.client.get(self.login_page_url)
         tpa_context = login_response.context["data"]["third_party_auth"]
-        assert tpa_context['errorMessage'] is None
+        self.assertEqual(tpa_context["errorMessage"], None)
         # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
-        assert tpa_context['currentProvider'] == self.PROVIDER_NAME
+        self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
         # Now the user enters their username and password.
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
             reverse('user_api_login_session'),
             {'email': self.user.email, 'password': 'test'}
         )
-        assert ajax_login_response.status_code == 200
+        self.assertEqual(ajax_login_response.status_code, 200)
         # Then the AJAX will finish the third party auth:
         continue_response = self.client.get(tpa_context["finishAuthUrl"])
         # And we should be redirected to the dashboard:
-        assert continue_response.status_code == 302
-        assert continue_response['Location'] == reverse('dashboard')
+        self.assertEqual(continue_response.status_code, 302)
+        self.assertEqual(continue_response['Location'], reverse('dashboard'))
 
         # Now check that we can login again:
         self.client.logout()
@@ -473,30 +467,30 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         """ Test logging in to an account that is already linked. """
         # Make sure we're not logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
-        assert dashboard_response.status_code == 302
+        self.assertEqual(dashboard_response.status_code, 302)
         # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
         # The user clicks on the provider's login button:
         try_login_response = self.client.get(provider_login_url)
         # The user should be redirected to the provider:
-        assert try_login_response.status_code == 302
+        self.assertEqual(try_login_response.status_code, 302)
         login_response = self.do_provider_login(try_login_response['Location'])
         # If the previous session was manually logged out, there will be one weird redirect
         # required to set the login cookie (it sticks around if the main session times out):
         if not previous_session_timed_out:
-            assert login_response.status_code == 302
-            assert login_response['Location'] == (self.complete_url + '?')
+            self.assertEqual(login_response.status_code, 302)
+            self.assertEqual(login_response['Location'], self.complete_url + "?")
             # And then we should be redirected to the dashboard:
             login_response = self.client.get(login_response['Location'])
-            assert login_response.status_code == 302
+            self.assertEqual(login_response.status_code, 302)
         if user_is_activated:
             url_expected = reverse('dashboard')
         else:
             url_expected = reverse('third_party_inactive_redirect') + '?next=' + reverse('dashboard')
-        assert login_response['Location'] == url_expected
+        self.assertEqual(login_response['Location'], url_expected)
         # Now we are logged in:
         dashboard_response = self.client.get(reverse('dashboard'))
-        assert dashboard_response.status_code == 200
+        self.assertEqual(dashboard_response.status_code, 200)
 
     def _check_login_page(self):
         """
@@ -518,7 +512,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         self.assertContains(response, self.PROVIDER_NAME)
         context_data = response.context['data']['third_party_auth']
         provider_urls = {provider['id']: provider[url_to_return] for provider in context_data['providers']}
-        assert self.PROVIDER_ID in provider_urls
+        self.assertIn(self.PROVIDER_ID, provider_urls)
         return provider_urls[self.PROVIDER_ID]
 
     @property
@@ -534,7 +528,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     """Abstract base class for provider integration tests."""
 
     def setUp(self):
-        super().setUp()
+        super(IntegrationTest, self).setUp()
         self.request_factory = test.RequestFactory()
 
     # Actual tests, executed once per child.
@@ -666,7 +660,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_social_auth_exists_for_user(linked_user, strategy)
         self.assert_social_auth_does_not_exist_for_user(unlinked_user, strategy)
 
-        with pytest.raises(exceptions.AuthAlreadyAssociated):
+        with self.assertRaises(exceptions.AuthAlreadyAssociated):
             # pylint: disable=protected-access
             actions.do_complete(backend, social_views._do_login, user=unlinked_user, request=strategy.request)
 
@@ -718,7 +712,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         partial_data = strategy.storage.partial.load(partial_pipeline_token)
 
         self.assert_social_auth_exists_for_user(user, strategy)
-        assert user.is_active
+        self.assertTrue(user.is_active)
 
         # Begin! Ensure that the login form contains expected controls before
         # the user starts the pipeline.
@@ -789,27 +783,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         post_request = self._get_login_post_request(strategy)
         self.assert_json_failure_response_is_missing_social_auth(login_user(post_request))
 
-    @django_utils.override_settings(ENABLE_REQUIRE_THIRD_PARTY_AUTH=True)
-    def test_signin_associates_user_if_oauth_provider_and_tpa_is_required(self):
-        """
-        Tests associate user by email with oauth provider and `ENABLE_REQUIRE_THIRD_PARTY_AUTH` enabled
-        """
-        username, email, password = self.get_username(), 'user@example.com', 'password'
-
-        _, strategy = self.get_request_and_strategy(
-            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
-
-        user = self.create_user_models_for_existing_account(strategy, email, password, username, skip_social_auth=True)
-
-        with mock.patch(
-            'common.djangoapps.third_party_auth.pipeline.get_associated_user_by_email_response',
-            return_value=[{'user': user}, True],
-        ):
-            strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-
-            post_request = self._get_login_post_request(strategy)
-            self.assert_json_success_response_looks_correct(login_user(post_request), verify_redirect_url=True)
-
     def test_first_party_auth_trumps_third_party_auth_but_is_invalid_when_only_email_in_request(self):
         self.assert_first_party_auth_trumps_third_party_auth(email='user@example.com')
 
@@ -818,11 +791,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_first_party_auth_trumps_third_party_auth_and_fails_when_credentials_bad(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=False)
+            email='user@example.com', password=u'password', success=False)
 
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=True)
+            email='user@example.com', password=u'password', success=True)
 
     def test_pipeline_redirects_to_requested_url(self):
         requested_redirect_url = 'foo'  # something different from '/dashboard'
@@ -881,7 +854,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             strategy.request.POST = self.get_registration_post_vars({'email': email})
 
         # The user must not exist yet...
-        with pytest.raises(auth_models.User.DoesNotExist):
+        with self.assertRaises(auth_models.User.DoesNotExist):
             self.get_user_by_email(strategy, email)
 
         # ...but when we invoke create_account the existing edX view will make
@@ -925,7 +898,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login,
                                                                         request=request))
         distinct_username = pipeline.get(request)['kwargs']['username']
-        assert original_username != distinct_username
+        self.assertNotEqual(original_username, distinct_username)
 
     def test_new_account_registration_fails_if_email_exists(self):
         request, strategy = self.get_request_and_strategy(
@@ -951,17 +924,17 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_pipeline_raises_auth_entry_error_if_auth_entry_invalid(self):
         auth_entry = 'invalid'
-        assert auth_entry not in pipeline._AUTH_ENTRY_CHOICES  # pylint: disable=protected-access
+        self.assertNotIn(auth_entry, pipeline._AUTH_ENTRY_CHOICES)  # pylint: disable=protected-access
 
         _, strategy = self.get_request_and_strategy(auth_entry=auth_entry, redirect_uri='social:complete')
 
-        with pytest.raises(pipeline.AuthEntryError):
+        with self.assertRaises(pipeline.AuthEntryError):
             strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
 
     def test_pipeline_assumes_login_if_auth_entry_missing(self):
         _, strategy = self.get_request_and_strategy(auth_entry=None, redirect_uri='social:complete')
         response = self.fake_auth_complete(strategy)
-        assert response.url == reverse('signin_user')
+        self.assertEqual(response.url, reverse('signin_user'))
 
     def assert_first_party_auth_trumps_third_party_auth(self, email=None, password=None, success=None):
         """Asserts first party auth was used in place of third party auth.
@@ -993,15 +966,15 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         if success is None:
             # Request malformed -- just one of email/password given.
-            assert not payload.get('success')
-            assert 'There was an error receiving your login information' in payload.get('value')
+            self.assertFalse(payload.get('success'))
+            self.assertIn('There was an error receiving your login information', payload.get('value'))
         elif success:
             # Request well-formed and credentials good.
-            assert payload.get('success')
+            self.assertTrue(payload.get('success'))
         else:
             # Request well-formed but credentials bad.
-            assert not payload.get('success')
-            assert 'incorrect' in payload.get('value')
+            self.assertFalse(payload.get('success'))
+            self.assertIn('incorrect', payload.get('value'))
 
     def get_response_data(self):
         """Gets a dict of response data of the form given by the provider.
@@ -1042,7 +1015,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
 # pylint: disable=abstract-method
 @django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL)
-class Oauth2IntegrationTest(IntegrationTest):  # lint-amnesty, pylint: disable=test-inherits-tests
+class Oauth2IntegrationTest(IntegrationTest):
     """Base test case for integration tests of Oauth2 providers."""
 
     # Dict of string -> object. Information about the token granted to the

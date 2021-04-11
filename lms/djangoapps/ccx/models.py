@@ -7,14 +7,15 @@ import json
 import logging
 from datetime import datetime
 
+import six
 from ccx_keys.locator import CCXLocator
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db import models
 from lazy import lazy
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from pytz import utc
 
-from xmodule.error_module import ErrorBlock
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.ccx")
@@ -31,18 +32,18 @@ class CustomCourseForEdX(models.Model):
     coach = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # if not empty, this field contains a json serialized list of
     # the master course modules
-    structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
+    structure_json = models.TextField(verbose_name=u'Structure JSON', blank=True, null=True)
 
-    class Meta:
+    class Meta(object):
         app_label = 'ccx'
 
     @lazy
     def course(self):
-        """Return the CourseBlock of the course related to this CCX"""
+        """Return the CourseDescriptor of the course related to this CCX"""
         store = modulestore()
         with store.bulk_operations(self.course_id):
             course = store.get_course(self.course_id)
-            if not course or isinstance(course, ErrorBlock):
+            if not course or isinstance(course, ErrorDescriptor):
                 log.error("CCX {0} from {2} course {1}".format(  # pylint: disable=logging-format-interpolation
                     self.display_name, self.course_id, "broken" if course else "non-existent"
                 ))
@@ -102,7 +103,7 @@ class CustomCourseForEdX(models.Model):
         Returns:
             The CCXLocator corresponding to this CCX.
         """
-        return CCXLocator.from_course_locator(self.course_id, str(self.id))
+        return CCXLocator.from_course_locator(self.course_id, six.text_type(self.id))
 
 
 class CcxFieldOverride(models.Model):
@@ -115,8 +116,8 @@ class CcxFieldOverride(models.Model):
     location = UsageKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 
-    class Meta:
+    class Meta(object):
         app_label = 'ccx'
         unique_together = (('ccx', 'location', 'field'),)
 
-    value = models.TextField(default='null')
+    value = models.TextField(default=u'null')

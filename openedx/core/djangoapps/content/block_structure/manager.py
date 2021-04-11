@@ -6,6 +6,8 @@ BlockStructures.
 
 from contextlib import contextmanager
 
+import six
+
 from . import config
 from .exceptions import BlockStructureNotFound, TransformerDataIncompatible, UsageKeyNotInBlockStructure
 from .factory import BlockStructureFactory
@@ -13,7 +15,7 @@ from .store import BlockStructureStore
 from .transformers import BlockStructureTransformers
 
 
-class BlockStructureManager:
+class BlockStructureManager(object):
     """
     Top-level class for managing Block Structures.
     """
@@ -69,10 +71,10 @@ class BlockStructureManager:
             # requested location.  The rest of the structure will be pruned
             # as part of the transformation.
             if starting_block_usage_key not in block_structure:
-                raise UsageKeyNotInBlockStructure(  # lint-amnesty, pylint: disable=raising-format-tuple
-                    "The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
-                    str(starting_block_usage_key),
-                    str(self.root_block_usage_key),
+                raise UsageKeyNotInBlockStructure(
+                    u"The requested usage_key '{0}' is not found in the block_structure with root '{1}'",
+                    six.text_type(starting_block_usage_key),
+                    six.text_type(self.root_block_usage_key),
                 )
             block_structure.set_root_block(starting_block_usage_key)
         transformers.transform(block_structure)
@@ -100,9 +102,10 @@ class BlockStructureManager:
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
-            if config.RAISE_ERROR_WHEN_NOT_FOUND.is_enabled():
+            if config.waffle().is_enabled(config.RAISE_ERROR_WHEN_NOT_FOUND):
                 raise
-            block_structure = self._update_collected()
+            else:
+                block_structure = self._update_collected()
 
         return block_structure
 

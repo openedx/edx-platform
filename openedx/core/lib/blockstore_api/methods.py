@@ -115,7 +115,7 @@ def get_collection(collection_uuid):
     try:
         data = api_request('get', api_url('collections', str(collection_uuid)))
     except NotFound:
-        raise CollectionNotFound("Collection {} does not exist.".format(collection_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise CollectionNotFound("Collection {} does not exist.".format(collection_uuid))
     return _collection_from_response(data)
 
 
@@ -170,7 +170,7 @@ def get_bundle(bundle_uuid):
     try:
         data = api_request('get', api_url('bundles', str(bundle_uuid)))
     except NotFound:
-        raise BundleNotFound("Bundle {} does not exist.".format(bundle_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise BundleNotFound("Bundle {} does not exist.".format(bundle_uuid))
     return _bundle_from_response(data)
 
 
@@ -224,7 +224,7 @@ def get_draft(draft_uuid):
     try:
         data = api_request('get', api_url('drafts', str(draft_uuid)))
     except NotFound:
-        raise DraftNotFound("Draft does not exist: {}".format(draft_uuid))  # lint-amnesty, pylint: disable=raise-missing-from
+        raise DraftNotFound("Draft does not exist: {}".format(draft_uuid))
     return _draft_from_response(data)
 
 
@@ -353,7 +353,7 @@ def get_bundle_file_metadata(bundle_uuid, path, use_draft=None):
     try:
         return files_dict[path]
     except KeyError:
-        raise BundleFileNotFound(  # lint-amnesty, pylint: disable=raise-missing-from
+        raise BundleFileNotFound(
             "Bundle {} (draft: {}) does not contain a file {}".format(bundle_uuid, use_draft, path)
         )
 

@@ -1,12 +1,13 @@
 """
 Tests for SettingsService
 """
-import unittest
-from unittest import mock
 
-import pytest
+
+import unittest
 from django.test import TestCase
+
 import ddt
+import mock
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -18,9 +19,9 @@ from xmodule.services import ConfigurationService, SettingsService, TeamsConfigu
 from openedx.core.lib.teams_config import TeamsConfig
 
 
-class _DummyBlock:
+class _DummyBlock(object):
     """ Dummy Xblock class """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class DummyConfig(ConfigurationModel):
@@ -31,11 +32,11 @@ class DummyConfig(ConfigurationModel):
         app_label = 'xmoduletestservices'
 
 
-class DummyUnexpected:
+class DummyUnexpected(object):
     """
     Dummy Unexpected Class
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @ddt.ddt
@@ -47,7 +48,7 @@ class TestSettingsService(unittest.TestCase):
 
     def setUp(self):
         """ Setting up tests """
-        super().setUp()
+        super(TestSettingsService, self).setUp()
         self.settings_service = SettingsService()
         self.xblock_mock = mock.Mock()
         self.xblock_mock.block_settings_key = self.xblock_setting_key1
@@ -56,48 +57,46 @@ class TestSettingsService(unittest.TestCase):
 
     def test_get_given_none_throws_value_error(self):
         """  Test that given None throws value error """
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             self.settings_service.get_settings_bucket(None)
 
     def test_get_return_default_if_xblock_settings_is_missing(self):
         """ Test that returns default (or None if default not set) if XBLOCK_SETTINGS is not set """
-        assert not hasattr(settings, 'XBLOCK_SETTINGS')
-        # precondition check
-        assert self.settings_service.get_settings_bucket(self.xblock_mock, 'zzz') == 'zzz'
+        self.assertFalse(hasattr(settings, 'XBLOCK_SETTINGS'))  # precondition check
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock, 'zzz'), 'zzz')
 
     def test_get_return_empty_dictionary_if_xblock_settings_and_default_is_missing(self):
         """ Test that returns default (or None if default not set) if XBLOCK_SETTINGS is not set """
-        assert not hasattr(settings, 'XBLOCK_SETTINGS')
-        # precondition check
-        assert self.settings_service.get_settings_bucket(self.xblock_mock) == {}
+        self.assertFalse(hasattr(settings, 'XBLOCK_SETTINGS'))  # precondition check
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), {})
 
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key2: {'b': 1}})
     def test_get_returns_none_or_default_if_bucket_not_found(self):
         """ Test if settings service returns default if setting not found """
-        assert settings.XBLOCK_SETTINGS == {self.xblock_setting_key2: {'b': 1}}
-        assert self.settings_service.get_settings_bucket(self.xblock_mock) == {}
-        assert self.settings_service.get_settings_bucket(self.xblock_mock, 123) == 123
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key2: {'b': 1}})
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), {})
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock, 123), 123)
 
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key1: 42})
     def test_get_returns_correct_value(self):
         """ Test if settings service returns correct bucket """
-        assert settings.XBLOCK_SETTINGS == {self.xblock_setting_key1: 42}
-        assert self.settings_service.get_settings_bucket(self.xblock_mock) == 42
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key1: 42})
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), 42)
 
     @override_settings(XBLOCK_SETTINGS={xblock_setting_key2: "I'm a setting"})
     def test_get_respects_block_settings_key(self):
         """ Test if settings service respects block_settings_key value """
-        assert settings.XBLOCK_SETTINGS == {self.xblock_setting_key2: "I'm a setting"}
+        self.assertEqual(settings.XBLOCK_SETTINGS, {self.xblock_setting_key2: "I'm a setting"})
         self.xblock_mock.block_settings_key = self.xblock_setting_key2
-        assert self.settings_service.get_settings_bucket(self.xblock_mock) == "I'm a setting"
+        self.assertEqual(self.settings_service.get_settings_bucket(self.xblock_mock), "I'm a setting")
 
     @override_settings(XBLOCK_SETTINGS={_DummyBlock.__name__: [1, 2, 3]})
     def test_get_uses_class_name_if_block_settings_key_is_not_set(self):
         """ Test if settings service uses class name if block_settings_key attribute does not exist """
         mixologist = Mixologist([])
         block = mixologist.mix(_DummyBlock)
-        assert settings.XBLOCK_SETTINGS == {'_DummyBlock': [1, 2, 3]}
-        assert self.settings_service.get_settings_bucket(block) == [1, 2, 3]
+        self.assertEqual(settings.XBLOCK_SETTINGS, {"_DummyBlock": [1, 2, 3]})
+        self.assertEqual(self.settings_service.get_settings_bucket(block), [1, 2, 3])
 
 
 class TestConfigurationService(unittest.TestCase):
@@ -110,7 +109,7 @@ class TestConfigurationService(unittest.TestCase):
         Test that instantiating ConfigurationService raises exception on passing
         a class which is not subclass of ConfigurationModel.
         """
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             ConfigurationService(DummyUnexpected)
 
     def test_configuration_service(self):
@@ -118,15 +117,15 @@ class TestConfigurationService(unittest.TestCase):
         Test the correct configuration on instantiating ConfigurationService.
         """
         config_service = ConfigurationService(DummyConfig)
-        assert config_service.configuration == DummyConfig
+        self.assertEqual(config_service.configuration, DummyConfig)
 
 
 class MockConfigurationService(TeamsConfigurationService):
     """
     Mock ConfigurationService for testing.
     """
-    def __init__(self, course, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
-        super().__init__()
+    def __init__(self, course, **kwargs):
+        super(MockConfigurationService, self).__init__()
         self._course = course
 
     def get_course(self, course_id):
@@ -139,7 +138,7 @@ class ConfigurationServiceBaseClass(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ConfigurationServiceBaseClass, self).setUp()
 
         self.teams_config = TeamsConfig(
             {'max_size': 2, 'topics': [{'id': 'topic', 'name': 'Topic', 'description': 'A Topic'}]}
@@ -158,4 +157,4 @@ class TestTeamsConfigurationService(ConfigurationServiceBaseClass):
 
     def test_get_teamsconfiguration(self):
         teams_config = self.configuration_service.get_teams_configuration(self.course.id)
-        assert teams_config == self.teams_config
+        self.assertEqual(teams_config, self.teams_config)

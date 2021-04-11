@@ -1,10 +1,12 @@
 """
-This file contains helper functions for configuring module_store_setting settings and support for backward compatibility with older formats.  # lint-amnesty, pylint: disable=line-too-long
+This file contains helper functions for configuring module_store_setting settings and support for backward compatibility with older formats.
 """
 
 
 import copy
 import warnings
+
+import six
 
 
 def convert_module_store_setting_if_needed(module_store_setting):
@@ -17,7 +19,7 @@ def convert_module_store_setting_if_needed(module_store_setting):
         Converts and returns the given stores in old (unordered) dict-style format to the new (ordered) list format
         """
         new_store_list = []
-        for store_name, store_settings in old_stores.items():
+        for store_name, store_settings in six.iteritems(old_stores):
 
             store_settings['NAME'] = store_name
             if store_name == 'default':
@@ -110,10 +112,10 @@ def update_module_store_settings(
     """
     for store in module_store_setting['default']['OPTIONS']['stores']:
         if store['NAME'] == 'xml':
-            xml_store_options and store['OPTIONS'].update(xml_store_options)  # lint-amnesty, pylint: disable=expression-not-assigned
+            xml_store_options and store['OPTIONS'].update(xml_store_options)
         else:
-            module_store_options and store['OPTIONS'].update(module_store_options)  # lint-amnesty, pylint: disable=expression-not-assigned
-            doc_store_settings and store['DOC_STORE_CONFIG'].update(doc_store_settings)  # lint-amnesty, pylint: disable=expression-not-assigned
+            module_store_options and store['OPTIONS'].update(module_store_options)
+            doc_store_settings and store['DOC_STORE_CONFIG'].update(doc_store_settings)
 
     if default_store:
         mixed_stores = get_mixed_stores(module_store_setting)
@@ -123,7 +125,7 @@ def update_module_store_settings(
                 mixed_stores.remove(store)
                 mixed_stores.insert(0, store)
                 return
-        raise Exception(f"Could not find setting for requested default store: {default_store}")
+        raise Exception("Could not find setting for requested default store: {}".format(default_store))
 
     if mappings and 'mappings' in module_store_setting['default']['OPTIONS']:
         module_store_setting['default']['OPTIONS']['mappings'] = mappings

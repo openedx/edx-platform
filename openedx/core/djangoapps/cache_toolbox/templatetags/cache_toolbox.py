@@ -7,7 +7,7 @@ automatically caching template fragments.
 from django import template
 from django.core.cache import cache
 from django.template import Node, TemplateSyntaxError, Variable
-from django.template import resolve_variable  # lint-amnesty, pylint: disable=no-name-in-module
+from django.template import resolve_variable
 
 register = template.Library()  # pylint: disable=invalid-name
 
@@ -52,7 +52,7 @@ def cachedeterministic(parser, token):
     parser.delete_first_token()
     tokens = token.contents.split()
     if len(tokens) != 3:
-        raise TemplateSyntaxError("'%r' tag requires 2 arguments." % tokens[0])
+        raise TemplateSyntaxError(u"'%r' tag requires 2 arguments." % tokens[0])
     return CacheNode(nodelist, tokens[1], tokens[2])
 
 
@@ -85,5 +85,5 @@ def showifcached(parser, token):  # pylint: disable=unused-argument
     """
     tokens = token.contents.split()
     if len(tokens) != 2:
-        raise TemplateSyntaxError("'%r' tag requires 1 argument." % tokens[0])
+        raise TemplateSyntaxError(u"'%r' tag requires 1 argument." % tokens[0])
     return ShowIfCachedNode(tokens[1])

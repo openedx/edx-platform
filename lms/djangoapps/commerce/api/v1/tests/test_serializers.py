@@ -13,7 +13,7 @@ class CourseValidatorTests(TestCase):
         """ Verify a validator checking non-existent courses."""
         course_key = 'non/existing/keyone'
 
-        error_msg = f"Course {course_key} does not exist."
+        error_msg = u"Course {} does not exist.".format(course_key)
         with self.assertRaisesRegex(serializers.ValidationError, error_msg):
             validate_course_id(course_key)
 
@@ -21,6 +21,6 @@ class CourseValidatorTests(TestCase):
         """ Verify a validator checking invalid course keys."""
         course_key = 'invalidkey'
 
-        error_msg = f"{course_key} is not a valid course key."
+        error_msg = u"{} is not a valid course key.".format(course_key)
         with self.assertRaisesRegex(serializers.ValidationError, error_msg):
             validate_course_id(course_key)

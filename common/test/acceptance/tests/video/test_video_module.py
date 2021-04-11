@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Acceptance tests for Video.
 """
@@ -5,7 +7,7 @@ Acceptance tests for Video.
 
 import os
 from unittest import skipIf
-from unittest.mock import patch
+from mock import patch
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -23,17 +25,17 @@ VIDEO_SOURCE_PORT = 8777
 VIDEO_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
 
 HTML5_SOURCES = [
-    f'http://{VIDEO_HOSTNAME}:{VIDEO_SOURCE_PORT}/gizmo.mp4',
-    f'http://{VIDEO_HOSTNAME}:{VIDEO_SOURCE_PORT}/gizmo.webm',
-    f'http://{VIDEO_HOSTNAME}:{VIDEO_SOURCE_PORT}/gizmo.ogv',
+    'http://{}:{}/gizmo.mp4'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.webm'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.ogv'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 HTML5_SOURCES_INCORRECT = [
-    f'http://{VIDEO_HOSTNAME}:{VIDEO_SOURCE_PORT}/gizmo.mp99',
+    'http://{}:{}/gizmo.mp99'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 HLS_SOURCES = [
-    f'http://{VIDEO_HOSTNAME}:{VIDEO_SOURCE_PORT}/hls/history.m3u8',
+    'http://{}:{}/hls/history.m3u8'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 
@@ -48,7 +50,7 @@ class VideoBaseTest(UniqueCourseTest):
         """
         Initialization of pages and course fixture for video tests
         """
-        super().setUp()
+        super(VideoBaseTest, self).setUp()
         self.longMessage = True
 
         self.video = VideoPage(self.browser)
@@ -123,7 +125,7 @@ class VideoBaseTest(UniqueCourseTest):
         :param vertical_index: index for the vertical display name
         :return: XBlockFixtureDesc
         """
-        xblock_course_vertical = XBlockFixtureDesc('vertical', f'Test Vertical-{vertical_index}')
+        xblock_course_vertical = XBlockFixtureDesc('vertical', u'Test Vertical-{0}'.format(vertical_index))
 
         for video in vertical_contents:
             xblock_course_vertical.add_children(
@@ -227,7 +229,7 @@ class LMSVideoBlockA11yTest(VideoBaseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super().setUp()
+            super(LMSVideoBlockA11yTest, self).setUp()
 
     def test_video_player_a11y(self):
         # load transcripts so we can test skipping to

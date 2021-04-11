@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:52+0000\n"
-"PO-Revision-Date: 2020-11-22 20:52:49.849863\n"
+"POT-Creation-Date: 2021-01-06 21:04+0000\n"
+"PO-Revision-Date: 2021-01-06 21:04:14.982920\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.0\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -6249,51 +6249,6 @@ msgid ""
 "sailthru."
 msgstr ""
 
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "{platform_name} Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Course Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: openedx/core/djangoapps/django_comment_common/models.py
-msgid "Student"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: lms/templates/preview_menu.html
-msgid "Staff"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Used Registration Code"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Credit Card - Individual"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-#, python-brace-format
-msgid "manually enrolled by username: {username}"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Manually Enrolled"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "Data Integrity Error"
-msgstr ""
-
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr ""
-
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
 "Cannot override subsection grade: subsection is not available for target "
@@ -7380,679 +7335,6 @@ msgid "text_search and order_by cannot be provided together"
 msgstr ""
 
 #: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course id {course_id} is not valid."
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-msgid "text_search and order_by cannot be provided together"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied topic id {topic_id} is not valid"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-msgid "Error connecting to elasticsearch"
-msgstr ""
-
-#. Translators: 'ordering' is a string describing a way
-#. of ordering a list. For example, {ordering} may be
-#. 'name', indicating that the user wants to sort the
-#. list by lower case name.
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The ordering {ordering} is not supported"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course_id {course_id} is not valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data! We apologize that we cannot verify whether the charge "
-"went through and take further action on your order. The specific error "
-"message is: {msg} Your credit card may possibly have been charged.  Contact "
-"us with payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total! The specific error message is: {msg}. Your credit card has"
-" probably been charged. Contact us with payment-specific questions at "
-"{email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a corrupted message regarding your"
-" charge, so we are unable to validate that the message actually came from "
-"the payment processor. The specific error message is: {msg}. We apologize "
-"that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged. "
-"Contact us with payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a message saying that you have "
-"cancelled this transaction. The items in your shopping cart will exist for "
-"future purchase. If you feel that this is in error, please contact us with "
-"payment-specific questions at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"We're sorry, but this payment was declined. The items in your shopping cart "
-"have been saved. If you have any questions about this transaction, please "
-"contact us at {email}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"Sorry! Your payment could not be processed because an unexpected exception "
-"occurred. Please contact us at {email} for assistance."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Successful transaction."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request is missing one or more required fields."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "One or more fields in the request contains invalid data."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The merchant reference code for this authorization request matches the merchant reference code of another\n"
-"            authorization request that you sent within the past 15 minutes.\n"
-"            Possible action: Resend the request with a unique merchant reference code.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Only a partial amount was approved."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "General system failure."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The request was received but there was a server timeout. This error does not include timeouts between the\n"
-"            client and the server.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but a service did not finish running in time."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
-"            because it did not pass the Address Verification System (AVS).\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The issuing bank has questions about the request. You do not receive an\n"
-"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Expired card. You might also receive this if the expiration date you\n"
-"            provided does not match the date the issuing bank has on file.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            General decline of the card. No other information provided by the issuing bank.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Insufficient funds in the account. Possible action: retry with another form "
-"of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stolen or lost card."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Issuing bank unavailable. Possible action: retry again after a few minutes."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Inactive card or card not authorized for card-not-present transactions.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "CVN did not match."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The card has reached the credit limit. Possible action: retry with another "
-"form of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid card verification number (CVN). Possible action: retry with another "
-"form of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The customer matched an entry on the processors negative file."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Account frozen. Possible action: retry with another form of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by\n"
-"            CyberSource because it did not pass the CVN check.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"Invalid account number. Possible action: retry with another form of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type is not accepted by the payment processor.\n"
-"            Possible action: retry with another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"General decline by the processor.  Possible action: retry with another form "
-"of payment."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#, python-brace-format
-msgid ""
-"There is a problem with the information in your CyberSource account.  Please"
-" let us know at {0}"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The requested capture amount exceeds the originally authorized amount."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Processor Failure.  Possible action: retry the payment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been reversed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The authorization has already been captured."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The card type sent is invalid or does not correlate with the credit card number.\n"
-"            Possible action: retry with the same card or another form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request ID is invalid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            You requested a capture, but there is no corresponding, unused authorization record. Occurs if there was\n"
-"            not a previously successful authorization request or if the previously successful authorization has already\n"
-"            been used by another capture request.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The transaction has already been settled or reversed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            Either the capture or credit is not voidable because the capture or credit information has already been\n"
-"            submitted to your processor, or you requested a void for a type of transaction that cannot be voided.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "You requested a credit for a capture that was previously voided."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The request was received, but there was a timeout at the payment processor."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Stand-alone credits are not allowed."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The cardholder is enrolled for payer authentication"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Payer authentication could not be authenticated"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
-"            on your legacy Smart Authorization settings.\n"
-"            Possible action: retry with a different form of payment.\n"
-"            "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order Number"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Customer Name"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Original Transaction"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Refund"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Amount of Refund"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Service Fees (if any)"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Purchase Time"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order ID"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Quantity"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Unit Cost"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Cost"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: wiki/plugins/attachments/forms.py
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Description"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Comments"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "University"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Announce Date"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
-msgid "Course Start Date"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Close Date"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Period"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Enrolled"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Audit Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Honor Code Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Verified Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue over the Minimum"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Verified Students Contributing More than the Minimum"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Dollars Refunded"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Transactions"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Payments Collected"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Successful Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Amount of Refunds"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You must be logged-in to add to a shopping cart"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course you requested does not exist."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "The course {course_id} is already in your cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "You are already registered in course {course_id}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Course added to cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "Discount does not exist against code '{code}'."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-#, python-brace-format
-msgid ""
-"Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Cart item quantity should not be greater than 1 when applying activation "
-"code"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Only one coupon redemption is allowed against an order"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "success"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You do not have permission to view this page."
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "View and regenerate certificates."
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/ccx/coach_dashboard.html lms/templates/ccx/enrollment.html
-#: lms/templates/support/enrollment.html
-msgid "Enrollment"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "View and update learner enrollments."
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/manage_user.html
-msgid "Manage User"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "Disable User Account"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "View, create, and reissue learner entitlements"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Feature Based Enrollments"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "View feature based enrollment settings"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-#: lms/templates/support/link_program_enrollments.html
-msgid "Link Program Enrollments"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "Link LMS users to program enrollments"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "Program Enrollments Inspector Tool"
-msgstr ""
-
-#: lms/djangoapps/support/views/index.py
-msgid "Find information related to a learner's program enrollments"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_support_url"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "user_detail_url"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Usable"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "Unusable"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "User Enabled Successfully"
-msgstr ""
-
-#: lms/djangoapps/support/views/manage_user.py
-msgid "User Disabled Successfully"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: lms/templates/shoppingcart/billing_details.html
-msgid "Email Address"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#: openedx/core/djangoapps/schedules/admin.py
-#: cms/templates/maintenance/_force_publish_course.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/support/feature_based_enrollments.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-msgid "User not found"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Course {course_id} not past the refund window."
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "No order found for {user} in course {course_id}"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Unenrolled {user} from {course_id}"
-msgstr ""
-
-#: lms/djangoapps/support/views/refund.py
-#, python-brace-format
-msgid "Refunded {cost} for order id {order_id}"
-msgstr ""
-
-#: lms/djangoapps/survey/utils.py
-msgid "You must complete a survey"
-msgstr ""
-
-#: lms/djangoapps/teams/models.py
-msgid "Optional language the team uses as ISO 639-1 code."
-msgstr ""
-
-#: lms/djangoapps/teams/plugins.py
-#: lms/djangoapps/teams/templates/teams/teams.html
-msgid "Teams"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-msgid "course_id must be provided"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-#, python-brace-format
-msgid "The supplied course id {course_id} is not valid."
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
-msgid "text_search and order_by cannot be provided together"
-msgstr ""
-
-#: lms/djangoapps/teams/views.py
 #, python-brace-format
 msgid "The supplied topic id {topic_id} is not valid"
 msgstr ""
@@ -8653,7 +7935,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for two years, and it will expire "
+"Your approval status remains valid for one year, and it will expire "
 "%(expiration_datetime)s."
 msgstr ""
 
@@ -8753,7 +8035,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 3-5 days."
+"We have received your photos and they will be reviewed within 5-7 days."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
@@ -9555,122 +8837,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
 msgid "Library cannot have more than {} XBlocks"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Complex"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "All Rights Reserved."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial-ShareAlike 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NoDerivatives 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You can only set a library to {library_type} if all existing blocks are of "
-"that type. Found incompatible block {block_id} with type {block_type}."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"Block type \"{block_type}\" is not compatible with library type "
-"\"{library_type}\"."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-msgid "Library cannot have more than {} XBlocks"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Complex"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "All Rights Reserved."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NonCommercial-ShareAlike 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-NoDerivatives 4.0"
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-msgid "Cannot change or remove the access level for the only admin."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You may not change a library's type to {library_type} if it still has "
-"unpublished changes."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"You can only set a library to {library_type} if all existing blocks are of "
-"that type. Found incompatible block {block_id} with type {block_type}."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-#, python-brace-format
-msgid ""
-"Block type \"{block_type}\" is not compatible with library type "
-"\"{library_type}\"."
-msgstr ""
-
-#: openedx/core/djangoapps/content_libraries/api.py
-msgid "Library cannot have more than {} XBlocks"
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Creative Commons Attribution-ShareAlike 4.0"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -10589,7 +9755,6 @@ msgid "Success"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/admin.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr ""
@@ -10740,6 +9905,10 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/subject.txt
 #, python-format
 msgid "Password reset completed on %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/utils.py
+msgid "Create Account"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/auto_auth.py
@@ -11067,10 +10236,6 @@ msgid ""
 "{tos_link_start}{terms_of_service}{tos_link_end}"
 msgstr ""
 
-#: openedx/core/djangoapps/user_authn/views/utils.py
-msgid "Create Account"
-msgstr ""
-
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
 msgid "{header_open}{title}{header_close}{body}"
@@ -11352,6 +10517,11 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
+msgstr ""
+
+#: openedx/features/course_experience/plugins.py
+#: openedx/features/course_experience/templates/course_experience/course-reviews-fragment.html
+msgid "Reviews"
 msgstr ""
 
 #: openedx/features/course_experience/views/course_home_messages.py
@@ -12729,17 +11899,6 @@ msgid "Unenroll"
 msgstr ""
 
 #: lms/templates/dates_banner.html
-msgid "We've built a suggested schedule to help you stay on track."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"But don't worry—it's flexible so you can learn at your own pace. If you "
-"happen to fall behind on our suggested dates, you'll be able to adjust them "
-"to keep yourself on track."
-msgstr ""
-
-#: lms/templates/dates_banner.html
 msgid ""
 "It looks like you missed some important deadlines based on our suggested "
 "schedule. "
@@ -12753,8 +11912,21 @@ msgstr ""
 
 #: lms/templates/dates_banner.html
 msgid ""
-" Don’t worry—you won’t lose any of the progress you’ve made when you shift "
+" Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"It looks like you missed some important deadlines based on our suggested "
+"schedule."
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid ""
+"To keep yourself on track, you can update this schedule and shift the past "
+"due assignments into the future. Don't worry—you won't lose any of the "
+"progress you've made when you shift your due dates."
 msgstr ""
 
 #: lms/templates/dates_banner.html
@@ -12768,21 +11940,8 @@ msgstr ""
 #: lms/templates/dates_banner.html
 msgid ""
 " It looks like you missed some important deadlines based on our suggested "
-"schedule. To complete graded assignments as part of this course and shift "
-"the past due assignments into the future, you can upgrade today by visiting "
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"It looks like you missed some important deadlines based on our suggested "
-"schedule."
-msgstr ""
-
-#: lms/templates/dates_banner.html
-msgid ""
-"To keep yourself on track, you can update this schedule and shift the past "
-"due assignments into the future. Don’t worry—you won’t lose any of the "
-"progress you’ve made when you shift your due dates."
+"schedule. Graded assignments and schedule adjustment are available to "
+"Verified Track learners."
 msgstr ""
 
 #: lms/templates/dates_banner.html
@@ -12793,21 +11952,28 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dates_banner.html
+msgid "Upgrade to shift due dates"
+msgstr ""
+
+#: lms/templates/dates_banner.html
+msgid "Graded assignments are available to Verified Track learners."
+msgstr ""
+
+#: lms/templates/dates_banner.html
 msgid ""
 " To complete graded assignments as part of this course, you can upgrade "
 "today."
 msgstr ""
 
 #: lms/templates/dates_banner.html
-msgid "Reset my deadlines"
+msgid "We've built a suggested schedule to help you stay on track."
 msgstr ""
 
 #: lms/templates/dates_banner.html
-msgid "Upgrade to shift due dates"
-msgstr ""
-
-#: lms/templates/edit_unit_link.html
-msgid "View Unit in Studio"
+msgid ""
+"But don't worry—it's flexible so you can learn at your own pace. If you "
+"happen to fall behind on our suggested dates, you'll be able to adjust them "
+"to keep yourself on track."
 msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
@@ -13081,7 +12247,6 @@ msgstr ""
 msgid "There has been an error on the {platform_name} servers"
 msgstr ""
 
-#: lms/templates/courseware/courseware-error.html
 #: lms/templates/module-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
@@ -13151,20 +12316,6 @@ msgstr ""
 
 #: lms/templates/problem.html
 msgid "Reset your answer"
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "Show answer"
-msgstr ""
-
-#: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempt"
-msgid_plural "You have used {num_used} of {num_total} attempts"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lms/templates/problem.html
-msgid "Save your answer"
 msgstr ""
 
 #: lms/templates/problem.html
@@ -15209,12 +14360,6 @@ msgstr ""
 msgid "Not yet released"
 msgstr ""
 
-#: lms/templates/courseware/error-message.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible."
-msgstr ""
-
 #: lms/templates/courseware/gradebook.html
 msgid "Gradebook"
 msgstr ""
@@ -16701,14 +15846,6 @@ msgstr ""
 msgid "Sysadmin"
 msgstr ""
 
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr ""
-
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
 msgstr ""
@@ -18006,176 +17143,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show the status for the tasks that you submitted for this problem."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Note"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid ""
-"Select a problem to generate a CSV         file that lists all student "
-"answers to the problem. You also select a section or chapter to include"
-"         results of all problems in that section or chapter."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to display the grading configuration for the                 course. "
-"The grading configuration is the breakdown of graded subsections of the "
-"course                 (such as exams and problem sets), and can be changed "
-"on the 'Grading'                 page (under 'Settings') in Studio."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Click to download a CSV of                 anonymized student IDs:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For large courses, generating some reports can take                 several "
-"hours. When report generation is complete, a                 link that "
-"includes the date and time of generation appears in the table below. These "
-"reports are                 generated in the background, meaning it is OK to"
-" navigate away from this page while your report is                 "
-"generating."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Please be patient and do not click these buttons                 multiple "
-"times. Clicking these buttons multiple times will significantly slow the "
-"generation                 process."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For smaller courses, click to list                 profile information for "
-"enrolled students directly on this page:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 all students enrolled in "
-"this course, along with profile information such as email address and"
-"                 username:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 that lists learners who can "
-"enroll in the course but have not yet done so."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 of all proctored exam results "
-"in this course."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 survey results for this "
-"course."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 ORA grade report for all currently "
-"enrolled students."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 problem grade report for all "
-"currently enrolled students."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Note"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
-msgid ""
-"Select a problem to generate a CSV         file that lists all student "
-"answers to the problem. You also select a section or chapter to include"
-"         results of all problems in that section or chapter."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to display the grading configuration for the                 course. "
-"The grading configuration is the breakdown of graded subsections of the "
-"course                 (such as exams and problem sets), and can be changed "
-"on the 'Grading'                 page (under 'Settings') in Studio."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid "Click to download a CSV of                 anonymized student IDs:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For large courses, generating some reports can take                 several "
-"hours. When report generation is complete, a                 link that "
-"includes the date and time of generation appears in the table below. These "
-"reports are                 generated in the background, meaning it is OK to"
-" navigate away from this page while your report is                 "
-"generating."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Please be patient and do not click these buttons                 multiple "
-"times. Clicking these buttons multiple times will significantly slow the "
-"generation                 process."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"For smaller courses, click to list                 profile information for "
-"enrolled students directly on this page:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 all students enrolled in "
-"this course, along with profile information such as email address and"
-"                 username:"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 that lists learners who can "
-"enroll in the course but have not yet done so."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file                 of all proctored exam results "
-"in this course."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV file of                 survey results for this "
-"course."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 ORA grade report for all currently "
-"enrolled students."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
-msgid ""
-"Click to generate a CSV                 problem grade report for all "
-"currently enrolled students."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/certificates.html

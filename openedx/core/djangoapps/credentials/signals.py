@@ -12,8 +12,8 @@ from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCer
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.site_configuration import helpers
 
-from .helpers import is_learner_records_enabled, is_learner_records_enabled_for_org  # lint-amnesty, pylint: disable=unused-import
 from .tasks.v1.tasks import send_grade_to_credentials
 
 log = getLogger(__name__)
@@ -49,14 +49,14 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     """ Checks if grade is interesting to Credentials and schedules a Celery task if so. """
 
     if verbose:
-        msg = "Starting send_grade_if_interesting with params: "\
-            "user [{username}], "\
-            "course_run_key [{key}], "\
-            "mode [{mode}], "\
-            "status [{status}], "\
-            "letter_grade [{letter_grade}], "\
-            "percent_grade [{percent_grade}], "\
-            "verbose [{verbose}]"\
+        msg = u"Starting send_grade_if_interesting with params: "\
+            u"user [{username}], "\
+            u"course_run_key [{key}], "\
+            u"mode [{mode}], "\
+            u"status [{status}], "\
+            u"letter_grade [{letter_grade}], "\
+            u"percent_grade [{percent_grade}], "\
+            u"verbose [{verbose}]"\
             .format(
                 username=getattr(user, 'username', None),
                 key=str(course_run_key),
@@ -74,10 +74,10 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         return
 
     # Avoid scheduling new tasks if learner records are disabled for this site.
-    if not is_learner_records_enabled_for_org(course_run_key.org):
+    if not helpers.get_value_for_org(course_run_key.org, 'ENABLE_LEARNER_RECORDS', True):
         if verbose:
             log.info(
-                "Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
+                u"Skipping send grade: ENABLE_LEARNER_RECORDS False for org [{org}]".format(
                     org=course_run_key.org
                 )
             )
@@ -93,7 +93,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
             # We only care about grades for which there is a certificate.
             if verbose:
                 log.info(
-                    "Skipping send grade: no cert for user [{username}] & course_id [{course_id}]".format(
+                    u"Skipping send grade: no cert for user [{username}] & course_id [{course_id}]".format(
                         username=getattr(user, 'username', None),
                         course_id=str(course_run_key)
                     )
@@ -106,7 +106,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     if mode not in INTERESTING_MODES or status not in INTERESTING_STATUSES:
         if verbose:
             log.info(
-                "Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]".format(
+                u"Skipping send grade: mode/status uninteresting for mode [{mode}] & status [{status}]".format(
                     mode=mode,
                     status=status
                 )
@@ -118,7 +118,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     if not is_course_run_in_a_program(course_run_key):
         if verbose:
             log.info(
-                "Skipping send grade: course run not in a program. [{course_id}]".format(course_id=str(course_run_key))
+                u"Skipping send grade: course run not in a program. [{course_id}]".format(course_id=str(course_run_key))
             )
         return
 
@@ -128,7 +128,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
         if grade is None:
             if verbose:
                 log.info(
-                    "Skipping send grade: No grade found for user [{username}] & course_id [{course_id}]".format(
+                    u"Skipping send grade: No grade found for user [{username}] & course_id [{course_id}]".format(
                         username=getattr(user, 'username', None),
                         course_id=str(course_run_key)
                     )

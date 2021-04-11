@@ -15,7 +15,7 @@ urlpatterns = [
         UserCourseEnrollmentsList.as_view(),
         name='courseenrollment-detail'
     ),
-    url(f'^{settings.USERNAME_PATTERN}/course_status_info/{settings.COURSE_ID_PATTERN}',
+    url('^{}/course_status_info/{}'.format(settings.USERNAME_PATTERN, settings.COURSE_ID_PATTERN),
         UserCourseStatus.as_view(),
         name='user-course-status')
 ]

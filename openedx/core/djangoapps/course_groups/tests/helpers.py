@@ -22,7 +22,7 @@ class CohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock cohorts.
     """
-    class Meta:
+    class Meta(object):
         model = CourseUserGroup
 
     name = Sequence("cohort{}".format)
@@ -35,8 +35,8 @@ class CohortFactory(DjangoModelFactory):
         Returns the users associated with the cohort.
         """
         if extracted:
-            self.users.add(*extracted)  # lint-amnesty, pylint: disable=no-member
-            for user in self.users.all():  # lint-amnesty, pylint: disable=no-member
+            self.users.add(*extracted)
+            for user in self.users.all():
                 CohortMembership.objects.create(
                     user=user,
                     course_user_group=self,
@@ -47,7 +47,7 @@ class CourseCohortFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort.
     """
-    class Meta:
+    class Meta(object):
         model = CourseCohort
 
 
@@ -55,7 +55,7 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     """
     Factory for constructing mock course cohort settings.
     """
-    class Meta:
+    class Meta(object):
         model = CourseCohortsSettings
 
     is_cohorted = False
@@ -74,11 +74,11 @@ def config_course_cohorts_legacy(
     the cohort config on the course descriptor.
 
     Since cohort settings are now stored in models.CourseCohortSettings,
-    this is only used for testing data migration from the CourseBlock
+    this is only used for testing data migration from the CourseDescriptor
     to the table.
 
     Arguments:
-        course: CourseBlock
+        course: CourseDescriptor
         cohorted: bool.
         auto_cohort_groups: optional list of strings
                   (names of groups to put students into).
@@ -113,7 +113,7 @@ def config_course_cohorts(
     Set and configure cohorts for a course.
 
     Arguments:
-        course: CourseBlock
+        course: CourseDescriptor
         is_cohorted (bool): Is the course cohorted?
         discussion_division_scheme (String): the division scheme for discussions. Default is
             CourseDiscussionSettings.COHORT.

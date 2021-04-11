@@ -108,9 +108,9 @@ class PytestSuite(TestSuite):
         if self.with_wtw:
             opts.extend([
                 '--wtw',
-                f'{COVERAGE_CACHE_BASEPATH}/{WHO_TESTS_WHAT_DIFF}',
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, WHO_TESTS_WHAT_DIFF),
                 '--wtwdb',
-                f'{COVERAGE_CACHE_BASEPATH}/{COVERAGE_CACHE_BASELINE}'
+                '{}/{}'.format(COVERAGE_CACHE_BASEPATH, COVERAGE_CACHE_BASELINE)
             ])
 
         return opts
@@ -160,8 +160,8 @@ class SystemTestSuite(PytestSuite):
             '-Wd',
             '-m',
             'pytest',
-            '--ds={}'.format(f'{self.root}.envs.{self.settings}'),
-            f"--junitxml={self.xunit_report}",
+            '--ds={}'.format('{}.envs.{}'.format(self.root, self.settings)),
+            "--junitxml={}".format(self.xunit_report),
         ])
         cmd.extend(self.test_options_flags)
         if self.verbosity < 1:
@@ -186,7 +186,7 @@ class SystemTestSuite(PytestSuite):
             for ip in self.xdist_ip_addresses.split(','):
                 # Propogate necessary env vars to xdist containers
                 env_var_cmd = 'export DJANGO_SETTINGS_MODULE={} DISABLE_COURSEENROLLMENT_HISTORY={} PYTHONHASHSEED=0'\
-                    .format(f'{self.root}.envs.{self.settings}',
+                    .format('{}.envs.{}'.format(self.root, self.settings),
                             self.disable_courseenrollment_history)
                 xdist_string = '--tx {}*ssh="jenkins@{} -o StrictHostKeyChecking=no"' \
                                '//python="source edx-venv-{}/edx-venv/bin/activate; {}; python"' \
@@ -194,19 +194,19 @@ class SystemTestSuite(PytestSuite):
                                .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
-                cmd.append(f'--rsyncdir {rsync_dir}')
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
         else:
             if self.processes == -1:
                 cmd.append('-n auto')
                 cmd.append('--dist=loadscope')
             elif self.processes != 0:
-                cmd.append(f'-n {self.processes}')
+                cmd.append('-n {}'.format(self.processes))
                 cmd.append('--dist=loadscope')
 
         if not self.randomize:
             cmd.append('-p no:randomly')
         if self.eval_attr:
-            cmd.append(f"-a '{self.eval_attr}'")
+            cmd.append("-a '{}'".format(self.eval_attr))
 
         cmd.extend(self.passthrough_options)
         cmd.append(self.test_id)
@@ -226,17 +226,17 @@ class SystemTestSuite(PytestSuite):
         # thereby making sure that we load any django models that are
         # only defined in test files.
         default_test_globs = [
-            f"{self.root}/djangoapps/*",
+            "{system}/djangoapps/*".format(system=self.root),
             "common/djangoapps/*",
             "openedx/core/djangoapps/*",
             "openedx/tests/*",
             "openedx/core/lib/*",
         ]
         if self.root in ('lms', 'cms'):
-            default_test_globs.append(f"{self.root}/lib/*")
+            default_test_globs.append("{system}/lib/*".format(system=self.root))
 
         if self.root == 'lms':
-            default_test_globs.append(f"{self.root}/tests.py")
+            default_test_globs.append("{system}/tests.py".format(system=self.root))
             default_test_globs.append("openedx/core/djangolib/*")
             default_test_globs.append("openedx/core/tests/*")
             default_test_globs.append("openedx/features")
@@ -288,7 +288,7 @@ class LibTestSuite(PytestSuite):
             '-Wd',
             '-m',
             'pytest',
-            f'--junitxml={self.xunit_report}',
+            '--junitxml={}'.format(self.xunit_report),
         ])
         cmd.extend(self.passthrough_options + self.test_options_flags)
         if self.verbosity < 1:
@@ -322,7 +322,7 @@ class LibTestSuite(PytestSuite):
                                .format(xdist_remote_processes, ip, Env.PYTHON_VERSION, env_var_cmd)
                 cmd.append(xdist_string)
             for rsync_dir in Env.rsync_dirs():
-                cmd.append(f'--rsyncdir {rsync_dir}')
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
             # "--rsyncdir" throws off the configuration root, set it explicitly
             if 'common/lib' in self.test_id:
                 cmd.append('--rootdir=common/lib')
@@ -334,13 +334,13 @@ class LibTestSuite(PytestSuite):
                 cmd.append('-n auto')
                 cmd.append('--dist=loadscope')
             elif self.processes != 0:
-                cmd.append(f'-n {self.processes}')
+                cmd.append('-n {}'.format(self.processes))
                 cmd.append('--dist=loadscope')
 
         if not self.randomize:
             cmd.append("-p no:randomly")
         if self.eval_attr:
-            cmd.append(f"-a '{self.eval_attr}'")
+            cmd.append("-a '{}'".format(self.eval_attr))
 
         cmd.append(self.test_id)
 

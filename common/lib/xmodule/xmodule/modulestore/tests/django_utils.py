@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 Modulestore configuration for test cases.
 """
@@ -8,13 +9,14 @@ import functools
 import os
 from contextlib import contextmanager
 from enum import Enum
-from unittest.mock import patch
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser, User
 from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
+from mock import patch
+from six.moves import range
 
 from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
@@ -41,7 +43,7 @@ class CourseUserType(Enum):
     UNENROLLED_STAFF = 'unenrolled_staff'
 
 
-class StoreConstructors:
+class StoreConstructors(object):
     """Enumeration of store constructor types."""
     draft, split = list(range(2))
 
@@ -94,7 +96,7 @@ def draft_mongo_store_config(data_dir):
     """
 
     modulestore_options = {
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string'
     }
@@ -106,7 +108,7 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': f'test_xmodule_{os.getpid()}',
+                'db': 'test_xmodule_{}'.format(os.getpid()),
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -121,7 +123,7 @@ def split_mongo_store_config(data_dir):
     Defines split module store.
     """
     modulestore_options = {
-        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+        'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
     }
@@ -133,7 +135,7 @@ def split_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': MONGO_HOST,
                 'port': MONGO_PORT_NUM,
-                'db': f'test_xmodule_{os.getpid()}',
+                'db': 'test_xmodule_{}'.format(os.getpid()),
                 'collection': 'modulestore',
             },
             'OPTIONS': modulestore_options
@@ -152,7 +154,7 @@ def contentstore_config():
         'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
         'DOC_STORE_CONFIG': {
             'host': MONGO_HOST,
-            'db': f'test_xcontent_{os.getpid()}',
+            'db': 'test_xcontent_{}'.format(os.getpid()),
             'port': MONGO_PORT_NUM,
         },
         # allow for additional options that can be keyed on a name, e.g. 'trashcan'
@@ -208,7 +210,7 @@ TEST_DATA_SPLIT_MODULESTORE = functools.partial(
 )
 
 
-class SignalIsolationMixin:
+class SignalIsolationMixin(object):
     """
     Simple utility mixin class to toggle ModuleStore signals on and off. This
     class operates on `SwitchedSignal` objects on the modulestore's
@@ -243,7 +245,7 @@ class SignalIsolationMixin:
                     "You tried to enable signal '{}', but I don't recognize that "
                     "signal name. Did you mean one of these?: {}"
                 )
-                raise ValueError(err_msg.format(signal_name, all_signal_names))  # lint-amnesty, pylint: disable=raise-missing-from
+                raise ValueError(err_msg.format(signal_name, all_signal_names))
             signal.enable()
 
 
@@ -396,7 +398,7 @@ class SharedModuleStoreTestCase(
     for Django ORM models that will get cleaned up properly.
     """
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = {alias for alias in connections}
 
     @classmethod
     @contextmanager
@@ -419,7 +421,7 @@ class SharedModuleStoreTestCase(
         # Now yield to allow the test class to run its setUpClass() setup code.
         yield
         # Now call the base class, which calls back into the test class's setUpTestData().
-        super().setUpClass()
+        super(SharedModuleStoreTestCase, cls).setUpClass()
 
     @classmethod
     def setUpClass(cls):
@@ -427,19 +429,19 @@ class SharedModuleStoreTestCase(
         Start modulestore isolation, and then load modulestore specific
         test data.
         """
-        super().setUpClass()
+        super(SharedModuleStoreTestCase, cls).setUpClass()
         cls.start_modulestore_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_modulestore_isolation()
-        super().tearDownClass()
+        super(SharedModuleStoreTestCase, cls).tearDownClass()
 
     def setUp(self):
         # OverrideFieldData.provider_classes is always reset to `None` so
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
-        super().setUp()
+        super(SharedModuleStoreTestCase, self).setUp()
 
 
 class ModuleStoreTestCase(
@@ -485,15 +487,15 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    databases = {alias for alias in connections}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    databases = {alias for alias in connections}
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(ModuleStoreTestCase, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
+        super(ModuleStoreTestCase, cls).tearDownClass()
 
     def setUp(self):
         """
@@ -509,7 +511,7 @@ class ModuleStoreTestCase(
         # that they're recalculated for every test
         OverrideFieldData.provider_classes = None
 
-        super().setUp()
+        super(ModuleStoreTestCase, self).setUp()
 
         self.store = modulestore()
 
@@ -549,7 +551,7 @@ class ModuleStoreTestCase(
         """
         Updates the version of course in the modulestore
 
-        'course' is an instance of CourseBlock for which we want
+        'course' is an instance of CourseDescriptor for which we want
         to update metadata.
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):

@@ -6,6 +6,7 @@ Python tests for the Survey views
 import json
 from collections import OrderedDict
 
+import six
 from django.test.client import Client
 from django.urls import reverse
 
@@ -24,7 +25,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         """
         Set up the test data used in the specific tests
         """
-        super().setUp()
+        super(SurveyViewsTests, self).setUp()
 
         self.client = Client()
 
@@ -39,10 +40,10 @@ class SurveyViewsTests(ModuleStoreTestCase):
         '''
 
         self.student_answers = OrderedDict({
-            'field1': 'value1',
-            'field2': 'value2',
-            'ddl': '1',
-            'textarea': 'textarea'
+            u'field1': u'value1',
+            u'field2': u'value2',
+            u'ddl': u'1',
+            u'textarea': u'textarea'
         })
 
         self.course = CourseFactory.create(
@@ -65,14 +66,14 @@ class SurveyViewsTests(ModuleStoreTestCase):
         anon_user = Client()
 
         resp = anon_user.get(self.view_url)
-        assert resp.status_code == 302
+        self.assertEqual(resp.status_code, 302)
 
     def test_survey_not_found(self):
         """
         Asserts that if we ask for a Survey that does not exist, then we get a 302 redirect
         """
         resp = self.client.get(reverse('view_survey', args=['NonExisting']))
-        assert resp.status_code == 302
+        self.assertEqual(resp.status_code, 302)
 
     def test_authenticated_survey_view(self):
         """
@@ -92,7 +93,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
             self.postback_url,
             self.student_answers
         )
-        assert resp.status_code == 302
+        self.assertEqual(resp.status_code, 302)
 
     def test_survey_postback_to_nonexisting_survey(self):
         """
@@ -102,7 +103,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
             reverse('submit_answers', args=['NonExisting']),
             self.student_answers
         )
-        assert resp.status_code == 404
+        self.assertEqual(resp.status_code, 404)
 
     def test_survey_postback(self):
         """
@@ -113,12 +114,12 @@ class SurveyViewsTests(ModuleStoreTestCase):
             self.postback_url,
             self.student_answers
         )
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content.decode('utf-8'))
-        assert 'redirect_url' in data
+        self.assertIn('redirect_url', data)
 
         answers = self.survey.get_answers(self.student)
-        assert answers[self.student.id] == self.student_answers
+        self.assertEqual(answers[self.student.id], self.student_answers)
 
     def test_strip_extra_fields(self):
         """
@@ -129,17 +130,17 @@ class SurveyViewsTests(ModuleStoreTestCase):
 
         data['csrfmiddlewaretoken'] = 'foo'
         data['_redirect_url'] = 'bar'
-        data['course_id'] = str(self.course.id)
+        data['course_id'] = six.text_type(self.course.id)
 
         resp = self.client.post(
             self.postback_url,
             data
         )
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         answers = self.survey.get_answers(self.student)
-        assert 'csrfmiddlewaretoken' not in answers[self.student.id]
-        assert '_redirect_url' not in answers[self.student.id]
-        assert 'course_id' not in answers[self.student.id]
+        self.assertNotIn('csrfmiddlewaretoken', answers[self.student.id])
+        self.assertNotIn('_redirect_url', answers[self.student.id])
+        self.assertNotIn('course_id', answers[self.student.id])
 
         # however we want to make sure we persist the course_id
         answer_objs = SurveyAnswer.objects.filter(
@@ -148,7 +149,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         )
 
         for answer_obj in answer_objs:
-            assert str(answer_obj.course_key) == data['course_id']
+            self.assertEqual(six.text_type(answer_obj.course_key), data['course_id'])
 
     def test_encoding_answers(self):
         """
@@ -162,7 +163,9 @@ class SurveyViewsTests(ModuleStoreTestCase):
             self.postback_url,
             data
         )
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         answers = self.survey.get_answers(self.student)
-        assert '&lt;script type=&quot;javascript&quot;&gt;alert(&quot;Deleting filesystem...&quot;)&lt;/script&gt;' ==\
-               answers[self.student.id]['field1']
+        self.assertEqual(
+            '&lt;script type=&quot;javascript&quot;&gt;alert(&quot;Deleting filesystem...&quot;)&lt;/script&gt;',
+            answers[self.student.id]['field1']
+        )

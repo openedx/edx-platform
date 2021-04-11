@@ -120,7 +120,7 @@ def _lint(file_or_dir, template_linters, options, summary_results, out):
             if os.path.exists(file_or_dir):
                 directory = file_or_dir
             else:
-                raise ValueError(f"Path [{file_or_dir}] is not a valid file or directory.")
+                raise ValueError("Path [{}] is not a valid file or directory.".format(file_or_dir))
         _process_os_dirs(directory, template_linters, options, summary_results, out)
 
     summary_results.print_results(options, out)
@@ -152,11 +152,6 @@ def main():
         help='Display the totals for each rule.'
     )
     parser.add_argument(
-        '--summary-format', dest='summary_format',
-        choices=['eslint', 'json'], default='eslint',
-        help='Choose the display format for the summary.'
-    )
-    parser.add_argument(
         '--verbose', dest='verbose', action='store_true',
         help='Print multiple lines where possible for additional context of violations.'
     )
@@ -171,13 +166,12 @@ def main():
     options = {
         'list_files': args.list_files,
         'rule_totals': args.rule_totals,
-        'summary_format': args.summary_format,
         'verbose': args.verbose,
         'skip_dirs': getattr(config, 'SKIP_DIRS', ())
     }
     template_linters = getattr(config, 'LINTERS', ())
     if not template_linters:
-        raise ValueError(f"LINTERS is empty or undefined in the config module ({args.config}).")
+        raise ValueError("LINTERS is empty or undefined in the config module ({}).".format(args.config))
 
     ruleset = _build_ruleset(template_linters)
     summary_results = SummaryResults(ruleset)

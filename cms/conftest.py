@@ -53,7 +53,7 @@ def _django_clear_site_cache():
     clearing mechanism actually works.  So override this fixture to not mess
     with what has been working for us so far.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 @pytest.fixture(autouse=True)

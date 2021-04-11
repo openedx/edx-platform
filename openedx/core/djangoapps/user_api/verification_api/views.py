@@ -4,38 +4,57 @@ from django.contrib.auth import get_user_model
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
+from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.user_api.serializers import IDVerificationDetailsSerializer
+from lms.djangoapps.verify_student.utils import most_recent_verification
+from openedx.core.djangoapps.user_api.serializers import (
+    IDVerificationDetailsSerializer,
+    ManualVerificationSerializer,
+    SoftwareSecurePhotoVerificationSerializer,
+    SSOVerificationSerializer
+)
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaffOrOwner
 
 
-class IDVerificationStatusView(APIView):
-    """ IDVerification Status endpoint """
+class IDVerificationStatusView(RetrieveAPIView):
+    """ IDVerificationStatus detail endpoint. """
     authentication_classes = (JwtAuthentication, BearerAuthentication, SessionAuthentication,)
     permission_classes = (IsStaffOrOwner,)
 
-    def get(self, request, **kwargs):  # lint-amnesty, pylint: disable=missing-function-docstring
-        username = kwargs.get('username')
-        User = get_user_model()
-        try:
-            user = User.objects.get(username=username)
-            user_status = IDVerificationService.user_status(user)
-            if user_status.get('status') == 'none':
-                raise Http404
+    def get_serializer(self, *args, **kwargs):
+        """
+        Overrides default get_serializer in order to choose the correct serializer for the instance.
+        """
+        instance = args[0]
+        kwargs['context'] = self.get_serializer_context()
+        if isinstance(instance, SoftwareSecurePhotoVerification):
+            return SoftwareSecurePhotoVerificationSerializer(*args, **kwargs)
+        elif isinstance(instance, SSOVerification):
+            return SSOVerificationSerializer(*args, **kwargs)
+        else:
+            return ManualVerificationSerializer(*args, **kwargs)
 
-            return Response({
-                "is_verified": user_status.get('status') == 'approved',
-                "status": user_status.get('status'),
-                "expiration_datetime": user_status.get('verification_expiry', '')
-            })
+    def get_object(self):
+        username = self.kwargs['username']
+        photo_verifications = SoftwareSecurePhotoVerification.objects.filter(
+            user__username=username).order_by('-updated_at')
+        sso_verifications = SSOVerification.objects.filter(user__username=username).order_by('-updated_at')
+        manual_verifications = ManualVerification.objects.filter(user__username=username).order_by('-updated_at')
 
-        except User.DoesNotExist:
-            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+        if photo_verifications or sso_verifications or manual_verifications:
+            verification = most_recent_verification(
+                photo_verifications,
+                sso_verifications,
+                manual_verifications,
+                'updated_at'
+            )
+            self.check_object_permissions(self.request, verification)
+            return verification
+
+        raise Http404
 
 
 class IDVerificationStatusDetailsView(ListAPIView):
@@ -59,4 +78,4 @@ class IDVerificationStatusDetailsView(ListAPIView):
 
             return sorted(verifications, key=lambda x: x.updated_at, reverse=True)
         except User.DoesNotExist:
-            raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404

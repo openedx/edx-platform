@@ -25,7 +25,7 @@ class RemoteContextPlugin(object):
     def pytest_runtest_call(self, item):
         self.doit(item, "call")
 
-    def doit(self, item, when):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def doit(self, item, when):
         if self.active:
             for cfg in Env.BOK_CHOY_SERVERS.values():
                 result = requests.post(

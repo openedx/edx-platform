@@ -3,6 +3,7 @@
 
 from logging import getLogger
 
+from six.moves import range
 
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff
@@ -111,7 +112,7 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
             position_list = []
             for path_index in range(2, n - 1):
                 category = path[path_index].block_type
-                if category == 'sequential' or category == 'videosequence':  # lint-amnesty, pylint: disable=consider-using-in
+                if category == 'sequential' or category == 'videosequence':
                     section_desc = modulestore.get_item(path[path_index])
                     # this calls get_children rather than just children b/c old mongo includes private children
                     # in children but not in get_children
@@ -150,7 +151,7 @@ def get_child_locations(section_desc, request, course_id):
         """
         Return True if child is appendable based on request and request's user type.
         """
-        return (request and is_user_staff_and_not_masquerading_learner()) or not child_instance.visible_to_staff_only  # lint-amnesty, pylint: disable=consider-using-ternary
+        return (request and is_user_staff_and_not_masquerading_learner()) or not child_instance.visible_to_staff_only
 
     child_locs = []
     for child in section_desc.get_children():
@@ -181,7 +182,7 @@ def navigation_index(position):
     try:
         navigation_position = int(position.split('_', 1)[0])
     except (ValueError, TypeError):
-        LOGGER.exception('Bad position %r passed to navigation_index, will assume first position', position)
+        LOGGER.exception(u'Bad position %r passed to navigation_index, will assume first position', position)
         navigation_position = 1
 
     return navigation_position

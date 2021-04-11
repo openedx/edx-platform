@@ -5,7 +5,7 @@ Tests to ensure only the report files we want are returned as part of run_qualit
 
 import unittest
 
-from unittest.mock import patch
+from mock import patch
 
 import pavelib.quality
 
@@ -23,7 +23,7 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pylint.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pylint")
-        assert len(reports) == 2
+        self.assertEqual(len(reports), 2)
 
     @patch('os.walk')
     def test_get_pep8_reports(self, my_mock):
@@ -32,7 +32,7 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pep8.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pep8")
-        assert len(reports) == 2
+        self.assertEqual(len(reports), 2)
 
     @patch('os.walk')
     def test_get_pep8_reports_noisy(self, my_mock):
@@ -45,4 +45,4 @@ class TestGetReportFiles(unittest.TestCase):
             ('/bar', ('/baz',), ('pep8.report',))
         ])
         reports = pavelib.quality.get_violations_reports("pep8")
-        assert len(reports) == 2
+        self.assertEqual(len(reports), 2)

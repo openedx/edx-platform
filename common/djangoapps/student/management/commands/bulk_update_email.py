@@ -44,12 +44,12 @@ class Command(BaseCommand):
         if not path.isfile(file_path):
             raise CommandError('File not found.')
 
-        with open(file_path) as csv_file:
+        with open(file_path, 'r') as csv_file:
             csv_reader = csv.reader(csv_file)
 
             email_mappings = [
                 (current_email, new_email)
-                for (current_email, new_email)  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                for (current_email, new_email)
                 in csv_reader
             ]
 
@@ -72,5 +72,5 @@ class Command(BaseCommand):
             len(failed_updates)
         )
 
-        if (failed_updates):  # lint-amnesty, pylint: disable=superfluous-parens
-            exit(-1)  # lint-amnesty, pylint: disable=consider-using-sys-exit
+        if (failed_updates):
+            exit(-1)

@@ -4,6 +4,7 @@
 import logging
 from itertools import groupby
 
+import six
 from django.db import transaction
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -17,14 +18,14 @@ log = logging.getLogger(__name__)
 UNDEFINED = object()
 
 
-class Course:
+class Course(object):
     """ Pseudo-course model used to group CourseMode objects. """
     id = None  # pylint: disable=invalid-name
     modes = None
     _deleted_modes = None
 
     def __init__(self, id, modes, **kwargs):  # pylint: disable=redefined-builtin
-        self.id = CourseKey.from_string(str(id))  # pylint: disable=invalid-name
+        self.id = CourseKey.from_string(six.text_type(id))  # pylint: disable=invalid-name
         self.modes = list(modes)
         self.verification_deadline = UNDEFINED
         if 'verification_deadline' in kwargs:
@@ -34,14 +35,14 @@ class Course:
     @property
     def name(self):
         """ Return course name. """
-        course_id = CourseKey.from_string(str(self.id))
+        course_id = CourseKey.from_string(six.text_type(self.id))
 
         try:
             return CourseOverview.get_from_id(course_id).display_name
         except CourseOverview.DoesNotExist:
             # NOTE (CCB): Ideally, the course modes table should only contain data for courses that exist in
             # modulestore. If that is not the case, say for local development/testing, carry on without failure.
-            log.warning('Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
+            log.warning(u'Failed to retrieve CourseOverview for [%s]. Using empty course name.', course_id)
             return None
 
     def get_mode_display_name(self, mode):
@@ -126,10 +127,10 @@ class Course:
     def get(cls, course_id):
         """ Retrieve a single course. """
         try:
-            course_id = CourseKey.from_string(str(course_id))
+            course_id = CourseKey.from_string(six.text_type(course_id))
         except InvalidKeyError:
-            log.debug('[%s] is not a valid course key.', course_id)
-            raise ValueError  # lint-amnesty, pylint: disable=raise-missing-from
+            log.debug(u'[%s] is not a valid course key.', course_id)
+            raise ValueError
 
         course_modes = CourseMode.objects.filter(course_id=course_id)
 

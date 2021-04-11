@@ -7,6 +7,7 @@ import random
 from uuid import uuid4
 
 import lxml.html
+import six
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -15,9 +16,7 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
@@ -27,6 +26,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
@@ -39,19 +39,19 @@ class XQueueAddToQueueError(Exception):
     def __init__(self, error_code, error_msg):
         self.error_code = error_code
         self.error_msg = error_msg
-        super().__init__(str(self))
+        super(XQueueAddToQueueError, self).__init__(six.text_type(self))
 
     def __str__(self):
         return (
-            "Could not add certificate to the XQueue.  "
-            "The error code was '{code}' and the message was '{msg}'."
+            u"Could not add certificate to the XQueue.  "
+            u"The error code was '{code}' and the message was '{msg}'."
         ).format(
             code=self.error_code,
             msg=self.error_msg
         )
 
 
-class XQueueCertInterface:
+class XQueueCertInterface(object):
     """
     XQueueCertificateInterface provides an
     interface to the xqueue server for
@@ -60,7 +60,8 @@ class XQueueCertInterface:
     Instantiating an object will create a new
     connection to the queue server.
 
-    Summary of methods:
+    See models.py for valid state transitions,
+    summary of methods:
 
        add_cert:   Add a new certificate.  Puts a single
                    request on the queue for the student/course.
@@ -104,6 +105,7 @@ class XQueueCertInterface:
             requests_auth,
         )
         self.whitelist = CertificateWhitelist.objects.all()
+        self.restricted = UserProfile.objects.filter(allow_certificate=False)
         self.use_https = True
 
     def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
@@ -131,12 +133,12 @@ class XQueueCertInterface:
 
             LOGGER.info(
                 (
-                    "Found an existing certificate entry for student %s "
-                    "in course '%s' "
-                    "with status '%s' while regenerating certificates. "
+                    u"Found an existing certificate entry for student %s "
+                    u"in course '%s' "
+                    u"with status '%s' while regenerating certificates. "
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
                 certificate.status
             )
 
@@ -151,11 +153,11 @@ class XQueueCertInterface:
 
             LOGGER.info(
                 (
-                    "The certificate status for student %s "
-                    "in course '%s' has been changed to '%s'."
+                    u"The certificate status for student %s "
+                    u"in course '%s' has been changed to '%s'."
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
                 certificate.status
             )
 
@@ -211,6 +213,9 @@ class XQueueCertInterface:
         If a student has a passing grade or is in the whitelist
         table for the course a request will be made for a new cert.
 
+        If a student has allow_certificate set to False in the
+        userprofile table the status will change to 'restricted'
+
         If a student does not have a passing grade the status
         will change to status.notpassing
 
@@ -220,12 +225,12 @@ class XQueueCertInterface:
         if hasattr(course_id, 'ccx'):
             LOGGER.warning(
                 (
-                    "Cannot create certificate generation task for user %s "
-                    "in the course '%s'; "
-                    "certificates are not allowed for CCX courses."
+                    u"Cannot create certificate generation task for user %s "
+                    u"in the course '%s'; "
+                    u"certificates are not allowed for CCX courses."
                 ),
                 student.id,
-                str(course_id)
+                six.text_type(course_id)
             )
             return None
 
@@ -255,14 +260,14 @@ class XQueueCertInterface:
         if cert_status not in valid_statuses:
             LOGGER.warning(
                 (
-                    "Cannot create certificate generation task for user %s "
-                    "in the course '%s'; "
-                    "the certificate status '%s' is not one of %s."
+                    u"Cannot create certificate generation task for user %s "
+                    u"in the course '%s'; "
+                    u"the certificate status '%s' is not one of %s."
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
                 cert_status,
-                str(valid_statuses)
+                six.text_type(valid_statuses)
             )
             return None
 
@@ -286,7 +291,7 @@ class XQueueCertInterface:
         user_is_verified = IDVerificationService.user_is_verified(student)
         cert_mode = enrollment_mode
 
-        is_eligible_for_certificate = modes_api.is_eligible_for_certificate(enrollment_mode, cert_status)
+        is_eligible_for_certificate = CourseMode.is_eligible_for_certificate(enrollment_mode, cert_status)
         if is_whitelisted and not is_eligible_for_certificate:
             # check if audit certificates are enabled for audit mode
             is_eligible_for_certificate = enrollment_mode != CourseMode.AUDIT or \
@@ -313,21 +318,21 @@ class XQueueCertInterface:
 
         LOGGER.info(
             (
-                "Certificate generated for student %s in the course: %s with template: %s. "
-                "given template: %s, "
-                "user is verified: %s, "
-                "mode is verified: %s,"
-                "generate_pdf is: %s"
+                u"Certificate generated for student %s in the course: %s with template: %s. "
+                u"given template: %s, "
+                u"user is verified: %s, "
+                u"mode is verified: %s,"
+                u"generate_pdf is: %s"
             ),
             student.username,
-            str(course_id),
+            six.text_type(course_id),
             template_pdf,
             template_file,
             user_is_verified,
             mode_is_verified,
             generate_pdf
         )
-        cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+        cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
         cert.mode = cert_mode
         cert.user = student
@@ -338,33 +343,34 @@ class XQueueCertInterface:
 
         # Strip HTML from grade range label
         grade_contents = forced_grade or course_grade.letter_grade
-        passing = False
         try:
             grade_contents = lxml.html.fromstring(grade_contents).text_content()
             passing = True
         except (TypeError, XMLSyntaxError, ParserError) as exc:
             LOGGER.info(
                 (
-                    "Could not retrieve grade for student %s "
-                    "in the course '%s' "
-                    "because an exception occurred while parsing the "
-                    "grade contents '%s' as HTML. "
-                    "The exception was: '%s'"
+                    u"Could not retrieve grade for student %s "
+                    u"in the course '%s' "
+                    u"because an exception occurred while parsing the "
+                    u"grade contents '%s' as HTML. "
+                    u"The exception was: '%s'"
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
                 grade_contents,
-                str(exc)
+                six.text_type(exc)
             )
 
-        # Check if the student is whitelisted
-        if is_whitelisted:
-            LOGGER.info(
-                "Student %s is whitelisted in '%s'",
-                student.id,
-                str(course_id)
-            )
-            passing = True
+            # Log if the student is whitelisted
+            if is_whitelisted:
+                LOGGER.info(
+                    u"Student %s is whitelisted in '%s'",
+                    student.id,
+                    six.text_type(course_id)
+                )
+                passing = True
+            else:
+                passing = False
 
         # If this user's enrollment is not eligible to receive a
         # certificate, mark it as such for reporting and
@@ -376,7 +382,7 @@ class XQueueCertInterface:
             cert.status = status.audit_passing if passing else status.audit_notpassing
             cert.save()
             LOGGER.info(
-                "Student %s with enrollment mode %s is not eligible for a certificate.",
+                u"Student %s with enrollment mode %s is not eligible for a certificate.",
                 student.id,
                 enrollment_mode
             )
@@ -388,13 +394,33 @@ class XQueueCertInterface:
 
             LOGGER.info(
                 (
-                    "Student %s does not have a grade for '%s', "
-                    "so their certificate status has been set to '%s'. "
-                    "No certificate generation task was sent to the XQueue."
+                    u"Student %s does not have a grade for '%s', "
+                    u"so their certificate status has been set to '%s'. "
+                    u"No certificate generation task was sent to the XQueue."
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
                 cert.status
+            )
+            return cert
+
+        # Check to see whether the student is on the the embargoed
+        # country restricted list. If so, they should not receive a
+        # certificate -- set their status to restricted and log it.
+        if self.restricted.filter(user=student).exists():
+            cert.status = status.restricted
+            cert.save()
+
+            LOGGER.info(
+                (
+                    u"Student %s is in the embargoed country restricted "
+                    u"list, so their certificate status has been set to '%s' "
+                    u"for the course '%s'. "
+                    u"No certificate generation task was sent to the XQueue."
+                ),
+                student.id,
+                cert.status,
+                six.text_type(course_id)
             )
             return cert
 
@@ -403,12 +429,12 @@ class XQueueCertInterface:
             cert.save()
             LOGGER.info(
                 (
-                    "User %s has a verified enrollment in course %s "
-                    "but is missing ID verification. "
-                    "Certificate status has been set to unverified"
+                    u"User %s has a verified enrollment in course %s "
+                    u"but is missing ID verification. "
+                    u"Certificate status has been set to unverified"
                 ),
                 student.id,
-                str(course_id),
+                six.text_type(course_id),
             )
             return cert
 
@@ -420,7 +446,7 @@ class XQueueCertInterface:
         Generate a certificate for the student. If `generate_pdf` is True,
         sends a request to XQueue.
         """
-        course_id = str(course.id)
+        course_id = six.text_type(course.id)
 
         key = make_hashkey(random.random())
         cert.key = key
@@ -440,7 +466,7 @@ class XQueueCertInterface:
             cert.verify_uuid = uuid4().hex
 
         cert.save()
-        logging.info('certificate generated for user: %s with generate_pdf status: %s',
+        logging.info(u'certificate generated for user: %s with generate_pdf status: %s',
                      student.username, generate_pdf)
 
         if generate_pdf:
@@ -448,22 +474,22 @@ class XQueueCertInterface:
                 self._send_to_xqueue(contents, key)
             except XQueueAddToQueueError as exc:
                 cert.status = ExampleCertificate.STATUS_ERROR
-                cert.error_reason = str(exc)
+                cert.error_reason = six.text_type(exc)
                 cert.save()
                 LOGGER.critical(
                     (
-                        "Could not add certificate task to XQueue.  "
-                        "The course was '%s' and the student was '%s'."
-                        "The certificate task status has been marked as 'error' "
-                        "and can be re-submitted with a management command."
+                        u"Could not add certificate task to XQueue.  "
+                        u"The course was '%s' and the student was '%s'."
+                        u"The certificate task status has been marked as 'error' "
+                        u"and can be re-submitted with a management command."
                     ), course_id, student.id
                 )
             else:
                 LOGGER.info(
                     (
-                        "The certificate status has been set to '%s'.  "
-                        "Sent a certificate grading task to the XQueue "
-                        "with the key '%s'. "
+                        u"The certificate status has been set to '%s'.  "
+                        u"Sent a certificate grading task to the XQueue "
+                        u"with the key '%s'. "
                     ),
                     cert.status,
                     key
@@ -487,7 +513,7 @@ class XQueueCertInterface:
         """
         contents = {
             'action': 'create',
-            'course_id': str(example_cert.course_key),
+            'course_id': six.text_type(example_cert.course_key),
             'name': example_cert.full_name,
             'template_pdf': example_cert.template,
 
@@ -518,18 +544,18 @@ class XQueueCertInterface:
                 task_identifier=example_cert.uuid,
                 callback_url_path=callback_url_path
             )
-            LOGGER.info("Started generating example certificates for course '%s'.", example_cert.course_key)
+            LOGGER.info(u"Started generating example certificates for course '%s'.", example_cert.course_key)
         except XQueueAddToQueueError as exc:
             example_cert.update_status(
                 ExampleCertificate.STATUS_ERROR,
-                error_reason=str(exc)
+                error_reason=six.text_type(exc)
             )
             LOGGER.critical(
                 (
-                    "Could not add example certificate with uuid '%s' to XQueue.  "
-                    "The exception was %s.  "
-                    "The example certificate has been marked with status 'error'."
-                ), example_cert.uuid, str(exc)
+                    u"Could not add example certificate with uuid '%s' to XQueue.  "
+                    u"The exception was %s.  "
+                    u"The example certificate has been marked with status 'error'."
+                ), example_cert.uuid, six.text_type(exc)
             )
 
     def _send_to_xqueue(self, contents, key, task_identifier=None, callback_url_path='/update_certificate'):
@@ -548,7 +574,7 @@ class XQueueCertInterface:
                 certificates.
 
         """
-        callback_url = '{protocol}://{base_url}{path}'.format(
+        callback_url = u'{protocol}://{base_url}{path}'.format(
             protocol=("https" if self.use_https else "http"),
             base_url=settings.SITE_NAME,
             path=callback_url_path
@@ -579,21 +605,21 @@ class XQueueCertInterface:
             header=xheader, body=json.dumps(contents))
         if error:
             exc = XQueueAddToQueueError(error, msg)
-            LOGGER.critical(str(exc))
+            LOGGER.critical(six.text_type(exc))
             raise exc
 
     def _log_pdf_cert_generation_discontinued_warning(self, student_id, course_id, cert_status, download_url):
         """Logs PDF certificate generation discontinued warning."""
         LOGGER.warning(
             (
-                "PDF certificate generation discontinued, canceling "
-                "PDF certificate generation for student %s "
-                "in course '%s' "
-                "with status '%s' "
-                "and download_url '%s'."
+                u"PDF certificate generation discontinued, canceling "
+                u"PDF certificate generation for student %s "
+                u"in course '%s' "
+                u"with status '%s' "
+                u"and download_url '%s'."
             ),
             student_id,
-            str(course_id),
+            six.text_type(course_id),
             cert_status,
             download_url
         )

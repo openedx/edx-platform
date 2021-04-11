@@ -10,30 +10,30 @@ import re
 import shutil
 import tarfile
 import tempfile
-from io import BytesIO
-from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import ddt
 import lxml
+import six
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
+from six.moves import zip
 from storages.backends.s3boto import S3BotoStorage
-from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from openedx.core.lib.extract_tar import safetar_extractall
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.util import milestones_helpers
-from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import LIBRARY_ROOT, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -56,7 +56,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
     """
 
     def setUp(self):
-        super().setUp()
+        super(ImportEntranceExamTestCase, self).setUp()
         self.url = reverse_course_url('import_handler', self.course.id)
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
@@ -93,7 +93,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertIsNotNone(course)
         self.assertEqual(course.entrance_exam_enabled, False)
 
-        with open(self.entrance_exam_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.entrance_exam_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEqual(resp.status_code, 200)
@@ -106,7 +106,7 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         """
         Check that pre existed entrance exam content should be overwrite with the imported course.
         """
-        exam_url = '/course/{}/entrance_exam/'.format(str(self.course.id))
+        exam_url = '/course/{}/entrance_exam/'.format(six.text_type(self.course.id))
         resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
 
@@ -116,16 +116,16 @@ class ImportEntranceExamTestCase(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(metadata['entrance_exam_enabled'])
         self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
         self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
-        self.assertTrue(len(milestones_helpers.get_course_milestones(str(self.course.id))))
+        self.assertTrue(len(milestones_helpers.get_course_milestones(six.text_type(self.course.id))))
         content_milestones = milestones_helpers.get_course_content_milestones(
-            str(self.course.id),
+            six.text_type(self.course.id),
             metadata['entrance_exam_id']['value'],
             milestones_helpers.get_milestone_relationship_types()['FULFILLS']
         )
         self.assertTrue(len(content_milestones))
 
         # Now import entrance exam course
-        with open(self.entrance_exam_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.entrance_exam_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEqual(resp.status_code, 200)
@@ -144,14 +144,14 @@ class ImportTestCase(CourseTestCase):
     CREATE_USER = True
 
     def setUp(self):
-        super().setUp()
+        super(ImportTestCase, self).setUp()
         self.url = reverse_course_url('import_handler', self.course.id)
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
 
         def touch(name):
             """ Equivalent to shell's 'touch'"""
-            with open(name, 'a'):
+            with open(name, 'a'):  # pylint: disable=W6005
                 os.utime(name, None)
 
         # Create tar test files -----------------------------------------------
@@ -184,7 +184,7 @@ class ImportTestCase(CourseTestCase):
         Check that the response for a tar.gz import without a course.xml is
         correct.
         """
-        with open(self.bad_tar, 'rb') as btar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.bad_tar, 'rb') as btar:  # pylint: disable=open-builtin
             resp = self.client.post(
                 self.url,
                 {
@@ -209,7 +209,7 @@ class ImportTestCase(CourseTestCase):
         Check that the response for a tar.gz import with a course.xml is
         correct.
         """
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
 
@@ -228,7 +228,7 @@ class ImportTestCase(CourseTestCase):
         display_name_before_import = course.display_name
 
         # Check that global staff user can import course
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEqual(resp.status_code, 200)
@@ -246,7 +246,7 @@ class ImportTestCase(CourseTestCase):
 
         # Now course staff user can also successfully import course
         self.client.login(username=nonstaff_user.username, password='foo')
-        with open(self.good_tar, 'rb') as gtar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        with open(self.good_tar, 'rb') as gtar:  # pylint: disable=open-builtin
             args = {"name": self.good_tar, "course-data": [gtar]}
             resp = self.client.post(self.url, args)
         self.assertEqual(resp.status_code, 200)
@@ -340,7 +340,7 @@ class ImportTestCase(CourseTestCase):
 
         def try_tar(tarpath):
             """ Attempt to tar an unacceptable file """
-            with open(tarpath, 'rb') as tar:  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+            with open(tarpath, 'rb') as tar:  # pylint: disable=open-builtin
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
             self.assertEqual(resp.status_code, 200)
@@ -500,7 +500,7 @@ class ImportTestCase(CourseTestCase):
             # Construct the modulestore for storing the import (using the previously created contentstore)
             with SPLIT_MODULESTORE_SETUP.build(contentstore=source_content) as source_store:
                 # Use the test branch setting.
-                with source_store.branch_setting(branch_setting):  # lint-amnesty, pylint: disable=no-member
+                with source_store.branch_setting(branch_setting):
                     source_library_key = LibraryLocator(org='TestOrg', library='TestProbs')
 
                     extract_dir = path(tempfile.mkdtemp(dir=settings.DATA_DIR))
@@ -537,7 +537,7 @@ class ExportTestCase(CourseTestCase):
         """
         Sets up the test course.
         """
-        super().setUp()
+        super(ExportTestCase, self).setUp()
         self.url = reverse_course_url('export_handler', self.course.id)
         self.status_url = reverse_course_url('export_status_handler', self.course.id)
 
@@ -576,7 +576,7 @@ class ExportTestCase(CourseTestCase):
         for item in resp.streaming_content:
             resp_content += item
 
-        buff = BytesIO(resp_content)
+        buff = six.BytesIO(resp_content)
         return tarfile.open(fileobj=buff)
 
     def _verify_export_succeeded(self, resp):
@@ -805,12 +805,10 @@ class ExportTestCase(CourseTestCase):
         result = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(result['ExportOutput'], '/path/to/testfile.tar.gz')
 
-    @ddt.data(S3BotoStorage, S3Boto3Storage)
     @patch('cms.djangoapps.contentstore.views.import_export._latest_task_status')
     @patch('user_tasks.models.UserTaskArtifact.objects.get')
     def test_export_status_handler_s3(
         self,
-        s3_storage,
         mock_get_user_task_artifact,
         mock_latest_task_status,
     ):
@@ -820,7 +818,7 @@ class ExportTestCase(CourseTestCase):
         """
         mock_latest_task_status.return_value = Mock(state=UserTaskStatus.SUCCEEDED)
         mock_get_user_task_artifact.return_value = self._mock_artifact(
-            spec=s3_storage,
+            spec=S3BotoStorage,
             file_url='/s3/file/path/testfile.tar.gz',
         )
         resp = self.client.get(self.status_url)
@@ -853,7 +851,7 @@ class TestLibraryImportExport(CourseTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestLibraryImportExport, self).setUp()
         self.export_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)
 
@@ -911,7 +909,7 @@ class TestCourseExportImport(LibraryTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestCourseExportImport, self).setUp()
         self.export_dir = tempfile.mkdtemp()
 
         # Create a problem in library
@@ -1034,7 +1032,7 @@ class TestCourseExportImportProblem(CourseTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestCourseExportImportProblem, self).setUp()
         self.export_dir = tempfile.mkdtemp()
         self.source_course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         self.addCleanup(shutil.rmtree, self.export_dir, ignore_errors=True)

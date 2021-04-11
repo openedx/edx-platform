@@ -3,9 +3,9 @@ Tests for the link_program_enrollments management command.
 """
 
 
-from unittest import mock
 from uuid import UUID
 
+import mock
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase

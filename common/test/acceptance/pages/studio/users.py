@@ -25,7 +25,7 @@ class UsersPageMixin(PageObject):
     """ Common functionality for course/library team pages """
     new_user_form_selector = '.form-create.create-user .user-email-input'
 
-    def url(self):  # lint-amnesty, pylint: disable=invalid-overridden-method
+    def url(self):
         """
         URL to this page - override in subclass
         """

@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import ensure_csrf_cookie

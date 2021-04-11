@@ -5,23 +5,23 @@ Unit tests for instructor_dashboard.py.
 
 import datetime
 import re
-from unittest.mock import patch
 
 import ddt
+import six
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
+from mock import patch
 from pyquery import PyQuery as pq
 from pytz import UTC
+from six import text_type
+from six.moves import range
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseFinanceAdminRole  # lint-amnesty, pylint: disable=unused-import
-from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from common.test.utils import XssTestMixin
+from common.djangoapps.course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
@@ -29,6 +29,9 @@ from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseFinanceAdminRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -58,7 +61,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         """
         Set up tests
         """
-        super().setUp()
+        super(TestInstructorDashboard, self).setUp()
         self.course = CourseFactory.create(
             grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
             display_name='<script>alert("XSS")</script>'
@@ -82,21 +85,21 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.client.login(username=self.instructor.username, password="test")
 
         # URL for instructor dash
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': str(self.course.id)})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
 
     def get_dashboard_enrollment_message(self):
         """
         Returns expected dashboard enrollment message with link to Insights.
         """
-        return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
-               'rel="noopener" target="_blank">Example</a>.'.format(str(self.course.id))
+        return u'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def get_dashboard_analytics_message(self):
         """
         Returns expected dashboard demographic message with link to Insights.
         """
-        return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'rel="noopener" target="_blank">Example</a>.'.format(str(self.course.id))
+        return u'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
+               'rel="noopener" target="_blank">Example</a>.'.format(text_type(self.course.id))
 
     def test_instructor_tab(self):
         """
@@ -107,13 +110,13 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             tabs = get_course_tab_list(user, course)
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
-        assert has_instructor_tab(self.instructor, self.course)
+        self.assertTrue(has_instructor_tab(self.instructor, self.course))
 
         staff = StaffFactory(course_key=self.course.id)
-        assert has_instructor_tab(staff, self.course)
+        self.assertTrue(has_instructor_tab(staff, self.course))
 
         student = UserFactory.create()
-        assert not has_instructor_tab(student, self.course)
+        self.assertFalse(has_instructor_tab(student, self.course))
 
         researcher = UserFactory.create()
         CourseAccessRoleFactory(
@@ -122,7 +125,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             role='data_researcher',
             org=self.course.id.org
         )
-        assert has_instructor_tab(researcher, self.course)
+        self.assertTrue(has_instructor_tab(researcher, self.course))
 
         org_researcher = UserFactory.create()
         CourseAccessRoleFactory(
@@ -131,7 +134,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             role='data_researcher',
             org=self.course.id.org
         )
-        assert has_instructor_tab(org_researcher, self.course)
+        self.assertTrue(has_instructor_tab(org_researcher, self.course))
 
     @ddt.data(
         ('staff', False, False),
@@ -200,20 +203,32 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': str(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
 
         response = self.client.get(url)
         content = pq(response.content)
 
-        assert display_name == content('#field-course-display-name b').contents()[0].strip()
+        self.assertEqual(
+            display_name,
+            content('#field-course-display-name b').contents()[0].strip()
+        )
 
-        assert run == content('#field-course-name b').contents()[0].strip()
+        self.assertEqual(
+            run,
+            content('#field-course-name b').contents()[0].strip()
+        )
 
-        assert number == content('#field-course-number b').contents()[0].strip()
+        self.assertEqual(
+            number,
+            content('#field-course-number b').contents()[0].strip()
+        )
 
-        assert org == content('#field-course-organization b').contents()[0].strip()
+        self.assertEqual(
+            org,
+            content('#field-course-organization b').contents()[0].strip()
+        )
 
     @ddt.data(True, False)
     def test_membership_reason_field_visibility(self, enbale_reason_field):
@@ -234,7 +249,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         url = reverse(
             'instructor_dashboard',
             kwargs={
-                'course_id': str(self.course_info.id)
+                'course_id': six.text_type(self.course_info.id)
             }
         )
         response = self.client.get(url)
@@ -244,6 +259,53 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             self.assertContains(response, reason_field)
         else:
             self.assertNotContains(response, reason_field)
+
+    def test_membership_site_configuration_role(self):
+        """
+        Verify that the role choices set via site configuration are loaded in the membership tab
+        of the instructor dashboard
+        """
+
+        configuration_values = {
+            "MANUAL_ENROLLMENT_ROLE_CHOICES": [
+                "role1",
+                "role2",
+            ]
+        }
+        site = Site.objects.first()
+        SiteConfiguration.objects.create(
+            site=site,
+            site_values=configuration_values,
+            enabled=True
+        )
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': six.text_type(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertContains(response, '<option value="role1">role1</option>')
+        self.assertContains(response, '<option value="role2">role2</option>')
+
+    def test_membership_default_role(self):
+        """
+        Verify that in the absence of site configuration role choices, default values of role choices are loaded
+        in the membership tab of the instructor dashboard
+        """
+
+        url = reverse(
+            'instructor_dashboard',
+            kwargs={
+                'course_id': six.text_type(self.course_info.id)
+            }
+        )
+
+        response = self.client.get(url)
+        self.assertContains(response, '<option value="Learner">Learner</option>')
+        self.assertContains(response, '<option value="Support">Support</option>')
+        self.assertContains(response, '<option value="Partner">Partner</option>')
 
     def test_student_admin_staff_instructor(self):
         """
@@ -275,7 +337,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
 
-        expected_gradebook_url = f'http://gradebook.local.edx.org/{self.course.id}'
+        expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
         self.assertContains(response, expected_gradebook_url)
         self.assertContains(response, 'View Gradebook')
 
@@ -297,7 +359,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
 
-        expected_gradebook_url = f'{settings.WRITABLE_GRADEBOOK_URL}/{self.course.id}'
+        expected_gradebook_url = '{}/{}'.format(settings.WRITABLE_GRADEBOOK_URL, self.course.id)
         self.assertContains(response, expected_gradebook_url)
         self.assertContains(response, 'View Gradebook')
 
@@ -332,7 +394,10 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
-        assert TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE not in response.content.decode('utf-8')
+        self.assertNotIn(
+            TestInstructorDashboard.GRADEBOOK_LEARNER_COUNT_MESSAGE,
+            response.content.decode('utf-8')
+        )
         self.assertContains(response, 'View Gradebook')
 
     def test_course_name_xss(self):
@@ -401,7 +466,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_enrollment_message()
-        assert expected_message in response.content.decode(response.charset)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     @override_settings(ANALYTICS_DASHBOARD_URL='')
     @override_settings(ANALYTICS_DASHBOARD_NAME='')
@@ -426,7 +491,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
-        assert expected_message in response.content.decode(response.charset)
+        self.assertIn(expected_message, response.content.decode(response.charset))
 
     @ddt.data(
         (True, True, True),
@@ -447,8 +512,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
 
             response = self.client.get(self.url)
 
-            assert expected_result == ('CCX Coaches are able to create their own Custom Courses based on this course'
-                                       in response.content.decode('utf-8'))
+            self.assertEqual(expected_result,
+                             'CCX Coaches are able to create their own Custom Courses based on this course'
+                             in response.content.decode('utf-8'))
 
     def test_grade_cutoffs(self):
         """
@@ -460,11 +526,11 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
         page = calculate_page_info(offset=0, total_students=2)
-        assert page['offset'] == 0
-        assert page['page_num'] == 1
-        assert page['next_offset'] is None
-        assert page['previous_offset'] is None
-        assert page['total_pages'] == 1
+        self.assertEqual(page["offset"], 0)
+        self.assertEqual(page["page_num"], 1)
+        self.assertEqual(page["next_offset"], None)
+        self.assertEqual(page["previous_offset"], None)
+        self.assertEqual(page["total_pages"], 1)
 
     @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
@@ -478,9 +544,9 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             kwargs={'course_id': self.course.id}
         )
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
-        assert len(response.mako_context['students']) == 1
+        self.assertEqual(len(response.mako_context['students']), 1)
 
     def test_open_response_assessment_page(self):
         """
@@ -517,7 +583,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         response = self.client.get(self.url)
         # assert we don't get a 500 error
-        assert 200 == response.status_code
+        self.assertEqual(200, response.status_code)
 
 
 @ddt.ddt
@@ -531,7 +597,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         """
         Set up tests
         """
-        super().setUp()
+        super(TestInstructorDashboardPerformance, self).setUp()
         self.course = CourseFactory.create(
             grading_policy={"GRADE_CUTOFFS": {"A": 0.75, "B": 0.63, "C": 0.57, "D": 0.5}},
             display_name='<script>alert("XSS")</script>',
@@ -593,7 +659,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             problem = ItemFactory.create(
                 category="problem",
                 parent=vertical,
-                display_name="A Problem Block %d" % i,
+                display_name=u"A Problem Block %d" % i,
                 weight=1,
                 publish_item=False,
                 metadata={'rerandomize': 'always'},
@@ -612,4 +678,4 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
         url = reverse('spoc_gradebook', kwargs={'course_id': self.course.id})
         with check_mongo_calls(9):
             response = self.client.get(url)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)

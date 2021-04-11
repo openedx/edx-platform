@@ -6,14 +6,15 @@ Content Library Transformer.
 import json
 import logging
 
+import six
 from eventtracking import tracker
 
-from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.models import StudentModule
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
+from common.djangoapps.track import contexts
 from xmodule.library_content_module import LibraryContentBlock
 from xmodule.modulestore.django import modulestore
 
@@ -57,9 +58,9 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             """ Basic information about the given block """
             orig_key, orig_version = store.get_block_original_usage(usage_key)
             return {
-                "usage_key": str(usage_key),
-                "original_usage_key": str(orig_key) if orig_key else None,
-                "original_usage_version": str(orig_version) if orig_version else None,
+                "usage_key": six.text_type(usage_key),
+                "original_usage_key": six.text_type(orig_key) if orig_key else None,
+                "original_usage_version": six.text_type(orig_version) if orig_version else None,
             }
 
         # For each block check if block is library_content.
@@ -161,7 +162,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             Helper function to publish an event for analytics purposes
             """
             event_data = {
-                "location": str(location),
+                "location": six.text_type(location),
                 "previous_count": previous_count,
                 "result": result,
                 "max_count": max_count,
@@ -170,7 +171,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             context = contexts.course_context_from_course_id(location.course_key)
             if user_id:
                 context['user_id'] = user_id
-            full_event_name = f"edx.librarycontentblock.content.{event_name}"
+            full_event_name = "edx.librarycontentblock.content.{}".format(event_name)
             with tracker.get_tracker().context(full_event_name, context):
                 tracker.emit(full_event_name, event_data)
 
@@ -224,8 +225,8 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
 
             if library_children:
                 state_dict = get_student_module_as_dict(usage_info.user, usage_info.course_key, block_key)
-                current_children_blocks = {block.block_id for block in library_children}
-                current_selected_blocks = {item[1] for item in state_dict['selected']}
+                current_children_blocks = set(block.block_id for block in library_children)
+                current_selected_blocks = set(item[1] for item in state_dict['selected'])
 
                 # As the selections should have already been made by the ContentLibraryTransformer,
                 # the current children of the library_content block should be the same as the stored
@@ -234,7 +235,7 @@ class ContentLibraryOrderTransformer(BlockStructureTransformer):
                 # transform the order in that case.
                 if current_children_blocks != current_selected_blocks:
                     logger.debug(
-                        'Mismatch between the children of %s in the stored state and the actual children for user %s. '
+                        u'Mismatch between the children of %s in the stored state and the actual children for user %s. '
                         'Continuing without order transformation.',
                         str(block_key),
                         usage_info.user.username

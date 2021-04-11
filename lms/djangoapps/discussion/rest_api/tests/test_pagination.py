@@ -22,7 +22,7 @@ class PaginationSerializerTest(TestCase):
         request = RequestFactory().get("/test")
         paginator = DiscussionAPIPagination(request, page_num, num_pages)
         actual = paginator.get_paginated_response(objects)
-        assert actual.data == expected
+        self.assertEqual(actual.data, expected)
 
     def test_empty(self):
         self.do_case(

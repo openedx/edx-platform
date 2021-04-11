@@ -1,9 +1,9 @@
 """
 Tests for paver xsslint quality tasks
 """
-from unittest.mock import patch
 
-import pytest
+
+from mock import patch
 from paver.easy import call_task
 
 import pavelib.quality
@@ -28,7 +28,7 @@ class PaverXSSLintTest(PaverTestCase):
         run_xsslint encounters an error parsing the xsslint output log
         """
         _mock_counts.return_value = {}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint')
 
     @patch.object(pavelib.quality, '_write_metric')
@@ -49,7 +49,7 @@ class PaverXSSLintTest(PaverTestCase):
         run_xsslint fails when thresholds option is poorly formatted
         """
         _mock_counts.return_value = {'total': 0}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint', options={"thresholds": "invalid"})
 
     @patch.object(pavelib.quality, '_write_metric')
@@ -60,7 +60,7 @@ class PaverXSSLintTest(PaverTestCase):
         run_xsslint fails when thresholds option is poorly formatted
         """
         _mock_counts.return_value = {'total': 0}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint', options={"thresholds": '{"invalid": 3}'})
 
     @patch.object(pavelib.quality, '_write_metric')
@@ -71,7 +71,7 @@ class PaverXSSLintTest(PaverTestCase):
         run_xsslint finds more violations than are allowed
         """
         _mock_counts.return_value = {'total': 4}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint', options={"thresholds": '{"total": 3}'})
 
     @patch.object(pavelib.quality, '_write_metric')
@@ -94,7 +94,7 @@ class PaverXSSLintTest(PaverTestCase):
         given rule threshold that was set.
         """
         _mock_counts.return_value = {'total': 4}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint', options={"thresholds": '{"rules": {"javascript-escape": 3}}'})
 
     @patch.object(pavelib.quality, '_write_metric')
@@ -105,7 +105,7 @@ class PaverXSSLintTest(PaverTestCase):
         run_xsslint finds more rule violations than are allowed
         """
         _mock_counts.return_value = {'total': 4, 'rules': {'javascript-escape': 4}}
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsslint', options={"thresholds": '{"rules": {"javascript-escape": 3}}'})
 
     @patch.object(pavelib.quality, '_write_metric')

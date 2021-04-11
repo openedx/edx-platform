@@ -1,9 +1,9 @@
 """
 Tests for paver xsscommitlint quality tasks
 """
-from unittest.mock import patch
 
-import pytest
+
+from mock import patch
 from paver.easy import call_task
 
 import pavelib.quality
@@ -32,7 +32,7 @@ class PaverXSSCommitLintTest(PaverTestCase):
 
         """
         _mock_count.return_value = None
-        with pytest.raises(SystemExit):
+        with self.assertRaises(SystemExit):
             call_task('pavelib.quality.run_xsscommitlint')
 
     @patch.object(pavelib.quality, '_write_metric')

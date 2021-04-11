@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for the Account Settings page.
 """
@@ -13,9 +14,9 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     Mixin with helper methods to test the account settings page.
     """
 
-    CHANGE_INITIATED_EVENT_NAME = "edx.user.settings.change_initiated"
+    CHANGE_INITIATED_EVENT_NAME = u"edx.user.settings.change_initiated"
     USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
-    ACCOUNT_SETTINGS_REFERER = "/account/settings"
+    ACCOUNT_SETTINGS_REFERER = u"/account/settings"
 
     shard = 23
 

@@ -42,7 +42,7 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 ################################# LMS INTEGRATION #############################
 
 LMS_BASE = 'localhost:8000'
-LMS_ROOT_URL = f'http://{LMS_BASE}'
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ########################### PIPELINE #################################
@@ -119,10 +119,10 @@ REQUIRE_DEBUG = DEBUG
 
 ########################### OAUTH2 #################################
 JWT_AUTH.update({
-    'JWT_ISSUER': f'{LMS_ROOT_URL}/oauth2',
+    'JWT_ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
     'JWT_ISSUERS': [{
         'AUDIENCE': 'lms-key',
-        'ISSUER': f'{LMS_ROOT_URL}/oauth2',
+        'ISSUER': '{}/oauth2'.format(LMS_ROOT_URL),
         'SECRET_KEY': 'lms-secret',
     }],
     'JWT_SECRET_KEY': 'lms-secret',
@@ -150,7 +150,7 @@ JWT_AUTH.update({
     ),
 })
 
-# pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
+# pylint: enable=unicode-format-string
 
 IDA_LOGOUT_URI_LIST = [
     'http://localhost:18130/logout/',  # ecommerce

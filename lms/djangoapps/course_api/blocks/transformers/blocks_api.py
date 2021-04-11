@@ -7,10 +7,10 @@ from openedx.core.djangoapps.content.block_structure.transformer import BlockStr
 
 from .block_counts import BlockCountsTransformer
 from .block_depth import BlockDepthTransformer
-from .extra_fields import ExtraFieldsTransformer
 from .navigation import BlockNavigationTransformer
 from .student_view import StudentViewTransformer
 from .video_urls import VideoBlockURLTransformer
+from .extra_fields import ExtraFieldsTransformer
 
 
 class BlocksAPITransformer(BlockStructureTransformer):

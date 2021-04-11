@@ -12,10 +12,10 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.query import use_read_replica_if_available
 
 USER_MODEL = get_user_model()
 
@@ -45,7 +45,7 @@ class CourseEnrollmentPagination(CursorPagination):
         Return a response given serialized page data, optional status_code (defaults to 200),
         and kwargs. Each key-value pair of kwargs is added to the response data.
         """
-        resp = super().get_paginated_response(data)
+        resp = super(CourseEnrollmentPagination, self).get_paginated_response(data)
 
         for (key, value) in kwargs.items():
             resp.data[key] = value
@@ -103,13 +103,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         try:
             yield self._get_single_user(request, course_key)
         except USER_MODEL.DoesNotExist:
-            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The user matching the requested username does not exist.',
                 error_code='user_does_not_exist'
             )
         except CourseEnrollment.DoesNotExist:
-            raise self.api_error(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The user matching the requested username is not enrolled in this course',
                 error_code='user_not_enrolled'
@@ -181,6 +181,6 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         """
         Ensures that the user is authenticated (e.g. not an AnonymousUser).
         """
-        super().perform_authentication(request)
+        super(GradeViewMixin, self).perform_authentication(request)
         if request.user.is_anonymous:
             raise AuthenticationFailed

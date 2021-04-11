@@ -27,7 +27,7 @@ from openedx.core.djangolib.markup import HTML
     % if completed:
       <div class="pill completed">${_('Completed')}</div>
     % elif past_due:
-      <div class="pill past-due">${_('Past due')}</div>
+      <div class="pill past-due">${_('Past Due')}</div>
     % endif
   </div>
 % endif
@@ -42,7 +42,7 @@ from openedx.core.djangolib.markup import HTML
       <div class="banner-cta-text">${vertical_banner_cta['description']}</div>
       % if vertical_banner_cta.get('event_data'):
         <div class="banner-cta-button">
-            <button class="btn btn-outline-primary" onclick="emit_event(${vertical_banner_cta['event_data']})">${vertical_banner_cta['link_name']}</button>
+            <button class="btn" onclick="emit_event(${vertical_banner_cta['event_data']})">${vertical_banner_cta['link_name']}</button>
         </div>
       % else:
         <div class="banner-cta-button">
@@ -51,7 +51,7 @@ from openedx.core.djangolib.markup import HTML
             % for form_name, form_value in vertical_banner_cta['form_values'].items():
               <input type="hidden" name="${form_name}" value="${form_value}">
             % endfor
-            <button class="btn btn-outline-primary">${vertical_banner_cta['link_name']}</button>
+            <button class="btn">${vertical_banner_cta['link_name']}</button>
           </form>
         </div>
      % endif

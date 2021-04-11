@@ -3,8 +3,8 @@ Tests for the force_publish management command
 """
 
 
-from unittest import mock
-
+import mock
+import six
 from django.core.management import CommandError, call_command
 
 from cms.djangoapps.contentstore.management.commands.force_publish import Command
@@ -20,7 +20,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
     """
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestForcePublish, cls).setUpClass()
         cls.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         cls.test_user_id = ModuleStoreEnum.UserID.test
         cls.command = Command()
@@ -29,7 +29,10 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         Test 'force_publish' command with no arguments
         """
-        errstring = "Error: the following arguments are required: course_key"
+        if six.PY2:
+            errstring = "Error: too few arguments"
+        else:
+            errstring = "Error: the following arguments are required: course_key"
 
         with self.assertRaisesRegex(CommandError, errstring):
             call_command('force_publish')
@@ -48,7 +51,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "Error: unrecognized arguments: invalid-arg"
         with self.assertRaisesRegex(CommandError, errstring):
-            call_command('force_publish', str(self.course.id), '--commit', 'invalid-arg')
+            call_command('force_publish', six.text_type(self.course.id), '--commit', 'invalid-arg')
 
     def test_course_key_not_found(self):
         """
@@ -56,7 +59,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         """
         errstring = "Course not found."
         with self.assertRaisesRegex(CommandError, errstring):
-            call_command('force_publish', 'course-v1:org+course+run')
+            call_command('force_publish', six.text_type('course-v1:org+course+run'))
 
     def test_force_publish_non_split(self):
         """
@@ -65,7 +68,7 @@ class TestForcePublish(SharedModuleStoreTestCase):
         course = CourseFactory.create(default_store=ModuleStoreEnum.Type.mongo)
         errstring = 'The owning modulestore does not support this command.'
         with self.assertRaisesRegex(CommandError, errstring):
-            call_command('force_publish', str(course.id))
+            call_command('force_publish', six.text_type(course.id))
 
 
 class TestForcePublishModifications(ModuleStoreTestCase):
@@ -75,7 +78,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestForcePublishModifications, self).setUp()
         self.course = CourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         self.test_user_id = ModuleStoreEnum.UserID.test
         self.command = Command()
@@ -97,7 +100,7 @@ class TestForcePublishModifications(ModuleStoreTestCase):
         self.assertTrue(self.store.has_changes(self.store.get_item(self.course.location)))
 
         # get draft and publish branch versions
-        versions = get_course_versions(str(self.course.id))
+        versions = get_course_versions(six.text_type(self.course.id))
         draft_version = versions['draft-branch']
         published_version = versions['published-branch']
 
@@ -108,13 +111,13 @@ class TestForcePublishModifications(ModuleStoreTestCase):
             patched_yes_no.return_value = True
 
             # force publish course
-            call_command('force_publish', str(self.course.id), '--commit')
+            call_command('force_publish', six.text_type(self.course.id), '--commit')
 
             # verify that course has no changes
             self.assertFalse(self.store.has_changes(self.store.get_item(self.course.location)))
 
             # get new draft and publish branch versions
-            versions = get_course_versions(str(self.course.id))
+            versions = get_course_versions(six.text_type(self.course.id))
             new_draft_version = versions['draft-branch']
             new_published_version = versions['published-branch']
 

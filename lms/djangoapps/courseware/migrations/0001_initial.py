@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django.utils.timezone
 import model_utils.fields
 from django.conf import settings
@@ -117,26 +120,26 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='xmoduleuserstatesummaryfield',
-            unique_together={('usage_id', 'field_name')},
+            unique_together=set([('usage_id', 'field_name')]),
         ),
         migrations.AlterUniqueTogether(
             name='xmodulestudentprefsfield',
-            unique_together={('student', 'module_type', 'field_name')},
+            unique_together=set([('student', 'module_type', 'field_name')]),
         ),
         migrations.AlterUniqueTogether(
             name='xmodulestudentinfofield',
-            unique_together={('student', 'field_name')},
+            unique_together=set([('student', 'field_name')]),
         ),
         migrations.AlterUniqueTogether(
             name='studentmodule',
-            unique_together={('student', 'module_state_key', 'course_id')},
+            unique_together=set([('student', 'module_state_key', 'course_id')]),
         ),
         migrations.AlterUniqueTogether(
             name='studentfieldoverride',
-            unique_together={('course_id', 'field', 'location', 'student')},
+            unique_together=set([('course_id', 'field', 'location', 'student')]),
         ),
         migrations.AlterUniqueTogether(
             name='offlinecomputedgrade',
-            unique_together={('user', 'course_id')},
+            unique_together=set([('user', 'course_id')]),
         ),
     ]

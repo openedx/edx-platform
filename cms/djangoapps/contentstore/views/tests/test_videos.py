@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 """
 Unit tests for video-related REST APIs.
 """
@@ -8,15 +9,14 @@ import json
 import re
 from contextlib import contextmanager
 from datetime import datetime
-from io import StringIO
-from unittest.mock import Mock, patch
 
 import dateutil.parser
 import ddt
 import pytz
+import six
 from django.conf import settings
 from django.test.utils import override_settings
-from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from edxval.api import (
     create_or_update_transcript_preferences,
@@ -27,6 +27,8 @@ from edxval.api import (
     get_transcript_preferences,
     get_video_info
 )
+from mock import Mock, patch
+from six import StringIO
 from waffle.testutils import override_flag
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig
@@ -52,26 +54,26 @@ from ..videos import (
     convert_video_status
 )
 
-VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = LegacyWaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
+VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = WaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
 
 
-class VideoUploadTestBase:
+class VideoUploadTestBase(object):
     """
     Test cases for the video upload feature
     """
 
     def get_url_for_course_key(self, course_key, kwargs=None):
         """Return video handler URL for the given course"""
-        return reverse_course_url(self.VIEW_NAME, course_key, kwargs)  # lint-amnesty, pylint: disable=no-member
+        return reverse_course_url(self.VIEW_NAME, course_key, kwargs)
 
     def setUp(self):
-        super().setUp()  # lint-amnesty, pylint: disable=no-member
+        super(VideoUploadTestBase, self).setUp()
         self.url = self.get_url_for_course_key(self.course.id)
         self.test_token = "test_token"
         self.course.video_upload_pipeline = {
             "course_video_upload_token": self.test_token,
         }
-        self.save_course()  # lint-amnesty, pylint: disable=no-member
+        self.save_course()
 
         # create another course for videos belonging to multiple courses
         self.course2 = CourseFactory.create()
@@ -79,10 +81,10 @@ class VideoUploadTestBase:
             "course_video_upload_token": self.test_token,
         }
         self.course2.save()
-        self.store.update_item(self.course2, self.user.id)  # lint-amnesty, pylint: disable=no-member
+        self.store.update_item(self.course2, self.user.id)
 
         # course ids for videos
-        course_ids = [str(self.course.id), str(self.course2.id)]
+        course_ids = [six.text_type(self.course.id), six.text_type(self.course2.id)]
         created = datetime.now(pytz.utc)
 
         self.profiles = ["profile1", "profile2"]
@@ -120,7 +122,7 @@ class VideoUploadTestBase:
             },
             {
                 "edx_video_id": "non-ascii",
-                "client_video_id": "nón-ascii-näme.mp4",
+                "client_video_id": u"nón-ascii-näme.mp4",
                 "duration": 256.0,
                 "status": "transcode_active",
                 "courses": course_ids,
@@ -128,7 +130,7 @@ class VideoUploadTestBase:
                 "encoded_videos": [
                     {
                         "profile": "profile1",
-                        "url": "http://example.com/profile1/nón-ascii-näme.mp4",
+                        "url": u"http://example.com/profile1/nón-ascii-näme.mp4",
                         "file_size": 3200,
                         "bitrate": 100,
                     },
@@ -138,7 +140,7 @@ class VideoUploadTestBase:
         # Ensure every status string is tested
         self.previous_uploads += [
             {
-                "edx_video_id": f"status_test_{status}",
+                "edx_video_id": "status_test_{}".format(status),
                 "client_video_id": "status_test.mp4",
                 "duration": 3.14,
                 "status": status,
@@ -204,7 +206,7 @@ class VideoUploadTestMixin(VideoUploadTestBase):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
 
-class VideoUploadPostTestsMixin:
+class VideoUploadPostTestsMixin(object):
     """
     Shared test cases for video post tests.
     """
@@ -282,7 +284,7 @@ class VideoUploadPostTestsMixin:
                 'client_video_id',
                 file_info['file_name']
             )
-            mock_key_instance.set_metadata.assert_any_call('course_key', str(self.course.id))
+            mock_key_instance.set_metadata.assert_any_call('course_key', six.text_type(self.course.id))
             mock_key_instance.generate_url.assert_called_once_with(
                 KEY_EXPIRATION_IN_SECONDS,
                 'PUT',
@@ -295,7 +297,7 @@ class VideoUploadPostTestsMixin:
             self.assertEqual(val_info['client_video_id'], file_info['file_name'])
             self.assertEqual(val_info['status'], 'upload')
             self.assertEqual(val_info['duration'], 0)
-            self.assertEqual(val_info['courses'], [{str(self.course.id): None}])
+            self.assertEqual(val_info['courses'], [{six.text_type(self.course.id): None}])
 
             # Ensure response is correct
             response_file = response_obj['files'][i]
@@ -350,7 +352,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
             original_video = self.previous_uploads[-(i + 1)]
             self.assertEqual(
                 set(response_video.keys()),
-                {
+                set([
                     'edx_video_id',
                     'client_video_id',
                     'created',
@@ -360,7 +362,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
                     'transcripts',
                     'transcription_status',
                     'error_description'
-                }
+                ])
             )
             dateutil.parser.parse(response_video['created'])
             for field in ['edx_video_id', 'client_video_id', 'duration']:
@@ -528,7 +530,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         """
         Test that video uploads throws error message when file name contains special characters.
         """
-        file_name = 'test\u2019_file.mp4'
+        file_name = u'test\u2019_file.mp4'
         files = [{'file_name': file_name, 'content_type': 'video/mp4'}]
 
         bucket = Mock()
@@ -541,12 +543,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         )
         self.assertEqual(response.status_code, 400)
         response = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(response['error'], 'The file name for %s must contain only ASCII characters.' % file_name)
+        self.assertEqual(response['error'], u'The file name for %s must contain only ASCII characters.' % file_name)
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
     @patch('boto.s3.connection.S3Connection')
-    @override_flag(waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].name, active=True)
+    @override_flag(waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].namespaced_flag_name, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
         mock_key_instances = [
@@ -653,7 +655,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
 
         DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE_FLAG.name, active=data['global_waffle']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['global_waffle']):
                 response = self.client.post(
                     self.url,
                     json.dumps({'files': [file_data]}),
@@ -782,7 +784,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
         )
 
         mock_logger.info.assert_called_with(
-            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            u'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
             edx_video_id,
             'upload_failed',
             'server down'
@@ -1017,7 +1019,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'extension': '.tiff'
             },
-            'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
+            u'This image file type is not supported. Supported file types are {supported_file_formats}.'.format(
                 supported_file_formats=list(settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys())
             )
         ),
@@ -1026,7 +1028,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'] + 10
             },
-            'This image file must be smaller than {image_max_size}.'.format(
+            u'This image file must be smaller than {image_max_size}.'.format(
                 image_max_size=settings.VIDEO_IMAGE_MAX_FILE_SIZE_MB
             )
         ),
@@ -1034,7 +1036,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
             {
                 'size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'] - 10
             },
-            'This image file must be larger than {image_min_size}.'.format(
+            u'This image file must be larger than {image_min_size}.'.format(
                 image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
             )
         ),
@@ -1044,7 +1046,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': 16,  # 16x9
                 'height': 9
             },
-            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(  # lint-amnesty, pylint: disable=line-too-long
+            u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
@@ -1056,7 +1058,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH - 10,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT
             },
-            'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(  # lint-amnesty, pylint: disable=line-too-long
+            u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. The minimum resolution is {image_file_min_width}x{image_file_min_height}.'.format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
                 image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
@@ -1069,8 +1071,8 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT - 10
             },
             (
-                'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
-                'The minimum resolution is {image_file_min_width}x{image_file_min_height}.'
+                u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
+                u'The minimum resolution is {image_file_min_width}x{image_file_min_height}.'
             ).format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
@@ -1084,8 +1086,8 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'height': 100
             },
             (
-                'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
-                'The minimum resolution is {image_file_min_width}x{image_file_min_height}.'
+                u'Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
+                u'The minimum resolution is {image_file_min_width}x{image_file_min_height}.'
             ).format(
                 image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
                 image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
@@ -1120,14 +1122,14 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
                 'width': settings.VIDEO_IMAGE_MIN_WIDTH + 100,
                 'height': settings.VIDEO_IMAGE_MIN_HEIGHT + 200
             },
-            'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
+            u'This image file must have an aspect ratio of {video_image_aspect_ratio_text}.'.format(
                 video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
             )
         ),
         # Image file name validation
         (
             {
-                'prefix': 'nøn-åßç¡¡'
+                'prefix': u'nøn-åßç¡¡'
             },
             'The image file name can only contain letters, numbers, hyphens (-), and underscores (_).'
         )
@@ -1197,7 +1199,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         (
             {},
             True,
-            "Invalid provider None.",
+            u"Invalid provider None.",
             400
         ),
         (
@@ -1205,7 +1207,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': ''
             },
             True,
-            "Invalid provider .",
+            u"Invalid provider .",
             400
         ),
         (
@@ -1213,7 +1215,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': 'dummy-provider'
             },
             True,
-            "Invalid provider dummy-provider.",
+            u"Invalid provider dummy-provider.",
             400
         ),
         (
@@ -1221,7 +1223,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.CIELO24
             },
             True,
-            "Invalid cielo24 fidelity None.",
+            u"Invalid cielo24 fidelity None.",
             400
         ),
         (
@@ -1230,7 +1232,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'cielo24_fidelity': 'PROFESSIONAL',
             },
             True,
-            "Invalid cielo24 turnaround None.",
+            u"Invalid cielo24 turnaround None.",
             400
         ),
         (
@@ -1241,7 +1243,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'video_source_language': 'en'
             },
             True,
-            "Invalid languages [].",
+            u"Invalid languages [].",
             400
         ),
         (
@@ -1252,7 +1254,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'video_source_language': 'es'
             },
             True,
-            "Unsupported source language es.",
+            u"Unsupported source language es.",
             400
         ),
         (
@@ -1272,7 +1274,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'provider': TranscriptProvider.THREE_PLAY_MEDIA
             },
             True,
-            "Invalid 3play turnaround None.",
+            u"Invalid 3play turnaround None.",
             400
         ),
         (
@@ -1282,7 +1284,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
                 'video_source_language': 'zh',
             },
             True,
-            "Unsupported source language zh.",
+            u"Unsupported source language zh.",
             400
         ),
         (
@@ -1373,7 +1375,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         Test that transcript handler removes transcript preferences correctly.
         """
         # First add course wide transcript preferences.
-        preferences = create_or_update_transcript_preferences(str(self.course.id))
+        preferences = create_or_update_transcript_preferences(six.text_type(self.course.id))
 
         # Verify transcript preferences exist
         self.assertIsNotNone(preferences)
@@ -1386,7 +1388,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         self.assertEqual(response.status_code, 204)
 
         # Verify transcript preferences no loger exist
-        preferences = get_transcript_preferences(str(self.course.id))
+        preferences = get_transcript_preferences(six.text_type(self.course.id))
         self.assertIsNone(preferences)
 
     def test_remove_transcript_preferences_not_found(self):
@@ -1452,7 +1454,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
         mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
         mock_key_instance = Mock(
             generate_url=Mock(
-                return_value=f'http://example.com/url_{file_name}'
+                return_value='http://example.com/url_{file_name}'.format(file_name=file_name)
             )
         )
         # If extra calls are made, return a dummy
@@ -1485,7 +1487,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
     VIEW_NAME = "video_encodings_download"
 
     def setUp(self):
-        super().setUp()
+        super(VideoUrlsCsvTestCase, self).setUp()
         VideoUploadConfig(profile_whitelist="profile1").save()
 
     def _check_csv_response(self, expected_profiles):
@@ -1497,32 +1499,37 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            f"attachment; filename=\"{self.course.id.course}_video_urls.csv\""
+            u"attachment; filename=\"{course}_video_urls.csv\"".format(course=self.course.id.course)
         )
         response_content = b"".join(response.streaming_content)
-        response_reader = StringIO(response_content.decode())
+        response_reader = StringIO(response_content.decode('utf-8') if six.PY3 else response_content)
         reader = csv.DictReader(response_reader, dialect=csv.excel)
         self.assertEqual(
             reader.fieldnames,
             (
                 ["Name", "Duration", "Date Added", "Video ID", "Status"] +
-                [f"{profile} URL" for profile in expected_profiles]
+                [u"{} URL".format(profile) for profile in expected_profiles]
             )
         )
         rows = list(reader)
         self.assertEqual(len(rows), len(self.previous_uploads))
         for i, row in enumerate(rows):
-            response_video = dict(row.items())
+            response_video = {
+                key.decode("utf-8") if six.PY2 else key: value.decode("utf-8") if six.PY2 else value
+                for key, value in row.items()
+            }
             # Videos should be returned by creation date descending
             original_video = self.previous_uploads[-(i + 1)]
-            client_video_id = original_video["client_video_id"]
-            self.assertEqual(response_video["Name"], client_video_id)
+            client_video_id = original_video["client_video_id"].encode('utf-8') if six.PY2 \
+                else original_video["client_video_id"]
+            self.assertEqual(response_video["Name"].encode('utf-8') if six.PY2
+                             else response_video["Name"], client_video_id)
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
             self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
-                response_profile_url = response_video[f"{profile} URL"]
+                response_profile_url = response_video["{} URL".format(profile)]
                 original_encoded_for_profile = next(
                     (
                         original_encoded
@@ -1532,8 +1539,10 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                     None
                 )
                 if original_encoded_for_profile:
-                    original_encoded_for_profile_url = original_encoded_for_profile["url"]
-                    self.assertEqual(response_profile_url, original_encoded_for_profile_url)
+                    original_encoded_for_profile_url = original_encoded_for_profile["url"].encode('utf-8') if six.PY2 \
+                        else original_encoded_for_profile["url"]
+                    self.assertEqual(response_profile_url.encode('utf-8') if six.PY2 else response_profile_url,
+                                     original_encoded_for_profile_url)
                 else:
                     self.assertEqual(response_profile_url, "")
 
@@ -1546,7 +1555,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
 
     def test_non_ascii_course(self):
         course = CourseFactory.create(
-            number="nón-äscii",
+            number=u"nón-äscii",
             video_upload_pipeline={
                 "course_video_upload_token": self.test_token,
             }
@@ -1555,5 +1564,5 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response["Content-Disposition"],
-            "attachment; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
+            u"attachment; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
         )

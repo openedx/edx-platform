@@ -33,10 +33,10 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
 
     CREATE_USER = True
 
-    def setUp(self):  # lint-amnesty, pylint: disable=arguments-differ
-        super().setUp()
+    def setUp(self):
+        super(ThirdPartyOAuthTestMixin, self).setUp()
         if self.CREATE_USER:
-            self.user = UserFactory.create(password='secret')
+            self.user = UserFactory()
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
         self.oauth_client = self._create_client()
         if self.BACKEND == 'google-oauth2':
@@ -45,7 +45,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             self.configure_facebook_provider(enabled=True, visible=True)
 
     def tearDown(self):
-        super().tearDown()
+        super(ThirdPartyOAuthTestMixin, self).tearDown()
         Partial.objects.all().delete()
 
     def _create_client(self):
@@ -87,7 +87,7 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
         )
 
 
-class ThirdPartyOAuthTestMixinFacebook:
+class ThirdPartyOAuthTestMixinFacebook(object):
     """Tests oauth with the Facebook backend"""
     BACKEND = "facebook"
     USER_URL = FacebookOAuth2.USER_DATA_URL.format(version=FACEBOOK_API_VERSION)
@@ -95,7 +95,7 @@ class ThirdPartyOAuthTestMixinFacebook:
     UID_FIELD = "id"
 
 
-class ThirdPartyOAuthTestMixinGoogle:
+class ThirdPartyOAuthTestMixinGoogle(object):
     """Tests oauth with the Google backend"""
     BACKEND = "google-oauth2"
     USER_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
@@ -115,7 +115,7 @@ def read_and_pre_process_xml(file_name):
     Returns:
          (str): Pre Processed contents of the file.
     """
-    with open(file_name) as xml_file:
+    with open(file_name, 'r') as xml_file:
         return xml_file.read().replace('\n', '')
 
 

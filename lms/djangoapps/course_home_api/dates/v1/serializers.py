@@ -6,8 +6,8 @@ Dates Tab Serializers. Represents the relevant dates for a Course.
 
 from rest_framework import serializers
 
-from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin
 from lms.djangoapps.courseware.date_summary import VerificationDeadlineDate
+from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin
 
 
 class DateSummarySerializer(serializers.Serializer):
@@ -15,7 +15,7 @@ class DateSummarySerializer(serializers.Serializer):
     Serializer for Date Summary Objects.
     """
     assignment_type = serializers.CharField(default=None)
-    complete = serializers.BooleanField(allow_null=True)
+    complete = serializers.NullBooleanField()
     date = serializers.DateTimeField()
     date_type = serializers.CharField()
     description = serializers.CharField()
@@ -24,7 +24,6 @@ class DateSummarySerializer(serializers.Serializer):
     link_text = serializers.CharField()
     title = serializers.CharField()
     extra_info = serializers.CharField()
-    first_component_block_id = serializers.SerializerMethodField()
 
     def get_learner_has_access(self, block):
         learner_is_full_access = self.context.get('learner_is_full_access', False)
@@ -37,9 +36,6 @@ class DateSummarySerializer(serializers.Serializer):
             request = self.context.get('request')
             return request.build_absolute_uri(block.link)
         return ''
-
-    def get_first_component_block_id(self, block):
-        return getattr(block, 'first_component_block_id', '')
 
 
 class DatesTabSerializer(DatesBannerSerializerMixin, serializers.Serializer):

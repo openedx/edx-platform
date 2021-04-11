@@ -7,7 +7,7 @@ import logging
 import os
 from pprint import pformat
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
 from lms.djangoapps.verify_student.models import ManualVerification
@@ -41,18 +41,18 @@ class Command(BaseCommand):
 
         if email_ids_file:
             if not os.path.exists(email_ids_file):
-                raise CommandError('Pass the correct absolute path to email ids file as --email-ids-file argument.')
+                raise CommandError(u'Pass the correct absolute path to email ids file as --email-ids-file argument.')
 
         total_emails, failed_emails = self._generate_manual_verification_from_file(email_ids_file)
 
         if failed_emails:
-            log.error('Completed manual verification. {} of {} failed.'.format(
+            log.error(u'Completed manual verification. {} of {} failed.'.format(
                 len(failed_emails),
                 total_emails
             ))
-            log.error('Failed emails:{}'.format(pformat(failed_emails)))
+            log.error(u'Failed emails:{}'.format(pformat(failed_emails)))
         else:
-            log.info(f'Successfully generated manual verification for {total_emails} emails.')
+            log.info(u'Successfully generated manual verification for {} emails.'.format(total_emails))
 
     def _generate_manual_verification_from_file(self, email_ids_file):
         """
@@ -67,10 +67,10 @@ class Command(BaseCommand):
         """
         failed_emails = []
 
-        with open(email_ids_file) as file_handler:
+        with open(email_ids_file, 'r') as file_handler:
             email_ids = file_handler.readlines()
             total_emails = len(email_ids)
-            log.info(f'Creating manual verification for {total_emails} emails.')
+            log.info(u'Creating manual verification for {} emails.'.format(total_emails))
             for email_id in email_ids:
                 try:
                     email_id = email_id.strip()
@@ -83,6 +83,6 @@ class Command(BaseCommand):
                     )
                 except User.DoesNotExist:
                     failed_emails.append(email_id)
-                    err_msg = 'Tried to verify email {}, but user not found'
+                    err_msg = u'Tried to verify email {}, but user not found'
                     log.error(err_msg.format(email_id))
         return total_emails, failed_emails

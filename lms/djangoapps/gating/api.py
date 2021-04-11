@@ -8,9 +8,9 @@ from collections import defaultdict
 
 from opaque_keys.edx.keys import UsageKey
 
-from common.djangoapps.util import milestones_helpers
 from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_content
 from openedx.core.lib.gating import api as gating_api
+from common.djangoapps.util import milestones_helpers
 from openedx.core.toggles import ENTRANCE_EXAMS
 
 log = logging.getLogger(__name__)
@@ -82,5 +82,5 @@ def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
         entrance_exam_score_ratio = course_grade.chapter_percentage(exam_chapter_key)
     except KeyError:
         entrance_exam_score_ratio = 0.0, 0.0
-        log.warning('Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
+        log.warning(u'Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
     return entrance_exam_score_ratio

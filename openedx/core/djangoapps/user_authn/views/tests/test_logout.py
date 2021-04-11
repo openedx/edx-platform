@@ -24,7 +24,7 @@ class LogoutTests(TestCase):
 
     def setUp(self):
         """ Create a course and user, then log in. """
-        super(LogoutTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(LogoutTests, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password='test')
 
@@ -39,7 +39,7 @@ class LogoutTests(TestCase):
         # Logging out should remove the session variables, and send a list of logout URLs to the template.
         # The template will handle loading those URLs and redirecting the user. That functionality is not tested here.
         response = self.client.get(reverse('logout'), **logout_headers)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         return response
 
@@ -53,7 +53,7 @@ class LogoutTests(TestCase):
         }
         # Authenticate with OAuth to set the appropriate session values
         response = self.client.post(reverse('oauth2_provider:authorize'), data, follow=True)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     @ddt.data(
         ('%2Fcourses', 'testserver'),

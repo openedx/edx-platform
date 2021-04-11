@@ -12,7 +12,7 @@ class BadgesConfig(AppConfig):
     """
     Application Configuration for Badges.
     """
-    name = 'lms.djangoapps.badges'
+    name = u'lms.djangoapps.badges'
 
     def ready(self):
         """

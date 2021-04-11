@@ -29,7 +29,7 @@ class ApiAdminTest(TestCase):
     Base class to allow API admin access to tests.
     """
     def setUp(self):
-        super().setUp()
+        super(ApiAdminTest, self).setUp()
         ApiAccessConfig(enabled=True).save()
 
 
@@ -39,7 +39,7 @@ class ApiRequestViewTest(ApiAdminTest):
     Test the API Request View.
     """
     def setUp(self):
-        super().setUp()
+        super(ApiRequestViewTest, self).setUp()
         self.url = reverse('api_admin:api-request')
         password = 'abc123'
         self.user = UserFactory(password=password)
@@ -48,13 +48,13 @@ class ApiRequestViewTest(ApiAdminTest):
     def test_get(self):
         """Verify that a logged-in can see the API request form."""
         response = self.client.get(self.url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     def test_get_anonymous(self):
         """Verify that users must be logged in to see the page."""
         self.client.logout()
         response = self.client.get(self.url)
-        assert response.status_code == 302
+        self.assertEqual(response.status_code, 302)
 
     def test_get_with_existing_request(self):
         """
@@ -72,12 +72,12 @@ class ApiRequestViewTest(ApiAdminTest):
         """
         self.assertRedirects(response, reverse('api_admin:api-status'))
         api_request = ApiAccessRequest.objects.get(user=self.user)
-        assert api_request.status == ApiAccessRequest.PENDING
+        self.assertEqual(api_request.status, ApiAccessRequest.PENDING)
         return api_request
 
     def test_post_valid(self):
         """Verify that a logged-in user can create an API request."""
-        assert not ApiAccessRequest.objects.all().exists()
+        self.assertFalse(ApiAccessRequest.objects.all().exists())
         response = self.client.post(self.url, VALID_DATA)
         self._assert_post_success(response)
 
@@ -86,20 +86,20 @@ class ApiRequestViewTest(ApiAdminTest):
         self.client.logout()
         response = self.client.post(self.url, VALID_DATA)
 
-        assert response.status_code == 302
-        assert not ApiAccessRequest.objects.all().exists()
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(ApiAccessRequest.objects.all().exists())
 
     def test_get_with_feature_disabled(self):
         """Verify that the view can be disabled via ApiAccessConfig."""
         ApiAccessConfig(enabled=False).save()
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def test_post_with_feature_disabled(self):
         """Verify that the view can be disabled via ApiAccessConfig."""
         ApiAccessConfig(enabled=False).save()
         response = self.client.post(self.url)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
 
 @skip_unless_lms
@@ -110,7 +110,7 @@ class ApiRequestStatusViewTest(ApiAdminTest):
     Tests of the API Status endpoint.
     """
     def setUp(self):
-        super().setUp()
+        super(ApiRequestStatusViewTest, self).setUp()
         password = 'abc123'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
@@ -155,13 +155,13 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         """Verify that users must be logged in to see the page."""
         self.client.logout()
         response = self.client.get(self.url)
-        assert response.status_code == 302
+        self.assertEqual(response.status_code, 302)
 
     def test_get_with_feature_disabled(self):
         """Verify that the view can be disabled via ApiAccessConfig."""
         ApiAccessConfig(enabled=False).save()
         response = self.client.get(self.url)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     @ddt.data(
         (ApiAccessRequest.APPROVED, True, True),
@@ -188,15 +188,15 @@ class ApiRequestStatusViewTest(ApiAdminTest):
         })
         applications = Application.objects.filter(user=self.user)
         if application_exists and new_application_created:
-            assert applications.count() == 1
-            assert old_application != applications[0]
+            self.assertEqual(applications.count(), 1)
+            self.assertNotEqual(old_application, applications[0])
         elif application_exists:
-            assert applications.count() == 1
-            assert old_application == applications[0]
+            self.assertEqual(applications.count(), 1)
+            self.assertEqual(old_application, applications[0])
         elif new_application_created:
-            assert applications.count() == 1
+            self.assertEqual(applications.count(), 1)
         else:
-            assert applications.count() == 0
+            self.assertEqual(applications.count(), 0)
 
     def test_post_with_errors(self):
         ApiAccessRequestFactory(user=self.user, status=ApiAccessRequest.APPROVED)
@@ -226,18 +226,18 @@ class CatalogTest(ApiAdminTest):
     Test the catalog API.
     """
     def setUp(self):
-        super().setUp()
+        super(CatalogTest, self).setUp()
         password = 'abc123'
         self.user = UserFactory(password=password, is_staff=True)
         self.client.login(username=self.user.username, password=password)
 
     def mock_catalog_endpoint(self, data, catalog_id=None, method=httpretty.GET, status_code=200):
         """ Mock the Course Catalog API's catalog endpoint. """
-        assert httpretty.is_enabled(), 'httpretty must be enabled to mock Catalog API calls.'
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
 
         url = '{root}/catalogs/'.format(root=settings.COURSE_CATALOG_API_URL.rstrip('/'))
         if catalog_id:
-            url += f'{catalog_id}/'
+            url += '{id}/'.format(id=catalog_id)
 
         httpretty.register_uri(
             method,
@@ -254,12 +254,12 @@ class CatalogSearchViewTest(CatalogTest):
     Test the catalog search endpoint.
     """
     def setUp(self):
-        super().setUp()
+        super(CatalogSearchViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-search')
 
     def test_get(self):
         response = self.client.get(self.url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     @httpretty.activate
     def test_post(self):
@@ -279,7 +279,7 @@ class CatalogListViewTest(CatalogTest):
     Test the catalog list endpoint.
     """
     def setUp(self):
-        super().setUp()
+        super(CatalogListViewTest, self).setUp()
         self.catalog_user = UserFactory()
         self.url = reverse('api_admin:catalog-list', kwargs={'username': self.catalog_user.username})
 
@@ -295,7 +295,7 @@ class CatalogListViewTest(CatalogTest):
         """Verify that the view works when no catalogs are set up."""
         self.mock_catalog_endpoint({}, status_code=404)
         response = self.client.get(self.url)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
     @httpretty.activate
     def test_post(self):
@@ -307,7 +307,7 @@ class CatalogListViewTest(CatalogTest):
         catalog_id = 123
         self.mock_catalog_endpoint(dict(catalog_data, id=catalog_id), method=httpretty.POST)
         response = self.client.post(self.url, catalog_data)
-        assert httpretty.last_request().method == 'POST'
+        self.assertEqual(httpretty.last_request().method, 'POST')
         self.mock_catalog_endpoint(CatalogFactory().attributes, catalog_id=catalog_id)
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog_id}))
 
@@ -320,9 +320,9 @@ class CatalogListViewTest(CatalogTest):
             'query': '*',
             'viewers': [self.catalog_user.username]
         })
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
         # Assert that no POST was made to the catalog API
-        assert len([r for r in httpretty.httpretty.latest_requests if r.method == 'POST']) == 0
+        self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'POST']), 0)
 
 
 @skip_unless_lms
@@ -331,7 +331,7 @@ class CatalogEditViewTest(CatalogTest):
     Test edits to the catalog endpoint.
     """
     def setUp(self):
-        super().setUp()
+        super(CatalogEditViewTest, self).setUp()
         self.catalog_user = UserFactory()
         self.catalog = CatalogFactory(viewers=[self.catalog_user.username])
         self.url = reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id})
@@ -351,10 +351,12 @@ class CatalogEditViewTest(CatalogTest):
         )
         response = self.client.post(self.url, {'delete-catalog': 'on'})
         self.assertRedirects(response, reverse('api_admin:catalog-search'))
-        assert httpretty.last_request().method == 'DELETE'  # lint-amnesty, pylint: disable=no-member
-        assert httpretty.last_request().path == \
-               f'/api/v1/catalogs/{self.catalog.id}/'  # lint-amnesty, pylint: disable=no-member
-        assert len(httpretty.httpretty.latest_requests) == 1
+        self.assertEqual(httpretty.last_request().method, 'DELETE')
+        self.assertEqual(
+            httpretty.last_request().path,
+            '/api/v1/catalogs/{}/'.format(self.catalog.id)
+        )
+        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
 
     @httpretty.activate
     def test_edit(self):
@@ -369,9 +371,9 @@ class CatalogEditViewTest(CatalogTest):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': ''})
         response = self.client.post(self.url, new_attributes)
-        assert response.status_code == 400
+        self.assertEqual(response.status_code, 400)
         # Assert that no PATCH was made to the Catalog API
-        assert len([r for r in httpretty.httpretty.latest_requests if r.method == 'PATCH']) == 0
+        self.assertEqual(len([r for r in httpretty.httpretty.latest_requests if r.method == 'PATCH']), 0)
 
 
 @skip_unless_lms
@@ -380,7 +382,7 @@ class CatalogPreviewViewTest(CatalogTest):
     Test the catalog preview endpoint.
     """
     def setUp(self):
-        super().setUp()
+        super(CatalogPreviewViewTest, self).setUp()
         self.url = reverse('api_admin:catalog-preview')
 
     @httpretty.activate
@@ -393,10 +395,13 @@ class CatalogPreviewViewTest(CatalogTest):
             content_type='application/json'
         )
         response = self.client.get(self.url, {'q': '*'})
-        assert response.status_code == 200
-        assert json.loads(response.content.decode('utf-8')) == data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content.decode('utf-8')), data)
 
     def test_get_without_query(self):
         response = self.client.get(self.url)
-        assert response.status_code == 200
-        assert json.loads(response.content.decode('utf-8')) == {'count': 0, 'results': [], 'next': None, 'prev': None}
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8')),
+            {'count': 0, 'results': [], 'next': None, 'prev': None}
+        )

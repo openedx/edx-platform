@@ -55,9 +55,9 @@ However, this has two main disadvantages:
 Usage
 ~~~~~
 
-To use, find ``MIDDLEWARE`` in your ``settings.py`` and replace::
+To use, find ``MIDDLEWARE_CLASSES`` in your ``settings.py`` and replace::
 
-    MIDDLEWARE = [
+    MIDDLEWARE_CLASSES = [
         ...
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         ...
@@ -65,7 +65,7 @@ To use, find ``MIDDLEWARE`` in your ``settings.py`` and replace::
 
 with::
 
-    MIDDLEWARE = [
+    MIDDLEWARE_CLASSES = [
         ...
         'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
         ...
@@ -84,7 +84,7 @@ from logging import getLogger
 from django.conf import settings
 from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser, User
 from django.utils.crypto import constant_time_compare
 from django.utils.deprecation import MiddlewareMixin
 
@@ -101,16 +101,16 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
     """
     def __init__(self, *args, **kwargs):
         cache_model(User)
-        super().__init__(*args, **kwargs)
+        super(CacheBackedAuthenticationMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         try:
             # Try and construct a User instance from data stored in the cache
             session_user_id = SafeSessionMiddleware.get_user_id_from_session(request)
-            request.user = User.get_cached(session_user_id)  # lint-amnesty, pylint: disable=no-member
+            request.user = User.get_cached(session_user_id)
             if request.user.id != session_user_id:
                 log.error(
-                    "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
+                    u"CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
                     request.user.id,
                     session_user_id,
                 )
@@ -119,7 +119,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
             self._verify_session_auth(request)
         except:  # pylint: disable=bare-except
             # Fallback to constructing the User from the database.
-            super().process_request(request)
+            super(CacheBackedAuthenticationMiddleware, self).process_request(request)
 
     def _verify_session_auth(self, request):
         """

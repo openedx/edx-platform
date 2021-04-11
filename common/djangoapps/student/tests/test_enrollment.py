@@ -4,16 +4,16 @@ Tests for student enrollment.
 
 
 import unittest
-from unittest.mock import patch
 
 import ddt
-import pytest
+import six
 from django.conf import settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
+from mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from common.djangoapps.student.models import (
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,
     CourseEnrollment,
@@ -23,15 +23,11 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
-from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@override_waffle_flag(COURSEWARE_PROCTORING_IMPROVEMENTS, active=True)
-@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     """
@@ -45,42 +41,21 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(EnrollmentTest, cls).setUpClass()
         cls.course = CourseFactory.create()
         cls.course_limited = CourseFactory.create()
-        cls.proctored_course = CourseFactory(
-            enable_proctored_exams=True, enable_timed_exams=True
-        )
-        cls.proctored_course_no_exam = CourseFactory(
-            enable_proctored_exams=True, enable_timed_exams=True
-        )
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
-        super().setUp()
+        super(EnrollmentTest, self).setUp()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.course_limited.max_student_enrollments_allowed = 1
         self.store.update_item(self.course_limited, self.user.id)
         self.urls = [
-            reverse('course_modes_choose', kwargs={'course_id': str(self.course.id)})
+            reverse('course_modes_choose', kwargs={'course_id': six.text_type(self.course.id)})
         ]
-        # Set up proctored exam
-        self._create_proctored_exam(self.proctored_course)
-
-    def _create_proctored_exam(self, course):
-        """
-        Helper function to create a proctored exam for a given course
-        """
-        chapter = ItemFactory.create(
-            parent=course, category='chapter', display_name='Test Section', publish_item=True
-        )
-        ItemFactory.create(
-            parent=chapter, category='sequential', display_name='Test Proctored Exam',
-            graded=True, is_time_limited=True, default_time_limit_minutes=10,
-            is_proctored_exam=True, publish_item=True
-        )
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -122,25 +97,25 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # (otherwise, use an empty string, which the JavaScript client
         # interprets as a redirect to the dashboard)
         full_url = (
-            reverse(next_url, kwargs={'course_id': str(self.course.id)})
+            reverse(next_url, kwargs={'course_id': six.text_type(self.course.id)})
             if next_url else next_url
         )
 
         # Enroll in the course and verify the URL we get sent to
         resp = self._change_enrollment('enroll')
-        assert resp.status_code == 200
-        assert resp.content.decode('utf-8') == full_url
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content.decode('utf-8'), full_url)
 
         # If we're not expecting to be enrolled, verify that this is the case
         if enrollment_mode is None:
-            assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
+            self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
         # Otherwise, verify that we're enrolled with the expected course mode
         else:
-            assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+            self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
             course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
-            assert is_active
-            assert course_mode == enrollment_mode
+            self.assertTrue(is_active)
+            self.assertEqual(course_mode, enrollment_mode)
 
     def test_unenroll(self):
         # Enroll the student in the course
@@ -148,41 +123,10 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         # Attempt to unenroll the student
         resp = self._change_enrollment('unenroll')
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
 
         # Expect that we're no longer enrolled
-        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
-
-    @ddt.data(-1, 0, 1)
-    def test_external_course_updates_signal(self, value):
-        """Confirm that we send the external updates experiment bucket with the activation signal"""
-        with patch('openedx.core.djangoapps.schedules.config.set_up_external_updates_for_enrollment',
-                   return_value=value):
-            with patch('common.djangoapps.student.models.segment') as mock_segment:
-                CourseEnrollment.enroll(self.user, self.course.id)
-
-        assert mock_segment.track.call_count == 1
-        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
-        assert mock_segment.track.call_args[0][2]['external_course_updates'] == value
-
-    def test_enrollment_properties_in_segment_traits(self):
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
-            enrollment = CourseEnrollment.enroll(self.user, self.course.id)
-        assert mock_segment.track.call_count == 1
-        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.activated'
-        traits = mock_segment.track.call_args[1]['traits']
-        assert traits['course_title'] == self.course.display_name
-        assert traits['mode'] == 'audit'
-        assert traits['email'] == self.EMAIL
-
-        with patch('common.djangoapps.student.models.segment') as mock_segment:
-            enrollment.update_enrollment(mode='verified')
-        assert mock_segment.track.call_count == 1
-        assert mock_segment.track.call_args[0][1] == 'edx.course.enrollment.mode_changed'
-        traits = mock_segment.track.call_args[1]['traits']
-        assert traits['course_title'] == self.course.display_name
-        assert traits['mode'] == 'verified'
-        assert traits['email'] == self.EMAIL
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     @patch('openedx.core.djangoapps.user_api.preferences.api.update_email_opt_in')
@@ -218,86 +162,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
             opt_in = email_opt_in == 'true'
             mock_update_email_opt_in.assert_called_once_with(self.user, self.course.org, opt_in)
         else:
-            assert not mock_update_email_opt_in.called
-
-    @ddt.data(
-        ('honor', False),
-        ('audit', False),
-        ('verified', True),
-        ('masters', True),
-        ('professional', True),
-        ('no-id-professional', False),
-        ('credit', False),
-        ('executive-education', True)
-    )
-    @ddt.unpack
-    def test_enroll_in_proctored_course(self, mode, email_sent):
-        """
-        When enrolling in a proctoring-enabled course in a verified mode, an email with proctoring
-        requirements should be sent. The email should not be sent for non-verified modes.
-        """
-        with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
-            return_value=None
-        ) as mock_send_email:
-            # First enroll in a non-proctored course. This should not trigger the email.
-            CourseEnrollment.enroll(self.user, self.course.id, mode)
-            assert not mock_send_email.called
-            # Then, enroll in a proctored course, and assert that the email is sent only when
-            # enrolling in a verified mode.
-            CourseEnrollment.enroll(self.user, self.proctored_course.id, mode)  # pylint: disable=no-member
-            assert email_sent == mock_send_email.called
-
-    def test_enroll_in_proctored_course_no_exam(self):
-        """
-        If a verified learner enrolls in a course that has proctoring enabled, but does not have
-        any proctored exams, they should not receive a proctoring requirements email.
-        """
-        with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
-            return_value=None
-        ) as mock_send_email:
-            CourseEnrollment.enroll(
-                self.user, self.proctored_course_no_exam.id, 'verified'  # pylint: disable=no-member
-            )
-            assert not mock_send_email.called
-
-    @ddt.data('verified', 'masters', 'professional', 'executive-education')
-    def test_upgrade_proctoring_enrollment(self, mode):
-        """
-        When upgrading from audit in a course with proctored exams, an email with proctoring requirements
-        should be sent.
-        """
-        with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
-            return_value=None
-        ) as mock_send_email:
-            enrollment = CourseEnrollment.enroll(
-                self.user, self.proctored_course.id, 'audit'  # pylint: disable=no-member
-            )
-            enrollment.update_enrollment(mode=mode)
-            assert mock_send_email.called
-
-    @patch.dict(
-        'django.conf.settings.PROCTORING_BACKENDS', {'test_provider_honor_mode': {'allow_honor_mode': True}}
-    )
-    def test_enroll_in_proctored_course_honor_mode_allowed(self):
-        """
-        If the proctoring provider allows honor mode, send proctoring requirements email when learners
-        enroll in honor mode for a course with proctored exams.
-        """
-        with patch(
-            'common.djangoapps.student.models.send_proctoring_requirements_email',
-            return_value=None
-        ) as mock_send_email:
-            course_honor_mode = CourseFactory(
-                enable_proctored_exams=True,
-                enable_timed_exams=True,
-                proctoring_provider='test_provider_honor_mode',
-            )
-            self._create_proctored_exam(course_honor_mode)
-            CourseEnrollment.enroll(self.user, course_honor_mode.id, 'honor')  # pylint: disable=no-member
-            assert mock_send_email.called
+            self.assertFalse(mock_update_email_opt_in.called)
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restrict(self):
@@ -305,22 +170,22 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         # we should be blocked.
         with restrict_course(self.course.id) as redirect_url:
             response = self._change_enrollment('enroll')
-            assert response.status_code == 200
-            assert response.content.decode('utf-8') == redirect_url
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.content.decode('utf-8'), redirect_url)
 
         # Verify that we weren't enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert not is_enrolled
+        self.assertFalse(is_enrolled)
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_allow(self):
         response = self._change_enrollment('enroll')
-        assert response.status_code == 200
-        assert response.content.decode('utf-8') == ''
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode('utf-8'), '')
 
         # Verify that we were enrolled
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert is_enrolled
+        self.assertTrue(is_enrolled)
 
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
@@ -328,35 +193,35 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         # Try to enroll, expecting a forbidden response
         resp = self._change_enrollment('enroll')
-        assert resp.status_code == 403
+        self.assertEqual(resp.status_code, 403)
 
     def test_missing_course_id_param(self):
         resp = self.client.post(
             reverse('change_enrollment'),
             {'enrollment_action': 'enroll'}
         )
-        assert resp.status_code == 400
+        self.assertEqual(resp.status_code, 400)
 
     def test_unenroll_not_enrolled_in_course(self):
         # Try unenroll without first enrolling in the course
         resp = self._change_enrollment('unenroll')
-        assert resp.status_code == 400
+        self.assertEqual(resp.status_code, 400)
 
     def test_invalid_enrollment_action(self):
         resp = self._change_enrollment('not_an_action')
-        assert resp.status_code == 400
+        self.assertEqual(resp.status_code, 400)
 
     def test_with_invalid_course_id(self):
         CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
         resp = self._change_enrollment('unenroll', course_id="edx/")
-        assert resp.status_code == 400
+        self.assertEqual(resp.status_code, 400)
 
     def test_enrollment_limit(self):
         """
         Assert that in a course with max student limit set to 1, we can enroll staff and instructor along with
         student. To make sure course full check excludes staff and instructors.
         """
-        assert self.course_limited.max_student_enrollments_allowed == 1
+        self.assertEqual(self.course_limited.max_student_enrollments_allowed, 1)
         user1 = UserFactory.create(username="tester1", email="tester1@e.com", password="test")
         user2 = UserFactory.create(username="tester2", email="tester2@e.com", password="test")
 
@@ -373,17 +238,25 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
         CourseEnrollment.enroll(staff, self.course_limited.id, check_access=True)
         CourseEnrollment.enroll(instructor, self.course_limited.id, check_access=True)
 
-        assert CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=staff).exists()
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=staff).exists()
+        )
 
-        assert CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=instructor).exists()
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=instructor).exists()
+        )
 
         CourseEnrollment.enroll(user1, self.course_limited.id, check_access=True)
-        assert CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user1).exists()
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user1).exists()
+        )
 
-        with pytest.raises(CourseFullError):
+        with self.assertRaises(CourseFullError):
             CourseEnrollment.enroll(user2, self.course_limited.id, check_access=True)
 
-        assert not CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user2).exists()
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=self.course_limited.id, user=user2).exists()
+        )
 
     def _change_enrollment(self, action, course_id=None, email_opt_in=None):
         """Change the student's enrollment status in a course.
@@ -402,7 +275,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
 
         """
         if course_id is None:
-            course_id = str(self.course.id)
+            course_id = six.text_type(self.course.id)
 
         params = {
             'enrollment_action': action,
@@ -428,47 +301,51 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
             auto_enroll=False,
         )
         # Still unlinked
-        assert cea.user is None
+        self.assertIsNone(cea.user)
 
         user1 = UserFactory.create(username="tester1", email="tester1@e.com", password="test")
         user2 = UserFactory.create(username="tester2", email="tester2@e.com", password="test")
 
-        assert not CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        self.assertFalse(
+            CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        )
 
         user1.email = 'allowed@edx.org'
         user1.save()
 
         CourseEnrollment.enroll(user1, self.course.id, check_access=True)
 
-        assert CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        self.assertTrue(
+            CourseEnrollment.objects.filter(course_id=self.course.id, user=user1).exists()
+        )
 
         # The CEA is now linked
         cea.refresh_from_db()
-        assert cea.user == user1
+        self.assertEqual(cea.user, user1)
 
         # user2 wants to enroll too, (ab)using the same allowed e-mail, but cannot
         user1.email = 'my_other_email@edx.org'
         user1.save()
         user2.email = 'allowed@edx.org'
         user2.save()
-        with pytest.raises(EnrollmentClosedError):
+        with self.assertRaises(EnrollmentClosedError):
             CourseEnrollment.enroll(user2, self.course.id, check_access=True)
 
         # CEA still linked to user1. Also after unenrolling
         cea.refresh_from_db()
-        assert cea.user == user1
+        self.assertEqual(cea.user, user1)
 
         CourseEnrollment.unenroll(user1, self.course.id)
 
         cea.refresh_from_db()
-        assert cea.user == user1
+        self.assertEqual(cea.user, user1)
 
         # Enroll user1 again. Because it's the original owner of the CEA, the enrollment is allowed
         CourseEnrollment.enroll(user1, self.course.id, check_access=True)
 
         # Still same
         cea.refresh_from_db()
-        assert cea.user == user1
+        self.assertEqual(cea.user, user1)
 
     def test_score_recalculation_on_enrollment_update(self):
         """

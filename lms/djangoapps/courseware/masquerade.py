@@ -10,7 +10,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -45,7 +45,7 @@ MASQUERADE_SETTINGS_KEY = 'masquerade_settings'
 MASQUERADE_DATA_KEY = 'masquerade_data'
 
 
-class CourseMasquerade:
+class CourseMasquerade(object):
     """
     Masquerade settings for a particular course.
     """
@@ -181,7 +181,7 @@ class MasqueradeView(View):
                 return JsonResponse({
                     'success': False,
                     'error': _(
-                        'There is no user with the username or email address "{user_identifier}" '
+                        u'There is no user with the username or email address "{user_identifier}" '
                         'enrolled in this course.'
                     ).format(
                         user_identifier=user_name,
@@ -412,7 +412,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
     This `KeyValueStore` wraps an underlying `KeyValueStore`.  Reads are forwarded to the underlying
     store, but writes go to a Django session (or other dictionary-like object).
     """
-    def __init__(self, kvs, session):  # lint-amnesty, pylint: disable=super-init-not-called
+    def __init__(self, kvs, session):
         """
         Arguments:
           kvs: The KeyValueStore to wrap.
@@ -461,7 +461,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
             return value != _DELETED_SENTINEL
 
 
-def filter_displayed_blocks(block, unused_view, frag, unused_context):  # lint-amnesty, pylint: disable=unused-argument
+def filter_displayed_blocks(block, unused_view, frag, unused_context):
     """
     A wrapper to only show XBlocks that set `show_in_read_only_mode` when masquerading as a specific user.
 
@@ -471,5 +471,5 @@ def filter_displayed_blocks(block, unused_view, frag, unused_context):  # lint-a
     if getattr(block, 'show_in_read_only_mode', False):
         return frag
     return Fragment(
-        _('This type of component cannot be shown while viewing the course as a specific student.')
+        _(u'This type of component cannot be shown while viewing the course as a specific student.')
     )

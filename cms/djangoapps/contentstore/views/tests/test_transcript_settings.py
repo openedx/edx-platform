@@ -1,19 +1,20 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+# -*- coding: utf-8 -*-
 
 
 import json
-from io import StringIO
-from unittest.mock import ANY, Mock, patch
+from io import BytesIO
 
 import ddt
+import six
 from django.test.testcases import TestCase
 from django.urls import reverse
 from edxval import api
+from mock import ANY, Mock, patch
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from common.djangoapps.student.roles import CourseStaffRole
 
 from ..transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 
@@ -234,31 +235,31 @@ class TranscriptDownloadTest(CourseTestCase):
         )
 
         # Expected response
-        expected_content = '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+        expected_content = u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
         expected_headers = {
             'Content-Disposition': 'attachment; filename="edx.srt"',
-            'Content-Language': 'en',
+            'Content-Language': u'en',
             'Content-Type': 'application/x-subrip; charset=utf-8'
         }
 
         # Assert the actual response
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), expected_content)
-        for attribute, value in expected_headers.items():
+        for attribute, value in six.iteritems(expected_headers):
             self.assertEqual(response.get(attribute), value)
 
     @ddt.data(
         (
             {},
-            'The following parameters are required: edx_video_id, language_code.'
+            u'The following parameters are required: edx_video_id, language_code.'
         ),
         (
             {'edx_video_id': '123'},
-            'The following parameters are required: language_code.'
+            u'The following parameters are required: language_code.'
         ),
         (
             {'language_code': 'en'},
-            'The following parameters are required: edx_video_id.'
+            u'The following parameters are required: edx_video_id.'
         ),
     )
     @ddt.unpack
@@ -310,7 +311,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests that transcript upload handler works as expected.
         """
-        transcript_file_stream = StringIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
+        transcript_file_stream = six.StringIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
@@ -328,7 +329,7 @@ class TranscriptUploadTest(CourseTestCase):
             video_id='123',
             language_code='en',
             metadata={
-                'language_code': 'es',
+                'language_code': u'es',
                 'file_format': 'sjson',
                 'provider': 'Custom'
             },
@@ -342,28 +343,28 @@ class TranscriptUploadTest(CourseTestCase):
                 'language_code': 'en',
                 'new_language_code': 'en',
             },
-            'A transcript file is required.'
+            u'A transcript file is required.'
         ),
         (
             {
-                'language_code': 'en',
-                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'language_code': u'en',
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            'The following parameters are required: edx_video_id, new_language_code.'
+            u'The following parameters are required: edx_video_id, new_language_code.'
         ),
         (
             {
-                'language_code': 'en',
-                'new_language_code': 'en',
-                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'language_code': u'en',
+                'new_language_code': u'en',
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            'The following parameters are required: edx_video_id.'
+            u'The following parameters are required: edx_video_id.'
         ),
         (
             {
-                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+                'file': u'0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
             },
-            'The following parameters are required: edx_video_id, language_code, new_language_code.'
+            u'The following parameters are required: edx_video_id, language_code, new_language_code.'
         )
     )
     @ddt.unpack
@@ -399,7 +400,7 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content.decode('utf-8'))['error'],
-            'A transcript with the "es" language code already exists.'
+            u'A transcript with the "es" language code already exists.'
         )
 
     @patch(
@@ -426,7 +427,7 @@ class TranscriptUploadTest(CourseTestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
                 json.loads(response.content.decode('utf-8'))['error'],
-                'There is a problem with this transcript file. Try to upload a different file.'
+                u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
     @patch(
@@ -437,7 +438,7 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests the transcript upload handler with an invalid transcript file.
         """
-        transcript_file_stream = StringIO('An invalid transcript SubRip file content')
+        transcript_file_stream = six.StringIO('An invalid transcript SubRip file content')
         # Make request to transcript upload handler
         response = self.client.post(
             self.view_url,
@@ -453,7 +454,7 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content.decode('utf-8'))['error'],
-            'There is a problem with this transcript file. Try to upload a different file.'
+            u'There is a problem with this transcript file. Try to upload a different file.'
         )
 
 
@@ -534,7 +535,7 @@ class TranscriptDeleteTest(CourseTestCase):
         self.assertEqual(self.user.is_staff, is_staff)
         self.assertEqual(CourseStaffRole(self.course.id).has_user(self.user), is_course_staff)
 
-        video_id, language_code = '1234', 'en'
+        video_id, language_code = u'1234', u'en'
         # Create a real transcript in VAL.
         api.create_or_update_video_transcript(
             video_id=video_id,

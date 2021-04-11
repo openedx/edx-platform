@@ -1,4 +1,4 @@
-"""
+u"""
 Profile Distributions
 
 Aggregate sums for values of fields in students profiles.
@@ -39,7 +39,7 @@ DISPLAY_NAMES = {
 }
 
 
-class ProfileDistribution:
+class ProfileDistribution(object):
     """
     Container for profile distribution data
 
@@ -52,7 +52,7 @@ class ProfileDistribution:
 
     class ValidationError(ValueError):
         """ Error thrown if validation fails. """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def __init__(self, feature):
         self.feature = feature
@@ -96,7 +96,7 @@ def profile_distribution(course_id, feature):
 
     if feature not in AVAILABLE_PROFILE_FEATURES:
         raise ValueError(
-            "unsupported feature requested for distribution u'{}'".format(
+            u"unsupported feature requested for distribution u'{}'".format(
                 feature)
         )
 
@@ -112,7 +112,7 @@ def profile_distribution(course_id, feature):
 
         # short name and display name (full) of the choices.
         choices = [(short, full)
-                   for (short, full) in raw_choices] + [('no_data', 'No Data')]  # lint-amnesty, pylint: disable=unnecessary-comprehension
+                   for (short, full) in raw_choices] + [('no_data', 'No Data')]
 
         def get_filter(feature, value):
             """ Get the orm filter parameters for a feature. """
@@ -130,7 +130,7 @@ def profile_distribution(course_id, feature):
             ).count()
 
         distribution = {}
-        for (short, full) in choices:  # lint-amnesty, pylint: disable=unused-variable
+        for (short, full) in choices:
             # handle no data case
             if short == 'no_data':
                 distribution['no_data'] = 0
@@ -152,7 +152,8 @@ def profile_distribution(course_id, feature):
         # query_distribution is of the form [{'featureval': 'value1', 'featureval__count': 4},
         #    {'featureval': 'value2', 'featureval__count': 2}, ...]
 
-        distribution = {vald[feature]: vald[feature + '__count'] for vald in query_distribution}
+        distribution = dict((vald[feature], vald[feature + '__count'])
+                            for vald in query_distribution)
         # distribution is of the form {'value1': 4, 'value2': 2, ...}
 
         # change none to no_data for valid json key

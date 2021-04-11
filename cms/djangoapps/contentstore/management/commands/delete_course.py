@@ -6,6 +6,7 @@ Management Command to delete course.
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from cms.djangoapps.contentstore.utils import delete_course
 from xmodule.contentstore.django import contentstore
@@ -61,25 +62,25 @@ class Command(BaseCommand):
         try:
             # a course key may have unicode chars in it
             try:
-                course_key = str(options['course_key'], 'utf8')
+                course_key = text_type(options['course_key'], 'utf8')
             # May already be decoded to unicode if coming in through tests, this is ok.
             except TypeError:
-                course_key = str(options['course_key'])
+                course_key = text_type(options['course_key'])
             course_key = CourseKey.from_string(course_key)
         except InvalidKeyError:
-            raise CommandError('Invalid course_key: {}'.format(options['course_key']))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(u'Invalid course_key: {}'.format(options['course_key']))
 
         if not modulestore().get_course(course_key):
-            raise CommandError('Course not found: {}'.format(options['course_key']))
+            raise CommandError(u'Course not found: {}'.format(options['course_key']))
 
-        print('Preparing to delete course %s from module store....' % options['course_key'])
+        print(u'Preparing to delete course %s from module store....' % options['course_key'])
 
-        if query_yes_no(f'Are you sure you want to delete course {course_key}?', default='no'):
-            if query_yes_no('Are you sure? This action cannot be undone!', default='no'):
+        if query_yes_no(u'Are you sure you want to delete course {}?'.format(course_key), default='no'):
+            if query_yes_no(u'Are you sure? This action cannot be undone!', default='no'):
                 delete_course(course_key, ModuleStoreEnum.UserID.mgmt_command, options['keep_instructors'])
 
                 if options['remove_assets']:
                     contentstore().delete_all_course_assets(course_key)
-                    print(f'Deleted assets for course {course_key}')  # lint-amnesty, pylint: disable=too-many-format-args
+                    print(u'Deleted assets for course'.format(course_key))
 
-                print(f'Deleted course {course_key}')
+                print(u'Deleted course {}'.format(course_key))

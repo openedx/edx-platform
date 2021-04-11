@@ -21,10 +21,10 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.auth import has_studio_write_access
-from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
+from common.djangoapps.student.auth import has_studio_write_access
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
 
 from .videos import TranscriptProvider
@@ -72,14 +72,14 @@ def validate_transcript_credentials(provider, **credentials):
             must_have_prop for must_have_prop in must_have_props if must_have_prop not in list(credentials.keys())
         ]
         if missing:
-            error_message = '{missing} must be specified.'.format(missing=' and '.join(missing))
+            error_message = u'{missing} must be specified.'.format(missing=' and '.join(missing))
             return error_message, validated_credentials
 
         validated_credentials.update({
             prop: credentials[prop] for prop in must_have_props
         })
     else:
-        error_message = f'Invalid Provider {provider}.'
+        error_message = u'Invalid Provider {provider}.'.format(provider=provider)
 
     return error_message, validated_credentials
 
@@ -148,7 +148,7 @@ def transcript_download_handler(request):
     missing = [attr for attr in ['edx_video_id', 'language_code'] if attr not in request.GET]
     if missing:
         return JsonResponse(
-            {'error': _('The following parameters are required: {missing}.').format(missing=', '.join(missing))},
+            {'error': _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))},
             status=400
         )
 
@@ -158,7 +158,7 @@ def transcript_download_handler(request):
     if transcript:
         name_and_extension = os.path.splitext(transcript['file_name'])
         basename, file_format = name_and_extension[0], name_and_extension[1][1:]
-        transcript_filename = f'{basename}.{Transcript.SRT}'
+        transcript_filename = '{base_name}.{ext}'.format(base_name=basename, ext=Transcript.SRT)
         transcript_content = Transcript.convert(
             content=transcript['content'],
             input_format=file_format,
@@ -166,7 +166,7 @@ def transcript_download_handler(request):
         )
         # Construct an HTTP response
         response = HttpResponse(transcript_content, content_type=Transcript.mime_types[Transcript.SRT])
-        response['Content-Disposition'] = f'attachment; filename="{transcript_filename}"'
+        response['Content-Disposition'] = u'attachment; filename="{filename}"'.format(filename=transcript_filename)
     else:
         response = HttpResponseNotFound()
 
@@ -188,16 +188,16 @@ def validate_transcript_upload_data(data, files):
     must_have_attrs = ['edx_video_id', 'language_code', 'new_language_code']
     missing = [attr for attr in must_have_attrs if attr not in data]
     if missing:
-        error = _('The following parameters are required: {missing}.').format(missing=', '.join(missing))
+        error = _(u'The following parameters are required: {missing}.').format(missing=', '.join(missing))
     elif (
         data['language_code'] != data['new_language_code'] and
         data['new_language_code'] in get_available_transcript_languages(video_id=data['edx_video_id'])
     ):
-        error = _('A transcript with the "{language_code}" language code already exists.'.format(  # lint-amnesty, pylint: disable=translation-of-non-string
+        error = _(u'A transcript with the "{language_code}" language code already exists.'.format(
             language_code=data['new_language_code']
         ))
     elif 'file' not in files:
-        error = _('A transcript file is required.')
+        error = _(u'A transcript file is required.')
 
     return error
 
@@ -247,7 +247,7 @@ def transcript_upload_handler(request):
             response = JsonResponse(status=201)
         except (TranscriptsGenerationException, UnicodeDecodeError):
             response = JsonResponse(
-                {'error': _('There is a problem with this transcript file. Try to upload a different file.')},
+                {'error': _(u'There is a problem with this transcript file. Try to upload a different file.')},
                 status=400
             )
 

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 from django.conf import settings
 from opaque_keys.edx.django.models import CourseKeyField
@@ -72,10 +75,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='courseusergroup',
-            unique_together={('name', 'course_id')},
+            unique_together=set([('name', 'course_id')]),
         ),
         migrations.AlterUniqueTogether(
             name='cohortmembership',
-            unique_together={('user', 'course_id')},
+            unique_together=set([('user', 'course_id')]),
         ),
     ]

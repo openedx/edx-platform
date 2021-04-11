@@ -4,6 +4,7 @@ Model Managers for Course Actions
 
 import traceback
 
+import six
 from django.db import models, transaction
 
 
@@ -12,7 +13,7 @@ class CourseActionStateManager(models.Manager):
     An abstract Model Manager class for Course Action State models.
     This abstract class expects child classes to define the ACTION (string) field.
     """
-    class Meta:
+    class Meta(object):
         """Abstract manager class, with subclasses defining the ACTION (string) field."""
         abstract = True
 
@@ -33,7 +34,7 @@ class CourseActionStateManager(models.Manager):
         There may or may not be greater than one entry, depending on the usage pattern for this Action.
         """
         objects = self.find_all(exclude_args=exclude_args, **kwargs)
-        if len(objects) == 0:  # lint-amnesty, pylint: disable=no-else-raise
+        if len(objects) == 0:
             raise CourseActionStateItemNotFoundError(
                 "No entry found for action {action} with filter {filter}, excluding {exclude}".format(
                     action=self.ACTION,
@@ -89,7 +90,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
 
         # update any additional fields in kwargs
         if kwargs:
-            for key, value in kwargs.items():
+            for key, value in six.iteritems(kwargs):
                 setattr(state_object, key, value)
 
         state_object.save()
@@ -108,7 +109,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
     """
     ACTION = "rerun"
 
-    class State:
+    class State(object):
         """
         An Enum class for maintaining the list of possible states for Reruns.
         """
@@ -151,4 +152,4 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
 
 class CourseActionStateItemNotFoundError(Exception):
     """An exception class for errors specific to Course Action states."""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 

@@ -3,7 +3,7 @@ Constants and Enums used by Grading.
 """
 
 
-class ScoreDatabaseTableEnum:
+class ScoreDatabaseTableEnum(object):
     """
     The various database tables that store scores.
     """
@@ -12,7 +12,7 @@ class ScoreDatabaseTableEnum:
     overrides = 'overrides'
 
 
-class GradeOverrideFeatureEnum:
-    proctoring = 'PROCTORING'
-    gradebook = 'GRADEBOOK'
+class GradeOverrideFeatureEnum(object):
+    proctoring = u'PROCTORING'
+    gradebook = u'GRADEBOOK'
     grade_import = 'grade-import'

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 course_overview api tests
 """
@@ -15,7 +16,7 @@ class TestCourseOverviewsApi(TestCase):
     """
 
     def setUp(self):
-        super().setUp()
+        super(TestCourseOverviewsApi, self).setUp()
         for _ in range(3):
             CourseOverviewFactory.create()
 

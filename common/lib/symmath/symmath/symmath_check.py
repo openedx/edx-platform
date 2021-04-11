@@ -1,5 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
-# !/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
 # File:   symmath_check.py
@@ -17,7 +16,7 @@ from markupsafe import escape
 
 from openedx.core.djangolib.markup import HTML
 
-from .formula import *  # lint-amnesty, pylint: disable=wildcard-import
+from .formula import *
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ log = logging.getLogger(__name__)
 # This is one of the main entry points to call.
 
 
-def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None):  # lint-amnesty, pylint: disable=dangerous-default-value, unused-argument
+def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None):
     """
     Check a symbolic mathematical expression using sympy.
     The input is an ascii string (not MathML) converted to math using sympy.sympify.
@@ -52,7 +51,7 @@ def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None)
                     abcsym=options['__ABC__'],
                     symtab=symtab,
                     )
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         return {'ok': False,
                 'msg': HTML('Error {err}<br/>Failed in evaluating check({expect},{ans})').format(
                     err=err, expect=expect, ans=ans
@@ -63,7 +62,7 @@ def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None)
 # pretty generic checking function
 
 
-def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=False, do_qubit=True, symtab=None, dosimplify=False):  # lint-amnesty, pylint: disable=line-too-long
+def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=False, do_qubit=True, symtab=None, dosimplify=False):
     """
     Returns dict with
 
@@ -94,19 +93,19 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
         threshold = float(st)
         numerical = True
 
-    if str(given) == '' and not str(expect) == '':  # lint-amnesty, pylint: disable=unneeded-not
+    if str(given) == '' and not str(expect) == '':
         return {'ok': False, 'msg': ''}
 
     try:
         xgiven = my_sympify(given, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         return {'ok': False, 'msg': HTML('Error {err}<br/> in evaluating your expression "{given}"').format(
             err=err, given=given
         )}
 
     try:
         xexpect = my_sympify(expect, normphase, matrix, do_qubit=do_qubit, abcsym=abcsym, symtab=symtab)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         return {'ok': False, 'msg': HTML('Error {err}<br/> in evaluating OUR expression "{expect}"').format(
             err=err, expect=expect
         )}
@@ -114,12 +113,12 @@ def check(expect, given, numerical=False, matrix=False, normphase=False, abcsym=
     if 'autonorm' in flags:	 # normalize trace of matrices
         try:
             xgiven /= xgiven.trace()
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:
             return {'ok': False, 'msg': HTML('Error {err}<br/> in normalizing trace of your expression {xgiven}').
                     format(err=err, xgiven=to_latex(xgiven))}
         try:
             xexpect /= xexpect.trace()
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:
             return {'ok': False, 'msg': HTML('Error {err}<br/> in normalizing trace of OUR expression {xexpect}').
                     format(err=err, xexpect=to_latex(xexpect))}
 
@@ -173,7 +172,7 @@ def is_within_tolerance(expected, actual, tolerance):
 # This is one of the main entry points to call.
 
 
-def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None):  # lint-amnesty, pylint: disable=too-many-statements
+def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None):
     """
     Check a symbolic mathematical expression using sympy.
     The input may be presentation MathML.  Uses formula.
@@ -221,7 +220,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # parse expected answer
     try:
         fexpect = my_sympify(str(expect), matrix=do_matrix, do_qubit=do_qubit)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         msg += HTML('<p>Error {err} in parsing OUR expected answer "{expect}"</p>').format(err=err, expect=expect)
         return {'ok': False, 'msg': make_error_message(msg)}
 
@@ -229,7 +228,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # if expected answer is a number, try parsing provided answer as a number also
     try:
         fans = my_sympify(str(ans), matrix=do_matrix, do_qubit=do_qubit)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
@@ -257,7 +256,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     # convert mathml answer to formula
     try:
         mmlans = dynamath[0] if dynamath else None
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         mmlans = None
     if not mmlans:
         return {'ok': False, 'msg': '[symmath_check] failed to get MathML for input; dynamath=%s' % dynamath}
@@ -269,7 +268,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     try:
         fsym = f.sympy
         msg += HTML('<p>You entered: {sympy}</p>').format(sympy=to_latex(f.sympy))
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         log.exception("Error evaluating expression '%s' as a valid equation", ans)
         msg += HTML("<p>Error in evaluating your expression '{ans}' as a valid equation</p>").format(ans=ans)
         if "Illegal math" in str(err):
@@ -310,7 +309,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         except sympy.ShapeError:
             msg += HTML("<p>Error - your input vector or matrix has the wrong dimensions")
             return {'ok': False, 'msg': make_error_message(msg)}
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:
             msg += HTML("<p>Error %s in comparing expected (a list) and your answer</p>").format(escape(str(err)))
             if DEBUG:
                 msg += HTML("<p/><pre>{format_exc}</pre>").format(format_exc=traceback.format_exc())
@@ -321,7 +320,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     #fexpect = fexpect.simplify()
     try:
         diff = (fexpect - fsym)
-    except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+    except Exception as err:
         diff = None
 
     if DEBUG:

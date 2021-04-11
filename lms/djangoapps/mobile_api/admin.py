@@ -17,7 +17,7 @@ class AppVersionConfigAdmin(admin.ModelAdmin):
     fields = ('platform', 'version', 'expire_at', 'enabled')
     list_filter = ['platform']
 
-    class Meta:
+    class Meta(object):
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
     def get_list_display(self, __):

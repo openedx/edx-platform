@@ -28,8 +28,8 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
         """
         _ = LibraryFactory.create(modulestore=self.store)
         all_libraries = self.tools.list_available_libraries()
-        assert all_libraries
-        assert len(all_libraries) == 1
+        self.assertTrue(all_libraries)
+        self.assertEqual(len(all_libraries), 1)
 
     @patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries')
     def test_list_available_libraries_fetch(self, mock_get_library_summaries):
@@ -37,7 +37,7 @@ class LibraryToolsServiceTest(MixedSplitTestCase):
         Test that library list is compiled using light weight library summary objects.
         """
         _ = self.tools.list_available_libraries()
-        assert mock_get_library_summaries.called
+        self.assertTrue(mock_get_library_summaries.called)
 
 
 class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
@@ -69,28 +69,28 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         self.tools.import_from_blockstore(sourced_block, [unit_block_id])
 
         # Verify imported block with its children
-        assert len(sourced_block.children) == 1
-        assert sourced_block.children[0].category == 'unit'
+        self.assertEqual(len(sourced_block.children), 1)
+        self.assertEqual(sourced_block.children[0].category, 'unit')
 
         imported_unit_block = self.store.get_item(sourced_block.children[0])
-        assert len(imported_unit_block.children) == 1
-        assert imported_unit_block.children[0].category == 'html'
+        self.assertEqual(len(imported_unit_block.children), 1)
+        self.assertEqual(imported_unit_block.children[0].category, 'html')
 
         imported_html_block = self.store.get_item(imported_unit_block.children[0])
-        assert 'Hello world' in imported_html_block.data
+        self.assertIn('Hello world', imported_html_block.data)
 
         # Check that assets were imported and static paths were modified after importing
         assets = library_api.get_library_block_static_asset_files(html_block.scope_ids.usage_id)
-        assert len(assets) == 1
-        assert assets[0].url in imported_html_block.data
+        self.assertEqual(len(assets), 1)
+        self.assertIn(assets[0].url, imported_html_block.data)
 
         # Check that reimporting updates the target block
         self._set_library_block_olx(html_block_id, '<html><a href="/static/test.txt">Foo bar</a></html>')
         self.tools.import_from_blockstore(sourced_block, [unit_block_id])
 
-        assert len(sourced_block.children) == 1
+        self.assertEqual(len(sourced_block.children), 1)
         imported_unit_block = self.store.get_item(sourced_block.children[0])
-        assert len(imported_unit_block.children) == 1
+        self.assertEqual(len(imported_unit_block.children), 1)
         imported_html_block = self.store.get_item(imported_unit_block.children[0])
-        assert 'Hello world' not in imported_html_block.data
-        assert 'Foo bar' in imported_html_block.data
+        self.assertNotIn('Hello world', imported_html_block.data)
+        self.assertIn('Foo bar', imported_html_block.data)

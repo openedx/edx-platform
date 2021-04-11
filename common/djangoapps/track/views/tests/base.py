@@ -37,7 +37,7 @@ class SegmentIOTrackingTestCaseBase(EventTrackingTestCase):
     """
 
     def setUp(self):
-        super(SegmentIOTrackingTestCaseBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(SegmentIOTrackingTestCaseBase, self).setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
         self.request_factory = RequestFactory()
 

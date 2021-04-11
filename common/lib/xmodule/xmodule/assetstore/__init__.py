@@ -8,6 +8,7 @@ from datetime import datetime
 
 import dateutil.parser
 import pytz
+import six
 from contracts import contract, new_contract
 from lxml import etree
 from opaque_keys.edx.keys import AssetKey, CourseKey
@@ -15,13 +16,16 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 new_contract('AssetKey', AssetKey)
 new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
-new_contract('basestring', (str,)[0])
-new_contract('long', int)
+new_contract('basestring', six.string_types[0])
+if six.PY2:
+    new_contract('long', long)
+else:
+    new_contract('long', int)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access
 new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access
 
 
-class AssetMetadata:
+class AssetMetadata(object):
     """
     Stores the metadata associated with a particular course asset. The asset metadata gets stored
     in the modulestore.
@@ -46,10 +50,10 @@ class AssetMetadata:
     ASSET_XML_TAG = 'asset'
 
     # Top-level directory name in exported course XML which holds asset metadata.
-    EXPORTED_ASSET_DIR = 'assets'
+    EXPORTED_ASSET_DIR = u'assets'
 
     # Filename of all asset metadata exported as XML.
-    EXPORTED_ASSET_FILENAME = 'assets.xml'
+    EXPORTED_ASSET_FILENAME = u'assets.xml'
 
     @contract(asset_id='AssetKey',
               pathname='str|None', internal_name='str|None',
@@ -124,7 +128,7 @@ class AssetMetadata:
         Arguments:
             attr_dict: Prop, val dictionary of all attributes to set.
         """
-        for attr, val in attr_dict.items():
+        for attr, val in six.iteritems(attr_dict):
             if attr in self.ATTRS_ALLOWED_TO_UPDATE:
                 setattr(self, attr, val)
             else:
@@ -195,7 +199,7 @@ class AssetMetadata:
                     continue
                 elif tag == 'locked':
                     # Boolean.
-                    value = True if value == "true" else False  # lint-amnesty, pylint: disable=simplifiable-if-expression
+                    value = True if value == "true" else False
                 elif value == 'None':
                     # None.
                     value = None
@@ -234,7 +238,7 @@ class AssetMetadata:
             elif isinstance(value, dict):
                 value = json.dumps(value)
             else:
-                value = str(value)
+                value = six.text_type(value)
             child.text = value
 
     @staticmethod
@@ -249,7 +253,7 @@ class AssetMetadata:
             asset.to_xml(asset_node)
 
 
-class CourseAssetsFromStorage:
+class CourseAssetsFromStorage(object):
     """
     Wrapper class for asset metadata lists returned from modulestore storage.
     """
@@ -300,7 +304,7 @@ class CourseAssetsFromStorage:
         """
         Iterates over the items of the asset dict.
         """
-        return self.asset_md.items()
+        return six.iteritems(self.asset_md)
 
     def items(self):
         """

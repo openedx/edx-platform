@@ -3,7 +3,7 @@
 
 import uuid
 
-from unittest import mock
+import mock
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
@@ -24,7 +24,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super().setUp()
+        super(TestGetCredentials, self).setUp()
 
         ApplicationFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME)
 
@@ -46,11 +46,11 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'status': 'awarded',
             'only_visible': 'True',
         }
-        cache_key = f'{self.credentials_config.CACHE_KEY}.{self.user.username}'
-        assert kwargs['querystring'] == querystring
-        assert kwargs['cache_key'] == cache_key
+        cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
+        self.assertEqual(kwargs['querystring'], querystring)
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     def test_get_one(self, mock_get_edx_api_data):
         expected = factories.UserCredential()
@@ -69,11 +69,11 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'only_visible': 'True',
             'program_uuid': program_uuid,
         }
-        cache_key = f'{self.credentials_config.CACHE_KEY}.{self.user.username}.{program_uuid}'
-        assert kwargs['querystring'] == querystring
-        assert kwargs['cache_key'] == cache_key
+        cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
+        self.assertEqual(kwargs['querystring'], querystring)
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
-        assert actual == expected
+        self.assertEqual(actual, expected)
 
     def test_type_filter(self, mock_get_edx_api_data):
         get_credentials(self.user, credential_type='program')
@@ -88,4 +88,4 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'only_visible': 'True',
             'type': 'program',
         }
-        assert kwargs['querystring'] == querystring
+        self.assertEqual(kwargs['querystring'], querystring)

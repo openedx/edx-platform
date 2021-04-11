@@ -4,8 +4,8 @@ Tests for Asides
 
 
 from unittest import TestCase
-from unittest.mock import patch
 
+from mock import patch
 from web_fragments.fragment import Fragment
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String
@@ -17,7 +17,7 @@ class AsideTestType(XBlockAside):
     """
     Test Aside type
     """
-    FRAG_CONTENT = "<p>Aside rendered</p>"
+    FRAG_CONTENT = u"<p>Aside rendered</p>"
 
     content = String(default="default_content", scope=Scope.content)
     data_field = String(default="default_data", scope=Scope.settings)
@@ -45,11 +45,11 @@ class TestAsidesXmlStore(TestCase):
                 Check whether block has the expected aside w/ its fields and then recurse to the block's children
                 """
                 asides = block.runtime.get_asides(block)
-                assert len(asides) == 1, f'Found {asides} asides but expected only test_aside'
-                assert isinstance(asides[0], AsideTestType)
+                self.assertEqual(len(asides), 1, "Found {} asides but expected only test_aside".format(asides))
+                self.assertIsInstance(asides[0], AsideTestType)
                 category = block.scope_ids.block_type
-                assert asides[0].data_field == f'{category} aside data'
-                assert asides[0].content == f'{category.capitalize()} Aside'
+                self.assertEqual(asides[0].data_field, "{} aside data".format(category))
+                self.assertEqual(asides[0].content, "{} Aside".format(category.capitalize()))
 
                 for child in block.get_children():
                     check_block(child)

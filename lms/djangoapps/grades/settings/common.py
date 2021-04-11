@@ -1,4 +1,3 @@
-# lint-amnesty, pylint: disable=missing-function-docstring, missing-module-docstring
 def plugin_settings(settings):
     # Queue to use for updating persistent grades
     settings.RECALCULATE_GRADES_ROUTING_KEY = settings.DEFAULT_PRIORITY_QUEUE

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
@@ -14,21 +17,21 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseentitlement',
             name='course_uuid',
-            field=models.UUIDField(help_text='UUID for the Course, not the Course Run'),
+            field=models.UUIDField(help_text=u'UUID for the Course, not the Course Run'),
         ),
         migrations.AlterField(
             model_name='courseentitlement',
             name='enrollment_course_run',
-            field=models.ForeignKey(to='student.CourseEnrollment', help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True, on_delete=models.CASCADE),  # lint-amnesty, pylint: disable=line-too-long
+            field=models.ForeignKey(to='student.CourseEnrollment', help_text=u'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='courseentitlement',
             name='expired_at',
-            field=models.DateTimeField(help_text='The date that an entitlement expired, if NULL the entitlement has not expired.', null=True),  # lint-amnesty, pylint: disable=line-too-long
+            field=models.DateTimeField(help_text=u'The date that an entitlement expired, if NULL the entitlement has not expired.', null=True),
         ),
         migrations.AlterField(
             model_name='courseentitlement',
             name='mode',
-            field=models.CharField(help_text='The mode of the Course that will be applied on enroll.', max_length=100),
+            field=models.CharField(help_text=u'The mode of the Course that will be applied on enroll.', max_length=100),
         ),
     ]

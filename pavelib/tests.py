@@ -337,7 +337,7 @@ def coverage(options):
     if not combined_report_file.isfile():
         # This may be that the coverage files were generated using -p,
         # try to combine them to the one file that we need.
-        sh(f"coverage combine --rcfile={rcfile}")
+        sh("coverage combine --rcfile={}".format(rcfile))
 
     if not os.path.getsize(combined_report_file) > 50:
         # Check if the .coverage data file is larger than the base file,
@@ -352,9 +352,9 @@ def coverage(options):
         return
 
     # Generate the coverage.py XML report
-    sh(f"coverage xml --rcfile={rcfile}")
+    sh("coverage xml --rcfile={}".format(rcfile))
     # Generate the coverage.py HTML report
-    sh(f"coverage html --rcfile={rcfile}")
+    sh("coverage html --rcfile={}".format(rcfile))
     diff_coverage()  # pylint: disable=no-value-for-parameter
 
 
@@ -389,9 +389,8 @@ def diff_coverage(options):
         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
-        # The --diff-range-notation parameter is a workaround for https://github.com/Bachmann1234/diff_cover/issues/153
         sh(
-            "diff-cover {xml_report_str} --diff-range-notation '..' --compare-branch={compare_branch} "
+            "diff-cover {xml_report_str} --compare-branch={compare_branch} "
             "--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,

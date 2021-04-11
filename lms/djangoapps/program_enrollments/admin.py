@@ -116,7 +116,7 @@ def _pending_role_assignment_enrollment_id(pending_role_assignment):
         "admin:program_enrollments_programcourseenrollment_change",
         args=[pce.id],
     )
-    link_text = f"id={pce.id:05}"
+    link_text = "id={pce.id:05}".format(pce=pce)
     return format_html("<a href={}>{}</a>", link_url, link_text)
 
 

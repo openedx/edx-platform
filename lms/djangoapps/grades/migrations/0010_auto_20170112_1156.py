@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 from django.db import migrations, models
 
 
@@ -10,6 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterIndexTogether(
             name='persistentsubsectiongrade',
-            index_together={('modified', 'course_id', 'usage_key'), ('first_attempted', 'course_id', 'user_id')},
+            index_together=set([('modified', 'course_id', 'usage_key'), ('first_attempted', 'course_id', 'user_id')]),
         ),
     ]

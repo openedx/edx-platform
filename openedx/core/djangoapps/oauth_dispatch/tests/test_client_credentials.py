@@ -21,7 +21,7 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
     """ Tests validating the client credentials grant behavior. """
 
     def setUp(self):
-        super().setUp()
+        super(ClientCredentialsTest, self).setUp()
         self.user = UserFactory()
 
     def test_jwt_access_token(self):
@@ -43,9 +43,9 @@ class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
         }
 
         response = self.client.post(reverse('access_token'), data)
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         content = json.loads(response.content.decode('utf-8'))
         access_token = content['access_token']
-        assert content['scope'] == data['scope']
+        self.assertEqual(content['scope'], data['scope'])
         self.assert_valid_jwt_access_token(access_token, self.user, scopes)

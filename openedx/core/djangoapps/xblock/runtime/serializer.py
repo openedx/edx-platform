@@ -71,7 +71,7 @@ def serialize_xblock(block):
         try:
             child_includes = block.runtime.child_includes_of(block)
         except AttributeError:
-            raise RuntimeError("Cannot get child includes of block. Make sure it's using BlockstoreXBlockRuntime")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise RuntimeError("Cannot get child includes of block. Make sure it's using BlockstoreXBlockRuntime")
         if len(child_includes) != len(block.children):
             raise RuntimeError(
                 "Mistmatch between block.children and runtime.child_includes_of()."
@@ -123,7 +123,7 @@ def override_export_fs(block):
     XmlParserMixin.export_to_file = lambda _: False  # So this applies to child blocks that get loaded during export
     try:
         yield fs
-    except:  # lint-amnesty, pylint: disable=try-except-raise
+    except:
         raise
     finally:
         block.runtime.export_fs = old_export_fs

@@ -9,7 +9,7 @@ are only accessible through the use of a specific query parameter
 Installation
 ------------
 
-Add the ``DarkLangMiddleware`` to your list of ``MIDDLEWARE``.
+Add the ``DarkLangMiddleware`` to your list of ``MIDDLEWARE_CLASSES``.
 It must come after the ``SessionMiddleware``, and before the ``LocaleMiddleware``.
 
 Run migrations to install the configuration table.

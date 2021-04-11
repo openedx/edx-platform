@@ -6,8 +6,8 @@ import logging
 import math
 import re
 from functools import partial
-from urllib.parse import urljoin
 
+import six
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -17,13 +17,13 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
+from six import text_type
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
-from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -150,7 +150,7 @@ def _assets_json(request, course_key):
 
     assets, total_count = _get_assets_for_page(course_key, query_options)
 
-    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:  # lint-amnesty, pylint: disable=chained-comparison
+    if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:
         _update_options_to_requery_final_page(query_options, total_count)
         current_page = query_options['current_page']
         first_asset_to_display_index = _get_first_asset_index(current_page, requested_page_size)
@@ -206,9 +206,9 @@ def _get_error_if_invalid_parameters(requested_filter):
     if invalid_filters:
         error_message = {
             'error_code': 'invalid_asset_type_filter',
-            'developer_message': 'The asset_type parameter to the request is invalid. '
-                                 'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
-                                 'dictionary.'.format(invalid_filters)
+            'developer_message': u'The asset_type parameter to the request is invalid. '
+                                 u'The {} filters are not described in the settings.FILES_AND_UPLOAD_TYPE_FILTERS '
+                                 u'dictionary.'.format(invalid_filters)
         }
         return JsonResponse({'error': error_message}, status=400)
 
@@ -414,7 +414,7 @@ def _upload_asset(request, course_key):
     try:
         content = update_course_run_asset(course_key, upload_file)
     except AssetSizeTooLargeException as exception:
-        return JsonResponse({'error': str(exception)}, status=413)
+        return JsonResponse({'error': text_type(exception)}, status=413)
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
@@ -432,15 +432,15 @@ def _upload_asset(request, course_key):
     })
 
 
-def _get_error_if_course_does_not_exist(course_key):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _get_error_if_course_does_not_exist(course_key):
     try:
         modulestore().get_course(course_key)
     except ItemNotFoundError:
-        logging.error('Could not find course: %s', course_key)
+        logging.error(u'Could not find course: %s', course_key)
         return HttpResponseBadRequest()
 
 
-def _get_file_metadata_as_dictionary(upload_file):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _get_file_metadata_as_dictionary(upload_file):
     # compute a 'filename' which is similar to the location formatting; we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here; we're just imposing the Location string formatting expectations to
@@ -472,8 +472,8 @@ def _get_file_too_large_error_message(filename):
     """returns formatted error message for large files"""
 
     return _(
-        'File {filename} exceeds maximum size of '
-        '{maximum_size_in_megabytes} MB.'
+        u'File {filename} exceeds maximum size of '
+        u'{maximum_size_in_megabytes} MB.'
     ).format(
         filename=filename,
         maximum_size_in_megabytes=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
@@ -564,15 +564,15 @@ def delete_asset(course_key, asset_key):
     del_cached_content(content.location)
 
 
-def _check_existence_and_get_asset_content(asset_key):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _check_existence_and_get_asset_content(asset_key):
     try:
         content = contentstore().find(asset_key)
         return content
     except NotFoundError:
-        raise AssetNotFoundException  # lint-amnesty, pylint: disable=raise-missing-from
+        raise AssetNotFoundException
 
 
-def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _delete_thumbnail(thumbnail_location, course_key, asset_key):
     if thumbnail_location is not None:
 
         # We are ignoring the value of the thumbnail_location-- we only care whether
@@ -585,7 +585,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             contentstore().delete(thumbnail_content.get_id())
             del_cached_content(thumbnail_location)
         except Exception:  # pylint: disable=broad-except
-            logging.warning('Could not delete thumbnail: %s', thumbnail_location)
+            logging.warning(u'Could not delete thumbnail: %s', thumbnail_location)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
@@ -593,7 +593,7 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+    external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
         'content_type': content_type,
@@ -604,5 +604,5 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # needed for Backbone delete/update.
-        'id': str(location)
+        'id': six.text_type(location)
     }

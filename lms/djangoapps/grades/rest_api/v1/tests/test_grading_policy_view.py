@@ -6,27 +6,28 @@ Tests for the views
 from datetime import datetime
 
 import ddt
+import six
 from django.urls import reverse
 from pytz import UTC
 
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @ddt.ddt
-class GradingPolicyTestMixin:
+class GradingPolicyTestMixin(object):
     """
     Mixin class for Grading Policy tests
     """
     view_name = None
 
     def setUp(self):
-        super().setUp()
+        super(GradingPolicyTestMixin, self).setUp()
         self.create_user_and_access_token()
 
     def create_user_and_access_token(self):
@@ -35,10 +36,10 @@ class GradingPolicyTestMixin:
         self.access_token = AccessTokenFactory.create(user=self.user, application=self.oauth_client).token
 
     @classmethod
-    def create_course_data(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def create_course_data(cls):
         cls.invalid_course_id = 'foo/bar/baz'
         cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
-        cls.course_id = str(cls.course.id)
+        cls.course_id = six.text_type(cls.course.id)
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.sequential = ItemFactory.create(
                 category="sequential",
@@ -94,7 +95,7 @@ class GradingPolicyTestMixin:
             reverse(self.view_name, kwargs={'course_id': course_id or self.course_id}),
             **headers
         )
-        assert response.status_code == expected_status_code
+        self.assertEqual(response.status_code, expected_status_code)
         return response
 
     def get_auth_header(self, user):
@@ -152,7 +153,7 @@ class GradingPolicyTestMixin:
             org="MTD",
             default_store=modulestore_type,
         )
-        self.assert_get_for_course(course_id=str(course.id))
+        self.assert_get_for_course(course_id=six.text_type(course.id))
 
 
 class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase):
@@ -180,14 +181,14 @@ class CourseGradingPolicyTests(GradingPolicyTestMixin, SharedModuleStoreTestCase
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseGradingPolicyTests, cls).setUpClass()
         cls.create_course_data()
 
     def test_get(self):
         """
         The view should return grading policy for a course.
         """
-        response = super().test_get()
+        response = super(CourseGradingPolicyTests, self).test_get()
 
         expected = [
             {
@@ -232,14 +233,14 @@ class CourseGradingPolicyMissingFieldsTests(GradingPolicyTestMixin, SharedModule
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CourseGradingPolicyMissingFieldsTests, cls).setUpClass()
         cls.create_course_data()
 
     def test_get(self):
         """
         The view should return grading policy for a course.
         """
-        response = super().test_get()
+        response = super(CourseGradingPolicyMissingFieldsTests, self).test_get()
 
         expected = [
             {

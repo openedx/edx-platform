@@ -1,8 +1,8 @@
 version: '3'
 services:
   mysql:
-    image: mysql:5.7
-    container_name: edx.devstack.mysql57
+    image: mysql:5.6
+    container_name: edx.devstack.mysql
     ports:
       - '3306:3306'
     environment:
@@ -20,4 +20,5 @@ services:
     volumes:
        - ../../:/edx/app/edxapp/edx-platform
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy

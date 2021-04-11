@@ -6,6 +6,7 @@ Course Goals Python API
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.reverse import reverse
+from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
@@ -24,7 +25,7 @@ def add_course_goal(user, course_id, goal_key):
         goal_key (string): The goal key for the new goal.
 
     """
-    course_key = CourseKey.from_string(str(course_id))
+    course_key = CourseKey.from_string(text_type(course_id))
     current_goal = get_course_goal(user, course_key)
     if current_goal:
         # If a course goal already exists, simply update it.
@@ -84,7 +85,7 @@ def get_course_goal_options():
     Returns the valid options for goal keys, mapped to their translated
     strings, as defined by theCourseGoal model.
     """
-    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}  # lint-amnesty, pylint: disable=unnecessary-comprehension
+    return {goal_key: goal_text for goal_key, goal_text in models.GOAL_KEY_CHOICES}
 
 
 def get_course_goal_text(goal_key):

@@ -1,7 +1,6 @@
 # pylint: disable=missing-docstring
 
 
-import pytest
 from django.template import VariableDoesNotExist
 from django.test import override_settings
 
@@ -21,20 +20,20 @@ class TestAbsoluteUrl(CacheIsolationTestCase):
     def setUp(self):
         self.site = SiteFactory.create()
         self.site.domain = 'example.com'
-        super().setUp()
+        super(TestAbsoluteUrl, self).setUp()
 
     def test_absolute_url(self):
         absolute = ensure_url_is_absolute(self.site, '/foo/bar')
-        assert absolute == 'https://example.com/foo/bar'
+        self.assertEqual(absolute, 'https://example.com/foo/bar')
 
     def test_absolute_url_domain_lstrip(self):
         self.site.domain = 'example.com/'
         absolute = ensure_url_is_absolute(self.site, 'foo/bar')
-        assert absolute == 'https://example.com/foo/bar'
+        self.assertEqual(absolute, 'https://example.com/foo/bar')
 
     def test_absolute_url_already_absolute(self):
         absolute = ensure_url_is_absolute(self.site, 'https://some-cdn.com/foo/bar')
-        assert absolute == 'https://some-cdn.com/foo/bar'
+        self.assertEqual(absolute, 'https://some-cdn.com/foo/bar')
 
 
 @skip_unless_lms
@@ -55,13 +54,13 @@ class TestLinkTrackingTag(QueryStringAssertionMixin, EmailTemplateTagMixin, Cach
     def test_missing_request(self):
         self.mock_get_current_request.return_value = None
 
-        with pytest.raises(VariableDoesNotExist):
+        with self.assertRaises(VariableDoesNotExist):
             with_link_tracking(self.context, 'http://example.com/foo')
 
     def test_missing_message(self):
         del self.context['message']
 
-        with pytest.raises(VariableDoesNotExist):
+        with self.assertRaises(VariableDoesNotExist):
             with_link_tracking(self.context, 'http://example.com/foo')
 
     def test_course_id(self):
@@ -112,13 +111,13 @@ class TestGoogleAnalyticsPixelTag(QueryStringAssertionMixin, EmailTemplateTagMix
     def test_missing_request(self):
         self.mock_get_current_request.return_value = None
 
-        with pytest.raises(VariableDoesNotExist):
+        with self.assertRaises(VariableDoesNotExist):
             google_analytics_tracking_pixel(self.context)
 
     def test_missing_message(self):
         del self.context['message']
 
-        with pytest.raises(VariableDoesNotExist):
+        with self.assertRaises(VariableDoesNotExist):
             google_analytics_tracking_pixel(self.context)
 
     def test_course_id(self):
@@ -139,9 +138,9 @@ class TestGoogleAnalyticsPixelTag(QueryStringAssertionMixin, EmailTemplateTagMix
 
     def test_html_emitted(self):
         result_html = google_analytics_tracking_pixel(self.context)
-        assert '<img src' in result_html
+        self.assertIn('<img src', result_html)
 
     @override_settings(GOOGLE_ANALYTICS_TRACKING_ID=None)
     def test_no_html_emitted_if_not_enabled(self):
         result_html = google_analytics_tracking_pixel(self.context)
-        assert '' == result_html
+        self.assertEqual('', result_html)

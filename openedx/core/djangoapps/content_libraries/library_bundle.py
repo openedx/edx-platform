@@ -3,7 +3,7 @@ Helper code for working with Blockstore bundles that contain OLX
 """
 
 import dateutil.parser
-import logging  # lint-amnesty, pylint: disable=wrong-import-order
+import logging
 
 from django.utils.lru_cache import lru_cache
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
@@ -92,7 +92,7 @@ def usage_for_child_include(parent_usage, parent_definition, parsed_include):
     )
 
 
-class LibraryBundle:
+class LibraryBundle(object):
     """
     Wrapper around a Content Library Blockstore bundle that contains OLX.
     """
@@ -149,7 +149,7 @@ class LibraryBundle:
             version_arg = {"draft_name": self.draft_name}
         else:
             version_arg = {"bundle_version": get_bundle_version_number(self.bundle_uuid)}
-        olx_path = f"{usage_key.block_type}/{usage_key.usage_id}/definition.xml"
+        olx_path = "{}/{}/definition.xml".format(usage_key.block_type, usage_key.usage_id)
         try:
             get_bundle_file_metadata_with_cache(self.bundle_uuid, olx_path, **version_arg)
             return BundleDefinitionLocator(self.bundle_uuid, usage_key.block_type, olx_path, **version_arg)
@@ -209,7 +209,7 @@ class LibraryBundle:
             try:
                 xml_node = xml_for_definition(def_key)
             except:  # pylint:disable=bare-except
-                log.exception(f"Unable to load definition {def_key}")
+                log.exception("Unable to load definition {}".format(def_key))
                 return
 
             for child in xml_node:
@@ -220,7 +220,7 @@ class LibraryBundle:
                     child_usage = usage_for_child_include(usage_key, def_key, parsed_include)
                     child_def_key = definition_for_include(parsed_include, def_key)
                 except BundleFormatException:
-                    log.exception(f"Unable to parse a child of {def_key}")
+                    log.exception("Unable to parse a child of {}".format(def_key))
                     continue
                 usages_found[child_usage] = child_def_key
                 add_definitions_children(child_usage, child_def_key)
@@ -314,8 +314,8 @@ class LibraryBundle:
             new_links = set(get_bundle_direct_links_with_cache(self.bundle_uuid, draft_name=self.draft_name).items())
             has_unpublished_changes = new_links != old_links
 
-        published_file_paths = {f.path for f in get_bundle_files_cached(self.bundle_uuid)}
-        draft_file_paths = {f.path for f in draft_files}
+        published_file_paths = set(f.path for f in get_bundle_files_cached(self.bundle_uuid))
+        draft_file_paths = set(f.path for f in draft_files)
         for file_path in published_file_paths:
             if file_path not in draft_file_paths:
                 has_unpublished_changes = True

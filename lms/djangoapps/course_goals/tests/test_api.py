@@ -3,16 +3,15 @@ Unit tests for course_goals.api methods.
 """
 
 
-from unittest import mock
-
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import mock
+from django.contrib.auth.models import User
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
+from lms.djangoapps.course_goals.models import CourseGoal
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.track.tests import EventTrackingTestCase
-from lms.djangoapps.course_goals.models import CourseGoal
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -28,7 +27,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
 
     def setUp(self):
         # Create a course with a verified track
-        super().setUp()
+        super(TestCourseGoalsAPI, self).setUp()
         self.course = CourseFactory.create(emit_signals=True)
 
         self.user = User.objects.create_user('john', 'lennon@thebeatles.com', 'password')
@@ -45,25 +44,25 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     def test_add_valid_goal(self, ga_call):
         """ Ensures a correctly formatted post succeeds."""
         response = self.post_course_goal(valid=True, goal_key='certify')
-        assert self.get_event((- 1))['name'] == EVENT_NAME_ADDED
+        self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_ADDED)
         ga_call.assert_called_with(self.user.id, EVENT_NAME_ADDED)
-        assert response.status_code == 201
+        self.assertEqual(response.status_code, 201)
 
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
-        assert len(current_goals) == 1
-        assert current_goals[0].goal_key == 'certify'
+        self.assertEqual(len(current_goals), 1)
+        self.assertEqual(current_goals[0].goal_key, 'certify')
 
     def test_add_invalid_goal(self):
         """ Ensures an incorrectly formatted post does not succeed. """
         response = self.post_course_goal(valid=False)
-        assert response.status_code == 400
-        assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
 
     def test_add_without_goal_key(self):
         """ Ensures if no goal key provided, post does not succeed. """
 
         response = self.post_course_goal(goal_key=None)
-        assert len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)) == 0
+        self.assertEqual(len(CourseGoal.objects.filter(user=self.user, course_key=self.course.id)), 0)
         self.assertContains(
             response=response,
             text='Please provide a valid goal key from following options.',
@@ -77,12 +76,12 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.post_course_goal(valid=True, goal_key='explore')
         self.post_course_goal(valid=True, goal_key='certify')
         self.post_course_goal(valid=True, goal_key='unsure')
-        assert self.get_event((- 1))['name'] == EVENT_NAME_UPDATED
+        self.assertEqual(self.get_event(-1)['name'], EVENT_NAME_UPDATED)
 
         ga_call.assert_called_with(self.user.id, EVENT_NAME_UPDATED)
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)
-        assert len(current_goals) == 1
-        assert current_goals[0].goal_key == 'unsure'
+        self.assertEqual(len(current_goals), 1)
+        self.assertEqual(current_goals[0].goal_key, 'unsure')
 
     def post_course_goal(self, valid=True, goal_key='certify'):
         """

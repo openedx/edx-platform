@@ -20,7 +20,7 @@ class TestRemoveHeaders(TestCase):
         wrapper = remove_headers('Vary', 'Accept-Encoding')
         wrapped_view = wrapper(fake_view)
         response = wrapped_view(request)
-        assert len(response.remove_headers) == 2
+        self.assertEqual(len(response.remove_headers), 2)
 
 
 class TestForceHeader(TestCase):
@@ -31,5 +31,5 @@ class TestForceHeader(TestCase):
         wrapper = force_header('Vary', 'Origin')
         wrapped_view = wrapper(fake_view)
         response = wrapped_view(request)
-        assert len(response.force_headers) == 1
-        assert response.force_headers['Vary'] == 'Origin'
+        self.assertEqual(len(response.force_headers), 1)
+        self.assertEqual(response.force_headers['Vary'], 'Origin')

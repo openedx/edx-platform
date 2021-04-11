@@ -11,6 +11,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
+% if is_mobile_app:
+  <%include file="/dates_banner.html" />
+% endif
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
@@ -51,14 +54,6 @@ ${static.get_page_title_breadcrumbs(course_name())}
   ## in this iframe to navigate the parent window.
   <base target="_parent">
 %endif
-
-## Expose the $$course_id variable for course-team-authored JS.
-## We assign it in the <head> so that it will definitely be
-## assigned before any in-XBlock JS is run.
-<script type="text/javascript">
-  var $$course_id = "${course.id | n, js_escaped_string}";
-</script>
-
 </%block>
 
 <%block name="js_extra">
@@ -67,12 +62,14 @@ ${static.get_page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
 
-  % if enable_mathjax:
-    <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
-  % endif
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
+
+  <script type="text/javascript">
+    var $$course_id = "${course.id | n, js_escaped_string}";
+  </script>
 
 ${HTML(fragment.foot_html())}
 
@@ -87,7 +84,7 @@ ${HTML(fragment.foot_html())}
     % endif
     style="display: block; width: auto; margin: 0;"
   >
-      <main id="main" aria-label="Content">
+      <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
       </main>
   </section>

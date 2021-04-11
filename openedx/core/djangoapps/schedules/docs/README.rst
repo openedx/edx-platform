@@ -236,6 +236,28 @@ Configuration Flags
 Configuring Schedule Creation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Make sure a Site has been created at ``<lms_url>/admin/sites/site``.
+
+ScheduleConfig
+^^^^^^^^^^^^^^
+
+In the Django admin panel at
+``<lms_url>/admin/schedules/scheduleconfig/`` create a ScheduleConfig
+and link it to the Site. Make sure to enable all of the settings:
+
+-  ``create_schedules``: enables creating new Schedules when new Course
+   Enrollments are created.
+-  ``hold_back_ratio``: ratio of all new Course Enrollments that should
+   NOT have a Schedule created.
+
+Roll-out Waffle Flag
+^^^^^^^^^^^^^^^^^^^^
+
+There is one roll-out related course waffle flag that we plan to delete
+called ``schedules.create_schedules_for_course``, which, if the
+``ScheduleConfig.create_schedules`` is disabled, will enable schedule
+creation on a per-course basis.
+
 Self-paced Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -301,6 +323,25 @@ configure enqueueing and delivering emails per message type:
    celery.
 -  ``deliver_*``: allows delivering emails through ACE for this message
    type.
+
+.. roll-out-waffle-flag-1:
+
+Roll-out Waffle Flag
+^^^^^^^^^^^^^^^^^^^^
+
+Another roll-out related course waffle flag that we plan to delete
+called ``schedules.send_updates_for_course`` will enable sending
+specifically the course updates email per-course.
+
+Configuring Highlights UI in Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The button and modal on the course outline page that allows course
+authors to enter section highlights can be toggled globally by going to
+``<lms_url>/admin/waffle/switch/`` and adding an active switch called
+``dynamic_pacing.studio_course_update``.
+
+This is a roll-out related waffle switch that we will eventually delete.
 
 Configuring a Learner’s Schedule
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -422,10 +463,10 @@ To begin using Litmus, follow these steps:
 1. Make sure that ACE is configured to use Sailthru (see instructions above).
 2. Go to the `Litmus checklist page <https://litmus.com/checklist>`__ and start
    a new checklist.
-3. The checklist will provide you with an email address to which you will send
+3. The checklist will provide you with an email address to which you will send 
    a test email.
-4. Send an email. Use one of the management commands with the
-   `--override-recipient-email` flag. Use the Litmus email you got in step 3
+4. Send an email. Use one of the management commands with the 
+   `--override-recipient-email` flag. Use the Litmus email you got in step 3 
    as the flag value.
 
 ::

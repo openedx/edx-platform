@@ -35,7 +35,7 @@ def runchecks(include_extended=False):
                 'message': message
             }
         except ImportError as e:
-            raise ImproperlyConfigured(f'Error importing module {module}: "{e}"')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ImproperlyConfigured(u'Error importing module %s: "%s"' % (module, e))
         except AttributeError:
-            raise ImproperlyConfigured(f'Module "{module}" does not define a "{attr}" callable')  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ImproperlyConfigured(u'Module "%s" does not define a "%s" callable' % (module, attr))
     return response_dict

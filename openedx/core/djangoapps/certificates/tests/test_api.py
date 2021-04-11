@@ -1,11 +1,14 @@
 
+
+import itertools
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import ddt
 import pytz
+import waffle
 from django.test import TestCase
-from edx_toggles.toggles import LegacyWaffleSwitch
+from edx_toggles.toggles import WaffleSwitch
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -17,7 +20,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 
 # TODO: Copied from lms.djangoapps.certificates.models,
 # to be resolved per https://openedx.atlassian.net/browse/EDUCATOR-1318
-class CertificateStatuses:
+class CertificateStatuses(object):
     """
     Enum for certificate statuses
     """
@@ -42,7 +45,7 @@ class CertificateStatuses:
     )
 
 
-class MockGeneratedCertificate:
+class MockGeneratedCertificate(object):
     """
     We can't import GeneratedCertificate from LMS here, so we roll
     our own minimal Certificate model for testing.
@@ -65,7 +68,7 @@ class MockGeneratedCertificate:
 @contextmanager
 def configure_waffle_namespace(feature_enabled):
     namespace = certs_waffle.waffle()
-    auto_certificate_generation_switch = LegacyWaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)
+    auto_certificate_generation_switch = WaffleSwitch(namespace, certs_waffle.AUTO_CERTIFICATE_GENERATION)
     with override_waffle_switch(auto_certificate_generation_switch, active=feature_enabled):
         yield
 
@@ -73,7 +76,7 @@ def configure_waffle_namespace(feature_enabled):
 @ddt.ddt
 class CertificatesApiTestCase(TestCase):
     def setUp(self):
-        super().setUp()
+        super(CertificatesApiTestCase, self).setUp()
         self.course = CourseOverviewFactory.create(
             start=datetime(2017, 1, 1, tzinfo=pytz.UTC),
             end=datetime(2017, 1, 31, tzinfo=pytz.UTC),
@@ -94,7 +97,7 @@ class CertificatesApiTestCase(TestCase):
     @ddt.data(True, False)
     def test_auto_certificate_generation_enabled(self, feature_enabled):
         with configure_waffle_namespace(feature_enabled):
-            assert feature_enabled == api.auto_certificate_generation_enabled()
+            self.assertEqual(feature_enabled, api.auto_certificate_generation_enabled())
 
     @ddt.data(
         (True, True, False),  # feature enabled and self-paced should return False
@@ -108,7 +111,7 @@ class CertificatesApiTestCase(TestCase):
     ):
         self.course.self_paced = is_self_paced
         with configure_waffle_namespace(feature_enabled):
-            assert expected_value == api.can_show_certificate_available_date_field(self.course)
+            self.assertEqual(expected_value, api.can_show_certificate_available_date_field(self.course))
 
     @ddt.data(
         (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
@@ -123,7 +126,7 @@ class CertificatesApiTestCase(TestCase):
         self.certificate.mode = CourseMode.VERIFIED
         self.certificate.status = certificate_status
 
-        assert expected_value == api.is_certificate_valid(self.certificate)
+        self.assertEqual(expected_value, api.is_certificate_valid(self.certificate))
 
     @ddt.data(
         (CourseMode.VERIFIED, CertificateStatuses.downloadable, True),
@@ -138,7 +141,7 @@ class CertificatesApiTestCase(TestCase):
         self.certificate.mode = CourseMode.VERIFIED
         self.certificate.status = certificate_status
 
-        assert expected_value == api.is_certificate_valid(self.certificate)
+        self.assertEqual(expected_value, api.is_certificate_valid(self.certificate))
 
     @ddt.data(
         (True, True, False),  # feature enabled and self-paced should return False
@@ -154,17 +157,17 @@ class CertificatesApiTestCase(TestCase):
         with configure_waffle_namespace(feature_enabled):
 
             # With no available_date set, both return modified_date
-            assert self.certificate.modified_date == api.available_date_for_certificate(self.course, self.certificate)
-            assert self.certificate.modified_date == api.display_date_for_certificate(self.course, self.certificate)
+            self.assertEqual(self.certificate.modified_date, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(self.certificate.modified_date, api.display_date_for_certificate(self.course, self.certificate))
 
             # With an available date set in the past, both return the available date (if configured)
             self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
-            assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)
-            assert maybe_avail == api.display_date_for_certificate(self.course, self.certificate)
+            self.assertEqual(maybe_avail, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(maybe_avail, api.display_date_for_certificate(self.course, self.certificate))
 
             # With a future available date, they each return a different date
             self.course.certificate_available_date = datetime.max.replace(tzinfo=pytz.UTC)
             maybe_avail = self.course.certificate_available_date if uses_avail_date else self.certificate.modified_date
-            assert maybe_avail == api.available_date_for_certificate(self.course, self.certificate)
-            assert self.certificate.modified_date == api.display_date_for_certificate(self.course, self.certificate)
+            self.assertEqual(maybe_avail, api.available_date_for_certificate(self.course, self.certificate))
+            self.assertEqual(self.certificate.modified_date, api.display_date_for_certificate(self.course, self.certificate))

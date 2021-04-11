@@ -28,22 +28,22 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         shard_str = '/shard_' + self.shard if self.shard else ''
 
         expected_statement = [
-            f"DEFAULT_STORE={store}",
-            f"SAVED_SOURCE_DIR='{REPO_DIR}/test_root/log{shard_str}'",
-            f"SCREENSHOT_DIR='{REPO_DIR}/test_root/log{shard_str}'",
-            f"BOK_CHOY_HAR_DIR='{REPO_DIR}/test_root/log{shard_str}/hars'",
+            "DEFAULT_STORE={}".format(store),
+            "SAVED_SOURCE_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
+            "SCREENSHOT_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
+            "BOK_CHOY_HAR_DIR='{}/test_root/log{}/hars'".format(REPO_DIR, shard_str),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}/{}'".format(
                 REPO_DIR,
                 'node_modules/edx-custom-a11y-rules/lib/custom_a11y_rules.js'
             ),
-            f"SELENIUM_DRIVER_LOG_DIR='{REPO_DIR}/test_root/log{shard_str}'",
-            f"VERIFY_XSS='{verify_xss}'",
+            "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
+            "VERIFY_XSS='{}'".format(verify_xss),
             "python",
             "-Wd",
             "-m",
             "pytest",
-            f"{REPO_DIR}/common/test/acceptance/{name}",
-            f"--junitxml={REPO_DIR}/reports/bok_choy{shard_str}/xunit.xml",
+            "{}/common/test/acceptance/{}".format(REPO_DIR, name),
+            "--junitxml={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
             "--verbose",
         ]
         return expected_statement
@@ -56,58 +56,67 @@ class TestPaverBokChoyCmd(unittest.TestCase):
     def test_default(self):
         suite = BokChoyTestSuite('')
         name = 'tests'
-        assert suite.cmd == self._expected_command(name=name)
+        self.assertEqual(suite.cmd, self._expected_command(name=name))
 
     def test_suite_spec(self):
         spec = 'test_foo.py'
         suite = BokChoyTestSuite('', test_spec=spec)
-        name = f'tests/{spec}'
-        assert suite.cmd == self._expected_command(name=name)
+        name = 'tests/{}'.format(spec)
+        self.assertEqual(suite.cmd, self._expected_command(name=name))
 
     def test_class_spec(self):
         spec = 'test_foo.py:FooTest'
         suite = BokChoyTestSuite('', test_spec=spec)
-        name = f'tests/{spec}'
-        assert suite.cmd == self._expected_command(name=name)
+        name = 'tests/{}'.format(spec)
+        self.assertEqual(suite.cmd, self._expected_command(name=name))
 
     def test_testcase_spec(self):
         spec = 'test_foo.py:FooTest.test_bar'
         suite = BokChoyTestSuite('', test_spec=spec)
-        name = f'tests/{spec}'
-        assert suite.cmd == self._expected_command(name=name)
+        name = 'tests/{}'.format(spec)
+        self.assertEqual(suite.cmd, self._expected_command(name=name))
 
     def test_spec_with_draft_default_store(self):
         spec = 'test_foo.py'
         suite = BokChoyTestSuite('', test_spec=spec, default_store='draft')
-        name = f'tests/{spec}'
-        assert suite.cmd == self._expected_command(name=name, store='draft')
+        name = 'tests/{}'.format(spec)
+        self.assertEqual(
+            suite.cmd,
+            self._expected_command(name=name, store='draft')
+        )
 
     def test_invalid_default_store(self):
         # the cmd will dumbly compose whatever we pass in for the default_store
         suite = BokChoyTestSuite('', default_store='invalid')
         name = 'tests'
-        assert suite.cmd == self._expected_command(name=name, store='invalid')
+        self.assertEqual(
+            suite.cmd,
+            self._expected_command(name=name, store='invalid')
+        )
 
     def test_serversonly(self):
         suite = BokChoyTestSuite('', serversonly=True)
-        assert suite.cmd is None
+        self.assertEqual(suite.cmd, None)
 
     def test_verify_xss(self):
         suite = BokChoyTestSuite('', verify_xss=True)
         name = 'tests'
-        assert suite.cmd == self._expected_command(name=name, verify_xss=True)
+        self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=True))
 
     def test_verify_xss_env_var(self):
         self.env_var_override.set('VERIFY_XSS', 'False')
         with self.env_var_override:
             suite = BokChoyTestSuite('')
             name = 'tests'
-            assert suite.cmd == self._expected_command(name=name, verify_xss=False)
+            self.assertEqual(suite.cmd, self._expected_command(name=name, verify_xss=False))
 
     def test_test_dir(self):
         test_dir = 'foo'
         suite = BokChoyTestSuite('', test_dir=test_dir)
-        assert suite.cmd == self._expected_command(name=test_dir)
+        self.assertEqual(
+            suite.cmd,
+            self._expected_command(name=test_dir)
+        )
 
     def test_verbosity_settings_1_process(self):
         """
@@ -121,7 +130,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=1)
-        assert suite.verbosity_processes_command == expected_verbosity_command
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
 
     def test_verbosity_settings_2_processes(self):
         """
@@ -134,12 +143,12 @@ class TestPaverBokChoyCmd(unittest.TestCase):
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            f"-n {process_count}",
+            "-n {}".format(process_count),
             "--color=no",
             "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
-        assert suite.verbosity_processes_command == expected_verbosity_command
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)
 
     def test_verbosity_settings_3_processes(self):
         """
@@ -151,9 +160,9 @@ class TestPaverBokChoyCmd(unittest.TestCase):
                 repo_dir=REPO_DIR,
                 shard_str='/shard_' + self.shard if self.shard else '',
             ),
-            f"-n {process_count}",
+            "-n {}".format(process_count),
             "--color=no",
             "--verbose",
         ]
         suite = BokChoyTestSuite('', num_processes=process_count)
-        assert suite.verbosity_processes_command == expected_verbosity_command
+        self.assertEqual(suite.verbosity_processes_command, expected_verbosity_command)

@@ -5,12 +5,23 @@ the import_shim/ system.
 See /docs/decisions/0007-sys-path-modification-removal.rst for details.
 """
 
+import warnings
 
-class DeprecatedEdxPlatformImportError(Exception):
+
+class DeprecatedEdxPlatformImportWarning(DeprecationWarning):
     """
-    Error: An edx-platform module is being imported from an unsupported location.
+    A warning that a module is being imported from an unsupported location.
 
-    See `DeprecatedEdxPlatformImportWarning` above for context.
+    Example use case:
+        edx-platform modules should be imported from the root of the repository.
+
+        For example, `from lms.djangoapps.course_wiki import views` is good.
+
+        However, we historically modify `sys.path` to allow importing relative to
+        certain subdirectories. For example, `from course_wiki ipmort views` currently
+        works.
+
+        We want to stardize on the prefixed version for a few different reasons.
     """
 
     def __init__(self, old_import, new_import):
@@ -26,12 +37,9 @@ class DeprecatedEdxPlatformImportError(Exception):
 
 def warn_deprecated_import(old_import, new_import):
     """
-    Raise an error that a module is being imported from an unsupported location.
-
-    The function is named "warn_deprecated_import" because importing
-    from these locations used to raise warnings instead of errors,
-    but updating all references to the old function name did not seem
-    worth it, especially since this function will be removed soon after
-    the Lilac release is cut.
+    Warn that a module is being imported from its old location.
     """
-    raise DeprecatedEdxPlatformImportError(old_import, new_import)
+    warnings.warn(
+        DeprecatedEdxPlatformImportWarning(old_import, new_import),
+        stacklevel=3,  # Should surface the line that is doing the importing.
+    )

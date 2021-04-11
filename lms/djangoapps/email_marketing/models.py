@@ -17,7 +17,7 @@ class EmailMarketingConfiguration(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "email_marketing"
 
     sailthru_key = models.fields.CharField(
@@ -169,5 +169,5 @@ class EmailMarketingConfiguration(ConfigurationModel):
     )
 
     def __str__(self):
-        return "Email marketing configuration: New user list %s, Welcome template: %s" % \
+        return u"Email marketing configuration: New user list %s, Welcome template: %s" % \
                (self.sailthru_new_user_list, self.sailthru_welcome_template)

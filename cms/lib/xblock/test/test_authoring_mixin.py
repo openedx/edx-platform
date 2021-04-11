@@ -23,8 +23,8 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
     """
     GROUP_NO_LONGER_EXISTS = "This group no longer exists"
     NO_CONTENT_OR_ENROLLMENT_GROUPS = "Access to this component is not restricted"
-    NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"  # lint-amnesty, pylint: disable=line-too-long
-    NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "You can restrict access to this component to learners in specific content groups"  # lint-amnesty, pylint: disable=line-too-long
+    NO_CONTENT_ENROLLMENT_TRACK_ENABLED = "You can restrict access to this component to learners in specific enrollment tracks or content groups"
+    NO_CONTENT_ENROLLMENT_TRACK_DISABLED = "You can restrict access to this component to learners in specific content groups"
     CONTENT_GROUPS_TITLE = "Content Groups"
     ENROLLMENT_GROUPS_TITLE = "Enrollment Track Groups"
     STAFF_LOCKED = 'The unit that contains this component is hidden from learners'
@@ -36,7 +36,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         """
         Create a simple course with a video component.
         """
-        super().setUp()
+        super(AuthoringMixinTestCase, self).setUp()
         self.course = CourseFactory.create()
         chapter = ItemFactory.create(
             category='chapter',

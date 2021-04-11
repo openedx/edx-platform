@@ -51,7 +51,7 @@ def safemembers(members, base):
         raise SuspiciousOperation("Attempted to import course outside of data dir")
 
     for finfo in members:
-        if _is_bad_path(finfo.name, base):  # lint-amnesty, pylint: disable=no-else-raise
+        if _is_bad_path(finfo.name, base):
             log.debug(u"File %r is blocked (illegal path)", finfo.name)
             raise SuspiciousOperation("Illegal path")
         elif finfo.issym() and _is_bad_link(finfo, base):

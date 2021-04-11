@@ -3,6 +3,7 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
 
 
+import six
 import xblock.reference.plugins
 from completion.services import CompletionService
 from django.conf import settings
@@ -45,7 +46,7 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         # to ask for handler URLs without a student context.
         func = getattr(block.__class__, handler_name, None)
         if not func:
-            raise ValueError(f"{handler_name!r} is not a function name")
+            raise ValueError(u"{!r} is not a function name".format(handler_name))
 
         # Is the following necessary? ProxyAttribute causes an UndefinedContext error
         # if trying this without the module system.
@@ -57,8 +58,8 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': str(block.location.course_key),
-        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
+        'course_id': six.text_type(block.location.course_key),
+        'usage_id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,
     })
@@ -90,7 +91,7 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
-class UserTagsService:
+class UserTagsService(object):
     """
     A runtime class that provides an interface to the user service.  It handles filling in
     the current course id and current user.
@@ -114,7 +115,7 @@ class UserTagsService:
             key: the key for the value we want
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError(f"unexpected scope {scope}")
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.get_course_tag(
             self._get_current_user(),
@@ -130,7 +131,7 @@ class UserTagsService:
             value: the value to set
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError(f"unexpected scope {scope}")
+            raise ValueError(u"unexpected scope {0}".format(scope))
 
         return user_course_tag_api.set_course_tag(
             self._get_current_user(),
@@ -165,9 +166,9 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
         services['call_to_action'] = CallToActionService()
-        super().__init__(**kwargs)
+        super(LmsModuleSystem, self).__init__(**kwargs)
 
-    def handler_url(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+    def handler_url(self, *args, **kwargs):
         """
         Implement the XBlock runtime handler_url interface.
 
@@ -204,8 +205,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
         runtime_class = 'LmsRuntime'
         extra_data = {
-            'block-id': quote_slashes(str(block.scope_ids.usage_id)),
-            'course-id': quote_slashes(str(block.course_id)),
+            'block-id': quote_slashes(six.text_type(block.scope_ids.usage_id)),
+            'course-id': quote_slashes(six.text_type(block.course_id)),
             'url-selector': 'asideBaseUrl',
             'runtime-class': runtime_class,
         }
@@ -218,7 +219,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             view,
             frag,
             context,
-            usage_id_serializer=str,
+            usage_id_serializer=six.text_type,
             request_token=self.request_token,
             extra_data=extra_data,
         )
@@ -243,6 +244,6 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         # (see https://openedx.atlassian.net/browse/TE-811)
         return [
             aside_type
-            for aside_type in super().applicable_aside_types(block)
+            for aside_type in super(LmsModuleSystem, self).applicable_aside_types(block)
             if aside_type != 'acid_aside'
         ]

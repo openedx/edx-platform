@@ -31,7 +31,7 @@ urlpatterns = [
         name='user_program_readonly_access'
     ),
     url(
-        fr'^programs/{PROGRAM_UUID_PATTERN}/enrollments/$',
+        r'^programs/{program_uuid}/enrollments/$'.format(program_uuid=PROGRAM_UUID_PATTERN),
         ProgramEnrollmentsView.as_view(),
         name='program_enrollments'
     ),

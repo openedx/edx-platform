@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 CourseOverview serializers
 """
@@ -11,12 +12,12 @@ class CourseOverviewBaseSerializer(serializers.ModelSerializer):
     Serializer for a course run overview.
     """
 
-    class Meta:
+    class Meta(object):
         model = CourseOverview
         fields = '__all__'
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
+        representation = super(CourseOverviewBaseSerializer, self).to_representation(instance)
         representation['display_name_with_default'] = instance.display_name_with_default
         representation['has_started'] = instance.has_started()
         representation['has_ended'] = instance.has_ended()

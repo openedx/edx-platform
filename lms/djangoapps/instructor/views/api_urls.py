@@ -53,7 +53,6 @@ urlpatterns = [
     # Reports..
     url(r'^get_course_survey_results$', api.get_course_survey_results, name='get_course_survey_results'),
     url(r'^export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
-    url(r'^export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
 
     url(r'^export_ora2_submission_files', api.export_ora2_submission_files,
         name='export_ora2_submission_files'),

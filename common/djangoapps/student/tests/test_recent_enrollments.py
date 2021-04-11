@@ -12,8 +12,11 @@ from django.urls import reverse
 from django.utils.timezone import now
 from opaque_keys.edx import locator
 from pytz import UTC
+from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from common.djangoapps.student.models import CourseEnrollment, DashboardConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views import get_course_enrollments
@@ -34,7 +37,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         Add a student
         """
-        super().setUp()
+        super(TestRecentEnrollments, self).setUp()
         self.student = UserFactory()
         self.student.set_password(self.PASSWORD)
         self.student.save()
@@ -72,10 +75,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
 
         # get courses through iterating all courses
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 2
+        self.assertEqual(len(courses_list), 2)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        assert len(recent_course_list) == 1
+        self.assertEqual(len(recent_course_list), 1)
 
     def test_zero_second_delta(self):
         """
@@ -83,10 +86,10 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         """
         self._configure_message_timeout(0)
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 2
+        self.assertEqual(len(courses_list), 2)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        assert len(recent_course_list) == 0
+        self.assertEqual(len(recent_course_list), 0)
 
     def test_enrollments_sorted_most_recent(self):
         """
@@ -101,9 +104,9 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         courses = []
         for idx, seconds_past in zip(list(range(2, 6)), [5, 10, 15, 20]):
             course_location = locator.CourseLocator(
-                f'Org{idx}',
-                f'Course{idx}',
-                f'Run{idx}'
+                'Org{num}'.format(num=idx),
+                'Course{num}'.format(num=idx),
+                'Run{num}'.format(num=idx)
             )
             course, enrollment = self._create_course_and_enrollment(course_location)
             enrollment.created = now() - datetime.timedelta(seconds=seconds_past)
@@ -111,21 +114,24 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
             courses.append(course)
 
         courses_list = list(get_course_enrollments(self.student, None, []))
-        assert len(courses_list) == 6
+        self.assertEqual(len(courses_list), 6)
 
         recent_course_list = _get_recently_enrolled_courses(courses_list)
-        assert len(recent_course_list) == 5
+        self.assertEqual(len(recent_course_list), 5)
 
-        assert recent_course_list[1].course.id == courses[0].id
-        assert recent_course_list[2].course.id == courses[1].id
-        assert recent_course_list[3].course.id == courses[2].id
-        assert recent_course_list[4].course.id == courses[3].id
+        self.assertEqual(recent_course_list[1].course.id, courses[0].id)
+        self.assertEqual(recent_course_list[2].course.id, courses[1].id)
+        self.assertEqual(recent_course_list[3].course.id, courses[2].id)
+        self.assertEqual(recent_course_list[4].course.id, courses[3].id)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
 
         # verify recent enrollment message
-        self.assertContains(response, 'Thank you for enrolling in:')
+        self.assertContains(
+            response,
+            'Thank you for enrolling in:'.format(course_name=self.course.display_name)
+        )
         self.assertContains(
             response,
             ', '.join(enrollment.course.display_name for enrollment in recent_course_list)
@@ -140,7 +146,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(
             response,
-            f"Thank you for enrolling in {self.course.display_name}"
+            "Thank you for enrolling in {course_name}".format(course_name=self.course.display_name)
         )
 
     def test_dashboard_rendering_with_two_courses(self):
@@ -153,21 +159,21 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
             'Course2',
             'Run2'
         )
-        course, _ = self._create_course_and_enrollment(course_location)  # lint-amnesty, pylint: disable=unused-variable
+        course, _ = self._create_course_and_enrollment(course_location)
 
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
 
         courses_enrollments = list(get_course_enrollments(self.student, None, []))
         courses_enrollments.sort(key=lambda x: x.created, reverse=True)
-        assert len(courses_enrollments) == 3
+        self.assertEqual(len(courses_enrollments), 3)
 
         recent_course_enrollments = _get_recently_enrolled_courses(courses_enrollments)
-        assert len(recent_course_enrollments) == 2
+        self.assertEqual(len(recent_course_enrollments), 2)
 
         self.assertContains(
             response,
-            "Thank you for enrolling in:"
+            "Thank you for enrolling in:".format(course_name=self.course.display_name)
         )
         self.assertContains(
             response,

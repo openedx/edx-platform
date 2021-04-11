@@ -10,9 +10,9 @@ Provides:
 
 
 from optparse import BadOptionError, OptionParser
-from unittest.mock import patch
 
 import paver.tasks
+from mock import patch
 
 
 class PassthroughOptionParser(OptionParser):

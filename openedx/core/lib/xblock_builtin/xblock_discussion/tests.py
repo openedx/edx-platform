@@ -66,7 +66,7 @@ class DiscussionXBlockImportExportTests(TestCase):
         """
         Set up method
         """
-        super(DiscussionXBlockImportExportTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(DiscussionXBlockImportExportTests, self).setUp()
         self.keys = ScopeIds("any_user", "discussion", "def_id", "usage_id")
         self.runtime_mock = mock.Mock(spec=Runtime)
         self.runtime_mock.construct_xblock_from_class = mock.Mock(side_effect=self._construct_xblock_mock)
@@ -106,9 +106,9 @@ class DiscussionXBlockImportExportTests(TestCase):
 
         block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
         try:
-            assert block.discussion_id == id_pair.value
-            assert block.discussion_category == category_pair.value
-            assert block.discussion_target == target_pair.value
+            self.assertEqual(block.discussion_id, id_pair.value)
+            self.assertEqual(block.discussion_category, category_pair.value)
+            self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
             print(xblock_xml)
             raise
@@ -138,9 +138,9 @@ class DiscussionXBlockImportExportTests(TestCase):
 
         block = DiscussionXBlock.parse_xml(node, self.runtime_mock, self.keys, self.id_gen_mock)
         try:
-            assert block.discussion_id == id_pair.value
-            assert block.discussion_category == category_pair.value
-            assert block.discussion_target == target_pair.value
+            self.assertEqual(block.discussion_id, id_pair.value)
+            self.assertEqual(block.discussion_category, category_pair.value)
+            self.assertEqual(block.discussion_target, target_pair.value)
         except AssertionError:
             print(xblock_xml, xblock_definition_xml)
             raise
@@ -160,15 +160,18 @@ class DiscussionXBlockImportExportTests(TestCase):
         target_node = etree.Element('dummy')
 
         block = DiscussionXBlock(self.runtime_mock, scope_ids=self.keys, field_data=DictFieldData({}))
-        discussion_id_field = block.fields['discussion_id']  # pylint: disable=unsubscriptable-object
+        discussion_id_field = block.fields['discussion_id']
 
         # precondition checks - discussion_id does not have a value and uses UNIQUE_ID
-        assert discussion_id_field._get_cached_value(block) == NO_CACHE_VALUE  # pylint: disable=W0212
-        assert discussion_id_field.default == UNIQUE_ID
+        self.assertEqual(
+            discussion_id_field._get_cached_value(block),  # pylint: disable=protected-access
+            NO_CACHE_VALUE
+        )
+        self.assertEqual(discussion_id_field.default, UNIQUE_ID)
 
         block.add_xml_to_node(target_node)
-        assert target_node.tag == 'discussion'  # pylint: disable=W0212
-        assert 'discussion_id' not in target_node.attrib
+        self.assertEqual(target_node.tag, "discussion")
+        self.assertNotIn("discussion_id", target_node.attrib)
 
     @ddt.data("jediwannabe", "iddqd", "itisagooddaytodie")
     def test_export_custom_discussion_id(self, discussion_id):
@@ -181,8 +184,8 @@ class DiscussionXBlockImportExportTests(TestCase):
         block.discussion_id = discussion_id
 
         # precondition check
-        assert block.discussion_id == discussion_id
+        self.assertEqual(block.discussion_id, discussion_id)
 
         block.add_xml_to_node(target_node)
-        assert target_node.tag == 'discussion'
-        assert target_node.attrib['discussion_id'], discussion_id
+        self.assertEqual(target_node.tag, "discussion")
+        self.assertTrue(target_node.attrib["discussion_id"], discussion_id)

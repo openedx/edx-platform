@@ -24,8 +24,9 @@ from textwrap import dedent
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
-from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
 
@@ -63,22 +64,22 @@ class Command(BaseCommand):
         for course_key_str in options['course_key_list']:
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
-            except InvalidKeyError as e:
+            except InvalidKeyError:
                 raise CommandError(
-                    '"{course_key_str}" is not a valid course key.'.format(
+                    u'"{course_key_str}" is not a valid course key.'.format(
                         course_key_str=course_key_str
                     )
-                ) from e
+                )
 
         if only_course_keys:
             LOGGER.info(
                 (
-                    'Starting to re-submit certificates with status "error" '
-                    'in these courses: %s'
-                ), ", ".join([str(key) for key in only_course_keys])
+                    u'Starting to re-submit certificates with status "error" '
+                    u'in these courses: %s'
+                ), ", ".join([text_type(key) for key in only_course_keys])
             )
         else:
-            LOGGER.info('Starting to re-submit certificates with status "error".')
+            LOGGER.info(u'Starting to re-submit certificates with status "error".')
 
         # Retrieve the IDs of generated certificates with
         # error status in the set of courses we're considering.
@@ -95,23 +96,23 @@ class Command(BaseCommand):
             course = self._load_course_with_cache(course_key, course_cache)
 
             if course is not None:
-                generate_user_certificates(user, course_key, course=course)
+                certs_api.generate_user_certificates(user, course_key, course=course)
                 resubmit_count += 1
                 LOGGER.info(
                     (
-                        "Re-submitted certificate for user %s "
-                        "in course '%s'"
+                        u"Re-submitted certificate for user %s "
+                        u"in course '%s'"
                     ), user.id, course_key
                 )
             else:
                 LOGGER.error(
                     (
-                        "Could not find course for course key '%s'.  "
-                        "Certificate for user %s will not be resubmitted."
+                        u"Could not find course for course key '%s'.  "
+                        u"Certificate for user %s will not be resubmitted."
                     ), course_key, user.id
                 )
 
-        LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
+        LOGGER.info(u"Finished resubmitting %s certificate tasks", resubmit_count)
 
     def _load_course_with_cache(self, course_key, course_cache):
         """Retrieve the course, then cache it to avoid Mongo queries. """

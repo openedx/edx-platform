@@ -1,16 +1,16 @@
+# -*- coding: utf-8 -*-
 """ Commerce app tests package. """
 
 
-from unittest import mock
-
 import httpretty
+import mock
 from django.conf import settings
 from django.test import TestCase
 from freezegun import freeze_time
 
-from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from common.djangoapps.student.tests.factories import UserFactory
 
 JSON = 'application/json'
 TEST_PUBLIC_URL_ROOT = 'http://www.example.com'
@@ -34,7 +34,7 @@ class EdxRestApiClientTest(TestCase):
     ]
 
     def setUp(self):
-        super().setUp()
+        super(EdxRestApiClientTest, self).setUp()
         self.user = UserFactory()
 
     @httpretty.activate
@@ -67,8 +67,8 @@ class EdxRestApiClientTest(TestCase):
                 }
             }
             expected_jwt = create_jwt_for_user(self.user, additional_claims=claims, scopes=self.SCOPES)
-            expected_header = f'JWT {expected_jwt}'
-            assert actual_header == expected_header
+            expected_header = u'JWT {}'.format(expected_jwt)
+            self.assertEqual(actual_header, expected_header)
 
     @httpretty.activate
     def test_client_unicode(self):
@@ -86,4 +86,4 @@ class EdxRestApiClientTest(TestCase):
             adding_headers={'Content-Type': JSON},
         )
         actual_object = ecommerce_api_client(self.user).baskets(1).order.get()
-        assert actual_object == {'result': 'Préparatoire'}
+        self.assertEqual(actual_object, {u"result": u"Préparatoire"})

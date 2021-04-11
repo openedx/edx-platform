@@ -59,9 +59,8 @@ var edx = edx || {};
                 if (chapter_location !== 'none') {
                     var chapter = self.find_unit(self.hidden, chapter_location);
                     self.sequential_select.html('')
-                    // xss-lint: disable=javascript-jquery-append, javascript-concat-html
           .append('<option value="all">' + gettext('All subsections') + '</option>')
-          .append(self.schedule_options(chapter.children)); // xss-lint: disable=javascript-jquery-append
+          .append(self.schedule_options(chapter.children));
                     self.sequential_select.prop('disabled', false);
                     $('#add-unit-button').prop('disabled', false);
           // When a chapter is selected, start date fields are enabled and due date
@@ -82,9 +81,8 @@ var edx = edx || {};
                     var chapter = self.chapter_select.val(),
                         sequential = self.find_unit(self.hidden, chapter, sequential_location);
                     self.vertical_select.html('')
-                    // xss-lint: disable=javascript-jquery-append, javascript-concat-html
            .append('<option value="all">' + gettext('All units') + '</option>')
-           .append(self.schedule_options(sequential.children)); // xss-lint: disable=javascript-jquery-append
+           .append(self.schedule_options(sequential.children));
                     self.vertical_select.prop('disabled', false);
                     self.set_datetime('start', sequential.start);
                     self.set_datetime('due', sequential.due);
@@ -177,15 +175,14 @@ var edx = edx || {};
             });
       // schedule_template defined globally in ccx\schedule.html
       /* globals schedule_template */
-            this.$el.html(schedule_template({chapters: this.showing})); // xss-lint: disable=javascript-jquery-html
+            this.$el.html(schedule_template({chapters: this.showing}));
             $('table.ccx-schedule .sequential,.vertical').hide();
             $('table.ccx-schedule .unit .toggle-collapse').on('click', this.toggle_collapse);
       // Hidden hover fields for empty date fields
             $('table.ccx-schedule .date button').each(function() {
                 if ($(this).text().trim() === gettext('Click to change')) {
-                    // xss-lint: disable=javascript-jquery-html, javascript-concat-html
                     $(this).html('Set date <span class="sr"> ' +
-          gettext('Click to change') + '</span>'); // xss-lint: disable=javascript-concat-html
+          gettext('Click to change') + '</span>');
                 }
             });
 
@@ -221,9 +218,8 @@ var edx = edx || {};
             if (this.hidden.length) {
         // Populate chapters select, depopulate others
                 this.chapter_select.html('')
-                // xss-lint: disable=javascript-jquery-append, javascript-concat-html
         .append('<option value="none">' + gettext('Select a chapter') + '...</option>')
-        .append(self.schedule_options(this.hidden)); // xss-lint: disable=javascript-jquery-append
+        .append(self.schedule_options(this.hidden));
                 this.sequential_select.html('').prop('disabled', true);
                 this.vertical_select.html('').prop('disabled', true);
                 $('form#add-unit').show();

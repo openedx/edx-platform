@@ -3,42 +3,21 @@ Test the enterprise support utils.
 """
 
 import json
-import uuid
-from unittest import mock
 
 import ddt
-from django.conf import settings
+import mock
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch
-from edx_toggles.toggles.testutils import override_waffle_flag
 
-from common.djangoapps.student.tests.factories import UserFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCustomerBrandingConfigurationFactory,
-    EnterpriseCustomerFactory,
     EnterpriseCustomerUserFactory
 )
-from openedx.features.enterprise_support.utils import (
-    ENTERPRISE_HEADER_LINKS,
-    clear_data_consent_share_cache,
-    enterprise_fields_only,
-    fetch_enterprise_customer_by_id,
-    get_data_consent_share_cache_key,
-    get_enterprise_learner_generic_name,
-    get_enterprise_learner_portal,
-    get_enterprise_readonly_account_fields,
-    get_enterprise_sidebar_context,
-    get_enterprise_slug_login_url,
-    get_provider_login_url,
-    handle_enterprise_cookies_for_logistration,
-    is_enterprise_learner,
-    update_account_settings_context_for_enterprise,
-    update_logistration_context_for_enterprise,
-    update_third_party_auth_context_for_enterprise
-)
+from openedx.features.enterprise_support.utils import ENTERPRISE_HEADER_LINKS, get_enterprise_learner_portal
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -52,104 +31,7 @@ class TestEnterpriseUtils(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory.create(password='password')
-        super().setUpTestData()
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_cache_key')
-    def test_get_data_consent_share_cache_key(self, mock_get_cache_key):
-        expected_cache_key = mock_get_cache_key.return_value
-
-        assert expected_cache_key == get_data_consent_share_cache_key('some-user-id', 'some-course-id')
-
-        mock_get_cache_key.assert_called_once_with(
-            type='data_sharing_consent_needed',
-            user_id='some-user-id',
-            course_id='some-course-id',
-        )
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_cache_key')
-    @mock.patch('openedx.features.enterprise_support.utils.TieredCache')
-    def test_clear_data_consent_share_cache(self, mock_tiered_cache, mock_get_cache_key):
-        user_id = 'some-user-id'
-        course_id = 'some-course-id'
-
-        clear_data_consent_share_cache(user_id, course_id)
-
-        mock_get_cache_key.assert_called_once_with(
-            type='data_sharing_consent_needed',
-            user_id='some-user-id',
-            course_id='some-course-id',
-        )
-        mock_tiered_cache.delete_all_tiers.assert_called_once_with(mock_get_cache_key.return_value)
-
-    @mock.patch('openedx.features.enterprise_support.utils.update_third_party_auth_context_for_enterprise')
-    def test_update_logistration_context_no_customer_data(self, mock_update_tpa_context):
-        request = mock.Mock()
-        context = {}
-        enterprise_customer = {}
-
-        update_logistration_context_for_enterprise(request, context, enterprise_customer)
-
-        assert context['enable_enterprise_sidebar'] is False
-        mock_update_tpa_context.assert_called_once_with(request, context, enterprise_customer)
-
-    @mock.patch('openedx.features.enterprise_support.utils.update_third_party_auth_context_for_enterprise')
-    @mock.patch('openedx.features.enterprise_support.utils.get_enterprise_sidebar_context', return_value={})
-    def test_update_logistration_context_no_sidebar_context(self, mock_sidebar_context, mock_update_tpa_context):
-        request = mock.Mock(GET={'proxy_login': False})
-        context = {}
-        enterprise_customer = {'key': 'value'}
-
-        update_logistration_context_for_enterprise(request, context, enterprise_customer)
-
-        assert context['enable_enterprise_sidebar'] is False
-        mock_update_tpa_context.assert_called_once_with(request, context, enterprise_customer)
-        mock_sidebar_context.assert_called_once_with(enterprise_customer, False)
-
-    @mock.patch('openedx.features.enterprise_support.utils.update_third_party_auth_context_for_enterprise')
-    @mock.patch('openedx.features.enterprise_support.utils.get_enterprise_sidebar_context')
-    @mock.patch('openedx.features.enterprise_support.utils.enterprise_fields_only')
-    def test_update_logistration_context_with_sidebar_context(
-            self, mock_enterprise_fields_only, mock_sidebar_context, mock_update_tpa_context
-    ):
-        request = mock.Mock(GET={'proxy_login': False})
-        context = {
-            'data': {
-                'registration_form_desc': {
-                    'thing-1': 'one',
-                    'thing-2': 'two',
-                },
-            },
-        }
-        enterprise_customer = {'name': 'pied-piper'}
-        mock_sidebar_context.return_value = {
-            'sidebar-1': 'one',
-            'sidebar-2': 'two',
-        }
-
-        update_logistration_context_for_enterprise(request, context, enterprise_customer)
-
-        assert context['enable_enterprise_sidebar'] is True
-        mock_update_tpa_context.assert_called_once_with(request, context, enterprise_customer)
-        mock_enterprise_fields_only.assert_called_once_with(context['data']['registration_form_desc'])
-        mock_sidebar_context.assert_called_once_with(enterprise_customer, False)
-
-    @ddt.data(
-        {'is_proxy_login': True, 'branding_configuration': {'logo': 'path-to-logo'}},
-        {'is_proxy_login': True, 'branding_configuration': {}},
-        {'is_proxy_login': False, 'branding_configuration': {'nonsense': 'foo'}},
-    )
-    @ddt.unpack
-    def test_get_enterprise_sidebar_context(self, is_proxy_login, branding_configuration):
-        enterprise_customer = {
-            'name': 'pied-piper',
-            'branding_configuration': branding_configuration,
-        }
-        actual_result = get_enterprise_sidebar_context(enterprise_customer, is_proxy_login)
-
-        assert 'pied-piper' == actual_result['enterprise_name']
-        expected_logo_url = branding_configuration.get('logo', '')
-        assert expected_logo_url == actual_result['enterprise_logo_url']
-        assert 'pied-piper' in str(actual_result['enterprise_branded_welcome_string'])
+        super(TestEnterpriseUtils, cls).setUpTestData()
 
     @ddt.data(
         ('notfoundpage', 0),
@@ -165,147 +47,7 @@ class TestEnterpriseUtils(TestCase):
             'openedx.features.enterprise_support.api.enterprise_customer_for_request'
         ) as mock_customer_request:
             self.client.get(resource)
-            assert mock_customer_request.call_count == expected_calls
-
-    @mock.patch('openedx.features.enterprise_support.utils.configuration_helpers.get_value')
-    def test_enterprise_fields_only(self, mock_get_value):
-        mock_get_value.return_value = ['cat', 'dog', 'sheep']
-        fields = {
-            'fields': [
-                {'name': 'cat', 'value': 1},
-                {'name': 'fish', 'value': 2},
-                {'name': 'dog', 'value': 3},
-                {'name': 'emu', 'value': 4},
-                {'name': 'sheep', 'value': 5},
-            ],
-        }
-
-        expected_fields = [
-            {'name': 'fish', 'value': 2},
-            {'name': 'emu', 'value': 4},
-        ]
-        assert expected_fields == enterprise_fields_only(fields)
-
-    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
-    def test_update_third_party_auth_context_for_enterprise(self, mock_tpa):
-        context = {
-            'data': {
-                'third_party_auth': {
-                    'errorMessage': 'Widget error.',
-                },
-            },
-        }
-
-        enterprise_customer = mock.Mock()
-        request = mock.Mock()
-
-        # This will directly modify context
-        update_third_party_auth_context_for_enterprise(request, context, enterprise_customer)
-
-        assert 'We are sorry, you are not authorized' in str(context['data']['third_party_auth']['errorMessage'])
-        assert 'Widget error.' in str(context['data']['third_party_auth']['errorMessage'])
-        assert [] == context['data']['third_party_auth']['providers']
-        assert [] == context['data']['third_party_auth']['secondaryProviders']
-        assert not context['data']['third_party_auth']['autoSubmitRegForm']
-        assert 'Just a couple steps' in str(context['data']['third_party_auth']['autoRegisterWelcomeMessage'])
-        assert 'Continue' == str(context['data']['third_party_auth']['registerFormSubmitButtonText'])
-        mock_tpa.pipeline.get.assert_called_once_with(request)
-
-    @mock.patch('openedx.features.enterprise_support.utils.standard_cookie_settings', return_value={})
-    def test_handle_enterprise_cookies_for_logistration(self, mock_cookie_settings):
-        context = {'enable_enterprise_sidebar': True}
-        request = mock.Mock()
-        response = mock.Mock()
-
-        handle_enterprise_cookies_for_logistration(request, response, context)
-
-        response.set_cookie.assert_called_once_with(
-            'experiments_is_enterprise',
-            'true',
-        )
-        response.delete_cookie.assert_called_once_with(
-            settings.ENTERPRISE_CUSTOMER_COOKIE_NAME,
-            domain=settings.BASE_COOKIE_DOMAIN,
-        )
-        mock_cookie_settings.assert_called_once_with(request)
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_enterprise_readonly_account_fields', return_value=[])
-    def test_update_account_settings_context_for_enterprise(self, mock_get_fields):
-        enterprise_customer = {
-            'name': 'pied-piper',
-            'identity_provider': None,
-        }
-        context = {}
-        user = mock.Mock()
-
-        update_account_settings_context_for_enterprise(context, enterprise_customer, user)
-
-        expected_context = {
-            'enterprise_name': 'pied-piper',
-            'sync_learner_profile_data': False,
-            'edx_support_url': settings.SUPPORT_SITE_LINK,
-            'enterprise_readonly_account_fields': {
-                'fields': mock_get_fields.return_value,
-            },
-        }
-        mock_get_fields.assert_called_once_with(user)
-        assert expected_context == context
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
-    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_get_enterprise_readonly_account_fields_no_sync_learner_profile_data(
-            self, mock_customer_for_request, mock_get_current_request
-    ):
-        mock_get_current_request.return_value = mock.Mock(
-            GET={'enterprise_customer': 'some-uuid'},
-        )
-        mock_customer_for_request.return_value = {
-            'uuid': 'some-uuid',
-            'identity_provider': None,
-        }
-        user = mock.Mock()
-
-        actual_fields = get_enterprise_readonly_account_fields(user)
-        assert set() == actual_fields
-        mock_customer_for_request.assert_called_once_with(mock_get_current_request.return_value)
-        mock_get_current_request.assert_called_once_with()
-
-    @mock.patch('openedx.features.enterprise_support.utils.UserSocialAuth')
-    @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
-    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
-    def test_get_enterprise_readonly_account_fields_with_idp_sync(
-            self, mock_tpa, mock_customer_for_request, mock_get_current_request, mock_user_social_auth
-    ):
-        mock_get_current_request.return_value = mock.Mock(
-            GET={'enterprise_customer': 'some-uuid'},
-        )
-        mock_customer_for_request.return_value = {
-            'uuid': 'some-uuid',
-            'identity_provider': 'mock-idp',
-        }
-        mock_idp = mock.MagicMock(
-            backend_name='mock-backend',
-            sync_learner_profile_data=True,
-        )
-        mock_tpa.provider.Registry.get.return_value = mock_idp
-        user = mock.Mock()
-
-        actual_fields = get_enterprise_readonly_account_fields(user)
-
-        assert set(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS) == actual_fields
-
-        mock_customer_for_request.assert_called_once_with(mock_get_current_request.return_value)
-        mock_get_current_request.assert_called_once_with()
-
-        mock_tpa.provider.Registry.get.assert_called_with(provider_id='mock-idp')
-
-        mock_select_related = mock_user_social_auth.objects.select_related
-        mock_select_related.assert_called_once_with('user')
-        mock_select_related.return_value.filter.assert_called_once_with(
-            provider=mock_idp.backend_name,
-            user=user
-        )
+            self.assertEqual(mock_customer_request.call_count, expected_calls)
 
     @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
     def test_get_enterprise_learner_portal_uncached(self):
@@ -406,100 +148,3 @@ class TestEnterpriseUtils(TestCase):
         }, user=self.user)
         portal = get_enterprise_learner_portal(request)
         self.assertDictEqual(portal, enterprise_customer_data)
-
-    @override_waffle_flag(ENTERPRISE_HEADER_LINKS, True)
-    def test_get_enterprise_learner_portal_no_enterprise_user(self):
-        request = mock.MagicMock(session={}, user=self.user)
-        # Indicate the "preferred" customer in the request
-        request.GET = {'enterprise_customer': uuid.uuid4()}
-
-        portal = get_enterprise_learner_portal(request)
-        assert portal is None
-
-    def test_get_enterprise_learner_generic_name_404_pages(self):
-        request = mock.Mock(view_name='404')
-        assert get_enterprise_learner_generic_name(request) is None
-
-    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_get_enterprise_learner_generic_name_with_replacement(self, mock_customer_for_request):
-        request = mock.Mock()
-        mock_customer_for_request.return_value = {
-            'name': 'Test Corp',
-            'replace_sensitive_sso_username': True,
-        }
-        generic_name = get_enterprise_learner_generic_name(request)
-        assert 'Test CorpLearner' == generic_name
-
-    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
-    def test_get_enterprise_learner_generic_name_no_replacement(self, mock_customer_for_request):
-        request = mock.Mock()
-        mock_customer_for_request.return_value = {
-            'name': 'Test Corp',
-            'replace_sensitive_sso_username': False,
-        }
-        generic_name = get_enterprise_learner_generic_name(request)
-        assert '' == generic_name
-
-    def test_is_enterprise_learner(self):
-        with mock.patch(
-            'django.core.cache.cache.set'
-        ) as mock_cache_set:
-            EnterpriseCustomerUserFactory.create(active=True, user_id=self.user.id)
-            assert is_enterprise_learner(self.user)
-
-        assert mock_cache_set.called
-
-    def test_is_enterprise_learner_no_enterprise_user(self):
-        with mock.patch(
-            'django.core.cache.cache.set'
-        ) as mock_cache_set:
-            assert not is_enterprise_learner(self.user)
-
-        assert not mock_cache_set.called
-
-    @mock.patch('openedx.features.enterprise_support.utils.reverse')
-    def test_get_enterprise_slug_login_url_no_reverse_match(self, mock_reverse):
-        mock_reverse.side_effect = NoReverseMatch
-        assert get_enterprise_slug_login_url() is None
-        mock_reverse.assert_called_once_with('enterprise_slug_login')
-
-    @mock.patch('openedx.features.enterprise_support.utils.reverse')
-    def test_get_enterprise_slug_login_url_with_match(self, mock_reverse):
-        assert get_enterprise_slug_login_url() is not None
-        mock_reverse.assert_called_once_with('enterprise_slug_login')
-
-    def test_fetch_enterprise_customer_by_id(self):
-        the_uuid = uuid.uuid4()
-        customer = EnterpriseCustomerFactory.create(uuid=the_uuid)
-        assert customer == fetch_enterprise_customer_by_id(the_uuid)
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_next_url_for_login_page')
-    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
-    def test_get_provider_login_url_no_redirect_url(self, mock_tpa, mock_next_login_url):
-        request = mock.Mock()
-        provider_id = 'anything'
-
-        login_url = get_provider_login_url(request, provider_id)
-        assert mock_tpa.pipeline.get_login_url.return_value == login_url
-        mock_tpa.pipeline.get_login_url.assert_called_once_with(
-            provider_id,
-            mock_tpa.pipeline.AUTH_ENTRY_LOGIN,
-            redirect_url=mock_next_login_url.return_value,
-        )
-        mock_next_login_url.assert_called_once_with(request)
-
-    @mock.patch('openedx.features.enterprise_support.utils.get_next_url_for_login_page')
-    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
-    def test_get_provider_login_url_with_redirect_url(self, mock_tpa, mock_next_login_url):
-        request = mock.Mock()
-        provider_id = 'anything'
-        redirect_url = 'the-next-url'
-
-        login_url = get_provider_login_url(request, provider_id, redirect_url=redirect_url)
-        assert mock_tpa.pipeline.get_login_url.return_value == login_url
-        mock_tpa.pipeline.get_login_url.assert_called_once_with(
-            provider_id,
-            mock_tpa.pipeline.AUTH_ENTRY_LOGIN,
-            redirect_url=redirect_url,
-        )
-        assert not mock_next_login_url.called

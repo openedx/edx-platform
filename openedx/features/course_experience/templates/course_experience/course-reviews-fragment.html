@@ -1,0 +1,40 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_page_title
+%>
+
+
+<div class="course-reviews page-content-container" tabindex="-1">
+    <header class="page-header has-secondary">
+        ## Breadcrumb navigation
+        <div class="page-header-main">
+            <nav aria-label="${_('Reviews')}" class="sr-is-focusable" tabindex="-1">
+                <div class="has-breadcrumbs">
+                    <div class="breadcrumbs">
+                        <span class="nav-item">
+                            <a href="${course_url}">${course_home_page_title(course)}</a>
+                        </span>
+                        <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                        <span class="nav-item">${_('Reviews')}</span>
+                    </div>
+                </div>
+            </nav>
+            % if is_enrolled:
+                <div class="btn btn-secondary toggle-read-write-reviews"></div>
+            % endif
+        </div>
+    </header>
+    <div class="course-reviews-tool">
+        % if course_reviews_fragment:
+            ${HTML(course_reviews_fragment.body_html())}
+        % endif
+    </div>
+</div>

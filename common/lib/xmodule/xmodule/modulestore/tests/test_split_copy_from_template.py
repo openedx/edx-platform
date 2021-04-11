@@ -6,7 +6,7 @@ However for these tests, we make sure it also works when copying from course to 
 
 
 import ddt
-import pytest
+from six.moves import range
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -49,20 +49,20 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         # Inherit the vertical and the problem from the library into the course:
         source_keys = [source_container.children[0]]
         new_blocks = self.store.copy_from_template(source_keys, dest_key=course.location, user_id=self.user_id)
-        assert len(new_blocks) == 1
+        self.assertEqual(len(new_blocks), 1)
 
         course = self.store.get_course(course.location.course_key)  # Reload from modulestore
 
-        assert len(course.children) == 1
+        self.assertEqual(len(course.children), 1)
         vertical_block_course = self.store.get_item(course.children[0])
-        assert new_blocks[0] == vertical_block_course.location
+        self.assertEqual(new_blocks[0], vertical_block_course.location)
         problem_block_course = self.store.get_item(vertical_block_course.children[0])
-        assert problem_block_course.display_name == problem_library_display_name
+        self.assertEqual(problem_block_course.display_name, problem_library_display_name)
 
         # Check that when capa modules are copied, their "markdown" fields (Scope.settings) are removed.
         # (See note in split.py:copy_from_template())
-        assert problem_block.markdown is not None
-        assert problem_block_course.markdown is None
+        self.assertIsNotNone(problem_block.markdown)
+        self.assertIsNone(problem_block_course.markdown)
 
         # Override the display_name and weight:
         new_display_name = "The Trouble with Tribbles"
@@ -77,16 +77,16 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
 
         # Repeat the copy_from_template():
         new_blocks2 = self.store.copy_from_template(source_keys, dest_key=course.location, user_id=self.user_id)
-        assert new_blocks == new_blocks2
+        self.assertEqual(new_blocks, new_blocks2)
         # Reload problem_block_course:
         problem_block_course = self.store.get_item(problem_block_course.location)
-        assert problem_block_course.display_name == new_display_name
-        assert problem_block_course.weight == new_weight
+        self.assertEqual(problem_block_course.display_name, new_display_name)
+        self.assertEqual(problem_block_course.weight, new_weight)
 
         # Ensure that extra_block was deleted:
         vertical_block_course = self.store.get_item(new_blocks2[0])
-        assert len(vertical_block_course.children) == 1
-        with pytest.raises(ItemNotFoundError):
+        self.assertEqual(len(vertical_block_course.children), 1)
+        with self.assertRaises(ItemNotFoundError):
             self.store.get_item(extra_block.location)
 
     def test_copy_from_template_publish(self):
@@ -119,7 +119,7 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
             problem_published = self.store.get_item(
                 problem_key_in_course.for_branch(ModuleStoreEnum.BranchName.published)
             )
-            assert problem_published.display_name == display_name_expected
+            self.assertEqual(problem_published.display_name, display_name_expected)
 
     def test_copy_from_template_auto_publish(self):
         """
@@ -146,7 +146,7 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         # Inherit the vertical and the problem from the library into the course:
         source_keys = [block.location for block in [about, chapter, html]]
         block_keys = self.store.copy_from_template(source_keys, dest_key=course.location, user_id=self.user_id)
-        assert len(block_keys) == len(source_keys)
+        self.assertEqual(len(block_keys), len(source_keys))
 
         # Build dict of the new blocks in 'course', keyed by category (which is a unique key in our case)
         new_blocks = {}
@@ -167,15 +167,14 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
                 return False
 
         # Check that the auto-publish blocks have been published:
-        assert not self.store.has_changes(new_blocks['about'])
+        self.assertFalse(self.store.has_changes(new_blocks["about"]))
         # We can't use has_changes because it includes descendants
-        assert published_version_exists(new_blocks['chapter'])
-        assert published_version_exists(new_blocks['sequential'])
-        # Ditto
+        self.assertTrue(published_version_exists(new_blocks["chapter"]))
+        self.assertTrue(published_version_exists(new_blocks["sequential"]))  # Ditto
         # Check that non-auto-publish blocks and blocks with non-auto-publish descendants show changes:
-        assert self.store.has_changes(new_blocks['html'])
-        assert self.store.has_changes(new_blocks['problem'])
+        self.assertTrue(self.store.has_changes(new_blocks["html"]))
+        self.assertTrue(self.store.has_changes(new_blocks["problem"]))
         # Will have changes since a child block has changes.
-        assert self.store.has_changes(new_blocks['chapter'])
+        self.assertTrue(self.store.has_changes(new_blocks["chapter"]))
         # Verify that our published_version_exists works
-        assert not published_version_exists(new_blocks['vertical'])
+        self.assertFalse(published_version_exists(new_blocks["vertical"]))

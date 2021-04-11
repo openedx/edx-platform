@@ -3,7 +3,7 @@ Unit tests for the Course Blocks tasks
 """
 
 
-from unittest.mock import patch
+from mock import patch
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -22,4 +22,4 @@ class UpdateCourseInCacheTaskTest(ModuleStoreTestCase):
         """
         mock_update.side_effect = Exception("WHAMMY")
         update_course_in_cache_v2.apply(kwargs=dict(course_id="invalid_course_key raises exception 12345 meow"))
-        assert mock_retry.called
+        self.assertTrue(mock_retry.called)

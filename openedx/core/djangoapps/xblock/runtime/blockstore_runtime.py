@@ -47,7 +47,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         try:
             block_type = self.id_reader.get_block_type(def_id)
         except NoSuchDefinition:
-            raise NoSuchUsage(repr(usage_id))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise NoSuchUsage(repr(usage_id))
         keys = ScopeIds(self.user_id, block_type, def_id, usage_id)
 
         if self.system.authored_data_store.has_cached_definition(def_id):
@@ -192,7 +192,7 @@ def xml_for_definition(definition_key):
             draft_name=definition_key.draft_name,
         )
     except blockstore_api.BundleFileNotFound:
-        raise NoSuchDefinition("OLX file {} not found in bundle {}.".format(  # lint-amnesty, pylint: disable=raise-missing-from
+        raise NoSuchDefinition("OLX file {} not found in bundle {}.".format(
             definition_key.olx_path, definition_key.bundle_uuid,
         ))
     node = etree.fromstring(xml_str)

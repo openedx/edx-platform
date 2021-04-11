@@ -4,11 +4,12 @@
 import itertools
 import json
 from datetime import datetime, timedelta
-from unittest import mock
 from uuid import uuid4
 
 import ddt
+import mock
 import pytz
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -16,11 +17,11 @@ from django.urls import reverse, reverse_lazy
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.enrollments.api import get_enrollment
 from openedx.core.lib.django_test_client_utils import get_absolute_url
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -52,7 +53,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         :return: Response
         """
         payload = {
-            "course_id": str(course_id or self.course.id)
+            "course_id": six.text_type(course_id or self.course.id)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
@@ -65,10 +66,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
     def assertResponseMessage(self, response, expected_msg):
         """ Asserts the detail field in the response's JSON body equals the expected message. """
         actual = json.loads(response.content.decode('utf-8'))['detail']
-        assert actual == expected_msg
+        self.assertEqual(actual, expected_msg)
 
     def setUp(self):
-        super().setUp()
+        super(BasketsViewTests, self).setUp()
         self.url = reverse('commerce_api:v0:baskets:create')
         self._login()
 
@@ -77,13 +78,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # TODO Verify this is the best method to create CourseMode objects.
         # TODO Find/create constants for the modes.
         for mode in [CourseMode.HONOR, CourseMode.VERIFIED, CourseMode.AUDIT]:
-            sku_string = str(uuid4().hex)
+            sku_string = six.text_type(uuid4().hex)
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode,
                 mode_display_name=mode,
                 sku=sku_string,
-                bulk_sku=f'BULK-{sku_string}'
+                bulk_sku='BULK-{}'.format(sku_string)
             )
 
         # Ignore events fired from UserFactory creation
@@ -96,16 +97,16 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         with restrict_course(self.course.id) as redirect_url:
             response = self._post_to_view()
-            assert 403 == response.status_code
+            self.assertEqual(403, response.status_code)
             body = json.loads(response.content.decode('utf-8'))
-            assert get_absolute_url(redirect_url) == body['user_message_url']
+            self.assertEqual(get_absolute_url(redirect_url), body['user_message_url'])
 
     def test_login_required(self):
         """
         The view should return HTTP 401 status if the user is not logged in.
         """
         self.client.logout()
-        assert 401 == self._post_to_view().status_code
+        self.assertEqual(401, self._post_to_view().status_code)
 
     @ddt.data('delete', 'get', 'put')
     def test_post_required(self, method):
@@ -113,21 +114,21 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         Verify that the view only responds to POST operations.
         """
         response = getattr(self.client, method)(self.url)
-        assert 405 == response.status_code
+        self.assertEqual(405, response.status_code)
 
     def test_invalid_course(self):
         """
         If the course does not exist, the view should return HTTP 406.
         """
         # TODO Test inactive courses, and those not open for enrollment.
-        assert 406 == self._post_to_view('aaa/bbb/ccc').status_code
+        self.assertEqual(406, self._post_to_view('aaa/bbb/ccc').status_code)
 
     def test_invalid_request_data(self):
         """
         If invalid data is supplied with the request, the view should return HTTP 406.
         """
-        assert 406 == self.client.post(self.url, {}).status_code
-        assert 406 == self.client.post(self.url, {'not_course_id': ''}).status_code
+        self.assertEqual(406, self.client.post(self.url, {}).status_code)
+        self.assertEqual(406, self.client.post(self.url, {'not_course_id': ''}).status_code)
 
     @ddt.data(True, False)
     def test_course_for_active_and_inactive_user(self, user_is_active):
@@ -140,7 +141,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         response = self._post_to_view()
 
         # Validate the response content
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         msg = Messages.ENROLL_DIRECTLY.format(
             course_id=self.course.id,
             username=self.user.username
@@ -154,7 +155,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         response = self._post_to_view()
 
         # Validate the response content
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         msg = Messages.NO_SKU_ENROLLED.format(
             enrollment_mode=enrollment_mode,
             course_id=self.course.id,
@@ -199,13 +200,13 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         CourseMode.objects.filter(course_id=self.course.id).delete()
         mode = CourseMode.NO_ID_PROFESSIONAL_MODE
-        sku_string = str(uuid4().hex)
+        sku_string = six.text_type(uuid4().hex)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=mode, mode_display_name=mode,
-                                 sku=sku_string, bulk_sku=f'BULK-{sku_string}')
+                                 sku=sku_string, bulk_sku='BULK-{}'.format(sku_string))
         response = self._post_to_view()
 
         # The view should return an error status code
-        assert response.status_code == 406
+        self.assertEqual(response.status_code, 406)
         msg = Messages.NO_DEFAULT_ENROLLMENT_MODE.format(course_id=self.course.id)
         self.assertResponseMessage(response, msg)
 
@@ -235,10 +236,10 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
 
         # Enroll user in the course
         CourseEnrollment.enroll(self.user, self.course.id)
-        assert CourseEnrollment.is_enrolled(self.user, self.course.id)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
         response = self._post_to_view()
-        assert response.status_code == 409
+        self.assertEqual(response.status_code, 409)
         msg = Messages.ENROLLMENT_EXISTS.format(username=self.user.username, course_id=self.course.id)
         self.assertResponseMessage(response, msg)
 
@@ -250,8 +251,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         # Create an inactive enrollment
         CourseEnrollment.enroll(self.user, self.course.id)
         CourseEnrollment.unenroll(self.user, self.course.id, True)
-        assert not CourseEnrollment.is_enrolled(self.user, self.course.id)
-        assert get_enrollment(self.user.username, str(self.course.id)) is not None
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertIsNotNone(get_enrollment(self.user.username, six.text_type(self.course.id)))
 
     @mock.patch('lms.djangoapps.commerce.api.v0.views.update_email_opt_in')
     @ddt.data(*itertools.product((False, True), (False, True), (False, True)))
@@ -270,8 +271,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             mock_update.side_effect = Exception("boink")
 
         response = self._post_to_view(marketing_email_opt_in=is_opt_in)
-        assert mock_update.called == is_opt_in
-        assert response.status_code == 200
+        self.assertEqual(mock_update.called, is_opt_in)
+        self.assertEqual(response.status_code, 200)
 
     def test_closed_course(self):
         """
@@ -279,7 +280,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
         modulestore().update_item(self.course, self.user.id)
-        assert self._post_to_view().status_code == 406
+        self.assertEqual(self._post_to_view().status_code, 406)
 
 
 class BasketOrderViewTests(UserMixin, TestCase):
@@ -289,7 +290,7 @@ class BasketOrderViewTests(UserMixin, TestCase):
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
 
     def setUp(self):
-        super().setUp()
+        super(BasketOrderViewTests, self).setUp()
         self._login()
 
     def test_order_found(self):
@@ -298,18 +299,18 @@ class BasketOrderViewTests(UserMixin, TestCase):
         with mock_basket_order(basket_id=1, response=self.MOCK_ORDER):
             response = self.client.get(self.path)
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         actual = json.loads(response.content.decode('utf-8'))
-        assert actual == self.MOCK_ORDER
+        self.assertEqual(actual, self.MOCK_ORDER)
 
     def test_order_not_found(self):
         """ If the order is not found, the view should return a 404. """
         with mock_basket_order(basket_id=1, status=404):
             response = self.client.get(self.path)
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
     def test_login_required(self):
         """ The view should return 403 if the user is not logged in. """
         self.client.logout()
         response = self.client.get(self.path)
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)

@@ -75,7 +75,7 @@ class TypedFileUploadParser(FileUploadParser):
                     u'Filename: "{filename}", Content-type: "{contenttype}"'
                 )
                 raise ParseError(errmsg.format(filename=filename, contenttype=media_type))
-        return super(TypedFileUploadParser, self).parse(stream, media_type, parser_context)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super(TypedFileUploadParser, self).parse(stream, media_type, parser_context)
 
 
 class MergePatchParser(JSONParser):

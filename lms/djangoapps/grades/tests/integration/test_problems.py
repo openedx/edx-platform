@@ -1,17 +1,17 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 import itertools
 
 import ddt
 import pytz
 from crum import set_current_request
+from six.moves import range
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.djangolib.testing.utils import get_mock_request
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
-from openedx.core.djangolib.testing.utils import get_mock_request
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -34,14 +34,14 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestMultipleProblemTypesSubsectionScores, cls).setUpClass()
         cls.load_scoreable_course()
         chapter1 = cls.course.get_children()[0]
         cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
-        super().setUp()
-        password = 'test'
+        super(TestMultipleProblemTypesSubsectionScores, self).setUp()
+        password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
         self.addCleanup(set_current_request, None)
@@ -78,8 +78,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         )
         score = subsection_factory.create(self.seq1)
 
-        assert score.all_total.earned == 0.0
-        assert score.all_total.possible == self.ACTUAL_TOTAL_POSSIBLE
+        self.assertEqual(score.all_total.earned, 0.0)
+        self.assertEqual(score.all_total.possible, self.ACTUAL_TOTAL_POSSIBLE)
 
         # Choose arbitrary, non-default values for earned and possible.
         earned_per_block = 3.0
@@ -92,8 +92,8 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
                 itertools.repeat(mock_score.return_value)
             )
             score = subsection_factory.update(self.seq1)
-        assert score.all_total.earned == (earned_per_block * block_count)
-        assert score.all_total.possible == (possible_per_block * block_count)
+        self.assertEqual(score.all_total.earned, earned_per_block * block_count)
+        self.assertEqual(score.all_total.possible, possible_per_block * block_count)
 
 
 @ddt.ddt
@@ -103,13 +103,13 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
     persisted score.
     """
     default_problem_metadata = {
-        'graded': True,
-        'weight': 2.5,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        u'graded': True,
+        u'weight': 2.5,
+        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
     }
 
     def setUp(self):
-        super().setUp()
+        super(TestVariedMetadata, self).setUp()
         self.course = CourseFactory.create()
         with self.store.bulk_operations(self.course.id):
             self.chapter = ItemFactory.create(
@@ -128,7 +128,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
                 category='vertical',
                 display_name='Test Vertical 1'
             )
-        self.problem_xml = '''
+        self.problem_xml = u'''
             <problem url_name="capa-optionresponse">
               <optionresponse>
                 <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
@@ -170,7 +170,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         two) is submitted.
         """
 
-        self.submit_question_answer('problem', {'2_1': 'Correct'})
+        self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
         course_structure = get_course_blocks(self.request.user, self.course.location)
         subsection_factory = SubsectionGradeFactory(
             self.request.user,
@@ -181,28 +181,28 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
 
     @ddt.data(
         ({}, 1.25, 2.5),
-        ({'weight': 27}, 13.5, 27),
-        ({'weight': 1.0}, 0.5, 1.0),
-        ({'weight': 0.0}, 0.0, 0.0),
-        ({'weight': None}, 1.0, 2.0),
+        ({u'weight': 27}, 13.5, 27),
+        ({u'weight': 1.0}, 0.5, 1.0),
+        ({u'weight': 0.0}, 0.0, 0.0),
+        ({u'weight': None}, 1.0, 2.0),
     )
     @ddt.unpack
     def test_weight_metadata_alterations(self, alterations, expected_earned, expected_possible):
         self._add_problem_with_alterations(alterations)
         score = self._get_score()
-        assert score.all_total.earned == expected_earned
-        assert score.all_total.possible == expected_possible
+        self.assertEqual(score.all_total.earned, expected_earned)
+        self.assertEqual(score.all_total.possible, expected_possible)
 
     @ddt.data(
-        ({'graded': True}, 1.25, 2.5),
-        ({'graded': False}, 0.0, 0.0),
+        ({u'graded': True}, 1.25, 2.5),
+        ({u'graded': False}, 0.0, 0.0),
     )
     @ddt.unpack
     def test_graded_metadata_alterations(self, alterations, expected_earned, expected_possible):
         self._add_problem_with_alterations(alterations)
         score = self._get_score()
-        assert score.graded_total.earned == expected_earned
-        assert score.graded_total.possible == expected_possible
+        self.assertEqual(score.graded_total.earned, expected_earned)
+        self.assertEqual(score.graded_total.possible, expected_possible)
 
 
 @ddt.ddt
@@ -213,7 +213,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestWeightedProblems, cls).setUpClass()
         cls.course = CourseFactory.create()
         with cls.store.bulk_operations(cls.course.id):
             cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
@@ -226,13 +226,13 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
                     ItemFactory.create(
                         parent=cls.vertical,
                         category="problem",
-                        display_name=f"problem_{i}",
+                        display_name="problem_{}".format(i),
                         data=problem_xml,
                     )
                 )
 
     def setUp(self):
-        super().setUp()
+        super(TestWeightedProblems, self).setUp()
         self.user = UserFactory()
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.user)
@@ -272,13 +272,13 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         # verify all problem grades
         for problem in self.problems:
             problem_score = subsection_grade.problem_scores[problem.location]
-            assert isinstance(expected_score.first_attempted, type(problem_score.first_attempted))
+            self.assertEqual(type(expected_score.first_attempted), type(problem_score.first_attempted))
             expected_score.first_attempted = problem_score.first_attempted
-            assert problem_score == expected_score
+            self.assertEqual(problem_score, expected_score)
 
         # verify subsection grades
-        assert subsection_grade.all_total.earned == (expected_score.earned * len(self.problems))
-        assert subsection_grade.all_total.possible == (expected_score.possible * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.earned, expected_score.earned * len(self.problems))
+        self.assertEqual(subsection_grade.all_total.possible, expected_score.possible * len(self.problems))
 
     @ddt.data(
         *itertools.product(

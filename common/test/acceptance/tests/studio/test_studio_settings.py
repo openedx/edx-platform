@@ -1,10 +1,11 @@
+# coding: utf-8
 """
 Acceptance tests for Studio's Setting pages
 """
 
 
 import os
-from unittest.mock import patch
+from mock import patch
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
@@ -21,7 +22,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
     """
 
     def setUp(self):  # pylint: disable=arguments-differ
-        super().setUp()
+        super(StudioSettingsA11yTest, self).setUp()
         self.settings_page = SettingsPage(self.browser, self.course_info['org'], self.course_info['number'],
                                           self.course_info['run'])
 
@@ -66,7 +67,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
             browser = 'firefox'
 
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
-            super().setUp(is_staff=True)
+            super(StudioSubsectionSettingsA11yTest, self).setUp(is_staff=True)
 
         self.course_outline = CourseOutlinePage(
             self.browser,

@@ -54,7 +54,7 @@ class UserMessage():
     """
     Representation of a message to be shown to a user.
     """
-    def __init__(self, type, message_html):  # lint-amnesty, pylint: disable=redefined-builtin
+    def __init__(self, type, message_html):
         assert isinstance(type, UserMessageType)
         self.type = type
         self.message_html = message_html
@@ -80,7 +80,7 @@ class UserMessageCollection():
     """
     @classmethod
     @abstractmethod
-    def get_namespace(self):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def get_namespace(self):
         """
         Returns the namespace of the message collection.
 
@@ -125,35 +125,35 @@ class UserMessageCollection():
             messages.add_message(request, message_type.value, Text(message), extra_tags=cls.get_namespace())
 
     @classmethod
-    def register_info_message(self, request, message, **kwargs):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def register_info_message(self, request, message, **kwargs):
         """
         Registers an information message to be shown to the user.
         """
         self.register_user_message(request, UserMessageType.INFO, message, **kwargs)
 
     @classmethod
-    def register_success_message(self, request, message, **kwargs):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def register_success_message(self, request, message, **kwargs):
         """
         Registers a success message to be shown to the user.
         """
         self.register_user_message(request, UserMessageType.SUCCESS, message, **kwargs)
 
     @classmethod
-    def register_warning_message(self, request, message, **kwargs):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def register_warning_message(self, request, message, **kwargs):
         """
         Registers a warning message to be shown to the user.
         """
         self.register_user_message(request, UserMessageType.WARNING, message, **kwargs)
 
     @classmethod
-    def register_error_message(self, request, message, **kwargs):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def register_error_message(self, request, message, **kwargs):
         """
         Registers an error message to be shown to the user.
         """
         self.register_user_message(request, UserMessageType.ERROR, message, **kwargs)
 
     @classmethod
-    def user_messages(self, request):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def user_messages(self, request):
         """
         Returns any outstanding user messages.
 
@@ -164,7 +164,7 @@ class UserMessageCollection():
             """
             Returns the user message type associated with a level.
             """
-            for __, type in UserMessageType.__members__.items():  # lint-amnesty, pylint: disable=redefined-builtin, no-member
+            for __, type in UserMessageType.__members__.items():
                 if type.value is level:
                     return type
             raise Exception(u'Unable to find UserMessageType for level {level}'.format(level=level))
@@ -222,7 +222,7 @@ class PageLevelMessages(UserMessageCollection):
         )
 
     @classmethod
-    def get_namespace(self):  # lint-amnesty, pylint: disable=bad-classmethod-argument
+    def get_namespace(self):
         """
         Returns the namespace of the message collection.
         """

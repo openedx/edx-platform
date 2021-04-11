@@ -4,17 +4,14 @@ Unit tests for bulk-email-related models.
 
 
 import datetime
-from unittest.mock import Mock, patch
 
-import pytest
 import ddt
 from django.core.management import call_command
 from django.test import TestCase
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import (
     SEND_TO_COHORT,
@@ -24,15 +21,17 @@ from lms.djangoapps.bulk_email.models import (
     CourseAuthorization,
     CourseEmail,
     CourseEmailTemplate,
-    Optout
+    Optout,
 )
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.course_groups.models import CourseCohort
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class CourseEmailTest(ModuleStoreTestCase):
     """Test the CourseEmail model."""
 
@@ -43,11 +42,11 @@ class CourseEmailTest(ModuleStoreTestCase):
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
         email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
-        assert email.course_id == course_id
-        assert SEND_TO_STAFF in [target.target_type for target in email.targets.all()]
-        assert email.subject == subject
-        assert email.html_message == html_message
-        assert email.sender == sender
+        self.assertEqual(email.course_id, course_id)
+        self.assertIn(SEND_TO_STAFF, [target.target_type for target in email.targets.all()])
+        self.assertEqual(email.subject, subject)
+        self.assertEqual(email.html_message, html_message)
+        self.assertEqual(email.sender, sender)
 
     def test_creation_with_optional_attributes(self):
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -60,13 +59,13 @@ class CourseEmailTest(ModuleStoreTestCase):
         email = CourseEmail.create(
             course_id, sender, [to_option], subject, html_message, template_name=template_name, from_addr=from_addr
         )
-        assert email.course_id == course_id
-        assert email.targets.all()[0].target_type == SEND_TO_STAFF
-        assert email.subject == subject
-        assert email.html_message == html_message
-        assert email.sender == sender
-        assert email.template_name == template_name
-        assert email.from_addr == from_addr
+        self.assertEqual(email.course_id, course_id)
+        self.assertEqual(email.targets.all()[0].target_type, SEND_TO_STAFF)
+        self.assertEqual(email.subject, subject)
+        self.assertEqual(email.html_message, html_message)
+        self.assertEqual(email.sender, sender)
+        self.assertEqual(email.template_name, template_name)
+        self.assertEqual(email.from_addr, from_addr)
 
     def test_bad_to_option(self):
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -74,7 +73,7 @@ class CourseEmailTest(ModuleStoreTestCase):
         to_option = "fake"
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
     @ddt.data(
@@ -99,11 +98,11 @@ class CourseEmailTest(ModuleStoreTestCase):
             expiration_datetime=expiration_datetime,
         )
         email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
-        assert len(email.targets.all()) == 1
+        self.assertEqual(len(email.targets.all()), 1)
         target = email.targets.all()[0]
-        assert target.target_type == SEND_TO_TRACK
-        assert target.short_display() == 'track-test'
-        assert target.long_display() == 'Course mode: Test, Currency: usd'
+        self.assertEqual(target.target_type, SEND_TO_TRACK)
+        self.assertEqual(target.short_display(), 'track-test')
+        self.assertEqual(target.long_display(), 'Course mode: Test, Currency: usd')
 
     @ddt.data(
         CourseMode.AUDIT,
@@ -118,7 +117,7 @@ class CourseEmailTest(ModuleStoreTestCase):
         mode_display_name = free_mode.capitalize
         course_id = course.id
         sender = UserFactory.create()
-        to_option = f'track:{free_mode}'
+        to_option = 'track:{}'.format(free_mode)
         subject = "dummy subject"
         html_message = "<html>dummy message</html>"
         CourseMode.objects.create(
@@ -128,11 +127,11 @@ class CourseEmailTest(ModuleStoreTestCase):
         )
 
         email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
-        assert len(email.targets.all()) == 1
+        self.assertEqual(len(email.targets.all()), 1)
         target = email.targets.all()[0]
-        assert target.target_type == SEND_TO_TRACK
-        assert target.short_display() == f'track-{free_mode}'
-        assert target.long_display() == f'Course mode: {mode_display_name}'
+        self.assertEqual(target.target_type, SEND_TO_TRACK)
+        self.assertEqual(target.short_display(), 'track-{}'.format(free_mode))
+        self.assertEqual(target.long_display(), u'Course mode: {}'.format(mode_display_name))
 
     def test_cohort_target(self):
         course_id = CourseKey.from_string('abc/123/doremi')
@@ -142,33 +141,33 @@ class CourseEmailTest(ModuleStoreTestCase):
         html_message = "<html>dummy message</html>"
         CourseCohort.create(cohort_name='test cohort', course_id=course_id)
         email = CourseEmail.create(course_id, sender, [to_option], subject, html_message)
-        assert len(email.targets.all()) == 1
+        self.assertEqual(len(email.targets.all()), 1)
         target = email.targets.all()[0]
-        assert target.target_type == SEND_TO_COHORT
-        assert target.short_display() == 'cohort-test cohort'
-        assert target.long_display() == 'Cohort: test cohort'
+        self.assertEqual(target.target_type, SEND_TO_COHORT)
+        self.assertEqual(target.short_display(), 'cohort-test cohort')
+        self.assertEqual(target.long_display(), 'Cohort: test cohort')
 
 
-class OptoutTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class OptoutTest(TestCase):
     def test_is_user_opted_out_for_course(self):
         user = UserFactory.create()
         course_id = CourseKey.from_string('abc/123/doremi')
 
-        assert not Optout.is_user_opted_out_for_course(user, course_id)
+        self.assertFalse(Optout.is_user_opted_out_for_course(user, course_id))
 
         Optout.objects.create(
             user=user,
             course_id=course_id,
         )
 
-        assert Optout.is_user_opted_out_for_course(user, course_id)
+        self.assertTrue(Optout.is_user_opted_out_for_course(user, course_id))
 
 
 class NoCourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model without loading the template data."""
 
     def test_get_missing_template(self):
-        with pytest.raises(CourseEmailTemplate.DoesNotExist):
+        with self.assertRaises(CourseEmailTemplate.DoesNotExist):
             CourseEmailTemplate.get_template()
 
 
@@ -176,7 +175,7 @@ class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
     def setUp(self):
-        super().setUp()
+        super(CourseEmailTemplateTest, self).setUp()
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
@@ -211,16 +210,16 @@ class CourseEmailTemplateTest(TestCase):
     def test_get_template(self):
         # Get the default template, which has name=None
         template = CourseEmailTemplate.get_template()
-        assert template.html_template is not None
-        assert template.plain_template is not None
+        self.assertIsNotNone(template.html_template)
+        self.assertIsNotNone(template.plain_template)
 
     def test_get_branded_template(self):
         # Get a branded (non default) template and make sure we get what we expect
         template = CourseEmailTemplate.get_template(name="branded.template")
-        assert template.html_template is not None
-        assert template.plain_template is not None
-        assert 'THIS IS A BRANDED HTML TEMPLATE' in template.html_template
-        assert 'THIS IS A BRANDED TEXT TEMPLATE' in template.plain_template
+        self.assertIsNotNone(template.html_template)
+        self.assertIsNotNone(template.plain_template)
+        self.assertIn(u"THIS IS A BRANDED HTML TEMPLATE", template.html_template)
+        self.assertIn(u"THIS IS A BRANDED TEXT TEMPLATE", template.plain_template)
 
     def test_render_html_without_context(self):
         template = CourseEmailTemplate.get_template()
@@ -228,7 +227,7 @@ class CourseEmailTemplateTest(TestCase):
         for keyname in base_context:
             context = dict(base_context)
             del context[keyname]
-            with pytest.raises(KeyError):
+            with self.assertRaises(KeyError):
                 template.render_htmltext("My new html text.", context)
 
     def test_render_plaintext_without_context(self):
@@ -237,7 +236,7 @@ class CourseEmailTemplateTest(TestCase):
         for keyname in base_context:
             context = dict(base_context)
             del context[keyname]
-            with pytest.raises(KeyError):
+            with self.assertRaises(KeyError):
                 template.render_plaintext("My new plain text.", context)
 
     def test_render_html(self):
@@ -249,11 +248,11 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_html_context())
         message = template.render_htmltext(
-            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
-        assert '<script>' not in message
-        assert '&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;' in message
-        assert '&lt;script&gt;alert(&#39;Profile Name!&#39;);&lt;/alert&gt;' in message
+        self.assertNotIn("<script>", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Course Title!&#39;);&lt;/alert&gt;", message)
+        self.assertIn("&lt;script&gt;alert(&#39;Profile Name!&#39;);&lt;/alert&gt;", message)
 
     def test_render_plain(self):
         template = CourseEmailTemplate.get_template()
@@ -264,49 +263,55 @@ class CourseEmailTemplateTest(TestCase):
         template = CourseEmailTemplate.get_template()
         context = self._add_xss_fields(self._get_sample_plain_context())
         message = template.render_plaintext(
-            "Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
+            u"Dear %%USER_FULLNAME%%, thanks for enrolling in %%COURSE_DISPLAY_NAME%%.", context
         )
-        assert '&lt;script&gt;' not in message
-        assert context['course_title'] in message
-        assert context['name'] in message
+        self.assertNotIn("&lt;script&gt;", message)
+        self.assertIn(context['course_title'], message)
+        self.assertIn(context['name'], message)
 
 
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 
     def tearDown(self):
-        super().tearDown()
+        super(CourseAuthorizationTest, self).tearDown()
         BulkEmailFlag.objects.all().delete()
 
     def test_creation_auth_on(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=True)
         course_id = CourseKey.from_string('abc/123/doremi')
         # Test that course is not authorized by default
-        assert not is_bulk_email_feature_enabled(course_id)
+        self.assertFalse(is_bulk_email_feature_enabled(course_id))
 
         # Authorize
         cauth = CourseAuthorization(course_id=course_id, email_enabled=True)
         cauth.save()
         # Now, course should be authorized
-        assert is_bulk_email_feature_enabled(course_id)
-        assert str(cauth) == "Course 'abc/123/doremi': Instructor Email Enabled"
+        self.assertTrue(is_bulk_email_feature_enabled(course_id))
+        self.assertEqual(
+            str(cauth),
+            "Course 'abc/123/doremi': Instructor Email Enabled"
+        )
 
         # Unauthorize by explicitly setting email_enabled to False
         cauth.email_enabled = False
         cauth.save()
         # Test that course is now unauthorized
-        assert not is_bulk_email_feature_enabled(course_id)
-        assert str(cauth) == "Course 'abc/123/doremi': Instructor Email Not Enabled"
+        self.assertFalse(is_bulk_email_feature_enabled(course_id))
+        self.assertEqual(
+            str(cauth),
+            "Course 'abc/123/doremi': Instructor Email Not Enabled"
+        )
 
     def test_creation_auth_off(self):
         BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
         course_id = CourseKey.from_string('blahx/blah101/ehhhhhhh')
         # Test that course is authorized by default, since auth is turned off
-        assert is_bulk_email_feature_enabled(course_id)
+        self.assertTrue(is_bulk_email_feature_enabled(course_id))
 
         # Use the admin interface to unauthorize the course
         cauth = CourseAuthorization(course_id=course_id, email_enabled=False)
         cauth.save()
 
         # Now, course should STILL be authorized!
-        assert is_bulk_email_feature_enabled(course_id)
+        self.assertTrue(is_bulk_email_feature_enabled(course_id))

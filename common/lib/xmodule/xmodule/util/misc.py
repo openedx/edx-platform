@@ -68,7 +68,7 @@ def get_short_labeler(prefix):
     `prefix` to an assignment index.
     """
     def labeler(index):
-        return f"{prefix} {index:02d}"
+        return u"{prefix} {index:02d}".format(prefix=prefix, index=index)
     return labeler
 
 
@@ -99,14 +99,3 @@ def get_default_short_labeler(course):
         default_labelers[assignment_type]['index'] += 1
         return labeler(index)
     return default_labeler
-
-
-def is_xblock_an_assignment(xblock):
-    """
-    Takes in a leaf xblock and returns a boolean if the xblock is an assignment.
-    """
-    graded = getattr(xblock, 'graded', False)
-    has_score = getattr(xblock, 'has_score', False)
-    weight = getattr(xblock, 'weight', 1)
-    scored = has_score and (weight is None or weight > 0)
-    return graded and scored

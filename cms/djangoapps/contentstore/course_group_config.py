@@ -10,9 +10,9 @@ from collections import defaultdict
 from django.utils.translation import ugettext as _
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
-from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition
 from xmodule.partitions.partitions_service import get_all_partitions_for_course
 from xmodule.split_test_module import get_split_user_partitions
@@ -36,10 +36,10 @@ class GroupConfigurationsValidationError(Exception):
     """
     An error thrown when a group configurations input is invalid.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
-class GroupConfiguration:
+class GroupConfiguration(object):
     """
     Prepare Group Configuration for the course.
     """
@@ -62,7 +62,7 @@ class GroupConfiguration:
         try:
             configuration = json.loads(json_string.decode("utf-8"))
         except ValueError:
-            raise GroupConfigurationsValidationError(_("invalid JSON"))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise GroupConfigurationsValidationError(_("invalid JSON"))
         configuration["version"] = UserPartition.VERSION
         return configuration
 
@@ -102,7 +102,7 @@ class GroupConfiguration:
         """
         Return a list of IDs that already in use.
         """
-        return {p.id for p in get_all_partitions_for_course(course)}
+        return set([p.id for p in get_all_partitions_for_course(course)])
 
     def get_user_partition(self):
         """
@@ -111,7 +111,7 @@ class GroupConfiguration:
         try:
             return UserPartition.from_json(self.configuration)
         except ReadOnlyUserPartitionError:
-            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise GroupConfigurationsValidationError(_("unable to load this type of group configuration"))
 
     @staticmethod
     def _get_usage_dict(course, unit, item, scheme_name=None):
@@ -144,7 +144,7 @@ class GroupConfiguration:
             course.location.course_key.make_usage_key(unit_for_url.location.block_type, unit_for_url.location.block_id)
         )
 
-        usage_dict = {'label': f"{unit.display_name} / {item.display_name}", 'url': unit_url}
+        usage_dict = {'label': u"{} / {}".format(unit.display_name, item.display_name), 'url': unit_url}
         if scheme_name == RANDOM_SCHEME:
             validation_summary = item.general_validation_message()
             usage_dict.update({'validation': validation_summary.to_json() if validation_summary else None})
@@ -196,7 +196,7 @@ class GroupConfiguration:
         for split_test in split_tests:
             unit = split_test.get_parent()
             if not unit:
-                log.warning("Unable to find parent for split_test %s", split_test.location)
+                log.warning(u"Unable to find parent for split_test %s", split_test.location)
                 # Make sure that this user_partition appears in the output even though it has no content
                 usage_info[split_test.user_partition_id] = []
                 continue
@@ -236,7 +236,7 @@ class GroupConfiguration:
         for item, partition_id, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             unit = item.get_parent()
             if not unit:
-                log.warning("Unable to find parent for component %s", item.location)
+                log.warning(u"Unable to find parent for component %s", item.location)
                 continue
 
             usage_info[partition_id][group_id].append(GroupConfiguration._get_usage_dict(

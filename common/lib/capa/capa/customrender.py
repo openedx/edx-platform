@@ -24,7 +24,7 @@ registry = TagRegistry()
 # -----------------------------------------------------------------------------
 
 
-class MathRenderer(object):  # lint-amnesty, pylint: disable=missing-class-docstring
+class MathRenderer(object):
     tags = ['math']
 
     def __init__(self, system, xml):
@@ -57,11 +57,11 @@ class MathRenderer(object):  # lint-amnesty, pylint: disable=missing-class-docst
         """
         # TODO: why are there nested html tags here??  Why are there html tags at all, in fact?
         # xss-lint: disable=python-interpolate-html
-        html = '<html><html>%s</html><html>%s</html></html>' % (  # lint-amnesty, pylint: disable=redefined-outer-name
+        html = '<html><html>%s</html><html>%s</html></html>' % (
             self.mathstr, saxutils.escape(self.xml.tail))
         try:
             xhtml = etree.XML(html)
-        except Exception as err:  # lint-amnesty, pylint: disable=broad-except
+        except Exception as err:
             if self.system.DEBUG:
                 # xss-lint: disable=python-interpolate-html
                 msg = '<html><div class="inline-error"><p>Error %s</p>' % (
@@ -99,7 +99,7 @@ class SolutionRenderer(object):
 
     def get_html(self):
         context = {'id': self.id}
-        html = self.system.render_template("solutionspan.html", context)  # lint-amnesty, pylint: disable=redefined-outer-name
+        html = self.system.render_template("solutionspan.html", context)
         return etree.XML(html)
 
 
@@ -175,7 +175,7 @@ class ClarificationRenderer(object):
         Return the contents of this tag, rendered to html, as an etree element.
         """
         context = {'clarification': self.inner_html}
-        html = self.system.render_template("clarification.html", context)  # lint-amnesty, pylint: disable=redefined-outer-name
+        html = self.system.render_template("clarification.html", context)
         xml = etree.XML(html)
         # We must include any text that was following our original <clarification>...</clarification> XML node.:
         xml.tail = self.tail

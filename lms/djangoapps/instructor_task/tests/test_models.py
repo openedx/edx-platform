@@ -5,14 +5,14 @@ Tests for instructor_task/models.py.
 
 import copy
 import time
-from io import StringIO
-import pytest
+from six import StringIO
+
 from django.conf import settings
 from django.test import SimpleTestCase, TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
 
 from common.test.utils import MockS3BotoMixin
-from lms.djangoapps.instructor_task.models import TASK_INPUT_LENGTH, InstructorTask, ReportStore
+from lms.djangoapps.instructor_task.models import InstructorTask, ReportStore, TASK_INPUT_LENGTH
 from lms.djangoapps.instructor_task.tests.test_base import TestReportMixin
 
 
@@ -25,7 +25,7 @@ class TestInstructorTasksModel(TestCase):
         Test allowed length of task_input field
         """
         task_input = 's' * TASK_INPUT_LENGTH
-        with pytest.raises(AttributeError):
+        with self.assertRaises(AttributeError):
             InstructorTask.create(
                 course_id='dummy_course_id',
                 task_type='dummy type',
@@ -35,28 +35,28 @@ class TestInstructorTasksModel(TestCase):
             )
 
 
-class ReportStoreTestMixin:
+class ReportStoreTestMixin(object):
     """
     Mixin for report store tests.
     """
 
     def setUp(self):
-        super().setUp()
+        super(ReportStoreTestMixin, self).setUp()
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
 
     def create_report_store(self):
         """
         Subclasses should override this and return their report store.
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        pass
 
     def test_links_for_order(self):
         """
         Test that ReportStore.links_for() returns file download links
         in reverse chronological order.
         """
-        report_store = self.create_report_store()  # lint-amnesty, pylint: disable=assignment-from-no-return
-        assert report_store.links_for(self.course_id) == []
+        report_store = self.create_report_store()
+        self.assertEqual(report_store.links_for(self.course_id), [])
 
         report_store.store(self.course_id, 'old_file', StringIO())
         time.sleep(1)  # Ensure we have a unique timestamp.
@@ -64,7 +64,10 @@ class ReportStoreTestMixin:
         time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'new_file', StringIO())
 
-        assert [link[0] for link in report_store.links_for(self.course_id)] == ['new_file', 'middle_file', 'old_file']
+        self.assertEqual(
+            [link[0] for link in report_store.links_for(self.course_id)],
+            ['new_file', 'middle_file', 'old_file']
+        )
 
 
 class LocalFSReportStoreTestCase(ReportStoreTestMixin, TestReportMixin, SimpleTestCase):
@@ -134,4 +137,4 @@ class TestS3ReportStorage(TestCase):
         }):
             report_store = ReportStore.from_config(config_name="FINANCIAL_REPORTS")
             # Make sure CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url
-            assert 'edx-financial-reports.s3.amazonaws.com' in report_store.storage.url('')
+            self.assertIn("edx-financial-reports.s3.amazonaws.com", report_store.storage.url(""))

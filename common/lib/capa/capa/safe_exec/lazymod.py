@@ -36,8 +36,8 @@ class LazyModule(object):
             try:
                 subname = '%s.%s' % (self.__name__, name)
                 __import__(subname)
-                submod = getattr(mod, name)  # lint-amnesty, pylint: disable=unused-variable
+                submod = getattr(mod, name)
             except ImportError:
-                raise AttributeError("'module' object has no attribute %r" % name)  # lint-amnesty, pylint: disable=raise-missing-from
+                raise AttributeError("'module' object has no attribute %r" % name)
             self.__dict__[name] = LazyModule(subname)
             return self.__dict__[name]

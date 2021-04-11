@@ -1,5 +1,5 @@
 """
-Authn API urls
+Logistration API urls
 """
 
 from django.conf.urls import url

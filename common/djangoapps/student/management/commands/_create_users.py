@@ -34,6 +34,6 @@ def create_users(
                 allow_access(course, user, 'staff', send_email=False)
 
         if course_key and course_staff:
-            print(f'Created user {user.username} as course staff')
+            print('Created user {} as course staff'.format(user.username))
         else:
-            print(f'Created user {user.username}')
+            print('Created user {}'.format(user.username))

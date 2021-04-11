@@ -12,9 +12,9 @@ def _jwt_token_from_role_context_pairs(user, role_context_pairs):
     """
     roles = []
     for role, context in role_context_pairs:
-        role_data = f'{role}'
+        role_data = '{role}'.format(role=role)
         if context is not None:
-            role_data += f':{context}'
+            role_data += ':{context}'.format(context=context)
         roles.append(role_data)
 
     payload = generate_unversioned_payload(user)

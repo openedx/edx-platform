@@ -82,7 +82,7 @@ def saml_metadata_view(request):
 
 
 @csrf_exempt
-@psa(f'{URL_NAMESPACE}:complete')
+@psa('{0}:complete'.format(URL_NAMESPACE))
 def lti_login_and_complete_view(request, backend, *args, **kwargs):
     """This is a combination login/complete due to LTI being a one step login"""
 
@@ -125,7 +125,7 @@ class IdPRedirectView(View):
         GET auth/idp_redirect/saml-default
 
     """
-    def get(self, request, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    def get(self, request, *args, **kwargs):
         """
         Return either a redirect to the login page of an identity provider that
         corresponds to the provider_slug keyword argument or a 404 if the

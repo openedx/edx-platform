@@ -3,17 +3,20 @@ This file contains celery tasks for credentials-related functionality.
 """
 
 
-from celery import shared_task
-from celery.exceptions import MaxRetriesExceededError
+from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from edx_django_utils.monitoring import set_code_owner_attribute
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 
 logger = get_task_logger(__name__)
+
+# Under cms the following setting is not defined, leading to errors during tests.
+# These tasks aren't strictly credentials generation, but are similar in the sense
+# that they generate records on the credentials side. And have a similar SLA.
+ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 
 # Maximum number of retries before giving up.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
@@ -22,11 +25,10 @@ logger = get_task_logger(__name__)
 MAX_RETRIES = 11
 
 
-@shared_task(bind=True, ignore_result=True)
-@set_code_owner_attribute
+@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
 def send_grade_to_credentials(self, username, course_run_key, verified, letter_grade, percent_grade):
     """ Celery task to notify the Credentials IDA of a grade change via POST. """
-    logger.info(f"Running task send_grade_to_credentials for username {username} and course {course_run_key}")
+    logger.info(u'Running task send_grade_to_credentials for username %s and course %s', username, course_run_key)
 
     countdown = 2 ** self.request.retries
     course_key = CourseKey.from_string(course_run_key)
@@ -45,12 +47,8 @@ def send_grade_to_credentials(self, username, course_run_key, verified, letter_g
             'verified': verified,
         })
 
-        logger.info(f"Sent grade for course {course_run_key} to user {username}")
+        logger.info(u'Sent grade for course %s to user %s', course_run_key, username)
 
     except Exception as exc:
-        error_msg = f"Failed to send grade for course {course_run_key} to user {username}."
-        logger.exception(error_msg)
-        exception = MaxRetriesExceededError(
-            f"Failed to send grade to credentials. Reason: {error_msg}"
-        )
-        raise self.retry(exc=exception, countdown=countdown, max_retries=MAX_RETRIES)
+        logger.exception(u'Failed to send grade for course %s to user %s', course_run_key, username)
+        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

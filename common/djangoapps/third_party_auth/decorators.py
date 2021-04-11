@@ -6,22 +6,24 @@ Decorators that can be used to interact with third_party_auth.
 from functools import wraps
 
 from django.conf import settings
+from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
-from six.moves.urllib.parse import urlparse  # lint-amnesty, pylint: disable=unused-import
+from six.moves.urllib.parse import urlencode, urlparse
 
 from common.djangoapps.third_party_auth.models import LTIProviderConfig
+from common.djangoapps.third_party_auth.provider import Registry
 
 
 def xframe_allow_whitelisted(view_func):
     """
     Modifies a view function so that its response has the X-Frame-Options HTTP header
-    set to `settings.X_FRAME_OPTIONS` if the request HTTP referrer is not from a whitelisted hostname.
+    set to 'DENY' if the request HTTP referrer is not from a whitelisted hostname.
     """
 
     def wrapped_view(request, *args, **kwargs):
         """ Modify the response with the correct X-Frame-Options. """
         resp = view_func(request, *args, **kwargs)
-        x_frame_option = settings.X_FRAME_OPTIONS
+        x_frame_option = 'DENY'
         if settings.FEATURES['ENABLE_THIRD_PARTY_AUTH']:
             referer = request.META.get('HTTP_REFERER')
             if referer is not None:

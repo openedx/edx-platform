@@ -14,7 +14,7 @@ def _message(reqm, message):
         url_name = reqm.display_name_with_default))
 %>
 % if message:
-    % for reqm in module.get_required_blocks:
+    % for reqm in module.required_modules:
         % if reqm:
             <p class="conditional-message">${_message(reqm, message)}</p>
         % else:

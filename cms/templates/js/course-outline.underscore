@@ -212,7 +212,7 @@ if (is_proctored_exam) {
                 </p>
               </div>
             <% } %>
-            <% if (xblockInfo.isChapter()) { %>
+            <% if (xblockInfo.get('highlights_enabled') && xblockInfo.isChapter()) { %>
                 <div class="block-highlights">
                     <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
                         <button class="block-highlights-value highlights-button action-button">

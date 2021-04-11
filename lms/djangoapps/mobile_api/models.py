@@ -22,10 +22,10 @@ class MobileApiConfig(ConfigurationModel):
     """
     video_profiles = models.TextField(
         blank=True,
-        help_text="A comma-separated list of names of profiles to include for videos returned from the mobile API."
+        help_text=u"A comma-separated list of names of profiles to include for videos returned from the mobile API."
     )
 
-    class Meta:
+    class Meta(object):
         app_label = "mobile_api"
 
     @classmethod
@@ -43,18 +43,20 @@ class AppVersionConfig(models.Model):
 
     .. no_pii:
     """
-    PLATFORM_CHOICES = tuple((platform, platform) for platform in sorted(PLATFORM_CLASSES.keys()))
+    PLATFORM_CHOICES = tuple(
+        [(platform, platform) for platform in sorted(PLATFORM_CLASSES.keys())]
+    )
 
     platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES, blank=False)
     version = models.CharField(
         max_length=50,
         blank=False,
-        help_text="Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric"
+        help_text=u"Version should be in the format X.X.X.Y where X is a number and Y is alphanumeric"
     )
     major_version = models.IntegerField()
     minor_version = models.IntegerField()
     patch_version = models.IntegerField()
-    expire_at = models.DateTimeField(null=True, blank=True, verbose_name="Expiry date for platform version")
+    expire_at = models.DateTimeField(null=True, blank=True, verbose_name=u"Expiry date for platform version")
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -65,7 +67,7 @@ class AppVersionConfig(models.Model):
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
     def __str__(self):
-        return f"{self.platform}_{self.version}"
+        return "{}_{}".format(self.platform, self.version)
 
     @classmethod
     def latest_version(cls, platform):
@@ -83,10 +85,10 @@ class AppVersionConfig(models.Model):
             if utils.parsed_version(config.version) >= parsed_version:
                 return config.expire_at
 
-    def save(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+    def save(self, *args, **kwargs):
         """ parses version into major, minor and patch versions before saving """
         self.major_version, self.minor_version, self.patch_version = utils.parsed_version(self.version)
-        super().save(*args, **kwargs)
+        super(AppVersionConfig, self).save(*args, **kwargs)
 
 
 class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
@@ -100,5 +102,5 @@ class IgnoreMobileAvailableFlagConfig(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "mobile_api"

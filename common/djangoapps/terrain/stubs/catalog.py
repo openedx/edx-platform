@@ -11,9 +11,9 @@ import six.moves.urllib.parse
 from .http import StubHttpRequestHandler, StubHttpService
 
 
-class StubCatalogServiceHandler(StubHttpRequestHandler):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StubCatalogServiceHandler(StubHttpRequestHandler):
 
-    def do_GET(self):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def do_GET(self):
         pattern_handlers = {
             r'/api/v1/programs/$': self.program_list,
             r'/api/v1/programs/([0-9a-f-]+)/$': self.program_detail,

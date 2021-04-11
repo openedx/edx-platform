@@ -4,7 +4,7 @@
 from django.apps import AppConfig
 
 
-class CourseModesConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-class-docstring
+class CourseModesConfig(AppConfig):
     name = 'common.djangoapps.course_modes'
     verbose_name = "Course Modes"
 

@@ -1,10 +1,10 @@
 """Tests for user API middleware"""
 
 
-from unittest.mock import Mock, patch
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from mock import Mock, patch
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 
@@ -17,7 +17,7 @@ class TagsMiddlewareTest(TestCase):
     Test the UserTagsEventContextMiddleware
     """
     def setUp(self):
-        super().setUp()
+        super(TagsMiddlewareTest, self).setUp()
         self.middleware = UserTagsEventContextMiddleware()
         self.user = UserFactory.create()
         self.other_user = UserFactory.create()
@@ -27,7 +27,7 @@ class TagsMiddlewareTest(TestCase):
 
         # TODO: Make it so we can use reverse. Appears to fail depending on the order in which tests are run
         #self.request = RequestFactory().get(reverse('courseware', kwargs={'course_id': self.course_id}))
-        self.request = RequestFactory().get(f'/courses/{self.course_id}/courseware')
+        self.request = RequestFactory().get('/courses/{}/courseware'.format(self.course_id))
         self.request.user = self.user
 
         self.response = Mock(spec=HttpResponse)
@@ -42,7 +42,7 @@ class TagsMiddlewareTest(TestCase):
         so that the request continues.
         """
         # Middleware should pass request through
-        assert self.middleware.process_request(self.request) is None
+        self.assertEqual(self.middleware.process_request(self.request), None)
 
     def assertContextSetTo(self, context):
         """Asserts UserTagsEventContextMiddleware.CONTEXT_NAME matches ``context``"""
@@ -114,10 +114,16 @@ class TagsMiddlewareTest(TestCase):
         exit_context = get_tracker.return_value.exit_context
 
         # The middleware should clean up the context when the request is done
-        assert self.middleware.process_response(self.request, self.response) == self.response
+        self.assertEqual(
+            self.middleware.process_response(self.request, self.response),
+            self.response
+        )
         exit_context.assert_called_with(UserTagsEventContextMiddleware.CONTEXT_NAME)
         exit_context.reset_mock()
 
         # Even if the tracker blows up, the middleware should still return the response
         get_tracker.side_effect = Exception
-        assert self.middleware.process_response(self.request, self.response) == self.response
+        self.assertEqual(
+            self.middleware.process_response(self.request, self.response),
+            self.response
+        )

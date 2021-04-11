@@ -45,5 +45,5 @@ def get_unsubscribed_link(username, course_id):
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     token = UsernameCipher.encrypt(username)
     optout_url = reverse('bulk_email_opt_out', kwargs={'token': token, 'course_id': course_id})
-    url = f'{lms_root_url}{optout_url}'
+    url = '{base_url}{optout_url}'.format(base_url=lms_root_url, optout_url=optout_url)
     return url

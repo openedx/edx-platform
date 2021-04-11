@@ -5,8 +5,10 @@ Base class for badge backends.
 
 from abc import ABCMeta, abstractmethod
 
+import six
 
-class BadgeBackend(metaclass=ABCMeta):
+
+class BadgeBackend(six.with_metaclass(ABCMeta, object)):
     """
     Defines the interface for badging backends.
     """

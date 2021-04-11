@@ -86,7 +86,7 @@ def mock_capa_module():
     """
     capa response types needs just two things from the capa_module: location and track_function.
     """
-    def mock_location_text(self):  # lint-amnesty, pylint: disable=unused-argument
+    def mock_location_text(self):
         """
         Mock implementation of __unicode__ or __str__ for the module's location.
         """

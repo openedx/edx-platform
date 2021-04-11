@@ -1,16 +1,15 @@
+# encoding: utf-8
 """Tests of Branding API """
 
 
-from unittest import mock
-
+import mock
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
-
 from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
     "CONTACT_US_ENABLE": False,
@@ -35,11 +34,11 @@ class TestHeader(TestCase):
         with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             logo_url = get_logo_url()
 
-        assert logo_url == cdn_url
+        self.assertEqual(logo_url, cdn_url)
 
     def test_home_url(self):
         expected_url = get_home_url()
-        assert reverse('dashboard') == expected_url
+        self.assertEqual(reverse('dashboard'), expected_url)
 
 
 class TestFooter(TestCase):
@@ -124,7 +123,7 @@ class TestFooter(TestCase):
             'connect_links': [
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
                 # pylint: disable=line-too-long
-                {'url': f'{settings.LMS_ROOT_URL}/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
+                {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -139,8 +138,8 @@ class TestFooter(TestCase):
                  'title': 'Accessibility Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
                 {'name': 'media_kit',
-                 'title': 'Media Kit',
-                 'url': 'https://edx.org/media-kit'}
+                 'title': u'Media Kit',
+                 'url': u'https://edx.org/media-kit'}
             ],
             'social_links': [
                 {'url': '#', 'action': 'Like \xe9dX on Facebook', 'name': 'facebook',
@@ -170,7 +169,7 @@ class TestFooter(TestCase):
                 'text': 'Take free online courses at edX.org',
             },
         }
-        assert actual_footer == expected_footer
+        self.assertEqual(actual_footer, expected_footer)
 
     @with_site_configuration(configuration=test_config_disabled_contact_us)
     def test_get_footer_disabled_contact_form(self):
@@ -178,8 +177,8 @@ class TestFooter(TestCase):
         Test retrieving the footer with disabled contact form.
         """
         actual_footer = get_footer(is_secure=True)
-        assert any(((l['name'] == 'contact') for l in actual_footer['connect_links'])) is False
-        assert any(((l['name'] == 'contact') for l in actual_footer['navigation_links'])) is False
+        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['connect_links']), False)
+        self.assertEqual(any(l['name'] == 'contact' for l in actual_footer['navigation_links']), False)
 
     @with_site_configuration(configuration=test_config_custom_url_contact_us)
     def test_get_footer_custom_contact_url(self):
@@ -188,7 +187,13 @@ class TestFooter(TestCase):
         """
         actual_footer = get_footer(is_secure=True)
         contact_us_link = [l for l in actual_footer['connect_links'] if l['name'] == 'contact'][0]
-        assert contact_us_link['url'] == test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        self.assertEqual(
+            contact_us_link['url'],
+            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        )
 
         navigation_link_contact_us = [l for l in actual_footer['navigation_links'] if l['name'] == 'contact'][0]
-        assert navigation_link_contact_us['url'] == test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        self.assertEqual(
+            navigation_link_contact_us['url'],
+            test_config_custom_url_contact_us['CONTACT_US_CUSTOM_LINK']
+        )

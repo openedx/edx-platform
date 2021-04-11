@@ -6,22 +6,20 @@ This file contains celery tasks for sending email
 import logging
 
 from celery.exceptions import MaxRetriesExceededError
-from celery import shared_task
+from celery.task import task
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
-from edx_django_utils.monitoring import set_code_owner_attribute
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 log = logging.getLogger('edx.celery.task')
 
 
-@shared_task(bind=True)
-@set_code_owner_attribute
+@task(bind=True, name='student.send_activation_email')
 def send_activation_email(self, msg_string, from_address=None):
     """
     Sending an activation email to the user.
@@ -40,7 +38,7 @@ def send_activation_email(self, msg_string, from_address=None):
     dest_addr = msg.recipient.email_address
 
     site = Site.objects.get_current()
-    user = User.objects.get(id=msg.recipient.lms_user_id)
+    user = User.objects.get(username=msg.recipient.username)
 
     try:
         with emulate_http_request(site=site, user=user):
@@ -66,4 +64,4 @@ def send_activation_email(self, msg_string, from_address=None):
             from_address,
             dest_addr,
         )
-        raise Exception  # lint-amnesty, pylint: disable=raise-missing-from
+        raise Exception

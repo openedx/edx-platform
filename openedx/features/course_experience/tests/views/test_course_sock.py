@@ -43,7 +43,7 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         add_course_mode(cls.verified_course_already_enrolled, upgrade_deadline_expired=False)
 
     def setUp(self):
-        super(TestCourseSockView, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseSockView, self).setUp()
         self.user = UserFactory.create()
 
         # Enroll the user in the four courses
@@ -104,8 +104,8 @@ class TestCourseSockView(SharedModuleStoreTestCase):
         response = self.client.get(course_home_url(self.verified_course))
         self.assertContains(response, "<span>DISCOUNT_PRICE</span>")
 
-    def assert_verified_sock_is_visible(self, course, response):  # lint-amnesty, pylint: disable=unused-argument
+    def assert_verified_sock_is_visible(self, course, response):
         return self.assertContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)
 
-    def assert_verified_sock_is_not_visible(self, course, response):  # lint-amnesty, pylint: disable=unused-argument
+    def assert_verified_sock_is_not_visible(self, course, response):
         return self.assertNotContains(response, TEST_VERIFICATION_SOCK_LOCATOR, html=False)

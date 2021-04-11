@@ -1,13 +1,16 @@
+# -*- coding: utf-8 -*-
 """
 Basic unit tests related to content libraries.
 
 Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 
-import pytest
+
 import ddt
+import six
 from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
+from six.moves import range
 
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
@@ -42,21 +45,21 @@ class TestLibraries(MixedSplitTestCase):
         """
         org, lib_code = ('DuplicateX', "DUP")
         LibraryFactory.create(org=org, library=lib_code, modulestore=self.store)
-        with pytest.raises(DuplicateCourseError):
+        with self.assertRaises(DuplicateCourseError):
             LibraryFactory.create(org=org, library=lib_code, modulestore=self.store)
 
     @ddt.data(
         "This is a test library!",
-        "Ωμέγα Βιβλιοθήκη",
+        u"Ωμέγα Βιβλιοθήκη",
     )
     def test_str_repr(self, name):
         """
         Test __unicode__() and __str__() methods of libraries
         """
         library = LibraryFactory.create(metadata={"display_name": name}, modulestore=self.store)
-        assert name in str(library)
-        if not isinstance(name, str):
-            assert name in str(library)
+        self.assertIn(name, six.text_type(library))
+        if not isinstance(name, six.text_type):
+            self.assertIn(name, str(library))
 
     def test_display_with_default_methods(self):
         """
@@ -66,8 +69,8 @@ class TestLibraries(MixedSplitTestCase):
         org = 'TestOrgX'
         lib_code = 'LC101'
         library = LibraryFactory.create(org=org, library=lib_code, modulestore=self.store)
-        assert library.display_org_with_default == org
-        assert library.display_number_with_default == lib_code
+        self.assertEqual(library.display_org_with_default, org)
+        self.assertEqual(library.display_number_with_default, lib_code)
 
     def test_block_with_children(self):
         """
@@ -91,7 +94,7 @@ class TestLibraries(MixedSplitTestCase):
             metadata={"data": "Hello world", },
             modulestore=self.store,
         )
-        assert child_block.parent.replace(version_guid=None, branch=None) == vert_block.location
+        self.assertEqual(child_block.parent.replace(version_guid=None, branch=None), vert_block.location)
 
     def test_update_item(self):
         """
@@ -113,10 +116,10 @@ class TestLibraries(MixedSplitTestCase):
         self.store.update_item(block, self.user_id)
         # Reload block from the modulestore
         block = self.store.get_item(block_key)
-        assert block.data == 'NEW'
-        assert block.location == block_key
+        self.assertEqual(block.data, "NEW")
+        self.assertEqual(block.location, block_key)
         new_version = self.store.get_item(block_key, remove_version=False, remove_branch=False).location.version_guid
-        assert old_version != new_version
+        self.assertNotEqual(old_version, new_version)
 
     def test_delete_item(self):
         """
@@ -132,33 +135,26 @@ class TestLibraries(MixedSplitTestCase):
             modulestore=self.store,
         )
         library = self.store.get_library(lib_key)
-        assert len(library.children) == 1
+        self.assertEqual(len(library.children), 1)
         self.store.delete_item(block.location, self.user_id)
         library = self.store.get_library(lib_key)
-        assert len(library.children) == 0
+        self.assertEqual(len(library.children), 0)
 
     def test_get_library_non_existent(self):
         """ Test get_library() with non-existent key """
         result = self.store.get_library(LibraryLocator("non", "existent"))
-        assert result is None
-
-    def test_get_library_keys(self):
-        """ Test get_library_keys() """
-        libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]
-        lib_keys_expected = {lib.location.library_key for lib in libraries}
-        lib_keys_actual = set(self.store.get_library_keys())
-        assert lib_keys_expected == lib_keys_actual
+        self.assertEqual(result, None)
 
     def test_get_libraries(self):
         """ Test get_libraries() """
         libraries = [LibraryFactory.create(modulestore=self.store) for _ in range(3)]
-        lib_dict = {lib.location.library_key: lib for lib in libraries}
+        lib_dict = dict([(lib.location.library_key, lib) for lib in libraries])
 
         lib_list = self.store.get_libraries()
 
-        assert len(lib_list) == len(libraries)
+        self.assertEqual(len(lib_list), len(libraries))
         for lib in lib_list:
-            assert lib.location.library_key in lib_dict
+            self.assertIn(lib.location.library_key, lib_dict)
 
     def test_strip(self):
         """
@@ -169,10 +165,10 @@ class TestLibraries(MixedSplitTestCase):
         lib_key = LibraryFactory.create(modulestore=self.store).location.library_key
         # Re-load the library from the modulestore, explicitly including version information:
         lib = self.store.get_library(lib_key)
-        assert lib.location.version_guid is None
-        assert lib.location.branch is None
-        assert lib.location.library_key.version_guid is None
-        assert lib.location.library_key.branch is None
+        self.assertEqual(lib.location.version_guid, None)
+        self.assertEqual(lib.location.branch, None)
+        self.assertEqual(lib.location.library_key.version_guid, None)
+        self.assertEqual(lib.location.library_key.branch, None)
 
     def test_get_lib_version(self):
         """
@@ -183,7 +179,7 @@ class TestLibraries(MixedSplitTestCase):
         # Re-load the library from the modulestore, explicitly including version information:
         lib = self.store.get_library(lib_key, remove_version=False, remove_branch=False)
         version = lib.location.library_key.version_guid
-        assert isinstance(version, ObjectId)
+        self.assertIsInstance(version, ObjectId)
 
     def test_xblock_in_lib_have_published_version_returns_false(self):
         library = LibraryFactory.create(modulestore=self.store)
@@ -194,4 +190,4 @@ class TestLibraries(MixedSplitTestCase):
             publish_item=False,
             modulestore=self.store,
         )
-        assert not self.store.has_published_version(block)
+        self.assertFalse(self.store.has_published_version(block))

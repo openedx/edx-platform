@@ -7,6 +7,7 @@ PluginManager.
 from base64 import b64encode
 from hashlib import sha1
 
+import six
 from edx_django_utils.plugins import PluginManager
 
 from openedx.core.lib.cache_utils import process_cached
@@ -33,7 +34,7 @@ class TransformerRegistry(PluginManager):
                 registered with the platform's PluginManager.
         """
         if cls.USE_PLUGIN_MANAGER:
-            return set(cls.get_available_plugins().values())
+            return set(six.itervalues(cls.get_available_plugins()))
         else:
             return set()
 
@@ -48,8 +49,8 @@ class TransformerRegistry(PluginManager):
 
         sorted_transformers = sorted(cls.get_registered_transformers(), key=lambda t: t.name())
         for transformer in sorted_transformers:
-            hash_obj.update((transformer.name()).encode())
-            hash_obj.update((str(transformer.WRITE_VERSION)).encode())
+            hash_obj.update(six.b(transformer.name()))
+            hash_obj.update(six.b(str(transformer.WRITE_VERSION)))
 
         return b64encode(hash_obj.digest()).decode('utf-8')
 
@@ -68,6 +69,6 @@ class TransformerRegistry(PluginManager):
             set([string]) - Set of names of a subset of the given
                 transformers that weren't found in the registry.
         """
-        registered_transformer_names = {reg_trans.name() for reg_trans in cls.get_registered_transformers()}
-        requested_transformer_names = {transformer.name() for transformer in transformers}
+        registered_transformer_names = set(reg_trans.name() for reg_trans in cls.get_registered_transformers())
+        requested_transformer_names = set(transformer.name() for transformer in transformers)
         return requested_transformer_names - registered_transformer_names

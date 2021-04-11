@@ -11,12 +11,12 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.courseware.courses import has_access
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from openedx.core.lib.teams_config import TeamsetType
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 logger = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ def user_organization_protection_status(user, course_key):
         else:
             return OrganizationProtectionStatus.unprotected
     else:
-        raise ValueError(  # lint-amnesty, pylint: disable=raising-format-tuple
+        raise ValueError(
             'Cannot check the org_protection status on a student [%s] not enrolled in course [%s]',
             user.id,
             course_key
@@ -349,7 +349,7 @@ def get_team_for_user_course_topic(user, course_id, topic_id):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise ValueError("The supplied course id {course_id} is not valid.".format(  # lint-amnesty, pylint: disable=raise-missing-from
+        raise ValueError(u"The supplied course id {course_id} is not valid.".format(
             course_id=course_id
         ))
     try:
@@ -392,7 +392,7 @@ def anonymous_user_ids_for_team(user, team):
         ))
 
     return sorted([
-        anonymous_id_for_user(user=team_member, course_id=team.course_id)
+        anonymous_id_for_user(user=team_member, course_id=team.course_id, save=True)
         for team_member in team.users.all()
     ])
 

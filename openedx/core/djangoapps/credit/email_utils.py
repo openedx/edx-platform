@@ -3,16 +3,16 @@ This file contains utility functions which will responsible for sending emails.
 """
 
 
-import html
 import logging
 import os
-import urllib
 import uuid
+import html
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 
+import six
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
@@ -31,14 +31,14 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger(__name__)
 
 
-def send_credit_notifications(username, course_key):  # lint-amnesty, pylint: disable=too-many-statements
+def send_credit_notifications(username, course_key):
     """Sends email notification to user on different phases during credit
     course e.g., credit eligibility, credit payment etc.
     """
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        log.error('No user with %s exist', username)
+        log.error(u'No user with %s exist', username)
         return
 
     course = modulestore().get_course(course_key, depth=0)
@@ -87,10 +87,10 @@ def send_credit_notifications(username, course_key):  # lint-amnesty, pylint: di
     msg_alternative = MIMEMultipart('alternative')
     notification_msg.attach(msg_alternative)
     # render the credit notification templates
-    subject = _('Course Credit Eligibility')
+    subject = _(u'Course Credit Eligibility')
 
     if providers_string:
-        subject = _('You are eligible for credit from {providers_string}').format(
+        subject = _(u'You are eligible for credit from {providers_string}').format(
             providers_string=providers_string
         )
 
@@ -103,7 +103,7 @@ def send_credit_notifications(username, course_key):  # lint-amnesty, pylint: di
     if email_body_content is None:
         html_file_path = file_path_finder('templates/credit_notifications/credit_eligibility_email.html')
         if html_file_path:
-            with open(html_file_path) as cur_file:
+            with open(html_file_path, 'r') as cur_file:
                 cur_text = cur_file.read()
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
@@ -140,7 +140,7 @@ def with_inline_css(html_without_css):
         css_filepath = file_path_finder(settings.NOTIFICATION_EMAIL_CSS)
 
     if css_filepath:
-        with open(css_filepath) as _file:
+        with open(css_filepath, "r") as _file:
             css_content = _file.read()
 
         # pynliner imports cssutils, which has an expensive initialization. All
@@ -193,7 +193,7 @@ def _email_url_parser(url_name, extra_param=None):
     site_name = configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME)
     dashboard_url_path = reverse(url_name) + extra_param if extra_param else reverse(url_name)
     dashboard_link_parts = ("https", site_name, dashboard_url_path, '', '', '')
-    return urllib.parse.urlunparse(dashboard_link_parts)  # pylint: disable=too-many-function-args
+    return six.moves.urllib.parse.urlunparse(dashboard_link_parts)  # pylint: disable=too-many-function-args
 
 
 def get_credit_provider_attribute_values(course_key, attribute_name):
@@ -206,7 +206,7 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
     Returns:
         List of provided credit provider attribute values.
     """
-    course_id = str(course_key)
+    course_id = six.text_type(course_key)
     credit_config = CreditConfig.current()
 
     cache_key = None
@@ -227,11 +227,11 @@ def get_credit_provider_attribute_values(course_key, attribute_name):
         user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
         response = ecommerce_api_client(user).courses(course_id).get(include_products=1)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
+        log.exception(u"Failed to receive data from the ecommerce course API for Course ID '%s'.", course_id)
         return attribute_values
 
     if not response:
-        log.info("No Course information found from ecommerce API for Course ID '%s'.", course_id)
+        log.info(u"No Course information found from ecommerce API for Course ID '%s'.", course_id)
         return attribute_values
 
     provider_ids = []
@@ -269,15 +269,15 @@ def make_providers_strings(providers):
 
     elif len(providers) == 2:
         # Translators: The join of two university names (e.g., Harvard and MIT).
-        providers_string = _("{first_provider} and {second_provider}").format(
+        providers_string = _(u"{first_provider} and {second_provider}").format(
             first_provider=providers[0],
             second_provider=providers[1]
         )
     else:
         # Translators: The join of three or more university names. The first of these formatting strings
         # represents a comma-separated list of names (e.g., MIT, Harvard, Dartmouth).
-        providers_string = _("{first_providers}, and {last_provider}").format(
-            first_providers=", ".join(providers[:-1]),
+        providers_string = _(u"{first_providers}, and {last_provider}").format(
+            first_providers=u", ".join(providers[:-1]),
             last_provider=providers[-1]
         )
 

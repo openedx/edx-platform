@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import django_countries.fields
 from django.conf import settings
 from django.db import migrations, models
@@ -47,6 +50,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='courseteammembership',
-            unique_together={('user', 'team')},
+            unique_together=set([('user', 'team')]),
         ),
     ]

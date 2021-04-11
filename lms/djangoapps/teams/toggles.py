@@ -2,8 +2,8 @@
 Togglable settings for Teams behavior
 """
 from edx_toggles.toggles import SettingDictToggle
-
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+
 
 # Course Waffle inherited from edx/edx-ora2
 WAFFLE_NAMESPACE = "openresponseassessment"
@@ -34,7 +34,7 @@ def are_team_submissions_enabled(course_key):
     ):
         return True
 
-    # TODO: this behaviour differs from edx-ora2, where the LegacyWaffleSwitch overrides the setting.
+    # TODO: this behaviour differs from edx-ora2, where the WaffleSwitch overrides the setting.
     # https://github.com/edx/edx-ora2/blob/ac502d8301cb987c9885aaefbaeddaf456c13fb9/openassessment/xblock/config_mixin.py#L96
 
     if TEAM_SUBMISSIONS_FEATURE.is_enabled():

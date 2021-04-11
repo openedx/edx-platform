@@ -78,7 +78,7 @@ def main(log_file, test_suite, fast, verbose):
     test_list_with_failures, pytest_command = _find_fewest_tests_with_failures(failing_test_list, 'ALL')
     if test_list_with_failures:
         print('Found failures running {} tests.'.format(len(test_list_with_failures)))
-        print(f'Use: {pytest_command}')
+        print('Use: {}'.format(pytest_command))
         return
 
     if fast_option:
@@ -102,9 +102,9 @@ def _strip_console_for_tests_with_failure(log_file, test_suite):
     worker_test_dict = {}
     test_base_included = {}
     failing_worker_num = None
-    with open(log_file, 'r') as console_file:
+    with io.open(log_file, 'r') as console_file:
         for line in console_file:
-            regex_search = re.search(fr'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)', line)
+            regex_search = re.search(r'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)'.format(test_suite), line)
             if regex_search:
                 worker_num_string = regex_search.group(1)
                 pass_fail_string = regex_search.group(2)
@@ -113,7 +113,7 @@ def _strip_console_for_tests_with_failure(log_file, test_suite):
                 test = regex_search.group(3)
                 if test_suite == "commonlib-unit":
                     if "pavelib" not in test and not test.startswith('scripts'):
-                        test = f"common/lib/{test}"
+                        test = u"common/lib/{}".format(test)
                 if fast_option and pass_fail_string == 'PASSED':
                     # fast option will only take one test per class or module, in case
                     # the failure is a setup/teardown failure.
@@ -134,7 +134,7 @@ def _get_pytest_command(output_file_name):
     """
     Return the pytest command to run.
     """
-    return f"pytest -p 'no:randomly' `cat {output_file_name}`"
+    return "pytest -p 'no:randomly' `cat {}`".format(output_file_name)
 
 
 def _run_tests_and_check_for_failures(output_file_name):
@@ -169,7 +169,7 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
     # to the command line, but this keeps the verbose  output cleaner.
     temp_file = tempfile.NamedTemporaryFile(prefix=output_file_name, dir=OUTPUT_FOLDER_NAME, delete=False)
 
-    with open(temp_file.name, 'w') as output_file:
+    with io.open(temp_file.name, 'w') as output_file:
         for line in test_list:
             output_file.write(line + "\n")
     temp_file.close()

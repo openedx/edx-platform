@@ -2,9 +2,8 @@
 
 
 import unittest
-from unittest.mock import patch
 
-import pytest
+from mock import patch
 from pymongo.errors import ConnectionFailure
 
 from xmodule.exceptions import HeartbeatFailure
@@ -22,5 +21,5 @@ class TestHeartbeatFailureException(unittest.TestCase):
             mock_proxy.return_value.admin.command.side_effect = ConnectionFailure('Test')
             useless_conn = MongoConnection('useless', 'useless', 'useless')
 
-            with pytest.raises(HeartbeatFailure):
+            with self.assertRaises(HeartbeatFailure):
                 useless_conn.heartbeat()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 End-to-end tests for the LMS Instructor Dashboard.
 """
@@ -58,7 +59,7 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
     Instructor dashboard base accessibility test.
     """
     def setUp(self):
-        super().setUp()
+        super(LMSInstructorDashboardA11yTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -81,7 +82,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
     shard = 23
 
     def setUp(self):
-        super().setUp()
+        super(BulkEmailTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -113,7 +114,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super().setUp()
+        super(AutoEnrollmentWithCSVTest, self).setUp()
         self.course_fixture = CourseFixture(**self.course_info).install()
         self.log_in_as_instructor()
         instructor_dashboard_page = self.visit_instructor_dashboard()
@@ -140,7 +141,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
     """
 
     def setUp(self):
-        super().setUp()
+        super(CertificatesTest, self).setUp()
         self.test_certificate_config = {
             'id': 1,
             'name': 'Certificate name',
@@ -182,7 +183,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(CertificateInvalidationTest, cls).setUpClass()
 
         # Create course fixture once each test run
         CourseFixture(
@@ -193,7 +194,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         ).install()
 
     def setUp(self):
-        super().setUp()
+        super(CertificateInvalidationTest, self).setUp()
         # set same course number as we have in fixture json
         self.course_info['number'] = "335535897951379478207964576572017930000"
 

@@ -17,9 +17,10 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 import itertools
 import logging
 
+import six
 from config_models.models import ConfigurationModel
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils.encoding import python_2_unicode_compatible
@@ -27,6 +28,8 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import BlockTypeKeyField, CourseKeyField, LearningContextKeyField, UsageKeyField
 from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
+from six import text_type
+from six.moves import range
 
 from openedx.core.djangolib.markup import HTML
 
@@ -47,7 +50,7 @@ class ChunkingManager(models.Manager):
     the ability to make select queries with specific chunk sizes.
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
 
     def chunked_filter(self, chunk_field, items, **kwargs):
@@ -97,12 +100,9 @@ class StudentModule(models.Model):
     # The learning context of the usage_key (usually a course ID, but may be a library or something else)
     course_id = LearningContextKeyField(max_length=255, db_index=True)
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('student', 'module_state_key', 'course_id'),)
-        indexes = [
-            models.Index(fields=['module_state_key', 'grade', 'student'], name="courseware_stats")
-        ]
 
     # Internal state of the object
     state = models.TextField(null=True, blank=True)
@@ -111,9 +111,9 @@ class StudentModule(models.Model):
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
     DONE_TYPES = (
-        ('na', 'NOT_APPLICABLE'),
-        ('f', 'FINISHED'),
-        ('i', 'INCOMPLETE'),
+        (u'na', u'NOT_APPLICABLE'),
+        (u'f', u'FINISHED'),
+        (u'i', u'INCOMPLETE'),
     )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
@@ -138,7 +138,7 @@ class StudentModule(models.Model):
             return queryset
 
     def __repr__(self):
-        return 'StudentModule<{!r}>'.format(
+        return 'StudentModule<%r>' % (
             {
                 'course_id': self.course_id,
                 'module_type': self.module_type,
@@ -148,10 +148,10 @@ class StudentModule(models.Model):
                 'student_id': self.student_id,
                 'module_state_key': self.module_state_key,
                 'state': str(self.state)[:20],
-            })
+            },)
 
     def __str__(self):
-        return str(repr(self))
+        return six.text_type(repr(self))
 
     @classmethod
     def get_state_by_params(cls, course_id, module_state_keys, student_id=None):
@@ -166,7 +166,7 @@ class StudentModule(models.Model):
         return module_states
 
     @classmethod
-    def save_state(cls, student, course_id, module_state_key, defaults):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def save_state(cls, student, course_id, module_state_key, defaults):
         if not student.is_authenticated:
             return
         else:
@@ -187,7 +187,7 @@ class BaseStudentModuleHistory(models.Model):
     objects = ChunkingManager()
     HISTORY_SAVING_TYPES = {'problem'}
 
-    class Meta:
+    class Meta(object):
         abstract = True
 
     version = models.CharField(max_length=255, null=True, blank=True, db_index=True)
@@ -240,14 +240,14 @@ class StudentModuleHistory(BaseStudentModuleHistory):
     Student. Right now, we restrict this to problems so that the table doesn't
     explode in size."""
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         get_latest_by = "created"
 
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(repr(self))
+        return six.text_type(repr(self))
 
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
         """
@@ -280,7 +280,7 @@ class XBlockFieldBase(models.Model):
     """
     objects = ChunkingManager()
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         abstract = True
 
@@ -293,20 +293,20 @@ class XBlockFieldBase(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
-    def __str__(self):  # lint-amnesty, pylint: disable=invalid-str-returned
+    def __str__(self):
         keys = [field.name for field in self._meta.get_fields() if field.name not in ('created', 'modified')]
-        return HTML('{}<{!r}').format(
+        return HTML(u'{}<{!r}').format(
             HTML(self.__class__.__name__),
             {key: HTML(getattr(self, key)) for key in keys}
         )
 
 
-class XModuleUserStateSummaryField(XBlockFieldBase):  # lint-amnesty, pylint: disable=model-no-explicit-unicode
+class XModuleUserStateSummaryField(XBlockFieldBase):
     """
     Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('usage_id', 'field_name'),)
 
@@ -314,12 +314,12 @@ class XModuleUserStateSummaryField(XBlockFieldBase):  # lint-amnesty, pylint: di
     usage_id = UsageKeyField(max_length=255, db_index=True)
 
 
-class XModuleStudentPrefsField(XBlockFieldBase):  # lint-amnesty, pylint: disable=model-no-explicit-unicode
+class XModuleStudentPrefsField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('student', 'module_type', 'field_name'),)
 
@@ -329,12 +329,12 @@ class XModuleStudentPrefsField(XBlockFieldBase):  # lint-amnesty, pylint: disabl
     student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
 
-class XModuleStudentInfoField(XBlockFieldBase):  # lint-amnesty, pylint: disable=model-no-explicit-unicode
+class XModuleStudentInfoField(XBlockFieldBase):
     """
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('student', 'field_name'),)
 
@@ -356,12 +356,12 @@ class OfflineComputedGrade(models.Model):
 
     gradeset = models.TextField(null=True, blank=True)  # grades, stored as JSON
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('user', 'course_id'),)
 
     def __str__(self):
-        return f"[OfflineComputedGrade] {self.user}: {self.course_id} ({self.created}) = {self.gradeset}"
+        return "[OfflineComputedGrade] %s: %s (%s) = %s" % (self.user, self.course_id, self.created, self.gradeset)
 
 
 @python_2_unicode_compatible
@@ -373,7 +373,7 @@ class OfflineComputedGradeLog(models.Model):
     .. no_pii:
     """
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         ordering = ["-created"]
         get_latest_by = "created"
@@ -384,7 +384,7 @@ class OfflineComputedGradeLog(models.Model):
     nstudents = models.IntegerField(default=0)
 
     def __str__(self):
-        return "[OCGLog] {}: {}".format(str(self.course_id), self.created)
+        return "[OCGLog] %s: %s" % (text_type(self.course_id), self.created)
 
 
 class StudentFieldOverride(TimeStampedModel):
@@ -399,7 +399,7 @@ class StudentFieldOverride(TimeStampedModel):
     location = UsageKeyField(max_length=255, db_index=True)
     student = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
         unique_together = (('course_id', 'field', 'location', 'student'),)
 
@@ -415,7 +415,7 @@ class DynamicUpgradeDeadlineConfiguration(ConfigurationModel):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = 'courseware'
 
     deadline_days = models.PositiveSmallIntegerField(
@@ -424,7 +424,7 @@ class DynamicUpgradeDeadlineConfiguration(ConfigurationModel):
     )
 
 
-class OptOutDynamicUpgradeDeadlineMixin:
+class OptOutDynamicUpgradeDeadlineMixin(object):
     """
     Provides convenience methods for interpreting the enabled and opt out status.
     """
@@ -447,7 +447,7 @@ class CourseDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixi
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
 
     KEY_FIELDS = ('course_id',)
@@ -474,7 +474,7 @@ class OrgDynamicUpgradeDeadlineConfiguration(OptOutDynamicUpgradeDeadlineMixin, 
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "courseware"
 
     KEY_FIELDS = ('org_id',)

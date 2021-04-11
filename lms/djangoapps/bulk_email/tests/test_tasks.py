@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for LMS instructor-initiated background tasks.
 
@@ -10,9 +11,8 @@ paths actually work.
 import json
 from itertools import chain, cycle, repeat
 from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected
-from unittest.mock import Mock, patch
 from uuid import uuid4
-import pytest
+
 from boto.exception import AWSConnectionError
 from boto.ses.exceptions import (
     SESAddressBlacklistedError,
@@ -28,8 +28,11 @@ from boto.ses.exceptions import (
 from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
+from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
+from six.moves import range
 
+from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from lms.djangoapps.bulk_email.tasks import _get_course_email_context
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import SubtaskStatus, update_subtask_status
@@ -38,12 +41,10 @@ from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
-
 
 class TestTaskFailure(Exception):
     """Dummy exception used for unit tests."""
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
@@ -74,12 +75,12 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
 
     def setUp(self):
-        super().setUp()
+        super(TestBulkEmailInstructorTask, self).setUp()
         self.initialize_course()
         self.instructor = self.create_instructor('instructor')
 
@@ -115,13 +116,13 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_missing_current_task(self):
         task_entry = self._create_input_entry()
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             send_bulk_course_email(task_entry.id, {})
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
         task_entry = self._create_input_entry(course_id=CourseLocator("bogus", "course", "id"))
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 
     def test_bad_task_id_on_update(self):
@@ -132,7 +133,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
             bogus_task_id = "this-is-bogus"
             update_subtask_status(entry_id, bogus_task_id, new_subtask_status)
 
-        with pytest.raises(ValueError):
+        with self.assertRaises(ValueError):
             with patch('lms.djangoapps.bulk_email.tasks.update_subtask_status', dummy_update_subtask_status):
                 send_bulk_course_email(task_entry.id, {})
 
@@ -144,24 +145,24 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         """Compare counts with 'subtasks' entry in InstructorTask table."""
         subtask_info = json.loads(entry.subtasks)
         # verify subtask-level counts:
-        assert subtask_info.get('total') == 1
-        assert subtask_info.get('succeeded') == (1 if (succeeded > 0) else 0)
-        assert subtask_info.get('failed') == (0 if (succeeded > 0) else 1)
+        self.assertEqual(subtask_info.get('total'), 1)
+        self.assertEqual(subtask_info.get('succeeded'), 1 if succeeded > 0 else 0)
+        self.assertEqual(subtask_info.get('failed'), 0 if succeeded > 0 else 1)
         # verify individual subtask status:
         subtask_status_info = subtask_info.get('status')
         task_id_list = list(subtask_status_info.keys())
-        assert len(task_id_list) == 1
+        self.assertEqual(len(task_id_list), 1)
         task_id = task_id_list[0]
         subtask_status = subtask_status_info.get(task_id)
-        print(f"Testing subtask status: {subtask_status}")
-        assert subtask_status.get('task_id') == task_id
-        assert subtask_status.get('attempted') == (succeeded + failed)
-        assert subtask_status.get('succeeded') == succeeded
-        assert subtask_status.get('skipped') == skipped
-        assert subtask_status.get('failed') == failed
-        assert subtask_status.get('retried_nomax') == retried_nomax
-        assert subtask_status.get('retried_withmax') == retried_withmax
-        assert subtask_status.get('state') == (SUCCESS if (succeeded > 0) else FAILURE)
+        print(u"Testing subtask status: {}".format(subtask_status))
+        self.assertEqual(subtask_status.get('task_id'), task_id)
+        self.assertEqual(subtask_status.get('attempted'), succeeded + failed)
+        self.assertEqual(subtask_status.get('succeeded'), succeeded)
+        self.assertEqual(subtask_status.get('skipped'), skipped)
+        self.assertEqual(subtask_status.get('failed'), failed)
+        self.assertEqual(subtask_status.get('retried_nomax'), retried_nomax)
+        self.assertEqual(subtask_status.get('retried_withmax'), retried_withmax)
+        self.assertEqual(subtask_status.get('state'), SUCCESS if succeeded > 0 else FAILURE)
 
     def _test_run_with_task(
             self, task_class, action_name, total, succeeded,
@@ -171,20 +172,20 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         parent_status = self._run_task_with_mock_celery(task_class, task_entry.id, task_entry.task_id)
 
         # check return value
-        assert parent_status.get('total') == total
-        assert parent_status.get('action_name') == action_name
+        self.assertEqual(parent_status.get('total'), total)
+        self.assertEqual(parent_status.get('action_name'), action_name)
 
         # compare with task_output entry in InstructorTask table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         status = json.loads(entry.task_output)
-        assert status.get('attempted') == (succeeded + failed)
-        assert status.get('succeeded') == succeeded
-        assert status.get('skipped') == skipped
-        assert status.get('failed') == failed
-        assert status.get('total') == total
-        assert status.get('action_name') == action_name
-        assert status.get('duration_ms') > 0
-        assert entry.task_state == SUCCESS
+        self.assertEqual(status.get('attempted'), succeeded + failed)
+        self.assertEqual(status.get('succeeded'), succeeded)
+        self.assertEqual(status.get('skipped'), skipped)
+        self.assertEqual(status.get('failed'), failed)
+        self.assertEqual(status.get('total'), total)
+        self.assertEqual(status.get('action_name'), action_name)
+        self.assertGreater(status.get('duration_ms'), 0)
+        self.assertEqual(entry.task_state, SUCCESS)
         self._assert_single_subtask_status(entry, succeeded, failed, skipped, retried_nomax, retried_withmax)
         return entry
 
@@ -210,9 +211,9 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([Exception("This should not happen!")])
             parent_status = self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
-        assert parent_status.get('total') == num_emails
-        assert parent_status.get('succeeded') == num_emails
-        assert parent_status.get('failed') == 0
+        self.assertEqual(parent_status.get('total'), num_emails)
+        self.assertEqual(parent_status.get('succeeded'), num_emails)
+        self.assertEqual(parent_status.get('failed'), 0)
 
     def test_unactivated_user(self):
         # Select number of emails to fit into a single subtask.
@@ -290,7 +291,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
         students = [self.create_student('robot%d' % i) for i in range(num_emails)]
         for student in students[:emails_with_non_ascii_chars]:
-            student.email = f'{student.username}@tesá.com'
+            student.email = '{username}@tesá.com'.format(username=student.username)
             student.save()
 
         total = num_emails + num_of_course_instructors
@@ -450,7 +451,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_bulk_emails_with_unicode_course_image_name(self):
         # Test bulk email with unicode characters in course image name
-        course_image = '在淡水測試.jpg'
+        course_image = u'在淡水測試.jpg'
         self.course = CourseFactory.create(course_image=course_image)
 
         num_emails = 2
@@ -463,12 +464,12 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_get_course_email_context_has_correct_keys(self):
         result = _get_course_email_context(self.course)
-        assert 'course_title' in result
-        assert 'course_root' in result
-        assert 'course_language' in result
-        assert 'course_url' in result
-        assert 'course_image_url' in result
-        assert 'course_end_date' in result
-        assert 'account_settings_url' in result
-        assert 'email_settings_url' in result
-        assert 'platform_name' in result
+        self.assertIn('course_title', result)
+        self.assertIn('course_root', result)
+        self.assertIn('course_language', result)
+        self.assertIn('course_url', result)
+        self.assertIn('course_image_url', result)
+        self.assertIn('course_end_date', result)
+        self.assertIn('account_settings_url', result)
+        self.assertIn('email_settings_url', result)
+        self.assertIn('platform_name', result)

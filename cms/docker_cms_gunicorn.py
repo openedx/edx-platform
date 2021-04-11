@@ -11,7 +11,7 @@ workers = 7
 
 
 def pre_request(worker, req):
-    worker.log.info(f"{req.method} {req.path}")
+    worker.log.info("%s %s" % (req.method, req.path))
 
 
 def close_all_caches():

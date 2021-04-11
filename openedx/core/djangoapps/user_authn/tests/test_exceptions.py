@@ -16,4 +16,4 @@ class AuthFailedErrorTests(TestCase):
         exception = AuthFailedError(script_tag)
 
         expected_value = Text(script_tag)
-        assert exception.value == expected_value
+        self.assertEqual(exception.value, expected_value)

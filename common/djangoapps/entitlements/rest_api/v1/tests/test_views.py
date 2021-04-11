@@ -7,23 +7,24 @@ import logging
 import unittest
 import uuid
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
+from mock import patch
 from opaque_keys.edx.locator import CourseKey
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.models import UserOrgTag
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -32,7 +33,7 @@ log = logging.getLogger(__name__)
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
-    from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail  # lint-amnesty, pylint: disable=line-too-long
+    from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
     from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
     from common.djangoapps.entitlements.rest_api.v1.views import set_entitlement_policy
 
@@ -45,7 +46,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
     ENTITLEMENTS_DETAILS_PATH = 'entitlements_api:v1:entitlements-detail'
 
     def setUp(self):
-        super().setUp()
+        super(EntitlementViewSetTest, self).setUp()
         self.user = UserFactory(is_staff=True)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.course = CourseFactory()
@@ -375,7 +376,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
         entitlement_data['email_opt_in'] = True
 
-        org = 'particularly'
+        org = u'particularly'
         mock_get_owners.return_value = [{'key': org}]
 
         response = self.client.post(
@@ -386,7 +387,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org, key='email-optin')
-        assert result_obj.value == 'True'
+        self.assertEqual(result_obj.value, u"True")
 
     @patch("common.djangoapps.entitlements.rest_api.v1.views.get_owners_for_course")
     def test_email_opt_in_multiple_orgs(self, mock_get_owners):
@@ -394,8 +395,8 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         entitlement_data = self._get_data_set(self.user, str(course_uuid))
         entitlement_data['email_opt_in'] = True
 
-        org_1 = 'particularly'
-        org_2 = 'underwood'
+        org_1 = u'particularly'
+        org_2 = u'underwood'
         mock_get_owners.return_value = [{'key': org_1}, {'key': org_2}]
 
         response = self.client.post(
@@ -406,9 +407,9 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         assert response.status_code == 201
 
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_1, key='email-optin')
-        assert result_obj.value == 'True'
+        self.assertEqual(result_obj.value, u"True")
         result_obj = UserOrgTag.objects.get(user=self.user, org=org_2, key='email-optin')
-        assert result_obj.value == 'True'
+        self.assertEqual(result_obj.value, u"True")
 
     def test_add_entitlement_with_support_detail(self):
         """
@@ -484,7 +485,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         course = CourseFactory.create(self_paced=True)
         course_uuid = uuid.uuid4()
-        CourseModeFactory(
+        course_mode = CourseModeFactory(
             course_id=course.id,
             mode_slug=CourseMode.VERIFIED,
             # This must be in the future to ensure it is returned by downstream code.
@@ -498,9 +499,11 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         # Add an audit course enrollment for user.
         enrollment = CourseEnrollment.enroll(self.user, course.id, mode=CourseMode.AUDIT)
 
-        # Set an expired dynamic upgrade deadline
-        enrollment.schedule.upgrade_deadline = now() + timedelta(days=-2)
-        enrollment.schedule.save()
+        # Set an upgrade schedule so that dynamic upgrade deadlines are used
+        ScheduleFactory.create(
+            enrollment=enrollment,
+            upgrade_deadline=course_mode.expiration_datetime + timedelta(days=-3)
+        )
 
         # The upgrade should complete and ignore the deadline
         response = self.client.post(
@@ -610,7 +613,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         self.client.login(username=not_staff_user.username, password=TEST_PASSWORD)
         entitlement_user2 = CourseEntitlementFactory.create_batch(2, user=not_staff_user, created=past_datetime)
         url = reverse('entitlements_api:v1:entitlements-list')
-        url += f'?user={not_staff_user.username}'
+        url += '?user={username}'.format(username=not_staff_user.username)
 
         # Set the first entitlement to be at a time that it isn't expired
         entitlement_user2[0].created = now()
@@ -630,7 +633,7 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         CourseEntitlementFactory.create()
         entitlement_user2 = CourseEntitlementFactory.create(user=user2)
         url = reverse('entitlements_api:v1:entitlements-list')
-        url += f'?user={user2.username}'
+        url += '?user={username}'.format(username=user2.username)
         response = self.client.get(
             url,
             content_type='application/json',
@@ -816,7 +819,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
     ENTITLEMENTS_ENROLLMENT_NAMESPACE = 'entitlements_api:v1:enrollments'
 
     def setUp(self):
-        super().setUp()
+        super(EntitlementEnrollmentViewSetTest, self).setUp()
         self.user = UserFactory()
         UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
 
@@ -1100,7 +1103,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is None
         assert course_entitlement.expired_at is not None
 
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)  # lint-amnesty, pylint: disable=line-too-long
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=False)
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=True)
     @patch('common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course')
     def test_user_can_revoke_and_no_refund_available(
@@ -1144,7 +1147,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert course_entitlement.enrollment_course_run is not None
         assert course_entitlement.expired_at is None
 
-    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)  # lint-amnesty, pylint: disable=line-too-long
+    @patch('common.djangoapps.entitlements.rest_api.v1.views.CourseEntitlement.is_entitlement_refundable', return_value=True)
     @patch('common.djangoapps.entitlements.models.refund_entitlement', return_value=False)
     @patch("common.djangoapps.entitlements.rest_api.v1.views.get_course_runs_for_course")
     def test_user_is_not_unenrolled_on_failed_refund(

@@ -12,11 +12,12 @@ of SSO IDV records.
 """
 
 from django.core.management.base import BaseCommand, CommandError
+
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.third_party_auth.api.utils import filter_user_social_auth_queryset_by_provider
-from common.djangoapps.third_party_auth.provider import Registry
 from lms.djangoapps.verify_student.models import SSOVerification
+from common.djangoapps.third_party_auth.provider import Registry
 
 
 class Command(BaseCommand):
@@ -48,8 +49,8 @@ class Command(BaseCommand):
 
         try:
             provider = Registry.get(provider_slug)
-        except ValueError as e:  # lint-amnesty, pylint: disable=unused-variable
-            raise CommandError(f'provider slug {provider_slug} does not exist')  # lint-amnesty, pylint: disable=raise-missing-from
+        except ValueError as e:
+            raise CommandError('provider slug {slug} does not exist'.format(slug=provider_slug))
 
         query_set = UserSocialAuth.objects.select_related('user__profile')
         query_set = filter_user_social_auth_queryset_by_provider(query_set, provider)

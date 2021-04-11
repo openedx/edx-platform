@@ -10,3 +10,4 @@
 -c ../constraints.txt
 
 pip-tools                 # Contains pip-compile, used to generate pip requirements files
+six                       # Python 2/3 compatibility

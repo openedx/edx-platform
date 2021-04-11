@@ -8,7 +8,6 @@ import logging
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from xmodule.modulestore.django import SignalHandler
 
 from .models import CourseOverview
@@ -51,7 +50,6 @@ def _check_for_course_changes(previous_course_overview, updated_course_overview)
     if previous_course_overview:
         _check_for_course_date_changes(previous_course_overview, updated_course_overview)
         _check_for_pacing_changes(previous_course_overview, updated_course_overview)
-        _check_for_cert_availability_date_changes(previous_course_overview, updated_course_overview)
 
 
 def _check_for_course_date_changes(previous_course_overview, updated_course_overview):
@@ -64,14 +62,14 @@ def _check_for_course_date_changes(previous_course_overview, updated_course_over
         )
 
 
-def _log_start_date_change(previous_course_overview, updated_course_overview):  # lint-amnesty, pylint: disable=missing-function-docstring
+def _log_start_date_change(previous_course_overview, updated_course_overview):
     previous_start_str = 'None'
     if previous_course_overview.start is not None:
         previous_start_str = previous_course_overview.start.isoformat()
     new_start_str = 'None'
     if updated_course_overview.start is not None:
         new_start_str = updated_course_overview.start.isoformat()
-    LOG.info('Course start date changed: course={} previous={} new={}'.format(
+    LOG.info(u'Course start date changed: course={0} previous={1} new={2}'.format(
         updated_course_overview.id,
         previous_start_str,
         new_start_str,
@@ -84,19 +82,4 @@ def _check_for_pacing_changes(previous_course_overview, updated_course_overview)
             sender=None,
             updated_course_overview=updated_course_overview,
             previous_self_paced=previous_course_overview.self_paced,
-        )
-
-
-def _check_for_cert_availability_date_changes(previous_course_overview, updated_course_overview):
-    """ Checks if the cert available date has changed and if so, sends a COURSE_CERT_DATE_CHANGE signal"""
-    if previous_course_overview.certificate_available_date != updated_course_overview.certificate_available_date:
-        LOG.info(
-            f"Certificate availability date for {str(updated_course_overview.id)} has changed from " +
-            f"{previous_course_overview.certificate_available_date} to " +
-            f"{updated_course_overview.certificate_available_date}. Sending COURSE_CERT_DATE_CHANGE signal."
-        )
-        COURSE_CERT_DATE_CHANGE.send_robust(
-            sender=None,
-            course_key=updated_course_overview.id,
-            available_date=updated_course_overview.certificate_available_date
         )

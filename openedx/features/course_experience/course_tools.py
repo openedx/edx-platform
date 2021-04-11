@@ -41,7 +41,7 @@ class CourseTool(object):
         raise NotImplementedError("Must specify an id to enable course tool eventing.")
 
     @classmethod
-    def is_enabled(cls, request, course_key):  # lint-amnesty, pylint: disable=unused-argument
+    def is_enabled(cls, request, course_key):
         """
         Returns true if this tool is enabled for the specified course key.
         """

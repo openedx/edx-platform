@@ -11,7 +11,7 @@ from common.test.acceptance.fixtures import CATALOG_STUB_URL
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 
 
-class CatalogFixture:
+class CatalogFixture(object):
     """
     Interface to set up mock responses from the Catalog stub server.
     """
@@ -30,15 +30,15 @@ class CatalogFixture:
             uuid = program['uuid']
             uuids.append(uuid)
 
-            program_key = f'{key}.{uuid}'
+            program_key = '{base}.{uuid}'.format(base=key, uuid=uuid)
             requests.put(
-                f'{CATALOG_STUB_URL}/set_config',
+                '{}/set_config'.format(CATALOG_STUB_URL),
                 data={program_key: json.dumps(program)},
             )
 
         # Stub list endpoint as if the uuids_only query param had been passed.
         requests.put(
-            f'{CATALOG_STUB_URL}/set_config',
+            '{}/set_config'.format(CATALOG_STUB_URL),
             data={key: json.dumps(uuids)},
         )
 
@@ -50,7 +50,7 @@ class CatalogFixture:
              pathways (list): A list of credit pathways. List endpoint will be stubbed using data from this list.
         """
         requests.put(
-            f'{CATALOG_STUB_URL}/set_config',
+            '{}/set_config'.format(CATALOG_STUB_URL),
             data={'catalog.pathways': json.dumps({'results': pathways, 'next': None})}
         )
 
@@ -62,18 +62,18 @@ class CatalogFixture:
             program_types (list): A list of program types. List endpoint will be stubbed using data from this list.
         """
         requests.put(
-            f'{CATALOG_STUB_URL}/set_config',
+            '{}/set_config'.format(CATALOG_STUB_URL),
             data={'catalog.programs_types': json.dumps(program_types)},
         )
 
 
-class CatalogIntegrationMixin:
+class CatalogIntegrationMixin(object):
     """Mixin providing a method used to configure the catalog integration."""
     def set_catalog_integration(self, is_enabled=False, service_username=None):
         """Use this to change the catalog integration config model during tests."""
         ConfigModelFixture('/config/catalog', {
             'enabled': is_enabled,
-            'internal_api_url': f'{CATALOG_STUB_URL}/api/v1/',
+            'internal_api_url': '{}/api/v1/'.format(CATALOG_STUB_URL),
             'cache_ttl': 0,
             'service_username': service_username,
         }).install()

@@ -8,14 +8,14 @@ from web_fragments.fragment import Fragment
 from .x_module import DescriptorSystem, XModuleDescriptor, shim_xmodule_js
 
 
-class MakoDescriptorSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstract-method
+class MakoDescriptorSystem(DescriptorSystem):
     def __init__(self, render_template, **kwargs):
-        super().__init__(**kwargs)
+        super(MakoDescriptorSystem, self).__init__(**kwargs)
 
         self.render_template = render_template
 
 
-class MakoTemplateBlockBase:
+class MakoTemplateBlockBase(object):
     """
     XBlock intended as a mixin that uses a mako template
     to specify the module html.
@@ -27,7 +27,7 @@ class MakoTemplateBlockBase:
     # pylint: disable=no-member
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(MakoTemplateBlockBase, self).__init__(*args, **kwargs)
         if getattr(self.runtime, 'render_template', None) is None:
             raise TypeError(
                 '{runtime} must have a render_template function'

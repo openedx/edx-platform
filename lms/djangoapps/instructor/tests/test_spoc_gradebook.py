@@ -1,12 +1,16 @@
 """
 Tests of the instructor dashboard spoc gradebook
 """
+
+
 from django.urls import reverse
+from six import text_type
+from six.moves import range
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -23,7 +27,7 @@ class TestGradebook(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestGradebook, cls).setUpClass()
 
         # Create a course with the desired grading policy (from our class attribute)
         kwargs = {}
@@ -53,7 +57,7 @@ class TestGradebook(SharedModuleStoreTestCase):
             ]
 
     def setUp(self):
-        super().setUp()
+        super(TestGradebook, self).setUp()
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
@@ -71,14 +75,14 @@ class TestGradebook(SharedModuleStoreTestCase):
                     course_id=self.course.id,
                     module_state_key=item.location
                 )
-        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': str(self.course.id)})
+        task_compute_all_grades_for_course.apply_async(kwargs={'course_key': text_type(self.course.id)})
 
         self.response = self.client.get(reverse(
             'spoc_gradebook',
-            args=(str(self.course.id),)
+            args=(text_type(self.course.id),)
         ))
 
-        assert self.response.status_code == 200
+        self.assertEqual(self.response.status_code, 200)
 
 
 class TestDefaultGradingPolicy(TestGradebook):
@@ -88,22 +92,22 @@ class TestDefaultGradingPolicy(TestGradebook):
     """
     def test_all_users_listed(self):
         for user in self.users:
-            assert user.username in str(self.response.content, 'utf-8')
+            self.assertIn(user.username, text_type(self.response.content, 'utf-8'))
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
         # One use at the top of the page [1]
-        assert 7 == self.response.content.count(b'grade_Pass')
+        self.assertEqual(7, self.response.content.count(b'grade_Pass'))
 
         # Users 1-5 attempted Homework 1 (and get Fs) [4]
         # Users 1-10 attempted any homework (and get Fs) [10]
         # Users 4-10 scored enough to not get rounded to 0 for the class (and get Fs) [7]
         # One use at top of the page [1]
-        assert 23 == self.response.content.count(b'grade_F')
+        self.assertEqual(23, self.response.content.count(b'grade_F'))
 
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
-        assert 292 == self.response.content.count(b'grade_None')
+        self.assertEqual(292, self.response.content.count(b'grade_None'))
 
 
 class TestLetterCutoffPolicy(TestGradebook):
@@ -131,38 +135,38 @@ class TestLetterCutoffPolicy(TestGradebook):
 
     def test_styles(self):
 
-        self.assertContains(self.response, "grade_A {color:green;}")
-        self.assertContains(self.response, "grade_B {color:Chocolate;}")
-        self.assertContains(self.response, "grade_C {color:DarkSlateGray;}")
-        self.assertContains(self.response, "grade_D {color:DarkSlateGray;}")
+        self.assertContains(self.response, u"grade_A {color:green;}")
+        self.assertContains(self.response, u"grade_B {color:Chocolate;}")
+        self.assertContains(self.response, u"grade_C {color:DarkSlateGray;}")
+        self.assertContains(self.response, u"grade_D {color:DarkSlateGray;}")
 
     def test_assigned_grades(self):
         # Users 9-10 have >= 90% on Homeworks [2]
         # Users 9-10 have >= 90% on the class [2]
         # One use at the top of the page [1]
-        assert 5 == self.response.content.count(b'grade_A')
+        self.assertEqual(5, self.response.content.count(b'grade_A'))
 
         # User 8 has 80 <= Homeworks < 90 [1]
         # User 8 has 80 <= class < 90 [1]
         # One use at the top of the page [1]
-        assert 3 == self.response.content.count(b'grade_B')
+        self.assertEqual(3, self.response.content.count(b'grade_B'))
 
         # User 7 has 70 <= Homeworks < 80 [1]
         # User 7 has 70 <= class < 80 [1]
         # One use at the top of the page [1]
-        assert 3 == self.response.content.count(b'grade_C')
+        self.assertEqual(3, self.response.content.count(b'grade_C'))
 
         # User 6 has 60 <= Homeworks < 70 [1]
         # User 6 has 60 <= class < 70 [1]
         # One use at the top of the page [1]
-        assert 3 == self.response.content.count(b'grade_C')
+        self.assertEqual(3, self.response.content.count(b'grade_C'))
 
         # Users 1-5 have 60% > grades > 0 on Homeworks [5]
         # Users 1-5 have 60% > grades > 0 on the class [5]
         # One use at top of the page [1]
-        assert 11 == self.response.content.count(b'grade_F')
+        self.assertEqual(11, self.response.content.count(b'grade_F'))
 
         # User 0 has 0 on Homeworks [1]
         # User 0 has 0 on the class [1]
         # One use at the top of the page [1]
-        assert 3 == self.response.content.count(b'grade_None')
+        self.assertEqual(3, self.response.content.count(b'grade_None'))

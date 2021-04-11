@@ -10,6 +10,7 @@ import traceback
 from collections import defaultdict
 from functools import wraps
 
+import six
 from django import forms
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -56,14 +57,14 @@ def intercept_errors(api_error, ignore_errors=None):
                 for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
                         msg = (
-                            "A handled error occurred when calling '{func_name}' "
-                            "with arguments '{args}' and keyword arguments '{kwargs}': "
-                            "{exception}"
+                            u"A handled error occurred when calling '{func_name}' "
+                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
+                            u"{exception}"
                         ).format(
                             func_name=func.__name__,
                             args=args,
                             kwargs=kwargs,
-                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)  # lint-amnesty, pylint: disable=no-member
+                            exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
                         )
                         LOGGER.warning(msg)
                         raise
@@ -72,18 +73,18 @@ def intercept_errors(api_error, ignore_errors=None):
 
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
-                    "An unexpected error occurred when calling '{func_name}' "
-                    "with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
-                    "{exception}"
+                    u"An unexpected error occurred when calling '{func_name}' "
+                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
+                    u"{exception}"
                 ).format(
                     func_name=func.__name__,
                     args=args,
                     kwargs=kwargs,
-                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),  # lint-amnesty, pylint: disable=no-member
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
                     caller=caller.strip(),
                 )
                 LOGGER.exception(msg)
-                raise api_error(msg)  # lint-amnesty, pylint: disable=raise-missing-from
+                raise api_error(msg)
         return _wrapped
     return _decorator
 
@@ -92,7 +93,7 @@ class InvalidFieldError(Exception):
     """The provided field definition is not valid. """
 
 
-class FormDescription:
+class FormDescription(object):
     """Generate a JSON representation of a form. """
 
     ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden"]
@@ -134,10 +135,10 @@ class FormDescription:
         self._field_overrides = defaultdict(dict)
 
     def add_field(
-            self, name, label="", field_type="text", default="",
-            placeholder="", instructions="", required=True, restrictions=None,
+            self, name, label=u"", field_type=u"text", default=u"",
+            placeholder=u"", instructions=u"", required=True, restrictions=None,
             options=None, include_default_option=False, error_messages=None,
-            supplementalLink="", supplementalText=""
+            supplementalLink=u"", supplementalText=u""
     ):
         """Add a field to the form description.
 
@@ -189,7 +190,7 @@ class FormDescription:
 
         """
         if field_type not in self.ALLOWED_TYPES:
-            msg = "Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
+            msg = u"Field type '{field_type}' is not a valid type.  Allowed types are: {allowed}.".format(
                 field_type=field_type,
                 allowed=", ".join(self.ALLOWED_TYPES)
             )
@@ -239,11 +240,14 @@ class FormDescription:
 
         if restrictions is not None:
             allowed_restrictions = self.ALLOWED_RESTRICTIONS.get(field_type, [])
-            for key, val in restrictions.items():
+            for key, val in six.iteritems(restrictions):
                 if key in allowed_restrictions:
                     field_dict["restrictions"][key] = val
                 else:
-                    msg = f"Restriction '{key}' is not allowed for field type '{field_type}'"
+                    msg = u"Restriction '{restriction}' is not allowed for field type '{field_type}'".format(
+                        restriction=key,
+                        field_type=field_type
+                    )
                     raise InvalidFieldError(msg)
 
         if error_messages is not None:
@@ -333,7 +337,7 @@ class FormDescription:
 
         self._field_overrides[field_name].update({
             property_name: property_value
-            for property_name, property_value in kwargs.items()
+            for property_name, property_value in six.iteritems(kwargs)
             if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
@@ -343,13 +347,13 @@ class LocalizedJSONEncoder(DjangoJSONEncoder):
     JSON handler that evaluates ugettext_lazy promises.
     """
     # pylint: disable=method-hidden
-    def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ
+    def default(self, obj):
         """
         Forces evaluation of ugettext_lazy promises.
         """
         if isinstance(obj, Promise):
             return force_text(obj)
-        super().default(obj)
+        super(LocalizedJSONEncoder, self).default(obj)
 
 
 def serializer_is_dirty(preference_serializer):

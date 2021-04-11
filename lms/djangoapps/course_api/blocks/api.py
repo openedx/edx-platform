@@ -9,10 +9,10 @@ from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenConte
 from lms.djangoapps.course_blocks.transformers.hide_empty import HideEmptyTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-from openedx.features.effort_estimation.api import EffortEstimationTransformer
 
 from .serializers import BlockDictSerializer, BlockSerializer
 from .toggles import HIDE_ACCESS_DENIALS_FLAG
+from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.blocks_api import BlocksAPITransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 
@@ -72,11 +72,8 @@ def get_blocks(
     if requested_fields is None:
         requested_fields = []
     include_completion = 'completion' in requested_fields
-    include_effort_estimation = (EffortEstimationTransformer.EFFORT_TIME in requested_fields or
-                                 EffortEstimationTransformer.EFFORT_ACTIVITIES in requested_fields)
-    include_gated_sections = 'show_gated_sections' in requested_fields
-    include_has_scheduled_content = 'has_scheduled_content' in requested_fields
     include_special_exams = 'special_exam_info' in requested_fields
+    include_gated_sections = 'show_gated_sections' in requested_fields
 
     if user is not None:
         transformers += course_blocks_api.get_course_block_access_transformers(user)
@@ -95,9 +92,6 @@ def get_blocks(
     if is_request_from_mobile_app(request):
         transformers += [HideEmptyTransformer()]
 
-    if include_effort_estimation:
-        transformers += [EffortEstimationTransformer()]
-
     transformers += [
         BlocksAPITransformer(
             block_counts,
@@ -107,15 +101,12 @@ def get_blocks(
         )
     ]
 
+    if include_completion:
+        transformers += [BlockCompletionTransformer()]
+
     # transform
     blocks = course_blocks_api.get_course_blocks(
-        user,
-        usage_key,
-        transformers,
-        allow_start_dates_in_future=allow_start_dates_in_future,
-        include_completion=include_completion,
-        include_has_scheduled_content=include_has_scheduled_content
-    )
+        user, usage_key, transformers, allow_start_dates_in_future=allow_start_dates_in_future)
 
     # filter blocks by types
     if block_types_filter:

@@ -18,7 +18,7 @@ class CourseEditLTIFieldsEnabledAdminForm(forms.ModelForm):
     Form for LTI consumer course-specific configuration to verify the course id.
     """
 
-    class Meta:
+    class Meta(object):
         model = CourseEditLTIFieldsEnabledFlag
         fields = '__all__'
 

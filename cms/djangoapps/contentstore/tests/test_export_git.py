@@ -32,7 +32,7 @@ class TestExportGit(CourseTestCase):
         """
         Setup test course, user, and url.
         """
-        super().setUp()
+        super(TestExportGit, self).setUp()
         self.course_module = modulestore().get_course(self.course.id)
         self.test_url = reverse_course_url('export_git', self.course.id)
 
@@ -46,7 +46,7 @@ class TestExportGit(CourseTestCase):
         os.mkdir(repo_dir)
         self.addCleanup(shutil.rmtree, repo_dir)
 
-        bare_repo_dir = '{}/{}.git'.format(
+        bare_repo_dir = '{0}/{1}.git'.format(
             os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR),
             repo_name
         )
@@ -55,7 +55,7 @@ class TestExportGit(CourseTestCase):
 
         subprocess.check_output(['git', '--bare', 'init', ], cwd=bare_repo_dir)
         self.populate_course()
-        self.course_module.giturl = f'file://{bare_repo_dir}'
+        self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
         modulestore().update_item(self.course_module, self.user.id)
 
     def test_giturl_missing(self):
@@ -70,7 +70,7 @@ class TestExportGit(CourseTestCase):
              'course settings before you can export to git.'),
         )
 
-        response = self.client.get(f'{self.test_url}?action=push')
+        response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertContains(
             response,
             ('giturl must be defined in your '
@@ -84,7 +84,7 @@ class TestExportGit(CourseTestCase):
         self.course_module.giturl = 'foobar'
         modulestore().update_item(self.course_module, self.user.id)
 
-        response = self.client.get(f'{self.test_url}?action=push')
+        response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertContains(response, 'Export Failed:')
 
     def test_exception_translation(self):
@@ -94,7 +94,7 @@ class TestExportGit(CourseTestCase):
         self.course_module.giturl = 'foobar'
         modulestore().update_item(self.course_module, self.user.id)
 
-        response = self.client.get(f'{self.test_url}?action=push')
+        response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertNotContains(response, 'django.utils.functional.__proxy__')
 
     def test_course_export_success(self):
@@ -103,7 +103,7 @@ class TestExportGit(CourseTestCase):
         """
 
         self.make_bare_repo_with_course('test_repo')
-        response = self.client.get(f'{self.test_url}?action=push')
+        response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertContains(response, 'Export Succeeded')
 
     def test_repo_with_dots(self):
@@ -111,7 +111,7 @@ class TestExportGit(CourseTestCase):
         Regression test for a bad directory pathing of repo's that have dots.
         """
         self.make_bare_repo_with_course('test.repo')
-        response = self.client.get(f'{self.test_url}?action=push')
+        response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertContains(response, 'Export Succeeded')
 
     def test_dirty_repo(self):

@@ -21,7 +21,7 @@ class TemplateError(Exception):
     """
     Error occurred while rendering a Mako template.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
+    pass
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -51,7 +51,7 @@ class TemplateTestCase(unittest.TestCase):
         """
         Initialize the context.
         """
-        super(TemplateTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TemplateTestCase, self).setUp()
         self.context = {}
 
     def render_to_xml(self, context_dict):
@@ -64,7 +64,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
         except:
-            raise TemplateError(exceptions.text_error_template().render())  # lint-amnesty, pylint: disable=raise-missing-from
+            raise TemplateError(exceptions.text_error_template().render())
 
         # Attempt to construct an XML tree from the template
         # This makes it easy to use XPath to make assertions, rather
@@ -74,7 +74,7 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError("Could not parse XML from '{0}': {1}".format(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise TemplateError("Could not parse XML from '{0}': {1}".format(
                                 xml_str, str(exc)))
         else:
             return xml
@@ -91,7 +91,7 @@ class TemplateTestCase(unittest.TestCase):
         message = ("XML does not have %d match(es) for xpath '%s'\nXML: %s\nContext: %s"
                    % (exact_num, str(xpath), etree.tostring(xml_root), str(context_dict)))
 
-        assert len(xml_root.xpath(xpath)) == exact_num, message
+        self.assertEqual(len(xml_root.xpath(xpath)), exact_num, msg=message)
 
     def assert_no_xpath(self, xml_root, xpath, context_dict):
         """
@@ -117,11 +117,12 @@ class TemplateTestCase(unittest.TestCase):
         If no elements are found, the assertion fails.
         """
         element_list = xml_root.xpath(xpath)
-        assert len(element_list) > 0, ("Could not find element at '%s'\n%s" % (str(xpath), etree.tostring(xml_root)))
+        self.assertGreater(len(element_list), 0, "Could not find element at '%s'\n%s" %
+                           (str(xpath), etree.tostring(xml_root)))
         if exact:
-            assert text == element_list[0].text.strip()
+            self.assertEqual(text, element_list[0].text.strip())
         else:
-            assert text in element_list[0].text.strip()
+            self.assertIn(text, element_list[0].text.strip())
 
     def assert_description(self, describedby_xpaths):
         """
@@ -136,17 +137,17 @@ class TemplateTestCase(unittest.TestCase):
         descriptions = OrderedDict(
             (tag.get('id'), stringify_children(tag)) for tag in xml.xpath('//p[@class="question-description"]')
         )
-        assert self.DESCRIPTIONS == descriptions
+        self.assertEqual(self.DESCRIPTIONS, descriptions)
 
         # for each xpath verify that description_ids are set correctly
         for describedby_xpath in describedby_xpaths:
             describedbys = xml.xpath(describedby_xpath)
 
             # aria-describedby attributes must have ids
-            assert describedbys
+            self.assertTrue(describedbys)
 
             for describedby in describedbys:
-                assert describedby == self.DESCRIPTION_IDS
+                self.assertEqual(describedby, self.DESCRIPTION_IDS)
 
     def assert_describedby_attribute(self, describedby_xpaths):
         """
@@ -161,7 +162,7 @@ class TemplateTestCase(unittest.TestCase):
         # for each xpath verify that description_ids are set correctly
         for describedby_xpath in describedby_xpaths:
             describedbys = xml.xpath(describedby_xpath)
-            assert not describedbys
+            self.assertFalse(describedbys)
 
     def assert_status(self, status_div=False, status_class=False):
         """
@@ -233,8 +234,8 @@ class TemplateTestCase(unittest.TestCase):
                 self.assert_has_xpath(xml, "//*[@aria-label='%s']" % label['expected'], self.context)
             else:
                 element_list = xml.xpath(xpath)
-                assert len(element_list) == 1
-                assert stringify_children(element_list[0]) == label['actual']
+                self.assertEqual(len(element_list), 1)
+                self.assertEqual(stringify_children(element_list[0]), label['actual'])
 
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
@@ -245,7 +246,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'choicegroup.html'
 
     def setUp(self):
-        super(ChoiceGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ChoiceGroupTemplateTest, self).setUp()
         choices = [('1', 'choice 1'), ('2', 'choice 2'), ('3', 'choice 3')]
         self.context = {
             'id': '1',
@@ -492,7 +493,7 @@ class TextlineTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'textline.html'
 
     def setUp(self):
-        super(TextlineTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TextlineTemplateTest, self).setUp()
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -617,7 +618,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'formulaequationinput.html'
 
     def setUp(self):
-        super(FormulaEquationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(FormulaEquationInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'value': 'PREFILLED_VALUE',
@@ -668,7 +669,7 @@ class AnnotationInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'annotationinput.html'
 
     def setUp(self):
-        super(AnnotationInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(AnnotationInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'value': '<p>Test value</p>',
@@ -796,7 +797,7 @@ class MathStringTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'mathstring.html'
 
     def setUp(self):
-        super(MathStringTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(MathStringTemplateTest, self).setUp()
         self.context = {'isinline': False, 'mathstr': '', 'tail': ''}
 
     def test_math_string_inline(self):
@@ -838,7 +839,7 @@ class OptionInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'optioninput.html'
 
     def setUp(self):
-        super(OptionInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(OptionInputTemplateTest, self).setUp()
         self.context = {
             'id': 2,
             'options': [],
@@ -899,7 +900,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'drag_and_drop_input.html'
 
     def setUp(self):
-        super(DragAndDropTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(DragAndDropTemplateTest, self).setUp()
         self.context = {'id': 2,
                         'drag_and_drop_json': '',
                         'value': 0,
@@ -956,7 +957,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
                              '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
-        super(ChoiceTextGroupTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ChoiceTextGroupTemplateTest, self).setUp()
         choices = [
             (
                 '1_choiceinput_0bc',
@@ -1132,7 +1133,7 @@ class ChemicalEquationTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'chemicalequationinput.html'
 
     def setUp(self):
-        super(ChemicalEquationTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(ChemicalEquationTemplateTest, self).setUp()
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1153,7 +1154,7 @@ class SchematicInputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'schematicinput.html'
 
     def setUp(self):
-        super(SchematicInputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(SchematicInputTemplateTest, self).setUp()
         self.context = {
             'id': '1',
             'status': Status('correct'),
@@ -1185,7 +1186,7 @@ class CodeinputTemplateTest(TemplateTestCase):
     TEMPLATE_NAME = 'codeinput.html'
 
     def setUp(self):
-        super(CodeinputTemplateTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(CodeinputTemplateTest, self).setUp()
         self.context = {
             'id': '1',
             'status': Status('correct'),

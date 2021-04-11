@@ -1,4 +1,4 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+
 
 import json
 import unittest
@@ -12,37 +12,37 @@ class Test_PositionsCompare(unittest.TestCase):
     """ describe"""
 
     def test_nested_list_and_list1(self):
-        assert PositionsCompare([[1, 2], 40]) == PositionsCompare([1, 3])
+        self.assertEqual(PositionsCompare([[1, 2], 40]), PositionsCompare([1, 3]))
 
     def test_nested_list_and_list2(self):
-        assert PositionsCompare([1, 12]) != PositionsCompare([1, 1])
+        self.assertNotEqual(PositionsCompare([1, 12]), PositionsCompare([1, 1]))
 
     def test_list_and_list1(self):
-        assert PositionsCompare([[1, 2], 12]) != PositionsCompare([1, 15])
+        self.assertNotEqual(PositionsCompare([[1, 2], 12]), PositionsCompare([1, 15]))
 
     def test_list_and_list2(self):
-        assert PositionsCompare([1, 11]) == PositionsCompare([1, 1])
+        self.assertEqual(PositionsCompare([1, 11]), PositionsCompare([1, 1]))
 
     def test_numerical_list_and_string_list(self):
-        assert PositionsCompare([1, 2]) != PositionsCompare(['1'])
+        self.assertNotEqual(PositionsCompare([1, 2]), PositionsCompare(["1"]))
 
     def test_string_and_string_list1(self):
-        assert PositionsCompare('1') == PositionsCompare(['1'])
+        self.assertEqual(PositionsCompare("1"), PositionsCompare(["1"]))
 
     def test_string_and_string_list2(self):
-        assert PositionsCompare('abc') == PositionsCompare('abc')
+        self.assertEqual(PositionsCompare("abc"), PositionsCompare("abc"))
 
     def test_string_and_string_list3(self):
-        assert PositionsCompare('abd') != PositionsCompare('abe')
+        self.assertNotEqual(PositionsCompare("abd"), PositionsCompare("abe"))
 
     def test_float_and_string(self):
-        assert PositionsCompare([3.5, 5.7]) != PositionsCompare(['1'])
+        self.assertNotEqual(PositionsCompare([3.5, 5.7]), PositionsCompare(["1"]))
 
     def test_floats_and_ints(self):
-        assert PositionsCompare([3.5, 4.5]) == PositionsCompare([5, 7])
+        self.assertEqual(PositionsCompare([3.5, 4.5]), PositionsCompare([5, 7]))
 
 
-class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Test_DragAndDrop_Grade(unittest.TestCase):
 
     def test_targets_are_draggable_1(self):
         user_input = json.dumps([
@@ -64,7 +64,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_are_draggable_2(self):
         user_input = json.dumps([
@@ -107,7 +107,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_are_draggable_2_manual_parsing(self):
         user_input = json.dumps([
@@ -150,7 +150,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_are_draggable_3_nested(self):
         user_input = json.dumps([
@@ -209,7 +209,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_are_draggable_4_real_example(self):
         user_input = json.dumps([
@@ -283,83 +283,83 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
             },
 
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_true(self):
         user_input = '[{"1": "t1"}, \
          {"name_with_icon": "t2"}]'
         correct_answer = {'1': 't1', 'name_with_icon': 't2'}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_expect_no_actions_wrong(self):
         user_input = '[{"1": "t1"}, \
          {"name_with_icon": "t2"}]'
         correct_answer = []
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_expect_no_actions_right(self):
         user_input = '[]'
         correct_answer = []
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_false(self):
         user_input = '[{"1": "t1"}, \
         {"name_with_icon": "t2"}]'
         correct_answer = {'1': 't3', 'name_with_icon': 't2'}
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_true(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
         {"2": "t1"}]'
         correct_answer = {'1': 't1', 'name_with_icon': 't2', '2': 't1'}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_multiple_images_per_target_false(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}, \
         {"2": "t1"}]'
         correct_answer = {'1': 't2', 'name_with_icon': 't2', '2': 't1'}
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_targets_and_positions(self):
         user_input = '[{"1": [10,10]}, \
          {"name_with_icon": [[10,10],4]}]'
         correct_answer = {'1': [10, 10], 'name_with_icon': [[10, 10], 4]}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_position_and_targets(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
         correct_answer = {'1': 't1', 'name_with_icon': 't2'}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_exact(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [10, 10], 'name_with_icon': [20, 20]}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [25, 25], 'name_with_icon': [20, 20]}
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_radius(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [14, 14], 'name_with_icon': [20, 20]}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_true_in_manual_radius(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [[40, 10], 30], 'name_with_icon': [20, 20]}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_positions_false_in_manual_radius(self):
         user_input = '[{"1": [10, 10]}, {"name_with_icon": [20, 20]}]'
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_correct_answer_not_has_key_from_user_answer(self):
         user_input = '[{"1": "t1"}, {"name_with_icon": "t2"}]'
         correct_answer = {'3': 't3', 'name_with_icon': 't2'}
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_anywhere(self):
         """Draggables can be places anywhere on base image.
@@ -369,7 +369,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
             {"grass":[322.5,199.449951171875]}]'
 
         correct_answer = {'grass': [[300, 200], 200], 'ant': [[500, 0], 200]}
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_lcao_correct(self):
         """Describe carbon molecule in LCAO-MO"""
@@ -408,7 +408,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
             'rule': 'anyof'
         }]
 
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_lcao_extra_element_incorrect(self):
         """Describe carbon molecule in LCAO-MO"""
@@ -447,7 +447,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
             'rule': 'anyof'
         }]
 
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_draggable_no_mupliples(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
@@ -471,7 +471,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_draggable_with_mupliples(self):
         """Test reusable draggables with mupltiple draggables per target"""
@@ -495,7 +495,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_many_draggable_with_mupliples(self):
         """Test reusable draggables with mupltiple draggables per target"""
@@ -525,7 +525,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_reuse_many_draggable_with_mupliples_wrong(self):
         """Test reusable draggables with mupltiple draggables per target"""
@@ -556,7 +556,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'targets': ['target6'],
                 'rule': 'anyof'
             }]
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_false(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
@@ -581,7 +581,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal'
             }
         ]
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_(self):
         """Test reusable draggables (no mupltiple draggables per target)"""
@@ -606,7 +606,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_multiple(self):
         """Test reusable draggables  (mupltiple draggables per target)"""
@@ -631,7 +631,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof+number'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_multiple_false(self):
         """Test reusable draggables  (mupltiple draggables per target)"""
@@ -656,7 +656,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'anyof+number'
             }
         ]
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused(self):
         """Test a b c in 10 labels reused"""
@@ -681,7 +681,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal+number'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_label_10_targets_with_a_b_c_reused_false(self):
         """Test a b c in 10 labels reused false"""
@@ -706,7 +706,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'unordered_equal+number'
             }
         ]
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse(self):
         """Test reusable draggables """
@@ -725,7 +725,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'exact'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse_number(self):
         """Test reusable draggables with number """
@@ -743,7 +743,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'exact'
             }
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
     def test_mixed_reuse_and_not_reuse_number_false(self):
         """Test reusable draggables with numbers, but wrong"""
@@ -761,7 +761,7 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
                 'rule': 'exact'
             }
         ]
-        assert not draganddrop.grade(user_input, correct_answer)
+        self.assertFalse(draganddrop.grade(user_input, correct_answer))
 
     def test_alternative_correct_answer(self):
         user_input = '[{"name_with_icon":"t1"},\
@@ -772,10 +772,10 @@ class Test_DragAndDrop_Grade(unittest.TestCase):  # lint-amnesty, pylint: disabl
             {'draggables': ['name_with_icon'], 'targets': ['t1', 't1', 't1'],
                 'rule': 'exact'}
         ]
-        assert draganddrop.grade(user_input, correct_answer)
+        self.assertTrue(draganddrop.grade(user_input, correct_answer))
 
 
-class Test_DragAndDrop_Populate(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Test_DragAndDrop_Populate(unittest.TestCase):
 
     def test_1(self):
         correct_answer = {'1': [[40, 10], 29], 'name_with_icon': [20, 20]}
@@ -787,48 +787,64 @@ class Test_DragAndDrop_Populate(unittest.TestCase):  # lint-amnesty, pylint: dis
         user_groups = [['1'], ['name_with_icon']]
         user_positions = [{'user': [[10, 10]]}, {'user': [[20, 20]]}]
 
-        assert correct_groups == dnd.correct_groups
-        assert correct_positions == dnd.correct_positions
-        assert user_groups == dnd.user_groups
-        assert user_positions == dnd.user_positions
+        self.assertEqual(correct_groups, dnd.correct_groups)
+        self.assertEqual(correct_positions, dnd.correct_positions)
+        self.assertEqual(user_groups, dnd.user_groups)
+        self.assertEqual(user_positions, dnd.user_positions)
 
 
-class Test_DraAndDrop_Compare_Positions(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class Test_DraAndDrop_Compare_Positions(unittest.TestCase):
 
     def test_1(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert dnd.compare_positions(correct=[[1, 1], [2, 3]], user=[[2, 3], [1, 1]], flag='anyof')
+        self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                              user=[[2, 3], [1, 1]],
+                                              flag='anyof'))
 
     def test_2a(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert dnd.compare_positions(correct=[[1, 1], [2, 3]], user=[[2, 3], [1, 1]], flag='exact')
+        self.assertTrue(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                              user=[[2, 3], [1, 1]],
+                                              flag='exact'))
 
     def test_2b(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert not dnd.compare_positions(correct=[[1, 1], [2, 3]], user=[[2, 13], [1, 1]], flag='exact')
+        self.assertFalse(dnd.compare_positions(correct=[[1, 1], [2, 3]],
+                                               user=[[2, 13], [1, 1]],
+                                               flag='exact'))
 
     def test_3(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert not dnd.compare_positions(correct=['a', 'b'], user=['a', 'b', 'c'], flag='anyof')
+        self.assertFalse(dnd.compare_positions(correct=["a", "b"],
+                                               user=["a", "b", "c"],
+                                               flag='anyof'))
 
     def test_4(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert dnd.compare_positions(correct=['a', 'b', 'c'], user=['a', 'b'], flag='anyof')
+        self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
+                                              user=["a", "b"],
+                                              flag='anyof'))
 
     def test_5(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert not dnd.compare_positions(correct=['a', 'b', 'c'], user=['a', 'c', 'b'], flag='exact')
+        self.assertFalse(dnd.compare_positions(correct=["a", "b", "c"],
+                                               user=["a", "c", "b"],
+                                               flag='exact'))
 
     def test_6(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert dnd.compare_positions(correct=['a', 'b', 'c'], user=['a', 'c', 'b'], flag='anyof')
+        self.assertTrue(dnd.compare_positions(correct=["a", "b", "c"],
+                                              user=["a", "c", "b"],
+                                              flag='anyof'))
 
     def test_7(self):
         dnd = draganddrop.DragAndDrop({'1': 't1'}, '[{"1": "t1"}]')
-        assert not dnd.compare_positions(correct=['a', 'b', 'b'], user=['a', 'c', 'b'], flag='anyof')
+        self.assertFalse(dnd.compare_positions(correct=["a", "b", "b"],
+                                               user=["a", "c", "b"],
+                                               flag='anyof'))
 
 
-def suite():  # lint-amnesty, pylint: disable=missing-function-docstring
+def suite():
 
     testcases = [Test_PositionsCompare,
                  Test_DragAndDrop_Populate,

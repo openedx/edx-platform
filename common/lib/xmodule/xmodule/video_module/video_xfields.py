@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=cyclic-import
+"""
 XFields for video module.
 """
 
@@ -14,7 +14,7 @@ from xmodule.fields import RelativeTime
 _ = lambda text: text
 
 
-class VideoFields:
+class VideoFields(object):
     """Fields for `VideoBlock`."""
     display_name = String(
         help=_("The display name for this component."),

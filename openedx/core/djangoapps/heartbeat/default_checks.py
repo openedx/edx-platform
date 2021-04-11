@@ -8,6 +8,7 @@ Other checks should be included in their respective modules/djangoapps
 from datetime import datetime, timedelta
 from time import sleep, time
 
+import six
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
@@ -38,9 +39,9 @@ def check_modulestore():
     try:
         #@TODO Do we want to parse the output for split and mongo detail and return it?
         modulestore().heartbeat()
-        return 'modulestore', True, 'OK'
+        return 'modulestore', True, u'OK'
     except HeartbeatFailure as fail:
-        return 'modulestore', False, str(fail)
+        return 'modulestore', False, six.text_type(fail)
 
 
 def check_database():
@@ -55,9 +56,9 @@ def check_database():
     try:
         cursor.execute("SELECT 1")
         cursor.fetchone()
-        return 'sql', True, 'OK'
+        return 'sql', True, u'OK'
     except DatabaseError as fail:
-        return 'sql', False, str(fail)
+        return 'sql', False, six.text_type(fail)
 
 
 # Caching
@@ -75,9 +76,9 @@ def check_cache_set():
     """
     try:
         cache.set(CACHE_KEY, CACHE_VALUE, 30)
-        return 'cache_set', True, 'OK'
-    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
-        return 'cache_set', False, str(fail)
+        return 'cache_set', True, u'OK'
+    except Exception as fail:
+        return 'cache_set', False, six.text_type(fail)
 
 
 def check_cache_get():
@@ -91,11 +92,11 @@ def check_cache_get():
     try:
         data = cache.get(CACHE_KEY)
         if data == CACHE_VALUE:
-            return 'cache_get', True, 'OK'
+            return 'cache_get', True, u'OK'
         else:
-            return 'cache_get', False, 'value check failed'
-    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
-        return 'cache_get', False, str(fail)
+            return 'cache_get', False, u'value check failed'
+    except Exception as fail:
+        return 'cache_get', False, six.text_type(fail)
 
 
 # Celery
@@ -116,8 +117,8 @@ def check_celery():
         while expires > datetime.now():
             if task.ready() and task.result:
                 finished = str(time() - now)
-                return 'celery', True, str({'time': finished})
+                return 'celery', True, six.text_type({'time': finished})
             sleep(0.25)
         return 'celery', False, "expired"
-    except Exception as fail:  # lint-amnesty, pylint: disable=broad-except
-        return 'celery', False, str(fail)
+    except Exception as fail:
+        return 'celery', False, six.text_type(fail)

@@ -10,7 +10,7 @@ from django.conf import settings
 from . import factories
 
 
-class mock_ecommerce_api_endpoint:
+class mock_ecommerce_api_endpoint(object):
     """
     Base class for contextmanagers used to mock calls to api endpoints.
 
@@ -95,11 +95,11 @@ class mock_basket_order(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, basket_id, **kwargs):
-        super().__init__(**kwargs)
+        super(mock_basket_order, self).__init__(**kwargs)
         self.basket_id = basket_id
 
     def get_path(self):
-        return f'/baskets/{self.basket_id}/order/'
+        return '/baskets/{}/order/'.format(self.basket_id)
 
 
 class mock_create_refund(mock_ecommerce_api_endpoint):
@@ -131,11 +131,11 @@ class mock_process_refund(mock_ecommerce_api_endpoint):
     method = httpretty.PUT
 
     def __init__(self, refund_id, **kwargs):
-        super().__init__(**kwargs)
+        super(mock_process_refund, self).__init__(**kwargs)
         self.refund_id = refund_id
 
     def get_path(self):
-        return f'/refunds/{self.refund_id}/process/'
+        return '/refunds/{}/process/'.format(self.refund_id)
 
 
 class mock_order_endpoint(mock_ecommerce_api_endpoint):
@@ -145,11 +145,11 @@ class mock_order_endpoint(mock_ecommerce_api_endpoint):
     method = httpretty.GET
 
     def __init__(self, order_number, **kwargs):
-        super().__init__(**kwargs)
+        super(mock_order_endpoint, self).__init__(**kwargs)
         self.order_number = order_number
 
     def get_path(self):
-        return f'/orders/{self.order_number}/'
+        return '/orders/{}/'.format(self.order_number)
 
 
 class mock_get_orders(mock_ecommerce_api_endpoint):

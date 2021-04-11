@@ -7,21 +7,22 @@ import json
 import logging
 from time import time
 
+import six
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
 
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from common.djangoapps.student.models import get_user_by_username_or_email
-from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from common.djangoapps.track.views import task_track
-from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_course_by_id, get_problems_in_section
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
+from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.views import task_track
+from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 from ..exceptions import UpdateProblemModuleStateError
@@ -74,7 +75,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
         # find the problem descriptor:
         problem_descriptor = modulestore().get_item(usage_key)
-        problems[str(usage_key)] = problem_descriptor
+        problems[six.text_type(usage_key)] = problem_descriptor
 
     # if entrance_exam is present grab all problems in it
     if entrance_exam_url:
@@ -90,7 +91,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     for module_to_update in modules_to_update:
         task_progress.attempted += 1
-        module_descriptor = problems[str(module_to_update.module_state_key)]
+        module_descriptor = problems[six.text_type(module_to_update.module_state_key)]
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         update_status = update_fcn(module_descriptor, module_to_update, task_input)
@@ -103,7 +104,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         elif update_status == UPDATE_STATUS_SKIPPED:
             task_progress.skipped += 1
         else:
-            raise UpdateProblemModuleStateError(f"Unexpected update_status returned: {update_status}")
+            raise UpdateProblemModuleStateError(u"Unexpected update_status returned: {}".format(update_status))
 
     return task_progress.update_task_state()
 
@@ -143,7 +144,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {location} for student {student}--access denied?".format(
+            msg = u"No module {location} for student {student}--access denied?".format(
                 location=usage_key,
                 student=student
             )
@@ -153,7 +154,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         if not hasattr(instance, 'rescore'):
             # This should not happen, since it should be already checked in the
             # caller, but check here to be sure.
-            msg = f"Specified module {usage_key} of type {instance.__class__} does not support rescoring."
+            msg = u"Specified module {0} of type {1} does not support rescoring.".format(usage_key, instance.__class__)
             raise UpdateProblemModuleStateError(msg)
 
         # We check here to see if the problem has any submissions. If it does not, we don't want to rescore it
@@ -171,8 +172,8 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             instance.rescore(only_if_higher=task_input['only_if_higher'])
         except (LoncapaProblemError, StudentInputError, ResponseError):
             TASK_LOG.warning(
-                "error processing rescore call for course %(course)s, problem %(loc)s "
-                "and student %(student)s",
+                u"error processing rescore call for course %(course)s, problem %(loc)s "
+                u"and student %(student)s",
                 dict(
                     course=course_id,
                     loc=usage_key,
@@ -183,8 +184,8 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
 
         instance.save()
         TASK_LOG.debug(
-            "successfully processed rescore call for course %(course)s, problem %(loc)s "
-            "and student %(student)s",
+            u"successfully processed rescore call for course %(course)s, problem %(loc)s "
+            u"and student %(student)s",
             dict(
                 course=course_id,
                 loc=usage_key,
@@ -228,7 +229,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         if instance is None:
             # Either permissions just changed, or someone is trying to be clever
             # and load something they shouldn't have access to.
-            msg = "No module {location} for student {student}--access denied?".format(
+            msg = u"No module {location} for student {student}--access denied?".format(
                 location=usage_key,
                 student=student
             )
@@ -240,7 +241,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
             raise UpdateProblemModuleStateError(msg)
 
         weighted_override_score = float(task_input['score'])
-        if not (0 <= weighted_override_score <= instance.max_score()):  # lint-amnesty, pylint: disable=superfluous-parens
+        if not (0 <= weighted_override_score <= instance.max_score()):
             msg = "Score must be between 0 and the maximum points available for the problem."
             raise UpdateProblemModuleStateError(msg)
 
@@ -251,7 +252,7 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         set_event_transaction_type(grades_events.GRADES_OVERRIDE_EVENT_TYPE)
 
         problem_weight = instance.weight if instance.weight is not None else 1
-        if problem_weight == 0:  # lint-amnesty, pylint: disable=no-else-raise
+        if problem_weight == 0:
             msg = "Scores cannot be overridden for a problem that has a weight of zero."
             raise UpdateProblemModuleStateError(msg)
         else:
@@ -263,8 +264,8 @@ def override_score_module_state(xmodule_instance_args, module_descriptor, studen
         instance.publish_grade()
         instance.save()
         TASK_LOG.debug(
-            "successfully processed score override for course %(course)s, problem %(loc)s "
-            "and student %(student)s",
+            u"successfully processed score override for course %(course)s, problem %(loc)s "
+            u"and student %(student)s",
             dict(
                 course=course_id,
                 loc=usage_key,

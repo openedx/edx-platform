@@ -10,7 +10,7 @@ app_name = 'v1'
 
 urlpatterns = [
     re_path(
-        fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
+        r'^proctored_exam_settings/{}$'.format(COURSE_ID_PATTERN),
         views.ProctoredExamSettingsView.as_view(),
         name="proctored_exam_settings"
     ),

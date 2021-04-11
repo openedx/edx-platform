@@ -4,7 +4,7 @@ Unit tests for ProgramEnrollment models.
 
 
 from uuid import UUID
-import pytest
+
 import ddt
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -12,8 +12,8 @@ from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from ..constants import ProgramCourseEnrollmentRoles
 from ..models import ProgramEnrollment
@@ -28,7 +28,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
-        super().setUp()
+        super(ProgramEnrollmentModelTests, self).setUp()
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
         self.other_program_uuid = UUID("88888888-4444-3333-1111-000000000000")
@@ -57,7 +57,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         A record with the same (external_user_key, program_uuid, curriculum_uuid) cannot be duplicated.
         """
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             _ = ProgramEnrollmentFactory(
                 user=None,
                 external_user_key='abc',
@@ -70,7 +70,7 @@ class ProgramEnrollmentModelTests(TestCase):
         """
         A record with the same (user, program_uuid, curriculum_uuid) cannot be duplicated.
         """
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             _ = ProgramEnrollmentFactory(
                 user=self.user,
                 external_user_key=None,
@@ -90,21 +90,29 @@ class ProgramEnrollmentModelTests(TestCase):
         self.enrollment.save()
 
         # Ensure that all the records had values for external_user_key
-        assert self.enrollment.external_user_key == 'abc'
+        self.assertEqual(self.enrollment.external_user_key, 'abc')
 
-        assert self.enrollment.historical_records.all()
+        self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            assert record.external_user_key == 'abc'
+            self.assertEqual(record.external_user_key, 'abc')
 
         ProgramEnrollment.retire_user(self.user.id)
         self.enrollment.refresh_from_db()
 
         # Ensure those values are retired
-        assert self.enrollment.external_user_key.startswith('retired_external_key')
+        self.assertTrue(
+            self.enrollment.external_user_key.startswith(
+                'retired_external_key'
+            )
+        )
 
-        assert self.enrollment.historical_records.all()
+        self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            assert record.external_user_key.startswith('retired_external_key')
+            self.assertTrue(
+                record.external_user_key.startswith(
+                    'retired_external_key'
+                )
+            )
 
 
 @ddt.ddt
@@ -116,7 +124,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         """
         Set up test data
         """
-        super().setUp()
+        super(ProgramCourseEnrollmentModelTests, self).setUp()
         RequestCache.clear_all_namespaces()
         self.user = UserFactory(username="rocko")
         self.program_uuid = UUID("88888888-4444-2222-1111-000000000000")
@@ -170,7 +178,7 @@ class ProgramCourseEnrollmentModelTests(TestCase):
         cannot be created.
         """
         pce = self._create_waiting_program_course_enrollment()
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             ProgramCourseEnrollmentFactory(
                 program_enrollment=pce.program_enrollment,
                 course_key=pce.course_key,
@@ -208,7 +216,7 @@ class CourseAccessRoleAssignmentTests(TestCase):
     Tests for the CourseAccessRoleAssignment model.
     """
     def setUp(self):
-        super().setUp()
+        super(CourseAccessRoleAssignmentTests, self).setUp()
         self.program_course_enrollment = ProgramCourseEnrollmentFactory()
         self.pending_role_assignment = CourseAccessRoleAssignmentFactory(
             enrollment=self.program_course_enrollment,
@@ -234,7 +242,7 @@ class CourseAccessRoleAssignmentTests(TestCase):
         """
         Multiple records with the same enrollment and role cannot be created
         """
-        with pytest.raises(IntegrityError):
+        with self.assertRaises(IntegrityError):
             CourseAccessRoleAssignmentFactory(
                 enrollment=self.program_course_enrollment,
                 role=ProgramCourseEnrollmentRoles.COURSE_STAFF,

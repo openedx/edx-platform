@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import logging
 
 import six
@@ -29,18 +32,18 @@ def change_existing_ccx_coaches_to_staff(apps, schema_editor):
         return
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
         try:
             course = get_course_by_id(ccx_locator)
         except Http404:
-            log.error('Could not migrate access for CCX course: %s', str(ccx_locator))
+            log.error('Could not migrate access for CCX course: %s', six.text_type(ccx_locator))
         else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'staff', send_email=False)
             revoke_access(course, coach, 'ccx_coach', send_email=False)
             log.info(
                 'The CCX coach of CCX %s has been switched from "CCX Coach" to "Staff".',
-                str(ccx_locator)
+                six.text_type(ccx_locator)
             )
 
 def revert_ccx_staff_to_coaches(apps, schema_editor):
@@ -59,18 +62,18 @@ def revert_ccx_staff_to_coaches(apps, schema_editor):
         return
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
-        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, str(ccx.id))
+        ccx_locator = CCXLocator.from_course_locator(ccx.course_id, six.text_type(ccx.id))
         try:
             course = get_course_by_id(ccx_locator)
         except Http404:
-            log.error('Could not migrate access for CCX course: %s', str(ccx_locator))
+            log.error('Could not migrate access for CCX course: %s', six.text_type(ccx_locator))
         else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'ccx_coach', send_email=False)
             revoke_access(course, coach, 'staff', send_email=False)
             log.info(
                 'The CCX coach of CCX %s has been switched from "Staff" to "CCX Coach".',
-                str(ccx_locator)
+                six.text_type(ccx_locator)
             )
 
 class Migration(migrations.Migration):

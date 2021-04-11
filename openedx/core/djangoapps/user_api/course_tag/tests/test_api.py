@@ -16,7 +16,7 @@ class TestCourseTagAPI(TestCase):
     """
 
     def setUp(self):
-        super(TestCourseTagAPI, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(TestCourseTagAPI, self).setUp()
         self.user = UserFactory.create()
         self.course_id = CourseLocator('test_org', 'test_course_number', 'test_run')
         self.test_key = 'test_key'
@@ -24,16 +24,16 @@ class TestCourseTagAPI(TestCase):
     def test_get_set_course_tag(self):
         # get a tag that doesn't exist
         tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
-        assert tag is None
+        self.assertIsNone(tag)
 
         # test setting a new key
         test_value = 'value'
         course_tag_api.set_course_tag(self.user, self.course_id, self.test_key, test_value)
         tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
-        assert tag == test_value
+        self.assertEqual(tag, test_value)
 
         #test overwriting an existing key
         test_value = 'value2'
         course_tag_api.set_course_tag(self.user, self.course_id, self.test_key, test_value)
         tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
-        assert tag == test_value
+        self.assertEqual(tag, test_value)

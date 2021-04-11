@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student dashboard page.
 """
@@ -13,7 +14,7 @@ class DashboardPage(PageObject):
     Student dashboard, where the student can view
     courses she/he has registered for.
     """
-    url = f"{BASE_URL}/dashboard"
+    url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
         return self.q(css='.my-courses').present

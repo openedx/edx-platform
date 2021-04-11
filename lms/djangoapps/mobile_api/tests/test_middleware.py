@@ -4,9 +4,9 @@ Tests for Version Based App Upgrade Middleware
 
 
 from datetime import datetime
-from unittest import mock
 
 import ddt
+import mock
 from django.core.cache import caches
 from django.http import HttpRequest, HttpResponse
 from pytz import UTC
@@ -25,7 +25,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super().setUp()
+        super(TestAppVersionUpgradeMiddleware, self).setUp()
         self.middleware = AppVersionUpgrade()
         self.set_app_version_config()
 
@@ -67,10 +67,10 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
         fake_request.META['HTTP_USER_AGENT'] = user_agent
         with mock.patch.object(caches['default'], 'get_many', wraps=caches['default'].get_many) as mocked_code:
             request_response = self.middleware.process_request(fake_request)
-            assert cache_get_many_calls_for_request == mocked_code.call_count
+            self.assertEqual(cache_get_many_calls_for_request, mocked_code.call_count)
         with mock.patch.object(caches['default'], 'get_many', wraps=caches['default'].get_many) as mocked_code:
             processed_response = self.middleware.process_response(fake_request, request_response or HttpResponse())
-            assert 0 == mocked_code.call_count
+            self.assertEqual(0, mocked_code.call_count)
         return request_response, processed_response
 
     @ddt.data(
@@ -84,10 +84,10 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     def test_non_mobile_app_requests(self, user_agent):
         with self.assertNumQueries(0):
             request_response, processed_response = self.process_middleware(user_agent, 0)
-        assert request_response is None
-        assert 200 == processed_response.status_code
-        assert AppVersionUpgrade.LATEST_VERSION_HEADER not in processed_response
-        assert AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER not in processed_response
+        self.assertIsNone(request_response)
+        self.assertEqual(200, processed_response.status_code)
+        self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
 
     @ddt.data(
         "edX/org.edx.mobile (6.6.6; OS Version 9.2 (Build 13C75))",
@@ -98,10 +98,10 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     def test_no_update(self, user_agent):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
-        assert request_response is None
-        assert 200 == processed_response.status_code
-        assert AppVersionUpgrade.LATEST_VERSION_HEADER not in processed_response
-        assert AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER not in processed_response
+        self.assertIsNone(request_response)
+        self.assertEqual(200, processed_response.status_code)
+        self.assertNotIn(AppVersionUpgrade.LATEST_VERSION_HEADER, processed_response)
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
@@ -115,10 +115,10 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     def test_new_version_available(self, user_agent, latest_version):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
-        assert request_response is None
-        assert 200 == processed_response.status_code
-        assert latest_version == processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER]
-        assert AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER not in processed_response
+        self.assertIsNone(request_response)
+        self.assertEqual(200, processed_response.status_code)
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
+        self.assertNotIn(AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER, processed_response)
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
@@ -136,9 +136,9 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     def test_version_update_required(self, user_agent, latest_version):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
-        assert request_response is not None
-        assert 426 == processed_response.status_code
-        assert latest_version == processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER]
+        self.assertIsNotNone(request_response)
+        self.assertEqual(426, processed_response.status_code)
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)
 
@@ -154,9 +154,9 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     def test_version_update_available_with_deadline(self, user_agent, latest_version, upgrade_date):
         with self.assertNumQueries(2):
             request_response, processed_response = self.process_middleware(user_agent)
-        assert request_response is None
-        assert 200 == processed_response.status_code
-        assert latest_version == processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER]
-        assert upgrade_date == processed_response[AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER]
+        self.assertIsNone(request_response)
+        self.assertEqual(200, processed_response.status_code)
+        self.assertEqual(latest_version, processed_response[AppVersionUpgrade.LATEST_VERSION_HEADER])
+        self.assertEqual(upgrade_date, processed_response[AppVersionUpgrade.LAST_SUPPORTED_DATE_HEADER])
         with self.assertNumQueries(0):
             self.process_middleware(user_agent)

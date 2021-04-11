@@ -5,8 +5,8 @@ URLs for the student support app.
 
 from django.conf.urls import url
 
-from .views.certificate import CertificatesSupportView
 from .views.contact_us import ContactUsView
+from .views.certificate import CertificatesSupportView
 from .views.course_entitlements import EntitlementSupportView
 from .views.enrollments import EnrollmentSupportListView, EnrollmentSupportView
 from .views.feature_based_enrollments import FeatureBasedEnrollmentsSupportView

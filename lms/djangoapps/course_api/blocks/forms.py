@@ -3,7 +3,7 @@ Course API Forms
 """
 
 
-from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ValidationError
 from django.forms import CharField, ChoiceField, Form, IntegerField
 from django.http import Http404
@@ -48,7 +48,7 @@ class BlockListGetForm(Form):
         try:
             return int(value)
         except ValueError:
-            raise ValidationError(f"'{value}' is not a valid depth value.")  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError("'{}' is not a valid depth value.".format(value))
 
     def clean_requested_fields(self):
         """
@@ -75,7 +75,7 @@ class BlockListGetForm(Form):
         try:
             usage_key = UsageKey.from_string(usage_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid usage key.".format(str(usage_key)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError("'{}' is not a valid usage key.".format(str(usage_key)))
 
         return usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
@@ -83,7 +83,7 @@ class BlockListGetForm(Form):
         """
         Return cleaned data, including additional requested fields.
         """
-        cleaned_data = super().clean()
+        cleaned_data = super(BlockListGetForm, self).clean()
 
         # Add additional requested_fields that are specified as separate
         # parameters, if they were requested.
@@ -224,7 +224,7 @@ class BlockListGetForm(Form):
         try:
             return User.objects.get(username=requested_username)
         except User.DoesNotExist:
-            raise Http404(  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(
                 "Requested user '{requested_username}' does not exist.".format(
                     requested_username=requested_username,
                 )

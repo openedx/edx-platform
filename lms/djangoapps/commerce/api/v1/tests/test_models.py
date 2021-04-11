@@ -14,7 +14,7 @@ class CourseTests(TestCase):
     """ Tests for Course model. """
 
     def setUp(self):
-        super().setUp()
+        super(CourseTests, self).setUp()
         self.course = Course('a/b/c', [])
 
     @ddt.unpack
@@ -29,9 +29,9 @@ class CourseTests(TestCase):
     def test_get_mode_display_name(self, slug, expected_display_name):
         """ Verify the method properly maps mode slugs to display names. """
         mode = CourseMode(mode_slug=slug)
-        assert self.course.get_mode_display_name(mode) == expected_display_name
+        self.assertEqual(self.course.get_mode_display_name(mode), expected_display_name)
 
     def test_get_mode_display_name_unknown_slug(self):
         """ Verify the method returns the slug if it has no known mapping. """
         mode = CourseMode(mode_slug='Blah!')
-        assert self.course.get_mode_display_name(mode) == mode.mode_slug
+        self.assertEqual(self.course.get_mode_display_name(mode), mode.mode_slug)

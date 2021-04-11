@@ -6,8 +6,11 @@ CourseDetails
 import logging
 import re
 
+import six
 from django.conf import settings
 
+from openedx.core.djangoapps.models.config.waffle import enable_course_detail_update_certificate_date
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.courses import course_image_url
 from xmodule.fields import Date
@@ -33,7 +36,7 @@ ABOUT_ATTRIBUTES = [
 ]
 
 
-class CourseDetails:
+class CourseDetails(object):
     """
     An interface for extracting course information from the modulestore.
     """
@@ -82,7 +85,7 @@ class CourseDetails:
         Retrieve an attribute from a course's "about" info
         """
         if attribute not in ABOUT_ATTRIBUTES + ['video']:
-            raise ValueError(f"'{attribute}' is not a valid course about attribute.")
+            raise ValueError(u"'{0}' is not a valid course about attribute.".format(attribute))
 
         usage_key = course_key.make_usage_key('about', attribute)
         try:
@@ -108,7 +111,7 @@ class CourseDetails:
         course_details = cls(course_key.org, course_key.course, course_key.run)
         course_details.start_date = course_descriptor.start
         course_details.end_date = course_descriptor.end
-        course_details.certificate_available_date = course_descriptor.certificate_available_date  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        course_details.certificate_available_date = course_descriptor.certificate_available_date
         course_details.enrollment_start = course_descriptor.enrollment_start
         course_details.enrollment_end = course_descriptor.enrollment_end
         course_details.pre_requisite_courses = course_descriptor.pre_requisite_courses
@@ -151,7 +154,7 @@ class CourseDetails:
         """
         video_id = cls.fetch_youtube_video_id(course_key)
         if video_id:
-            return f"http://www.youtube.com/watch?v={video_id}"
+            return "http://www.youtube.com/watch?v={0}".format(video_id)
 
     @classmethod
     def update_about_item(cls, course, about_key, data, user_id, store=None):
@@ -243,6 +246,8 @@ class CourseDetails:
         if converted != descriptor.certificate_available_date:
             dirty = True
             descriptor.certificate_available_date = converted
+            if enable_course_detail_update_certificate_date(course_key):
+                COURSE_CERT_DATE_CHANGE.send_robust(sender=cls, course_key=six.text_type(course_key))
 
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']
@@ -320,7 +325,7 @@ class CourseDetails:
         if keystring_matcher:
             return keystring_matcher.group(0)
         else:
-            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)  # lint-amnesty, pylint: disable=deprecated-method, logging-not-lazy
+            logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
             return None
 
     @staticmethod
@@ -334,7 +339,7 @@ class CourseDetails:
         result = None
         if video_key:
             result = (
-                HTML('<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/{}?rel=0" '
+                HTML(u'<iframe title="YouTube Video" width="560" height="315" src="//www.youtube.com/embed/{}?rel=0" '
                      'frameborder="0" allowfullscreen=""></iframe>').format(video_key)
             )
         return result

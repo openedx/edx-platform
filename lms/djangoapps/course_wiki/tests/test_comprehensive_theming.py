@@ -20,7 +20,7 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
-        super().setUp()
+        super(TestComprehensiveTheming, self).setUp()
 
         self.wiki = get_or_create_root()
 
@@ -41,6 +41,6 @@ class TestComprehensiveTheming(ModuleStoreTestCase):
         footer when comprehensive theme is enabled.
         """
         response = self.client.get('/courses/edx/math101/2014/wiki/math101/')
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         # This string comes from themes/red-theme/lms/templates/footer.html
         self.assertContains(response, "super-ugly")

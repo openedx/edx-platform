@@ -9,7 +9,7 @@
     <span class="notification-message" aria-describedby="${ short_id }-problem-title">${notification_message}
     </span>
     <div class="notification-btn-wrapper">
-        % if notification_name == 'hint':
+        % if notification_name is 'hint':
         <button type="button" class="btn btn-default btn-small notification-btn hint-button">
           ${_('Next Hint')}
         </button>

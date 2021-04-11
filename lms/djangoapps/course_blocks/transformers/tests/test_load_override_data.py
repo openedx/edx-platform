@@ -8,10 +8,10 @@ import datetime
 import ddt
 import pytz
 
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.course_blocks.transformers.load_override_data import REQUESTED_FIELDS, OverrideDataTransformer
 from lms.djangoapps.courseware.student_field_overrides import get_override_for_user, override_field_for_user
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -35,12 +35,12 @@ class TestOverrideDataTransformer(ModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        super(TestOverrideDataTransformer, cls).setUpClass()
         cls.learner = UserFactory.create()
         cls.learner2 = UserFactory.create()
 
     def setUp(self):
-        super().setUp()
+        super(TestOverrideDataTransformer, self).setUp()
         self.course_key = ToyCourseFactory.create().id
         self.course_usage_key = self.store.make_course_usage_key(self.course_key)
         self.block_structure = BlockStructureFactory.create_from_modulestore(self.course_usage_key, self.store)

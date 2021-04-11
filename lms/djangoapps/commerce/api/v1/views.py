@@ -5,7 +5,7 @@ Commerce views
 
 import logging
 
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User
 from django.http import Http404
 from edx_rest_api_client import exceptions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -13,12 +13,12 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from openedx.core.lib.api.authentication import BearerAuthentication
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.mixins import PutAsCreateMixin
+from common.djangoapps.util.json_request import JsonResponse
 
 from ...utils import is_account_activation_requirement_disabled
 from .models import Course
@@ -53,7 +53,7 @@ class CourseRetrieveUpdateView(PutAsCreateMixin, RetrieveUpdateAPIView):
     # rather than a CourseMode, so this isn't really used.
     queryset = CourseMode.objects.all()
 
-    def get_object(self, queryset=None):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def get_object(self, queryset=None):
         course_id = self.kwargs.get(self.lookup_url_kwarg)
         course = Course.get(course_id)
 
@@ -80,7 +80,7 @@ class OrderView(APIView):
         # anonymous user object attached to the request with the actual user object (if it exists)
         if not request.user.is_authenticated and is_account_activation_requirement_disabled():
             try:
-                request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])  # lint-amnesty, pylint: disable=protected-access
+                request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])
             except User.DoesNotExist:
                 return JsonResponse(status=403)
         try:

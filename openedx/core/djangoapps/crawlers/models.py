@@ -4,6 +4,7 @@ appropriately in other parts of the code.
 """
 
 
+import six
 from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -16,17 +17,17 @@ class CrawlersConfig(ConfigurationModel):
 
     .. no_pii:
     """
-    class Meta:
+    class Meta(object):
         app_label = "crawlers"
 
     known_user_agents = models.TextField(
         blank=True,
-        help_text="A comma-separated list of known crawler user agents.",
-        default='edX-downloader',
+        help_text=u"A comma-separated list of known crawler user agents.",
+        default=u'edX-downloader',
     )
 
     def __str__(self):
-        return f'CrawlersConfig("{self.known_user_agents}")'
+        return u'CrawlersConfig("{}")'.format(self.known_user_agents)
 
     @classmethod
     def is_crawler(cls, request):
@@ -52,7 +53,7 @@ class CrawlersConfig(ConfigurationModel):
         # value is an ISO-8859-1 encoded byte string in Python 2.7 (and in the HTTP spec), but
         # it will be a unicode str when we move to Python 3.x. This code should work under
         # either version.
-        if isinstance(req_user_agent, bytes):
+        if isinstance(req_user_agent, six.binary_type):
             crawler_agents = [crawler_agent.encode('iso-8859-1') for crawler_agent in crawler_agents]
 
         # We perform prefix matching of the crawler agent here so that we don't

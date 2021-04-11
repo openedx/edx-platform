@@ -16,9 +16,9 @@ from common.djangoapps.student.tests.factories import UserFactory
 LOGGER_NAME = "openedx.core.djangoapps.user_api.accounts.serializers"
 
 
-class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UserReadOnlySerializerTest(TestCase):
     def setUp(self):
-        super(UserReadOnlySerializerTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super(UserReadOnlySerializerTest, self).setUp()
         request_factory = RequestFactory()
         self.request = request_factory.get('/api/user/v1/accounts/')
         self.user = UserFactory.build(username='test_user', email='test_user@test.com')
@@ -36,9 +36,9 @@ class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=mis
         """
         UserProfile.objects.create(user=self.user, name='test name')
         data = UserReadOnlySerializer(self.user, configuration=self.config, context={'request': self.request}).data
-        assert data['username'] == self.user.username
-        assert data['name'] == 'test name'
-        assert data['email'] == self.user.email
+        self.assertEqual(data['username'], self.user.username)
+        self.assertEqual(data['name'], 'test name')
+        self.assertEqual(data['email'], self.user.email)
 
     def test_user_no_profile(self):
         """
@@ -50,5 +50,5 @@ class UserReadOnlySerializerTest(TestCase):  # lint-amnesty, pylint: disable=mis
                 (LOGGER_NAME, 'WARNING', 'user profile for the user [test_user] does not exist')
             )
 
-        assert data['username'] == self.user.username
-        assert data['name'] is None
+        self.assertEqual(data['username'], self.user.username)
+        self.assertEqual(data['name'], None)
