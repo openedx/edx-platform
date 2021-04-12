@@ -50,6 +50,16 @@ def update_course_creator_group(caller, user, add):
         auth.remove_users(caller, CourseCreatorRole(), user)
 
 
+def update_org_content_creator_role(caller, user, orgs):
+    """
+    Method for updating users for OrgContentCreatorRole, this method
+    takes care of creating and deleting the role as required.
+
+    Caller must have staff permissions.
+    """
+    auth.update_org_course_role(caller, OrgContentCreatorRole(), user, orgs)
+
+
 def get_course_creator_status(user):
     """
     Returns the status for a particular user, or None if user is not in the table.

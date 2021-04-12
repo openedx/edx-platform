@@ -850,9 +850,6 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not auth.user_has_role(request.user, CourseCreatorRole()):
-        raise PermissionDenied()
-
     try:
         org = request.json.get('org')
         course = request.json.get('number', request.json.get('course'))
@@ -860,6 +857,10 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
+
+        if not auth.user_has_role(request.user, CourseCreatorRole(), org):
+            raise PermissionDenied()
+
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):

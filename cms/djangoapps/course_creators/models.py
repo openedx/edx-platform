@@ -2,10 +2,9 @@
 Table for storing information about whether or not Studio users have course creation privileges.
 """
 
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
-from django.db.models.signals import post_init, post_save
+from django.db.models.signals import post_init, post_save, m2m_changed
 from django.dispatch import Signal, receiver
 from django.utils import timezone
 
@@ -82,7 +81,8 @@ def post_save_callback(sender, **kwargs):
                 sender=sender,
                 caller=instance.admin,
                 user=instance.user,
-                state=instance.state
+                state=instance.state,
+                all_organizations=instance.all_organizations
             )
 
         # If user has been denied access, granted access, or previously granted access has been

@@ -42,7 +42,7 @@ def is_ccx_course(course_key):
     return isinstance(course_key, CCXLocator) or isinstance(course_key, CCXBlockUsageLocator)  # lint-amnesty, pylint: disable=consider-merging-isinstance
 
 
-def user_has_role(user, role):
+def user_has_role(user, role, org=None):
     """
     Check whether this user has access to this role (either direct or implied)
     :param user:
@@ -63,6 +63,9 @@ def user_has_role(user, role):
             return True
 
     if role.has_user(user):
+        return True
+    # If user has content creation for org
+    if org and OrgContentCreatorRole(org=org).has_user(user):
         return True
     # if not, then check inferred permissions
     if (isinstance(role, (CourseStaffRole, CourseBetaTesterRole)) and
@@ -162,6 +165,20 @@ def remove_users(caller, role, *users):
     if not(len(users) == 1 and caller == users[0]):
         _check_caller_authority(caller, role)
     role.remove_users(*users)
+
+def update_org_course_role(caller, role, user, *orgs):
+    """
+    The caller requests updating the Org role for the user. Checks that the caller has
+    sufficient authority.
+
+    :param caller: an user
+    :param role: an AccessRole
+    :param user: an user for which org roles are updated
+    :param orgs: List of organization names to update the org role
+    """
+    _check_caller_authority(caller, role)
+    role.update_org_course_role(user, *orgs)
+
 
 
 def _check_caller_authority(caller, role):

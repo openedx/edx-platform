@@ -245,6 +245,32 @@ class OrgRole(RoleBase):
     def __repr__(self):
         return f'<{self.__class__.__name__}>'
 
+    def update_org_course_role(self, user, orgs):
+        """
+        Updates(creates/deletes) the org role specified for the user
+        for multiple organizations.
+
+        Args:
+            user: User object
+            orgs: List of organization names
+        """
+        from common.djangoapps.student.models import CourseAccessRole  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
+        org_role_to_delete = []
+        org_role_to_create = []
+        existing_org_role = set(CourseAccessRole.objects.filter(user=user, role=self._role_name).values_list('org', flat=True))
+        orgs_role_to_create = list(set(orgs) - existing_org_role)
+        org_role_to_delete = list(existing_org_role - set(orgs))
+        if user.is_authenticated and user.is_active and not self.has_user(user):
+            if orgs_role_to_create:
+                for org in orgs_role_to_create:
+                        entry = CourseAccessRole(user=user, role=self._role_name, org=org)
+                        entry.save()
+            if org_role_to_delete:
+                entries = CourseAccessRole.objects.filter(user=user, role=self._role_name, org__in=org_role_to_delete)
+                entries.delete()
+            if hasattr(user, '_roles'):
+                del user._roles
+
 
 @register_access_role
 class CourseStaffRole(CourseRole):

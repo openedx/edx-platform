@@ -6,9 +6,12 @@ django admin page for the course creators table
 import logging
 from smtplib import SMTPException
 
+from django import forms
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib import admin
 from django.core.mail import send_mail
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 
 from cms.djangoapps.course_creators.models import (
@@ -17,7 +20,7 @@ from cms.djangoapps.course_creators.models import (
     send_user_notification,
     update_creator_state
 )
-from cms.djangoapps.course_creators.views import update_course_creator_group
+from cms.djangoapps.course_creators.views import update_course_creator_group, update_org_content_creator_role
 from common.djangoapps.edxmako.shortcuts import render_to_string
 
 log = logging.getLogger("studio.coursecreatoradmin")
@@ -28,6 +31,19 @@ def get_email(obj):
     return obj.user.email
 
 get_email.short_description = 'email'
+
+class CourseCreatorForm(forms.ModelForm):
+    class Meta:
+        model = CourseCreator
+        fields = '__all__'
+
+    def clean(self):
+        all_orgs = self.cleaned_data.get("all_organizations")
+        orgs = self.cleaned_data.get("orgs").exists()
+        if orgs and all_orgs:
+            raise ValidationError("all_organization should be disabled to use organization restrictions")
+        if not orgs and not all_orgs:
+            raise ValidationError("Oragnizations should be added if all_organization is disabled")
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
@@ -51,6 +67,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'state', 'note', 'orgs']
     # Turn off the action bar (we have no bulk actions)
     actions = None
+    form=CourseCreatorForm
 
     def username(self, inst):
         """
@@ -87,7 +104,9 @@ def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: di
     """
     user = kwargs['user']
     updated_state = kwargs['state']
-    update_course_creator_group(kwargs['caller'], user, updated_state == CourseCreator.GRANTED)
+    all_orgs = kwargs['all_organizations']
+    if all_orgs:
+        update_course_creator_group(kwargs['caller'], user, updated_state == CourseCreator.GRANTED)
 
 
 @receiver(send_user_notification, sender=CourseCreator)
@@ -142,3 +161,15 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
         )
     except SMTPException:
         log.warning("Failure sending 'pending state' e-mail for %s to %s", user.email, studio_request_email)
+
+
+@receiver(m2m_changed, sender=CourseCreator.orgs.through)
+def post_all_organizations_callback(sender, **kwargs):
+    """
+    Callback for addition and removal for orgs field.
+    """
+    instance = kwargs["instance"]
+    action = kwargs["action"]
+    orgs = list(instance.orgs.all().values_list('short_name', flat=True))
+    if action in ["post_add", "post_remove"]:
+        update_org_content_creator_role(instance.admin, instance.user, orgs)
