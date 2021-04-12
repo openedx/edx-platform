@@ -1,9 +1,9 @@
 """
 All the tests related to admin in webinars app
 """
-import mock
 import pytest
 from django.contrib.admin.sites import AdminSite
+from mock import Mock
 
 from openedx.adg.lms.webinars.admin import ActiveWebinarStatusFilter, CancelledWebinarAdmin, WebinarAdmin
 from openedx.adg.lms.webinars.models import CancelledWebinar, Webinar
@@ -25,23 +25,23 @@ def webinar_admin_fixture():
 
 def test_cancelled_webinar_admin_add_permission():
     """
-    Test if CancelledWebinarAdmin has add permission or not
+    Test if CancelledWebinarAdmin does not have add permission
     """
-    assert not CancelledWebinarAdmin.has_add_permission('self', mock.Mock())
+    assert not CancelledWebinarAdmin.has_add_permission('self', Mock())
 
 
 def test_cancelled_webinar_admin_change_permission():
     """
-    Test if CancelledWebinarAdmin has change permission or not
+    Test if CancelledWebinarAdmin does not have change permission
     """
-    assert not CancelledWebinarAdmin.has_change_permission('self', mock.Mock())
+    assert not CancelledWebinarAdmin.has_change_permission('self', Mock())
 
 
 def test_cancelled_webinar_admin_delete_permission():
     """
-    Test if CancelledWebinarAdmin has delete permission or not
+    Test if CancelledWebinarAdmin does not have delete permission
     """
-    assert not CancelledWebinarAdmin.has_delete_permission('self', mock.Mock())
+    assert not CancelledWebinarAdmin.has_delete_permission('self', Mock())
 
 
 @pytest.mark.django_db
@@ -78,7 +78,7 @@ def test_cancelled_webinar_admin_get_queryset(
         ([Webinar.CANCELLED, Webinar.CANCELLED, Webinar.CANCELLED], 0)
     ]
 )
-def test_webinar_admin_get_queryset(webinar_statuses, expected_webinar_count, webinar_admin, request):
+def test_non_cancelled_webinar_admin_get_queryset(webinar_statuses, expected_webinar_count, webinar_admin, request):
     """
     Test if the queryset for the WebinarAdmin fetches the correct data i.e Non-cancelled webinars
     """
