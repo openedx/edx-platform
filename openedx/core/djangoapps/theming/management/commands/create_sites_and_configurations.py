@@ -20,7 +20,6 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.models import SiteTheme
 from student.models import UserProfile
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -75,7 +74,7 @@ class Command(BaseCommand):
             service_name=service_name,
             site_name="" if site_name == "edx" else "-{}".format(site_name)
         )
-        app, = Application.objects.update_or_create(
+        app, _ = Application.objects.update_or_create(
             client_id=client_id,
             defaults={
                 "user": service_user,
