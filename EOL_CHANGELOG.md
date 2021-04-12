@@ -1,5 +1,8 @@
 # Changelog EOL
 
+## 12/04/2021 Changes on xblock utils
+- Get CMS_BASE from Site Configurations instead of django.conf settings (openedx/core/lib/xblock_utils/__init__.py)
+
 ## 21/01/2021 Changes on Certificates
 - Get user profile name from user_certificate and not from user. (lms/djangoapps/certificates/views/webview.py)
 - Update tests (lms/djangoapps/certificates/tests/test_webview_views.py)
