@@ -10,9 +10,6 @@ from student.signals import ENROLL_STATUS_CHANGE
 from openedx.features.pakx.lms.overrides.tasks import add_enrollment_record, remove_enrollment_record
 
 
-log = getLogger(__name__)
-
-
 @receiver(ENROLL_STATUS_CHANGE)
 def copy_active_course_enrollment(sender, event=None, user=None, **kwargs):  # pylint: disable=unused-argument
     """
