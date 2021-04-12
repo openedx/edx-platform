@@ -3179,14 +3179,7 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
         scope_ids = Mock(block_type='problem')
         descriptor = ProblemBlock(get_test_system(), scope_ids=scope_ids)
         descriptor.runtime = Mock()
-        # Put a script tag so that codejail is normally invoked, to test that we
-        # suppress that invocation when generating this report.
-        descriptor.data = '''<problem>
-            <script type="loncapa/python">
-            x1 = random.randint(0, 100)
-            </script>
-        </problem>
-        '''
+        descriptor.data = '<problem/>'
         return descriptor
 
     def test_generate_report_data_not_implemented(self):
@@ -3217,17 +3210,3 @@ class ProblemBlockReportGenerationTest(unittest.TestCase):
         iterator = iter([self._user_state(suffix='_dynamath')])
         report_data = list(descriptor.generate_report_data(iterator))
         assert 0 == len(report_data)
-
-    def test_safe_exec_not_called(self):
-        """
-        Make sure we're not calling instructor code when doing this report.
-
-        This relies on us passing minimal_init=True when making the
-        LoncapaProblem. Without that, this whole suite will break because the
-        data in the descriptor (self._get_descriptor()) will force capa to do
-        initializations that are mocked out at the moment.
-        """
-        with patch('capa.safe_exec.safe_exec') as mock_safe_exec:
-            descriptor = self._get_descriptor()
-            list(descriptor.generate_report_data(self._mock_user_state_generator(), 2))
-            assert not mock_safe_exec.called
