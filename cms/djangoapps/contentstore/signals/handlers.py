@@ -67,6 +67,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from cms.djangoapps.contentstore.tasks import update_outline_from_modulestore_task, update_search_index
     if key_supports_outlines(course_key):
+        # Push the course outline to learning_sequences asynchronously.
         update_outline_from_modulestore_task.delay(str(course_key))
 
     # Finally call into the course search subsystem
