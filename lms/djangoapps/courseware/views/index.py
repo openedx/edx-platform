@@ -65,7 +65,7 @@ from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import courseware_legacy_is_visible, courseware_mfe_is_visible
-from .views import CourseTabView
+from .views import CourseTabView, set_feature_policy_for_courseware
 
 log = logging.getLogger("edx.courseware.views.index")
 
@@ -254,7 +254,9 @@ class CoursewareIndex(View):
                     )
                 )
 
-        return render_to_response('courseware/courseware.html', self._create_courseware_context(request))
+        response = render_to_response('courseware/courseware.html', self._create_courseware_context(request))
+        set_feature_policy_for_courseware(response)
+        return response
 
     def _redirect_if_not_requested_section(self):
         """

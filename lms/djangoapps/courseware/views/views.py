@@ -1814,7 +1814,9 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
             **optimization_flags,
         }
-        return render_to_response('courseware/courseware-chromeless.html', context)
+        response = render_to_response('courseware/courseware-chromeless.html', context)
+        set_feature_policy_for_courseware(response)
+        return response
 
 
 def get_optimization_flags_for_content(block, fragment):
@@ -2125,3 +2127,21 @@ def get_learner_username(learner_identifier):
     learner = User.objects.filter(Q(username=learner_identifier) | Q(email=learner_identifier)).first()
     if learner:
         return learner.username
+
+
+def set_feature_policy_for_courseware(response: HttpResponse) -> None:
+    """
+    Set Feature-Policy headers to allow access to certain courseware-related media.
+
+    This will override any previously-set Feature-Policy header value.
+
+    We must use the wildcard (*) origin for each feature, as courseware content
+    may be embedded in external iframes. Notably, xblock-lti-consumer is a popular
+    block that iframes external course content.
+
+    This policy was selected in conference with the edX Security Working Group.
+    Changes to it should be vetted by them (security@edx.org).
+    """
+    response['Feature-Policy'] = (
+        "microphone *; camera *; midi *; geolocation *; encrypted-media *"
+    )
