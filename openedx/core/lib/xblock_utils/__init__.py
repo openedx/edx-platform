@@ -15,6 +15,7 @@ import six
 import webpack_loader.utils
 from contracts import contract
 from django.conf import settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import reverse
@@ -328,7 +329,8 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
 
         if is_studio_course:
             # build edit link to unit in CMS. Can't use reverse here as lms doesn't load cms's urls.py
-            edit_link = "//" + settings.CMS_BASE + '/container/' + text_type(block.location)
+            cms_base = configuration_helpers.get_value('CMS_BASE', settings.CMS_BASE)
+            edit_link = "//" + cms_base + '/container/' + text_type(block.location)
 
             # return edit link in rendered HTML for display
             return wrap_fragment(
