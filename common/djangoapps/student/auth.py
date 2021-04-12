@@ -106,7 +106,7 @@ def get_user_permissions(user, course_key, org=None):
     return STUDIO_NO_PERMISSIONS
 
 
-def has_studio_write_access(user, course_key, org=None):
+def has_studio_write_access(user, course_key):
     """
     Return True if user has studio write access to the given course.
     Note that the CMS permissions model is with respect to courses.
@@ -118,9 +118,8 @@ def has_studio_write_access(user, course_key, org=None):
 
     :param user:
     :param course_key: a CourseKey
-    :param org: name of organisation
     """
-    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key, org))
+    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key))
 
 
 def has_course_author_access(user, course_key):

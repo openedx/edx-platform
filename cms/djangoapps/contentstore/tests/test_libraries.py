@@ -27,7 +27,6 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
-from common.djangoapps.student.models import CourseAccessRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -827,72 +826,6 @@ class TestLibraryAccess(LibraryTestCase):
         self.assertIn('staff_lib_2', non_staff_settings_html)
         self.assertNotIn('admin_lib_1', non_staff_settings_html)
         self.assertNotIn('admin_lib_2', non_staff_settings_html)
-
-    @patch.dict('django.conf.settings.FEATURES', {'RESTRICT_COURSE_CREATION_TO_ORG_ROLES': True})
-    def test_library_creation_when_user_is_global_staff(self):
-        """
-        Tests course creation with restriction and user is global staff.
-        """
-        self._login_as_staff_user()
-        response = self.client.ajax_post(LIBRARY_REST_URL, {
-            'org': 'Oscorp',
-            'library': 'CentralLibrary',
-            'display_name': 'Making better web',
-        })
-        self.assertEqual(response.status_code, 200)
-
-    @patch.dict('django.conf.settings.FEATURES', {'RESTRICT_COURSE_CREATION_TO_ORG_ROLES': True})
-    def test_library_creation_with_normaL_user_with_no_role(self):
-        """
-        Tests course creation with restriction and user is not a global staff.
-        """
-        self._login_as_non_staff_user()
-        response = self.client.ajax_post(LIBRARY_REST_URL, {
-            'org': 'Stark',
-            'library': 'AvengerLibrary',
-            'display_name': 'Alien Science',
-        })
-        self.assertEqual(response.status_code, 400)
-        data = parse_json(response)
-        self.assertEqual(
-            data["ErrMsg"],
-            "User does not have the permission to create library in this organization"
-        )
-
-    @patch.dict('django.conf.settings.FEATURES', {'RESTRICT_COURSE_CREATION_TO_ORG_ROLES': True})
-    def test_library_creation_with_normaL_user_with_non_access_role(self):
-        """
-        Tests course creation with restriction and user doesn't have access role for org.
-        """
-        staff_role = "finance_admin"
-        self._login_as_non_staff_user()
-        CourseAccessRole.objects.create(org='Stark', role=staff_role, user=self.non_staff_user)
-        response = self.client.ajax_post(LIBRARY_REST_URL, {
-            'org': 'Stark',
-            'library': 'AvengerLibrary',
-            'display_name': 'Alien Science',
-        })
-        self.assertEqual(response.status_code, 400)
-        data = parse_json(response)
-        self.assertEqual(
-            data["ErrMsg"],
-            "User does not have the permission to create library in this organization"
-        )
-
-    @patch.dict('django.conf.settings.FEATURES', {'RESTRICT_COURSE_CREATION_TO_ORG_ROLES': True})
-    def test_library_creation_with_normaL_user_with_role(self):
-        """
-        Tests course creation with restriction and user has role access.
-        """
-        staff_role = "instructor"
-        self._login_as_non_staff_user()
-        CourseAccessRole.objects.create(org='Stark', role=staff_role, user=self.non_staff_user)
-        response = self.client.ajax_post(LIBRARY_REST_URL, {
-            'org': 'Stark',
-            'library': 'AvengerLibrary',
-            'display_name': 'Alien Science',
-        })
-        self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt
