@@ -341,12 +341,11 @@ class GeneratedCertificate(models.Model):
 
     def invalidate(self):
         """
-        Invalidate Generated Certificate by  marking it 'unavailable'.
+        Invalidate Generated Certificate by marking it 'unavailable'.
         """
         log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
 
         self.error_reason = ''
-        self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
         self.grade = ''
@@ -368,7 +367,6 @@ class GeneratedCertificate(models.Model):
         log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
 
         self.error_reason = ''
-        self.verify_uuid = ''
         self.download_uuid = ''
         self.download_url = ''
         self.grade = grade
