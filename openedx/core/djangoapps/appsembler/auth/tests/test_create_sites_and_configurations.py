@@ -70,18 +70,10 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.dns_name = "dummy_dns"
         self.theme_path = "/dummyA/dummyB/"
         self.service_names = ['discovery', 'ecommerce']
-        # self.expected_app_names = []
-        # for site_name in SITES:
-        #     for service_name in self.service_names:
-        #         self.expected_app_names.append(
-        #             '{service_name}-sso-{site_name}'.format(
-        #                 site_name=site_name,
-        #                 service_name=service_name))
-        # Build the expected app names we expect TrustedApplication to have
         self.expected_app_names = [
             '{service_name}-sso-{site_name}'.format(
-                        site_name=site_name,
-                        service_name=service_name)
+                site_name=site_name,
+                service_name=service_name)
             for service_name in self.service_names
             for site_name in SITES
         ]
