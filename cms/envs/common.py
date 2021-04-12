@@ -355,7 +355,8 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
-
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
     # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -2416,3 +2417,7 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+############## Settings for course import olx validation ############################
+COURSE_OLX_VALIDATION_STAGE = 1
+COURSE_OLX_VALIDATION_IGNORE_LIST = None

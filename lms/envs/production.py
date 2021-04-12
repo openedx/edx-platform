@@ -1051,3 +1051,10 @@ LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
 
 ############## XBlock extra mixins ############################
 XBLOCK_MIXINS += tuple(XBLOCK_EXTRA_MIXINS)
+
+############## Settings for course import olx validation ############################
+COURSE_OLX_VALIDATION_STAGE = ENV_TOKENS.get('COURSE_OLX_VALIDATION_STAGE', COURSE_OLX_VALIDATION_STAGE)
+COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
+    'COURSE_OLX_VALIDATION_IGNORE_LIST',
+    COURSE_OLX_VALIDATION_IGNORE_LIST
+)

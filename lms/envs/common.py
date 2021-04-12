@@ -65,7 +65,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-
 ENABLE_JASMINE = False
 
 LMS_ROOT_URL = 'https://localhost:18000'
@@ -311,6 +310,8 @@ FEATURES = {
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
 
     # .. toggle_name: FEATURES['DISABLE_HONOR_CERTIFICATES']
     # .. toggle_implementation: DjangoSetting
@@ -4672,3 +4673,7 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+################# Settings for olx validation. #################
+COURSE_OLX_VALIDATION_STAGE = 1
+COURSE_OLX_VALIDATION_IGNORE_LIST = None
