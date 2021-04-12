@@ -196,7 +196,7 @@ def streak_celebration_is_active(course_key):
 # .. toggle_implementation: SettingToggle
 # .. toggle_type: feature_flag
 # .. toggle_default: False
-# .. toggle_description: Set this to manage the default value for INVITE_ONLY across all courses in a given deployment
+# .. toggle_description: Setting this sets the default value of INVITE_ONLY across all courses in a given deployment
 # .. toggle_category: admin
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2019-05-16
