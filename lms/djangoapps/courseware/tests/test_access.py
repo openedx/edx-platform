@@ -503,29 +503,37 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     @override_settings(COURSES_INVITE_ONLY=False)
     def test__course_default_invite_only_flag_false(self):
-        """Tests that default value of COURSES_INVITE_ONLY as False."""
+        """
+        Ensure that COURSES_INVITE_ONLY does not take precedence if it is not set over the course invitation_only settings. 
+        """
 
         user = UserFactory.create()
 
-        course = self._mock_course(invitation=True)
+        # User cannot enroll in the course if it is just invitation only.
+        course = self._mock_course_with_invitation(invitation=True)
         self.assertFalse(access._has_access_course(user, 'enroll', course))
 
-        course = self._mock_course(invitation=False)
+        # User can enroll in the course if it is not just invitation only.
+        course = self._mock_course_with_invitation(invitation=False)
         self.assertTrue(access._has_access_course(user, 'enroll', course))
 
     @override_settings(COURSES_INVITE_ONLY=True)
     def test__course_default_invite_only_flag_true(self):
-        """Tests that default value of COURSES_INVITE_ONLY as True."""
+        """
+        Ensure that COURSES_INVITE_ONLY takes precedence over the course invitation_only settings. 
+        """
 
         user = UserFactory.create()
 
-        course = self._mock_course(invitation=True)
+        # User cannot enroll in the course if it is just invitation only and COURSES_INVITE_ONLY is also set.
+        course = self._mock_course_with_invitation(invitation=True)
         self.assertFalse(access._has_access_course(user, 'enroll', course))
 
-        course = self._mock_course(invitation=False)
+        # User cannot enroll in the course if COURSES_INVITE_ONLY is set despite of the course invitation_only value.
+        course = self._mock_course_with_invitation(invitation=False)
         self.assertFalse(access._has_access_course(user, 'enroll', course))
 
-    def _mock_course(self, invitation):
+    def _mock_course_with_invitation(self, invitation):
         yesterday = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
         return Mock(
