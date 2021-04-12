@@ -504,7 +504,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     @override_settings(COURSES_INVITE_ONLY=False)
     def test__course_default_invite_only_flag_false(self):
         """
-        Ensure that COURSES_INVITE_ONLY does not take precedence if it is not set over the course invitation_only settings. 
+        Ensure that COURSES_INVITE_ONLY does not take precedence if it is not set over the course invitation_only settings.
         """
 
         user = UserFactory.create()
@@ -520,7 +520,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     @override_settings(COURSES_INVITE_ONLY=True)
     def test__course_default_invite_only_flag_true(self):
         """
-        Ensure that COURSES_INVITE_ONLY takes precedence over the course invitation_only settings. 
+        Ensure that COURSES_INVITE_ONLY takes precedence over the course invitation_only settings.
         """
 
         user = UserFactory.create()
