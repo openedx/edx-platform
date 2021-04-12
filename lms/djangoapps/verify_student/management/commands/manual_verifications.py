@@ -91,6 +91,15 @@ class Command(BaseCommand):
         return total_emails, failed_emails
 
     def _add_user_to_manual_verification(self, email_id):
+        """
+        Generates a single verification for a user. 
+
+        Arguments:
+            email_id (str): email of the user to be verified
+
+        Returns:
+            (success): boolean to show if the user has been successfully verified.
+        """
         try:
             email_id = email_id.strip()
             user = User.objects.get(email=email_id)
