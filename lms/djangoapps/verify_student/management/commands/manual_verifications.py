@@ -45,7 +45,7 @@ class Command(BaseCommand):
         single_email = options['email']
 
         if single_email:
-            successfully_verified =  self._add_user_to_manual_verification(single_email)
+            successfully_verified = self._add_user_to_manual_verification(single_email)
             if successfully_verified is False:
                 log.error(f'Manual verification of {single_email} failed')
             return
