@@ -102,6 +102,5 @@ class Command(BaseCommand):
             )
             return True
         except User.DoesNotExist:
-            err_msg = 'Tried to verify email {}, but user not found'
-            log.error(err_msg.format(email_id))
+            log.error(f'Tried to verify email {email_id}, but user not found')
             return False
