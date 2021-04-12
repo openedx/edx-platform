@@ -39,11 +39,15 @@ class CourseCreatorForm(forms.ModelForm):
 
     def clean(self):
         all_orgs = self.cleaned_data.get("all_organizations")
+        updated_state = self.cleaned_data.get("state")
         orgs = self.cleaned_data.get("orgs").exists()
+        add_role = updated_state == CourseCreator.GRANTED
+        if not add_role and orgs:
+            raise ValidationError("Organizations cannot be added if the role is not granted.")
         if orgs and all_orgs:
-            raise ValidationError("all_organization should be disabled to use organization restrictions")
+            raise ValidationError("All Organization should be disabled to use organization restrictions.")
         if not orgs and not all_orgs:
-            raise ValidationError("Oragnizations should be added if all_organization is disabled")
+            raise ValidationError("Organizations should be added if All Organization is disabled.")
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
@@ -105,8 +109,8 @@ def update_creator_group_callback(sender, **kwargs):  # lint-amnesty, pylint: di
     user = kwargs['user']
     updated_state = kwargs['state']
     all_orgs = kwargs['all_organizations']
-    if all_orgs:
-        update_course_creator_group(kwargs['caller'], user, updated_state == CourseCreator.GRANTED)
+    create_role = all_orgs and (updated_state == CourseCreator.GRANTED)
+    update_course_creator_group(kwargs['caller'], user, create_role)
 
 
 @receiver(send_user_notification, sender=CourseCreator)
@@ -171,5 +175,7 @@ def post_all_organizations_callback(sender, **kwargs):
     instance = kwargs["instance"]
     action = kwargs["action"]
     orgs = list(instance.orgs.all().values_list('short_name', flat=True))
-    if action in ["post_add", "post_remove"]:
+    updated_state = instance.state
+    add_role = updated_state == CourseCreator.GRANTED
+    if action in ["post_add", "post_remove"] and add_role:
         update_org_content_creator_role(instance.admin, instance.user, orgs)
