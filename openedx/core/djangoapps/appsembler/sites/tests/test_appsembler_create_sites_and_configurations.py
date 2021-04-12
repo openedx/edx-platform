@@ -24,8 +24,8 @@ from openedx.core.djangoapps.appsembler.auth.models import TrustedApplication
 
 
 SITES = ["site_a", "site_b"]
-MANAGEMENT_COMMAND_PATH = ('openedx.core.djangoapps.theming.management.commands'
-                           '.create_sites_and_configurations.')
+MANAGEMENT_COMMAND_PATH = ('openedx.core.djangoapps.appsembler.sites.management'
+                           '.commands.appsembler_create_sites_and_configurations.')
 
 
 def _generate_site_config(dns_name, site_domain, devstack=False):
@@ -77,6 +77,7 @@ class TestCreateSiteAndConfiguration(TestCase):
             for service_name in self.service_names
             for site_name in SITES
         ]
+        self.command_under_test = 'appsembler_create_sites_and_configurations'
 
     def _assert_sites_are_valid(self):
         """
@@ -87,7 +88,6 @@ class TestCreateSiteAndConfiguration(TestCase):
         for site in sites:
             if site.name in SITES:
                 site_theme = SiteTheme.objects.get(site=site)
-
                 self.assertEqual(
                     site_theme.theme_dir_name,
                     "{}_dir_name".format(site.name)
@@ -202,7 +202,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         mock_get_sites.return_value = _get_sites(self.dns_name)
         mock_commerce.return_value = None
         call_command(
-            "create_sites_and_configurations",
+            self.command_under_test,
             "--dns-name", self.dns_name,
             "--theme-path", self.theme_path
         )
@@ -211,7 +211,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self._assert_ecommerce_clients_are_valid()
         self._assert_trusted_apps_are_valid()
         call_command(
-            "create_sites_and_configurations",
+            self.command_under_test,
             "--dns-name", self.dns_name,
             "--theme-path", self.theme_path
         )
@@ -223,7 +223,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self.dns_name = "new-dns"
         mock_get_sites.return_value = _get_sites(self.dns_name)
         call_command(
-            "create_sites_and_configurations",
+            self.command_under_test,
             "--dns-name", self.dns_name,
             "--theme-path", self.theme_path
         )
@@ -241,7 +241,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         mock_commerce.return_value = None
         assert TrustedApplication.objects.count() == 0
         call_command(
-            "create_sites_and_configurations",
+            self.command_under_test,
             "--dns-name", self.dns_name,
             "--theme-path", self.theme_path,
             "--devstack"
@@ -251,7 +251,7 @@ class TestCreateSiteAndConfiguration(TestCase):
         self._assert_ecommerce_clients_are_valid(devstack=True)
         self._assert_trusted_apps_are_valid()
         call_command(
-            "create_sites_and_configurations",
+            self.command_under_test,
             "--dns-name", self.dns_name,
             "--theme-path", self.theme_path,
             "--devstack"

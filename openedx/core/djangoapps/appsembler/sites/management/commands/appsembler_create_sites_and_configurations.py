@@ -1,7 +1,16 @@
 """
 This command will be run by an ansible script.
-"""
 
+For Tahoe, this command  should be used instead of the original command in
+`openedx.core.djangoapps.theming`
+
+This command has been modified from the original to support `TrustedApplication`
+handling. See ocd/appsembler/auth/models.TrustedApplication
+
+Original:
+
+* ocd/theming/management/commands/create_sites_and_configurations.py
+"""
 
 import fnmatch
 import json
@@ -247,6 +256,7 @@ class Command(BaseCommand):
         self._update_default_clients()
 
         # creating Sites, SiteThemes, SiteConfigurations and oauth2 clients
+
         for site_name, site_data in all_sites.items():
             site_domain = site_data['site_domain']
 
