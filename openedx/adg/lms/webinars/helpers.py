@@ -46,10 +46,12 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
             webinar_id=cancelled_webinar.id, is_registered=True
         ).values_list('user__email', flat=True)
 
-        if registered_user_emails:
-            _send_webinar_cancellation_emails(
-                cancelled_webinar.title,
-                cancelled_webinar.description,
-                cancelled_webinar.start_time,
-                list(registered_user_emails)
-            )
+        if not registered_user_emails:
+            continue
+
+        _send_webinar_cancellation_emails(
+            cancelled_webinar.title,
+            cancelled_webinar.description,
+            cancelled_webinar.start_time,
+            list(registered_user_emails)
+        )
