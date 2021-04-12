@@ -20,7 +20,7 @@ class TrustedApplication(models.Model):
     a good idea in the future. For now we're implementing this as a distinct
     model to make it easier to debug and troubleshoot
     """
-    application = models.ForeignKey(Application, on_delete=models.CASCADE)
+    application = models.OneToOneField(Application, on_delete=models.CASCADE)
 
     def __str__(self):
         return 'TrustedClient[{pk}] for {application}'.format(
