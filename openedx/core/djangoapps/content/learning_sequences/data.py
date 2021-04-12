@@ -18,9 +18,6 @@ Guidelines:
    or use API functions from other apps. They should not trigger expensive
    computation.
 
-Note: we're using old-style syntax for attrs because we need to support Python
-3.5, but we can move to the PEP-526 style once we move to Python 3.6+.
-
 TODO: Validate all datetimes to be UTC.
 """
 import logging
@@ -50,7 +47,7 @@ class ObjectDoesNotExist(Exception):
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class ContentErrorData:
     """
     A human-readable description of something wrong with the content, to ease
@@ -62,11 +59,11 @@ class ContentErrorData:
     when things don't show up where we expect then to be and we omit them from
     the outline (unknown tag types, sequences where we expect sections, etc.)
     """
-    message = attr.ib(type=str)
-    usage_key = attr.ib(type=Optional[UsageKey], default=None)
+    message: str
+    usage_key: Optional[UsageKey] = None
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class VisibilityData:
     """
     XBlock attributes that help determine item visibility.
@@ -75,29 +72,29 @@ class VisibilityData:
     # lets you define a Sequence that is reachable by direct URL but not shown
     # in Course navigation. It was used for things like supplementary tutorials
     # that were not considered a part of the normal course path.
-    hide_from_toc = attr.ib(type=bool, default=False)
+    hide_from_toc: bool = False
 
     # Restrict visibility to course staff, regardless of start date. This is
     # often used to hide content that either still being built out, or is a
     # scratch space of content that will eventually be copied over to other
     # sequences.
-    visible_to_staff_only = attr.ib(type=bool, default=False)
+    visible_to_staff_only: bool = False
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class ExamData:
     """
     XBlock attributes that describe exams
     """
-    is_practice_exam = attr.ib(type=bool, default=False)
-    is_proctored_enabled = attr.ib(type=bool, default=False)
-    is_time_limited = attr.ib(type=bool, default=False)
+    is_practice_exam: bool = False
+    is_proctored_enabled: bool = False
+    is_time_limited: bool = False
 
     def __bool__(self):
         return self.is_practice_exam or self.is_proctored_enabled or self.is_time_limited
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class CourseLearningSequenceData:
     """
     A Learning Sequence (a.k.a. subsection) from a Course.
@@ -107,22 +104,22 @@ class CourseLearningSequenceData:
     learning sequences in Courses vs. Pathways vs. Libraries. Such an object
     would likely not have `visibility` as that holds course-specific concepts.
     """
-    usage_key = attr.ib(type=UsageKey)
-    title = attr.ib(type=str)
-    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
-    exam = attr.ib(type=ExamData, default=ExamData())
-    inaccessible_after_due = attr.ib(type=bool, default=False)
+    usage_key: UsageKey
+    title: str
+    visibility: VisibilityData = VisibilityData()
+    exam: ExamData = ExamData()
+    inaccessible_after_due: bool = False
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class CourseSectionData:
     """
     A Section in a Course (sometimes called a Chapter).
     """
-    usage_key = attr.ib(type=UsageKey)
-    title = attr.ib(type=str)
-    visibility = attr.ib(type=VisibilityData)
-    sequences = attr.ib(type=List[CourseLearningSequenceData])
+    usage_key: UsageKey
+    title: str
+    visibility: VisibilityData
+    sequences: List[CourseLearningSequenceData]
 
 
 @attr.s(frozen=True)
@@ -247,41 +244,41 @@ class CourseOutlineData:
             )
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class ScheduleItemData:
     """
     Scheduling specific data (start/end/due dates) for a single item.
     """
-    usage_key = attr.ib(type=UsageKey)
+    usage_key: UsageKey
 
     # Start date that is specified for this item
-    start = attr.ib(type=Optional[datetime])
+    start: Optional[datetime]
 
     # Effective release date that it's available (may be affected by parents)
-    effective_start = attr.ib(type=Optional[datetime])
-    due = attr.ib(type=Optional[datetime])
+    effective_start: Optional[datetime]
+    due: Optional[datetime]
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class ScheduleData:
     """
     Overall course schedule data.
     """
-    course_start = attr.ib(type=Optional[datetime])
-    course_end = attr.ib(type=Optional[datetime])
-    sections = attr.ib(type=Dict[UsageKey, ScheduleItemData])
-    sequences = attr.ib(type=Dict[UsageKey, ScheduleItemData])
+    course_start: Optional[datetime]
+    course_end: Optional[datetime]
+    sections: Dict[UsageKey, ScheduleItemData]
+    sequences: Dict[UsageKey, ScheduleItemData]
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class SpecialExamAttemptData:
     """
     Overall special exam attempt data.
     """
-    sequences = attr.ib(type=Dict[UsageKey, Dict])
+    sequences: Dict[UsageKey, Dict]
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class UserCourseOutlineData(CourseOutlineData):
     """
     A course outline that has been customized for a specific user and time.
@@ -298,16 +295,16 @@ class UserCourseOutlineData(CourseOutlineData):
     # to reach up into parts of a Course that the user is not normally allowed
     # to know the existence of (e.g. Sequences marked `visible_to_staff_only`),
     # we can use this attribute.
-    base_outline = attr.ib(type=CourseOutlineData)
+    base_outline: CourseOutlineData
 
     # Django User representing who we've customized this outline for. This may
     # be the AnonymousUser.
-    user = attr.ib(type=User)
+    user: User
 
     # UTC TZ time representing the time for which this user course outline was
     # created. It is possible to create UserCourseOutlineData for a time in the
     # future (i.e. "What will this user be able to see next week?")
-    at_time = attr.ib(type=datetime)
+    at_time: datetime
 
     # What Sequences is this `user` allowed to access? Anything in the `outline`
     # is something that the `user` is allowed to know exists, but they might not
@@ -317,15 +314,15 @@ class UserCourseOutlineData(CourseOutlineData):
     # * If anonymous course access is enabled in "public_outline" mode,
     #   unauthenticated users (AnonymousUser) will see the course outline but
     #   not be able to access anything inside.
-    accessible_sequences = attr.ib(type=Set[UsageKey])
+    accessible_sequences: Set[UsageKey]
 
 
-@attr.s(frozen=True)
+@attr.s(frozen=True, auto_attribs=True)
 class UserCourseOutlineDetailsData:
     """
     Class that has a user's course outline plus useful details (like schedules).
     Will eventually expand to include other systems like Completion.
     """
-    outline = attr.ib(type=UserCourseOutlineData)
-    schedule = attr.ib(type=ScheduleData)
-    special_exam_attempts = attr.ib(type=SpecialExamAttemptData)
+    outline: UserCourseOutlineData
+    schedule: ScheduleData
+    special_exam_attempts: SpecialExamAttemptData
