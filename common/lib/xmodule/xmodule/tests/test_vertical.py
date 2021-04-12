@@ -83,10 +83,13 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
     """
     test_html = 'Test HTML'
     test_problem = 'Test Problem'
+    test_html_nested = 'Nest Nested HTML'
+    test_problem_nested = 'Nest_Nested_Problem'
 
     def setUp(self):
         super().setUp()
-        # construct module
+        # construct module: course/sequence/vertical - problems
+        #                                           \_  nested_vertical / problems
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)
         vertical = xml.VerticalFactory.build(parent=sequence)
@@ -94,6 +97,10 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.course = self.process_xml(course)
         xml.HtmlFactory(parent=vertical, url_name='test-html', text=self.test_html)
         xml.ProblemFactory(parent=vertical, url_name='test-problem', text=self.test_problem)
+
+        nested_vertical = xml.VerticalFactory.build(parent=vertical)
+        xml.HtmlFactory(parent=nested_vertical, url_name='test_html_nested', text=self.test_html_nested)
+        xml.ProblemFactory(parent=nested_vertical, url_name='test_problem_nested', text=self.test_problem_nested)
 
         self.course = self.process_xml(course)
         course_seq = self.course.get_children()[0]
@@ -109,6 +116,10 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.problem_block = self.vertical.get_children()[1]
         self.problem_block.has_score = True
         self.problem_block.graded = True
+        self.extra_vertical_block = self.vertical.get_children()[2]  # VerticalBlockWithMixins
+        self.nested_problem_block = self.extra_vertical_block.get_children()[1]
+        self.nested_problem_block.has_score = True
+        self.nested_problem_block.graded = True
 
         self.username = "bilbo"
         self.default_context = {"bookmarked": False, "username": self.username}
@@ -210,6 +221,33 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             assert self.test_problem not in html
         else:
             assert self.test_problem in html
+
+    @ddt.data(True, False)
+    def test_render_access_denied_child_blocks(self, has_access_error):
+        """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
+        self.module_system._services['bookmarks'] = Mock()
+        self.module_system._services['user'] = StubUserService()
+        self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
+        self.nested_problem_block.has_access_error = has_access_error
+
+        context = {'username': self.username, 'hide_access_error_blocks': True}
+        html = self.module_system.render(self.vertical, STUDENT_VIEW, context).content
+
+        if has_access_error:
+            assert self.test_problem_nested not in html
+        else:
+            assert self.test_problem_nested in html
+
+    @ddt.data(True, False)
+    def test_block_has_access_error(self, has_access_error):
+        """ Tests block_has_access_error gives the correct result for child node questions """
+        # Use special block from setup (vertical/nested_vertical/problem)
+        # has_access_error is set on problem an extra level down, so we have to recurse to pass
+
+        self.nested_problem_block.has_access_error = has_access_error
+        should_block = self.vertical.block_has_access_error(self.vertical)
+
+        assert should_block == has_access_error
 
     @ddt.unpack
     @ddt.data(
