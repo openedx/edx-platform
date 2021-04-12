@@ -154,6 +154,7 @@
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
+            this.$(".forum-nav-thread[data-id='" + threadId + "']").removeClass('never-read');
             this.threadListView.$el.addClass('is-hidden');
             this.$('.inline-thread').removeClass('is-hidden');
         },
