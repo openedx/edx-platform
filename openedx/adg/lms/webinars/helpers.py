@@ -7,15 +7,16 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 
 
-def _send_webinar_cancellation_emails(webinar_title, webinar_description, webinar_start_time, recipient_emails):
+def send_webinar_emails(template_slug, webinar_title, webinar_description, webinar_start_time, recipient_emails):
     """
-    Send webinar cancellation email to the list of given email addresses
+    Send webinar email to the list of given email addresses using the given template and data
 
     Arguments:
-        webinar_title (str): Title of the cancelled webinar
-        webinar_description (str): Description of the cancelled webinar
-        webinar_start_time (Datetime): Start datetime of the cancelled webinar
-        recipient_emails (list):  List of Email addresses (str) to send the email to
+        template_slug (str): Slug for the chosen email template
+        webinar_title (str): Title of the webinar
+        webinar_description (str): Description of the webinar
+        webinar_start_time (Datetime): Start datetime of the webinar
+        recipient_emails (list):  List of email addresses (str) to send the email to
 
     Returns:
         None
@@ -26,7 +27,7 @@ def _send_webinar_cancellation_emails(webinar_title, webinar_description, webina
         'webinar_start_time': webinar_start_time.strftime("%B %d, %Y %I:%M %p %Z")
     }
 
-    task_send_mandrill_email.delay(MandrillClient.WEBINAR_CANCELLATION, recipient_emails, context)
+    task_send_mandrill_email.delay(template_slug, recipient_emails, context)
 
 
 def send_cancellation_emails_for_given_webinars(cancelled_webinars):
@@ -51,7 +52,8 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
         if not webinar_email_addresses:
             continue
 
-        _send_webinar_cancellation_emails(
+        send_webinar_emails(
+            MandrillClient.WEBINAR_CANCELLATION,
             cancelled_webinar.title,
             cancelled_webinar.description,
             cancelled_webinar.start_time,

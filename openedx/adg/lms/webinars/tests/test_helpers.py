@@ -1,13 +1,32 @@
 """
 Tests for all the helpers in webinars app
 """
+import factory
 import pytest
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.lms.webinars.helpers import send_cancellation_emails_for_given_webinars
+from openedx.adg.lms.webinars.helpers import send_cancellation_emails_for_given_webinars, send_webinar_emails
 
 from .factories import WebinarFactory, WebinarRegistrationFactory
+
+
+@pytest.mark.django_db
+def test_send_webinar_emails(mocker):
+    """
+    Test if `send_webinar_emails` is sending the email with the correct data
+    """
+    mocked_task_send_mandrill_email = mocker.patch('openedx.adg.lms.webinars.helpers.task_send_mandrill_email')
+
+    webinar = WebinarFactory()
+    send_webinar_emails("test_slug", webinar.title, webinar.description, webinar.start_time, "t1@eg.com")
+
+    expected_context = {
+        'webinar_title': webinar.title,
+        'webinar_description': webinar.description,
+        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
+    }
+    mocked_task_send_mandrill_email.delay.assert_called_with("test_slug", "t1@eg.com", expected_context)
 
 
 @pytest.mark.django_db
@@ -56,15 +75,13 @@ def test_send_cancellation_emails_for_given_webinars(
     for email, invite_response in registered_users_with_response:
         WebinarRegistrationFactory(user__email=email, webinar=webinar, is_registered=invite_response)
 
-    for cohost_email in cohosts:
-        cohost = UserFactory(email=cohost_email)
-        webinar.co_hosts.add(cohost)
-        webinar.save()
+    cohost_emails = factory.Iterator(cohosts)
+    cohost_users = UserFactory.create_batch(len(cohosts), email=cohost_emails)
+    webinar.co_hosts.add(*cohost_users)
 
-    for panelist_email in panelists:
-        panelist = UserFactory(email=panelist_email)
-        webinar.panelists.add(panelist)
-        webinar.save()
+    panelist_emails = factory.Iterator(panelists)
+    panelist_users = UserFactory.create_batch(len(panelists), email=panelist_emails)
+    webinar.panelists.add(*panelist_users)
 
     send_cancellation_emails_for_given_webinars([webinar])
 
