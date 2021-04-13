@@ -2,10 +2,22 @@
 Instructor API endpoint urls.
 """
 
-
 from django.conf.urls import url
 
 from lms.djangoapps.instructor.views import api, gradebook_api
+from openedx.core.constants import COURSE_ID_PATTERN
+
+# These endpoints are exposing existing views in a way that can be used by MFEs
+# or other API clients. They are currently versioned at `v1` since they have
+# been around without major changes for a while and will probably not be changed
+# in incompatible ways. If they do need incompatible changes for use via MFEs
+# then new v2 endpoints can be introduced.
+v1_api_urls = [
+    url(rf'^tasks/{COURSE_ID_PATTERN}$', api.InstructorTasks.as_view(), name='list_instructor_tasks', ),
+    url(rf'^reports/{COURSE_ID_PATTERN}$', api.ReportDownloads.as_view(), name='list_report_downloads', ),
+    url(rf'^reports/{COURSE_ID_PATTERN}/generate/problem_responses$', api.ProblemResponseReportInitiate.as_view(),
+        name='generate_problem_responses', ),
+]
 
 urlpatterns = [
     url(r'^students_update_enrollment$', api.students_update_enrollment, name='students_update_enrollment'),
