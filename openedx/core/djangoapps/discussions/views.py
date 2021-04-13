@@ -170,7 +170,7 @@ class DiscussionsConfigurationView(APIView):
         """
         Handle HTTP/GET requests
         """
-        course_key = self._validate_course_key(course_key_string)
+        course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = self.Serializer(configuration)
         return Response(serializer.data)
@@ -181,25 +181,26 @@ class DiscussionsConfigurationView(APIView):
 
         TODO: Should we cleanup orphaned LTI config when swapping to cs_comments_service?
         """
-        course_key = self._validate_course_key(course_key_string)
+        course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = self.Serializer(configuration, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data)
 
-    def _validate_course_key(self, course_key_string: str) -> CourseKey:
-        """
-        Validate and parse a course_key string, if supported
-        """
-        try:
-            course_key = CourseKey.from_string(course_key_string)
-        except InvalidKeyError as error:
-            raise serializers.ValidationError(
-                f"{course_key_string} is not a valid CourseKey"
-            ) from error
-        if course_key.deprecated:
-            raise serializers.ValidationError(
-                'Deprecated CourseKeys (Org/Course/Run) are not supported.'
-            )
-        return course_key
+
+def _validate_course_key(course_key_string: str) -> CourseKey:
+    """
+    Validate and parse a course_key string, if supported
+    """
+    try:
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError as error:
+        raise serializers.ValidationError(
+            f"{course_key_string} is not a valid CourseKey"
+        ) from error
+    if course_key.deprecated:
+        raise serializers.ValidationError(
+            'Deprecated CourseKeys (Org/Course/Run) are not supported.'
+        )
+    return course_key
