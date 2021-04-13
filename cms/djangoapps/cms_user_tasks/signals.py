@@ -42,9 +42,9 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
         if not course_import_olx_validation_is_enabled():
             return None
 
-        artifact = UserTaskArtifact.objects.filter(status=status, name="OLX_VALIDATION_ERROR").first()
-        if artifact and not bypass_olx_failure_enabled():
-            return artifact.text
+        olx_artifact = UserTaskArtifact.objects.filter(status=status, name="OLX_VALIDATION_ERROR").first()
+        if olx_artifact and not bypass_olx_failure_enabled():
+            return olx_artifact.text
 
     status = kwargs['status']
     # Only send email when the entire task is complete, should only send when

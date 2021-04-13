@@ -7,7 +7,6 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-
 from mock import Mock, mock, patch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
@@ -648,13 +647,21 @@ class ValidateCourseOlxTests(CourseTestCase):
         self.assertTrue(validate_course_olx(library_key, self.toy_course_path, self.status))
         self.assertFalse(mock_olxcleaner_validate.called)
 
-    def test_waffle_flag_settings(self, mock_olxcleaner_validate):
+    def test_config_settings_enabled(self, mock_olxcleaner_validate):
         """
-        Tests olx validation in case of waffle flag is off.
+        Tests olx validation with config setting is disabled.
         """
         with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=False):
             self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
             self.assertFalse(mock_olxcleaner_validate.called)
+
+    def test_config_settings_disabled(self, mock_olxcleaner_validate):
+        """
+        Tests olx validation with config setting is enabled.
+        """
+        with patch.dict(settings.FEATURES, ENABLE_COURSE_OLX_VALIDATION=True):
+            self.assertTrue(validate_course_olx(self.course.id, self.toy_course_path, self.status))
+            self.assertTrue(mock_olxcleaner_validate.called)
 
     def test_exception_during_validation(self, mock_olxcleaner_validate):
         """

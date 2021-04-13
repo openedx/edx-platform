@@ -708,7 +708,7 @@ def validate_course_olx(courselike_key, course_dir, status):
     if bypass_olx_failure_enabled():
         return olx_is_valid
 
-    status.fail(_('Course olx validation failed. Please check your email.'))
+    status.fail(UserErrors.OLX_VALIDATION_FAILED)
     return False
 
 
