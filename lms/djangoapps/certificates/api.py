@@ -24,6 +24,7 @@ from lms.djangoapps.certificates.generation_handler import (
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
     is_using_certificate_allowlist as _is_using_certificate_allowlist,
+    is_using_v2_course_certificates as _is_using_v2_course_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
 from lms.djangoapps.certificates.models import (
@@ -705,3 +706,10 @@ def get_certificate_invalidation_entry(certificate):
         return None
 
     return certificate_invalidation_entry
+
+
+def is_using_v2_course_certificates(course_key):
+    """
+    Determines if the given course run is using V2 of course certificates
+    """
+    return _is_using_v2_course_certificates(course_key)
