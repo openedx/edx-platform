@@ -58,7 +58,7 @@ class CertificateServiceTests(ModuleStoreTestCase):
         self.assertDictEqual(
             self.generated_certificate_to_dict(invalid_generated_certificate),
             {
-                'verify_uuid': '',
+                'verify_uuid': invalid_generated_certificate.verify_uuid,
                 'download_uuid': '',
                 'download_url': '',
                 'grade': '',
