@@ -1,5 +1,8 @@
 # Changelog EOL
 
+## 13/04/2021 Changes on Gradebook api
+- Page number in integer format (lms/djangoapps/instructor/views/gradebook_api.py)
+
 ## 12/04/2021 Changes on xblock utils
 - Get CMS_BASE from Site Configurations instead of django.conf settings (openedx/core/lib/xblock_utils/__init__.py)
 
