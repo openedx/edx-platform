@@ -1,11 +1,11 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-import factory
+from factory.django import DjangoModelFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.survey.models import SurveyAnswer, SurveyForm
 
 
-class SurveyFormFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SurveyFormFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta:
         model = SurveyForm
 
@@ -13,7 +13,7 @@ class SurveyFormFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pyl
     form = '<form>First name:<input type="text" name="firstname"/></form>'
 
 
-class SurveyAnswerFactory(factory.django.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class SurveyAnswerFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
     class Meta:
         model = SurveyAnswer
 

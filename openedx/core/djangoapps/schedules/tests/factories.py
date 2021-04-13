@@ -6,20 +6,20 @@ Factories for schedules tests
 from factory.django import DjangoModelFactory
 import pytz
 
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.schedules import models
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 
-class ScheduleExperienceFactory(factory.DjangoModelFactory):
-    class Meta:
+class ScheduleExperienceFactory(DjangoModelFactory):
+    class Meta(object):
         model = models.ScheduleExperience
 
     experience_type = models.ScheduleExperience.EXPERIENCES.default
 
 
-class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class ScheduleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta(object):
         model = models.Schedule
 
     start_date = factory.Faker('future_datetime', tzinfo=pytz.UTC)
@@ -28,8 +28,8 @@ class ScheduleFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disa
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule')
 
 
-class ScheduleConfigFactory(factory.DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
-    class Meta:
+class ScheduleConfigFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+    class Meta(object):
         model = models.ScheduleConfig
 
     site = factory.SubFactory(SiteFactory)
