@@ -1016,7 +1016,10 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
         course = create_self_paced_course_run(days_till_start=-1, org_id='TestOrg')
         DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
         if enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(
+                course_id=course.id, mode=CourseMode.AUDIT, course=course_overview
+            )
         OrgDynamicUpgradeDeadlineConfiguration.objects.create(
             enabled=org_config_enabled, opt_out=org_config_opt_out, org_id=course.id.org
         )
@@ -1024,7 +1027,10 @@ class TestScheduleOverrides(SharedModuleStoreTestCase):
             enabled=course_config_enabled, opt_out=course_config_opt_out, course_id=course.id
         )
         if not enroll_first:
-            enrollment = CourseEnrollmentFactory(course_id=course.id, mode=CourseMode.AUDIT, course__self_paced=True)
+            course_overview = CourseOverviewFactory.create(self_paced=True)
+            enrollment = CourseEnrollmentFactory(
+                course_id=course.id, mode=CourseMode.AUDIT, course=course_overview
+            )
 
         # The enrollment has a schedule, and the upgrade_deadline is set when expected_dynamic_deadline is True
         if not enroll_first:
