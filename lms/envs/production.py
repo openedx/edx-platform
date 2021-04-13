@@ -953,3 +953,41 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+ACTIVE_DJANGO_DEBUG_TOOLBAR = ENV_TOKENS.get('ACTIVE_DJANGO_DEBUG_TOOLBAR', False)
+
+if ACTIVE_DJANGO_DEBUG_TOOLBAR:
+    INSTALLED_APPS += ['debug_toolbar']  # NOQA
+    INTERNAL_IPS = ('127.0.0.1',)
+    DDT_WHITELIST_PATHS = ('/render_player',)
+
+    MIDDLEWARE += [  # NOQA
+        'lms.djangoapps.discussion.django_comment_client.utils.QueryCountDebugMiddleware',
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
+
+    DEBUG_TOOLBAR_PANELS = (
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+    )
+
+    DEBUG_TOOLBAR_CONFIG = {
+        # Profile panel is incompatible with wrapped views
+        # See https://github.com/jazzband/django-debug-toolbar/issues/792
+        'DISABLE_PANELS': (
+            'debug_toolbar.panels.profiling.ProfilingPanel',
+        ),
+        'SHOW_TOOLBAR_CALLBACK': 'lms.envs.production.should_show_debug_toolbar',
+    }
+
+    def should_show_debug_toolbar(request):
+        if request.path.endswith(DDT_WHITELIST_PATHS):
+            return False
+        return True
