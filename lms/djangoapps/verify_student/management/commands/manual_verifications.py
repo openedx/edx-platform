@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
     def _add_user_to_manual_verification(self, email_id):
         """
-        Generates a single verification for a user. 
+        Generates a single verification for a user.
 
         Arguments:
             email_id (str): email of the user to be verified
