@@ -58,7 +58,13 @@ class CertificateStatuses:
     restricted          - The user is on the restricted list. This status was previously set if allow_certificate was
                           set to False in the userprofile table.
     unavailable         - Certificate has been invalidated.
-    unverified          - The user is in verified track but does not have an approved, unexpired identity verification.
+    unverified          - The user does not have an approved, unexpired identity verification.
+
+    The following statuses are set by V2 of course certificates:
+      downloadable - See generation.py
+      notpassing - See GeneratedCertificate.mark_notpassing()
+      unavailable - See GeneratedCertificate.invalidate()
+      unverified - See GeneratedCertificate.mark_unverified()
     """
     deleted = 'deleted'
     deleting = 'deleting'
@@ -379,6 +385,28 @@ class GeneratedCertificate(models.Model):
         self.download_url = ''
         self.grade = grade
         self.status = CertificateStatuses.notpassing
+        self.save()
+
+        COURSE_CERT_REVOKED.send_robust(
+            sender=self.__class__,
+            user=self.user,
+            course_key=self.course_id,
+            mode=self.mode,
+            status=self.status,
+        )
+
+    def mark_unverified(self):
+        """
+        Invalidates a Generated Certificate by marking it as 'unverified'. For additional information, please see the
+        comments of the `invalidate` function above as they also apply here.
+        """
+        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id}')
+
+        self.error_reason = ''
+        self.download_uuid = ''
+        self.download_url = ''
+        self.grade = ''
+        self.status = CertificateStatuses.unverified
         self.save()
 
         COURSE_CERT_REVOKED.send_robust(

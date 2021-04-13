@@ -11,8 +11,6 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from lms.djangoapps.certificates.generation_handler import (
     CERTIFICATES_USE_ALLOWLIST,
     CERTIFICATES_USE_UPDATED,
-    is_using_certificate_allowlist,
-    is_using_v2_course_certificates,
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
     _can_generate_v2_certificate,
@@ -20,7 +18,11 @@ from lms.djangoapps.certificates.generation_handler import (
     generate_allowlist_certificate_task,
     generate_certificate_task,
     generate_regular_certificate_task,
-    is_using_certificate_allowlist_and_is_on_allowlist
+    is_using_certificate_allowlist,
+    is_using_certificate_allowlist_and_is_on_allowlist,
+    is_using_v2_course_certificates,
+    _set_allowlist_cert_status,
+    _set_v2_cert_status
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import (
@@ -153,6 +155,7 @@ class AllowlistTests(ModuleStoreTestCase):
         assert not generate_allowlist_certificate_task(self.user, self.course_run_key)
         assert not can_generate_certificate_task(self.user, self.course_run_key)
         assert not generate_certificate_task(self.user, self.course_run_key)
+        assert _set_allowlist_cert_status(self.user, self.course_run_key) is None
 
     def test_handle_valid(self):
         """
@@ -174,6 +177,7 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
             assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
+            assert _set_allowlist_cert_status(self.user, self.course_run_key) == CertificateStatuses.unverified
 
     def test_can_generate_not_enrolled(self):
         """
@@ -184,6 +188,7 @@ class AllowlistTests(ModuleStoreTestCase):
         key = cr.id  # pylint: disable=no-member
         CertificateWhitelistFactory.create(course_id=key, user=u)
         assert not _can_generate_allowlist_certificate(u, key)
+        assert _set_allowlist_cert_status(u, key) is None
 
     def test_can_generate_audit(self):
         """
@@ -201,6 +206,7 @@ class AllowlistTests(ModuleStoreTestCase):
         CertificateWhitelistFactory.create(course_id=key, user=u)
 
         assert not _can_generate_allowlist_certificate(u, key)
+        assert _set_allowlist_cert_status(u, key) is None
 
     def test_can_generate_not_whitelisted(self):
         """
@@ -216,6 +222,7 @@ class AllowlistTests(ModuleStoreTestCase):
             mode="verified",
         )
         assert not _can_generate_allowlist_certificate(u, key)
+        assert _set_allowlist_cert_status(u, key) is None
 
     def test_can_generate_invalidated(self):
         """
@@ -244,6 +251,7 @@ class AllowlistTests(ModuleStoreTestCase):
         )
 
         assert not _can_generate_allowlist_certificate(u, key)
+        assert _set_allowlist_cert_status(u, key) == CertificateStatuses.unavailable
 
     def test_can_generate_web_cert_disabled(self):
         """
@@ -251,6 +259,29 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         with mock.patch(WEB_CERTS_METHOD, return_value=False):
             assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
+            assert _set_allowlist_cert_status(self.user, self.course_run_key) is None
+
+    def test_cert_status_downloadable(self):
+        """
+        Test cert status when status is already downloadable
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode="verified",
+        )
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.verified,
+            status=CertificateStatuses.downloadable
+        )
+
+        assert _set_allowlist_cert_status(u, key) is None
 
 
 @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
@@ -362,6 +393,7 @@ class CertificateTests(ModuleStoreTestCase):
         """
         with mock.patch(ID_VERIFIED_METHOD, return_value=False):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) == CertificateStatuses.unverified
 
     def test_can_generate_ccx(self):
         """
@@ -369,6 +401,7 @@ class CertificateTests(ModuleStoreTestCase):
         """
         with mock.patch(CCX_COURSE_METHOD, return_value=True):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_beta_tester(self):
         """
@@ -376,6 +409,7 @@ class CertificateTests(ModuleStoreTestCase):
         """
         with mock.patch(BETA_TESTER_METHOD, return_value=True):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) is None
 
     def test_can_generate_failing_grade(self):
         """
@@ -383,6 +417,7 @@ class CertificateTests(ModuleStoreTestCase):
         """
         with mock.patch(PASSING_GRADE_METHOD, return_value=False):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) == CertificateStatuses.notpassing
 
     def test_can_generate_not_enrolled(self):
         """
@@ -392,6 +427,7 @@ class CertificateTests(ModuleStoreTestCase):
         cr = CourseFactory()
         key = cr.id  # pylint: disable=no-member
         assert not _can_generate_v2_certificate(u, key)
+        assert _set_v2_cert_status(u, key) is None
 
     def test_can_generate_audit(self):
         """
@@ -408,6 +444,7 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         assert not _can_generate_v2_certificate(u, key)
+        assert _set_v2_cert_status(u, key) is None
 
     def test_can_generate_invalidated(self):
         """
@@ -435,6 +472,7 @@ class CertificateTests(ModuleStoreTestCase):
         )
 
         assert not _can_generate_v2_certificate(u, key)
+        assert _set_v2_cert_status(u, key) == CertificateStatuses.unavailable
 
     def test_can_generate_web_cert_disabled(self):
         """
@@ -442,3 +480,71 @@ class CertificateTests(ModuleStoreTestCase):
         """
         with mock.patch(WEB_CERTS_METHOD, return_value=False):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
+    def test_cert_status_v1(self):
+        """
+        Test cert status with V1 of course certs
+        """
+        assert _set_v2_cert_status(self.user, self.course_run_key) is None
+
+    def test_cert_status_downloadable(self):
+        """
+        Test cert status when status is already downloadable
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode="verified",
+        )
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.verified,
+            status=CertificateStatuses.downloadable
+        )
+
+        assert _set_v2_cert_status(u, key) is None
+
+    def test_cert_status_none(self):
+        """
+        Test cert status when the user has no cert
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode="verified",
+        )
+
+        assert _set_v2_cert_status(u, key) == CertificateStatuses.notpassing
+
+    def test_cert_status_generating(self):
+        """
+        Test cert status when status is generating
+        """
+        u = UserFactory()
+        cr = CourseFactory()
+        key = cr.id  # pylint: disable=no-member
+        CourseEnrollmentFactory(
+            user=u,
+            course_id=key,
+            is_active=True,
+            mode="verified",
+        )
+        GeneratedCertificateFactory(
+            user=u,
+            course_id=key,
+            mode=GeneratedCertificate.MODES.verified,
+            status=CertificateStatuses.generating
+        )
+
+        assert _set_v2_cert_status(u, key) == CertificateStatuses.notpassing

@@ -106,11 +106,14 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
-    if not _can_generate_allowlist_certificate(user, course_key):
-        log.info(f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_allowlist_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _set_allowlist_cert_status(user, course_key)
+    if status is not None:
+        return True
+
+    return False
 
 
 def generate_regular_certificate_task(user, course_key, generation_mode=None):
@@ -118,11 +121,14 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
     """
-    if not _can_generate_v2_certificate(user, course_key):
-        log.info(f'Cannot generate a v2 course certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_v2_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _set_v2_cert_status(user, course_key)
+    if status is not None:
+        return True
+
+    return False
 
 
 def _generate_certificate_task(user, course_key, generation_mode=None):
@@ -239,6 +245,122 @@ def _can_generate_certificate_common(user, course_key):
     return True
 
 
+def _set_allowlist_cert_status(user, course_key):
+    """
+    Determine the allowlist certificate status for this user, in this course run and update the cert.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not _can_set_allowlist_cert_status(user, course_key):
+        return None
+
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    return _get_cert_status_common(user, course_key, cert)
+
+
+def _set_v2_cert_status(user, course_key):
+    """
+    Determine the V2 certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not _can_set_v2_cert_status(user, course_key):
+        return None
+
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    status = _get_cert_status_common(user, course_key, cert)
+    if status is not None:
+        return status
+
+    course = _get_course(course_key)
+    course_grade = _get_course_grade(user, course)
+    if not course_grade.passed:
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.notpassing:
+            cert.mark_notpassing(course_grade.percent)
+        return CertificateStatuses.notpassing
+
+    return None
+
+
+def _get_cert_status_common(user, course_key, cert):
+    """
+    Determine the certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.unavailable:
+            cert.invalidate()
+        return CertificateStatuses.unavailable
+
+    if not IDVerificationService.user_is_verified(user):
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.unverified:
+            cert.mark_unverified()
+        return CertificateStatuses.unverified
+
+    return None
+
+
+def _can_set_allowlist_cert_status(user, course_key):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status for an allowlist certificate
+    """
+    if not is_using_certificate_allowlist(course_key):
+        return False
+
+    if not is_on_certificate_allowlist(user, course_key):
+        return False
+
+    course = _get_course(course_key)
+    return _can_set_cert_status_common(user, course_key, course)
+
+
+def _can_set_v2_cert_status(user, course_key):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status for a V2 certificate
+    """
+    if not is_using_v2_course_certificates(course_key):
+        return False
+
+    if _is_ccx_course(course_key):
+        return False
+
+    course = _get_course(course_key)
+    if _is_beta_tester(user, course):
+        return False
+
+    return _can_set_cert_status_common(user, course_key, course)
+
+
+def _can_set_cert_status_common(user, course_key, course):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status
+    """
+    if _is_cert_downloadable(user, course_key):
+        return False
+
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    if enrollment_mode is None:
+        return False
+
+    if not modes_api.is_eligible_for_certificate(enrollment_mode):
+        return False
+
+    if not has_html_certificates_enabled(course):
+        return False
+
+    return True
+
+
 def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
     """
     Return True if both:
@@ -306,8 +428,30 @@ def _has_passing_grade(user, course):
     """
     Check if the user has a passing grade in this course run
     """
-    course_grade = CourseGradeFactory().read(user, course)
+    course_grade = _get_course_grade(user, course)
     return course_grade.passed
+
+
+def _get_course_grade(user, course):
+    """
+    Get the user's course grade in this course run
+    """
+    return CourseGradeFactory().read(user, course)
+
+
+def _is_cert_downloadable(user, course_key):
+    """
+    Check if cert already exists, has a downloadable status, and has not been invalidated
+    """
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    if cert is None:
+        return False
+    if cert.status != CertificateStatuses.downloadable:
+        return False
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
+        return False
+
+    return True
 
 
 def _get_course(course_key):
