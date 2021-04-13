@@ -91,3 +91,15 @@ class AuthorizedApiTest(AuthenticatedApiTest):
     def test_access_put(self):
         response = self.client.put(self.url)
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+
+class CourseStaffAuthorizedTest(UnauthorizedApiTest):
+    """
+    Course Staff should have the same access as Global Staff
+
+    TODO: This behavior should be changed to _allow_ access [1]
+    - [1] https://openedx.atlassian.net/browse/TNL-8231
+    """
+
+    def _login(self):
+        self.client.login(username=self.user_staff_course.username, password=self.password)
