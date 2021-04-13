@@ -60,7 +60,7 @@ def calculate_page_info(offset, total_students):
     return {
         "previous_offset": previous_offset,
         "next_offset": next_offset,
-        "page_num": page_num,
+        "page_num": int(page_num),
         "offset": offset,
         "total_pages": total_pages
     }
