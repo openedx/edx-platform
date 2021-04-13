@@ -55,8 +55,7 @@ class CertificateStatuses:
     invalidated         - Certificate is not valid.
     notpassing          - The user has not achieved a passing grade.
     requesting          - A request has been made to generate the PDF certificate.
-    restricted          - The user is on the restricted list. This status was previously set if allow_certificate was
-                          set to False in the userprofile table.
+    restricted          - The user is restricted from receiving a certificate.
     unavailable         - Certificate has been invalidated.
     unverified          - The user does not have an approved, unexpired identity verification.
 

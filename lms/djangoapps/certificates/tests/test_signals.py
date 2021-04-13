@@ -12,7 +12,10 @@ from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import cert_generation_enabled
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
+from lms.djangoapps.certificates.generation_handler import (
+    CERTIFICATES_USE_ALLOWLIST,
+    CERTIFICATES_USE_UPDATED
+)
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
@@ -217,6 +220,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             self_paced=True,
         )
+        self.course_key = self.course.id
         self.user = UserFactory.create()
         self.enrollment = CourseEnrollmentFactory(
             user=self.user,
@@ -333,6 +337,54 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 ) as mock_cert_task:
                     CourseGradeFactory().update(u, c)
                     mock_cert_task.assert_called_with(u, course_key)
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_cert_already_generated_downloadable(self):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            GeneratedCertificateFactory(
+                user=self.user,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable
+            )
+
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate_task',
+                return_value=None
+            ) as mock_cert_task:
+                grade_factory = CourseGradeFactory()
+                with mock_passing_grade():
+                    grade_factory.update(self.user, self.course)
+                    mock_cert_task.assert_not_called()
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_cert_already_generated_unverified(self):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            GeneratedCertificateFactory(
+                user=self.user,
+                course_id=self.course.id,
+                status=CertificateStatuses.unverified
+            )
+
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate_task',
+                return_value=None
+            ) as mock_cert_task:
+                grade_factory = CourseGradeFactory()
+                with mock_passing_grade():
+                    grade_factory.update(self.user, self.course)
+                    mock_cert_task.assert_called_with(self.user, self.course_key)
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_without_cert(self):
+        with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_certificate_task',
+                return_value=None
+            ) as mock_cert_task:
+                grade_factory = CourseGradeFactory()
+                with mock_passing_grade():
+                    grade_factory.update(self.user, self.course)
+                    mock_cert_task.assert_called_with(self.user, self.course_key)
 
 
 @ddt.ddt
