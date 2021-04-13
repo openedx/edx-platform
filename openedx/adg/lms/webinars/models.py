@@ -23,7 +23,8 @@ class WebinarQuerySet(models.QuerySet):
     """
 
     def delete(self):
-        cancelled_upcoming_webinars = self.filter(status=Webinar.UPCOMING)
+        cancelled_upcoming_webinars = self.filter(
+            status=Webinar.UPCOMING).select_related('presenter').prefetch_related('co_hosts', 'panelists')
         send_cancellation_emails_for_given_webinars(cancelled_upcoming_webinars)
         self.update(status=Webinar.CANCELLED)
 

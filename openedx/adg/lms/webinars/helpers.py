@@ -1,7 +1,7 @@
 """
 Helpers for webinars app
 """
-from django.apps import apps
+from itertools import chain
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
@@ -31,7 +31,7 @@ def _send_webinar_cancellation_emails(webinar_title, webinar_description, webina
 
 def send_cancellation_emails_for_given_webinars(cancelled_webinars):
     """
-    Sends emails for all the registered users for the given cancelled webinars
+    Sends emails for all the registered users, co-hosts, panelists and the presenter for the given cancelled webinars
 
     Arguments:
         cancelled_webinars (iterable): Webinars for which to send the cancellation emails
@@ -39,19 +39,21 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
     Returns:
         None
     """
-    WebinarRegistration = apps.get_model(app_label='webinars', model_name='WebinarRegistration')
-
     for cancelled_webinar in cancelled_webinars:
-        registered_user_emails = WebinarRegistration.objects.filter(
-            webinar_id=cancelled_webinar.id, is_registered=True
-        ).values_list('user__email', flat=True)
+        registered_user_emails = cancelled_webinar.registrations.filter(
+            is_registered=True).values_list('user__email', flat=True)
+        co_hosts = cancelled_webinar.co_hosts.all().values_list('email', flat=True)
+        panelists = cancelled_webinar.panelists.all().values_list('email', flat=True)
+        presenter_email_address = cancelled_webinar.presenter.email
 
-        if not registered_user_emails:
+        webinar_email_addresses = set(chain(co_hosts, panelists, registered_user_emails, {presenter_email_address}))
+
+        if not webinar_email_addresses:
             continue
 
         _send_webinar_cancellation_emails(
             cancelled_webinar.title,
             cancelled_webinar.description,
             cancelled_webinar.start_time,
-            list(registered_user_emails)
+            list(webinar_email_addresses)
         )
