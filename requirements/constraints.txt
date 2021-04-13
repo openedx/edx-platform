@@ -48,9 +48,6 @@ isort<5.0.0
 # 0.15.0 dropped support for Python 3.5
 joblib<0.15.0
 
-# Version 2.0.0 is giving incompatible versions errors on upgrade
-importlib-metadata==1.7.0
-
 # jsonfield2 3.1.0 drops support for python 3.5
 jsonfield2<3.1.0
 
@@ -115,5 +112,3 @@ httpretty<1.0
 
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
-
-pytest-randomly==3.6.0
