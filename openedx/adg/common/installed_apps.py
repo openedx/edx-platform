@@ -10,10 +10,3 @@ ADG_COMMON_INSTALLED_APPS = [
     'openedx.adg.common.course_meta',
     'openedx.adg.common.mailchimp_pipeline',
 ]
-
-if not is_testing_environment():
-    ADG_COMMON_INSTALLED_APPS.extend(
-        [
-            'msp_assessment.msp_dashboard',
-        ]
-    )

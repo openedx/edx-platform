@@ -20,10 +20,3 @@ adg_url_patterns = [
     ),
     path('adg-admin/', adg_admin_site.urls)
 ]
-
-if not is_testing_environment():
-    adg_url_patterns.extend(
-        [
-            url(r'msp/', include('msp_assessment.msp_dashboard.urls')),
-        ]
-    )
