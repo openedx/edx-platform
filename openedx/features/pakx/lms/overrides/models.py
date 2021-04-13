@@ -22,3 +22,6 @@ class CourseProgressEmailModel(models.Model):
 
     class Meta:
         unique_together = ('user', 'course_id',)
+
+    def __str__(self):
+        return "{} status:{}".format(self.user.email, self.status)
