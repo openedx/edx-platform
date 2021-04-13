@@ -718,7 +718,7 @@ class ValidateCourseOlxTests(CourseTestCase):
         allowed_xblocks = ALL_ALLOWED_XBLOCKS
         steps = 2
         ignore = ['edx-xblock']
-        mock_olxcleaner_validate.return_value = [Mock(), Mock(errors=[], return_error=Mock()), Mock()]
+        mock_olxcleaner_validate.return_value = [Mock(), Mock(errors=[], return_error=Mock(return_value=False)), Mock()]
 
         with override_settings(COURSE_OLX_VALIDATION_STAGE=steps, COURSE_OLX_VALIDATION_IGNORE_LIST=ignore):
             validate_course_olx(self.course.id, self.toy_course_path, self.status)
