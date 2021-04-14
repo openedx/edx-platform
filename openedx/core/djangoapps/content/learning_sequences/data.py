@@ -21,9 +21,9 @@ Guidelines:
 TODO: Validate all datetimes to be UTC.
 """
 import logging
-from datetime import datetime  # lint-amnesty, pylint: disable=unused-import
+from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import Dict, FrozenSet, List, Optional
 
 import attr
 from django.contrib.auth import get_user_model
@@ -44,7 +44,6 @@ class ObjectDoesNotExist(Exception):
     Imitating Django model conventions, we put a subclass of this in some of our
     data classes to indicate when something is not found.
     """
-    pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -94,7 +93,30 @@ class ExamData:
         return self.is_practice_exam or self.is_proctored_enabled or self.is_time_limited
 
 
-@attr.s(frozen=True, auto_attribs=True)
+def user_partition_groups_not_empty(instance, attribute, value):  # pylint: disable=unused-argument
+    """
+    It's not valid to have a user_partition_groups key with no groups.
+
+    For any User Partition, users must be in one group. Associating a piece of
+    content with a user partition but no groups within that partition means that
+    the content would never be accessible to anyone who is not staff, which is
+    likely just an error. There _is_ a use case for this kind of hidden content,
+    but we do that with visible_to_staff_only.
+    """
+    # If it's None or an empty dictionary, we don't have to check it.
+    if not value:
+        return
+
+    for partition_id, group_list in value.items():
+        if not group_list:
+            raise ValueError(
+                f"{instance.usage_key} has an empty list of groups for "
+                f"user_partition_groups[{partition_id}]. User Partitioned "
+                f"content must be associated with at least one group."
+            )
+
+
+@attr.s(frozen=True)
 class CourseLearningSequenceData:
     """
     A Learning Sequence (a.k.a. subsection) from a Course.
@@ -104,22 +126,40 @@ class CourseLearningSequenceData:
     learning sequences in Courses vs. Pathways vs. Libraries. Such an object
     would likely not have `visibility` as that holds course-specific concepts.
     """
-    usage_key: UsageKey
-    title: str
-    visibility: VisibilityData = VisibilityData()
-    exam: ExamData = ExamData()
-    inaccessible_after_due: bool = False
+    usage_key = attr.ib(type=UsageKey)
+    title = attr.ib(type=str)
+    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
+    exam = attr.ib(type=ExamData, default=ExamData())
+    inaccessible_after_due = attr.ib(type=bool, default=False)
+
+    # Mapping of UserPartition IDs to list of UserPartition Groups that are
+    # associated with this piece of content. See models.UserPartitionGroup
+    # for more details.
+    user_partition_groups = attr.ib(
+        type=Dict[int, FrozenSet[int]],
+        factory=dict,
+        validator=[user_partition_groups_not_empty],
+    )
 
 
-@attr.s(frozen=True, auto_attribs=True)
+@attr.s(frozen=True)
 class CourseSectionData:
     """
     A Section in a Course (sometimes called a Chapter).
     """
-    usage_key: UsageKey
-    title: str
-    visibility: VisibilityData
-    sequences: List[CourseLearningSequenceData]
+    usage_key = attr.ib(type=UsageKey)
+    title = attr.ib(type=str)
+    visibility = attr.ib(type=VisibilityData, default=VisibilityData())
+    sequences = attr.ib(type=List[CourseLearningSequenceData], factory=list)
+
+    # Mapping of UserPartition IDs to list of UserPartition Groups that are
+    # associated with this piece of content. See models.UserPartitionGroup
+    # for more details.
+    user_partition_groups = attr.ib(
+        type=Dict[int, FrozenSet[int]],
+        factory=dict,
+        validator=[user_partition_groups_not_empty],
+    )
 
 
 @attr.s(frozen=True)
@@ -314,7 +354,7 @@ class UserCourseOutlineData(CourseOutlineData):
     # * If anonymous course access is enabled in "public_outline" mode,
     #   unauthenticated users (AnonymousUser) will see the course outline but
     #   not be able to access anything inside.
-    accessible_sequences: Set[UsageKey]
+    accessible_sequences: FrozenSet[UsageKey]
 
 
 @attr.s(frozen=True, auto_attribs=True)
