@@ -10,29 +10,32 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.lib.xmodule.xmodule.modulestore.tests.django_utils import CourseUserType
+from common.lib.xmodule.xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'URLs are only configured in LMS')
-class ApiTest(APITestCase):
+class ApiTest(ModuleStoreTestCase, APITestCase):
     """
     Test basic API operations
     """
+    CREATE_USER = True
+    USER_TYPE = None
+
     def setUp(self):
         super().setUp()
-        self.course_key = CourseKey.from_string('course-v1:Test+Course+Configured')
+        store = ModuleStoreEnum.Type.split
+        self.course = CourseFactory.create(default_store=store)
         self.url = reverse(
             'discussions',
             kwargs={
-                'course_key_string': str(self.course_key),
+                'course_key_string': str(self.course.id),
             }
         )
-        self.password = 'password'
-        self.user_student = UserFactory(username='dummy', password=self.password)
-        self.user_staff_course = StaffFactory(course_key=self.course_key, password=self.password)
-        self.user_staff_global = GlobalStaffFactory(password=self.password)
+        if self.USER_TYPE:
+            self.user = self.create_user_for_course(self.course, user_type=self.USER_TYPE)
 
 
 class UnauthorizedApiTest(ApiTest):
@@ -65,13 +68,7 @@ class AuthenticatedApiTest(UnauthorizedApiTest):
     """
 
     expected_response_code = status.HTTP_403_FORBIDDEN
-
-    def setUp(self):
-        super().setUp()
-        self._login()
-
-    def _login(self):
-        self.client.login(username=self.user_student.username, password=self.password)
+    USER_TYPE = CourseUserType.ENROLLED
 
 
 class AuthorizedApiTest(AuthenticatedApiTest):
@@ -80,9 +77,7 @@ class AuthorizedApiTest(AuthenticatedApiTest):
     """
 
     expected_response_code = status.HTTP_200_OK
-
-    def _login(self):
-        self.client.login(username=self.user_staff_global.username, password=self.password)
+    USER_TYPE = CourseUserType.GLOBAL_STAFF
 
     def test_access_patch(self):
         response = self.client.patch(self.url)
@@ -98,5 +93,4 @@ class CourseStaffAuthorizedTest(AuthorizedApiTest):
     Course Staff should have the same access as Global Staff
     """
 
-    def _login(self):
-        self.client.login(username=self.user_staff_course.username, password=self.password)
+    USER_TYPE = CourseUserType.UNENROLLED_STAFF
