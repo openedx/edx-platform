@@ -26,6 +26,7 @@ from common.djangoapps.student.models import (
     UserStanding
 )
 from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.roles import CourseStaffRole
 
 # Factories are self documenting
@@ -240,6 +241,20 @@ class GlobalStaffFactory(UserFactory):
     @factory.post_generation
     def set_staff(self, _create, _extracted, **kwargs):
         GlobalStaff().add_users(self)
+
+
+class InstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with instructor
+    permissions for `course`.
+    """
+    last_name = 'Instructor'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for a course instructor user')
+        CourseInstructorRole(extracted).add_users(self)
 
 
 class StaffFactory(UserFactory):

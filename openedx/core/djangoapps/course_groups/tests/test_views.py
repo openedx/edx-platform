@@ -15,8 +15,8 @@ from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

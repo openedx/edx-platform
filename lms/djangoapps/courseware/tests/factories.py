@@ -18,7 +18,6 @@ from lms.djangoapps.courseware.models import (
 )
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
-    CourseInstructorRole,
     OrgInstructorRole,
     OrgStaffRole
 )
@@ -40,20 +39,6 @@ class UserProfileFactory(StudentUserProfileFactory):
 # unused arguments create and **kwargs in the line:
 # course_key(self, create, extracted, **kwargs)
 # pylint: disable=unused-argument
-
-class InstructorFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with instructor
-    permissions for `course`.
-    """
-    last_name = "Instructor"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course instructor user")
-        CourseInstructorRole(extracted).add_users(self)
-
 
 class BetaTesterFactory(UserFactory):
     """
