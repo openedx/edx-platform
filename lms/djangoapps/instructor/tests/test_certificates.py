@@ -20,6 +20,9 @@ from django.urls import reverse
 from capa.xqueue_interface import XQueueInterface
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -33,7 +36,6 @@ from lms.djangoapps.certificates.tests.factories import (
     CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory

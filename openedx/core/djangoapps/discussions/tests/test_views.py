@@ -10,9 +10,9 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from lms.djangoapps.courseware.tests.factories import StaffFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'URLs are only configured in LMS')

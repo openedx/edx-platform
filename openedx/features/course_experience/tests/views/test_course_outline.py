@@ -26,9 +26,9 @@ from waffle.models import Switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from lms.djangoapps.gating import api as lms_gating_api
-from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.urls import RESET_COURSE_DEADLINES_NAME
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig

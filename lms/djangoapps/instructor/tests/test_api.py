@@ -52,7 +52,12 @@ from common.djangoapps.student.roles import (
     CourseFinanceAdminRole,
     CourseInstructorRole,
 )
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory  # lint-amnesty, pylint: disable=unused-import
+from common.djangoapps.student.tests.factories import BetaTesterFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import StaffFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -60,12 +65,6 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory
 )
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.tests.factories import (
-    BetaTesterFactory,
-    GlobalStaffFactory,
-    InstructorFactory,
-    StaffFactory,
-)
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (

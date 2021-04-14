@@ -29,6 +29,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
+    GlobalStaffFactory,
     UserFactory
 )
 from common.djangoapps.util.testing import EventTestMixin
@@ -70,7 +71,6 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     CertificateInvalidationFactory
 )
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 

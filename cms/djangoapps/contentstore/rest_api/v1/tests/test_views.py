@@ -8,8 +8,9 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

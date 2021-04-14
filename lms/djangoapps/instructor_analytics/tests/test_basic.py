@@ -12,7 +12,6 @@ from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from opaque_keys.edx.locator import UsageKey
 from six.moves import range, zip
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint: disable=unused-import
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
@@ -28,6 +27,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
