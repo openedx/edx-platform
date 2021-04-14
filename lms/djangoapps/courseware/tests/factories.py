@@ -17,10 +17,8 @@ from lms.djangoapps.courseware.models import (
 )
 from common.djangoapps.student.tests.factories import UserFactory
 
-# TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
-# pylint: disable=invalid-name
-course_id = CourseKey.from_string('edX/test_course/test')
-location = partial(course_id.make_usage_key, 'problem')
+COURSE_KEY = CourseKey.from_string('edX/test_course/test')
+LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')
 
 
 class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -42,7 +40,7 @@ class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('usage_id')
+    usage_id = LOCATION('usage_id')
 
 
 class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
