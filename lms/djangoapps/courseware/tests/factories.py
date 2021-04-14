@@ -1,6 +1,9 @@
-# Factories are self documenting  # lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Build courseware-centric test factories
 
-
+Generic, LMS-agnostic factories can be found in:
+`common.djangoapps.student.tests.factories.py`
+"""
 import json
 from functools import partial
 
@@ -21,7 +24,10 @@ COURSE_KEY = CourseKey.from_string('edX/test_course/test')
 LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')
 
 
-class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StudentModuleFactory(DjangoModelFactory):
+    """
+    Build StudentModule models
+    """
     class Meta:
         model = StudentModule
 
@@ -34,7 +40,10 @@ class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable
     done = 'na'
 
 
-class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class UserStateSummaryFactory(DjangoModelFactory):
+    """
+    Build XModuleUserStateSummaryField models
+    """
     class Meta:
         model = XModuleUserStateSummaryField
 
@@ -43,7 +52,10 @@ class UserStateSummaryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disa
     usage_id = LOCATION('usage_id')
 
 
-class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StudentPrefsFactory(DjangoModelFactory):
+    """
+    Build XModuleStudentPrefsField models
+    """
     class Meta:
         model = XModuleStudentPrefsField
 
@@ -53,7 +65,10 @@ class StudentPrefsFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=
     module_type = 'mock_problem'
 
 
-class StudentInfoFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
+class StudentInfoFactory(DjangoModelFactory):
+    """
+    Build XModuleStudentInfoField models
+    """
     class Meta:
         model = XModuleStudentInfoField
 

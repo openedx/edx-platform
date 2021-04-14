@@ -33,8 +33,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.roles import OrgInstructorRole
 from common.djangoapps.student.roles import OrgStaffRole
 
-# Factories are self documenting
-
 TEST_PASSWORD = 'test'
 
 
