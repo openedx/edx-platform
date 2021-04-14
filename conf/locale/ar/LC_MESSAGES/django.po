@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-07 09:05+0000\n"
+"POT-Creation-Date: 2021-04-14 08:56+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -10113,6 +10113,18 @@ msgstr "نعم"
 msgid "No"
 msgstr "لا"
 
+#: openedx/adg/lms/webinars/admin.py openedx/adg/lms/webinars/models.py
+msgid "Webinar Status"
+msgstr "حالة التحقق"
+
+#: lms/templates/courseware/progress.html
+msgid "Upcoming"
+msgstr "قريبًا"
+
+#: openedx/adg/lms/webinars/admin.py openedx/adg/lms/webinars/models.py
+msgid "Delivered"
+msgstr ""
+
 #: openedx/adg/lms/webinars/models.py
 msgid "Start Time"
 msgstr "وقت بدء تشغيل الفيديو"
@@ -10144,18 +10156,6 @@ msgstr ""
 #: openedx/adg/lms/webinars/models.py
 msgid "Panelists"
 msgstr ""
-
-#: lms/templates/courseware/progress.html
-msgid "Upcoming"
-msgstr "قريبًا"
-
-#: openedx/adg/lms/webinars/models.py
-msgid "Delivered"
-msgstr ""
-
-#: openedx/adg/lms/webinars/models.py
-msgid "Webinar Status"
-msgstr "حالة التحقق"
 
 #: openedx/adg/lms/webinars/models.py
 msgid "Virtual Event"
