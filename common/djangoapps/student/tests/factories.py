@@ -7,6 +7,7 @@ from uuid import uuid4
 import factory
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.test.client import RequestFactory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -113,6 +114,16 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
 
         for group_name in extracted:
             self.groups.add(GroupFactory.simple_generate(create, name=group_name))  # lint-amnesty, pylint: disable=no-member
+
+
+class RequestFactoryNoCsrf(RequestFactory):
+    """
+    RequestFactory, which disables csrf checks.
+    """
+    def request(self, **kwargs):
+        request = super().request(**kwargs)
+        setattr(request, '_dont_enforce_csrf_checks', True)  # pylint: disable=literal-used-as-attribute
+        return request
 
 
 class AnonymousUserFactory(factory.Factory):
