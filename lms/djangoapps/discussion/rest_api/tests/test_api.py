@@ -17,11 +17,11 @@ from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
+from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (

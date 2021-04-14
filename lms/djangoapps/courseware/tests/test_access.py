@@ -22,9 +22,6 @@ from opaque_keys.edx.locator import CourseLocator
 import lms.djangoapps.courseware.access as access
 import lms.djangoapps.courseware.access_response as access_response
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
-from lms.djangoapps.courseware.tests.factories import (
-    BetaTesterFactory,
-)
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -38,6 +35,7 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentAllowedFactory,
     CourseEnrollmentFactory
 )
+from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory

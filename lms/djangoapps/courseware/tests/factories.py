@@ -17,7 +17,6 @@ from lms.djangoapps.courseware.models import (
     XModuleUserStateSummaryField
 )
 from common.djangoapps.student.roles import (
-    CourseBetaTesterRole,
     OrgInstructorRole,
     OrgStaffRole
 )
@@ -39,20 +38,6 @@ class UserProfileFactory(StudentUserProfileFactory):
 # unused arguments create and **kwargs in the line:
 # course_key(self, create, extracted, **kwargs)
 # pylint: disable=unused-argument
-
-class BetaTesterFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with beta-tester
-    permissions for `course`.
-    """
-    last_name = "Beta-Tester"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a beta-tester user")
-        CourseBetaTesterRole(extracted).add_users(self)
-
 
 class OrgStaffFactory(UserFactory):
     """

@@ -26,6 +26,7 @@ from common.djangoapps.student.models import (
     UserStanding
 )
 from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.roles import CourseStaffRole
 
@@ -232,6 +233,20 @@ class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disab
 
 
 # pylint: disable=unused-argument
+class BetaTesterFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with beta-tester
+    permissions for `course`.
+    """
+    last_name = 'Beta-Tester'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for a beta-tester user')
+        CourseBetaTesterRole(extracted).add_users(self)
+
+
 class GlobalStaffFactory(UserFactory):
     """
     Returns a User object with global staff access
