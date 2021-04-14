@@ -20,13 +20,14 @@ from lms.djangoapps.courseware.tabs import (
     ProgressTab,
     get_course_tab_list
 )
-from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.milestones_helpers import (
     add_course_content_milestone,

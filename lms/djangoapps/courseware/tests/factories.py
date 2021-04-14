@@ -19,7 +19,6 @@ from lms.djangoapps.courseware.models import (
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
-    CourseStaffRole,
     OrgInstructorRole,
     OrgStaffRole
 )
@@ -54,20 +53,6 @@ class InstructorFactory(UserFactory):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for a course instructor user")
         CourseInstructorRole(extracted).add_users(self)
-
-
-class StaffFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with staff
-    permissions for `course`.
-    """
-    last_name = "Staff"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for a course staff user")
-        CourseStaffRole(extracted).add_users(self)
 
 
 class BetaTesterFactory(UserFactory):
