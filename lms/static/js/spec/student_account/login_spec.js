@@ -19,7 +19,7 @@
                     authComplete = false,
                     PLATFORM_NAME = 'edX',
                     ENTERPRISE_SLUG_LOGIN_URL = 'enterprise/login',
-                    ENTERPRISE_ENABLE = true,
+                    IS_ENTERPRISE_ENABLE = true,
                     USER_DATA = {
                         email: 'xsy@edx.org',
                         password: 'xsyisawesome',
@@ -92,7 +92,7 @@
                         thirdPartyAuth: THIRD_PARTY_AUTH,
                         platformName: PLATFORM_NAME,
                         enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
-                        enterpriseEnable: ENTERPRISE_ENABLE
+                        isEnterpriseEnable: IS_ENTERPRISE_ENABLE
                     });
 
                 // Spy on AJAX requests
@@ -218,7 +218,7 @@
                         thirdPartyAuth: THIRD_PARTY_AUTH,
                         platformName: PLATFORM_NAME,
                         enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
-                        enterpriseEnable: false
+                        isEnterpriseEnable: false
                     });
 
                     expect(enterpriseDisabledLoginView).not.toContain($('.enterprise-login'));

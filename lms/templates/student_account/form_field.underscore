@@ -140,7 +140,7 @@
                 <span><a class="field-link" href="<%- loginIssueSupportLink %>"><%- gettext("Other sign-in issues") %></a></span>
             <% } %>
         </div>
-        <% if ( enterpriseEnable ) { %>
+        <% if ( isEnterpriseEnable ) { %>
             <button type="button" class="enterprise-login field-link"><%- gettext("Sign in with your company or school") %></button>
         <% } %>
     <% } %>

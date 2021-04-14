@@ -251,7 +251,7 @@ def login_and_registration_form(request, initial_mode="login"):
             'is_account_recovery_feature_enabled': is_secondary_email_feature_enabled(),
             'is_multiple_user_enterprises_feature_enabled': is_multiple_user_enterprises_feature_enabled(),
             'enterprise_slug_login_url': get_enterprise_slug_login_url(),
-            'enterprise_enable': enterprise_enabled(),
+            'is_enterprise_enable': enterprise_enabled(),
             'is_require_third_party_auth_enabled': is_require_third_party_auth_enabled(),
         },
         'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in header
