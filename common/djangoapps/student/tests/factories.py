@@ -29,6 +29,7 @@ from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.roles import OrgInstructorRole
 from common.djangoapps.student.roles import OrgStaffRole
 
 # Factories are self documenting
@@ -233,7 +234,6 @@ class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disab
     is_active = True
 
 
-# pylint: disable=unused-argument
 class BetaTesterFactory(UserFactory):
     """
     Given a course Location, returns a User object with beta-tester
@@ -271,6 +271,20 @@ class InstructorFactory(UserFactory):
         if extracted is None:
             raise ValueError('Must specify a CourseKey for a course instructor user')
         CourseInstructorRole(extracted).add_users(self)
+
+
+class OrgInstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-instructor
+    permissions for `course`.
+    """
+    last_name = 'Org-Instructor'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for an org-instructor user')
+        OrgInstructorRole(extracted.org).add_users(self)
 
 
 class OrgStaffFactory(UserFactory):

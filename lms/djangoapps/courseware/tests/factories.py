@@ -16,10 +16,6 @@ from lms.djangoapps.courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from common.djangoapps.student.roles import (
-    OrgInstructorRole,
-)
-# Imported to re-export
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
@@ -31,26 +27,6 @@ location = partial(course_id.make_usage_key, 'problem')
 
 class UserProfileFactory(StudentUserProfileFactory):
     courseware = 'course.xml'
-
-
-# For the following factories, these are disabled because we're ok ignoring the
-# unused arguments create and **kwargs in the line:
-# course_key(self, create, extracted, **kwargs)
-# pylint: disable=unused-argument
-
-class OrgInstructorFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with org-instructor
-    permissions for `course`.
-    """
-    last_name = "Org-Instructor"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-instructor user")
-        OrgInstructorRole(extracted.org).add_users(self)
-# pylint: enable=unused-argument
 
 
 class StudentModuleFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
