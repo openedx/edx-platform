@@ -138,7 +138,7 @@ enmerkar-underscore==2.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via -r requirements/edx/testing.txt, pytest-xdist
-factory-boy==2.8.1        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+factory-boy==3.2.0        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 faker==8.0.0              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
