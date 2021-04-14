@@ -12,16 +12,16 @@ Course Grades
 
 **Indices from Uniqueness Constraint**: ('course_id', 'user_id')
 
- * course_id
- * course_id, user_id
+* course_id
+* course_id, user_id
 
 **Additional Indices:**
 
- * user_id
- * course_id, passed_timestamp
- 
- **Fields:**
- 
+* user_id
+* course_id, passed_timestamp
+
+**Fields:**
+
 +-------------------------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+
 | Field name              | Type         | Description                                                                                                                                                                                                                                   | Include in Data Package |
 +-------------------------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+
@@ -92,13 +92,13 @@ Subsection Grade Table
 
 **Indices from Uniqueness Constraint:** ('course_id', 'user_id', 'usage_key')
 
-course_id
-course_id, user_id
-course_id, user_id, usage_key
+* course_id
+* course_id, user_id
+* course_id, user_id, usage_key
 
 **Additional Indices:**
 
-visible_blocks_hash
+* visible_blocks_hash
 
 **Fields:**
 
@@ -165,13 +165,13 @@ Visible Blocks Table
 
 **Table Description:** Stores an ordered list of visible blocks within a subsection for a learner at the time of computing the subsection grade.  It is expected that multiple learners will share access to the same list of visible blocks and hence this data is stored in a separate table so it can be referred to by multiple rows in the Subsection Grade table.
 
-**Indices from Uniqueness Constraint:** ('hashed)
+**Indices from Uniqueness Constraint:** ('hashed')
 
- * hashed
- 
+* hashed
+
 **Additional Indices:**
 
- * course_id
+* course_id
 
 **Fields:**
 
@@ -201,7 +201,7 @@ Courseware Student Module
 
 **Table Description:** A general-purpose storage for user-specific state for any xBlock/xModule (not just problem-types).  In addition to user-state, separate fields exist to store "earned" and "possible" grades for scorable blocks.
 
-**Indices from Uniqueness Constraint: ('student', 'module_id', 'course_id')**
+**Indices from Uniqueness Constraint:** ('student', 'module_id', 'course_id')
 
 * student
 * student, module_id
@@ -251,16 +251,16 @@ ORA Submissions
 
 **Table Description:** One of the tables amongst the suite of tables used for ORA submissions.  This particular table stores the scores for ORA problems.
 
-**Indices from Uniqueness Constraint: ('id')**
+**Indices from Uniqueness Constraint:** ('id')
 
- * id
- 
+* id
+
 **Additional Indices:**
 
- * student_item_id
- * submission_id
- * created_at
- 
+* student_item_id
+* submission_id
+* created_at
+
 **Fields:**
 
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -279,6 +279,3 @@ ORA Submissions
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | submission      | Submission       | Foreign key to the submissions_submission table.                                                                                                                                                              |
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
-
