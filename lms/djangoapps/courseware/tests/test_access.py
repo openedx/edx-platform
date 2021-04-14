@@ -25,7 +25,6 @@ from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
     InstructorFactory,
-    UserFactory
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -42,6 +41,7 @@ from common.djangoapps.student.tests.factories import (
 )
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,

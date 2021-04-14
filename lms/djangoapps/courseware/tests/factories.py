@@ -23,7 +23,7 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 # Imported to re-export
-from common.djangoapps.student.tests.factories import UserFactory  # Imported to re-export
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
