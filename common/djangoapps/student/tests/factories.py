@@ -29,6 +29,7 @@ from common.djangoapps.student.roles import GlobalStaff
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.roles import OrgStaffRole
 
 # Factories are self documenting
 
@@ -270,6 +271,20 @@ class InstructorFactory(UserFactory):
         if extracted is None:
             raise ValueError('Must specify a CourseKey for a course instructor user')
         CourseInstructorRole(extracted).add_users(self)
+
+
+class OrgStaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-staff
+    permissions for `course`.
+    """
+    last_name = 'Org-Staff'
+
+    @factory.post_generation
+    def course_key(self, _create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError('Must specify a CourseKey for an org-staff user')
+        OrgStaffRole(extracted.org).add_users(self)
 
 
 class StaffFactory(UserFactory):

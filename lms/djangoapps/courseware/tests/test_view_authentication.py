@@ -12,11 +12,11 @@ from django.urls import reverse
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.tests.factories import (
     OrgInstructorFactory,
-    OrgStaffFactory,
 )
 from lms.djangoapps.courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired

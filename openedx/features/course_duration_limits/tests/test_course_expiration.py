@@ -17,10 +17,10 @@ from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.factories import (
     OrgInstructorFactory,
-    OrgStaffFactory,
 )
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory

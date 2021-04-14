@@ -18,7 +18,6 @@ from lms.djangoapps.courseware.models import (
 )
 from common.djangoapps.student.roles import (
     OrgInstructorRole,
-    OrgStaffRole
 )
 # Imported to re-export
 from common.djangoapps.student.tests.factories import UserFactory
@@ -38,20 +37,6 @@ class UserProfileFactory(StudentUserProfileFactory):
 # unused arguments create and **kwargs in the line:
 # course_key(self, create, extracted, **kwargs)
 # pylint: disable=unused-argument
-
-class OrgStaffFactory(UserFactory):
-    """
-    Given a course Location, returns a User object with org-staff
-    permissions for `course`.
-    """
-    last_name = "Org-Staff"
-
-    @factory.post_generation
-    def course_key(self, create, extracted, **kwargs):
-        if extracted is None:
-            raise ValueError("Must specify a CourseKey for an org-staff user")
-        OrgStaffRole(extracted.org).add_users(self)
-
 
 class OrgInstructorFactory(UserFactory):
     """
