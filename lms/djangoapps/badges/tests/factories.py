@@ -7,7 +7,6 @@ from random import random
 
 import factory
 from django.core.files.base import ContentFile
-from factory import DjangoModelFactory
 from factory.django import ImageField
 
 from common.djangoapps.student.tests.factories import UserFactory

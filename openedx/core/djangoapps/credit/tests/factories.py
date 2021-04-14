@@ -93,4 +93,3 @@ class CreditRequestFactory(factory.django.DjangoModelFactory):
             })
 
         obj.save()
-
