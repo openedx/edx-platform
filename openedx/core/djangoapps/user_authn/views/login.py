@@ -25,6 +25,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.monitoring import set_custom_attribute
+from openedx_hooks.signals.auth.v1 import LOGIN_USER
 from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
 
@@ -269,6 +270,9 @@ def _handle_successful_authentication_and_login(user, request):
         log.critical("Login failed - Could not create session. Is memcached running?")
         log.exception(exc)
         raise
+
+    # Announce user login
+    LOGIN_USER.send(sender=None, user=user, site=request.site)
 
 
 def _track_user_login(user, request):

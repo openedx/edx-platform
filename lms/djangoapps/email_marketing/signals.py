@@ -13,7 +13,7 @@ from celery.exceptions import TimeoutError as CeleryTimeoutError
 from django.conf import settings
 from django.dispatch import receiver
 from edx_toggles.toggles import LegacyWaffleSwitchNamespace
-from openedx_events.signals.auth.v1 import REGISTER_USER
+from openedx_hooks.signals.auth.v1 import REGISTER_USER
 from sailthru.sailthru_error import SailthruClientError
 
 from common.djangoapps import third_party_auth

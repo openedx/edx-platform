@@ -31,7 +31,7 @@ from rest_framework.views import APIView
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
-from openedx_events.signals.auth.v1 import REGISTER_USER
+from openedx_hooks.signals.auth.v1 import REGISTER_USER
 
 from common.djangoapps import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
