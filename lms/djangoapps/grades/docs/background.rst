@@ -157,19 +157,24 @@ As described above in the Grade Computation section, the grading policy is distr
 Grade Overrides/Exceptions
 --------------------------
 
-Today, we support the following features to `adjust grades <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/named-release-birch/running_course/course_grades.html#adjust-grades>`_, but don't have a general feature to override a grade for any xBlock:
+Today, we support the following features to `adjust grades <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_, but don't have a general feature to override a grade for any xBlock:
 
 * In `ORA Studio settings <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/Manage_ORA_Assignment.html#override-a-learner-s-assessment-grade>`_:
 
   - override a learner's grade for an ORA2 block
-  
+
 * In LMS Instructor Dashboard or `Staff Debug Info <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/manage_live_course/staff_debug_info.html>`_:
 
   - reset the number of attempts a learner has made for a problem back to 0
-  
+
   - force a rescore on a submission to update all stored scores
-  
+
   - delete a student state for a problem
+
+* In `Gradebook <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_: 
+
+  - override a subsection grade for a learner
+  - override subsection grades in bulk (master's track only)
 
 ORA2's Immutable Data
 ---------------------
