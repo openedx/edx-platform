@@ -82,7 +82,7 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
     Tests for the BaseVerticalBlock.
     """
     test_html = 'Test HTML'
-    test_problem = 'Test Problem'
+    test_problem = 'Test_Problem'
     test_html_nested = 'Nest Nested HTML'
     test_problem_nested = 'Nest_Nested_Problem'
 
@@ -206,36 +206,30 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
             assert "'completed': None" in html
             assert "'past_due': False" in html
 
-    @ddt.data(True, False)
-    def test_render_access_denied_blocks(self, has_access_error):
+    @ddt.data((True, True), (True, False), (False, True), (False, False))
+    @ddt.unpack
+    def test_render_access_denied_blocks(self, node_has_access_error, child_has_access_error):
         """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
         self.module_system._services['bookmarks'] = Mock()
         self.module_system._services['user'] = StubUserService()
         self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
-        self.problem_block.has_access_error = has_access_error
+        self.problem_block.has_access_error = node_has_access_error
+        self.nested_problem_block.has_access_error = child_has_access_error
 
         context = {'username': self.username, 'hide_access_error_blocks': True}
         html = self.module_system.render(self.vertical, STUDENT_VIEW, context).content
 
-        if has_access_error:
+        if node_has_access_error and child_has_access_error:
             assert self.test_problem not in html
-        else:
-            assert self.test_problem in html
-
-    @ddt.data(True, False)
-    def test_render_access_denied_child_blocks(self, has_access_error):
-        """ Tests access denied blocks are not rendered when hide_access_error_blocks is True """
-        self.module_system._services['bookmarks'] = Mock()
-        self.module_system._services['user'] = StubUserService()
-        self.vertical.due = datetime.now(pytz.UTC) + timedelta(days=-1)
-        self.nested_problem_block.has_access_error = has_access_error
-
-        context = {'username': self.username, 'hide_access_error_blocks': True}
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, context).content
-
-        if has_access_error:
             assert self.test_problem_nested not in html
-        else:
+        if node_has_access_error and not child_has_access_error:
+            assert self.test_problem not in html
+            assert self.test_problem_nested in html
+        if not node_has_access_error and child_has_access_error:
+            assert self.test_problem in html
+            assert self.test_problem_nested not in html
+        if not node_has_access_error and not child_has_access_error:
+            assert self.test_problem in html
             assert self.test_problem_nested in html
 
     @ddt.data(True, False)
