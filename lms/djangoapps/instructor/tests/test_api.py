@@ -23,6 +23,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse as django_reverse
 from django.utils.translation import ugettext as _
 from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
@@ -66,7 +67,6 @@ from lms.djangoapps.courseware.tests.factories import (
     StaffFactory,
 )
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
     _get_certificate_for_user,
@@ -3930,7 +3930,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert response.status_code == 400, response.content
         assert get_extended_due(self.course, self.week3, self.user1) is None
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': str(self.course.id)})
@@ -3941,7 +3941,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert response.status_code == 200, response.content
         assert self.due == get_extended_due(self.course, self.week1, self.user1)
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date_only_in_edx_when(self):
         # Start with a unit that only has a date in edx-when
         assert get_date_for_block(self.course, self.week3, self.user1) is None
@@ -4070,7 +4070,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         self.client.login(username=self.instructor.username, password='test')
         extract_dates(None, self.course.id)
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_extension_to_deleted_date(self):
         """
         Test that we can delete a due date extension after deleting the normal
