@@ -15,10 +15,10 @@ from common.djangoapps.student.tests.factories import AdminFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.tests.test_field_overrides import inject_field_overrides
 from lms.djangoapps.courseware.testutils import FieldOverrideTestMixin
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

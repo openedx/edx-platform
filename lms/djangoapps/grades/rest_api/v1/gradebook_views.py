@@ -31,7 +31,6 @@ from common.djangoapps.track.event_transaction_utils import (
 )
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
@@ -66,6 +65,7 @@ from openedx.core.lib.api.view_utils import (
     view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
