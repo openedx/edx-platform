@@ -116,16 +116,18 @@ Problem Scores
 * *weighted_possible* (*a.k.a. max_grade*).  The weighted_possible value is the maximum possible score that is achievable on the problem post-weight-computation.
 * *weighted_earned* (*a.k.a. grade*). The weighted_earned value is the learner's score computed from the learner's response to the problem. The process for computing this score can be classified into the following types:
 
- - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
- 
- - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
- 
- - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
- 
-   - a single course staff (staff assessment)
-   - a number of peers (peer assessment)
-   - the self learner (self assessment)
-   
+  - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
+
+  - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
+
+  - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
+
+    - a single course staff (staff assessment)
+
+    - a number of peers (peer assessment)
+
+    - the self learner (self assessment)
+
 .. image:: images/background_problem_score.png
 
 Grading Policy
@@ -136,21 +138,21 @@ As described above in the Grade Computation section, the grading policy is distr
 * Course level (adjusted in *Settings->Grading page in Studio*)
 
   - Grade Range policy: Pass cutoff and letter grade thresholds
-  
+
   - Assignment Type policy: Weights and Allowable drops
-  
+
 * Subsection level (adjusted in *Content->Outline->Subsection->Settings* modal in Studio)
 
   - A subsection's designation to an assignment type
-  
+
   - A subsection's setting of whether it is 'graded'
-  
+
 * Problem level (adjusted in *Content->Outline->Subsection->Unit->Problem->Edit* modal in Studio)
 
   - A problem's weight
-  
+
   - A problem's external grader configuration
-  
+
   - A problem's individual grading policy - as currently supported by `ORA's assessment configuration <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html#how-scores-for-open-response-assessments-are-calculated>`_
 
 
