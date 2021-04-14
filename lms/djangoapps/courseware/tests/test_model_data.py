@@ -1,12 +1,11 @@
 """
 Test for lms courseware app, module data (runtime data storage for XBlocks)
 """
-
-
 import json
 from functools import partial
 from unittest.mock import Mock, patch
 import pytest
+
 from django.db import connections, DatabaseError
 from django.test import TestCase
 from xblock.core import XBlock
