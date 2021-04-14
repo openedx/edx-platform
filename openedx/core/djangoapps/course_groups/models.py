@@ -203,7 +203,7 @@ class CourseCohortsSettings(models.Model):
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
         """
-        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings` via `set_course_discussion_settings`.
+        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings.update`
         """
         self._cohorted_discussions = json.dumps(value)
 

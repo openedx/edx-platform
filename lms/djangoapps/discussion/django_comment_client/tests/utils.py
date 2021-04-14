@@ -11,8 +11,8 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig, Role
 from openedx.core.djangoapps.django_comment_common.utils import (
     CourseDiscussionSettings,
+    get_course_discussion_settings,
     seed_permissions_roles,
-    set_course_discussion_settings
 )
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore import ModuleStoreEnum
@@ -108,12 +108,15 @@ def config_course_discussions(
         """Convert name to id."""
         return topic_name_to_id(course, name)
 
-    set_course_discussion_settings(
-        course.id,
-        divided_discussions=[to_id(name) for name in divided_discussions],
-        always_divide_inline_discussions=always_divide_inline_discussions,
-        division_scheme=CourseDiscussionSettings.COHORT,
-    )
+    discussion_settings = get_course_discussion_settings(course.id)
+    discussion_settings.update({
+        'divided_discussions': [
+            to_id(name)
+            for name in divided_discussions
+        ],
+        'always_divide_inline_discussions': always_divide_inline_discussions,
+        'division_scheme': CourseDiscussionSettings.COHORT,
+    })
 
     course.discussion_topics = {name: {"sort_key": "A", "id": to_id(name)}
                                 for name in discussion_topics}

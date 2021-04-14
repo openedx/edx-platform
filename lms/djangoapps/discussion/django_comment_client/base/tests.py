@@ -47,7 +47,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
     seed_permissions_roles,
-    set_course_discussion_settings
+    get_course_discussion_settings
 )
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
@@ -1425,13 +1425,13 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         If dividing by cohorts, create and assign users to a cohort.
         """
         enable_cohorts = True if scheme is CourseDiscussionSettings.COHORT else False
-        set_course_discussion_settings(
-            self.course.id,
-            enable_cohorts=enable_cohorts,
-            divided_discussions=[],
-            always_divide_inline_discussions=True,
-            division_scheme=scheme,
-        )
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        discussion_settings.update({
+            'enable_cohorts': enable_cohorts,
+            'divided_discussions': [],
+            'always_divide_inline_discussions': True,
+            'division_scheme': scheme,
+        })
         set_course_cohorted(self.course.id, enable_cohorts)
 
     @classmethod

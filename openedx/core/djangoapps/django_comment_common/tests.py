@@ -10,7 +10,6 @@ from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
 from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
-    set_course_discussion_settings
 )
 from common.djangoapps.student.models import CourseEnrollment, User
 from xmodule.modulestore import ModuleStoreEnum
@@ -111,13 +110,13 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
         assert ['foo', 'bar'] == discussion_settings.divided_discussions
         assert discussion_settings.always_divide_inline_discussions
 
-    def test_set_course_discussion_settings(self):
-        set_course_discussion_settings(
-            course_key=self.course.id,
-            divided_discussions=['cohorted_topic'],
-            division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK,
-            always_divide_inline_discussions=True,
-        )
+    def test_update_course_discussion_settings(self):
+        discussion_settings = get_course_discussion_settings(self.course.id)
+        discussion_settings.update({
+            'divided_discussions': ['cohorted_topic'],
+            'division_scheme': CourseDiscussionSettings.ENROLLMENT_TRACK,
+            'always_divide_inline_discussions': True,
+        })
         discussion_settings = get_course_discussion_settings(self.course.id)
         assert CourseDiscussionSettings.ENROLLMENT_TRACK == discussion_settings.division_scheme
         assert ['cohorted_topic'] == discussion_settings.divided_discussions
@@ -132,8 +131,9 @@ class CourseDiscussionSettingsTest(ModuleStoreTestCase):
         ]
         invalid_value = 3.14
 
+        discussion_settings = get_course_discussion_settings(self.course.id)
         for field in fields:
             with pytest.raises(ValueError) as value_error:
-                set_course_discussion_settings(self.course.id, **{field['name']: invalid_value})
+                discussion_settings.update({field['name']: invalid_value})
 
             assert str(value_error.value) == exception_msg_template.format(field['name'], field['type'].__name__)

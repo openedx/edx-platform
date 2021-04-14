@@ -37,7 +37,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     Role
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.django_comment_common.utils import set_course_discussion_settings
 
 
 def get_context(course, request, thread=None):
@@ -542,7 +541,7 @@ class DiscussionSettingsSerializer(serializers.Serializer):
         if not any(field in validated_data for field in self.fields):
             raise ValidationError('Bad request')
         try:
-            set_course_discussion_settings(course_key, **validated_data)
+            instance.update(validated_data)
         except ValueError as e:
             raise ValidationError(str(e)) from e
         return instance

@@ -54,7 +54,6 @@ from openedx.core.djangoapps.django_comment_common.models import CourseDiscussio
 from openedx.core.djangoapps.django_comment_common.utils import (
     ThreadContext,
     get_course_discussion_settings,
-    set_course_discussion_settings
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
@@ -941,7 +940,7 @@ def course_discussions_settings_handler(request, course_key_string):
 
         try:
             if settings_to_change:
-                discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+                discussion_settings.update(settings_to_change)
 
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).

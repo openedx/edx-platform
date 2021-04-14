@@ -10,7 +10,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.django_comment_common.utils import set_course_discussion_settings
+from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
@@ -125,10 +125,10 @@ def config_course_cohorts(
     """
 
     set_course_cohorted(course.id, is_cohorted)
-    set_course_discussion_settings(
-        course.id,
-        division_scheme=discussion_division_scheme,
-    )
+    discussion_settings = get_course_discussion_settings(course.id)
+    discussion_settings.update({
+        'division_scheme': discussion_division_scheme,
+    })
 
     for cohort_name in auto_cohorts:
         cohort = CohortFactory(course_id=course.id, name=cohort_name)

@@ -267,6 +267,26 @@ class CourseDiscussionSettings(models.Model):
         """
         self._divided_discussions = json.dumps(value)
 
+    def update(self, validated_data: dict):
+        """
+        Set discussion settings for a course
+
+        Returns:
+            A CourseDiscussionSettings object
+        """
+        fields = {
+            'division_scheme': (str,)[0],
+            'always_divide_inline_discussions': bool,
+            'divided_discussions': list,
+        }
+        for field, field_type in fields.items():
+            if field in validated_data:
+                if not isinstance(validated_data[field], field_type):
+                    raise ValueError(f"Incorrect field type for `{field}`. Type must be `{field_type.__name__}`")
+                setattr(self, field, validated_data[field])
+        self.save()
+        return self
+
 
 class DiscussionsIdMapping(models.Model):
     """

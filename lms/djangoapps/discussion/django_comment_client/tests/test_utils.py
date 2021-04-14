@@ -42,7 +42,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
 from openedx.core.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
     seed_permissions_roles,
-    set_course_discussion_settings
 )
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from xmodule.modulestore import ModuleStoreEnum
@@ -1697,12 +1696,12 @@ def set_discussion_division_settings(
     COHORT is the default division_scheme, as no other schemes were supported at
     the time that the unit tests were originally written.
     """
-    set_course_discussion_settings(
-        course_key=course_key,
-        divided_discussions=divided_discussions,
-        division_scheme=division_scheme,
-        always_divide_inline_discussions=always_divide_inline_discussions,
-    )
+    discussion_settings = get_course_discussion_settings(course_key)
+    discussion_settings.update({
+        'divided_discussions': divided_discussions,
+        'division_scheme': division_scheme,
+        'always_divide_inline_discussions': always_divide_inline_discussions,
+    })
     set_course_cohorted(course_key, enable_cohorts)
 
 

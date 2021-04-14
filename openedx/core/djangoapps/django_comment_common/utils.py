@@ -134,34 +134,3 @@ def get_course_discussion_settings(course_key):
         )
 
     return course_discussion_settings
-
-
-def set_course_discussion_settings(course_key, **kwargs):
-    """
-    Set discussion settings for a course.
-
-    Arguments:
-        course_key: CourseKey
-        always_divide_inline_discussions (bool): If inline discussions should always be divided.
-        divided_discussions (list): List of discussion ids.
-        division_scheme (str): `CourseDiscussionSettings.NONE`, `CourseDiscussionSettings.COHORT`,
-            or `CourseDiscussionSettings.ENROLLMENT_TRACK`
-
-    Returns:
-        A CourseDiscussionSettings object.
-    """
-    fields = {
-        'division_scheme': (str,)[0],
-        'always_divide_inline_discussions': bool,
-        'divided_discussions': list,
-    }
-
-    course_discussion_settings = get_course_discussion_settings(course_key)
-    for field, field_type in fields.items():
-        if field in kwargs:
-            if not isinstance(kwargs[field], field_type):
-                raise ValueError(f"Incorrect field type for `{field}`. Type must be `{field_type.__name__}`")
-            setattr(course_discussion_settings, field, kwargs[field])
-
-    course_discussion_settings.save()
-    return course_discussion_settings
