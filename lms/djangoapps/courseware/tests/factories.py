@@ -12,13 +12,13 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.courseware.models import (
     StudentModule,
     XModuleStudentInfoField,
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from common.djangoapps.student.tests.factories import UserFactory
 
 COURSE_KEY = CourseKey.from_string('edX/test_course/test')
 LOCATION = partial(COURSE_KEY.make_usage_key, 'problem')

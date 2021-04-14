@@ -12,8 +12,6 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from common.djangoapps.student.models import (
     AccountRecovery,
     CourseAccessRole,
@@ -32,6 +30,8 @@ from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.roles import OrgInstructorRole
 from common.djangoapps.student.roles import OrgStaffRole
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 TEST_PASSWORD = 'test'
 
