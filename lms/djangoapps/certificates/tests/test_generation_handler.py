@@ -12,7 +12,7 @@ from lms.djangoapps.certificates.generation_handler import (
     CERTIFICATES_USE_ALLOWLIST,
     CERTIFICATES_USE_UPDATED,
     is_using_certificate_allowlist,
-    _is_using_v2_course_certificates,
+    is_using_v2_course_certificates,
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
     _can_generate_v2_certificate,
@@ -309,14 +309,14 @@ class CertificateTests(ModuleStoreTestCase):
         """
         Test the updated flag
         """
-        assert _is_using_v2_course_certificates(self.course_run_key)
+        assert is_using_v2_course_certificates(self.course_run_key)
 
     @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
     def test_is_using_updated_false(self):
         """
         Test the updated flag without the override
         """
-        assert not _is_using_v2_course_certificates(self.course_run_key)
+        assert not is_using_v2_course_certificates(self.course_run_key)
 
     @ddt.data(
         (CertificateStatuses.deleted, True),
