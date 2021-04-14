@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
@@ -474,6 +475,22 @@ def get_dashboard_course_limit():
 
 @login_required
 @ensure_csrf_cookie
+def send_account_activation_email(request):
+    try:
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        if not user.is_active:
+            from common.djangoapps.student.views import compose_and_send_activation_email
+            compose_and_send_activation_email(user, profile)
+
+        return HttpResponse('success', status=200)
+    except Exception:  # pylint: disable=broad-except
+        return HttpResponse('Failure', status=500)
+
+
+
+@login_required
+@ensure_csrf_cookie
 @add_maintenance_banner
 def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statements
     """
@@ -827,3 +844,4 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     })
 
     return render_to_response('dashboard.html', context)
+

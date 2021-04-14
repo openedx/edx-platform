@@ -9,6 +9,11 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
+    url(
+        r'^send_account_activation_email$',
+        views.send_account_activation_email,
+        name='send_account_activation_email'
+    ),
 
     url(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 

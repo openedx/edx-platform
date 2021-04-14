@@ -1536,6 +1536,36 @@ a.fade-cover {
   }
 }
 
+#activate-account-modal {
+    margin-top: -60px;
+    display: block;
+    left: 33%;
+    text-align: left;
+    height: 252px;
+    width: 450px;
+
+  .inner-wrapper{
+      height: 239px;
+      width: 428px;
+      header {
+          padding: 1.5rem 1.5rem 0 1.5px;
+          h3 {
+          text-align: left;
+          font-weight: bold;
+          font-size: 1.5rem;
+          line-height: 1.75rem;
+
+      }
+      }
+  }
+}
+
+//.close-account-activation-modal {
+//     display: block;
+//}
+
+
+
 .reasons_survey {
   margin: 20px;
 

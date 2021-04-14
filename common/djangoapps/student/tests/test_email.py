@@ -25,8 +25,8 @@ from common.djangoapps.student.views import (
     SETTING_CHANGE_INITIATED,
     confirm_email_change,
     do_email_change_request,
-    validate_new_email
-)
+    validate_new_email,
+    send_account_activation_email)
 from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
@@ -211,6 +211,19 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
             with patch('common.djangoapps.third_party_auth.pipeline.running', return_value=False):
                 inactive_user_view(request)
                 assert email.called is True, 'method should have been called'
+
+    @patch('common.djangoapps.student.views.management.compose_activation_email')
+    def test_send_email_to_inactive_user_via_cta_dialog(self, email):
+        """
+        Tests when user clicks on resend activation email on CTA dialog box, system
+        sends an activation email to the user.
+        """
+        inactive_user = UserFactory(username='test', password='test123', is_active=False)
+        Registration().register(inactive_user)
+        self.client.login(username=inactive_user.username, password='test123')
+        url = reverse(send_account_activation_email)
+        self.client.post(url)
+        assert email.called is True, 'method should have been called'
 
 
 @ddt.ddt
