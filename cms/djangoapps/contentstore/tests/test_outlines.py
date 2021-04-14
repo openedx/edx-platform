@@ -273,6 +273,152 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
         assert outline.sections[0].title == section.url_name
         assert outline.sections[0].sequences[0].title == sequence.url_name
 
+    def test_empty_user_partition_groups(self):
+        """
+        Ignore user partition setting if no groups are associated.
+
+        If we didn't ignore it, we would be creating content that can never be
+        seen by any student.
+        """
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name='Ch 1',
+                group_access={
+                    49: [],
+                    50: [1, 2],
+                    51: [],
+                }
+            )
+            ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name='Seq 1',
+                group_access={
+                    49: [],
+                }
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        assert len(outline.sections) == 1
+        assert len(outline.sequences) == 1
+        assert outline.sections[0].user_partition_groups == {50: [1, 2]}
+        assert outline.sections[0].sequences[0].user_partition_groups == {}
+        assert len(errs) == 2
+
+    def test_bubbled_up_user_partition_groups_no_children(self):
+        """Testing empty case to make sure bubble-up code doesn't break."""
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name='Ch 0',
+            )
+
+            # Bubble up with no children (nothing happens)
+            ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name='Seq 0',
+                group_access={}
+            )
+
+        outline, _errs = get_outline_from_modulestore(self.course_key)
+        seq_data = outline.sections[0].sequences[0]
+        assert seq_data.user_partition_groups == {}
+
+    def test_bubbled_up_user_partition_groups_one_child(self):
+        """Group settings should bubble up from Unit to Seq. if only one unit"""
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name='Ch 0',
+            )
+
+            # Bubble up with 1 child (grabs the setting from child)
+            seq_1 = ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name='Seq 1',
+                group_access={}
+            )
+            ItemFactory.create(
+                parent_location=seq_1.location,
+                category='vertical',
+                display_name='Single Vertical',
+                group_access={50: [1, 2]},
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        seq_data = outline.sections[0].sequences[0]
+        assert seq_data.user_partition_groups == {50: [1, 2]}
+        assert len(errs) == 1
+
+    def test_bubbled_up_user_partition_groups_multiple_children(self):
+        """If all Units have the same group_access, bubble up to Sequence."""
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name='Ch 0',
+            )
+
+            # Bubble up with n children, all matching for one group
+            seq_n = ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name='Seq N',
+                group_access={}
+            )
+            for i in range(4):
+                ItemFactory.create(
+                    parent_location=seq_n.location,
+                    category='vertical',
+                    display_name=f'vertical {i}',
+                    group_access={50: [3, 4], 51: [i]}  # Only 50 should get bubbled up
+                )
+            ItemFactory.create(
+                parent_location=seq_n.location,
+                category='vertical',
+                display_name='vertical 5',
+                group_access={50: [4, 3], 51: [5]}  # Ordering should be normalized
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        seq_data = outline.sections[0].sequences[0]
+        assert seq_data.user_partition_groups == {50: [3, 4]}
+        assert len(errs) == 1
+
+    def test_not_bubbled_up(self):
+        """Don't bubble up from Unit if Seq has a conflicting group_access."""
+        with self.store.bulk_operations(self.course_key):
+            section = ItemFactory.create(
+                parent_location=self.draft_course.location,
+                category='chapter',
+                display_name='Ch 0',
+            )
+
+            # Bubble up with 1 child (grabs the setting from child)
+            seq_1 = ItemFactory.create(
+                parent_location=section.location,
+                category='sequential',
+                display_name='Seq 1',
+                group_access={50: [3, 4]}
+            )
+            ItemFactory.create(
+                parent_location=seq_1.location,
+                category='vertical',
+                display_name='Single Vertical',
+                group_access={50: [1, 2]},
+            )
+
+        outline, errs = get_outline_from_modulestore(self.course_key)
+        seq_data = outline.sections[0].sequences[0]
+        assert seq_data.user_partition_groups == {50: [3, 4]}  # Kept the seq settings
+        assert len(errs) == 1
+
     def _outline_seq_data(self, modulestore_seq):
         """
         (CourseLearningSequenceData, UsageKey) for a Modulestore sequence.
