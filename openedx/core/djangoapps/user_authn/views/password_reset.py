@@ -594,7 +594,7 @@ def password_change_request_handler(request):
 
     """
     user = request.user
-    if user.is_staff and user.is_superuser and request.POST.get('email_from_support_tools'):
+    if (user.is_staff or user.is_superuser) and request.POST.get('email_from_support_tools'):
         email = request.POST.get('email_from_support_tools')
     else:
         # Prefer logged-in user's email
