@@ -15,7 +15,7 @@ from ddt import data, ddt
 from django.conf import settings
 from django.urls import reverse
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

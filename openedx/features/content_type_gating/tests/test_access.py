@@ -16,10 +16,10 @@ from pyquery import PyQuery as pq
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
-    GlobalStaffFactory,
     InstructorFactory,
     OrgInstructorFactory,
     OrgStaffFactory,

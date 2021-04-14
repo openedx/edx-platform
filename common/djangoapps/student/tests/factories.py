@@ -25,6 +25,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserStanding
 )
+from common.djangoapps.student.roles import GlobalStaff
 
 # Factories are self documenting
 
@@ -226,3 +227,16 @@ class AccountRecoveryFactory(DjangoModelFactory):  # lint-amnesty, pylint: disab
     user = None
     secondary_email = factory.Sequence('robot+test+recovery+{}@edx.org'.format)
     is_active = True
+
+
+# pylint: disable=unused-argument
+class GlobalStaffFactory(UserFactory):
+    """
+    Returns a User object with global staff access
+    """
+    last_name = 'GlobalStaff'
+
+    @factory.post_generation
+    def set_staff(self, _create, _extracted, **kwargs):
+        GlobalStaff().add_users(self)
+# pylint: enable=unused-argument

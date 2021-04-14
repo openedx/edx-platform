@@ -24,7 +24,6 @@ import lms.djangoapps.courseware.access_response as access_response
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
-    GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory
@@ -42,6 +41,7 @@ from common.djangoapps.student.tests.factories import (
     CourseEnrollmentAllowedFactory,
     CourseEnrollmentFactory
 )
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,

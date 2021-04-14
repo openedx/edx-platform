@@ -20,7 +20,6 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseStaffRole,
-    GlobalStaff,
     OrgInstructorRole,
     OrgStaffRole
 )
@@ -111,17 +110,6 @@ class OrgInstructorFactory(UserFactory):
         if extracted is None:
             raise ValueError("Must specify a CourseKey for an org-instructor user")
         OrgInstructorRole(extracted.org).add_users(self)
-
-
-class GlobalStaffFactory(UserFactory):
-    """
-    Returns a User object with global staff access
-    """
-    last_name = "GlobalStaff"
-
-    @factory.post_generation
-    def set_staff(self, create, extracted, **kwargs):
-        GlobalStaff().add_users(self)
 # pylint: enable=unused-argument
 
 

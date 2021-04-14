@@ -21,6 +21,7 @@ from waffle.testutils import override_flag
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.util.date_utils import strftime_localized_html
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -28,7 +29,6 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from lms.djangoapps.courseware.tests.factories import (
     BetaTesterFactory,
-    GlobalStaffFactory,
     InstructorFactory,
     OrgInstructorFactory,
     OrgStaffFactory,

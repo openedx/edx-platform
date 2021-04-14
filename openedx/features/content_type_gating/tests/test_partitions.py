@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.helpers import CONTENT_GATING_PARTITION_ID, FULL_ACCESS, LIMITED_ACCESS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
