@@ -263,8 +263,8 @@ class OrgRole(RoleBase):
         if user.is_authenticated and user.is_active and not self.has_user(user):
             if orgs_role_to_create:
                 for org in orgs_role_to_create:
-                        entry = CourseAccessRole(user=user, role=self._role_name, org=org)
-                        entry.save()
+                    entry = CourseAccessRole(user=user, role=self._role_name, org=org)
+                    entry.save()
             if org_role_to_delete:
                 entries = CourseAccessRole.objects.filter(user=user, role=self._role_name, org__in=org_role_to_delete)
                 entries.delete()
@@ -356,6 +356,7 @@ class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
         super().__init__('instructor', *args, **kwargs)
+
 
 @register_access_role
 class OrgContentCreatorRole(OrgRole):

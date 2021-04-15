@@ -861,7 +861,6 @@ def _create_or_rerun_course(request):
         if not auth.user_has_role(request.user, CourseCreatorRole(), org):
             raise PermissionDenied()
 
-
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
             if _has_non_ascii_characters(org) or _has_non_ascii_characters(course) or _has_non_ascii_characters(run):

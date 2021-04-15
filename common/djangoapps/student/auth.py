@@ -165,6 +165,7 @@ def remove_users(caller, role, *users):
         _check_caller_authority(caller, role)
     role.remove_users(*users)
 
+
 def update_org_course_role(caller, role, user, *orgs):
     """
     The caller requests updating the Org role for the user. Checks that the caller has
@@ -177,7 +178,6 @@ def update_org_course_role(caller, role, user, *orgs):
     """
     _check_caller_authority(caller, role)
     role.update_org_course_role(user, *orgs)
-
 
 
 def _check_caller_authority(caller, role):

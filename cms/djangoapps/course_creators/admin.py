@@ -32,6 +32,7 @@ def get_email(obj):
 
 get_email.short_description = 'email'
 
+
 class CourseCreatorForm(forms.ModelForm):
     class Meta:
         model = CourseCreator
@@ -71,7 +72,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'state', 'note', 'orgs']
     # Turn off the action bar (we have no bulk actions)
     actions = None
-    form=CourseCreatorForm
+    form = CourseCreatorForm
 
     def username(self, inst):
         """
