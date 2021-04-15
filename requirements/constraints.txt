@@ -111,3 +111,5 @@ httpretty<1.0
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
 
+# 3.8.6 causes an issue in the instructor dashboard
+edx-proctoring<=3.8.5
