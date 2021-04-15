@@ -10,9 +10,10 @@ from six.moves import range
 
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from student.models import Registration
 from student.tasks import send_activation_email
-from student.views.management import compose_activation_email
+from student.views.management import compose_activation_email, compose_and_send_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):
@@ -91,3 +92,26 @@ class SendActivationEmailTestCase(TestCase):
         self.assertEqual(mock_log.info.call_count, 0)
         self.assertEqual(mock_log.error.call_count, 0)
         self.assertEqual(mock_log.exception.call_count, 1)
+
+    @mock.patch('student.tasks.log')
+    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    @mock.patch('common.djangoapps.student.views.management.theming_helpers.get_current_site')
+    @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration')
+    def test_from_address_in_send_email(self, mock_site_configuration, mock_get_current_site, mock_log):
+        """
+        Tests that the "from_address" is pulled from the site configuration.
+        """
+        site = SiteFactory.create()
+        mock_get_current_site.return_value = site
+        expected_from_email_address = 'test-no-reply@example.com'
+        site_config = SiteConfigurationFactory.create(site=site, site_values={
+            'ACTIVATION_EMAIL_FROM_ADDRESS': expected_from_email_address
+        })
+        mock_site_configuration.return_value = site_config
+
+        compose_and_send_activation_email(self.student, self.student.profile, self.student.registration)
+        mock_log.exception.assert_called_with(
+            'Unable to send activation email to user from "%s" to "%s"',
+            expected_from_email_address,
+            self.student.email,
+        )
