@@ -10,10 +10,10 @@ These methods should be called from tasks.
 """
 
 import logging
-import random
+import random  # lint-amnesty, pylint: disable=unused-import
 from uuid import uuid4
 
-from capa.xqueue_interface import make_hashkey
+from capa.xqueue_interface import make_hashkey  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface

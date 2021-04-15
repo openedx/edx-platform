@@ -5,10 +5,10 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
-import shutil
-import tarfile
-from datetime import datetime
-from tempfile import NamedTemporaryFile, mkdtemp
+import shutil  # lint-amnesty, pylint: disable=wrong-import-order
+import tarfile  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
+from tempfile import NamedTemporaryFile, mkdtemp  # lint-amnesty, pylint: disable=wrong-import-order
 
 import olxcleaner
 import pkg_resources

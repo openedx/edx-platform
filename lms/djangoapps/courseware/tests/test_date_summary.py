@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 import crum
 import ddt
-import waffle
+import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
