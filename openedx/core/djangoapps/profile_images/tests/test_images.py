@@ -5,9 +5,9 @@ from contextlib import closing
 from unittest import mock
 
 import pytest
-from itertools import product
-import os
-from tempfile import NamedTemporaryFile
+from itertools import product  # lint-amnesty, pylint: disable=wrong-import-order
+import os  # lint-amnesty, pylint: disable=wrong-import-order
+from tempfile import NamedTemporaryFile  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.core.files.uploadedfile import UploadedFile
 from django.test import TestCase

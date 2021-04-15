@@ -13,16 +13,16 @@ file and check it in at the same time as your model changes. To do that,
 
 
 import crum
-import hashlib
-import json
-import logging
-import uuid
-from collections import defaultdict, namedtuple
-from datetime import datetime, timedelta
-from functools import total_ordering
-from importlib import import_module
-from urllib.parse import urlencode
-import warnings
+import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+import logging  # lint-amnesty, pylint: disable=wrong-import-order
+import uuid  # lint-amnesty, pylint: disable=wrong-import-order
+from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
+from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
+from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
+from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
+import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -910,7 +910,7 @@ class Registration(models.Model):
         self.user = user
         self.save()
 
-    def activate(self):
+    def activate(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.user.is_active = True
         self.user.save(update_fields=['is_active'])
         self.activation_timestamp = datetime.utcnow()

@@ -13,5 +13,5 @@ WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='effort_estimation')
 # - Bucket 0: off
 # - Bucket 1: section (chapter) estimations
 # - Bucket 2: subsection (sequential) estimations
-EFFORT_ESTIMATION_LOCATION_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'location', __name__, num_buckets=3,
+EFFORT_ESTIMATION_LOCATION_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'location', __name__, num_buckets=3,  # lint-amnesty, pylint: disable=toggle-missing-annotation
                                                        use_course_aware_bucketing=False)

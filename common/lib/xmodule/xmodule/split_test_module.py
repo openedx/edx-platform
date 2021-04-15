@@ -125,7 +125,7 @@ def get_split_user_partitions(user_partitions):
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.needs('partitions')
 @XBlock.needs('user')
-class SplitTestBlock(
+class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     SplitTestFields,
     SequenceMixin,
     ProctoringFields,

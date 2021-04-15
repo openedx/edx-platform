@@ -456,7 +456,7 @@ def revoke_program_certificate(client, username, program_uuid):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def revoke_program_certificates(self, username, course_key):
+def revoke_program_certificates(self, username, course_key):  # lint-amnesty, pylint: disable=too-many-statements
     """
     This task is designed to be called whenever a student's course certificate is
     revoked.
