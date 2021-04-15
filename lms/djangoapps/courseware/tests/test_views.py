@@ -35,6 +35,8 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -47,7 +49,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
@@ -58,7 +60,6 @@ from lms.djangoapps.courseware.toggles import (
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -3262,7 +3263,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
         response = self._get_response(self.course)
         assert response.status_code == 200
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @patch('edx_django_utils.monitoring.set_custom_attribute')
     def test_defaults(self, mock_set_custom_attribute):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
@@ -3323,7 +3324,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
             # Make sure the assignment type is rendered
             self.assertContains(response, 'Homework:')
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_deadlines_banner_displays(self):
         CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)

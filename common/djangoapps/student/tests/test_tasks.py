@@ -8,9 +8,9 @@ from django.conf import settings
 from django.test import TestCase
 
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
-from lms.djangoapps.courseware.tests.factories import UserFactory
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.views.management import compose_activation_email
 
 

@@ -13,15 +13,13 @@ from django.utils.timezone import now
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.courseware.tests.factories import (
-    BetaTesterFactory,
-    GlobalStaffFactory,
-    InstructorFactory,
-    OrgInstructorFactory,
-    OrgStaffFactory,
-    StaffFactory
-)
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import OrgInstructorFactory
+from common.djangoapps.student.tests.factories import OrgStaffFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

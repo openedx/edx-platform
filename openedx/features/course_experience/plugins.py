@@ -8,8 +8,8 @@ This includes any locally defined CourseTools.
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from lms.djangoapps.courseware.courses import get_course_by_id
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.lib.courses import get_course_by_id
 
 from . import DISABLE_UNIFIED_COURSE_TAB_FLAG
 from .course_tools import CourseTool

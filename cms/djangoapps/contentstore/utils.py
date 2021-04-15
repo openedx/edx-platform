@@ -171,6 +171,13 @@ def get_proctored_exam_settings_url(course_module):
     return course_authoring_microfrontend_url
 
 
+def course_import_olx_validation_is_enabled():
+    """
+    Check if course olx validation is enabled on course import.
+    """
+    return settings.FEATURES.get('ENABLE_COURSE_OLX_VALIDATION', False)
+
+
 # pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """

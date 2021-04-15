@@ -86,6 +86,8 @@ from lms.djangoapps.courseware.permissions import (  # lint-amnesty, pylint: dis
     VIEW_COURSEWARE,
     VIEW_XQA_INTERFACE
 )
+
+from lms.djangoapps.courseware.toggles import is_courses_default_invite_only_enabled
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -947,7 +949,7 @@ def course_about(request, course_id):
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(request.user.has_perm(ENROLL_IN_COURSE, course))
-        invitation_only = course.invitation_only
+        invitation_only = is_courses_default_invite_only_enabled() or course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:

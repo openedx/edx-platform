@@ -17,11 +17,12 @@ from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from common.djangoapps.track.views import task_track
 from common.djangoapps.util.db import outer_atomic
-from lms.djangoapps.courseware.courses import get_course_by_id, get_problems_in_section
+from lms.djangoapps.courseware.courses import get_problems_in_section
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
 from ..exceptions import UpdateProblemModuleStateError

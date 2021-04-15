@@ -1,8 +1,6 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-
-
 import os
 from datetime import datetime, timedelta
 
@@ -18,23 +16,20 @@ from pyquery import PyQuery as pq
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import BetaTesterFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import OrgInstructorFactory
+from common.djangoapps.student.tests.factories import OrgStaffFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.courseware.module_render import load_single_xblock
-from lms.djangoapps.courseware.tests.factories import (
-    BetaTesterFactory,
-    GlobalStaffFactory,
-    InstructorFactory,
-    OrgInstructorFactory,
-    OrgStaffFactory,
-    StaffFactory
-)
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR,
-    Role
+    FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent

@@ -16,11 +16,11 @@ from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.student.tests.factories import BetaTesterFactory
 
 from ...data import (
     ContentErrorData,

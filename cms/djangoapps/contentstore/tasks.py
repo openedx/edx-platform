@@ -22,7 +22,6 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
-from django.utils.translation import ugettext as _
 from edx_django_utils.monitoring import (
     set_code_owner_attribute,
     set_code_owner_attribute_from_module,
@@ -62,9 +61,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, InvalidProctoringProvider
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-
+import cms.djangoapps.contentstore.errors as UserErrors
 from .outlines import update_outline_from_modulestore
-from .toggles import course_import_olx_validation_is_enabled
+from .utils import course_import_olx_validation_is_enabled
 
 User = get_user_model()
 
@@ -276,11 +275,11 @@ def export_olx(self, user_id, course_key_string, language):
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         with translation_language(language):
-            self.status.fail(_('Unknown User ID: {0}').format(user_id))
+            self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
         return
     if not has_course_author_access(user, courselike_key):
         with translation_language(language):
-            self.status.fail(_('Permission denied'))
+            self.status.fail(UserErrors.PERMISSION_DENIED)
         return
 
     if isinstance(courselike_key, LibraryLocator):
@@ -421,7 +420,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             return User.objects.get(pk=user_id)
         except User.DoesNotExist as exc:
             with translation_language(language):
-                self.status.fail(_('User permission denied.'))
+                self.status.fail(UserErrors.USER_PERMISSION_DENIED)
             LOGGER.error(f'{log_prefix}: Unknown User: {user_id}')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -432,7 +431,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not has_access:
             message = f'User permission denied: {user.username}'
             with translation_language(language):
-                self.status.fail(_('Permission denied. You do not have write access to this course.'))
+                self.status.fail(UserErrors.COURSE_PERMISSION_DENIED)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return has_access
@@ -444,7 +443,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not file_is_valid:
             message = f'Unsupported file {archive_name}'
             with translation_language(language):
-                self.status.fail(_('We only support uploading a .tar.gz file.'))
+                self.status.fail(UserErrors.INVALID_FILE_TYPE)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return file_is_valid
@@ -456,7 +455,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         if not archive_path_exists:
             message = f'Uploaded file {archive_path} not found'
             with translation_language(language):
-                self.status.fail(_('Uploaded Tar file not found. Try again.'))
+                self.status.fail(UserErrors.FILE_NOT_FOUND)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
         return archive_path_exists
@@ -486,9 +485,9 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         dirpath = get_dir_for_filename(course_dir, root_name)
         if not dirpath:
-            message = f'Could not find the {root_name} file in the package.'
+            message = UserErrors.FILE_MISSING.format(root_name)
             with translation_language(language):
-                self.status.fail(_('Could not find the {0} file in the package.').format(root_name))
+                self.status.fail(message)
             LOGGER.error(f'{log_prefix}: {message}')
             monitor_import_failure(courselike_key, current_step, message=message)
             return
@@ -561,7 +560,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             shutil.rmtree(course_dir)
             LOGGER.info(f'{log_prefix}: Temp data cleared')
 
-        self.status.fail(_('An Unknown error occurred during the unpacking step.'))
+        self.status.fail(UserErrors.UNKNOWN_ERROR_IN_UNPACKING)
         LOGGER.exception(f'{log_prefix}: Unknown error while unpacking', exc_info=True)
         monitor_import_failure(courselike_key, current_step, exception=exception)
         return
@@ -573,7 +572,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             safetar_extractall(tar_file, (course_dir + '/'))
         except SuspiciousOperation as exc:
             with translation_language(language):
-                self.status.fail(_('Unsafe tar file. Aborting import.'))
+                self.status.fail(UserErrors.UNSAFE_TAR_FILE)
             LOGGER.error(f'{log_prefix}: Unsafe tar file')
             monitor_import_failure(courselike_key, current_step, exception=exc)
             return
@@ -616,7 +615,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         set_custom_attribute('course_import_completed', True)
     except Exception as exception:  # pylint: disable=broad-except
         msg = str(exception)
-        status_msg = _('Unknown error while importing course.')
+        status_msg = UserErrors.UNKNOWN_ERROR_IN_IMPORT
         if isinstance(exception, InvalidProctoringProvider):
             status_msg = msg
         LOGGER.exception(f'{log_prefix}: Unknown error while importing course {str(exception)}')
@@ -688,7 +687,12 @@ def validate_course_olx(courselike_key, course_dir, status):
     if not course_import_olx_validation_is_enabled():
         return olx_is_valid
     try:
-        __, errorstore, __ = olxcleaner.validate(course_dir, steps=8, allowed_xblocks=ALL_ALLOWED_XBLOCKS)
+        __, errorstore, __ = olxcleaner.validate(
+            filename=course_dir,
+            steps=settings.COURSE_OLX_VALIDATION_STAGE,
+            ignore=settings.COURSE_OLX_VALIDATION_IGNORE_LIST,
+            allowed_xblocks=ALL_ALLOWED_XBLOCKS
+        )
     except Exception:  # pylint: disable=broad-except
         LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
         return olx_is_valid

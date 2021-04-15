@@ -15,7 +15,9 @@ from django.db import connections
 from django.test import TestCase
 
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
-from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, course_id, location
+from lms.djangoapps.courseware.tests.factories import COURSE_KEY
+from lms.djangoapps.courseware.tests.factories import LOCATION
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 
 
 @skipUnless(settings.FEATURES["ENABLE_CSMH_EXTENDED"], "CSMH Extended needs to be enabled")
@@ -28,9 +30,11 @@ class TestStudentModuleHistoryBackends(TestCase):
         super().setUp()
         for record in (1, 2, 3):
             # This will store into CSMHE via the post_save signal
-            csm = StudentModuleFactory.create(module_state_key=location('usage_id'),
-                                              course_id=course_id,
-                                              state=json.dumps({'type': 'csmhe', 'order': record}))
+            csm = StudentModuleFactory.create(
+                module_state_key=LOCATION('usage_id'),
+                course_id=COURSE_KEY,
+                state=json.dumps({'type': 'csmhe', 'order': record}),
+            )
             # This manually gets us a CSMH record to compare
             csmh = StudentModuleHistory(student_module=csm,
                                         version=None,

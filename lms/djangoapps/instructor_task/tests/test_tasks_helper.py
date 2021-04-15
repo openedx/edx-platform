@@ -30,7 +30,10 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
+from lms.djangoapps.certificates.generation_handler import (
+    CERTIFICATES_USE_ALLOWLIST,
+    CERTIFICATES_USE_UPDATED
+)
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
@@ -2528,6 +2531,50 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         assert certs.count() == 1
         invalidated_cert = certs.first()
         assert invalidated_cert.status == CertificateStatuses.unavailable
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
+    def test_invalidation_v2_certificates_disabled(self):
+        """
+        Test that ensures the bulk invalidation step (as part of bulk certificate regeneration) continues to occur when
+        the v2 certificates feature is disabled for a course run.
+        """
+        students = self._create_students(2)
+
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        _invalidate_generated_certificates(self.course.id, students, [CertificateStatuses.downloadable])
+
+        for s in students:
+            cert = GeneratedCertificate.objects.get(user=s, course_id=self.course.id)
+            assert cert.status == CertificateStatuses.unavailable
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_invalidation_v2_certificates_enabled(self):
+        """
+        Test that ensures the bulk invalidation step (as part of bulk certificate regeneration) is skipped when the v2
+        certificates feature is enabled for a course run.
+        """
+        students = self._create_students(2)
+
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        _invalidate_generated_certificates(self.course.id, students, [CertificateStatuses.downloadable])
+
+        for s in students:
+            cert = GeneratedCertificate.objects.get(user=s, course_id=self.course.id)
+            assert cert.status == CertificateStatuses.downloadable
 
     def assertCertificatesGenerated(self, task_input, expected_results):
         """

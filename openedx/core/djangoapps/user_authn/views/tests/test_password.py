@@ -28,6 +28,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.test_api import CreateAccou
 from openedx.core.djangoapps.user_api.errors import UserAPIInternalError, UserNotFound
 from openedx.core.djangoapps.user_authn.views.password_reset import request_password_change
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
@@ -176,6 +177,36 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         response_dict = json.loads(response.content.decode('utf-8'))
         assert response_dict['success']
 
+    @ddt.data(
+        (True, True, OLD_EMAIL),
+        (True, False, OLD_EMAIL),
+        (False, True, OLD_EMAIL),
+        (False, False, 'edx@example.com'),
+    )
+    @ddt.unpack
+    def test_password_change_from_support_tools(self, is_superuser, is_staff, reset_email):
+        """
+        Request a password change from Support Tools while logged in from a staff/superuser
+        """
+        self.client.logout()
+        UserFactory.create(
+            username='edx',
+            email='edx@example.com',
+            password='edx',
+            is_superuser=is_superuser,
+            is_staff=is_staff,
+        )
+        self.client.login(username='edx', password='edx')
+
+        response = self._change_password_from_support(email_from_support_tools=self.OLD_EMAIL)
+        assert response.status_code == 200
+
+        # Check that an email was sent
+        assert len(mail.outbox) == 1
+        assert reset_email in mail.outbox[0].to
+        email_body = mail.outbox[0].body
+        assert email_body is not None
+
     def test_password_change_failure(self):
         with patch(
             'openedx.core.djangoapps.user_authn.views.password_reset.request_password_change',
@@ -311,6 +342,15 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
 
         if email:
             data['email'] = email
+
+        return self.client.post(path=reverse('password_change_request'), data=data)
+
+    def _change_password_from_support(self, email_from_support_tools=None):
+        """Request to change the user's password. """
+        data = {}
+
+        if email_from_support_tools:
+            data['email_from_support_tools'] = email_from_support_tools
 
         return self.client.post(path=reverse('password_change_request'), data=data)
 

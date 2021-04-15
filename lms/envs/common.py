@@ -65,7 +65,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-
 ENABLE_JASMINE = False
 
 LMS_ROOT_URL = 'https://localhost:18000'
@@ -311,6 +310,8 @@ FEATURES = {
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
 
     # .. toggle_name: FEATURES['DISABLE_HONOR_CERTIFICATES']
     # .. toggle_implementation: DjangoSetting
@@ -968,11 +969,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
-
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
 
 # For Node.js
 
@@ -3862,6 +3858,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'account_privacy',
         'profile_image',
         'username',
+        "email",
+        "id",
     ],
 }
 
@@ -3892,8 +3890,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
 # The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
-        "email",
-        "id",
         "extended_profile",
         "gender",
         "state",
@@ -4410,6 +4406,7 @@ RATELIMIT_RATE = '120/m'
 LOGISTRATION_RATELIMIT_RATE = '100/5m'
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '30/5m'
 LOGISTRATION_API_RATELIMIT = '20/m'
+LOGIN_AND_REGISTER_FORM_RATELIMIT = '100/5m'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
 RESET_PASSWORD_API_RATELIMIT = '30/7d'
 
@@ -4671,3 +4668,7 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+################# Settings for olx validation. #################
+COURSE_OLX_VALIDATION_STAGE = 1
+COURSE_OLX_VALIDATION_IGNORE_LIST = None

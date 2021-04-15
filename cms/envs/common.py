@@ -355,7 +355,8 @@ FEATURES = {
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
-
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
     # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -490,11 +491,6 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
-
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'import_shims' / 'studio')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
@@ -2368,6 +2364,7 @@ DISABLE_DEPRECATED_SIGNUP_URL = False
 LOGISTRATION_RATELIMIT_RATE = '100/5m'
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '30/5m'
 LOGISTRATION_API_RATELIMIT = '20/m'
+LOGIN_AND_REGISTER_FORM_RATELIMIT = '100/5m'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
 RESET_PASSWORD_API_RATELIMIT = '30/7d'
 
@@ -2415,3 +2412,7 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+############## Settings for course import olx validation ############################
+COURSE_OLX_VALIDATION_STAGE = 1
+COURSE_OLX_VALIDATION_IGNORE_LIST = None
