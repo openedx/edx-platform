@@ -1,5 +1,5 @@
 """
-Tests for all the models in webinars app.
+Tests for all the models in webinars app
 """
 from datetime import timedelta
 from unittest.mock import Mock
@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from openedx.adg.lms.webinars.constants import BANNER_MAX_SIZE
+from openedx.adg.lms.webinars.models import Webinar
 from openedx.adg.lms.webinars.tests.factories import WebinarFactory
 
 
@@ -72,3 +73,28 @@ def test_valid_banner_size_in_webinar(webinar):
 
     webinar.banner = mocked_file
     webinar.clean()
+
+
+@pytest.mark.django_db
+def test_delete_single_webinar(mocker, webinar):
+    """
+    Test deleting a single webinar to check if the Webinar.delete() method works as expected
+    """
+    mocker.patch('openedx.adg.lms.webinars.models.send_cancellation_emails_for_given_webinars')
+    webinar.delete()
+    assert webinar.status == Webinar.CANCELLED
+
+
+@pytest.mark.django_db
+def test_delete_multiple_webinars(mocker):
+    """
+    Test deleting a queryset of webinars to check if the WebinarQuerySet.delete() method works as expected
+    """
+    mocker.patch('openedx.adg.lms.webinars.models.send_cancellation_emails_for_given_webinars')
+    test_webinar1 = WebinarFactory(status=Webinar.DELIVERED)
+    test_webinar2 = WebinarFactory(status=Webinar.UPCOMING)
+
+    Webinar.objects.filter(id__in=[test_webinar1.id, test_webinar2.id]).delete()
+
+    assert Webinar.objects.filter(id=test_webinar1.id).first().status == Webinar.CANCELLED
+    assert Webinar.objects.filter(id=test_webinar2.id).first().status == Webinar.CANCELLED
