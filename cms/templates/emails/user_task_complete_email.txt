@@ -19,12 +19,12 @@ ${_("Here are some validations we found with your course content.")}
 
 ${_("Errors: ")} ${len(errors)}
 % for index, error in enumerate(errors, start=1):
-  ${index}  ${error}
+  ${index}.  ${error}
 % endfor
 
 ${_("Warnings: ")} ${len(warnings)}
 % for warning in enumerate(warnings, start=1):
-  ${index}  ${warning}
+  ${index}.  ${warning}
 % endfor
 
 % endif
