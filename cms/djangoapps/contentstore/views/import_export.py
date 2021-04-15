@@ -114,7 +114,7 @@ def _save_request_status(request, key, status):
     request.session.save()
 
 
-def _write_chunk(request, courselike_key):
+def _write_chunk(request, courselike_key):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Write the OLX file data chunk from the given request to the local filesystem.
     """

@@ -54,7 +54,7 @@ from openedx.core.lib.tests.assertions.events import assert_event_matches
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()

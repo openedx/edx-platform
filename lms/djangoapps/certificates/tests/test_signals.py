@@ -28,7 +28,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)
+AUTO_CERTIFICATE_GENERATION_SWITCH = LegacyWaffleSwitch(waffle.waffle(), waffle.AUTO_CERTIFICATE_GENERATION)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):

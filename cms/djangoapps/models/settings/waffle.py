@@ -8,7 +8,7 @@ WAFFLE_NAMESPACE = 'grades'
 # edx/edx-platform feature
 MATERIAL_RECOMPUTE_ONLY = 'MATERIAL_RECOMPUTE_ONLY'
 
-MATERIAL_RECOMPUTE_ONLY_FLAG = CourseWaffleFlag(
+MATERIAL_RECOMPUTE_ONLY_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=WAFFLE_NAMESPACE,
     flag_name=MATERIAL_RECOMPUTE_ONLY,
     module_name=__name__,

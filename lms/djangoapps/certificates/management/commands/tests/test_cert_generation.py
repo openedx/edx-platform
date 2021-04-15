@@ -6,7 +6,7 @@ from unittest import mock
 
 import pytest
 from django.core.management import CommandError, call_command
-from waffle.testutils import override_switch
+from waffle.testutils import override_switch  # lint-amnesty, pylint: disable=unused-import
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.tests.test_generation_handler import ID_VERIFIED_METHOD

@@ -40,13 +40,13 @@ def waffle_flags():
 
 
 # TODO: After removing this flag, add a migration to remove waffle flag in a follow-up deployment.
-ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
+ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=waffle_flags(),
     flag_name='enable_checklists_quality',
     module_name=__name__,
 )
 
-SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(
+SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=waffle_flags(),
     flag_name='show_review_rules',
     module_name=__name__,
