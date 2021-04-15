@@ -37,7 +37,9 @@ class WebinarAdminBase(admin.ModelAdmin):
     Base Model admin for webinars i.e Cancelled Webinars and Non-Cancelled Webinars
     """
 
+    save_as = True
     list_display = ('title', 'start_time', 'presenter', 'status',)
+    raw_id_fields = ('presenter', 'co_hosts', 'panelists')
     search_fields = ('title',)
     filter_horizontal = ('co_hosts', 'panelists',)
 
@@ -47,7 +49,6 @@ class WebinarAdmin(WebinarAdminBase):
     Admin for upcoming and delivered webinars
     """
 
-    save_as = True
     list_filter = ('start_time', 'language', ActiveWebinarStatusFilter)
     readonly_fields = ('created_by', 'modified_by', 'status',)
 
@@ -67,6 +68,8 @@ class CancelledWebinarAdmin(WebinarAdminBase):
     """
     Model admin for cancelled webinar
     """
+
+    save_as = False
 
     def get_queryset(self, request):
         qs = super(CancelledWebinarAdmin, self).get_queryset(request)
