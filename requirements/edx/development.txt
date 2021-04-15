@@ -67,7 +67,7 @@ django-cookies-samesite==0.9.0  # via -r requirements/edx/testing.txt
 django-cors-headers==2.5.3  # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 django-countries==5.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-enterprise
 django-crum==0.7.9        # via -r requirements/edx/testing.txt, edx-django-utils, edx-enterprise, edx-proctoring, edx-rbac, edx-toggles, super-csv
-django-debug-toolbar==3.2  # via -r requirements/edx/development.in
+django-debug-toolbar==3.2.1  # via -r requirements/edx/development.in
 django-fernet-fields==0.6  # via -r requirements/edx/testing.txt, edx-enterprise, edx-event-routing-backends, edxval
 django-filter==2.4.0      # via -r requirements/edx/testing.txt, edx-enterprise, lti-consumer-xblock
 django-ipware==3.0.2      # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
@@ -120,7 +120,7 @@ edx-milestones==0.3.1     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
-edx-proctoring==3.8.5     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
+edx-proctoring==3.8.6     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.2           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/testing.txt
@@ -137,7 +137,7 @@ enmerkar-underscore==2.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via -r requirements/edx/testing.txt, pytest-xdist
-factory-boy==3.2.0        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
+factory-boy==3.2.0        # via -r requirements/edx/testing.txt
 faker==8.1.0              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
