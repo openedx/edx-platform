@@ -6,7 +6,7 @@ Utility methods for the account settings.
 import re
 from urllib.parse import urlparse  # pylint: disable=import-error
 
-import waffle
+import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from django.conf import settings

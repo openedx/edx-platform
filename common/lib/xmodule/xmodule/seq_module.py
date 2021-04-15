@@ -57,7 +57,7 @@ class_priority = ['video', 'problem']
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
-TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(
+TIMED_EXAM_GATING_WAFFLE_FLAG = LegacyWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace="xmodule",
     flag_name='rev_1377_rollout',
     module_name=__name__,
@@ -402,7 +402,7 @@ class SequenceBlock(
                 self, self.course_id
             )
 
-    def student_view(self, context):
+    def student_view(self, context):  # lint-amnesty, pylint: disable=missing-function-docstring
         _ = self.runtime.service(self, "i18n").ugettext
         context = context or {}
         self._capture_basic_metrics()

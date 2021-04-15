@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_authn.cookies import standard_cookie_settings
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 
-ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)
+ENTERPRISE_HEADER_LINKS = LegacyWaffleFlag('enterprise', 'enterprise_header_links', __name__)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 def get_data_consent_share_cache_key(user_id, course_id, enterprise_customer_uuid=None):

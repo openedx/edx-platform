@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 from unittest.mock import patch
 import pytest

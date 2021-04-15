@@ -55,7 +55,7 @@ def waffle_flags():
             flag_name=ENABLE_DEVSTACK_VIDEO_UPLOADS,
             module_name=__name__,
         ),
-        ENABLE_VEM_PIPELINE: CourseWaffleFlag(
+        ENABLE_VEM_PIPELINE: CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
             waffle_namespace=namespace,
             flag_name=ENABLE_VEM_PIPELINE,
             module_name=__name__,
