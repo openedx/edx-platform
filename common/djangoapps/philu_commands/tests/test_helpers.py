@@ -37,7 +37,9 @@ class TestHelpers(ModuleStoreTestCase):
         This function is responsible for creating courses for every test and mocking the function for tests.
         """
         super(TestHelpers, self).setUp()
-        self.course = CourseFactory.create(display_name='test course 1', run='Testing_course_1')
+        self.course = CourseFactory.create(
+            display_name='test course 1', org='test_org', course='mth', run='Testing_course_1'
+        )
         self.course.end = datetime.now(pytz.UTC) - timedelta(hours=2)
 
     @patch('philu_commands.helpers.modulestore')
@@ -52,16 +54,16 @@ class TestHelpers(ModuleStoreTestCase):
         expected_course_object = {
             'structure': {
                 'blocks': {
-                    u'i4x://org.0/course_0/course/Testing_course_1': {
+                    u'i4x://test_org/mth/course/Testing_course_1': {
                         'block_type': 'course',
                         'graded': False,
                         'format': None,
-                        'usage_key': u'i4x://org.0/course_0/course/Testing_course_1',
+                        'usage_key': u'i4x://test_org/mth/course/Testing_course_1',
                         'children': [],
                         'display_name': u'test course 1'
                     }
                 },
-                'root': u'i4x://org.0/course_0/course/Testing_course_1'
+                'root': u'i4x://test_org/mth/course/Testing_course_1'
             },
             'discussion_id_map': {}
         }
@@ -70,25 +72,26 @@ class TestHelpers(ModuleStoreTestCase):
             parent=self.course,
             parent_location=self.course.location,
             category='discussion',
+            display_name='test_discussion_name',
             discussion_id='test_discussion',
             discussion_category='Category discussion',
             discussion_target='Target Discussion',
         )
         course_structure_data_2 = generate_course_structure(self.course.id)
         course_blocks = expected_course_object['structure']['blocks']
-        course_blocks[u'i4x://org.0/course_0/discussion/discussion_1'] = {
+        course_blocks[u'i4x://test_org/mth/discussion/test_discussion_name'] = {
             'block_type': u'discussion',
             'graded': False,
             'format': None,
-            'usage_key': u'i4x://org.0/course_0/discussion/discussion_1',
+            'usage_key': u'i4x://test_org/mth/discussion/test_discussion_name',
             'children': [],
-            'display_name': u'discussion 1'
+            'display_name': u'test_discussion_name'
         }
-        course_blocks[u'i4x://org.0/course_0/course/Testing_course_1']['children'] = [
-            u'i4x://org.0/course_0/discussion/discussion_1'
+        course_blocks[u'i4x://test_org/mth/course/Testing_course_1']['children'] = [
+            u'i4x://test_org/mth/discussion/test_discussion_name'
         ]
         expected_course_object['discussion_id_map'] = {
-            u'test_discussion': u'i4x://org.0/course_0/discussion/discussion_1'
+            u'test_discussion': u'i4x://test_org/mth/discussion/test_discussion_name'
         }
         assert course_structure_data_2 == expected_course_object
 

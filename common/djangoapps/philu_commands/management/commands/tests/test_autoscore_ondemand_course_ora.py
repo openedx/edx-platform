@@ -73,14 +73,14 @@ def test_autoscore_ondemand_course_ora_successfully(mock_log_info, mock_autoscor
         if enrollment.is_active:
             enrollments.append(enrollment)
 
-    call_command('autoscore_ondemand_course_ora')
+    call_command('autoscore_ondemand_course_ora', site_id=1)
 
     if not submission_uuids:
         assert mock_log_info.called
         assert not mock_autoscore_submissions.called
     else:
         assert not mock_log_info.called
-        mock_autoscore_submissions.assert_called_once_with(enrollments, submission_uuids)
+        mock_autoscore_submissions.assert_called_once_with(enrollments, submission_uuids, 1)
 
 
 @pytest.mark.django_db
