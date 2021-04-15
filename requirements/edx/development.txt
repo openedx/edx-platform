@@ -218,7 +218,7 @@ pkgconfig==1.5.1          # via -r requirements/edx/testing.txt, xmlsec
 pluggy==0.13.1            # via -r requirements/edx/testing.txt, diff-cover, pytest, tox
 polib==1.1.0              # via -r requirements/edx/testing.txt, edx-i18n-tools
 psutil==1.2.1             # via -r requirements/edx/testing.txt, edx-django-utils
-py2neo==3.1.2             # via -r requirements/edx/testing.txt
+git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2             # via -r requirements/edx/testing.txt
 py==1.8.1                 # via -r requirements/edx/testing.txt, pytest, tox
 pycodestyle==2.6.0        # via -r requirements/edx/testing.txt, flake8
 pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-client
