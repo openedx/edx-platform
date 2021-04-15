@@ -14,14 +14,14 @@ ${_("Your {task_name} task has completed with the status '{task_status}'. Sign i
 
 ${_("Here are some validations we found with your course content.")}
 
-${_("Errors:")}
-% for error in olx_validation_errors.get('errors'):
-  * ${error}
+${_("Errors: ({len(olx_validation_errors.get('errors'))})")}
+% for index, error in enumerate(olx_validation_errors.get('errors'), start=1):
+  ${index}  ${error}
 % endfor
 
-${_("Warnings:")}
-% for warning in olx_validation_errors.get('warnings'):
-  * ${warning}
+${_("Warnings: ({len(olx_validation_errors.get('warnings'))})")}
+% for warning in enumerate(olx_validation_errors.get('warnings'), start=1):
+  ${index}  ${warning}
 % endfor
 
 % endif
