@@ -117,7 +117,7 @@ edx-milestones==0.3.1     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/base.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/base.txt
-edx-proctoring==3.8.5     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
+edx-proctoring==3.8.6     # via -r requirements/edx/base.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.2           # via -r requirements/edx/base.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/base.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/base.txt
@@ -133,7 +133,7 @@ enmerkar-underscore==2.0.0  # via -r requirements/edx/base.txt
 enmerkar==0.7.1           # via -r requirements/edx/base.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/base.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via pytest-xdist
-factory-boy==3.2.0        # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
+factory-boy==3.2.0        # via -r requirements/edx/testing.in
 faker==8.1.0              # via factory-boy
 filelock==3.0.12          # via tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
