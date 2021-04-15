@@ -28,6 +28,7 @@ from openedx.adg.lms.applications.helpers import (
     get_duration,
     get_embedded_view_html,
     get_extra_context_for_application_review_page,
+    has_admin_permissions,
     is_displayable_on_browser,
     max_year_value_validator,
     min_year_value_validator,
@@ -324,3 +325,30 @@ def test_get_extra_context_for_application_review_page(mock_get_application_revi
     actual_context = get_extra_context_for_application_review_page(user_application)
 
     assert expected_context == actual_context
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_staff, is_superuser, is_business_line_admin, expected_result',
+    [
+        (False, False, False, False),
+        (False, False, True, False),
+        (False, True, False, False),
+        (False, True, True, False),
+        (True, False, False, False),
+        (True, False, True, True),
+        (True, True, False, True),
+        (True, True, True, True),
+    ]
+)
+def test_has_admin_permissions(mocker, is_business_line_admin, is_superuser, is_staff, expected_result):
+    """
+    Test if the user is a superuser or an ADG admin or the admin of any Business line while having the staff
+    status
+    """
+    mocked_class = mocker.patch('openedx.adg.lms.applications.models.BusinessLine')
+    mocked_class.is_user_business_line_admin.return_value = is_business_line_admin
+
+    test_user = UserFactory(is_superuser=is_superuser, is_staff=is_staff)
+
+    assert has_admin_permissions(test_user) == expected_result
