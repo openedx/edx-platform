@@ -14,7 +14,6 @@ import ddt
 import lxml.html
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.middleware.csrf import _compare_salted_tokens  # lint-amnesty, pylint: disable=unused-import
 from django.test import TestCase
 from django.test.utils import override_settings
 from edxval.api import create_video, get_videos_for_course

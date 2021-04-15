@@ -21,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
 from common.djangoapps.student.roles import BulkRoleCache
 from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
@@ -31,7 +31,6 @@ from common.djangoapps.track.event_transaction_utils import (
 )
 from common.djangoapps.util.date_utils import to_timestamp
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.courseware.courses import get_course_by_id
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_and_subsection_grades
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import context as grades_context
@@ -66,6 +65,7 @@ from openedx.core.lib.api.view_utils import (
     view_auth_classes
 )
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
 
@@ -618,7 +618,19 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 q_object |= Q(course_grade_in_range=True)
 
                 q_objects.append(q_object)
-
+            if request.GET.get('excluded_course_roles'):
+                excluded_course_roles = request.GET.getlist('excluded_course_roles')
+                course_access_role_filters = dict(
+                    user=OuterRef('user'),
+                    course_id=course_key,
+                )
+                if 'all' not in excluded_course_roles:
+                    course_access_role_filters['role__in'] = excluded_course_roles
+                annotations['has_excluded_role'] = Exists(
+                    CourseAccessRole.objects.filter(**course_access_role_filters)
+                )
+                # TODO: In django 3.0+, we can directly filter on this 'exists' rather than annotating
+                q_objects.append(Q(has_excluded_role=False))
             entries = []
             related_models = ['user']
             users = self._paginate_users(course_key, q_objects, related_models, annotations=annotations)

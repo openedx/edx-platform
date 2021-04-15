@@ -25,7 +25,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_
 from markupsafe import escape
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC, utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -36,6 +35,8 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -48,7 +49,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
@@ -59,7 +60,6 @@ from lms.djangoapps.courseware.toggles import (
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
-from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
 from lms.djangoapps.verify_student.models import VerificationDeadline
@@ -83,7 +83,11 @@ from openedx.features.course_experience import (
     RELATIVE_DATES_FLAG
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
-from openedx.features.course_experience.url_helpers import get_learning_mfe_courseware_url, get_legacy_courseware_url
+from openedx.features.course_experience.url_helpers import (
+    get_courseware_url,
+    make_learning_mfe_courseware_url,
+    ExperienceOption,
+)
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
@@ -96,7 +100,6 @@ from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
     CourseUserType,
     ModuleStoreTestCase,
@@ -110,135 +113,234 @@ FEATURES_WITH_DISABLE_HONOR_CERTIFICATE = settings.FEATURES.copy()
 FEATURES_WITH_DISABLE_HONOR_CERTIFICATE['DISABLE_HONOR_CERTIFICATES'] = True
 
 
+def _set_mfe_flag(active: bool):
+    """
+    A decorator/contextmanager to force the base courseware MFE flag on or off.
+    """
+    return override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=active)
+
+
+def _set_preview_mfe_flag(active: bool):
+    """
+    A decorator/contextmanager to force the courseware MFE educator preview flag on or off.
+    """
+    return override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, active=active)
+
+
 @ddt.ddt
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def setUp(self):
-        super().setUp()
-        # Use toy course from XML
-        self.course_key = CourseKey.from_string('edX/toy/2012_Fall')
+    @ddt.data(
+        (False, None, False),  # not provided -> Active experience
+        (False, "blarfingar", False),  # nonsense -> Active experience
+        (False, "legacy", False),  # "legacy" -> Legacy experience
+        (False, "new", True),  # "new" -> MFE experience
+        (True, None, True),  # not provided ->  Active experience
+        (True, "blarfingar", True),  # nonsense -> Active experience
+        (True, "legacy", False),  # "legacy" -> Legacy experience
+        (True, "new", True),  # "new" -> MFE experience
+    )
+    @ddt.unpack
+    def test_jump_to_legacy_vs_mfe(self, activate_mfe, experience_param, expect_mfe):
+        """
+        Test that jump_to and jump_to_id correctly choose which courseware
+        frontend to redirect to, taking into account the '?experience=' query
+        param.
 
-    def test_jumpto_invalid_location(self):
-        location = self.course_key.make_usage_key(None, 'NoSuchPlace')
+        Will be removed along with DEPR-109.
+        """
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        querystring = f"experience={experience_param}" if experience_param else ""
+        if expect_mfe:
+            expected_url = f'http://learning-mfe/course/{course.id}/{chapter.location}'
+        else:
+            expected_url = f'/courses/{course.id}/courseware/{chapter.url_name}/'
+
+        jumpto_url = f'/courses/{course.id}/jump_to/{chapter.location}?{querystring}'
+        with _set_mfe_flag(activate_mfe):
+            response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        # Check the response URL, but chop off the querystring; we don't care here.
+        assert response.url.split('?')[0] == expected_url
+
+        jumpto_id_url = f'/courses/{course.id}/jump_to_id/{chapter.url_name}?{querystring}'
+        with _set_mfe_flag(activate_mfe):
+            response = self.client.get(jumpto_id_url)
+        assert response.status_code == 302
+        # Check the response URL, but chop off the querystring; we don't care here.
+        assert response.url.split('?')[0] == expected_url
+
+    @ddt.data(
+        (False, ModuleStoreEnum.Type.mongo),
+        (False, ModuleStoreEnum.Type.split),
+        (True, ModuleStoreEnum.Type.split),
+    )
+    @ddt.unpack
+    def test_jump_to_invalid_location(self, activate_mfe, store_type):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            location = course.id.make_usage_key(None, 'NoSuchPlace')
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        jumpto_url = '{}/{}/jump_to/{}'.format('/courses', str(self.course_key), str(location))
-        response = self.client.get(jumpto_url)
+        jumpto_url = f'/courses/{course.id}/jump_to/{location}'
+        with _set_mfe_flag(activate_mfe):
+            response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
-    def test_jumpto_from_section(self):
-        course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(section.location)})
+    @_set_mfe_flag(False)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_jump_to_legacy_from_sequence(self, store_type):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        activate_block_id = urlencode({'activate_block_id': str(sequence.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/?{activate_block_id}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(section.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-    def test_jumpto_from_module(self):
+    @_set_mfe_flag(True)
+    def test_jump_to_mfe_from_sequence(self):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        vertical1 = ItemFactory.create(category='vertical', parent_location=section.location)
-        vertical2 = ItemFactory.create(category='vertical', parent_location=section.location)
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}'
+        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
+        response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
+
+    @_set_mfe_flag(False)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_jump_to_legacy_from_module(self, store_type):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            vertical1 = ItemFactory.create(category='vertical', parent_location=sequence.location)
+            vertical2 = ItemFactory.create(category='vertical', parent_location=sequence.location)
+            module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
+            module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
+
+        activate_block_id = urlencode({'activate_block_id': str(module1.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
+        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+
+        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
+        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+
+    @_set_mfe_flag(True)
+    def test_jump_to_mfe_from_module(self):
+        course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+        sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+        vertical1 = ItemFactory.create(category='vertical', parent_location=sequence.location)
+        vertical2 = ItemFactory.create(category='vertical', parent_location=sequence.location)
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module1.location)})
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical1.location}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module1.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
+        expected_redirect_url = (
+            f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical2.location}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module2.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
-    def test_jumpto_from_nested_module(self):
-        course = CourseFactory.create()
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
-        nested_section = ItemFactory.create(category='sequential', parent_location=vertical.location)
-        nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
-        # put a module into nested_vertical1 for completeness
-        ItemFactory.create(category='html', parent_location=nested_vertical1.location)
-        nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_section.location)
-        module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
+    # The new courseware experience does not support this sort of course structure;
+    # it assumes a simple course->chapter->sequence->unit->component tree.
+    @_set_mfe_flag(False)
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_jump_to_legacy_from_nested_module(self, store_type):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            vertical = ItemFactory.create(category='vertical', parent_location=sequence.location)
+            nested_sequence = ItemFactory.create(category='sequential', parent_location=vertical.location)
+            nested_vertical1 = ItemFactory.create(category='vertical', parent_location=nested_sequence.location)
+            # put a module into nested_vertical1 for completeness
+            ItemFactory.create(category='html', parent_location=nested_vertical1.location)
+            nested_vertical2 = ItemFactory.create(category='vertical', parent_location=nested_sequence.location)
+            module2 = ItemFactory.create(category='html', parent_location=nested_vertical2.location)
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
-        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
-            course_id=str(course.id),
-            chapter_id=chapter.url_name,
-            section_id=section.url_name,
-            activate_block_id=urlencode({'activate_block_id': str(module2.location)})
+        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        expected_redirect_url = (
+            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = '{}/{}/jump_to/{}'.format(
-            '/courses',
-            str(course.id),
-            str(module2.location),
-        )
+        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
-
-    def test_jumpto_id_invalid_location(self):
-        location = BlockUsageLocator(CourseLocator('edX', 'toy', 'NoSuchPlace', deprecated=True),
-                                     None, None, deprecated=True)
-        jumpto_url = '{}/{}/jump_to_id/{}'.format('/courses', str(self.course_key), str(location))
-        response = self.client.get(jumpto_url)
-        assert response.status_code == 404
+        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @ddt.data(
-        (False, '1'),
-        (True, '2')
+        (False, ModuleStoreEnum.Type.mongo),
+        (False, ModuleStoreEnum.Type.split),
+        (True, ModuleStoreEnum.Type.split),
     )
     @ddt.unpack
-    def test_jump_to_for_learner_with_staff_only_content(self, is_staff_user, position):
+    def test_jump_to_id_invalid_location(self, activate_mfe, store_type):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+        jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace'
+        with _set_mfe_flag(activate_mfe):
+            response = self.client.get(jumpto_url)
+        assert response.status_code == 404
+
+    @_set_mfe_flag(False)
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, False, '1'),
+        (ModuleStoreEnum.Type.mongo, True, '2'),
+        (ModuleStoreEnum.Type.split, False, '1'),
+        (ModuleStoreEnum.Type.split, True, '2'),
+    )
+    @ddt.unpack
+    def test_jump_to_legacy_for_learner_with_staff_only_content(self, store_type, is_staff_user, position):
         """
         Test for checking correct position in redirect_url for learner when a course has staff-only units.
+
+        (When the MFE is active, it handles this logic itself with the help of the
+         courseware blocks/metadata/outline APIs, so we don't test for it here.)
         """
-        course = CourseFactory.create()
-        request = RequestFactory().get('/')
-        request.user = UserFactory(is_staff=is_staff_user, username="staff")
-        request.session = {}
-        course_key = CourseKey.from_string(str(course.id))
-        chapter = ItemFactory.create(category='chapter', parent_location=course.location)
-        section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        __ = ItemFactory.create(category='vertical', parent_location=section.location)
-        staff_only_vertical = ItemFactory.create(category='vertical', parent_location=section.location,
-                                                 metadata=dict(visible_to_staff_only=True))
-        __ = ItemFactory.create(category='vertical', parent_location=section.location)
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            request = RequestFactory().get('/')
+            request.user = UserFactory(is_staff=is_staff_user, username="staff")
+            request.session = {}
+            course_key = CourseKey.from_string(str(course.id))
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequence = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            __ = ItemFactory.create(category='vertical', parent_location=sequence.location)
+            staff_only_vertical = ItemFactory.create(category='vertical', parent_location=sequence.location,
+                                                     metadata=dict(visible_to_staff_only=True))
+            __ = ItemFactory.create(category='vertical', parent_location=sequence.location)
 
         usage_key = UsageKey.from_string(str(staff_only_vertical.location)).replace(course_key=course_key)
         expected_url = reverse(
@@ -246,13 +348,12 @@ class TestJumpTo(ModuleStoreTestCase):
             kwargs={
                 'course_id': str(course.id),
                 'chapter': chapter.url_name,
-                'section': section.url_name,
+                'section': sequence.url_name,
                 'position': position,
             }
         )
         expected_url += "?{}".format(urlencode({'activate_block_id': str(staff_only_vertical.location)}))
-
-        assert expected_url == get_legacy_courseware_url(usage_key, request)
+        assert expected_url == get_courseware_url(usage_key, request, ExperienceOption.LEGACY)
 
 
 @ddt.ddt
@@ -542,9 +643,19 @@ class ViewsTestCase(BaseViewsTestCase):
 
     def test_get_redirect_url(self):
         # test the course location
-        assert '/courses/{course_key}/courseware?{activate_block_id}'.format(course_key=str(self.course_key), activate_block_id=urlencode({'activate_block_id': str(self.course.location)})) == get_legacy_courseware_url(self.course.location)  # pylint: disable=line-too-long
+        assert '/courses/{course_key}/courseware?{activate_block_id}'.format(
+            course_key=str(self.course_key),
+            activate_block_id=urlencode({'activate_block_id': str(self.course.location)})
+        ) == get_courseware_url(
+            self.course.location, experience=ExperienceOption.LEGACY
+        )
         # test a section location
-        assert '/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(course_key=str(self.course_key), activate_block_id=urlencode({'activate_block_id': str(self.section.location)})) == get_legacy_courseware_url(self.section.location)  # pylint: disable=line-too-long
+        assert '/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
+            course_key=str(self.course_key),
+            activate_block_id=urlencode({'activate_block_id': str(self.section.location)})
+        ) == get_courseware_url(
+            self.section.location, experience=ExperienceOption.LEGACY
+        )
 
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
@@ -3152,7 +3263,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
         response = self._get_response(self.course)
         assert response.status_code == 200
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     @patch('edx_django_utils.monitoring.set_custom_attribute')
     def test_defaults(self, mock_set_custom_attribute):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
@@ -3213,7 +3324,7 @@ class DatesTabTestCase(ModuleStoreTestCase):
             # Make sure the assignment type is rendered
             self.assertContains(response, 'Homework:')
 
-    @override_experiment_waffle_flag(RELATIVE_DATES_FLAG, active=True)
+    @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_deadlines_banner_displays(self):
         CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode=CourseMode.VERIFIED)
         now = datetime.now(utc)
@@ -3261,15 +3372,15 @@ class TestShowCoursewareMFE(TestCase):
             [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
         )
         for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
-            with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, preview_active):
-                with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=redirect_active):
+            with _set_preview_mfe_flag(preview_active):
+                with _set_mfe_flag(redirect_active):
                     assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
         # user permissions...
-        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, True):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_preview_mfe_flag(True):
+            with _set_mfe_flag(True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3279,7 +3390,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with _set_mfe_flag(False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3289,8 +3400,8 @@ class TestShowCoursewareMFE(TestCase):
                 # Regular users don't see the link.
                 assert not show_courseware_mfe_link(regular_user, False, new_course_key)
 
-        with override_waffle_flag(COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW, False):
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_preview_mfe_flag(False):
+            with _set_mfe_flag(True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3303,7 +3414,7 @@ class TestShowCoursewareMFE(TestCase):
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
-            with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=False):
+            with _set_mfe_flag(False):
                 # (preview=off, redirect=off)
                 # Global staff see the link anyway
                 assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
@@ -3320,16 +3431,16 @@ class TestShowCoursewareMFE(TestCase):
         course_key = CourseKey.from_string("course-v1:OpenEdX+MFE+2020")
         section_key = UsageKey.from_string("block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction")
         unit_id = "block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You"
-        assert get_learning_mfe_courseware_url(course_key) == (
+        assert make_learning_mfe_courseware_url(course_key) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
         )
-        assert get_learning_mfe_courseware_url(course_key, section_key, '') == (
+        assert make_learning_mfe_courseware_url(course_key, section_key, '') == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
         )
-        assert get_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
+        assert make_learning_mfe_courseware_url(course_key, section_key, unit_id) == (
             'https://learningmfe.openedx.org'
             '/course/course-v1:OpenEdX+MFE+2020'
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
@@ -3361,7 +3472,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         # learners will be redirected when the waffle flag is set
         lms_url, mfe_url = self._get_urls()
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).url == mfe_url
 
     def test_staff_no_redirect(self):
@@ -3373,14 +3484,14 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
         # global staff will never be redirected
         self._create_global_staff_user()
         assert self.client.get(lms_url).status_code == 200
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
     def test_exam_no_redirect(self):
@@ -3390,7 +3501,7 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
 
         lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
-        with override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True):
+        with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
 

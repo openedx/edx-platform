@@ -82,7 +82,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         # pylint: disable=no-member
         for child in child_blocks:
-            if context.get('hide_access_error_blocks') and getattr(child, 'has_access_error', False):
+            child_has_access_error = self.block_has_access_error(child)
+            if context.get('hide_access_error_blocks') and child_has_access_error:
                 continue
             child_block_context = copy(child_context)
             if child in list(child_blocks_to_complete_on_view):
@@ -129,6 +130,23 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.initialize_js('VerticalStudentView')
 
         return fragment
+
+    def block_has_access_error(self, block):
+        """
+        Returns whether has_access_error is True for the given block (itself or any child)
+        """
+        # Check its access attribute (regular question will have it set)
+        has_access_error = getattr(block, 'has_access_error', False)
+        if has_access_error:
+            return True
+
+        # Check child nodes if they exist (e.g. randomized library question aka LibraryContentBlock)
+        for child in block.get_children():
+            has_access_error = getattr(child, 'has_access_error', False)
+            if has_access_error:
+                return True
+            has_access_error = self.block_has_access_error(child)
+        return has_access_error
 
     def student_view(self, context):
         """

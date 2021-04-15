@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 import ddt
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_experience.url_helpers import get_legacy_courseware_url
+from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -176,7 +176,10 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_legacy_courseware_url(self.block_to_be_tested.location)
+                url = get_courseware_url(
+                    self.block_to_be_tested.location,
+                    experience=ExperienceOption.LEGACY,
+                )
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:

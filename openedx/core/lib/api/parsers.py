@@ -71,11 +71,11 @@ class TypedFileUploadParser(FileUploadParser):
                 ext = '.{}'.format(fileparts[1])
             if ext.lower() not in self.file_extensions[media_type]:
                 errmsg = (
-                    u'File extension does not match requested Content-type. '
-                    u'Filename: "{filename}", Content-type: "{contenttype}"'
+                    'File extension does not match requested Content-type. '
+                    'Filename: "{filename}", Content-type: "{contenttype}"'
                 )
                 raise ParseError(errmsg.format(filename=filename, contenttype=media_type))
-        return super(TypedFileUploadParser, self).parse(stream, media_type, parser_context)  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().parse(stream, media_type, parser_context)
 
 
 class MergePatchParser(JSONParser):

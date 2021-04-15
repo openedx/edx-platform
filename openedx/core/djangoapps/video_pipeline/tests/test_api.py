@@ -3,10 +3,10 @@ Tests for Video Pipeline api utils.
 """
 
 import json
+from unittest.mock import Mock, patch
 
 import ddt
 from django.test.testcases import TestCase
-from mock import Mock, patch
 from slumber.exceptions import HttpClientError
 from common.djangoapps.student.tests.factories import UserFactory
 

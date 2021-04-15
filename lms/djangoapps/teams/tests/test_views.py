@@ -24,9 +24,9 @@ from search.search_engine_base import SearchEngine
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.util.testing import EventTestMixin
 from common.test.utils import skip_signal
-from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles

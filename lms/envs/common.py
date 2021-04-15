@@ -65,7 +65,6 @@ CC_MERCHANT_NAME = PLATFORM_NAME
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
-
 ENABLE_JASMINE = False
 
 LMS_ROOT_URL = 'https://localhost:18000'
@@ -195,17 +194,6 @@ FEATURES = {
     # .. toggle_creation_date: 2013-04-13
     'ENABLE_MASQUERADE': True,
 
-    # .. toggle_name: FEATURES['ENABLE_SYSADMIN_DASHBOARD']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: enables dashboard at /syadmin/ for django staff, for seeing overview of system status, for
-    #   deleting and loading courses, for seeing log of git imports of courseware. Note that some views are noopen_edx
-    # .. toggle_use_cases: temporary, open_edx
-    # .. toggle_creation_date: 2013-12-12
-    # .. toggle_target_removal_date: None
-    # .. toggle_warnings: This feature is not supported anymore and should have a target removal date.
-    'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
-
     # .. toggle_name: FEATURES['DISABLE_LOGIN_BUTTON']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -322,6 +310,8 @@ FEATURES = {
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
+    # Settings for course import olx validation
+    'ENABLE_COURSE_OLX_VALIDATION': True,
 
     # .. toggle_name: FEATURES['DISABLE_HONOR_CERTIFICATES']
     # .. toggle_implementation: DjangoSetting
@@ -622,6 +612,17 @@ FEATURES = {
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
 
+    # .. toggle_name: FEATURES['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable custom certificate templates which are configured via Django admin.
+    # .. toggle_warnings: None
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-08-13
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-1044
+    'CUSTOM_CERTIFICATE_TEMPLATES_ENABLED': False,
+
     # .. toggle_name: FEATURES['ENABLE_COURSE_DISCOVERY']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -905,6 +906,18 @@ FEATURES = {
     # .. toggle_creation_date: 2021-01-27
     # .. toggle_tickets: https://openedx.atlassian.net/browse/ENT-4022
     'ALLOW_ADMIN_ENTERPRISE_COURSE_ENROLLMENT_DELETION': False,
+
+    # .. toggle_name: FEATURES['ENABLE_BULK_USER_RETIREMENT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable bulk user retirement through REST API. This is disabled by
+    #   default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2021-03-11
+    # .. toggle_target_removal_date: None
+    # .. toggle_warnings: None
+    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
+    'ENABLE_BULK_USER_RETIREMENT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -956,11 +969,6 @@ COURSES_ROOT = ENV_ROOT / "data"
 NODE_MODULES_ROOT = REPO_ROOT / "node_modules"
 
 DATA_DIR = COURSES_ROOT
-
-# TODO: This path modification exists as temporary support for deprecated import patterns.
-# It will be removed in an upcoming Open edX release.
-# See docs/decisions/0007-sys-path-modification-removal.rst
-sys.path.append(REPO_ROOT / 'import_shims' / 'lms')
 
 # For Node.js
 
@@ -1257,8 +1265,6 @@ DATA_DIR = '/edx/var/edxapp/data'
 #   The banner is only rendered when the switch is activated.
 MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 
-GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
-
 DJFS = {
     'type': 'osfs',
     'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
@@ -1413,6 +1419,7 @@ from xmodule.x_module import XModuleMixin
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_SELECT_FUNCTION
 # .. setting_default: prefer_xmodules
@@ -2833,7 +2840,6 @@ INSTALLED_APPS = [
     'eventtracking.django.apps.EventTrackingConfig',
     'common.djangoapps.util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
-    'lms.djangoapps.dashboard',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'lms.djangoapps.bulk_email',
@@ -3070,6 +3076,9 @@ INSTALLED_APPS = [
 
     # Database-backed Organizations App (http://github.com/edx/edx-organizations)
     'organizations',
+
+    # Bulk User Retirement
+    'lms.djangoapps.bulk_user_retirement',
 
     # management of user-triggered async tasks (course import/export, etc.)
     # This is only used by Studio, but is being added here because the
@@ -3849,6 +3858,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'account_privacy',
         'profile_image',
         'username',
+        "email",
+        "id",
     ],
 }
 
@@ -3879,8 +3890,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] = (
 # The list of account fields that are visible only to staff and users viewing their own profiles
 ACCOUNT_VISIBILITY_CONFIGURATION["admin_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["custom_shareable_fields"] + [
-        "email",
-        "id",
         "extended_profile",
         "gender",
         "state",
@@ -4397,6 +4406,7 @@ RATELIMIT_RATE = '120/m'
 LOGISTRATION_RATELIMIT_RATE = '100/5m'
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '30/5m'
 LOGISTRATION_API_RATELIMIT = '20/m'
+LOGIN_AND_REGISTER_FORM_RATELIMIT = '100/5m'
 RESET_PASSWORD_TOKEN_VALIDATE_API_RATELIMIT = '30/7d'
 RESET_PASSWORD_API_RATELIMIT = '30/7d'
 
@@ -4658,3 +4668,7 @@ LOGO_URL_PNG = None
 LOGO_TRADEMARK_URL = None
 FAVICON_URL = None
 DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
+
+################# Settings for olx validation. #################
+COURSE_OLX_VALIDATION_STAGE = 1
+COURSE_OLX_VALIDATION_IGNORE_LIST = None

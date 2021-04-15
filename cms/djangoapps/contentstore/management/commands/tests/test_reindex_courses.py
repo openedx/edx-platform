@@ -5,7 +5,6 @@ from unittest import mock
 
 import ddt
 from django.core.management import CommandError, call_command
-
 from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

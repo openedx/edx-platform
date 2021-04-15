@@ -7,16 +7,13 @@ import collections
 import functools
 import itertools
 import zlib
+import pickle
 
-import six
 import wrapt
 from django.db.models.signals import post_save, post_delete
 from django.utils.encoding import force_text
 
 from edx_django_utils.cache import RequestCache, TieredCache
-from six import iteritems
-from six.moves import cPickle as pickle
-from six.moves import map
 
 
 def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
@@ -96,19 +93,19 @@ def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     converted_kwargs = list(map(arg_map_function, _sorted_kwargs_list(kwargs)))
 
     cache_keys = [func.__module__, func.__name__] + converted_args + converted_kwargs
-    return u'.'.join(cache_keys)
+    return '.'.join(cache_keys)
 
 
 def _sorted_kwargs_list(kwargs):
     """
     Returns a unique and deterministic ordered list from the given kwargs.
     """
-    sorted_kwargs = sorted(iteritems(kwargs))
+    sorted_kwargs = sorted(kwargs.items())
     sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
     return sorted_kwargs_list
 
 
-class process_cached(object):  # pylint: disable=invalid-name
+class process_cached:  # pylint: disable=invalid-name
     """
     Decorator to cache the result of a function for the life of a process.
 
@@ -174,7 +171,7 @@ class CacheInvalidationManager:
         if model:
             post_save.connect(self.invalidate, sender=model)
             post_delete.connect(self.invalidate, sender=model)
-            namespace = "{}.{}".format(model.__module__, model.__qualname__)
+            namespace = f"{model.__module__}.{model.__qualname__}"
         self.namespace = namespace
         self.cache_time = cache_time
         self.keys = set()
@@ -191,7 +188,7 @@ class CacheInvalidationManager:
         """
         Decorator for functions with no arguments.
         """
-        cache_key = '{}.{}.{}'.format(self.namespace, func.__module__, func.__name__)
+        cache_key = f'{self.namespace}.{func.__module__}.{func.__name__}'
         self.keys.add(cache_key)
 
         @functools.wraps(func)
@@ -212,10 +209,7 @@ def zpickle(data):
 
 def zunpickle(zdata):
     """Given a zlib compressed pickled serialization, returns the deserialized data."""
-    if six.PY2:
-        return pickle.loads(zlib.decompress(zdata))
-    else:
-        return pickle.loads(zlib.decompress(zdata), encoding='latin1')
+    return pickle.loads(zlib.decompress(zdata), encoding='latin1')
 
 
 def get_cache(name):

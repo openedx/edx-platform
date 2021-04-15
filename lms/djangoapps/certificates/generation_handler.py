@@ -24,7 +24,6 @@ from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_c
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.modulestore.django import modulestore
 
@@ -75,7 +74,7 @@ def can_generate_certificate_task(user, course_key):
     """
     if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
         return True
-    elif _is_using_v2_course_certificates(course_key):
+    elif is_using_v2_course_certificates(course_key):
         return True
 
     return False
@@ -94,7 +93,7 @@ def generate_certificate_task(user, course_key, generation_mode=None):
                  f'will be made to generate an allowlist certificate.')
         return generate_allowlist_certificate_task(user, course_key, generation_mode)
 
-    elif _is_using_v2_course_certificates(course_key):
+    elif is_using_v2_course_certificates(course_key):
         log.info(f'{course_key} is using v2 course certificates. Attempt will be made to generate a certificate for '
                  f'user {user.id}.')
         return generate_regular_certificate_task(user, course_key, generation_mode)
@@ -155,7 +154,7 @@ def _can_generate_allowlist_certificate(user, course_key):
                  f'for {user.id}.')
         return False
 
-    if not _is_on_certificate_allowlist(user, course_key):
+    if not is_on_certificate_allowlist(user, course_key):
         log.info(f'{user.id} : {course_key} is not on the certificate allowlist. Allowlist certificate cannot be '
                  f'generated.')
         return False
@@ -176,7 +175,7 @@ def _can_generate_v2_certificate(user, course_key):
     Check if a v2 course certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
     """
-    if not _is_using_v2_course_certificates(course_key):
+    if not is_using_v2_course_certificates(course_key):
         # This course run is not using the v2 course certificate feature
         log.info(f'{course_key} is not using v2 course certificates. Certificate cannot be generated.')
         return False
@@ -209,12 +208,6 @@ def _can_generate_certificate_common(user, course_key):
 
     This method contains checks that are common to both allowlist and V2 regular course certificates.
     """
-    if not auto_certificate_generation_enabled():
-        # Automatic certificate generation is globally disabled
-        log.info(f'Automatic certificate generation is globally disabled. Certificate cannot be generated for '
-                 f'{user.id} : {course_key}.')
-        return False
-
     if CertificateInvalidation.has_certificate_invalidation(user, course_key):
         # The invalidation list prevents certificate generation
         log.info(f'{user.id} : {course_key} is on the certificate invalidation list. Certificate cannot be generated.')
@@ -252,7 +245,7 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
     1) the course run is using the allowlist, and
     2) if the user is on the allowlist for this course run
     """
-    return is_using_certificate_allowlist(course_key) and _is_on_certificate_allowlist(user, course_key)
+    return is_using_certificate_allowlist(course_key) and is_on_certificate_allowlist(user, course_key)
 
 
 def is_using_certificate_allowlist(course_key):
@@ -262,14 +255,14 @@ def is_using_certificate_allowlist(course_key):
     return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
 
 
-def _is_using_v2_course_certificates(course_key):
+def is_using_v2_course_certificates(course_key):
     """
     Return True if the course run is using v2 course certificates
     """
     return CERTIFICATES_USE_UPDATED.is_enabled(course_key)
 
 
-def _is_on_certificate_allowlist(user, course_key):
+def is_on_certificate_allowlist(user, course_key):
     """
     Check if the user is on the allowlist, and is enabled for the allowlist, for this course run
     """

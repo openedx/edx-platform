@@ -16,7 +16,7 @@ class ExpandableField(Field):  # lint-amnesty, pylint: disable=abstract-method
         assert 'collapsed_serializer' in kwargs and 'expanded_serializer' in kwargs
         self.collapsed = kwargs.pop('collapsed_serializer')
         self.expanded = kwargs.pop('expanded_serializer')
-        super(ExpandableField, self).__init__(**kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(**kwargs)
 
     def to_representation(self, obj):  # lint-amnesty, pylint: disable=arguments-differ
         """
@@ -47,8 +47,8 @@ class AbsoluteURLField(URLField):
         request = self.context.get('request', None)
 
         assert request is not None, (
-            u"`%s` requires the request in the serializer  context. "
-            u"Add `context={'request': request}` when instantiating the serializer." % self.__class__.__name__
+            "`%s` requires the request in the serializer  context. "
+            "Add `context={'request': request}` when instantiating the serializer." % self.__class__.__name__
         )
 
         if value.startswith(('http:', 'https:')):

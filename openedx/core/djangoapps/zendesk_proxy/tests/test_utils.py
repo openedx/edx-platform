@@ -6,10 +6,10 @@ Tests of Zendesk interaction utility functions
 import json
 from collections import OrderedDict
 
+from unittest.mock import MagicMock, patch
 from django.test.utils import override_settings
 
 import ddt
-from mock import MagicMock, patch
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.lib.api.test_utils import ApiTestCase
 
@@ -28,7 +28,7 @@ class TestUtils(ApiTestCase):  # lint-amnesty, pylint: disable=missing-class-doc
             'subject': 'Python Unit Test Help Request',
             'body': "Help! I'm trapped in a unit test factory and I can't get out!",
         }
-        return super(TestUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().setUp()
 
     @override_settings(
         ZENDESK_URL=None,

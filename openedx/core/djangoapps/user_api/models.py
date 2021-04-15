@@ -23,15 +23,13 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.lib.cache_utils import request_cached
 # pylint: disable=unused-import
 from common.djangoapps.student.models import (
-    PendingEmailChange,
-    Registration,
-    UserProfile,
     get_retired_email_by_email,
     get_retired_username_by_username
 )
 from common.djangoapps.util.model_utils import (
     emit_settings_changed_event,
     get_changed_fields_dict,
+
 )
 
 

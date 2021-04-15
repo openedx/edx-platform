@@ -36,6 +36,8 @@ class CourseHomeMetadataView(RetrieveAPIView):
         Body consists of the following fields:
 
         course_id: (str) The Course's id (Course Run key)
+        username: (str) The requesting (or masqueraded) user. Returns None for an
+            unauthenticated user.
         is_enrolled: (bool) Indicates if the user is enrolled in the course
         is_self_paced: (bool) Indicates if the course is self paced
         is_staff: (bool) Indicates if the user is staff
@@ -77,6 +79,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
             reset_masquerade_data=True,
         )
 
+        username = request.user.username if request.user.username else None
         course = course_detail(request, request.user.username, course_key)
         user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key_string)
         browser_timezone = request.query_params.get('browser_timezone', None)
@@ -91,6 +94,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
 
         data = {
             'course_id': course.id,
+            'username': username,
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
             'original_user_is_staff': original_user_is_staff,
             'number': course.display_number_with_default,

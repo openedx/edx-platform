@@ -7,7 +7,7 @@ from oauth2_provider.models import Application
 from openedx.core.djangoapps.video_pipeline.models import VEMPipelineIntegration
 
 
-class VideoPipelineMixin(object):
+class VideoPipelineMixin:
     """
     Utility for working with the VEM video pipeline service during testing.
     """

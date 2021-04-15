@@ -692,6 +692,9 @@ class SequenceBlock(
         display_items.  Returns a list of dict objects with information about
         the given display_items.
         """
+        # Avoid circular imports.
+        from openedx.core.lib.xblock_utils import get_icon
+
         render_items = not context.get('exclude_units', False)
         is_user_authenticated = self.is_user_authenticated(context)
         completion_service = self.runtime.service(self, 'completion')
@@ -708,8 +711,7 @@ class SequenceBlock(
         ]
         contents = []
         for item in display_items:
-            # NOTE (CCB): This seems like a hack, but I don't see a better method of determining the type/category.
-            item_type = item.get_icon_class()
+            item_type = get_icon(item)
             usage_id = item.scope_ids.usage_id
 
             show_bookmark_button = False

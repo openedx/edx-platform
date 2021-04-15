@@ -20,7 +20,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import clone_request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from six import text_type, iteritems
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.user_api.accounts import BIO_MAX_LENGTH
@@ -35,11 +34,11 @@ class DeveloperErrorResponseException(Exception):
     Intended to be used with and by DeveloperErrorViewMixin.
     """
     def __init__(self, response):
-        super(DeveloperErrorResponseException, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.response = response
 
 
-class DeveloperErrorViewMixin(object):
+class DeveloperErrorViewMixin:
     """
     A view mixin to handle common error cases other than validation failure
     (auth failure, method not allowed, etc.) by generating an error response
@@ -93,19 +92,19 @@ class DeveloperErrorViewMixin(object):
         elif isinstance(exc, APIException):
             return self._make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):  # lint-amnesty, pylint: disable=consider-merging-isinstance
-            return self._make_error_response(404, text_type(exc) or "Not found.")
+            return self._make_error_response(404, str(exc) or "Not found.")
         elif isinstance(exc, ValidationError):
             return self._make_validation_error_response(exc)
         else:
             raise  # lint-amnesty, pylint: disable=misplaced-bare-raise
 
 
-class ExpandableFieldViewMixin(object):
+class ExpandableFieldViewMixin:
     """A view mixin to add expansion information to the serializer context for later use by an ExpandableField."""
 
     def get_serializer_context(self):
         """Adds expand information from query parameters to the serializer context to support expandable fields."""
-        result = super(ExpandableFieldViewMixin, self).get_serializer_context()  # lint-amnesty, pylint: disable=super-with-arguments
+        result = super().get_serializer_context()
         result['expand'] = [x for x in self.request.query_params.get('expand', '').split(',') if x]
         return result
 
@@ -141,7 +140,7 @@ def clean_errors(error):
     This cursively handles the nesting of errors.
     """
     if isinstance(error, ErrorDetail):
-        return text_type(error)
+        return str(error)
     if isinstance(error, list):
         return [clean_errors(el) for el in error]
     else:
@@ -153,15 +152,15 @@ def add_serializer_errors(serializer, data, field_errors):
     """Adds errors from serializer validation to field_errors. data is the original data to deserialize."""
     if not serializer.is_valid():
         errors = serializer.errors
-        for key, error in iteritems(errors):
+        for key, error in errors.items():
             error = clean_errors(error)
             if key == 'bio':
-                user_message = _(u"The about me field must be at most {} characters long.".format(BIO_MAX_LENGTH))  # lint-amnesty, pylint: disable=translation-of-non-string
+                user_message = _(f"The about me field must be at most {BIO_MAX_LENGTH} characters long.")  # lint-amnesty, pylint: disable=translation-of-non-string
             else:
-                user_message = _(u"This value is invalid.")
+                user_message = _("This value is invalid.")
 
             field_errors[key] = {
-                'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
+                'developer_message': "Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
                 ),
                 'user_message': user_message,
@@ -323,12 +322,12 @@ class LazySequence(Sequence):
 
     def __repr__(self):
         if self._exhausted:
-            return u"LazySequence({!r}, {!r})".format(
+            return "LazySequence({!r}, {!r})".format(
                 self._data,
                 self.est_len,
             )
         else:
-            return u"LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
+            return "LazySequence(itertools.chain({!r}, {!r}), {!r})".format(
                 self._data,
                 self.iterable,
                 self.est_len,
@@ -386,7 +385,7 @@ def require_post_params(required_params):
             request = args[0]
             missing_params = set(required_params) - set(request.POST.keys())
             if missing_params:
-                msg = u"Missing POST parameters: {missing}".format(
+                msg = "Missing POST parameters: {missing}".format(
                     missing=", ".join(missing_params)
                 )
                 return HttpResponseBadRequest(msg)
@@ -426,7 +425,7 @@ def verify_course_exists(view_func):
         if not CourseOverview.course_exists(course_key):
             raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
-                developer_message=u"Requested grade for unknown course {course}".format(course=text_type(course_key)),
+                developer_message="Requested grade for unknown course {course}".format(course=str(course_key)),
                 error_code='course_does_not_exist'
             )
 

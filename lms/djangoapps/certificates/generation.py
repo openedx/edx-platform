@@ -59,14 +59,18 @@ def _generate_certificate(user, course_key):
     """
     Generate a certificate for this user, in this course run.
     """
+    # Retrieve the existing certificate for the learner if it exists
+    existing_certificate = GeneratedCertificate.certificate_for_student(user, course_key)
+
     profile = UserProfile.objects.get(user=user)
     profile_name = profile.name
 
     course = modulestore().get_course(course_key, depth=0)
     course_grade = CourseGradeFactory().read(user, course)
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
-    key = make_hashkey(random.random())
-    uuid = uuid4().hex
+    # Retain the `verify_uuid` from an existing certificate if possible, this will make it possible for the learner to
+    # keep the existing URL to their certificate
+    uuid = getattr(existing_certificate, 'verify_uuid', uuid4().hex)
 
     cert, created = GeneratedCertificate.objects.update_or_create(
         user=user,
@@ -79,8 +83,9 @@ def _generate_certificate(user, course_key):
             'status': CertificateStatuses.downloadable,
             'grade': course_grade.percent,
             'download_url': '',
-            'key': key,
-            'verify_uuid': uuid
+            'key': '',
+            'verify_uuid': uuid,
+            'error_reason': ''
         }
     )
 

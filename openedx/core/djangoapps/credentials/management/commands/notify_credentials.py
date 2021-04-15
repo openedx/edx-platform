@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 import dateutil.parser
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
+from MySQLdb import OperationalError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -29,7 +30,7 @@ from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from lms.djangoapps.certificates.models import CertificateStatuses
-from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
+from openedx.core.djangoapps.credentials.signals import send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
@@ -67,10 +68,24 @@ def paged_query(queryset, delay, page_size):
 
         if delay and page:
             time.sleep(delay)
+
         index = 0
-        for item in subquery.iterator():
-            index += 1
-            yield page_start + index, item
+        try:
+            for item in subquery.iterator():
+                index += 1
+                yield page_start + index, item
+        except OperationalError:
+            # When running the notify_credentials command locally there is an
+            # OperationalError thrown by MySQL when there are no more results
+            # available for the queryset iterator. This change catches that exception,
+            # checks state, and then logs according to that state. This code runs in
+            # production without issue. This changes allows for the code to be run
+            # locally without a separate code path.
+            if index == count:
+                log.info('OperationalError Exception caught, all known results processed in paged_query')
+            else:
+                log.warning('OperationalError Exception caught, it is possible some results were missed')
+            continue
 
 
 class Command(BaseCommand):
@@ -246,6 +261,7 @@ class Command(BaseCommand):
         """ Run actual handler commands for the provided certs and grades. """
 
         course_cert_info = {}
+
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
             if site_config and not site_config.has_org(cert.course_id.org):

@@ -33,7 +33,8 @@ def clear_enterprise_customer_data_consent_share_cache(enterprise_customer_uuid)
     for enrollment in enterprise_course_enrollments:
         clear_data_consent_share_cache(
             enrollment.enterprise_customer_user.user_id,
-            enrollment.course_id
+            enrollment.course_id,
+            enterprise_customer_uuid,
         )
     log.info('Ended Clearing data_sharing_consent_needed cache for enterprise customer {uuid}'.format(
         uuid=enterprise_customer_uuid,

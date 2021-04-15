@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from edx_toggles.toggles.testutils import override_waffle_flag
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG
 from common.djangoapps.student.tests.factories import UserFactory

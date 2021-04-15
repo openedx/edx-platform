@@ -74,7 +74,7 @@ from lms.djangoapps.certificates.models import (
     CertificateStatuses
 )
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.courses import get_course_by_id, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_course_discussion_settings,
@@ -114,6 +114,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
 from .. import permissions

@@ -1,12 +1,12 @@
 """
 Logistration API View Tests
 """
+from unittest.mock import patch
+from urllib.parse import urlencode
 import ddt
 from django.conf import settings
 from django.urls import reverse
-from mock import patch
 from rest_framework.test import APITestCase
-from six.moves.urllib.parse import urlencode
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.third_party_auth import pipeline
@@ -24,7 +24,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Test Setup
         """
-        super(TPAContextViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.url = reverse('third_party_auth_context')
         self.query_params = {'next': '/dashboard'}
@@ -42,7 +42,7 @@ class TPAContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         Construct the login URL to start third party authentication
         """
-        return u'{url}?auth_entry={auth_entry}&{param_str}'.format(
+        return '{url}?auth_entry={auth_entry}&{param_str}'.format(
             url=reverse('social:begin', kwargs={'backend': backend_name}),
             auth_entry=auth_entry,
             param_str=urlencode(params)

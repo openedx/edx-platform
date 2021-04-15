@@ -15,7 +15,8 @@ from lms.djangoapps.certificates.api import (
     can_generate_certificate_task,
     generate_certificate_task,
     generate_user_certificates,
-    get_allowlisted_users
+    get_allowlisted_users,
+    is_using_v2_course_certificates,
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
@@ -140,27 +141,33 @@ def _invalidate_generated_certificates(course_id, enrolled_students, certificate
     Invalidate generated certificates for all enrolled students in the given course having status in
     'certificate_statuses', if the student is not on the course's allowlist.
 
-    Generated Certificates are invalidated by marking its status 'unavailable' and updating verify_uuid, download_uuid,
+    Generated Certificates are invalidated by marking its status 'unavailable' and updating error_reason, download_uuid,
     download_url and grade with empty string.
+
+    If V2 of Course Certificates is enabled for this course-run, this step will be skipped.
 
     :param course_id: Course Key for the course whose generated certificates need to be removed
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(
-        user__in=enrolled_students,
-        course_id=course_id,
-        status__in=certificate_statuses,
-    )
+    if is_using_v2_course_certificates(course_id):
+        log.info(f"Course {course_id} is using V2 certificates. Skipping certificate invalidation step of bulk "
+                 "regeneration.")
+    else:
+        certificates = GeneratedCertificate.objects.filter(
+            user__in=enrolled_students,
+            course_id=course_id,
+            status__in=certificate_statuses,
+        )
 
-    allowlisted_users = get_allowlisted_users(course_id)
+        allowlisted_users = get_allowlisted_users(course_id)
 
-    # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order to
-    # save a history of the change.
-    for c in certificates:
-        if c.user in allowlisted_users:
-            log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist for '
-                     f'course {course_id}')
-        else:
-            log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
-            c.invalidate()
+        # Invalidate each cert that is not allowlisted. We loop over the certs and invalidate each individually in order
+        # to save a history of the change.
+        for c in certificates:
+            if c.user in allowlisted_users:
+                log.info(f'Certificate for user {c.user.id} will not be invalidated because they are on the allowlist '
+                         f'for course {course_id}')
+            else:
+                log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
+                c.invalidate()

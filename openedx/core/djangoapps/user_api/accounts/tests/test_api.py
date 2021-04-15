@@ -119,20 +119,20 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         config = {
             "default_visibility": "private",
             "public_fields": [
-                'email', 'name',
+                'gender', 'name',
             ],
         }
 
-        # With default configuration settings, email is not shared with other (non-staff) users.
+        # With default configuration settings, gender is not shared with other (non-staff) users.
         account_settings = get_account_settings(self.default_request, [self.different_user.username])[0]
-        assert 'email' not in account_settings
+        assert 'gender' not in account_settings
 
         account_settings = get_account_settings(
             self.default_request,
             [self.different_user.username],
             configuration=config,
         )[0]
-        assert self.different_user.email == account_settings['email']
+        assert self.different_user.profile.gender == account_settings['gender']
 
     def test_get_user_not_found(self):
         """Test that UserNotFound is thrown if there is no user with username."""
@@ -272,7 +272,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
             mock_customer.return_value.update({
                 'uuid': 'real-ent-uuid',
                 'name': 'Dummy Enterprise',
-                'identity_provider': 'saml-ubc'
+                'identity_provider': 'saml-ubc',
+                'identity_providers': [
+                    {
+                        "provider_id": "saml-ubc",
+                    }
+                ],
             })
         mock_auth_provider.return_value.sync_learner_profile_data = is_synch_learner_profile_data
         mock_auth_provider.return_value.backend_name = idp_backend_name

@@ -263,7 +263,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         # cache is working fine
         assert not consent_needed_for_course(request, user, course_id)
         # Removing cache
-        clear_data_consent_share_cache(user.id, course_id)
+        clear_data_consent_share_cache(user.id, course_id, ec_uuid)
         # Now test again
         assert consent_needed_for_course(request, user, course_id)
 
@@ -272,7 +272,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         assert not consent_needed_for_course(request, user, course_id)
 
         # test when the enrollment already exists without a consent record existing.
-        clear_data_consent_share_cache(user.id, course_id)
+        clear_data_consent_share_cache(user.id, course_id, ec_uuid)
         self.mock_consent_missing(user.username, course_id, ec_uuid)
         assert not consent_needed_for_course(request, user, course_id, enrollment_exists=True)
 

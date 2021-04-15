@@ -19,24 +19,24 @@ class ZendeskProxyConfig(AppConfig):
     plugin_app = {
         PluginURLs.CONFIG: {
             ProjectType.CMS: {
-                PluginURLs.NAMESPACE: u'',
+                PluginURLs.NAMESPACE: '',
                 PluginURLs.REGEX: r'^zendesk_proxy/',
-                PluginURLs.RELATIVE_PATH: u'urls',
+                PluginURLs.RELATIVE_PATH: 'urls',
             },
             ProjectType.LMS: {
-                PluginURLs.NAMESPACE: u'',
+                PluginURLs.NAMESPACE: '',
                 PluginURLs.REGEX: r'^zendesk_proxy/',
-                PluginURLs.RELATIVE_PATH: u'urls',
+                PluginURLs.RELATIVE_PATH: 'urls',
             }
         },
         PluginSettings.CONFIG: {
             ProjectType.CMS: {
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
             },
             ProjectType.LMS: {
-                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: u'settings.production'},
+                SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: 'settings.common'},
+                SettingsType.PRODUCTION: {PluginSettings.RELATIVE_PATH: 'settings.production'},
             }
         }
     }

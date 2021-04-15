@@ -2,14 +2,13 @@
 
 
 import json
+from unittest.mock import Mock, patch
 
 import ddt
-import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.client import Client
-from mock import Mock, patch
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment, UserProfile, anonymous_id_for_user
@@ -51,7 +50,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         # of the UrlResetMixin)
 
         self.CREATE_USER = False  # no need to add a user from modulestore setup
-        super(AutoAuthEnabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -148,7 +147,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
     @ddt.unpack
     def test_set_roles(self, course_id, course_key):
         seed_permissions_roles(course_key)
-        course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_key))
+        course_roles = {r.name: r for r in Role.objects.filter(course_id=course_key)}
         assert len(course_roles) == 5
         # sanity check
 
@@ -163,13 +162,13 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         self._auto_auth({'username': 'a_moderator', 'course_id': course_id, 'roles': 'Moderator'})
         user = User.objects.get(username='a_moderator')
         user_roles = user.roles.all()
-        assert set(user_roles) == set([course_roles[FORUM_ROLE_STUDENT], course_roles[FORUM_ROLE_MODERATOR]])
+        assert set(user_roles) == {course_roles[FORUM_ROLE_STUDENT], course_roles[FORUM_ROLE_MODERATOR]}
 
         # check multiple roles work.
         self.client.logout()
         self._auto_auth({
             'username': 'an_admin', 'course_id': course_id,
-            'roles': '{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
+            'roles': f'{FORUM_ROLE_MODERATOR},{FORUM_ROLE_ADMINISTRATOR}'
         })
         user = User.objects.get(username='an_admin')
         user_roles = user.roles.all()
@@ -211,7 +210,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         if settings.ROOT_URLCONF == 'lms.urls':
             url_pattern = '/course/'
         else:
-            url_pattern = '/course/{}'.format(six.text_type(course_key))
+            url_pattern = '/course/{}'.format(str(course_key))
 
         assert response.url.endswith(url_pattern)
 
@@ -306,7 +305,7 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthDisabledTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = '/auto_auth'
         self.client = Client()
 
@@ -330,7 +329,7 @@ class AutoAuthRestrictedTestCase(AutoAuthTestCase):
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-        super(AutoAuthRestrictedTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = '/auto_auth'
         self.client = Client()
 

@@ -1,7 +1,4 @@
 """ Tests for OAuth Dispatch's jwt module. """
-
-
-import itertools  # lint-amnesty, pylint: disable=unused-import
 from datetime import timedelta
 from unittest.mock import patch
 

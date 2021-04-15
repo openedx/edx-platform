@@ -25,7 +25,6 @@ from lms.djangoapps.courseware.courses import (
     get_cms_course_link,
     get_course_about_section,
     get_course_assignments,
-    get_course_by_id,
     get_course_chapter_ids,
     get_course_info_section,
     get_course_overview_with_access,
@@ -38,6 +37,7 @@ from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore

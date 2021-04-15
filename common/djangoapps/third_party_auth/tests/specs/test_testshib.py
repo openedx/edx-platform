@@ -163,8 +163,10 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
 
     @patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     @patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
+    @patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_full_pipeline_succeeds_for_unlinking_testshib_account(
         self,
+        mock_auth_provider,
         mock_enterprise_customer_for_request_settings_view,
         mock_enterprise_customer_for_request,
     ):
@@ -197,7 +199,13 @@ class TestShibIntegrationTest(SamlIntegrationTestUtilities, IntegrationTestMixin
             'uuid': enterprise_customer.uuid,
             'name': enterprise_customer.name,
             'identity_provider': 'saml-default',
+            'identity_providers': [
+                {
+                    "provider_id": "saml-default",
+                }
+            ],
         }
+        mock_auth_provider.return_value.backend_name = 'tpa-saml'
         mock_enterprise_customer_for_request.return_value = enterprise_customer_data
         mock_enterprise_customer_for_request_settings_view.return_value = enterprise_customer_data
 

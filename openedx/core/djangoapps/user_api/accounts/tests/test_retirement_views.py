@@ -197,7 +197,7 @@ class TestDeactivateLogout(RetirementTestCase):
     def build_post(self, password):
         return {'password': password}
 
-    @mock.patch('openedx.core.djangoapps.user_api.accounts.views.retire_dot_oauth2_models')
+    @mock.patch('openedx.core.djangoapps.user_api.accounts.utils.retire_dot_oauth2_models')
     def test_user_can_deactivate_self(self, mock_retire_dot):
         """
         Verify a user calling the deactivation endpoint logs out the user, deletes all their SSO tokens,

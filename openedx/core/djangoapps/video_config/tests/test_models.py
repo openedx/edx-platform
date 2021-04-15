@@ -38,7 +38,7 @@ def video_feature_flags(
     yield
 
 
-class FeatureFlagTestMixin(object):
+class FeatureFlagTestMixin:
     """
     Adds util methods to test the behavior of the flags for video feature.
     """

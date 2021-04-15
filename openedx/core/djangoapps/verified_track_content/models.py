@@ -4,7 +4,6 @@ Models for verified track selections.
 
 
 import logging
-import six
 
 from config_models.models import ConfigurationModel
 from django.db import models
@@ -15,7 +14,6 @@ from django.utils.translation import ugettext_lazy
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 
-from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.djangoapps.course_groups.cohorts import (
     CourseCohort,
     get_course_cohorts,
@@ -24,11 +22,12 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
-DEFAULT_VERIFIED_COHORT_NAME = u"Verified Learners"
+DEFAULT_VERIFIED_COHORT_NAME = "Verified Learners"
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -43,7 +42,7 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
 
     if verified_cohort_enabled and (instance.mode != instance._old_mode):  # pylint: disable=protected-access
         if not is_course_cohorted(course_key):
-            log.error(u"Automatic verified cohorting enabled for course '%s', but course is not cohorted.", course_key)
+            log.error("Automatic verified cohorting enabled for course '%s', but course is not cohorted.", course_key)
         else:
             course = get_course_by_id(course_key)
             existing_manual_cohorts = get_course_cohorts(course, assignment_type=CourseCohort.MANUAL)
@@ -53,14 +52,14 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                 # cohort yet exist.
                 random_cohort = get_random_cohort(course_key)
                 args = {
-                    'course_id': six.text_type(course_key),
+                    'course_id': str(course_key),
                     'user_id': instance.user.id,
                     'verified_cohort_name': verified_cohort_name,
                     'default_cohort_name': random_cohort.name
                 }
                 log.info(
-                    u"Queuing automatic cohorting for user '%s' in course '%s' "
-                    u"due to change in enrollment mode from '%s' to '%s'.",
+                    "Queuing automatic cohorting for user '%s' in course '%s' "
+                    "due to change in enrollment mode from '%s' to '%s'.",
                     instance.user.id, course_key, instance._old_mode, instance.mode  # pylint: disable=protected-access
                 )
 
@@ -74,8 +73,8 @@ def move_to_verified_cohort(sender, instance, **kwargs):  # pylint: disable=unus
                 sync_cohort_with_mode.apply_async(kwargs=args, countdown=300)
             else:
                 log.error(
-                    u"Automatic verified cohorting enabled for course '%s', "
-                    u"but verified cohort named '%s' does not exist.",
+                    "Automatic verified cohorting enabled for course '%s', "
+                    "but verified cohort named '%s' does not exist.",
                     course_key,
                     verified_cohort_name,
                 )
@@ -102,17 +101,17 @@ class VerifiedTrackCohortedCourse(models.Model):
     """
     course_key = CourseKeyField(
         max_length=255, db_index=True, unique=True,
-        help_text=ugettext_lazy(u"The course key for the course we would like to be auto-cohorted.")
+        help_text=ugettext_lazy("The course key for the course we would like to be auto-cohorted.")
     )
 
     verified_cohort_name = models.CharField(max_length=100, default=DEFAULT_VERIFIED_COHORT_NAME)
 
     enabled = models.BooleanField()
 
-    CACHE_NAMESPACE = u"verified_track_content.VerifiedTrackCohortedCourse.cache."
+    CACHE_NAMESPACE = "verified_track_content.VerifiedTrackCohortedCourse.cache."
 
     def __str__(self):
-        return u"Course: {}, enabled: {}".format(six.text_type(self.course_key), self.enabled)
+        return "Course: {}, enabled: {}".format(str(self.course_key), self.enabled)
 
     @classmethod
     def verified_cohort_name_for_course(cls, course_key):
@@ -164,21 +163,21 @@ class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
 
     .. no_pii:
     """
-    class Meta(object):
+    class Meta:
         app_label = "verified_track_content"
 
     old_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text=u"Course key for which to migrate verified track cohorts from"
+        help_text="Course key for which to migrate verified track cohorts from"
     )
     rerun_course_key = CourseKeyField(
         max_length=255,
         blank=False,
-        help_text=u"Course key for which to migrate verified track cohorts to enrollment tracks to"
+        help_text="Course key for which to migrate verified track cohorts to enrollment tracks to"
     )
     audit_cohort_names = models.TextField(
-        help_text=u"Comma-separated list of audit cohort names"
+        help_text="Comma-separated list of audit cohort names"
     )
 
     @classmethod

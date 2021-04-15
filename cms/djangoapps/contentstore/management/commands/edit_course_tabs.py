@@ -13,7 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
 from cms.djangoapps.contentstore.views import tabs
-from lms.djangoapps.courseware.courses import get_course_by_id
+from openedx.core.lib.courses import get_course_by_id
 
 from .prompt import query_yes_no
 

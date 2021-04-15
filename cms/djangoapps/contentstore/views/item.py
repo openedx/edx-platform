@@ -1,6 +1,5 @@
 """Views for items (modules)."""
 
-
 import logging
 from collections import OrderedDict
 from datetime import datetime

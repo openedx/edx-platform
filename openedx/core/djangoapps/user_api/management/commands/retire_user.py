@@ -1,7 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 
-from django.contrib.auth import get_user_model, logout  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth import get_user_model  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction

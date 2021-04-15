@@ -34,7 +34,6 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
@@ -48,12 +47,10 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
-    CourseEnrollment,
     CourseEnrollmentAllowed,
     LoginFailures,
     ManualEnrollmentAudit,
@@ -81,6 +78,7 @@ from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
+from .utils import create_retirement_request_and_deactivate_account
 
 try:
     from coaching.api import has_ever_consented_to_coaching
@@ -130,8 +128,8 @@ class AccountViewSet(ViewSet):
         **Example Requests**
 
             GET /api/user/v1/me[?view=shared]
-            GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
-            GET /api/user/v1/accounts?email={user_email}
+            GET /api/user/v1/accounts?usernames={username1},{username2}[?view=shared]
+            GET /api/user/v1/accounts?email={user_email1},{user_email2}
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
@@ -292,22 +290,20 @@ class AccountViewSet(ViewSet):
 
     def list(self, request):
         """
-        GET /api/user/v1/accounts?username={username1,username2}
-        GET /api/user/v1/accounts?email={user_email}
+        GET /api/user/v1/accounts?username={username1},{username2}
+        GET /api/user/v1/accounts?email={user_email1},{user_email2}
         """
         usernames = request.GET.get('username')
-        user_email = request.GET.get('email')
+        user_emails = request.GET.get('email')
         search_usernames = []
 
         if usernames:
             search_usernames = usernames.strip(',').split(',')
-        elif user_email:
-            user_email = user_email.strip('')
-            try:
-                user = User.objects.get(email=user_email)
-            except (UserNotFound, User.DoesNotExist):
+        elif user_emails:
+            user_emails = user_emails.strip(',').split(',')
+            search_usernames = User.objects.filter(email__in=user_emails).values_list('username')
+            if not search_usernames:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            search_usernames = [user.username]
         try:
             account_settings = get_account_settings(
                 request, search_usernames, view=request.query_params.get('view'))
@@ -426,23 +422,8 @@ class DeactivateLogoutView(APIView):
             if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
                 return verify_user_password_response
             with transaction.atomic():
-                # Add user to retirement queue.
-                UserRetirementStatus.create_retirement(request.user)
-                # Unlink LMS social auth accounts
-                UserSocialAuth.objects.filter(user_id=request.user.id).delete()
-                # Change LMS password & email
                 user_email = request.user.email
-                request.user.email = get_retired_email_by_email(request.user.email)
-                request.user.save()
-                _set_unusable_password(request.user)
-
-                # TODO: Unlink social accounts & change password on each IDA.
-                # Remove the activation keys sent by email to the user for account activation.
-                Registration.objects.filter(user=request.user).delete()
-
-                # Delete OAuth tokens associated with the user.
-                retire_dot_oauth2_models(request.user)
-                AccountRecovery.retire_recovery_email(request.user.id)
+                create_retirement_request_and_deactivate_account(request.user)
 
                 try:
                     # Send notification email to user

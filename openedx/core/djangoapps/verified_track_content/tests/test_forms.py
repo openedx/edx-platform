@@ -2,8 +2,6 @@
 Test for forms helpers.
 """
 
-import six
-
 from openedx.core.djangoapps.verified_track_content.forms import VerifiedTrackCourseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -19,12 +17,12 @@ class TestVerifiedTrackCourseForm(SharedModuleStoreTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestVerifiedTrackCourseForm, cls).setUpClass()
+        super().setUpClass()
         cls.course = CourseFactory.create()
 
     def test_form_validation_success(self):
         form_data = {
-            'course_key': six.text_type(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
+            'course_key': str(self.course.id), 'verified_cohort_name': 'Verified Learners', 'enabled': True
         }
         form = VerifiedTrackCourseForm(data=form_data)
         assert form.is_valid()
