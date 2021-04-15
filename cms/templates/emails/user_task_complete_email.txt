@@ -28,5 +28,5 @@ ${_("Warnings: ")} (${len(warnings)})
 % for index, warning in enumerate(warnings, start=1):
   ${index}.  ${warning}
 % endfor
-%endif
+% endif
 % endif
