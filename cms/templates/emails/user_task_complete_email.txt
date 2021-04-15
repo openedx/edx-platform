@@ -1,5 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-
 % if detail_url:
 
 ${_("Your {task_name} task has completed with the status '{task_status}'. Use this URL to view task details or download any files created: {detail_url}").format(task_name=task_name, task_status=task_status, detail_url=detail_url)}
@@ -11,17 +10,23 @@ ${_("Your {task_name} task has completed with the status '{task_status}'. Sign i
 % endif
 
 % if olx_validation_errors:
-
+<%
+    warnings = olx_validation_errors.get('warnings')
+    errors = olx_validation_errors.get('errors')
+%>
 ${_("Here are some validations we found with your course content.")}
 
-${_("Errors:")}
-% for error in olx_validation_errors.get('errors'):
-  * ${error}
+% if errors:
+${_("Errors: ")} ${len(errors)}
+% for index, error in enumerate(errors, start=1):
+  ${index}.  ${error}
 % endfor
+% endif
 
-${_("Warnings:")}
-% for warning in olx_validation_errors.get('warnings'):
-  * ${warning}
+% if warnings:
+${_("Warnings: ")} ${len(warnings)}
+% for warning in enumerate(warnings, start=1):
+  ${index}.  ${warning}
 % endfor
-
+%endif
 % endif
