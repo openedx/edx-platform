@@ -31,7 +31,7 @@ var edx = edx || {};
                     type: 'hidden',
                     name: key,
                     value: value
-                }).appendTo(form);
+                }).appendTo(form); // xss-lint: disable=javascript-jquery-insert-into-target
             });
         };
 
@@ -98,7 +98,7 @@ var edx = edx || {};
             */
             render: function() {
                 var html = _.template($('#donation-tpl').html())({});
-                this.$el.html(html);
+                this.$el.html(html); // xss-lint: disable=javascript-jquery-html
                 this.$amount = $('input[name="amount"]', this.$el);
                 this.$submit = $('.action-donate', this.$el);
                 this.$errorMsg = $('.donation-error-msg', this.$el);
