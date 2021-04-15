@@ -18,13 +18,16 @@ import sys
 from datetime import datetime, timedelta
 import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
-from MySQLdb import OperationalError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
+from openedx.core.djangoapps.catalog.api import (
+    get_programs_from_cache_by_uuid,
+    get_course_run_key_for_program_from_cache,
+)
 
 log = logging.getLogger(__name__)
 
@@ -80,6 +83,11 @@ class Command(BaseCommand):
             '--courses',
             nargs='+',
             help='Send information only for specific courses.',
+        )
+        parser.add_argument(
+            '--program_uuids',
+            nargs='+',
+            help='Send information only for all courses in these programs.',
         )
         parser.add_argument(
             '--start-date',
@@ -164,11 +172,35 @@ class Command(BaseCommand):
             'auto' if options['auto'] else 'manual',
         )
 
-        course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
+        program_course_run_keys = self._get_course_run_keys_for_programs(options["program_uuids"])
+
+        courses = options["courses"]
+        if not courses:
+            courses = []
+        if program_course_run_keys:
+            courses.extend(program_course_run_keys)
+
+        course_keys = self.get_course_keys(courses)
+        if not (
+            course_keys or
+            program_course_run_keys or
+            options['start_date'] or
+            options['end_date'] or
+            options['user_ids']
+        ):
+            raise CommandError(
+                'You must specify a filter (e.g. --courses, --program_uuids, --start-date, or --user_ids)'
+            )
 
         handle_notify_credentials.delay(options, course_keys)
+
+    def _get_course_run_keys_for_programs(self, uuids):
+        program_course_run_keys = []
+        if uuids:
+            programs = get_programs_from_cache_by_uuid(uuids=uuids)
+            for program in programs:
+                program_course_run_keys.extend(get_course_run_key_for_program_from_cache(program))
+        return program_course_run_keys
 
     def get_course_keys(self, courses=None):
         """
