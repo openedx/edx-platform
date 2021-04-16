@@ -7,11 +7,12 @@ from lti_consumer.models import LtiConfiguration
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from rest_framework import serializers
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.lib.api.permissions import IsStaff
 
 from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
@@ -28,6 +29,27 @@ PROVIDER_FEATURE_MAP = {
         'lti',
     ],
 }
+
+
+class IsStaff(BasePermission):
+    """
+    Check if user is global or course staff
+
+    We create our own copy of this because other versions of this check
+    allow access to additional user roles.
+    """
+    def has_permission(self, request, view):
+        """
+        Check if user has global or course staff permission
+        """
+        user = request.user
+        if user.is_staff:
+            return True
+        course_key_string = view.kwargs.get('course_key_string')
+        course_key = _validate_course_key(course_key_string)
+        return CourseStaffRole(
+            course_key,
+        ).has_user(request.user)
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -170,7 +192,7 @@ class DiscussionsConfigurationView(APIView):
         """
         Handle HTTP/GET requests
         """
-        course_key = self._validate_course_key(course_key_string)
+        course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = self.Serializer(configuration)
         return Response(serializer.data)
@@ -181,25 +203,26 @@ class DiscussionsConfigurationView(APIView):
 
         TODO: Should we cleanup orphaned LTI config when swapping to cs_comments_service?
         """
-        course_key = self._validate_course_key(course_key_string)
+        course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = self.Serializer(configuration, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data)
 
-    def _validate_course_key(self, course_key_string: str) -> CourseKey:
-        """
-        Validate and parse a course_key string, if supported
-        """
-        try:
-            course_key = CourseKey.from_string(course_key_string)
-        except InvalidKeyError as error:
-            raise serializers.ValidationError(
-                f"{course_key_string} is not a valid CourseKey"
-            ) from error
-        if course_key.deprecated:
-            raise serializers.ValidationError(
-                'Deprecated CourseKeys (Org/Course/Run) are not supported.'
-            )
-        return course_key
+
+def _validate_course_key(course_key_string: str) -> CourseKey:
+    """
+    Validate and parse a course_key string, if supported
+    """
+    try:
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError as error:
+        raise serializers.ValidationError(
+            f"{course_key_string} is not a valid CourseKey"
+        ) from error
+    if course_key.deprecated:
+        raise serializers.ValidationError(
+            'Deprecated CourseKeys (Org/Course/Run) are not supported.'
+        )
+    return course_key
