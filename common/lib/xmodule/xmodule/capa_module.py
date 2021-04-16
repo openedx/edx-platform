@@ -1,4 +1,6 @@
-"""Implements basics of Capa, including class CapaModule."""
+"""
+Implements the Problem XBlock, which is built on top of the CAPA subsystem.
+"""
 
 import copy
 import datetime
@@ -126,7 +128,20 @@ class ProblemBlock(
     XModuleMixin,
 ):
     """
-    An XBlock for CAPA.
+    An XBlock representing a "problem".
+
+    A problem contains zero or more respondable items, such as multiple choice,
+    numeric response, true/false, etc. See common/lib/capa/capa/responsetypes.py
+    for the full ensemble.
+
+    The rendering logic of a problem is largely encapsulated within
+    LoncapaProblem, LoncapaSystem and related classes. This block serves to
+    host the Loncapa system within the XBlock runtime and connect it to the
+    greater LMS/CMS.
+
+    As historical context: the acronym LON-CAPA references the "Learning
+    Online - Computer-Assisted Personalized Approach" LMS, from which this
+    system is inspired.
     """
     INDEX_CONTENT_TYPE = 'CAPA'
 
