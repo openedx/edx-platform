@@ -109,6 +109,9 @@ class InvalidBranchSetting(Exception):
 
 
 class CourseImportException(Exception):
+    """
+    Base exception for course import raised when course import fails
+    """
     def __init__(self, args, kwargs):
         super().__init__(args, kwargs)
 
