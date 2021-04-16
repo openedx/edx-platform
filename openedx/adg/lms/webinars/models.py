@@ -143,6 +143,8 @@ class WebinarRegistration(TimeStampedModel):
         User, verbose_name=_('Registered User'), on_delete=models.CASCADE, related_name='webinar_registrations',
     )
     is_registered = models.BooleanField(verbose_name=_('Registered'), )
+    starting_soon_mandrill_reminder_id = models.CharField(default='', max_length=255)
+    week_before_mandrill_reminder_id = models.CharField(default='', max_length=255)
 
     class Meta:
         app_label = 'webinars'

@@ -93,6 +93,15 @@ class WebinarRegistrationAdmin(admin.ModelAdmin):
     list_display = ('webinar', 'user', 'is_registered',)
     search_fields = ('webinar',)
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 admin.site.register(Webinar, WebinarAdmin)
 adg_admin_site.register(Webinar, WebinarAdmin)

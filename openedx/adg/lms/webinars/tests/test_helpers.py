@@ -25,7 +25,7 @@ def test_send_webinar_emails(mocker):
     mocked_task_send_mandrill_email = mocker.patch('openedx.adg.lms.webinars.helpers.task_send_mandrill_email')
 
     webinar = WebinarFactory()
-    send_webinar_emails("test_slug", webinar.title, webinar.description, webinar.start_time, "t1@eg.com")
+    send_webinar_emails("test_slug", webinar.id, webinar.title, webinar.description, webinar.start_time, "t1@eg.com")
 
     expected_context = {
         'webinar_title': webinar.title,

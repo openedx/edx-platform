@@ -11,7 +11,9 @@ from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.detail import SingleObjectMixin
 
-from .helpers import send_webinar_registration_email
+from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_email
+
+from .helpers import schedule_webinar_reminders, send_webinar_registration_email
 from .models import Webinar, WebinarRegistration
 
 
@@ -56,7 +58,12 @@ class WebinarRegistrationView(LoginRequiredMixin, SingleObjectMixin, View):
             WebinarRegistration.objects.update_or_create(
                 webinar=self.object, user=user, defaults={'is_registered': is_registering}
             )
-            # pylint: disable=expression-not-assigned
-            send_webinar_registration_email(self.object, user.email) if is_registering else None
+            if is_registering:
+                send_webinar_registration_email(self.object, user.email)
+                schedule_webinar_reminders(user.email, self.object)
+            else:
+                registration = WebinarRegistration.objects.get(webinar=self.object, user=user)
+                task_cancel_mandrill_email.delay(registration.starting_soon_mandrill_reminder_id)
+                task_cancel_mandrill_email.delay(registration.week_before_mandrill_reminder_id)
 
         return redirect(reverse('webinar_event', kwargs={'pk': pk}))
