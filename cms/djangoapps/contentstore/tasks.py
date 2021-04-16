@@ -5,13 +5,13 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
-import pkg_resources
 import shutil
 import tarfile
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
 import olxcleaner
+import pkg_resources
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -58,12 +58,13 @@ from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, InvalidProctoringProvider
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 import cms.djangoapps.contentstore.errors as UserErrors
 from .outlines import update_outline_from_modulestore
 from .utils import course_import_olx_validation_is_enabled
+from .toggles import bypass_olx_failure_enabled
 
 User = get_user_model()
 
@@ -694,22 +695,21 @@ def validate_course_olx(courselike_key, course_dir, status):
             allowed_xblocks=ALL_ALLOWED_XBLOCKS
         )
     except Exception:  # pylint: disable=broad-except
-        LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
+        LOGGER.exception(f'{log_prefix}: CourseOlx could not be validated')
         return olx_is_valid
-
-    log_errors = len(errorstore.errors) > 0
-    if log_errors:
-        log_errors_to_artifact(errorstore, status)
 
     has_errors = errorstore.return_error(ErrorLevel.ERROR.value)
     if not has_errors:
         return olx_is_valid
 
-    LOGGER.error(f'{log_prefix}: CourseOlx validation failed')
+    LOGGER.error(f'{log_prefix}: CourseOlx validation failed.')
+    log_errors_to_artifact(errorstore, status)
 
-    # TODO: Do not fail the task until we have some data about kinds of
-    #  olx validation failures. TNL-8151
-    return olx_is_valid
+    if bypass_olx_failure_enabled():
+        return olx_is_valid
+
+    status.fail(UserErrors.OLX_VALIDATION_FAILED)
+    return False
 
 
 def log_errors_to_artifact(errorstore, status):
