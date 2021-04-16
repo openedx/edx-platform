@@ -1,0 +1,42 @@
+name: edx-platform tests
+
+on:
+  push:
+    branches:
+      - "appsembler/tahoe/develop"
+      - "appsembler/tahoe/master"
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+    strategy:
+      matrix:
+        python-version: [2.7]
+        tox-env:
+          - pep8
+          - py-common
+          - py-lms-1
+          - py-lms-2
+          - py-mte
+          - py-studio
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} ${{ matrix.tox-env }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      # TODO: Remove tox-pip-version once we upgrade to Koa+, or whenever we have addressed pip 20.3 strict issues.
+      run: |
+        sudo apt-get install -y python-dev libxml2-dev libxmlsec1-dev
+        pip install tox tox-pip-version
+    - name: Run tox
+      run: |
+        tox -e ${{ matrix.tox-env }}
