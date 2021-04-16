@@ -21,11 +21,14 @@ import os
 os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
 
 import random2 as random_module
+from random import SystemRandom
 import sys
 from six.moves import xrange
 
 random = random_module.Random(%r)
 random.Random = random_module.Random
+# numpy needs SystemRandom
+random.SystemRandom = SystemRandom
 sys.modules['random'] = random
 """
 

@@ -387,3 +387,18 @@ class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         g = {}
         safe_exec(code, g)
         assert 'aVAP' in g
+
+    def test_matplot(self):
+        code = textwrap.dedent("""\
+            import matplotlib.pyplot as plt
+            import numpy as np
+
+            xpoints = np.array([0, 6])
+            ypoints = np.array([0, 250])
+
+            plt.plot(xpoints, ypoints)
+            plotted = plt.show()
+            """)
+        g = {}
+        safe_exec(code, g)
+        assert 'plotted' in g
