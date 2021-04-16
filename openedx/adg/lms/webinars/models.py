@@ -146,6 +146,7 @@ class WebinarRegistration(TimeStampedModel):
 
     class Meta:
         app_label = 'webinars'
+        unique_together = ('webinar', 'user')
 
     def __str__(self):
         return f'User {self.user}, webinar {self.webinar}'

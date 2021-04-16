@@ -29,6 +29,7 @@ class MandrillClient(object):
     APPLICATION_WAITLISTED = 'adg-waitlisted-application'
     APPLICATION_ACCEPTED = 'adg-application-accepted'
     WEBINAR_CANCELLATION = 'adg-cancellation-email'
+    WEBINAR_REGISTRATION_CONFIRMATION = 'adg-webinar-confirmation'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
