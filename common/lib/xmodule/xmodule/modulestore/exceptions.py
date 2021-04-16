@@ -108,7 +108,12 @@ class InvalidBranchSetting(Exception):
         self.actual_setting = actual_setting
 
 
-class InvalidProctoringProvider(Exception):
+class CourseImportException(Exception):
+    def __init__(self, args, kwargs):
+        super().__init__(args, kwargs)
+
+
+class InvalidProctoringProvider(CourseImportException):
     """
     Error with selected proctoring provider raised when the provided is unknown.
     """
