@@ -139,10 +139,66 @@ class ComplexEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class CapaFields:
+@XBlock.wants('user')
+@XBlock.needs('i18n')
+@XBlock.wants('call_to_action')
+class ProblemBlock(
+        ScorableXBlockMixin, RawMixin, XmlMixin, EditingMixin,
+        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
     """
-    Define the possible fields for a Capa problem
+    The XBlock for CAPA.
     """
+    INDEX_CONTENT_TYPE = 'CAPA'
+
+    resources_dir = None
+
+    has_score = True
+    show_in_read_only_mode = True
+    template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+    has_author_view = True
+
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(XmlMixin.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
+    icon_class = 'problem'
+
+    uses_xmodule_styles_setup = True
+    requires_per_student_anonymous_id = True
+
+    preview_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
+            resource_string(__name__, 'js/src/capa/display.js'),
+            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/src/capa/imageinput.js'),
+            resource_string(__name__, 'js/src/capa/schematic.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+    }
+
+    preview_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/capa/display.scss'),
+        ],
+    }
+
+    studio_view_js = {
+        'js': [
+            resource_string(__name__, 'js/src/problem/edit.js'),
+        ],
+        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+    }
+
+    studio_view_css = {
+        'scss': [
+            resource_string(__name__, 'css/editor/edit.scss'),
+            resource_string(__name__, 'css/problem/edit.scss'),
+        ]
+    }
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -285,67 +341,6 @@ class CapaFields:
                "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
-
-
-@XBlock.wants('user')
-@XBlock.needs('i18n')
-@XBlock.wants('call_to_action')
-class ProblemBlock(
-        ScorableXBlockMixin, CapaFields, RawMixin, XmlMixin, EditingMixin,
-        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
-    """
-    The XBlock for CAPA.
-    """
-    INDEX_CONTENT_TYPE = 'CAPA'
-
-    resources_dir = None
-
-    has_score = True
-    show_in_read_only_mode = True
-    template_dir_name = 'problem'
-    mako_template = "widgets/problem-edit.html"
-    has_author_view = True
-
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(XmlMixin.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
-
-    icon_class = 'problem'
-
-    uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
-
-    preview_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/capa/display.scss'),
-        ],
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_string(__name__, 'js/src/problem/edit.js'),
-        ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss'),
-        ]
-    }
 
     def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         super().bind_for_student(*args, **kwargs)
