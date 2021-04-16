@@ -17,16 +17,16 @@ ${_("Your {task_name} task has completed with the status '{task_status}'. Sign i
 ${_("Here are some validations we found with your course content.")}
 
 % if errors:
-${_("Errors: ")} ${len(errors)}
+${_("Errors: ")} (${len(errors)})
 % for index, error in enumerate(errors, start=1):
   ${index}.  ${error}
 % endfor
 % endif
 
 % if warnings:
-${_("Warnings: ")} ${len(warnings)}
-% for warning in enumerate(warnings, start=1):
+${_("Warnings: ")} (${len(warnings)})
+% for index, warning in enumerate(warnings, start=1):
   ${index}.  ${warning}
 % endfor
-%endif
+% endif
 % endif
