@@ -143,10 +143,18 @@ class ComplexEncoder(json.JSONEncoder):
 @XBlock.needs('i18n')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
-        ScorableXBlockMixin, RawMixin, XmlMixin, EditingMixin,
-        XModuleDescriptorToXBlockMixin, XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin):
+    ScorableXBlockMixin,
+    RawMixin,
+    XmlMixin,
+    EditingMixin,
+    XModuleDescriptorToXBlockMixin,
+    XModuleToXBlockMixin,
+    HTMLSnippet,
+    ResourceTemplates,
+    XModuleMixin,
+):
     """
-    The XBlock for CAPA.
+    An XBlock for CAPA.
     """
     INDEX_CONTENT_TYPE = 'CAPA'
 
