@@ -1199,9 +1199,6 @@ INSTALLED_APPS = [
 
     # Third party action planner xblock goals tracking application
     'action_planner.actionplan_manager',
-
-    # Third party msp assessment submission dashboard.
-    'msp_assessment.msp_dashboard',
 ]
 
 
