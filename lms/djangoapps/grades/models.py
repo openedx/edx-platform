@@ -18,7 +18,7 @@ from hashlib import sha1
 import six
 from django.apps import apps
 from django.contrib.auth.models import User
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from lazy import lazy
@@ -226,7 +226,8 @@ class VisibleBlocks(models.Model):
 
         try:
             # Try to bulk create the blocks assuming all blocks are new
-            created_visual_blocks = cls.objects.bulk_create(visual_blocks)
+            with transaction.atomic():
+                created_visual_blocks = cls.objects.bulk_create(visual_blocks)
         except IntegrityError:
             # Try to create blocks one by one and mark newly created blocks
             for visual_block in visual_blocks:
