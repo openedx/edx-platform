@@ -117,7 +117,7 @@ class RegistrationApiViewTests(TestCase):
                 res = self.client.post(self.url, params)
                 self.assertContains(res, 'user_id', status_code=200)
                 new_user = User.objects.get(username=params['username'])
-                assert new_user.is_active == False
+                assert not new_user.is_active
 
     @ddt.data('username', 'name')
     def test_missing_field(self, field):
