@@ -112,7 +112,6 @@ PyContracts==1.7.1
 pycountry==1.20
 pycryptodomex==3.4.7
 pygments==2.2.0                     # Used to support colors in paver command output
-pygraphviz==1.1                     # No longer in use?  Optional dependency of networkx, from edx-sandbox/shared.in
 pyjwkest==1.3.2
 # TODO Replace PyJWT usage with pyjwkest
 PyJWT==1.5.2
