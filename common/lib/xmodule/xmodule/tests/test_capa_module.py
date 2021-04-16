@@ -16,6 +16,7 @@ import pytest
 import ddt
 import requests
 import webob
+from codejail.safe_exec import SafeExecException
 from django.utils.encoding import smart_text
 from edx_user_state_client.interface import XBlockUserState
 from lxml import etree
@@ -1230,6 +1231,31 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_supports_rescoring.return_value = False
             with pytest.raises(NotImplementedError):
                 module.rescore(only_if_higher=False)
+
+    def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
+        class CustomCapaFactory(CapaFactory):
+            """
+            A factory for creating a Capa problem with arbitrary xml.
+            """
+            sample_problem_xml = textwrap.dedent(xml)
+
+        return CustomCapaFactory
+
+    def test_codejail_error_upon_problem_creation(self):
+        # Simulate a codejail safe_exec failure upon problem creation.
+        # Create a problem with some script attached.
+        xml_str = textwrap.dedent("""
+            <problem>
+                <script>test=True</script>
+            </problem>
+        """)
+        factory = self.capa_factory_for_problem_xml(xml_str)
+
+        # When codejail safe_exec fails upon problem creation, a LoncapaProblemError should be raised.
+        with pytest.raises(LoncapaProblemError):
+            with patch('capa.capa_problem.safe_exec') as mock_safe_exec:
+                mock_safe_exec.side_effect = SafeExecException()
+                factory.create()
 
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
