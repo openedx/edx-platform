@@ -1,5 +1,5 @@
 """
-A command to delete user from mail chimp learners list
+A command to delete users from mailchimp learners list
 """
 from logging import getLogger
 
@@ -14,7 +14,7 @@ log = getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    A command to delete user from mail chimp learners list
+    A command to delete users from mailchimp learners list
     """
 
     help = """

@@ -63,7 +63,7 @@ def has_active_certificate(course):
         course (Course): Course from module store
 
     Returns:
-        boolean: True of course contains any active certificate, False otherwise
+        boolean: True if course contains any active certificate, False otherwise
     """
     has_activated_certificate = False
     certificates = course.certificates

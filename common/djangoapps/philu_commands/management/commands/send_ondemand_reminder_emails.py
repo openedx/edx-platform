@@ -205,7 +205,16 @@ def get_last_module_ora(course_blocks):
 
 
 def check_for_last_module_submission(oras_list, anonymous_user):
-    # pylint: disable=useless-else-on-loop
+    """
+    Check if user have submitted ORAs
+
+    Args:
+        oras_list (List): List of ORAs units
+        anonymous_user (AnonymousUserId): Model object with id associated to anonymous user
+
+    Returns:
+        boolean: False if user have not submitted any ORA, True otherwise
+    """
     for ora in oras_list:
         try:
             Submission.objects.get(
@@ -213,8 +222,8 @@ def check_for_last_module_submission(oras_list, anonymous_user):
                 student_item__item_id=ora)
         except Submission.DoesNotExist:
             return False
-    else:
-        return True
+
+    return True
 
 
 def send_reminder_email(user, course, course_deadline):

@@ -12,6 +12,7 @@ from django.core.management import call_command
 from django.db.models.signals import post_save
 from django.test import TestCase
 from factory.django import mute_signals
+
 from lms.djangoapps.onboarding.tests.factories import OrganizationFactory, UserFactory
 from philu_commands.management.commands.sync_users_with_mailchimp import Command
 

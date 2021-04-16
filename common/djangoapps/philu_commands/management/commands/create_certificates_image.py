@@ -30,19 +30,20 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # pylint: disable=no-member
         opt_after = options['after']
         opt_uuid = options['uuid']
         certificates = []
 
         if opt_after:
             after_date = datetime.strptime(opt_after, '%d/%m/%Y')
-            certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
+            certificates = GeneratedCertificate.objects.filter(
                 created_date__gte=after_date
             )
         elif opt_uuid:
-            certificates = GeneratedCertificate.objects.filter(verify_uuid__in=opt_uuid)  # pylint: disable=no-member
+            certificates = GeneratedCertificate.objects.filter(verify_uuid__in=opt_uuid)
         else:
-            certificates = GeneratedCertificate.objects.all()  # pylint: disable=no-member
+            certificates = GeneratedCertificate.objects.all()
 
         for certificate in certificates:
             task_create_certificate_img_and_upload_to_s3.delay(verify_uuid=certificate.verify_uuid)

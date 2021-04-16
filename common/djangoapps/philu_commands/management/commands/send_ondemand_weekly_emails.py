@@ -39,7 +39,7 @@ class Command(BaseCommand):
         # Getting all self paced courses.
         courses = CourseOverview.objects.filter(self_paced=True)
 
-        # TODO This command have too many nested blocks, which need and update.
+        # TODO This command have too many nested blocks, which needs an update.
         # pylint: disable=too-many-nested-blocks
         for course in courses:
             course_struct = generate_course_structure(course.id)['structure']
