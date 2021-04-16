@@ -97,21 +97,6 @@ class RANDOMIZATION:
     PER_STUDENT = "per_student"
 
 
-def randomization_bin(seed, problem_id):
-    """
-    Pick a randomization bin for the problem given the user's seed and a problem id.
-
-    We do this because we only want e.g. 20 randomizations of a problem to make analytics
-    interesting.  To avoid having sets of students that always get the same problems,
-    we'll combine the system's per-student seed with the problem id in picking the bin.
-    """
-    r_hash = hashlib.sha1()
-    r_hash.update(str(seed).encode())
-    r_hash.update(str(problem_id).encode())
-    # get the first few digits of the hash, convert to an int, then mod.
-    return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
-
-
 class Randomization(String):
     """
     Define a field to store how to randomize a problem.
@@ -124,19 +109,6 @@ class Randomization(String):
         return value
 
     to_json = from_json
-
-
-class ComplexEncoder(json.JSONEncoder):
-    """
-    Extend the JSON encoder to correctly handle complex numbers
-    """
-    def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ, method-hidden
-        """
-        Print a nicely formatted complex number, or default to the JSON encoder
-        """
-        if isinstance(obj, complex):
-            return f"{obj.real:.7g}{obj.imag:+.7g}*j"
-        return json.JSONEncoder.default(self, obj)
 
 
 @XBlock.wants('user')
@@ -2225,3 +2197,31 @@ class ProblemBlock(
         """
         lcp_score = lcp.calculate_score()
         return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])
+
+
+class ComplexEncoder(json.JSONEncoder):
+    """
+    Extend the JSON encoder to correctly handle complex numbers
+    """
+    def default(self, obj):  # lint-amnesty, pylint: disable=arguments-differ, method-hidden
+        """
+        Print a nicely formatted complex number, or default to the JSON encoder
+        """
+        if isinstance(obj, complex):
+            return f"{obj.real:.7g}{obj.imag:+.7g}*j"
+        return json.JSONEncoder.default(self, obj)
+
+
+def randomization_bin(seed, problem_id):
+    """
+    Pick a randomization bin for the problem given the user's seed and a problem id.
+
+    We do this because we only want e.g. 20 randomizations of a problem to make analytics
+    interesting.  To avoid having sets of students that always get the same problems,
+    we'll combine the system's per-student seed with the problem id in picking the bin.
+    """
+    r_hash = hashlib.sha1()
+    r_hash.update(str(seed).encode())
+    r_hash.update(str(problem_id).encode())
+    # get the first few digits of the hash, convert to an int, then mod.
+    return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
