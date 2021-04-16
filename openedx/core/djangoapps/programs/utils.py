@@ -426,6 +426,9 @@ class ProgramProgressMeter:
         """
         Determine which course runs have been completed and failed by the user.
 
+        A course run is considered completed for a user if they have a certificate in the correct state and
+        the certificate is available.
+
         Returns:
             dict with a list of completed and failed runs
         """
@@ -433,12 +436,16 @@ class ProgramProgressMeter:
 
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
+            course_key = certificate['course_key']
             course_data = {
-                'course_run_id': str(certificate['course_key']),
+                'course_run_id': str(course_key),
                 'type': self._certificate_mode_translation(certificate['type']),
             }
 
-            if certificate_api.is_passing_status(certificate['status']):
+            if (
+                certificate_api.is_passing_status(certificate['status'])
+                and CourseOverview.get_from_id(course_key).may_certify()
+            ):
                 completed_runs.append(course_data)
             else:
                 failed_runs.append(course_data)
