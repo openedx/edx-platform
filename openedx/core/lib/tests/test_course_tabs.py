@@ -1,8 +1,8 @@
 """ Tests of specific tabs. """
 from unittest import TestCase
+from unittest.mock import Mock, patch
 
 import pytest
-from mock import Mock, patch
 
 import xmodule.tabs as xmodule_tabs
 from openedx.core.lib.course_tabs import CourseTabPluginManager
@@ -40,7 +40,7 @@ class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
 
     def setUp(self):
-        super(KeyCheckerTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.valid_keys = ['a', 'b']
         self.invalid_keys = ['a', 'v', 'g']
@@ -58,7 +58,7 @@ class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
 
     def setUp(self):
-        super(NeedNameTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.valid_dict1 = {'a': 1, 'name': 2}
         self.valid_dict2 = {'name': 1}

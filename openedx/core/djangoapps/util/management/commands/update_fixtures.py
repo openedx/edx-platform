@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django management command to update the loaded test fixtures as necessary for
 the current test environment.  Currently just sets an appropriate domain for
@@ -25,7 +24,7 @@ class Command(BaseCommand):
             host = os.environ['BOK_CHOY_HOSTNAME']
             cms_port = os.environ['BOK_CHOY_CMS_PORT']
             lms_port = os.environ['BOK_CHOY_LMS_PORT']
-            cms_domain = '{}:{}'.format(host, cms_port)
+            cms_domain = f'{host}:{cms_port}'
             Site.objects.filter(name='cms').update(domain=cms_domain)
-            lms_domain = '{}:{}'.format(host, lms_port)
+            lms_domain = f'{host}:{lms_port}'
             Site.objects.filter(name='lms').update(domain=lms_domain)

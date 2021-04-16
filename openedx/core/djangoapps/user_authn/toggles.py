@@ -12,13 +12,10 @@ from openedx.core.djangoapps.theming.helpers import get_current_request
 # .. toggle_name: ENABLE_REQUIRE_THIRD_PARTY_AUTH
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: Set to True to prevent using username/password login and registration and only allow authentication with third party auth
-# .. toggle_category: admin
+# .. toggle_description: Set to True to prevent using username/password login and registration and only allow
+#   authentication with third party auth
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-09-16
-# .. toggle_expiration_date: None
-# .. toggle_tickets: None
-# .. toggle_status: supported
 # .. toggle_warnings: Requires configuration of third party auth
 
 
@@ -29,7 +26,8 @@ def is_require_third_party_auth_enabled():
 # .. toggle_name: user_authn.redirect_to_microfrontend
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the login and registration pages
+# .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the login and
+#   registration pages
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-02-02
 # .. toggle_target_removal_date: None

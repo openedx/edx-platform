@@ -3,13 +3,11 @@
 
 from copy import deepcopy
 import json
+from unittest.mock import MagicMock, patch
 
 import ddt
 from django.urls import reverse
 from django.test.utils import override_settings
-from mock import MagicMock, patch
-import six
-from six.moves import range
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.zendesk_proxy.v1.views import ZendeskProxyThrottle
@@ -45,7 +43,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 }
             ],
         }
-        return super(ZendeskProxyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().setUp()
 
     @ddt.data(
         True, False
@@ -67,7 +65,7 @@ class ZendeskProxyTestCase(ApiTestCase):
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
             assert mock_args == ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',)
-            six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
+            self.assertCountEqual(mock_kwargs.keys(), ['headers', 'data'])
             assert mock_kwargs['headers'] == {
                 'content-type': 'application/json', 'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
             }

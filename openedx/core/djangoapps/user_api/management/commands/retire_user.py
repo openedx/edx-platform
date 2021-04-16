@@ -1,7 +1,7 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import logging
 
-from django.contrib.auth import get_user_model, logout  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth import get_user_model  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -85,15 +85,15 @@ class Command(BaseCommand):
                 retire_dot_oauth2_models(user)
                 AccountRecovery.retire_recovery_email(user.id)
         except KeyError:
-            error_message = 'Username not specified {}'.format(user)
+            error_message = f'Username not specified {user}'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
         except user_model.DoesNotExist:
-            error_message = 'The user "{}" does not exist.'.format(user.username)
+            error_message = f'The user "{user.username}" does not exist.'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
         except Exception as exc:  # pylint: disable=broad-except
-            error_message = '500 error deactivating account {}'.format(exc)
+            error_message = f'500 error deactivating account {exc}'
             logger.error(error_message)
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
 

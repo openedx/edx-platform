@@ -69,6 +69,7 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
+done-xblock
 edx-ace
 edx-analytics-data-api-client
 edx-api-doc-tools
@@ -78,7 +79,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=3.12.0            # Utilities for cache, monitoring, and plugins; 3.12.0+ for set_code_owner_attribute method
+edx-django-utils>=3.16.0            # Utilities for cache, monitoring, and plugins; 3.16.0+ for the `pluggable_override`
 edx-drf-extensions
 edx-enterprise
 edx-event-routing-backends
@@ -114,7 +115,6 @@ mysqlclient                         # Driver for the default production relation
 newrelic                            # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
-olxcleaner                          # Library to support syntex validation during course import
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 ora2
 piexif                              # Exif image metadata manipulation, used in the profile_images app

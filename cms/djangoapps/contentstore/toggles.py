@@ -22,35 +22,16 @@ EXPORT_GIT = SettingDictToggle(
 WAFFLE_NAMESPACE = 'contentstore'
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE, log_prefix='Contentstore: ')
 
-# Waffle flag to split library to new view.
 # .. toggle_name: split_library_on_studio_dashboard
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Studio dashboard
+# .. toggle_description: Enables data new view for library on studio dashboard.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2020-07-8
-# .. toggle_target_removal_date: None
-# .. toggle_warnings: ??
 # .. toggle_tickets: TNL-7536
 SPLIT_LIBRARY_ON_DASHBOARD = LegacyWaffleFlag(
     waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
     flag_name='split_library_on_studio_dashboard',
-    module_name=__name__
-)
-
-# Waffle flag to enable olx validation during course import.
-# .. toggle_name: course_import_olx_validation
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Studio Import
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-04-01
-# .. toggle_target_removal_date: 2021-05-01
-# .. toggle_warnings: ??
-# .. toggle_tickets: TNL-8151
-COURSE_IMPORT_OLX_VALIDATION = LegacyWaffleFlag(
-    waffle_namespace=LegacyWaffleFlagNamespace(name=WAFFLE_NAMESPACE),
-    flag_name='course_import_olx_validation',
     module_name=__name__
 )
 
@@ -60,10 +41,3 @@ def split_library_view_on_dashboard():
     check if data new view for library is enabled on studio dashboard.
     """
     return SPLIT_LIBRARY_ON_DASHBOARD.is_enabled()
-
-
-def course_import_olx_validation_is_enabled():
-    """
-    Check if course olx validation is enabled on course import.
-    """
-    return COURSE_IMPORT_OLX_VALIDATION.is_enabled()

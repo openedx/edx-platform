@@ -31,6 +31,7 @@
             */
             optionalStr: gettext('(optional)'),
             submitButton: '',
+            isEnterpriseEnable: false,
 
             initialize: function(data) {
                 this.model = data.model;
@@ -95,7 +96,8 @@
                         optionalStr: this.optionalStr,
                         supplementalText: data[i].supplementalText || '',
                         supplementalLink: data[i].supplementalLink || '',
-                        loginIssueSupportLink: data[i].loginIssueSupportLink || ''
+                        loginIssueSupportLink: data[i].loginIssueSupportLink || '',
+                        isEnterpriseEnable: this.isEnterpriseEnable
                     })));
                 }
 

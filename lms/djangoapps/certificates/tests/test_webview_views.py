@@ -63,10 +63,8 @@ FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
 
-FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
-    "CUSTOM_CERTIFICATE_TEMPLATES_ENABLED": True
-}
-FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
+FEATURES_WITH_CUSTOM_CERTS_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
+FEATURES_WITH_CUSTOM_CERTS_ENABLED['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED'] = True
 
 
 class CommonCertificatesTestCase(ModuleStoreTestCase):
@@ -105,7 +103,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='downloadable',
+            status=CertificateStatuses.downloadable,
             mode='honor',
             name=self.user.profile.name,
         )

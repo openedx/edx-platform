@@ -2,9 +2,9 @@
 # pylint: disable=missing-docstring
 
 import json
+from unittest import mock
 
 import httpretty
-import mock
 from django.core.cache import cache
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -26,7 +26,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetEdxApiData, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory()
 

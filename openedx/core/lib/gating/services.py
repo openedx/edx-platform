@@ -5,7 +5,7 @@ A wrapper class to communicate with Gating api
 from . import api as gating_api
 
 
-class GatingService(object):
+class GatingService:
     """
     An XBlock service to talk to the Gating api.
     """

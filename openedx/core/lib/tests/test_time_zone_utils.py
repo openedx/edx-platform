@@ -17,7 +17,7 @@ class TestTimeZoneUtils(TestCase):
         """
         Sets up user for testing with time zone utils.
         """
-        super(TestTimeZoneUtils, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.user = UserFactory.build()
         self.user.save()

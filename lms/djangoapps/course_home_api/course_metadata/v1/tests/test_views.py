@@ -28,6 +28,12 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
     def setUp(self):
         super().setUp()
         self.url = reverse('course-home-course-metadata', args=[self.course.id])
+        self.staff_user = UserFactory(
+            username='staff',
+            email='staff@example.com',
+            password='bar',
+            is_staff=True
+        )
 
     def test_get_authenticated_user(self):
         CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
@@ -39,19 +45,26 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
 
     def test_get_authenticated_staff_user(self):
         self.client.logout()
-        staff_user = UserFactory(
-            username='staff',
-            email='staff@example.com',
-            password='bar',
-            is_staff=True
-        )
-        self.client.login(username=staff_user.username, password='bar')
+        self.client.login(username=self.staff_user.username, password='bar')
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.data['is_staff']
         # This differs for a staff user because they also receive the Instructor tab
         # 'Course', 'Wiki', 'Progress', and 'Instructor' tabs
         assert len(response.data.get('tabs', [])) == 4
+
+    def test_get_masqueraded_user(self):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+
+        self.client.logout()
+        self.client.login(username=self.staff_user.username, password='bar')
+
+        # Sanity check on our normal staff user
+        assert self.client.get(self.url).data['username'] == self.staff_user.username
+
+        # Now switch users and confirm we get a different result
+        self.update_masquerade(username=self.user.username)
+        assert self.client.get(self.url).data['username'] == self.user.username
 
     def test_get_unknown_course(self):
         url = reverse('course-home-course-metadata', args=['course-v1:unknown+course+2T2020'])

@@ -18,7 +18,7 @@ class TestTypedFileUploadParser(APITestCase):
     """
 
     def setUp(self):
-        super(TestTypedFileUploadParser, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.parser = parsers.TypedFileUploadParser()
         self.request_factory = APIRequestFactory()
         upload_media_types = {'image/png', 'image/jpeg', 'application/octet-stream'}

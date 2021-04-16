@@ -43,13 +43,11 @@ import unittest
 from datetime import datetime, timedelta
 import html
 
-import mock
+from unittest import mock
 import pytz
-import six
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.urls import reverse
-from six.moves import range
 from xblock.plugin import Plugin
 
 import lms.djangoapps.lms_xblock.runtime
@@ -58,7 +56,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-class XBlockEventTestMixin(object):
+class XBlockEventTestMixin:
     """Mixin for easily verifying that events were published during a
     test.
 
@@ -101,7 +99,7 @@ class XBlockEventTestMixin(object):
         passed into it.
 
         """
-        super(XBlockEventTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         saved_init = lms.djangoapps.lms_xblock.runtime.LmsModuleSystem.__init__
 
         def patched_init(runtime_self, **kwargs):
@@ -166,7 +164,7 @@ class XBlockEventTestMixin(object):
         self.events = []
 
 
-class GradePublishTestMixin(object):
+class GradePublishTestMixin:
     '''
     This checks whether a grading event was correctly published. This
     puts basic plumbing in place, but we would like to:
@@ -188,7 +186,7 @@ class GradePublishTestMixin(object):
         '''
         Hot-patch the grading emission system to capture grading events.
         '''
-        super(GradePublishTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         def capture_score(user_id, usage_key, score, max_score):
             '''
@@ -218,7 +216,7 @@ class GradePublishTestMixin(object):
         assert grade == self.scores[(- 1)]['score']
 
 
-class XBlockScenarioTestCaseMixin(object):
+class XBlockScenarioTestCaseMixin:
     '''
     This allows us to have test cases defined in JSON today, and in OLX
     someday.
@@ -232,7 +230,7 @@ class XBlockScenarioTestCaseMixin(object):
         Create a set of pages with XBlocks on them. For now, we restrict
         ourselves to one block per learning sequence.
         """
-        super(XBlockScenarioTestCaseMixin, cls).setUpClass()
+        super().setUpClass()
 
         cls.course = CourseFactory.create(
             display_name='XBlock_Test_Course'
@@ -273,10 +271,10 @@ class XBlockScenarioTestCaseMixin(object):
                     )
                     cls.xblocks[xblock_config['urlname']] = xblock
 
-                scenario_url = six.text_type(reverse(
+                scenario_url = str(reverse(
                     'courseware_section',
                     kwargs={
-                        'course_id': six.text_type(cls.course.id),
+                        'course_id': str(cls.course.id),
                         'chapter': "ch_" + chapter_config['urlname'],
                         'section': "sec_" + chapter_config['urlname']
                     }
@@ -285,7 +283,7 @@ class XBlockScenarioTestCaseMixin(object):
                 cls.scenario_urls[chapter_config['urlname']] = scenario_url
 
 
-class XBlockStudentTestCaseMixin(object):
+class XBlockStudentTestCaseMixin:
     '''
     Creates a default set of students for XBlock tests
     '''
@@ -303,9 +301,9 @@ class XBlockStudentTestCaseMixin(object):
         users, so we exercise more corner cases, but we could
         standardize if this is more hassle than it's worth.
         """
-        super(XBlockStudentTestCaseMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         for idx, student in enumerate(self.student_list):
-            username = "u{}".format(idx)
+            username = f"u{idx}"
             self._enroll_user(username, student['email'], student['password'])
         self.select_student(0)
 
@@ -324,8 +322,8 @@ class XBlockStudentTestCaseMixin(object):
         """
         # If we don't have enough users, add a few more...
         for newuser_id in range(len(self.student_list), user_id):
-            username = "user_{i}".format(i=newuser_id)
-            email = "user_{i}@example.edx.org".format(i=newuser_id)
+            username = f"user_{newuser_id}"
+            email = f"user_{newuser_id}@example.edx.org"
             password = "12345"
             self._enroll_user(username, email, password)
             self.student_list.append({'email': email, 'password': password})
@@ -365,15 +363,15 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         # So, skip the test class here if we are not in the LMS.
         if settings.ROOT_URLCONF != 'lms.urls':
             raise unittest.SkipTest('Test only valid in lms')
-        super(XBlockTestCase, cls).setUpClass()
+        super().setUpClass()
 
     def get_handler_url(self, handler, xblock_name=None):
         """
         Get url for the specified xblock handler
         """
         return reverse('xblock_handler', kwargs={
-            'course_id': six.text_type(self.course.id),
-            'usage_id': six.text_type(
+            'course_id': str(self.course.id),
+            'usage_id': str(
                 self.course.id.make_usage_key('done', xblock_name)
             ),
             'handler': handler,
@@ -413,9 +411,9 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
                 if block["urlname"] == xblock_name:
                     xblock_type = block["blocktype"]
 
-        key = six.text_type(self.course.id.make_usage_key(xblock_type, xblock_name))
+        key = str(self.course.id.make_usage_key(xblock_type, xblock_name))
         return reverse('xblock_handler', kwargs={
-            'course_id': six.text_type(self.course.id),
+            'course_id': str(self.course.id),
             'usage_id': key,
             'handler': handler,
             'suffix': ''
@@ -449,7 +447,7 @@ class XBlockTestCase(XBlockStudentTestCaseMixin,
         usage_id = self.xblocks[urlname].scope_ids.usage_id
         # First, we get out our <div>
         soup_html = BeautifulSoup(markup=content, features="lxml")
-        xblock_html = six.text_type(soup_html.find(id="seq_contents_0"))
+        xblock_html = str(soup_html.find(id="seq_contents_0"))
         # Now, we get out the text of the <div>
         try:
             escaped_html = xblock_html.split('<')[1].split('>')[1]

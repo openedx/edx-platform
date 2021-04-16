@@ -8,7 +8,6 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField
-import six
 
 
 class VEMPipelineIntegration(ConfigurationModel):
@@ -24,8 +23,6 @@ class VEMPipelineIntegration(ConfigurationModel):
       video pipeline.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2020-06-04
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/24093
     """
     client_name = models.CharField(
@@ -68,8 +65,6 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
       enables the "Video Uploads" menu in the CMS.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """
     # this field overrides course-specific settings
@@ -102,7 +97,7 @@ class VideoUploadsEnabledByDefault(ConfigurationModel):
 
     def __str__(self):
         current_model = VideoUploadsEnabledByDefault.current()
-        return u"VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
+        return "VideoUploadsEnabledByDefault: enabled {is_enabled}".format(
             is_enabled=current_model.is_enabled()
         )
 
@@ -121,8 +116,6 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
       "Video Uploads" menu in the CMS.
     .. toggle_use_cases:  open_edx
     .. toggle_creation_date: 2017-11-10
-    .. toggle_target_removal_date: None
-    .. toggle_warnings: None
     .. toggle_tickets: https://github.com/edx/edx-platform/pull/16536
     """
     KEY_FIELDS = ('course_id',)
@@ -134,7 +127,7 @@ class CourseVideoUploadsEnabledByDefault(ConfigurationModel):
         if self.enabled:
             not_en = ""
 
-        return u"Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
-            course_key=six.text_type(self.course_id),
+        return "Course '{course_key}': Video Uploads {not_enabled}Enabled by default.".format(
+            course_key=str(self.course_id),
             not_enabled=not_en
         )

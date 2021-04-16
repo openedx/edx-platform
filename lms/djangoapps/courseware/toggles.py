@@ -2,7 +2,7 @@
 Toggles for courseware in-course experience.
 """
 
-from edx_toggles.toggles import LegacyWaffleFlagNamespace
+from edx_toggles.toggles import LegacyWaffleFlagNamespace, SettingToggle
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
@@ -46,7 +46,6 @@ COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW = CourseWaffleFlag(
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports staged rollout of the new micro-frontend-based implementation of the course exit page.
-# .. toggle_category: micro-frontend
 # .. toggle_use_cases: open_edx, temporary
 # .. toggle_creation_date: 2020-10-02
 # .. toggle_target_removal_date: None
@@ -95,7 +94,6 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2020-10-07
 # .. toggle_target_removal_date: None
-# .. toggle_warnings: None
 # .. toggle_tickets: MST-432
 COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'proctoring_improvements', __name__
@@ -111,7 +109,6 @@ COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-02-09
 # .. toggle_target_removal_date: 2021-05-01
-# .. toggle_warnings: None
 COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
     WAFFLE_FLAG_NAMESPACE, 'optimized_render_xblock', __name__
 )
@@ -193,3 +190,18 @@ def streak_celebration_is_active(course_key):
         courseware_mfe_progress_milestones_are_active(course_key) and
         COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION.is_enabled(course_key)
     )
+
+
+# .. toggle_name: COURSES_INVITE_ONLY
+# .. toggle_implementation: SettingToggle
+# .. toggle_type: feature_flag
+# .. toggle_default: False
+# .. toggle_description: Setting this sets the default value of INVITE_ONLY across all courses in a given deployment
+# .. toggle_category: admin
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2019-05-16
+# .. toggle_expiration_date: None
+# .. toggle_tickets: https://github.com/mitodl/edx-platform/issues/123
+# .. toggle_status: unsupported
+def is_courses_default_invite_only_enabled():
+    return SettingToggle("COURSES_INVITE_ONLY", default=False).is_enabled()

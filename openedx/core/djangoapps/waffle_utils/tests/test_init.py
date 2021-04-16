@@ -3,12 +3,12 @@ Tests for waffle utils features.
 """
 # pylint: disable=toggle-missing-annotation
 
+from unittest.mock import patch
 import crum
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
 from edx_django_utils.cache import RequestCache
-from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from waffle.testutils import override_flag
 

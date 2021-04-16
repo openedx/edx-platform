@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 Test models, managers, and validators.
 """
 
 
 import ddt
-import six
 from completion.test_utils import CompletionWaffleTestMixin
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.urls import reverse
@@ -38,7 +36,7 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
         """
         Create the test data.
         """
-        super(CompletionBatchTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.url = reverse('completion:v1:completion-batch')
 
         # Enable the waffle flag for all tests
@@ -49,21 +47,21 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             org='TestX', number='101', display_name='Test',
             default_store=ModuleStoreEnum.Type.split,
         )
-        assert six.text_type(self.course.id) == self.COURSE_KEY
+        assert str(self.course.id) == self.COURSE_KEY
         self.problem = ItemFactory.create(
             parent=self.course, category="problem", display_name="Test Problem", publish_item=False,
         )
-        assert six.text_type(self.problem.location) == self.BLOCK_KEY
+        assert str(self.problem.location) == self.BLOCK_KEY
         # And an old mongo course:
         self.course_deprecated = CourseFactory.create(
             org='TestX', number='201', display_name='Test',
             default_store=ModuleStoreEnum.Type.mongo,
         )
-        assert six.text_type(self.course_deprecated.id) == self.COURSE_KEY_DEPRECATED
+        assert str(self.course_deprecated.id) == self.COURSE_KEY_DEPRECATED
         self.problem_deprecated = ItemFactory.create(
             parent=self.course_deprecated, category="problem", display_name="Test Problem",
         )
-        assert six.text_type(self.problem_deprecated.location) == self.BLOCK_KEY_DEPRECATED
+        assert str(self.problem_deprecated.location) == self.BLOCK_KEY_DEPRECATED
 
         # Create users
         self.staff_user = UserFactory(is_staff=True)
@@ -152,8 +150,8 @@ class CompletionBatchTestCase(CompletionWaffleTestMixin, ModuleStoreTestCase):
             400,
             {
                 "detail": (
-                    u"Block with key: 'block-v1:TestX+101+OtherCourse+type@problem+block@other' "
-                    u"is not in context {}".format(COURSE_KEY)
+                    "Block with key: 'block-v1:TestX+101+OtherCourse+type@problem+block@other' "
+                    "is not in context {}".format(COURSE_KEY)
                 )
             }
         ),

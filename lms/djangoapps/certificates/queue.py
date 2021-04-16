@@ -104,7 +104,6 @@ class XQueueCertInterface:
             requests_auth,
         )
         self.whitelist = CertificateWhitelist.objects.all()
-        self.restricted = UserProfile.objects.filter(allow_certificate=False)
         self.use_https = True
 
     def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
@@ -114,12 +113,12 @@ class XQueueCertInterface:
           student   - User.object
           course_id - courseenrollment.course_id (string)
 
+        [PDF Certificates only]
         WARNING: this command will leave the old certificate, if one exists,
                  laying around in AWS taking up space. If this is a problem,
                  take pains to clean up storage before running this command.
 
-        Change the certificate status to unavailable (if it exists) and request
-        grading. Passing grades will put a certificate request on the queue.
+        Invalidate the certificate (if it exists) and request a new certificate.
 
         Return the certificate.
         """
@@ -131,14 +130,8 @@ class XQueueCertInterface:
             certificate = GeneratedCertificate.eligible_certificates.get(user=student, course_id=course_id)
 
             LOGGER.info(
-                (
-                    "Found an existing certificate entry for student %s "
-                    "in course '%s' "
-                    "with status '%s' while regenerating certificates. "
-                ),
-                student.id,
-                str(course_id),
-                certificate.status
+                f"Found an existing certificate entry for student {student.id} in course '{course_id}' with status "
+                f"'{certificate.status}' while regenerating certificates."
             )
 
             if certificate.download_url:
@@ -147,19 +140,12 @@ class XQueueCertInterface:
                 )
                 return None
 
-            certificate.status = status.unavailable
-            certificate.save()
+            certificate.invalidate()
 
             LOGGER.info(
-                (
-                    "The certificate status for student %s "
-                    "in course '%s' has been changed to '%s'."
-                ),
-                student.id,
-                str(course_id),
-                certificate.status
+                f"The certificate status for student {student.id} in course '{course_id} has been changed to "
+                f"'{certificate.status}'."
             )
-
         except GeneratedCertificate.DoesNotExist:
             pass
 
@@ -211,9 +197,6 @@ class XQueueCertInterface:
 
         If a student has a passing grade or is in the whitelist
         table for the course a request will be made for a new cert.
-
-        If a student has allow_certificate set to False in the
-        userprofile table the status will change to 'restricted'
 
         If a student does not have a passing grade the status
         will change to status.notpassing
@@ -399,26 +382,6 @@ class XQueueCertInterface:
                 student.id,
                 str(course_id),
                 cert.status
-            )
-            return cert
-
-        # Check to see whether the student is on the the embargoed
-        # country restricted list. If so, they should not receive a
-        # certificate -- set their status to restricted and log it.
-        if self.restricted.filter(user=student).exists():
-            cert.status = status.restricted
-            cert.save()
-
-            LOGGER.info(
-                (
-                    "Student %s is in the embargoed country restricted "
-                    "list, so their certificate status has been set to '%s' "
-                    "for the course '%s'. "
-                    "No certificate generation task was sent to the XQueue."
-                ),
-                student.id,
-                cert.status,
-                str(course_id)
             )
             return cert
 

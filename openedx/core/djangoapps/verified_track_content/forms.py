@@ -23,7 +23,7 @@ class VerifiedTrackCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta(object):
+    class Meta:
         model = VerifiedTrackCohortedCourse
         fields = '__all__'
 

@@ -26,11 +26,12 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, InstructorFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationStatuses as CourseStatuses
 from lms.djangoapps.program_enrollments.constants import ProgramOperationStatuses as ProgramStatuses

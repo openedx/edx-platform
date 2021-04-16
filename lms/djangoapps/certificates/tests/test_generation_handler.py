@@ -5,16 +5,14 @@ import logging
 from unittest import mock
 
 import ddt
-from edx_toggles.toggles import LegacyWaffleSwitch
-from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
-from waffle.testutils import override_switch
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import (
     CERTIFICATES_USE_ALLOWLIST,
     CERTIFICATES_USE_UPDATED,
     is_using_certificate_allowlist,
-    _is_using_v2_course_certificates,
+    is_using_v2_course_certificates,
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
     _can_generate_v2_certificate,
@@ -30,7 +28,6 @@ from lms.djangoapps.certificates.tests.factories import (
     CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
-from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -41,13 +38,8 @@ CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_cour
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._has_passing_grade'
 WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
-AUTO_GENERATION_NAMESPACE = waffle.WAFFLE_NAMESPACE
-AUTO_GENERATION_NAME = waffle.AUTO_CERTIFICATE_GENERATION
-AUTO_GENERATION_SWITCH_NAME = f'{AUTO_GENERATION_NAMESPACE}.{AUTO_GENERATION_NAME}'
-AUTO_GENERATION_SWITCH = LegacyWaffleSwitch(AUTO_GENERATION_NAMESPACE, AUTO_GENERATION_NAME)
 
 
-@override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
 @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
@@ -176,13 +168,6 @@ class AllowlistTests(ModuleStoreTestCase):
         assert can_generate_certificate_task(self.user, self.course_run_key)
         assert generate_certificate_task(self.user, self.course_run_key)
 
-    def test_can_generate_auto_disabled(self):
-        """
-        Test handling when automatic generation is disabled
-        """
-        with override_waffle_switch(AUTO_GENERATION_SWITCH, active=False):
-            assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
-
     def test_can_generate_not_verified(self):
         """
         Test handling when the user's id is not verified
@@ -268,7 +253,6 @@ class AllowlistTests(ModuleStoreTestCase):
             assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
 
 
-@override_switch(AUTO_GENERATION_SWITCH_NAME, active=True)
 @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(CCX_COURSE_METHOD, mock.Mock(return_value=False))
@@ -325,14 +309,14 @@ class CertificateTests(ModuleStoreTestCase):
         """
         Test the updated flag
         """
-        assert _is_using_v2_course_certificates(self.course_run_key)
+        assert is_using_v2_course_certificates(self.course_run_key)
 
     @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
     def test_is_using_updated_false(self):
         """
         Test the updated flag without the override
         """
-        assert not _is_using_v2_course_certificates(self.course_run_key)
+        assert not is_using_v2_course_certificates(self.course_run_key)
 
     @ddt.data(
         (CertificateStatuses.deleted, True),
@@ -371,13 +355,6 @@ class CertificateTests(ModuleStoreTestCase):
         Test handling of certificate statuses for a non-existent cert
         """
         assert _can_generate_certificate_for_status(None, None)
-
-    def test_can_generate_auto_disabled(self):
-        """
-        Test handling when automatic generation is disabled
-        """
-        with override_waffle_switch(AUTO_GENERATION_SWITCH, active=False):
-            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
 
     def test_can_generate_not_verified(self):
         """

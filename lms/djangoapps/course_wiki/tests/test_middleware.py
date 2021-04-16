@@ -6,8 +6,8 @@ Tests for wiki middleware.
 from django.test.client import Client
 from wiki.models import URLPath
 
+from common.djangoapps.student.tests.factories import InstructorFactory
 from lms.djangoapps.course_wiki.views import get_or_create_root
-from lms.djangoapps.courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

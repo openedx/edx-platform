@@ -9,7 +9,7 @@ from unittest.mock import patch
 import ddt
 from django.utils.timezone import now
 
-from lms.djangoapps.courseware.tests.factories import BetaTesterFactory
+from common.djangoapps.student.tests.factories import BetaTesterFactory
 
 from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block

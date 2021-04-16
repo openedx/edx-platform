@@ -4,7 +4,7 @@ of content where learning happens.
 """
 
 
-class LearningContext(object):
+class LearningContext:
     """
     Abstract base class for learning context implementations.
 

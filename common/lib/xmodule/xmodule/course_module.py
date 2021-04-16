@@ -27,6 +27,7 @@ from xmodule.seq_module import SequenceBlock
 from xmodule.tabs import CourseTabList, InvalidTabsException
 
 from .fields import Date
+from .modulestore.exceptions import InvalidProctoringProvider
 
 log = logging.getLogger(__name__)
 
@@ -210,17 +211,9 @@ class ProctoringProvider(String):
         Return ProctoringProvider as full featured Python type. Perform validation on the provider
         and include any inherited values from the platform default.
         """
-        errors = []
         value = super().from_json(value)
-
-        provider_errors = self._validate_proctoring_provider(value)
-        errors.extend(provider_errors)
-
-        if errors:
-            raise ValueError(errors)
-
+        self._validate_proctoring_provider(value)
         value = self._get_proctoring_value(value)
-
         return value
 
     def _get_proctoring_value(self, value):
@@ -240,21 +233,10 @@ class ProctoringProvider(String):
         specified, and it is not one of the providers configured at the platform level, return
         a list of error messages to the caller.
         """
-        errors = []
-
         available_providers = get_available_providers()
 
         if value is not None and value not in available_providers:
-            errors.append(
-                _('The selected proctoring provider, {proctoring_provider}, is not a valid provider. '
-                    'Please select from one of {available_providers}.')
-                .format(
-                    proctoring_provider=value,
-                    available_providers=available_providers
-                )
-            )
-
-        return errors
+            raise InvalidProctoringProvider(value, available_providers)
 
     @property
     def default(self):

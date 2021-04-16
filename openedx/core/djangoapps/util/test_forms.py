@@ -3,7 +3,7 @@ Mixins for testing forms.
 """
 
 
-class FormTestMixin(object):
+class FormTestMixin:
     """A mixin for testing forms"""
     def get_form(self, expected_valid):
         """

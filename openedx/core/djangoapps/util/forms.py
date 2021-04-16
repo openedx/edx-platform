@@ -26,7 +26,7 @@ class MultiValueField(Field):
         """
         Convert the form input to a list of strings
         """
-        values = super(MultiValueField, self).to_python(list_of_string_values) or set()  # lint-amnesty, pylint: disable=super-with-arguments
+        values = super().to_python(list_of_string_values) or set()
 
         if values:
             # combine all values if there were multiple specified individually

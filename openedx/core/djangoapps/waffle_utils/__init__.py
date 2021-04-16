@@ -33,8 +33,17 @@ class CourseWaffleFlag(LegacyWaffleFlag):
 
         SOME_COURSE_FLAG.is_enabled(course_key)
 
-    The Django Admin "waffle_utils" section can be used to configure a course override for this same flag (e.g.
-    my_namespace.some_course_feature).
+    To configure, go to "Waffle flag course overrides" under the Django Admin "waffle_utils" section.
+
+        Waffle flag: Set this to the flag name (e.g. my_namespace.some_course_feature).
+        Course id: Set this to the course id (e.g. course-v1:edx+100+Demo)
+        Override choice: (Force on/Force off). "Force on" will enable the waffle flag for all users in a course,
+            overriding any behavior configured on the waffle flag itself. "Force off" will disable the waffle flag
+            for all users in a course, overriding any behavior configured on the waffle flag itself. Requires
+            "Enabled" (see below) to apply.
+        Enabled: This must be marked as enabled in order for the override to be applied. These settings can't be
+            deleted, so instead, you need to disable if it should no longer apply.
+
     """
 
     def _get_course_override_value(self, course_key):

@@ -24,8 +24,8 @@ class ZendeskProxyThrottle(UserRateThrottle):
     """
 
     def __init__(self):
-        self.rate = '{}/hour'.format(REQUESTS_PER_HOUR)
-        super(ZendeskProxyThrottle, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.rate = f'{REQUESTS_PER_HOUR}/hour'
+        super().__init__()
 
 
 class ZendeskPassthroughView(APIView):

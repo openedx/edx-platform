@@ -19,6 +19,7 @@
                     authComplete = false,
                     PLATFORM_NAME = 'edX',
                     ENTERPRISE_SLUG_LOGIN_URL = 'enterprise/login',
+                    IS_ENTERPRISE_ENABLE = true,
                     USER_DATA = {
                         email: 'xsy@edx.org',
                         password: 'xsyisawesome',
@@ -90,7 +91,8 @@
                         resetModel: resetModel,
                         thirdPartyAuth: THIRD_PARTY_AUTH,
                         platformName: PLATFORM_NAME,
-                        enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL
+                        enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
+                        isEnterpriseEnable: IS_ENTERPRISE_ENABLE
                     });
 
                 // Spy on AJAX requests
@@ -206,6 +208,20 @@
 
                     expect(thirdPartyAuthView).not.toContain(view.$submitButton);
                     expect(thirdPartyAuthView).not.toContain($('form-field'));
+                });
+
+                it('does not display the enterprise login button', function() {
+                    var enterpriseDisabledLoginView = new LoginView({
+                        fields: FORM_DESCRIPTION.fields,
+                        model: model,
+                        resetModel: resetModel,
+                        thirdPartyAuth: THIRD_PARTY_AUTH,
+                        platformName: PLATFORM_NAME,
+                        enterpriseSlugLoginURL: ENTERPRISE_SLUG_LOGIN_URL,
+                        isEnterpriseEnable: false
+                    });
+
+                    expect(enterpriseDisabledLoginView).not.toContain($('.enterprise-login'));
                 });
 
                 it('displays a link to the signin help', function() {

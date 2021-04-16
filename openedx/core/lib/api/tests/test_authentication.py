@@ -11,7 +11,7 @@ from datetime import timedelta
 
 import ddt
 from django.conf import settings
-from django.conf.urls import include, url  # lint-amnesty, pylint: disable=unused-import
+from django.conf.urls import url
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
@@ -62,7 +62,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
     OAUTH2_BASE_TESTING_URL = '/oauth2-inactive-test/'
 
     def setUp(self):
-        super(OAuth2AllowInActiveUsersTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.dot_adapter = adapters.DOTAdapter()
         self.csrf_client = APIClient(enforce_csrf_checks=True)
         self.username = 'john'
@@ -96,7 +96,7 @@ class OAuth2AllowInActiveUsersTests(TestCase):  # lint-amnesty, pylint: disable=
     def _create_authorization_header(self, token=None):
         if token is None:
             token = self.dot_access_token.token
-        return "Bearer {0}".format(token)
+        return f"Bearer {token}"
 
     def get_with_bearer_token(self, target_url, params=None, token=None):
         """
@@ -224,7 +224,7 @@ class BearerAuthenticationTests(OAuth2AllowInActiveUsersTests):  # lint-amnesty,
     OAUTH2_BASE_TESTING_URL = '/oauth2-test/'
 
     def setUp(self):
-        super(BearerAuthenticationTests, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Since this is testing back to previous version, user should be set to true
         self.user.is_active = True
         self.user.save()

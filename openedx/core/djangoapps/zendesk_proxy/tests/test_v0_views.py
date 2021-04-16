@@ -4,12 +4,10 @@
 from copy import deepcopy
 import json
 
+from unittest.mock import MagicMock, patch
 import ddt
 from django.urls import reverse
 from django.test.utils import override_settings
-from mock import MagicMock, patch
-import six
-from six.moves import range
 
 from openedx.core.djangoapps.zendesk_proxy.v0.views import ZENDESK_REQUESTS_PER_HOUR
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -34,7 +32,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 'message': "Help! I'm trapped in a unit test factory and I can't get out!",
             }
         }
-        return super(ZendeskProxyTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        return super().setUp()
 
     def test_post(self):
         with patch('requests.post', return_value=MagicMock(status_code=201)) as mock_post:
@@ -47,7 +45,7 @@ class ZendeskProxyTestCase(ApiTestCase):
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
             assert mock_args == ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',)
-            six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
+            self.assertCountEqual(mock_kwargs.keys(), ['headers', 'data'])
             assert mock_kwargs['headers'] == {
                 'content-type': 'application/json', 'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
             }

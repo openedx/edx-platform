@@ -21,9 +21,11 @@ from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseFinanceAdminRole  # lint-amnesty, pylint: disable=unused-import
 from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import StaffFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from common.test.utils import XssTestMixin
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2

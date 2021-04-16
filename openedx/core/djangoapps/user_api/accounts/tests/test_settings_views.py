@@ -1,8 +1,7 @@
 """ Tests for views related to account settings. """
-# -*- coding: utf-8 -*-
 
 
-import mock
+from unittest import mock
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
@@ -49,7 +48,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
 
     @mock.patch("django.conf.settings.MESSAGE_STORAGE", 'django.contrib.messages.storage.cookie.CookieStorage')
     def setUp(self):  # pylint: disable=arguments-differ
-        super(AccountSettingsViewTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         CommerceConfiguration.objects.create(cache_ttl=10, enabled=True)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)

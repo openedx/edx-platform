@@ -30,7 +30,10 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
+from lms.djangoapps.certificates.generation_handler import (
+    CERTIFICATES_USE_ALLOWLIST,
+    CERTIFICATES_USE_UPDATED
+)
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
@@ -1889,14 +1892,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             data=problem_xml
         )
 
-    def user_is_embargoed(self, user, is_embargoed):
-        """
-        Set a users embargoed state.
-        """
-        user_profile = UserFactory(username=user.username, email=user.email).profile
-        user_profile.allow_certificate = not is_embargoed
-        user_profile.save()  # pylint: disable=no-member
-
     def _verify_csv_data(self, username, expected_data):
         """
         Verify grade report data.
@@ -1919,7 +1914,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
                           user_enroll_mode,
                           has_passed,
                           whitelisted,
-                          is_embargoed,
                           verification_status,
                           certificate_status,
                           certificate_mode):
@@ -1933,8 +1927,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             self.submit_student_answer('u1', 'test_problem', ['choice_1'])
 
         CertificateWhitelistFactory.create(user=user, course_id=self.course.id, whitelist=whitelisted)
-
-        self.user_is_embargoed(user, is_embargoed)
 
         if user_enroll_mode in CourseMode.VERIFIED_MODES:
             SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
@@ -1950,19 +1942,19 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
 
     @ddt.data(
         (
-            'verified', False, False, False, 'approved', 'notpassing', 'honor',
+            'verified', False, False, 'approved', 'notpassing', 'honor',
             ['verified', 'ID Verified', 'N', 'N', 'N/A']
         ),
         (
-            'verified', False, True, False, 'approved', 'downloadable', 'verified',
+            'verified', False, True, 'approved', 'downloadable', 'verified',
             ['verified', 'ID Verified', 'Y', 'Y', 'verified']
         ),
         (
-            'honor', True, True, True, 'approved', 'restricted', 'honor',
-            ['honor', 'N/A', 'N', 'N', 'N/A']
+            'honor', True, True, 'approved', 'restricted', 'honor',
+            ['honor', 'N/A', 'Y', 'N', 'N/A']
         ),
         (
-            'verified', True, True, False, 'must_retry', 'downloadable', 'honor',
+            'verified', True, True, 'must_retry', 'downloadable', 'honor',
             ['verified', 'Not ID Verified', 'Y', 'Y', 'honor']
         ),
     )
@@ -1972,7 +1964,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             user_enroll_mode,
             has_passed,
             whitelisted,
-            is_embargoed,
             verification_status,
             certificate_status,
             certificate_mode,
@@ -1983,7 +1974,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             user_enroll_mode,
             has_passed,
             whitelisted,
-            is_embargoed,
             verification_status,
             certificate_status,
             certificate_mode
@@ -2034,7 +2024,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(174):
+        with self.assertNumQueries(170):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {
@@ -2541,6 +2531,50 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         assert certs.count() == 1
         invalidated_cert = certs.first()
         assert invalidated_cert.status == CertificateStatuses.unavailable
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=False)
+    def test_invalidation_v2_certificates_disabled(self):
+        """
+        Test that ensures the bulk invalidation step (as part of bulk certificate regeneration) continues to occur when
+        the v2 certificates feature is disabled for a course run.
+        """
+        students = self._create_students(2)
+
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        _invalidate_generated_certificates(self.course.id, students, [CertificateStatuses.downloadable])
+
+        for s in students:
+            cert = GeneratedCertificate.objects.get(user=s, course_id=self.course.id)
+            assert cert.status == CertificateStatuses.unavailable
+
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_invalidation_v2_certificates_enabled(self):
+        """
+        Test that ensures the bulk invalidation step (as part of bulk certificate regeneration) is skipped when the v2
+        certificates feature is enabled for a course run.
+        """
+        students = self._create_students(2)
+
+        for s in students:
+            GeneratedCertificateFactory.create(
+                user=s,
+                course_id=self.course.id,
+                status=CertificateStatuses.downloadable,
+                mode='verified'
+            )
+
+        _invalidate_generated_certificates(self.course.id, students, [CertificateStatuses.downloadable])
+
+        for s in students:
+            cert = GeneratedCertificate.objects.get(user=s, course_id=self.course.id)
+            assert cert.status == CertificateStatuses.downloadable
 
     def assertCertificatesGenerated(self, task_input, expected_results):
         """

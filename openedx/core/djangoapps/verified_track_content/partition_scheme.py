@@ -5,7 +5,6 @@ UserPartitionScheme for enrollment tracks.
 
 import logging
 
-import six
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
@@ -49,12 +48,12 @@ class EnrollmentTrackUserPartition(UserPartition):
             return []
 
         return [
-            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], six.text_type(mode.name))
+            Group(ENROLLMENT_GROUP_IDS[mode.slug]["id"], str(mode.name))
             for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
 
 
-class EnrollmentTrackPartitionScheme(object):
+class EnrollmentTrackPartitionScheme:
     """
     This scheme uses learner enrollment tracks to map learners into partition groups.
     """
@@ -96,7 +95,7 @@ class EnrollmentTrackPartitionScheme(object):
                 course_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             if not course_mode:
                 course_mode = CourseMode.DEFAULT_MODE
-            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], six.text_type(course_mode.name))
+            return Group(ENROLLMENT_GROUP_IDS[course_mode.slug]["id"], str(course_mode.name))
         else:
             return None
 
@@ -118,8 +117,8 @@ class EnrollmentTrackPartitionScheme(object):
         """
         return EnrollmentTrackUserPartition(
             id,
-            six.text_type(name),
-            six.text_type(description),
+            str(name),
+            str(description),
             [],
             cls,
             parameters,

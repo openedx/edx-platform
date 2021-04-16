@@ -3,11 +3,11 @@
 
 from datetime import datetime, timedelta
 from enum import Enum
+from unittest.mock import patch
 
 import ddt
 import pytz
 from django.conf import settings
-from mock import patch
 from oauth2_provider import models as dot_models
 from rest_framework import status
 
@@ -46,7 +46,7 @@ def utcnow():
 
 
 @ddt.ddt
-class AuthAndScopesTestMixin(object):
+class AuthAndScopesTestMixin:
     """
     Mixin class to test authentication and oauth scopes for an API.
     Test classes that use this Mixin need to define:
@@ -61,7 +61,7 @@ class AuthAndScopesTestMixin(object):
     user_password = 'test'
 
     def setUp(self):
-        super(AuthAndScopesTestMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.student = UserFactory.create(password=self.user_password)
         self.other_student = UserFactory.create(password=self.user_password)
         self.global_staff = UserFactory.create(password=self.user_password, is_staff=True)
@@ -84,12 +84,12 @@ class AuthAndScopesTestMixin(object):
         elif auth_type == AuthType.oauth:
             if not token:
                 token = self._create_oauth_token(requesting_user)
-            auth_header = u"Bearer {0}".format(token)
+            auth_header = f"Bearer {token}"
         else:
             assert auth_type in JWT_AUTH_TYPES
             if not token:
                 token = self._create_jwt_token(requesting_user, auth_type)
-            auth_header = u"JWT {0}".format(token)
+            auth_header = f"JWT {token}"
 
         extra = dict(HTTP_AUTHORIZATION=auth_header) if auth_header else {}
         return self.client.get(
@@ -119,7 +119,7 @@ class AuthAndScopesTestMixin(object):
         """ Creates and returns a JWT token for the given user with the given parameters. """
         filters = []
         if include_org_filter:
-            filters += ['content_org:{}'.format(self.course.id.org)]
+            filters += [f'content_org:{self.course.id.org}']
         if include_me_filter:
             filters += ['user:me']
 

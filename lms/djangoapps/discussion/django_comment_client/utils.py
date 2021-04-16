@@ -17,7 +17,6 @@ from pytz import UTC
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
@@ -36,6 +35,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
@@ -924,7 +924,7 @@ def is_commentable_divided(course_key, commentable_id, course_discussion_setting
     if not course_discussion_settings:
         course_discussion_settings = get_course_discussion_settings(course_key)
 
-    course = courses.get_course_by_id(course_key)
+    course = get_course_by_id(course_key)
 
     if not course_discussion_division_enabled(course_discussion_settings) or get_team(commentable_id):
         # this is the easy case :)
@@ -1034,7 +1034,7 @@ def get_group_names_by_id(course_discussion_settings):
     division_scheme = _get_course_division_scheme(course_discussion_settings)
     course_key = course_discussion_settings.course_id
     if division_scheme == CourseDiscussionSettings.COHORT:
-        return get_cohort_names(courses.get_course_by_id(course_key))
+        return get_cohort_names(get_course_by_id(course_key))
     elif division_scheme == CourseDiscussionSettings.ENROLLMENT_TRACK:
         # We negate the group_ids from dynamic partitions so that they will not conflict
         # with cohort IDs (which are an auto-incrementing integer field, starting at 1).

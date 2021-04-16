@@ -30,12 +30,6 @@ from django.utils.translation import ugettext as _
         </li>
       % endif
     % endif
-    % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
-      <li class="item">
-        ## Translators: This is short for "System administration".
-        <a class="btn" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
-      </li>
-    % endif
   </%block>
 </ol>
 

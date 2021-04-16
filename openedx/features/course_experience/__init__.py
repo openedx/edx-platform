@@ -7,7 +7,6 @@ from edx_django_utils.monitoring import set_custom_attribute
 from waffle import flag_is_active
 
 from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace
-from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.util.user_messages import UserMessageCollection
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -32,7 +31,6 @@ DISPLAY_COURSE_SOCK_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'display_cour
 # Waffle flag to let learners access a course before its start date.
 COURSE_PRE_START_ACCESS_FLAG = LegacyWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_start_access', __name__)
 
-# Waffle flag to enable the setting of course goals.
 # .. toggle_name: course_experience.enable_course_goals
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -41,7 +39,6 @@ COURSE_PRE_START_ACCESS_FLAG = LegacyWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'pre_star
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: This temporary feature toggle does not have a target removal date.
-# .. toggle_tickets: None
 ENABLE_COURSE_GOALS = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'enable_course_goals', __name__)
 
 # Waffle flag to control the display of the hero
@@ -50,18 +47,16 @@ SHOW_UPGRADE_MSG_ON_COURSE_HOME = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'show_
 # Waffle flag to control the display of the upgrade deadline message
 UPGRADE_DEADLINE_MESSAGE = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'upgrade_deadline_message', __name__)
 
-# Waffle flag to switch between the 'welcome message' and 'latest update' on the course home page.
 # .. toggle_name: course_experience.latest_update
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Used to switch between 'welcome message' and 'latest update' on the course home page.
-# .. toggle_use_cases: opt_out
+# .. toggle_use_cases: opt_out, temporary
 # .. toggle_creation_date: 2017-09-11
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: This is meant to be configured using waffle_utils course override only. Either do not create the
 #   actual waffle flag, or be sure to unset the flag even for Superusers. This is no longer used in the learning MFE
 #   and can be removed when the outline tab is fully moved to the learning MFE.
-# .. toggle_tickets: None
 LATEST_UPDATE_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'latest_update', __name__)
 
 # Waffle flag to enable anonymous access to a course
@@ -73,16 +68,16 @@ COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(
 )
 
 # .. toggle_name: course_experience.relative_dates
-# .. toggle_implementation: ExperimentWaffleFlag
+# .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable relative dates for course content. A 'Dates' tab will be visible in the
-#   course view showing key course dates.
+#   course view showing key course dates. Was previously an ExperimentWaffleFlag with experiment_id=17.
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2020-02-10
 # .. toggle_warnings: To set a relative due date for self-paced courses, the weeks_to_complete field for a course run
 #   needs to be set. Currently it can be set through the publisher app.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-27
-RELATIVE_DATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__, experiment_id=17)
+RELATIVE_DATES_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'relative_dates', __name__)
 
 # .. toggle_name: course_experience.calendar_sync
 # .. toggle_implementation: CourseWaffleFlag

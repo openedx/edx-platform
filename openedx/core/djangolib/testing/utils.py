@@ -23,7 +23,7 @@ from django.test.utils import CaptureQueriesContext
 from edx_django_utils.cache import RequestCache
 
 
-class CacheIsolationMixin(object):
+class CacheIsolationMixin:
     """
     This class can be used to enable specific django caches for
     the specific TestCase that it's mixed into.
@@ -50,16 +50,16 @@ class CacheIsolationMixin(object):
 
     @classmethod
     def setUpClass(cls):
-        super(CacheIsolationMixin, cls).setUpClass()
+        super().setUpClass()
         cls.start_cache_isolation()
 
     @classmethod
     def tearDownClass(cls):
         cls.end_cache_isolation()
-        super(CacheIsolationMixin, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
-        super(CacheIsolationMixin, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         self.clear_caches()
         self.addCleanup(self.clear_caches)
@@ -165,7 +165,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         self.test_case = test_case
         self.num = num
         self.table_blacklist = table_blacklist
-        super(_AssertNumQueriesContext, self).__init__(connection)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
         def is_unfiltered_query(query):
@@ -181,24 +181,24 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
                     # SQL contains the following format for columns:
                     # "table_name"."column_name".  The regex ensures there is no
                     # "." before the name to avoid matching columns.
-                    if re.search(r'[^.]"{}"'.format(table), query['sql']):
+                    if re.search(fr'[^.]"{table}"', query['sql']):
                         return False
             return True
 
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         filtered_queries = [query for query in self.captured_queries if is_unfiltered_query(query)]
         executed = len(filtered_queries)
 
         assert executed == self.num, (
-            u'%d queries executed, %d expected\nCaptured queries were:\n%s' % (
-                executed, self.num, '\n'.join((query['sql'] for query in filtered_queries))
+            '%d queries executed, %d expected\nCaptured queries were:\n%s' % (
+                executed, self.num, '\n'.join(query['sql'] for query in filtered_queries)
             )
         )
 
 
-class FilteredQueryCountMixin(object):
+class FilteredQueryCountMixin:
     """
     Mixin to add to any subclass of Django's TestCase that replaces
     assertNumQueries with one that accepts a blacklist of tables to filter out

@@ -12,7 +12,7 @@ class AuthFailedError(Exception):
     def __init__(  # lint-amnesty, pylint: disable=dangerous-default-value
         self, value=None, redirect=None, redirect_url=None, error_code=None, context={},
     ):
-        super(AuthFailedError, self).__init__()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__()
         self.value = Text(value)
         self.redirect = redirect
         self.redirect_url = redirect_url

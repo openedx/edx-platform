@@ -32,6 +32,7 @@ from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
+from openedx.core.lib.courses import get_course_by_id
 
 USER_PASSWORD = 'test'
 
@@ -422,7 +423,7 @@ class CcxListTest(CcxRestApiTest):
         self.mstore.update_item(self.course, self.coach.id)
 
         # case with deprecated  master_course_id
-        with mock.patch('lms.djangoapps.courseware.courses.get_course_by_id', autospec=True) as mocked:
+        with mock.patch('lms.djangoapps.ccx.api.v0.views.get_course_by_id', autospec=True) as mocked:
             mocked.return_value.id.deprecated = True
             resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=self.auth)
 
@@ -594,7 +595,7 @@ class CcxListTest(CcxRestApiTest):
         coach_role_on_master_course = CourseCcxCoachRole(self.master_course_key)
         assert coach_role_on_master_course.has_user(self.coach)
         # check that the coach has been enrolled in the ccx
-        ccx_course_object = courses.get_course_by_id(course_key)
+        ccx_course_object = get_course_by_id(course_key)
         assert CourseEnrollment.objects.filter(course_id=ccx_course_object.id, user=self.coach).exists()
         # check that an email has been sent to the coach
         assert len(outbox) == 1
@@ -1053,7 +1054,7 @@ class CcxDetailTest(CcxRestApiTest):
         coach_role_on_master_course = CourseCcxCoachRole(self.master_course_key)
         assert coach_role_on_master_course.has_user(new_coach)
         # check that the coach has been enrolled in the ccx
-        ccx_course_object = courses.get_course_by_id(self.ccx_key)
+        ccx_course_object = get_course_by_id(self.ccx_key)
         assert CourseEnrollment.objects.filter(course_id=ccx_course_object.id, user=new_coach).exists()
         # check that an email has been sent to the coach
         assert len(outbox) == 1

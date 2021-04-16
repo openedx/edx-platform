@@ -81,6 +81,8 @@ FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = True
 
 FEATURES['ENABLE_BULK_ENROLLMENT_VIEW'] = True
 
+FEATURES['ENABLE_BULK_USER_RETIREMENT'] = True
+
 DEFAULT_MOBILE_AVAILABLE = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
@@ -269,10 +271,6 @@ OAUTH_ENFORCE_SECURE = False
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
-
-########################### SYSADMIN DASHBOARD ################################
-FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
-GIT_REPO_DIR = TEST_ROOT / "course_repos"
 
 ################################# CELERY ######################################
 
@@ -592,6 +590,7 @@ RATELIMIT_RATE = '2/m'
 LOGISTRATION_RATELIMIT_RATE = '5/5m'
 LOGISTRATION_PER_EMAIL_RATELIMIT_RATE = '6/5m'
 LOGISTRATION_API_RATELIMIT = '5/m'
+LOGIN_AND_REGISTER_FORM_RATELIMIT = '5/5m'
 
 REGISTRATION_VALIDATION_RATELIMIT = '5/minute'
 REGISTRATION_RATELIMIT = '5/minute'

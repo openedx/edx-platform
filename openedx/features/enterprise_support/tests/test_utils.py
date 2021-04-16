@@ -58,12 +58,17 @@ class TestEnterpriseUtils(TestCase):
     def test_get_data_consent_share_cache_key(self, mock_get_cache_key):
         expected_cache_key = mock_get_cache_key.return_value
 
-        assert expected_cache_key == get_data_consent_share_cache_key('some-user-id', 'some-course-id')
+        assert expected_cache_key == get_data_consent_share_cache_key(
+            'some-user-id',
+            'some-course-id',
+            '1a9cae8f-abb7-4336-b075-6ff32ecf73de'
+        )
 
         mock_get_cache_key.assert_called_once_with(
             type='data_sharing_consent_needed',
             user_id='some-user-id',
             course_id='some-course-id',
+            enterprise_customer_uuid='1a9cae8f-abb7-4336-b075-6ff32ecf73de'
         )
 
     @mock.patch('openedx.features.enterprise_support.utils.get_cache_key')
@@ -71,13 +76,15 @@ class TestEnterpriseUtils(TestCase):
     def test_clear_data_consent_share_cache(self, mock_tiered_cache, mock_get_cache_key):
         user_id = 'some-user-id'
         course_id = 'some-course-id'
+        enterprise_customer_uuid = '1a9cae8f-abb7-4336-b075-6ff32ecf73de'
 
-        clear_data_consent_share_cache(user_id, course_id)
+        clear_data_consent_share_cache(user_id, course_id, enterprise_customer_uuid)
 
         mock_get_cache_key.assert_called_once_with(
             type='data_sharing_consent_needed',
             user_id='some-user-id',
             course_id='some-course-id',
+            enterprise_customer_uuid=enterprise_customer_uuid
         )
         mock_tiered_cache.delete_all_tiers.assert_called_once_with(mock_get_cache_key.return_value)
 
@@ -254,7 +261,7 @@ class TestEnterpriseUtils(TestCase):
     @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_get_enterprise_readonly_account_fields_no_sync_learner_profile_data(
-            self, mock_customer_for_request, mock_get_current_request
+            self, mock_customer_for_request, mock_get_current_request,
     ):
         mock_get_current_request.return_value = mock.Mock(
             GET={'enterprise_customer': 'some-uuid'},
@@ -262,6 +269,7 @@ class TestEnterpriseUtils(TestCase):
         mock_customer_for_request.return_value = {
             'uuid': 'some-uuid',
             'identity_provider': None,
+            'identity_providers': [],
         }
         user = mock.Mock()
 
@@ -283,6 +291,11 @@ class TestEnterpriseUtils(TestCase):
         mock_customer_for_request.return_value = {
             'uuid': 'some-uuid',
             'identity_provider': 'mock-idp',
+            'identity_providers': [
+                {
+                    "provider_id": "mock-idp",
+                },
+            ]
         }
         mock_idp = mock.MagicMock(
             backend_name='mock-backend',
@@ -299,11 +312,10 @@ class TestEnterpriseUtils(TestCase):
         mock_get_current_request.assert_called_once_with()
 
         mock_tpa.provider.Registry.get.assert_called_with(provider_id='mock-idp')
-
         mock_select_related = mock_user_social_auth.objects.select_related
         mock_select_related.assert_called_once_with('user')
         mock_select_related.return_value.filter.assert_called_once_with(
-            provider=mock_idp.backend_name,
+            provider__in=[mock_idp.backend_name],
             user=user
         )
 

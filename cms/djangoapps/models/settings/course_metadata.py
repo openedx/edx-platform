@@ -18,6 +18,7 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.lib.teams_config import TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidProctoringProvider
 
 
 class CourseMetadata:
@@ -245,7 +246,7 @@ class CourseMetadata:
                 val = model['value']
                 if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                     key_values[key] = descriptor.fields[key].from_json(val)
-            except (TypeError, ValueError, ValidationError) as err:
+            except (InvalidProctoringProvider, TypeError, ValueError, ValidationError) as err:
                 did_validate = False
                 errors.append({'key': key, 'message': str(err), 'model': model})
 

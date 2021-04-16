@@ -32,6 +32,7 @@ class CourseHomeMetadataSerializer(serializers.Serializer):
     Serializer for the Course Home Course Metadata
     """
     course_id = serializers.CharField()
+    username = serializers.CharField()
     is_enrolled = serializers.BooleanField()
     is_self_paced = serializers.BooleanField()
     is_staff = serializers.BooleanField()
