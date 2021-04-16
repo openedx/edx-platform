@@ -35,7 +35,7 @@ from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 
-from ..capa_base import RANDOMIZATION, SHOWANSWER
+from ..capa_module import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
 
 
@@ -1913,8 +1913,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert 0 <= module.seed < 1000
             i -= 1
 
-    @patch('xmodule.capa_base.log')
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.log')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -1927,7 +1927,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_no_error_if_weight_zero(self, mock_progress):
         """
         Check that if the weight is 0 get_progress does not try to create a Progress object.
@@ -1939,7 +1939,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert progress is None
         assert not mock_progress.called
 
-    @patch('xmodule.capa_base.Progress')
+    @patch('xmodule.capa_module.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.
