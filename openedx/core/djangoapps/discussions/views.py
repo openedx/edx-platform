@@ -150,6 +150,8 @@ class DiscussionsConfigurationView(APIView):
                 value = validated_data.get(key)
                 if value is not None:
                     setattr(instance, key, value)
+            # _update_* helpers assume `enabled` and `provider_type`
+            # have already been set
             instance = self._update_lti(instance, validated_data)
             instance.save()
             return instance
@@ -159,15 +161,19 @@ class DiscussionsConfigurationView(APIView):
             Update LtiConfiguration
             """
             lti_configuration_data = validated_data.get('lti_configuration')
-            if lti_configuration_data:
-                instance.lti_configuration = instance.lti_configuration or LtiConfiguration()
-                lti_configuration = LtiSerializer(
-                    instance.lti_configuration,
+            supports_lti = instance.supports('lti')
+            if not supports_lti:
+                instance.lti_configuration = None
+            elif lti_configuration_data:
+                lti_configuration = instance.lti_configuration or LtiConfiguration()
+                lti_serializer = LtiSerializer(
+                    lti_configuration,
                     data=lti_configuration_data,
                     partial=True,
                 )
-                if lti_configuration.is_valid(raise_exception=True):
-                    lti_configuration.save()
+                if lti_serializer.is_valid(raise_exception=True):
+                    lti_serializer.save()
+                instance.lti_configuration = lti_configuration
             return instance
 
     # pylint: disable=redefined-builtin
