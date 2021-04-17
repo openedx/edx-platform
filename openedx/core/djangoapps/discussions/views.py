@@ -144,12 +144,7 @@ class DiscussionsConfigurationView(APIView):
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
                     'active': instance.provider_type or DEFAULT_PROVIDER_TYPE,
-                    'available': {
-                        provider: {
-                            'features': PROVIDER_FEATURE_MAP.get(provider) or [],
-                        }
-                        for provider in instance.available_providers
-                    },
+                    'available': PROVIDER_FEATURE_MAP,
                 },
             })
             return payload
