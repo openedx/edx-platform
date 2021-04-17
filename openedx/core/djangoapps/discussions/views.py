@@ -16,19 +16,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
-
-
-PROVIDER_FEATURE_MAP = {
-    'legacy': [
-        'discussion-page',
-        'embedded-course-sections',
-        'wcag-2.1',
-    ],
-    'piazza': [
-        'discussion-page',
-        'lti',
-    ],
-}
+from .models import PROVIDER_FEATURE_MAP
 
 
 class IsStaff(BasePermission):
