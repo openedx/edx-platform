@@ -389,6 +389,8 @@ class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert 'aVAP' in g
 
     def test_matplot(self):
+        if not jail_code.is_configured("python"):
+            pytest.skip()
         code = textwrap.dedent("""\
             import matplotlib.pyplot as plt
             import numpy as np
