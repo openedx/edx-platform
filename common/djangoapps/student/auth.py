@@ -19,10 +19,10 @@ from common.djangoapps.student.roles import (
     CourseStaffRole,
     GlobalStaff,
     LibraryUserRole,
+    OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole,
-    OrgContentCreatorRole
+    OrgStaffRole
 )
 
 # Studio permissions:

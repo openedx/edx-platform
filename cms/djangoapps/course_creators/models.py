@@ -4,7 +4,7 @@ Table for storing information about whether or not Studio users have course crea
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import models
-from django.db.models.signals import post_init, post_save, m2m_changed
+from django.db.models.signals import post_init, post_save
 from django.dispatch import Signal, receiver
 from django.utils import timezone
 
@@ -47,8 +47,11 @@ class CourseCreator(models.Model):
                              help_text=_("Current course creator state"))
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
-    orgs = models.ManyToManyField(Organization, blank=True, help_text=_("Organizations for which content creator is a part of"))
-    all_organizations = models.BooleanField(default=True, help_text=_("To restrict the course creation by user in specific organizations"))
+    orgs = models.ManyToManyField(Organization, blank=True,
+                                  help_text=_("Organizations for which content creator is a part of"))
+    all_organizations = models.BooleanField(default=True,
+                                            help_text=_("To restrict the course creation by user in \
+                                                specific organizations"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"

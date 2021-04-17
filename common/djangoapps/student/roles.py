@@ -256,8 +256,10 @@ class OrgRole(RoleBase):
         """
         from common.djangoapps.student.models import CourseAccessRole  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
         org_role_to_delete = []
-        org_role_to_create = []
-        existing_org_role = set(CourseAccessRole.objects.filter(user=user, role=self._role_name).values_list('org', flat=True))
+        orgs_role_to_create = []
+        existing_org_role = set(CourseAccessRole.objects \
+            .filter(user=user, role=self._role_name) \
+            .values_list('org', flat=True))
         orgs_role_to_create = list(set(orgs) - existing_org_role)
         org_role_to_delete = list(existing_org_role - set(orgs))
         if user.is_authenticated and user.is_active and not self.has_user(user):

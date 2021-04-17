@@ -7,9 +7,9 @@ import logging
 from smtplib import SMTPException
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
@@ -34,11 +34,18 @@ get_email.short_description = 'email'
 
 
 class CourseCreatorForm(forms.ModelForm):
+    """
+    Admin form for course creator
+    """
     class Meta:
         model = CourseCreator
         fields = '__all__'
 
     def clean(self):
+        """
+        Running validation of the form. Validation to stop user from entering
+        false data.
+        """
         all_orgs = self.cleaned_data.get("all_organizations")
         updated_state = self.cleaned_data.get("state")
         orgs = self.cleaned_data.get("orgs").exists()
@@ -46,7 +53,7 @@ class CourseCreatorForm(forms.ModelForm):
         if not add_role and orgs:
             raise ValidationError("Organizations cannot be added if the role is not granted.")
         if orgs and all_orgs:
-            raise ValidationError("All Organization should be disabled to use organization restrictions.")
+            raise ValidationError("All Organization should be disabled to add organization")
         if not orgs and not all_orgs:
             raise ValidationError("Organizations should be added if All Organization is disabled.")
 
@@ -169,7 +176,7 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
 
 
 @receiver(m2m_changed, sender=CourseCreator.orgs.through)
-def post_all_organizations_callback(sender, **kwargs):
+def post_all_organizations_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Callback for addition and removal for orgs field.
     """
