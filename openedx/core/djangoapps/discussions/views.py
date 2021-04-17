@@ -120,7 +120,11 @@ class DiscussionsConfigurationView(APIView):
             Serialize data into a dictionary, to be used as a response
             """
             payload = super().to_representation(instance)
-            lti_configuration = LtiSerializer(instance.lti_configuration)
+            lti_configuration_data = {}
+            supports_lti = instance.supports('lti')
+            if supports_lti:
+                lti_configuration = LtiSerializer(instance.lti_configuration)
+                lti_configuration_data = lti_configuration.data
             payload.update({
                 'features': {
                     'discussion-page',
@@ -128,7 +132,7 @@ class DiscussionsConfigurationView(APIView):
                     'lti',
                     'wcag-2.1',
                 },
-                'lti_configuration': lti_configuration.data,
+                'lti_configuration': lti_configuration_data,
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
                     'active': instance.provider_type or DEFAULT_PROVIDER_TYPE,
