@@ -14,14 +14,12 @@ from common.djangoapps.student.roles import (
     CourseRole,
     CourseStaffRole,
     GlobalStaff,
+    OrgContentCreatorRole,
     OrgInstructorRole,
     OrgStaffRole,
     RoleCache
 )
-from common.djangoapps.student.tests.factories import AnonymousUserFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, InstructorFactory, StaffFactory, UserFactory
 
 
 class RolesTestCase(TestCase):
@@ -38,6 +36,7 @@ class RolesTestCase(TestCase):
         self.global_staff = UserFactory(is_staff=True)
         self.course_staff = StaffFactory(course_key=self.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course_key)
+        self.orgs = ["Marvel", "DC"]
 
     def test_global_staff(self):
         assert not GlobalStaff().has_user(self.student)
@@ -141,6 +140,28 @@ class RolesTestCase(TestCase):
         role.add_users(self.student)
         role.remove_users(self.student)
         assert not role.has_user(self.student)
+
+    def test_update_org_course_role(self):
+        """
+        Test update_org_course_role
+        """
+        role = OrgContentCreatorRole()
+        role.update_org_course_role(self.student, self.orgs)
+        # Check both roles got created
+        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) > 0
+        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) > 0
+
+        # Check if the org list is updated
+        role.update_org_course_role(self.student, ["Edx"])
+        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
+        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
+        assert len(OrgContentCreatorRole("Edx").users_with_role()) == 1
+
+        # Check removing all orgs
+        role.update_org_course_role(self.student, [])
+        assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
+        assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
+        assert len(OrgContentCreatorRole("Edx").users_with_role()) == 0
 
 
 @ddt.ddt
