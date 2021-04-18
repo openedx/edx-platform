@@ -361,7 +361,7 @@ class OrgInstructorRole(OrgRole):
 
 @register_access_role
 class OrgContentCreatorRole(OrgRole):
-    """An organization instructor"""
+    """An organization content creator"""
 
     ROLE = "org_course_creator_group"
 

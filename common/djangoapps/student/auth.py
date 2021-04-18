@@ -50,7 +50,7 @@ def user_has_role(user, role, org=None):
     """
     if not user.is_active:
         return False
-    # do cheapest check first even tho it's not the direct one
+    # Do cheapest check first even though it's not the direct one
     if GlobalStaff().has_user(user):
         return True
     # CourseCreator is odd b/c it can be disabled via config
@@ -64,13 +64,14 @@ def user_has_role(user, role, org=None):
 
     if role.has_user(user):
         return True
-    # If user has content creation for org
-    if org and OrgContentCreatorRole(org=org).has_user(user):
-        return True
-    # if not, then check inferred permissions
+    # If not, then check inferred permissions
     if (isinstance(role, (CourseStaffRole, CourseBetaTesterRole)) and
             CourseInstructorRole(role.course_key).has_user(user)):
         return True
+    # If user has content creation for org
+    if org and OrgContentCreatorRole(org=org).has_user(user):
+        return True
+
     return False
 
 
@@ -94,6 +95,9 @@ def get_user_permissions(user, course_key, org=None):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
+    # User has all permission for libraries and courses if user belongs to contenten creator role.
+    if OrgContentCreatorRole(org=org).has_user(user):
+        return all_perms
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
@@ -101,8 +105,6 @@ def get_user_permissions(user, course_key, org=None):
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
-    if OrgContentCreatorRole(org=org).has_user(user):
-        return all_perms
     return STUDIO_NO_PERMISSIONS
 
 
