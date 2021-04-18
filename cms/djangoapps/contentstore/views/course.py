@@ -50,6 +50,7 @@ from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
+    OrgContentCreatorRole,
     UserBasedRole
 )
 from common.djangoapps.util.course import get_link_for_about_page
@@ -857,8 +858,10 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
+        is_course_creator = auth.user_has_role(request.user, CourseCreatorRole()) or \
+                            auth.user_has_role(request.user, OrgContentCreatorRole(org=org))
 
-        if not auth.user_has_role(request.user, CourseCreatorRole(), org):
+        if not is_course_creator:
             raise PermissionDenied()
 
         # allow/disable unicode characters in course_id according to settings

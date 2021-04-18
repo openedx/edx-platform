@@ -42,7 +42,7 @@ def is_ccx_course(course_key):
     return isinstance(course_key, CCXLocator) or isinstance(course_key, CCXBlockUsageLocator)  # lint-amnesty, pylint: disable=consider-merging-isinstance
 
 
-def user_has_role(user, role, org=None):
+def user_has_role(user, role):
     """
     Check whether this user has access to this role (either direct or implied)
     :param user:
@@ -67,9 +67,6 @@ def user_has_role(user, role, org=None):
     # If not, then check inferred permissions
     if (isinstance(role, (CourseStaffRole, CourseBetaTesterRole)) and
             CourseInstructorRole(role.course_key).has_user(user)):
-        return True
-    # If user has content creation for org
-    if org and OrgContentCreatorRole(org=org).has_user(user):
         return True
 
     return False
