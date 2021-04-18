@@ -858,8 +858,8 @@ def _create_or_rerun_course(request):
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
-        is_course_creator = auth.user_has_role(request.user, CourseCreatorRole()) or \
-                            auth.user_has_role(request.user, OrgContentCreatorRole(org=org))
+        is_course_creator = (auth.user_has_role(request.user, CourseCreatorRole()) or
+                             auth.user_has_role(request.user, OrgContentCreatorRole(org=org)))
 
         if not is_course_creator:
             raise PermissionDenied()
