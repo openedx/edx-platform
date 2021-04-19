@@ -870,7 +870,7 @@
             var sibling = preview.nextSibling;
             parent.removeChild(preview);
             preview.innerHTML = text;
-            if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); }
+            if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); } // eslint-disable-line max-len, xss-lint: disable=javascript-jquery-insert-into-target
         };
 
         var nonSuckyBrowserPreviewSet = function(text) {
@@ -1053,7 +1053,7 @@
                 }
 
                 document.getElementById('wmd-editor-dialog-form-errors').textContent = [
-                    interpolate(
+                    interpolate( // eslint-disable-line no-undef, xss-lint: disable=javascript-interpolate
                         ngettext(
                             // Translators: 'errorCount' is the number of errors found in the form.
                             '%(errorCount)s error found in form.', '%(errorCount)s errors found in form.',
@@ -1523,7 +1523,7 @@
     };
 
     commandProto.wrap = function(chunk, len) {
-        this.unwrap(chunk);
+        this.unwrap(chunk); // xss-lint: disable=javascript-jquery-insertion
         var regex = new re('(.{1,' + len + '})( +|$\\n?)', 'gm'),
             that = this;
 
@@ -1935,13 +1935,13 @@
         };
 
         if (/^(?![ ]{0,3}>)/m.test(chunk.selection)) {
-            this.wrap(chunk, SETTINGS.lineLength - 2);
+            this.wrap(chunk, SETTINGS.lineLength - 2); // xss-lint: disable=javascript-jquery-insertion
             chunk.selection = chunk.selection.replace(/^/gm, '> ');
             replaceBlanksInTags(true);
             chunk.skipLines();
         } else {
             chunk.selection = chunk.selection.replace(/^[ ]{0,3}> ?/gm, '');
-            this.unwrap(chunk);
+            this.unwrap(chunk); // xss-lint: disable=javascript-jquery-insertion
             replaceBlanksInTags(false);
 
             if (!/^(\n|^)[ ]{0,3}>/.test(chunk.selection) && chunk.startTag) {
@@ -2073,7 +2073,7 @@
             var hasDigits = /\d+[.]/.test(chunk.startTag);
             chunk.startTag = '';
             chunk.selection = chunk.selection.replace(/\n[ ]{4}/g, '\n');
-            this.unwrap(chunk);
+            this.unwrap(chunk); // xss-lint: disable=javascript-jquery-insertion
             chunk.skipLines();
 
             if (hasDigits) {
@@ -2114,7 +2114,7 @@
         chunk.skipLines(nLinesUp, nLinesDown, true);
         chunk.startTag = prefix;
         var spaces = prefix.replace(/./g, ' ');
-        this.wrap(chunk, SETTINGS.lineLength - spaces.length);
+        this.wrap(chunk, SETTINGS.lineLength - spaces.length); // xss-lint: disable=javascript-jquery-insertion
         chunk.selection = chunk.selection.replace(/\n/g, '\n' + spaces);
     };
 

@@ -148,9 +148,10 @@
 
     function formatInfo(raw_info) {
         var results = [];
+        var fragment;
 
         if (raw_info.search('It is not possible') == -1) {
-            var fragment = $('<div>').append(raw_info);
+            fragment = $('<div>').append(raw_info); // xss-lint: disable=javascript-jquery-append
             fragment.find('font').each(function() {
                 results.push($(this).html());
             });
@@ -173,7 +174,7 @@
     function updateMessages(message_field, values) {
         var error = values.error;
         if (error) {
-            message_field.html(error).show();
+            message_field.html(error).show(); // xss-lint: disable=javascript-jquery-html
         } else {
             // Clear messages
             message_field.html('').hide();
