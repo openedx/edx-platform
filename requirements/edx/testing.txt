@@ -150,7 +150,7 @@ html5lib==1.1             # via -r requirements/edx/base.txt, ora2
 httpretty==0.9.7          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.in
 icalendar==4.0.7          # via -r requirements/edx/base.txt
 idna==2.10                # via -r requirements/edx/base.txt, requests
-importlib-metadata==3.10.1  # via -r requirements/edx/coverage.txt, inflect, pytest-randomly
+importlib-metadata==4.0.0  # via -r requirements/edx/coverage.txt, inflect, pytest-randomly
 inflect==3.0.2            # via -c requirements/edx/../constraints.txt, -r requirements/edx/coverage.txt, jinja2-pluralize
 inflection==0.5.1         # via -r requirements/edx/base.txt, drf-yasg
 iniconfig==1.1.1          # via pytest
