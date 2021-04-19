@@ -228,7 +228,7 @@ pillow==5.4.1
 pluggy==0.8.1             # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
-py2neo==3.1.2
+git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2             # via -r requirements/edx/base.txt
 py==1.7.0                 # via pytest, tox
 pyasn1-modules==0.2.3     # via service-identity
 pyasn1==0.4.5             # via pyasn1-modules, service-identity
