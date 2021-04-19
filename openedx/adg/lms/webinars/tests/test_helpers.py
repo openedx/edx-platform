@@ -25,14 +25,16 @@ def test_send_webinar_emails(mocker):
     mocked_task_send_mandrill_email = mocker.patch('openedx.adg.lms.webinars.helpers.task_send_mandrill_email')
 
     webinar = WebinarFactory()
-    send_webinar_emails("test_slug", webinar.id, webinar.title, webinar.description, webinar.start_time, "t1@eg.com")
+    send_webinar_emails(
+        "test_slug", webinar.id, webinar.title, webinar.description, webinar.start_time, "t1@eg.com", None)
 
     expected_context = {
+        'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
         'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
     }
-    mocked_task_send_mandrill_email.delay.assert_called_with("test_slug", "t1@eg.com", expected_context)
+    mocked_task_send_mandrill_email.delay.assert_called_with("test_slug", "t1@eg.com", expected_context, None)
 
 
 @pytest.mark.django_db
@@ -92,12 +94,13 @@ def test_send_cancellation_emails_for_given_webinars(
     send_cancellation_emails_for_given_webinars([webinar])
 
     expected_context = {
+        'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
         'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
     }
 
-    actual_template, actual_email_addresses, actual_context = mocked_task_send_mandrill_email.delay.call_args.args
+    actual_template, actual_email_addresses, actual_context, _ = mocked_task_send_mandrill_email.delay.call_args.args
 
     assert actual_template == MandrillClient.WEBINAR_CANCELLATION
     assert actual_context == expected_context
