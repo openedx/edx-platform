@@ -1,12 +1,16 @@
+"""
+Sync groups with pynodebb
+"""
 from pynodebb.api.groups import Group
 
 
+# pylint: disable=abstract-method
 class ForumGroup(Group):
     """
     Added custom methods to the default Group class of pynodebb package
     """
 
-    def create(self, **kwargs):
+    def create(self, **kwargs):  # pylint: disable=arguments-differ
         """
         Create a group on NodeBB
 
@@ -57,7 +61,7 @@ class ForumGroup(Group):
         """
         return self.client.put('/api/v2/groupChat/update/%s' % room_id, **kwargs)
 
-    def delete(self, room_id, **kwargs):
+    def delete(self, room_id, **kwargs):  # pylint: disable=arguments-differ
         """
         Delete a group from Nodebb
 

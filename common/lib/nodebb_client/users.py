@@ -1,5 +1,6 @@
-from requests.exceptions import ConnectionError
-
+"""
+Sync users with pynodebb
+"""
 from pynodebb.api.users import User
 
 
@@ -22,7 +23,7 @@ class ForumUser(User):
         payload = {'category_id': category_id, 'username': username, '_uid': uid}
         return self.client.post('/api/v2/users/unjoin', **payload)
 
-    def create(self, username, user_data):
+    def create(self, username, user_data):  # pylint: disable=arguments-differ
         """
         Create a user on Nodebb
         @param: username - str
