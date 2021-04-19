@@ -1,6 +1,7 @@
 define(
-    ['underscore', 'js/models/active_video_upload', 'js/views/baseview', 'common/js/components/views/feedback_prompt'],
-    function(_, ActiveVideoUpload, BaseView, PromptView) {
+    ['underscore', 'js/models/active_video_upload', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
+        'edx-ui-toolkit/js/utils/html-utils'],
+    function(_, ActiveVideoUpload, BaseView, PromptView, HtmlUtils) {
         'use strict';
 
         var STATUS_CLASSES = [
@@ -25,7 +26,7 @@ define(
             render: function() {
                 var $el = this.$el,
                     status;
-                $el.html(this.template(this.model.attributes));
+                $el.html(HtmlUtils.HTML(this.template(this.model.attributes)).toString());
                 status = this.model.get('status');
                 _.each(
                     STATUS_CLASSES,
