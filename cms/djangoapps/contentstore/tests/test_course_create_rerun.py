@@ -12,15 +12,16 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from organizations.api import add_organization, get_course_organizations, get_organization_by_short_name
 from organizations.exceptions import InvalidOrganizationException
-
-from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.course_module import CourseFields
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from common.djangoapps.student.auth import update_org_course_role
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, OrgContentCreatorRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 
 @ddt.ddt
@@ -37,6 +38,7 @@ class TestCourseListing(ModuleStoreTestCase):
         # create and log in a non-staff user
         self.user = UserFactory()
         self.factory = RequestFactory()
+        self.global_admin = AdminFactory()
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password='test')
         self.course_create_rerun_url = reverse('course_handler')
@@ -180,3 +182,39 @@ class TestCourseListing(ModuleStoreTestCase):
             course_orgs = get_course_organizations(new_course_key)
             self.assertEqual(len(course_orgs), 1)
             self.assertEqual(course_orgs[0]['short_name'], 'orgX')
+
+    @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_creation_when_user_not_in_org(self, store):
+        """
+        Tests course creation with restriction and user not regitered in CourseAccessRole.
+        """
+        with modulestore().default_store(store):
+            response = self.client.ajax_post(self.course_create_rerun_url, {
+                'org': 'TestorgX',
+                'number': 'CS101',
+                'display_name': 'Course with web certs enabled',
+                'run': '2021_T1'
+            })
+            self.assertEqual(response.status_code, 403)
+
+    @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_creation_when_user_in_org(self, store):
+        """
+        Tests course creation with restriction and user not regitered in CourseAccessRole.
+        """
+        add_organization({
+            'name': 'Test Organization',
+            'short_name': self.source_course_key.org,
+            'description': 'Testing Organization Description',
+        })
+        update_org_course_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.source_course_key.org])
+        with modulestore().default_store(store):
+            response = self.client.ajax_post(self.course_create_rerun_url, {
+                'org': self.source_course_key.org,
+                'number': 'CS101',
+                'display_name': 'Course with web certs enabled',
+                'run': '2021_T1'
+            })
+            self.assertEqual(response.status_code, 200)
