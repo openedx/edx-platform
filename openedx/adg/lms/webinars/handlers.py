@@ -14,4 +14,4 @@ def rescheduled_reminder_emails(instance, **kwargs):  # pylint: disable=unused-a
     Reschedules reminder emails for webinar if start_time is updated.
     """
     if instance.start_time != Webinar.objects.get(id=instance.id).start_time:
-        task_reschedule_webinar_reminders.delay(instance.id)
+        task_reschedule_webinar_reminders.delay(instance.id, instance.start_time.strftime('%m/%d/%Y, %H:%M:%S'))

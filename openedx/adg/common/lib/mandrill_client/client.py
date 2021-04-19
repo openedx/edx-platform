@@ -38,7 +38,7 @@ class MandrillClient(object):
 
     def cancel_scheduled_email(self, msg_id):
         """
-        Calls the mandrill api to cancel a scheduled email.
+        Calls the mandrill API to cancel a scheduled email.
 
         Args:
             msg_id (str): Scheduled email Id.
@@ -49,32 +49,39 @@ class MandrillClient(object):
         try:
             result = self.mandrill_client.messages.cancel_scheduled(msg_id)
             log.info(result)
+            return result
         except mandrill.Error as e:
             log.error('A mandrill error occurred: {exception_class} - {exception}'.format(
                 exception_class=e.__class__, exception=e)
             )
-            raise
-        return result
 
     def reschedule_email(self, msg_id, send_at):
         """
-        Calls Mandrill api to reschedule an email.
+        Calls mandrill API to reschedule an email.
 
         Args:
             msg_id (str): Mandrill msg id of the scheduled email.
-            send_at (str): Staring containing time to reschedule at.
+            send_at (str): String containing time to reschedule at.
         """
         try:
             result = self.mandrill_client.messages.reschedule(msg_id, send_at)
             log.info(result)
+            return result
         except mandrill.Error as e:
             log.error('A mandrill error occurred: {exception_class} - {exception}'.format(
                 exception_class=e.__class__, exception=e)
             )
-            raise
-        return result
 
     def list_scheduled_emails(self, email):
+        """
+        Lists all scheduled messages for an email address.
+
+        Args:
+            email (str): Email address for which list will be fetched.
+
+        Returns:
+            list: List of scheduled emails for a user email.
+        """
         return self.mandrill_client.messages.list_scheduled(email)
 
     def _send_mail(self, email_data, send_at=None):

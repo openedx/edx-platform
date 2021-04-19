@@ -50,7 +50,7 @@ def task_cancel_mandrill_email(msg_id):
     Cancels a scheduled msg on mandrill.
 
     Args:
-        msg_id (str): Id of the scheduled email on mandrill
+        msg_id (str): Id of the scheduled email on mandrill.
     """
     log.info(f'Cancelling a scheduled email, mandrill msg_id: {msg_id}')
     MandrillClient().cancel_scheduled_email(msg_id)

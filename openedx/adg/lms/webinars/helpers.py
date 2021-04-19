@@ -140,6 +140,20 @@ def reschedule_webinar_reminders(registrations, send_at, msg_id_field_name):
         MandrillClient().reschedule_email(getattr(registration, msg_id_field_name), send_at)
 
 
+def cancel_webinar_reminders(registrations, msg_id_field_name):
+    """
+    Cancels reminders for webinar
+
+    Args:
+        registrations (list): List of webinar registrations.
+        msg_id_field_name (str): String containing field name for the mandrill msg ids.
+    """
+    for registration in registrations:
+        msg_id = getattr(registration, msg_id_field_name)
+        if msg_id:
+            MandrillClient().cancel_scheduled_email(msg_id)
+
+
 def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
     """
     Saves mandrill msg ids of the reminders for a webinar registration.
@@ -157,8 +171,8 @@ def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
     }
 
     for response in mandrill_response:
-        registration = WebinarRegistration.objects.get(
+        registration = WebinarRegistration.objects.filter(
             user__email=response['email'], webinar__id=webinar_id
-        )
+        ).first()
         setattr(registration, template_name_to_field_map[template_name], response['_id'])
         registration.save()
