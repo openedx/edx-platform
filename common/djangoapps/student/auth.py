@@ -92,7 +92,7 @@ def get_user_permissions(user, course_key, org=None):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
-    # User has all permission for libraries and courses if user belongs to contenten creator role.
+    # User has all permission for libraries and courses if user belongs to content creator role.
     if OrgContentCreatorRole(org=org).has_user(user):
         return all_perms
     # Staff have all permissions except EDIT_ROLES:
@@ -191,7 +191,7 @@ def _check_caller_authority(caller, role):
     if GlobalStaff().has_user(caller):
         return
 
-    if isinstance(role, (GlobalStaff, CourseCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
+    if isinstance(role, (GlobalStaff, CourseCreatorRole, OrgContentCreatorRole)):  # lint-amnesty, pylint: disable=no-else-raise
         raise PermissionDenied
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
         if not user_has_role(caller, CourseInstructorRole(role.course_key)):
