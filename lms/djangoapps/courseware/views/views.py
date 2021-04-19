@@ -90,6 +90,7 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.adg.lms.courseware_override.helpers import get_courses, get_extra_course_about_context
+from openedx.adg.lms.webinars.models import Webinar
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -267,12 +268,14 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
+    # Add upcoming webinars in context to display them on `learn` page.
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
+            'webinars': Webinar.objects.filter(status=Webinar.UPCOMING).order_by('start_time'),
         }
     )
 
