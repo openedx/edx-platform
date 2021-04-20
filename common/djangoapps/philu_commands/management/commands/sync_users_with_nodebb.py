@@ -1,27 +1,28 @@
 """
 Django management command to create users at nodeBB corresponding to edx-platform users.
 """
-import time
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-from requests.exceptions import ConnectionError
 
-from nodebb.tasks import (
-    task_create_user_on_nodebb,
-    task_activate_user_on_nodebb,
-    task_update_user_profile_on_nodebb,
-    task_update_onboarding_surveys_status
-)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile
-from philu_commands.models import CreationFailedUsers
+from nodebb.tasks import (
+    task_activate_user_on_nodebb,
+    task_create_user_on_nodebb,
+    task_update_onboarding_surveys_status,
+    task_update_user_profile_on_nodebb
+)
 
 log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to creates users in nodeBB according to all UserExtendedProfile instances in edx-platform
+    """
+
     help = """
     This command creates users in nodeBB according to all UserExtendedProfile instances in edx-platform.
 

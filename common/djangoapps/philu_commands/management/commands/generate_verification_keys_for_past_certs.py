@@ -2,6 +2,7 @@
 Django management command to generate CertificateVerificationKey objects.
 """
 from logging import getLogger
+
 from django.core.management.base import BaseCommand
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -11,6 +12,11 @@ log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to generate CertificateVerificationKey object for all certificates that aren't linked with a
+    `CertificateVerificationKey` object
+    """
+
     help = """
     This command creates a CertificateVerificationKey object for all certificates that aren't linked with a
     CertificateVerificationKey object.
@@ -20,7 +26,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        for certificate in GeneratedCertificate.objects.all():
+        for certificate in GeneratedCertificate.objects.all():  # pylint: disable=no-member
             if not hasattr(certificate, 'certificate_verification_key'):
                 log.info('Generating verification key for certificate: {}'.format(certificate.verify_uuid))
                 CertificateVerificationKey.objects.create_object(certificate)

@@ -5,15 +5,19 @@ import json
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
 from philu_commands.helpers import generate_course_structure
 
 log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to fetch course structures for provided course ids
+    """
+
     help = """
     This command prints the course structure for all the course ids given in arguments
     example:
@@ -39,7 +43,8 @@ class Command(BaseCommand):
             course_structures.append(course_structure)
 
         if course_structures:
-            print('-' * 80)
+            # pylint: disable=superfluous-parens
+            print ('-' * 80)
             print('Course structures for given course ids: ')
             print(json.dumps(course_structures))
             print('-' * 80)

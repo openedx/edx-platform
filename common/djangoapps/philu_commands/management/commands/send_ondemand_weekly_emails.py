@@ -1,5 +1,5 @@
 """
-Command to send ondemand weekly emails.
+Command to send on-demand weekly emails.
 """
 from datetime import datetime, timedelta
 from logging import getLogger
@@ -27,19 +27,20 @@ ON_DEMAND_MODULE_TEXT_FOMATTER = "<li> {module_name} </li>"
 
 class Command(BaseCommand):
     """
-    Command class for send ondemand weekly emails
+    Command class for send on-demand weekly emails
     """
     help = """
-        Send weekly emails to those users who have completed graded module in last 24 hours. This email will not be
-        sent for those modules which don't have at-least one graded sub-section. If user has completed last module and
-        skipped some graded modules then skip module email will be send.
+    Send weekly emails to those users who have completed graded module in last 24 hours. This email will not be
+    sent for those modules which don't have at-least one graded sub-section. If user has completed last module and
+    skipped some graded modules then skip module email will be send.
     """
 
-    def handle(self, *args, **options):
-
+    def handle(self, *args, **options):  # pylint: disable=too-many-statements
         # Getting all self paced courses.
         courses = CourseOverview.objects.filter(self_paced=True)
 
+        # TODO This command have too many nested blocks, which needs an update.
+        # pylint: disable=too-many-nested-blocks
         for course in courses:
             course_struct = generate_course_structure(course.id)['structure']
 
@@ -60,7 +61,7 @@ class Command(BaseCommand):
 
                 try:
                     anonymous_user = get_user_anonymous_id(user, course.id)
-                except Exception as error:
+                except Exception as error:  # pylint: disable=broad-except
                     log.info(error)
                     continue
 
@@ -91,7 +92,7 @@ class Command(BaseCommand):
                     # Getting sub-section in chapter
                     sequentials = modulestore().get_item(chapter)
                     log.info("$$$$$$$$$$$$$$$ %s $$$$$$$$$$$$$$$", sequentials.display_name)
-                    for index_sequential, sequential in enumerate(sequentials.children):
+                    for sequential in sequentials.children:
                         if course_blocks[str(sequential)]['graded']:
 
                             # We introduced this boolean to check if there is atleast
@@ -106,7 +107,7 @@ class Command(BaseCommand):
                             # Getting list of all ORAs in vertical of graded sub-section. We won't proceed if
                             # there are no ORAs in this vertical. There may be multiple vertical in sub-section
                             ora_list = get_ora_list(verticals)
-                            if len(ora_list) > 0:
+                            if ora_list:
                                 log.info("&&&&&&&&&&&&&&& %s &&&&&&&&&&&&&&&", verticals.display_name)
                                 for ora_block in ora_list:
                                     response_submissions = Submission.objects.filter(
@@ -136,7 +137,7 @@ class Command(BaseCommand):
 
                                     # We need to send skip email if user has completed last
                                     # module but has skipped one or more prevedxious module.
-                                    elif index_chapter == last_chapter_index and len(chapters_skipped) > 0:
+                                    elif index_chapter == last_chapter_index and bool(chapters_skipped):
                                         days_last_module_submission = today - last_module_ora_submission_date
 
                                         # We only need to send this email for once so we are checking if the

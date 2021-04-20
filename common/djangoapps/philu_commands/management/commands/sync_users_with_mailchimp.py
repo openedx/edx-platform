@@ -1,18 +1,27 @@
+"""
+A command to collect users data and sync with mailchimp learner's list
+"""
+from logging import getLogger
+
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import connection
-from mailchimp_pipeline.client import ChimpClient
-from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids
-from django.contrib.auth.models import User
-from lms.djangoapps.onboarding.models import FocusArea, OrgSector
-from lms.djangoapps.certificates import api as certificate_api
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from django.conf import settings
 
-from logging import getLogger
+from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector
+from mailchimp_pipeline.client import ChimpClient
+from mailchimp_pipeline.helpers import get_enrollements_course_short_ids, get_user_active_enrollements
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 log = getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    A command to collect users data and sync with mailchimp learner's list
+    """
+
     help = """
     One time addition of already existing users into mailchimp learner's list
     example:
@@ -26,6 +35,15 @@ class Command(BaseCommand):
         })
 
     def get_users_data_to_send(self, users):
+        """
+        Get users data to send to mailchimp
+
+        Args:
+            users (list): List of user objects
+
+        Returns:
+            list: list of dicts with users data
+        """
         users_set = []
 
         focus_areas = FocusArea.get_map()
@@ -56,7 +74,7 @@ class Command(BaseCommand):
                         org_type = org_sectors.get(
                             extended_profile.organization.org_type, ''
                         )
-            except:
+            except Exception:  # pylint: disable=broad-except
                 log.exception(
                     "User %s does not have related object profile or extended_profile.",
                     user.username
@@ -65,7 +83,7 @@ class Command(BaseCommand):
             all_certs = []
             try:
                 all_certs = certificate_api.get_certificates_for_user(user.username)
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 log.exception(str(ex.args))
 
             completed_course_keys = [cert.get('course_key', '') for cert in all_certs
@@ -92,7 +110,7 @@ class Command(BaseCommand):
                         "WORKAREA": work_area,
                     }
                 }
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 log.info("There was an error for user with email address as {}".format(user.email))
                 log.exception(str(ex.args))
                 continue
@@ -118,7 +136,7 @@ class Command(BaseCommand):
                 log.info(User.objects.all()[page_start:page_end].query)
                 users_json = self.get_users_data_to_send(users)
                 self.send_user_to_mailchimp(client, users_json)
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 log.info("There was an error in batch from {} to {}".format(page_start, page_end))
                 log.exception(str(ex.args))
 

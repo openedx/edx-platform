@@ -6,18 +6,18 @@ in the certificate_display_behavior setting in course advanced settings
 
 from datetime import datetime
 from logging import getLogger
-from pytz import UTC
 
-from courseware.views.views import _get_cert_data
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from opaque_keys.edx.keys import UsageKey
+from pytz import UTC
+
+from courseware.views.views import _get_cert_data
+from lms.djangoapps.certificates.api import generate_user_certificates
+from lms.djangoapps.certificates.models import CertificateStatuses
 from philu_commands.helpers import has_active_certificate
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses
 
 log = getLogger(__name__)
 
@@ -55,6 +55,11 @@ def _is_eligible_for_certificate(user_course_enrollment, course_chapters, user):
 
 
 class Command(BaseCommand):
+    """
+    A command to auto generate certificates for all users enrolled in currently running courses with `early_no_info`
+    or `early_with_info` set in the `certificate_display_behavior` setting in course advanced settings
+    """
+
     help = """
     The purpose of this command is to automatically generate certificates for
     all passed users (that do not have a certificate yet) in all currently

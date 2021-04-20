@@ -1,16 +1,18 @@
-from logging import getLogger
-from pytz import utc
+"""
+A command to notify non active users
+"""
 from datetime import datetime, timedelta
+from logging import getLogger
 
 from django.core.management.base import BaseCommand
+from pytz import utc
 
 from common.lib.mandrill_client.client import MandrillClient
-
-from student.models import CourseEnrollment
 from courseware.models import StudentModule
 from lms.djangoapps.branding import get_visible_courses
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
 from openedx.features.course_card.helpers import get_course_open_date
+from student.models import CourseEnrollment
 
 log = getLogger(__name__)
 
@@ -18,6 +20,10 @@ DAYS_TO_SEND_EMAIL = 7
 
 
 class Command(BaseCommand):
+    """
+    A command to notify non active users
+    """
+
     help = """
     Send Notifications prompts to users who have not entered into course after Course Open Date.
     Orientation module will not be considered because that module will be accessible to user

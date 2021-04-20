@@ -1,4 +1,8 @@
+"""
+All helpers for philu_commands
+"""
 from logging import getLogger
+
 from xmodule.modulestore.django import modulestore
 
 log = getLogger(__name__)
@@ -52,6 +56,15 @@ def generate_course_structure(course_key):
 
 
 def has_active_certificate(course):
+    """
+    Return true if course contains any active certificate
+
+    Args:
+        course (Course): Course from module store
+
+    Returns:
+        boolean: True if course contains any active certificate, False otherwise
+    """
     has_activated_certificate = False
     certificates = course.certificates
 
