@@ -137,7 +137,7 @@ class Command(BaseCommand):
 
                                     # We need to send skip email if user has completed last
                                     # module but has skipped one or more prevedxious module.
-                                    elif index_chapter == last_chapter_index and not bool(chapters_skipped):
+                                    elif index_chapter == last_chapter_index and bool(chapters_skipped):
                                         days_last_module_submission = today - last_module_ora_submission_date
 
                                         # We only need to send this email for once so we are checking if the
