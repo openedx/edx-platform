@@ -12,6 +12,6 @@ class OurTeamMemberAdmin(admin.ModelAdmin):
     Django admin class for OurTeamMember
     """
 
-    list_display = ('id', 'name', 'designation', 'image', 'description',)
-    list_filter = ('designation',)
+    list_display = ('id', 'name', 'designation', 'image', 'description', 'member_type')
+    list_filter = ('designation', 'member_type')
     search_fields = ('name',)
