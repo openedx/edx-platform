@@ -38,17 +38,6 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from common.djangoapps.entitlements.models import CourseEntitlement
-from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
-from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
-from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
-from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
-from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.profile_images.images import remove_profile_images
-from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.lib.api.parsers import MergePatchParser
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollmentAllowed,
@@ -64,6 +53,17 @@ from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=
     get_retired_username_by_username,
     is_username_retired
 )
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.credit.models import CreditRequest, CreditRequirementStatus
+from openedx.core.djangoapps.external_user_ids.models import ExternalId, ExternalIdType
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.profile_images.images import remove_profile_images
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.lib.api.parsers import MergePatchParser
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..message_types import DeletionNotificationMessage
@@ -76,7 +76,11 @@ from ..models import (
 )
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanReplaceUsername, CanRetireUser
-from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
+from .serializers import (
+    UserRetirementPartnerReportSerializer,
+    UserRetirementStatusSerializer,
+    UserSearchEmailSerializer
+)
 from .signals import USER_RETIRE_LMS_CRITICAL, USER_RETIRE_LMS_MISC, USER_RETIRE_MAILINGS
 from .utils import create_retirement_request_and_deactivate_account
 
@@ -133,6 +137,8 @@ class AccountViewSet(ViewSet):
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
+
+            POST /api/user/v1/accounts/search_emails "application/merge-patch+json"
 
         **Notes for PATCH requests to /accounts endpoints**
             * Requested updates to social_links are automatically merged with
@@ -311,6 +317,42 @@ class AccountViewSet(ViewSet):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
+
+    def search_emails(self, request):
+        """
+        POST /api/user/v1/accounts/search_emails
+        Content Type: "application/merge-patch+json"
+        {
+            "emails": ["edx@example.com", "staff@example.com"]
+        }
+        Response:
+        [
+            {
+                "username": "edx",
+                "email": "edx@example.com",
+                "id": 3,
+            },
+            {
+                "username": "staff",
+                "email": "staff@example.com",
+                "id": 8,
+            }
+        ]
+        """
+        try:
+            user_emails = request.data['emails']
+        except KeyError as error:
+            error_message = f'{error} field is required'
+            return Response(
+                {
+                    'developer_message': error_message,
+                    'user_message': error_message
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        users = User.objects.filter(email__in=user_emails)
+        data = UserSearchEmailSerializer(users, many=True).data
+        return Response(data)
 
     def retrieve(self, request, username):
         """

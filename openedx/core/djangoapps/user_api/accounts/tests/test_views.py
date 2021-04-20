@@ -70,6 +70,16 @@ class UserAPITestCase(APITestCase):
         assert expected_status == response.status_code
         return response
 
+    def post_search_api(self, client, json_data, content_type='application/merge-patch+json', expected_status=200):
+        """
+        Helper method for sending a post to the server, defaulting to application/merge-patch+json content_type.
+        Verifies the expected status and returns the response.
+        """
+        # pylint: disable=no-member
+        response = client.post(self.search_api_url, data=json.dumps(json_data), content_type=content_type)
+        assert expected_status == response.status_code
+        return response
+
     def send_get(self, client, query_parameters=None, expected_status=200):
         """
         Helper method for sending a GET to the server. Verifies the expected status and returns the response.
@@ -209,6 +219,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         super().setUp()
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
+        self.search_api_url = reverse("accounts_search_emails_api")
 
     def _set_user_age_to_10_years(self, user):
         """
@@ -345,6 +356,27 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
         response = self.send_get(client, query_parameters=f'email={self.user.email}')
         self._verify_full_account_response(response)
+
+    def test_search_emails(self):
+        client = self.login_client('client', 'user')
+        json_data = {'emails': [self.user.email]}
+        response = self.post_search_api(client, json_data=json_data)
+        assert response.data == [{'email': self.user.email, 'id': self.user.id, 'username': self.user.username}]
+
+    def test_search_emails_with_non_existing_email(self):
+        client = self.login_client('client', 'user')
+        json_data = {"emails": ['non_existant_email@example.com']}
+        response = self.post_search_api(client, json_data=json_data)
+        assert response.data == []
+
+    def test_search_emails_with_invalid_param(self):
+        client = self.login_client('client', 'user')
+        json_data = {'invalid_key': [self.user.email]}
+        response = self.post_search_api(client, json_data=json_data, expected_status=400)
+        assert response.data == {
+            'developer_message': "'emails' field is required",
+            'user_message': "'emails' field is required"
+        }
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
