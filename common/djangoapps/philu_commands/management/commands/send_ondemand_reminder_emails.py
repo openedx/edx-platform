@@ -27,7 +27,7 @@ ORA_ASSESSMENT_BLOCK = 'openassessment'
 class Command(BaseCommand):
     """
     A command to send reminder emails to those users who haven't completed the scheduled graded module for 10 days.
-    This email will not be sent for those module which don't have at-least one graded sub-section.
+    This email will not be sent for those modules which don't have at-least one graded sub-section.
     """
 
     help = """
@@ -135,13 +135,13 @@ def get_suggested_course_deadline(enrollment_date, chapters):
 
 def get_graded_ora_count(oras_block):
     """
-    Total no of graded ORAs
+    Get total number of graded ORAs
 
     Args:
         oras_block (list): List of ORAs
 
     Returns:
-        int: No of graded ORAs
+        int: Number of graded ORAs
     """
     graded_ora_count = 0
 
@@ -154,7 +154,7 @@ def get_graded_ora_count(oras_block):
 
 def get_all_ora_blocks(course_struct):
     """
-    Get all ORA is a course
+    Get all ORAs is a course
 
     Args:
         course_struct (dict): Course structure dict
@@ -206,7 +206,7 @@ def get_last_module_ora(course_blocks):
 
 def check_for_last_module_submission(oras_list, anonymous_user):
     """
-    Check if user have submitted ORAs
+    Check if user has submitted ORAs
 
     Args:
         oras_list (List): List of ORAs units

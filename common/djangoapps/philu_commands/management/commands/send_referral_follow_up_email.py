@@ -1,6 +1,5 @@
 """
-A command to send follow-up referral email to all those contacts which are at least 3 days old, are not registered
-on our platform, and have not received follow-up email.
+Send referral follow up email command
 """
 from datetime import timedelta
 

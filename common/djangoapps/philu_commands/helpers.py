@@ -57,7 +57,7 @@ def generate_course_structure(course_key):
 
 def has_active_certificate(course):
     """
-    Return true of course contains any active certificate
+    Return true if course contains any active certificate
 
     Args:
         course (Course): Course from module store

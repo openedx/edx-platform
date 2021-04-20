@@ -1,5 +1,5 @@
 """
-A command to get all enrolled user(s) of given course(s) and add them to respective nodebb group
+Sync course enrollments with nodebb command
 """
 from logging import getLogger
 
