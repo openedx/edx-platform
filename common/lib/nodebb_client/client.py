@@ -1,3 +1,6 @@
+"""
+Nodebb client to communicate with pynodebb
+"""
 from __future__ import unicode_literals
 
 from django.conf import settings
@@ -6,10 +9,10 @@ from pynodebb.api.posts import Post
 from pynodebb.api.topics import Topic
 from pynodebb.http_client import HttpClient
 
+from common.lib.nodebb_client.badges import ForumBadge
 from common.lib.nodebb_client.categories import ForumCategory
 from common.lib.nodebb_client.groups import ForumGroup
 from common.lib.nodebb_client.users import ForumUser
-from common.lib.nodebb_client.badges import ForumBadge
 
 
 class NodeBBClient(Client):
@@ -20,6 +23,7 @@ class NodeBBClient(Client):
                 some form of context (which user made a request) and that context is
                 based on a `_uid` field. Defaults to `HttpClient.DEFAULT_ADMIN_UID`.
         """
+        super(NodeBBClient, self).__init__()
         self.configure(api_endpoint=settings.NODEBB_ENDPOINT,
                        master_token=settings.NODEBB_MASTER_TOKEN,
                        admin_uid=admin_uid)

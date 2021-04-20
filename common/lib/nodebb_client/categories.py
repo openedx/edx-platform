@@ -1,12 +1,16 @@
+"""
+Sync categories with pynodebb
+"""
 from pynodebb.api.categories import Category
 
 
+# pylint: disable=abstract-method
 class ForumCategory(Category):
     """
     Added custom methods to the default Category class of pynodebb package
     """
 
-    def create(self, name, label, hidden=1, uid=1, parent_cid=None, description='', **kwargs):
+    def create(self, name, label, hidden=1, uid=1, parent_cid=None, description='', **kwargs):  # pylint: disable=arguments-differ
         """
          Create a private category on NodeBB
 
@@ -29,21 +33,21 @@ class ForumCategory(Category):
         """
         return self.client.get('/api/v2/category/featured', **kwargs)
 
-    def recommended(self, username, **kwargs):
+    def recommended(self, username, **kwargs):  # pylint: disable=unused-argument
         """
         Get recommended categories for a specific user
         """
         payload = {'username': username}
         return self.client.post('/api/v2/category/recommended', **payload)
 
-    def joined(self, username, **kwargs):
+    def joined(self, username, **kwargs):  # pylint: disable=unused-argument
         """
         Get joined categories for a specific user
         """
         payload = {'username': username}
         return self.client.post('/api/v2/category/joined', **payload)
 
-    def delete(self, category_id, **kwargs):
+    def delete(self, category_id, **kwargs):  # pylint: disable=unused-argument
         """
         Delete a category from NodeBB, including all topics and posts inside of it (Careful: There is no confirmation!)
         :param category_id: Id of the NodeBB category
@@ -52,7 +56,7 @@ class ForumCategory(Category):
         """
         return self.client.delete('/api/v2/categories/{}'.format(category_id))
 
-    def archive(self, category_id, **kwargs):
+    def archive(self, category_id, **kwargs):  # pylint: disable=unused-argument
         """
         Archive(disable) a category from NodeBB, including all topics, posts and subcategories inside of it
         (Careful: There is no confirmation!)

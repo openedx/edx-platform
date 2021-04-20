@@ -1,7 +1,13 @@
+"""
+Sync badges with pynodebb
+"""
 from pynodebb.api import Resource
 
 
 class ForumBadge(Resource):
+    """
+    Added custom methods to the default Resources class of pynodebb package
+    """
 
     def save(self, badge_info):
         """
