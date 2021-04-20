@@ -1704,7 +1704,20 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'staffgradedxblock',
         'boilerplate_name': None
-    }
+    },
+    {
+        'component': 'adventure',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'image-explorer',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'problem-builder',
+        'boilerplate_name': None
+    },
+
 ]
 
 ############### Settings for Retirement #####################
