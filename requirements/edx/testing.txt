@@ -21,6 +21,8 @@
 -e common/lib/symmath  # via -r requirements/edx/base.txt
 -e openedx/core/lib/xblock_builtin/xblock_discussion  # via -r requirements/edx/base.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive  # via -r requirements/edx/base.txt
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@rebase-juniper#egg=xblock-ooyala==rebase-juniper
+-e git://github.com/edx-solutions/xblock-mentoring.git@rebase-juniper#egg=xblock-mentoring==rebase-juniper
 -e git+https://github.com/PakistanX/xblock-adventure.git@1.0.2#egg=xblock-adventure
 -e git+https://github.com/PakistanX/xblock-image-explorer.git@v2.1#egg=xblock-image-explorer
 -e common/lib/xmodule  # via -r requirements/edx/base.txt
@@ -306,7 +308,7 @@ webob==1.8.6              # via -r requirements/edx/base.txt, xblock, xmodule
 wrapt==1.11.2             # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, astroid
 git+https://github.com/PakistanX/xblock-drag-and-drop-v2@v2.3.4.1#egg=xblock-drag-and-drop-v2==v2.3.4.1  # via -r requirements/edx/base.txt
 git+https://github.com/open-craft/xblock-poll@da2d8fd21791a7af128595cf82bee83ee579e00f#egg=xblock-poll==1.9.6  # via -r requirements/edx/base.txt
-xblock-utils==2.1.1       # via -r requirements/edx/base.txt, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
+xblock-utils==2.1.2       # via -r requirements/edx/base.txt, edx-sga, lti-consumer-xblock, staff-graded-xblock, xblock-drag-and-drop-v2, xblock-google-drive
 xblock==1.3.1             # via -r requirements/edx/base.txt, acid-xblock, crowdsourcehinter-xblock, done-xblock, edx-completion, edx-sga, edx-user-state-client, edx-when, lti-consumer-xblock, ora2, rate-xblock, staff-graded-xblock, xblock-discussion, xblock-drag-and-drop-v2, xblock-google-drive, xblock-poll, xblock-utils
 xmlsec==1.3.3             # via -r requirements/edx/base.txt, python3-saml
 xss-utils==0.1.3          # via -r requirements/edx/base.txt
