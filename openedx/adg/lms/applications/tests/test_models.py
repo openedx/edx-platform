@@ -3,17 +3,23 @@ Tests for all the models in applications app.
 """
 from datetime import date
 
+import factory
 import mock
 import pytest
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.applications.constants import CourseScore
-from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup, UserApplication
+from openedx.adg.lms.applications.models import (
+    BusinessLine,
+    MultilingualCourse,
+    MultilingualCourseGroup,
+    UserApplication
+)
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import ApplicationHubFactory, MultilingualCourseFactory, UserApplicationFactory
+from .factories import ApplicationHubFactory, BusinessLineFactory, MultilingualCourseFactory, UserApplicationFactory
 
 
 @pytest.mark.django_db
@@ -377,3 +383,23 @@ def test_multilingual_course_with_course_id(courses):
     multilingual_course = MultilingualCourseFactory(course=course)
 
     assert MultilingualCourse.objects.all().multilingual_course_with_course_id(course.id) == multilingual_course
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'business_line_names, expected_result',
+    (
+        ([], False),
+        (['test-line-1'], True),
+        (['test-line-1', 'test-line-2'], True)
+    )
+)
+def test_is_user_business_line_admin(business_line_names, expected_result):
+    """
+    Test if the user is the admin of atleast one business line
+    """
+    business_line_iter = factory.Iterator(business_line_names)
+    business_lines = BusinessLineFactory.create_batch(len(business_line_names), title=business_line_iter)
+    test_user = UserFactory(groups=business_lines)
+
+    assert BusinessLine.is_user_business_line_admin(test_user) == expected_result

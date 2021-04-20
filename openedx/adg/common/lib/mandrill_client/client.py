@@ -32,6 +32,8 @@ class MandrillClient(object):
     WEBINAR_REGISTRATION_CONFIRMATION = 'adg-webinar-confirmation'
     WEBINAR_ONE_WEEK_REMINDER = 'adg-reminder-email-1-week'
     WEBINAR_TWO_HOURS_REMINDER = 'adg-reminder-email'
+    WEBINAR_CREATED = 'adg-webinar-invite'
+    WEBINAR_UPDATED = 'adg-webinar-update-email'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
