@@ -9,11 +9,40 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-v1-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-v1-
+
       - name: Build Open edX Base
-        run: docker build . --file .github/build/Dockerfile --target base --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} --tag eoluchile/edx-platform:${GITHUB_SHA} --tag eoluchile/edx-platform:koa
+        run: |
+          docker buildx build . \
+            --file .github/build/Dockerfile \
+            --target base \
+            --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
+            --tag eoluchile/edx-platform:${GITHUB_SHA} \
+            --tag eoluchile/edx-platform:koa \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache-new" \
+            --output "type=docker,push=false"
 
       - name: Build Open edX Testing version
-        run: docker build . --file .github/build/Dockerfile --target testing --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA}  --tag eoluchile/edx-platform:testing-koa
+        run: |
+          docker buildx build . \
+            --file .github/build/Dockerfile \
+            --target testing \
+            --build-arg EDX_PLATFORM_VERSION=${GITHUB_SHA} \
+            --tag eoluchile/edx-platform:testing-koa \
+            --cache-from "type=local,src=/tmp/.buildx-cache-new" \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --output "type=docker,push=false"
 
       - name: Test eol changes
         run: |
@@ -34,3 +63,8 @@ jobs:
         env:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
