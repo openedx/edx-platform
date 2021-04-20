@@ -12,15 +12,6 @@ from openedx.adg.lms.webinars.tests.factories import WebinarFactory
 
 
 @pytest.mark.django_db
-@pytest.fixture(name='webinar')
-def webinar_fixture():
-    """
-    Create webinar fixture to use as a parameter to other pytests or fixtures
-    """
-    return WebinarFactory()
-
-
-@pytest.mark.django_db
 def test_start_date_in_past_for_webinar(webinar):
     """
     Test that exception is thrown when the start_date is in the past for the webinar.

@@ -1,0 +1,40 @@
+"""
+Forms for webinars app.
+"""
+from django import forms
+from django.utils.translation import ugettext_lazy as _
+
+from openedx.adg.lms.webinars.models import Webinar
+
+from .helpers import validate_email_list
+
+
+class WebinarForm(forms.ModelForm):
+    """
+    Webinar Form to create/edit a webinar from admin side
+    """
+    invites_by_email_address = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+        label=_('Add guests by email address'),
+        help_text=_('Add comma separated emails e.g. example1@domain.com,example2@domain.com')
+    )
+    send_update_emails_to_registrants = forms.BooleanField(
+        required=False, label=_('Send update email to all the users who have registered')
+    )
+    invite_all_platform_users = forms.BooleanField(required=False, label=_('Invite all Omnipreneurship Academy users'))
+
+    class Meta:
+        model = Webinar
+        fields = '__all__'
+
+    def clean_invites_by_email_address(self):
+        """
+        Check that the invitees contains 'comma-separated' emails
+        and normalizes the data to a list of the email strings.
+        """
+        invites_by_email_address = self.cleaned_data.get('invites_by_email_address')
+        error, emails = validate_email_list(invites_by_email_address)
+        if error:
+            raise forms.ValidationError(_("Please enter valid email addresses"))
+        return emails
