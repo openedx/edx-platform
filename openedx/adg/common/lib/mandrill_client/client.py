@@ -7,6 +7,7 @@ import mandrill
 from django.conf import settings
 
 from .email_data import EmailData
+from .helpers import mandrill_exception_handler_decorator
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
+    @mandrill_exception_handler_decorator(False)
     def cancel_scheduled_email(self, msg_id):
         """
         Calls the mandrill API to cancel a scheduled email.
@@ -48,15 +50,9 @@ class MandrillClient(object):
         Returns:
             dict: dictionary containing mandrill response
         """
-        try:
-            result = self.mandrill_client.messages.cancel_scheduled(msg_id)
-            log.info(result)
-            return result
-        except mandrill.Error as e:
-            log.error('A mandrill error occurred: {exception_class} - {exception}'.format(
-                exception_class=e.__class__, exception=e)
-            )
+        return self.mandrill_client.messages.cancel_scheduled(msg_id)
 
+    @mandrill_exception_handler_decorator(True)
     def reschedule_email(self, msg_id, send_at):
         """
         Calls mandrill API to reschedule an email.
@@ -64,16 +60,13 @@ class MandrillClient(object):
         Args:
             msg_id (str): Mandrill msg id of the scheduled email.
             send_at (str): String containing time to reschedule at.
-        """
-        try:
-            result = self.mandrill_client.messages.reschedule(msg_id, send_at)
-            log.info(result)
-            return result
-        except mandrill.Error as e:
-            log.error('A mandrill error occurred: {exception_class} - {exception}'.format(
-                exception_class=e.__class__, exception=e)
-            )
 
+        Returns:
+            dict: Dictionary containing mandrill response.
+        """
+        return self.mandrill_client.messages.reschedule(msg_id, send_at)
+
+    @mandrill_exception_handler_decorator(True)
     def list_scheduled_emails(self, email):
         """
         Lists all scheduled messages for an email address.
@@ -86,31 +79,24 @@ class MandrillClient(object):
         """
         return self.mandrill_client.messages.list_scheduled(email)
 
+    @mandrill_exception_handler_decorator(True)
     def _send_mail(self, email_data, send_at=None):
         """
         Calls the mandrill API for the specific template and email
 
         Arguments:
-            email_data (EmailData): all the data related to email
+            email_data (EmailData): All the data related to email
             send_at (str): A String containing the time at which email will be sent
 
         Returns:
             list: list of dictionaries containing mandrill responses
         """
-        try:
-            result = self.mandrill_client.messages.send_template(
-                template_name=email_data.template_name,
-                template_content=[],
-                message=email_data.message,
-                send_at=send_at
-            )
-            log.info(result)
-        except mandrill.Error as e:
-            log.error('A mandrill error occurred: {exception_class} - {exception}'.format(
-                exception_class=e.__class__, exception=e)
-            )
-            raise
-        return result
+        return self.mandrill_client.messages.send_template(
+            template_name=email_data.template_name,
+            template_content=[],
+            message=email_data.message,
+            send_at=send_at
+        )
 
     def send_mandrill_email(self, template, emails, context, send_at=None):
         """

@@ -5,14 +5,24 @@ from datetime import datetime
 
 import factory
 import pytest
+from mock import Mock
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
+from openedx.adg.lms.webinars.constants import (
+    ONE_WEEK_REMINDER_ID_FIELD_NAME,
+    STARTING_SOON_REMINDER_ID_FIELD_NAME,
+    WEBINARS_TIME_FORMAT
+)
 from openedx.adg.lms.webinars.helpers import (
+    cancel_all_reminders,
+    cancel_reminders_for_given_webinars,
     remove_emails_duplicate_in_other_list,
+    save_scheduled_reminder_ids,
     send_cancellation_emails_for_given_webinars,
     send_webinar_emails,
     send_webinar_registration_email,
+    update_webinar_team_registrations,
     validate_email_list,
     webinar_emails_for_panelists_co_hosts_and_presenter
 )
@@ -20,6 +30,7 @@ from openedx.adg.lms.webinars.helpers import (
 from .constants import (
     CO_HOST_1,
     CO_HOST_2,
+    FAKE_MANDRILL_MSG_ID,
     INVALID_EMAIL_ADDRESSES,
     PANELIST_1,
     PANELIST_2,
@@ -43,7 +54,7 @@ def test_send_webinar_emails(mocker):
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
+        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT)
     }
     mocked_task_send_mandrill_email.delay.assert_called_with("test_slug", ["t1@eg.com"], expected_context, None)
 
@@ -108,7 +119,7 @@ def test_send_cancellation_emails_for_given_webinars(
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
+        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT)
     }
 
     actual_template, actual_email_addresses, actual_context, _ = mocked_task_send_mandrill_email.delay.call_args.args
@@ -199,3 +210,85 @@ def test_remove_emails_duplicate_in_other_list(emails, reference_emails, expecte
     Test that only the list of emails that are not present in reference list of emails are returned
     """
     assert sorted(remove_emails_duplicate_in_other_list(emails, reference_emails)) == sorted(expected_emails)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'template, msg_id_field_name', [
+        (MandrillClient.WEBINAR_TWO_HOURS_REMINDER, STARTING_SOON_REMINDER_ID_FIELD_NAME),
+        (MandrillClient.WEBINAR_ONE_WEEK_REMINDER, ONE_WEEK_REMINDER_ID_FIELD_NAME),
+    ]
+)
+def test_save_scheduled_reminder_ids(template, msg_id_field_name, webinar_registration):
+    """
+    Tests save_scheduled_reminder_ids method is saving reminder ids properly.
+    """
+    mandrill_response = [
+        {
+            '_id': FAKE_MANDRILL_MSG_ID,
+            'email': webinar_registration.user.email
+        }
+    ]
+
+    save_scheduled_reminder_ids(mandrill_response, template, webinar_registration.webinar.id)
+
+    webinar_registration.refresh_from_db()
+    assert getattr(webinar_registration, msg_id_field_name) == FAKE_MANDRILL_MSG_ID
+
+
+@pytest.mark.django_db
+def test_cancel_reminders_for_given_webinars(webinar, mocker):
+    """
+    Tests `cancel_all_reminders` is called for the webinar to cancel reminder emails.
+    """
+    mock_cancel_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.cancel_all_reminders')
+
+    cancel_reminders_for_given_webinars([webinar])
+
+    mock_cancel_reminders.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    'msg_id_field_name, msg_id, is_rescheduling', [
+        (STARTING_SOON_REMINDER_ID_FIELD_NAME, FAKE_MANDRILL_MSG_ID, True),
+        (ONE_WEEK_REMINDER_ID_FIELD_NAME, FAKE_MANDRILL_MSG_ID, False),
+    ]
+)
+@pytest.mark.django_db
+def test_cancel_all_reminders(msg_id, msg_id_field_name, webinar_registration, mocker, is_rescheduling):
+    """
+    Tests `task_cancel_mandrill_emails` is called to cancel reminder emails.
+    """
+    mock_task_cancel_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.task_cancel_mandrill_emails')
+
+    setattr(webinar_registration, msg_id_field_name, msg_id)
+    cancel_all_reminders([webinar_registration], is_rescheduling)
+
+    if is_rescheduling:
+        assert mock_task_cancel_reminders.call_count == 2
+    else:
+        assert mock_task_cancel_reminders.delay.call_count == 2
+
+
+@pytest.mark.django_db
+def test_update_webinar_team_registrations(webinar, mocker):
+    """
+    Tests `schedule_webinar_reminders` is called to schedule reminders for newly added team members and
+    `cancel_all_reminders` is called for the removed team members.
+    """
+    mock_schedule_webinar_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.schedule_webinar_reminders')
+    mock_cancel_all_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.cancel_all_reminders')
+
+    mock_webinar_form = Mock()
+    mock_webinar_form.instance = webinar
+    users = UserFactory.create_batch(6)
+    mock_webinar_form.cleaned_data = {
+        'co_hosts': users[0:2],
+        'presenter': users[2],
+        'panelists': users[3:]
+    }
+
+    update_webinar_team_registrations(mock_webinar_form)
+
+    mock_schedule_webinar_reminders.assert_called_once()
+    mock_cancel_all_reminders.assert_called_once()

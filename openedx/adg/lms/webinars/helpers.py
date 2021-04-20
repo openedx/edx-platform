@@ -1,25 +1,19 @@
 """
 Helpers for webinars app
 """
-from datetime import timedelta
+from datetime import datetime, timedelta
 from itertools import chain
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.utils.timezone import now
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
+from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
 
-from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME
+from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINARS_TIME_FORMAT
 
 
-def send_webinar_emails(
-    template_slug,
-    webinar,
-    recipient_emails,
-    send_at=None,
-):
+def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
     """
     Send webinar email to the list of given email addresses using the given template and data
 
@@ -71,6 +65,22 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
         )
 
 
+def cancel_reminders_for_given_webinars(webinars):
+    """
+    Cancels all the reminders for the given webinars.
+
+    Args:
+        webinars (list): List of webinars for which reminders will be cancelled.
+
+    Returns:
+        None
+    """
+    for webinar in webinars:
+        cancel_all_reminders(
+            webinar.registrations.webinar_team_and_active_user_registrations()
+        )
+
+
 def send_webinar_registration_email(webinar, email):
     """
     Send webinar registration email to user.
@@ -90,66 +100,33 @@ def send_webinar_registration_email(webinar, email):
     })
 
 
-def schedule_webinar_reminders(user_email, webinar):
+def schedule_webinar_reminders(user_emails, email_context):
     """
     Schedule reminders for a webinar on mandrill.
 
     Args:
-        user_email (str): User email to schedule a reminder.
-        webinar (Webinar): The webinar for which reminders will be scheduled.
+        user_emails (list): List of user emails to schedule reminders.
+        email_context (dict): Webinar reminders context.
 
     Returns:
         None
     """
-    send_webinar_emails(
+    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINARS_TIME_FORMAT)
+
+    task_send_mandrill_email.delay(
         MandrillClient.WEBINAR_TWO_HOURS_REMINDER,
-        webinar,
-        [user_email],
-        webinar.start_time - timedelta(hours=2),
+        user_emails,
+        email_context,
+        webinar_start_time - timedelta(hours=2),
     )
 
-    week_before_webinar_start_time = webinar.start_time - timedelta(days=7)
-
-    if week_before_webinar_start_time > now():
-        send_webinar_emails(
+    if (webinar_start_time - timedelta(days=6)) > datetime.now():
+        task_send_mandrill_email.delay(
             MandrillClient.WEBINAR_ONE_WEEK_REMINDER,
-            webinar,
-            [user_email],
-            week_before_webinar_start_time,
+            user_emails,
+            email_context,
+            webinar_start_time - timedelta(days=7),
         )
-
-
-def reschedule_webinar_reminders(registrations, send_at, msg_id_field_name):
-    """
-    Reschedules reminders using the given field for msg ids.
-
-    Args:
-        registrations (list): List of webinar registrations.
-        send_at (str): String containing time to schedule an email at.
-        msg_id_field_name (str): String containing field name for the mandrill msg ids.
-
-    Returns:
-        None
-    """
-    for registration in registrations:
-        MandrillClient().reschedule_email(getattr(registration, msg_id_field_name), send_at)
-
-
-def cancel_webinar_reminders(registrations, msg_id_field_name):
-    """
-    Cancels reminders for webinar
-
-    Args:
-        registrations (list): List of webinar registrations.
-        msg_id_field_name (str): String containing field name for the mandrill msg ids.
-
-    Returns:
-        None
-    """
-    for registration in registrations:
-        msg_id = getattr(registration, msg_id_field_name)
-        if msg_id:
-            MandrillClient().cancel_scheduled_email(msg_id)
 
 
 def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
@@ -233,3 +210,76 @@ def remove_emails_duplicate_in_other_list(email_list, reference_email_list):
         emails (list): list of remaining emails
     """
     return [email for email in email_list if email not in reference_email_list]
+
+
+def update_webinar_team_registrations(webinar_form):
+    """
+    Updates webinar team registrations if webinar presenter, cohosts or panelists are updated.
+
+    Args:
+        webinar_form (Form): Model form with updated data.
+
+    Returns:
+        None
+    """
+    from openedx.adg.lms.webinars.models import WebinarRegistration
+
+    webinar = webinar_form.instance
+    cleaned_data = webinar_form.cleaned_data
+    old_team = webinar.webinar_team()
+    new_team = set(chain(cleaned_data['co_hosts'], cleaned_data['panelists'], {cleaned_data['presenter']}))
+
+    newly_added_members = list(new_team - old_team)
+    removed_members = list(old_team - new_team)
+
+    if newly_added_members:
+        WebinarRegistration.create_team_registrations(newly_added_members, webinar)
+        schedule_webinar_reminders([user.email for user in newly_added_members], webinar.to_dict())
+
+    if removed_members:
+        WebinarRegistration.remove_team_registrations(removed_members, webinar)
+
+        registrations = WebinarRegistration.objects.filter(
+            webinar=webinar, user__in=removed_members, is_registered=False
+        )
+        cancel_all_reminders(registrations)
+
+
+def cancel_all_reminders(registrations, is_rescheduling=False):
+    """
+    Cancels reminders by extracting msg ids from the given registrations. In case the `is_rescheduling` is `True`, we
+    will not run the task `task_cancel_mandrill_emails` asynchronously.
+
+    Args:
+        is_rescheduling (bool): It shows whether we are rescheduling emails or just cancelling them.
+        registrations (list): List of registrations for which reminders will be cancelled.
+
+    Returns:
+        None
+    """
+    from openedx.adg.lms.webinars.models import WebinarRegistration
+
+    msg_id_map = {
+        'starting_soon_msg_ids': [],
+        'one_week_before_msg_ids': [],
+    }
+
+    for registration in registrations:
+        if registration.starting_soon_mandrill_reminder_id:
+            msg_id_map['starting_soon_msg_ids'].append(registration.starting_soon_mandrill_reminder_id)
+            registration.starting_soon_mandrill_reminder_id = ''
+
+        if registration.week_before_mandrill_reminder_id:
+            msg_id_map['one_week_before_msg_ids'].append(registration.week_before_mandrill_reminder_id)
+            registration.week_before_mandrill_reminder_id = ''
+
+    if is_rescheduling:
+        task_cancel_mandrill_emails(msg_id_map['starting_soon_msg_ids'])
+        task_cancel_mandrill_emails(msg_id_map['one_week_before_msg_ids'])
+    else:
+        task_cancel_mandrill_emails.delay(msg_id_map['starting_soon_msg_ids'])
+        task_cancel_mandrill_emails.delay(msg_id_map['one_week_before_msg_ids'])
+
+    WebinarRegistration.objects.bulk_update(
+        registrations, ['starting_soon_mandrill_reminder_id', 'week_before_mandrill_reminder_id'], batch_size=999
+    )

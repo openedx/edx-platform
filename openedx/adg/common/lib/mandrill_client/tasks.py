@@ -45,12 +45,13 @@ def task_send_mandrill_email(template, emails, context, send_at=None):
 
 
 @task()
-def task_cancel_mandrill_email(msg_id):
+def task_cancel_mandrill_emails(msg_ids):
     """
-    Cancels a scheduled msg on mandrill.
+    Cancels scheduled msgs on mandrill.
 
     Args:
-        msg_id (str): Id of the scheduled email on mandrill.
+        msg_ids (list): List of Ids of the scheduled emails on mandrill.
     """
-    log.info(f'Cancelling a scheduled email, mandrill msg_id: {msg_id}')
-    MandrillClient().cancel_scheduled_email(msg_id)
+    for msg_id in msg_ids:
+        log.info(f'Cancelling a scheduled email, mandrill msg_id: {msg_id}')
+        MandrillClient().cancel_scheduled_email(msg_id)
