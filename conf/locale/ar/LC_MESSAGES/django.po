@@ -25,6 +25,7 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
+# Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -58,7 +59,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-15 10:24+0000\n"
+"POT-Creation-Date: 2021-04-19 08:33+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -10125,6 +10126,27 @@ msgstr "قريبًا"
 msgid "Delivered"
 msgstr ""
 
+#: openedx/adg/lms/webinars/forms.py
+msgid "Add guests by email address"
+msgstr "عنوان البريد الإلكتروني الثانوي"
+
+#: openedx/adg/lms/webinars/forms.py
+msgid ""
+"Add comma separated emails e.g. example1@domain.com,example2@domain.com"
+msgstr ""
+
+#: openedx/adg/lms/webinars/forms.py
+msgid "Send update email to all the users who have registered"
+msgstr ""
+
+#: openedx/adg/lms/webinars/forms.py
+msgid "Invite all Omnipreneurship Academy users"
+msgstr ""
+
+#: openedx/adg/lms/webinars/forms.py
+msgid "Please enter valid email addresses"
+msgstr "\"{email}\" ليس عنوان بريد إلكتروني صالح."
+
 #: openedx/adg/lms/webinars/models.py
 msgid "Start Time"
 msgstr "وقت بدء تشغيل الفيديو"
@@ -10170,15 +10192,15 @@ msgid "Last Modified By"
 msgstr "تاريخ التعديل الأخير:"
 
 #: openedx/adg/lms/webinars/models.py
-msgid "Start date should be in future"
+msgid "Start date/time should be in future"
 msgstr ""
 
 #: openedx/adg/lms/webinars/models.py
-msgid "End date should be in future"
+msgid "End date/time should be in future"
 msgstr ""
 
 #: openedx/adg/lms/webinars/models.py
-msgid "End date must be greater than start date"
+msgid "End date/time must be greater than start date/time"
 msgstr ""
 "لا بدّ أن يتأخّر تاريخ الاستحقاق الخاضع للتمديد عن تاريخ الاستحقاق الأساسي."
 
@@ -12576,10 +12598,9 @@ msgstr ""
 msgid "Continue"
 msgstr "استمرار"
 
-#: openedx/features/personalized_learner_schedules/call_to_action.py
 #: lms/templates/dates_banner.html
 msgid "Shift due dates"
-msgstr ""
+msgstr "تغيير تواريخ التسليم"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 msgid ""
@@ -13767,7 +13788,7 @@ msgstr ""
 msgid ""
 " Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
-msgstr ""
+msgstr "لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ التسليم."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13782,6 +13803,9 @@ msgid ""
 "due assignments into the future. Don't worry—you won't lose any of the "
 "progress you've made when you shift your due dates."
 msgstr ""
+"للبقاء على المسار الصحيح ، يمكنك تحديث هذا الجدول وتحويل المهام السابقة "
+"المستحقة إلى المستقبل. لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير التواريخ "
+"المستحقة. لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ التسليم."
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"
