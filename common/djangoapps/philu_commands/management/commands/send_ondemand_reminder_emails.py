@@ -95,7 +95,7 @@ class Command(BaseCommand):
 
                 latest_submission = response_submissions.first()
 
-                if response_submissions:
+                if not response_submissions.exists():
                     if has_inactivity_threshold_reached(enrollment.created.date(), today):
                         send_reminder_email(user, course, course_deadline)
                     continue
