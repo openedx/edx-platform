@@ -8,6 +8,8 @@ from celery.task import task
 from openedx.adg.lms.webinars.helpers import cancel_webinar_reminders, reschedule_webinar_reminders
 from openedx.adg.lms.webinars.models import WebinarRegistration
 
+from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME
+
 
 @task()
 def task_reschedule_webinar_reminders(webinar_id, new_start_time):
@@ -25,9 +27,9 @@ def task_reschedule_webinar_reminders(webinar_id, new_start_time):
 
     registrations = WebinarRegistration.objects.filter(webinar__id=webinar_id)
 
-    reschedule_webinar_reminders(registrations, str(two_hours_before_start_time), 'starting_soon_mandrill_reminder_id')
+    reschedule_webinar_reminders(registrations, str(two_hours_before_start_time), STARTING_SOON_REMINDER_ID_FIELD_NAME)
 
     if week_before_start_time > datetime.now():
-        reschedule_webinar_reminders(registrations, str(week_before_start_time), 'week_before_mandrill_reminder_id')
+        reschedule_webinar_reminders(registrations, str(week_before_start_time), ONE_WEEK_REMINDER_ID_FIELD_NAME)
     else:
-        cancel_webinar_reminders(registrations, 'week_before_mandrill_reminder_id')
+        cancel_webinar_reminders(registrations, ONE_WEEK_REMINDER_ID_FIELD_NAME)

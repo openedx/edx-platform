@@ -30,7 +30,7 @@ class MandrillClient(object):
     APPLICATION_ACCEPTED = 'adg-application-accepted'
     WEBINAR_CANCELLATION = 'adg-cancellation-email'
     WEBINAR_REGISTRATION_CONFIRMATION = 'adg-webinar-confirmation'
-    WEBINAR_WEEK_BEFORE_REMINDER = 'adg-reminder-email-1-week'
+    WEBINAR_ONE_WEEK_REMINDER = 'adg-reminder-email-1-week'
     WEBINAR_TWO_HOURS_REMINDER = 'adg-reminder-email'
 
     def __init__(self):

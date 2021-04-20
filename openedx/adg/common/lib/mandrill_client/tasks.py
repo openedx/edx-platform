@@ -40,7 +40,7 @@ def task_send_mandrill_email(template, emails, context, send_at=None):
         response = MandrillClient().send_mandrill_email(template_slug, recipient_emails, context, send_at)
 
         if (response and
-                template in [MandrillClient.WEBINAR_WEEK_BEFORE_REMINDER, MandrillClient.WEBINAR_TWO_HOURS_REMINDER]):
+                template in [MandrillClient.WEBINAR_ONE_WEEK_REMINDER, MandrillClient.WEBINAR_TWO_HOURS_REMINDER]):
             save_scheduled_reminder_ids(response, template, context['webinar_id'])
 
 

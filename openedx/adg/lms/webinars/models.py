@@ -115,11 +115,27 @@ class Webinar(TimeStampedModel):
         if errors:
             raise ValidationError(errors)
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        from openedx.adg.lms.webinars.tasks import task_reschedule_webinar_reminders
+
+        old_values = getattr(self, '_loaded_values', {})
+        if old_values and old_values.get('start_time') != self.start_time:
+            task_reschedule_webinar_reminders.delay(self.id, self.start_time.strftime('%m/%d/%Y, %H:%M:%S'))
+
+        return super().save(force_insert, force_update, using, update_fields)
+
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
         if self.status == Webinar.UPCOMING:
             send_cancellation_emails_for_given_webinars([self])
         self.status = self.CANCELLED
         self.save()
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))  # pylint: disable=protected-access
+
+        return instance
 
 
 class CancelledWebinar(Webinar):

@@ -9,13 +9,12 @@ from django.utils.timezone import now
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 
+from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME
+
 
 def send_webinar_emails(
     template_slug,
-    webinar_id,
-    webinar_title,
-    webinar_description,
-    webinar_start_time,
+    webinar,
     recipient_emails,
     send_at=None,
 ):
@@ -24,10 +23,7 @@ def send_webinar_emails(
 
     Arguments:
         template_slug (str): Slug for the chosen email template
-        webinar_id (int): Id of the webinar
-        webinar_title (str): Title of the webinar
-        webinar_description (str): Description of the webinar
-        webinar_start_time (Datetime): Start datetime of the webinar
+        webinar (Webinar): Webinar object
         recipient_emails (list):  List of email addresses (str) to send the email to
         send_at (str): A String containing the time at which email will be sent
 
@@ -35,10 +31,10 @@ def send_webinar_emails(
         None
     """
     context = {
-        'webinar_id': webinar_id,
-        'webinar_title': webinar_title,
-        'webinar_description': webinar_description,
-        'webinar_start_time': webinar_start_time.strftime("%B %d, %Y %I:%M %p %Z")
+        'webinar_id': webinar.id,
+        'webinar_title': webinar.title,
+        'webinar_description': webinar.description,
+        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
     }
 
     task_send_mandrill_email.delay(template_slug, recipient_emails, context, send_at)
@@ -68,10 +64,7 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
 
         send_webinar_emails(
             MandrillClient.WEBINAR_CANCELLATION,
-            cancelled_webinar.id,
-            cancelled_webinar.title,
-            cancelled_webinar.description,
-            cancelled_webinar.start_time,
+            cancelled_webinar,
             list(webinar_email_addresses)
         )
 
@@ -102,13 +95,13 @@ def schedule_webinar_reminders(user_email, webinar):
     Args:
         user_email (str): User email to schedule a reminder.
         webinar (Webinar): The webinar for which reminders will be scheduled.
+
+    Returns:
+        None
     """
     send_webinar_emails(
         MandrillClient.WEBINAR_TWO_HOURS_REMINDER,
-        webinar.id,
-        webinar.title,
-        webinar.description,
-        webinar.start_time,
+        webinar,
         [user_email],
         webinar.start_time - timedelta(hours=2),
     )
@@ -117,11 +110,8 @@ def schedule_webinar_reminders(user_email, webinar):
 
     if week_before_webinar_start_time > now():
         send_webinar_emails(
-            MandrillClient.WEBINAR_WEEK_BEFORE_REMINDER,
-            webinar.id,
-            webinar.title,
-            webinar.description,
-            webinar.start_time,
+            MandrillClient.WEBINAR_ONE_WEEK_REMINDER,
+            webinar,
             [user_email],
             week_before_webinar_start_time,
         )
@@ -133,8 +123,11 @@ def reschedule_webinar_reminders(registrations, send_at, msg_id_field_name):
 
     Args:
         registrations (list): List of webinar registrations.
-        send_at (str): String containing time to schedules an email at.
+        send_at (str): String containing time to schedule an email at.
         msg_id_field_name (str): String containing field name for the mandrill msg ids.
+
+    Returns:
+        None
     """
     for registration in registrations:
         MandrillClient().reschedule_email(getattr(registration, msg_id_field_name), send_at)
@@ -147,6 +140,9 @@ def cancel_webinar_reminders(registrations, msg_id_field_name):
     Args:
         registrations (list): List of webinar registrations.
         msg_id_field_name (str): String containing field name for the mandrill msg ids.
+
+    Returns:
+        None
     """
     for registration in registrations:
         msg_id = getattr(registration, msg_id_field_name)
@@ -162,12 +158,15 @@ def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
         webinar_id (int): Webinar Id
         mandrill_response (list): List containing the response from mandrill
         template_name (str): Mandrill email template slug
+
+    Returns:
+        None
     """
     from openedx.adg.lms.webinars.models import WebinarRegistration
 
     template_name_to_field_map = {
-        MandrillClient.WEBINAR_TWO_HOURS_REMINDER: 'starting_soon_mandrill_reminder_id',
-        MandrillClient.WEBINAR_WEEK_BEFORE_REMINDER: 'week_before_mandrill_reminder_id',
+        MandrillClient.WEBINAR_TWO_HOURS_REMINDER: STARTING_SOON_REMINDER_ID_FIELD_NAME,
+        MandrillClient.WEBINAR_ONE_WEEK_REMINDER: ONE_WEEK_REMINDER_ID_FIELD_NAME,
     }
 
     for response in mandrill_response:

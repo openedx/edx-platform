@@ -55,14 +55,13 @@ class WebinarRegistrationView(LoginRequiredMixin, SingleObjectMixin, View):
         ).first()
 
         if not registered_webinar_for_user:
-            WebinarRegistration.objects.update_or_create(
+            registration, created = WebinarRegistration.objects.update_or_create(
                 webinar=self.object, user=user, defaults={'is_registered': is_registering}
             )
             if is_registering:
                 send_webinar_registration_email(self.object, user.email)
                 schedule_webinar_reminders(user.email, self.object)
-            else:
-                registration = WebinarRegistration.objects.get(webinar=self.object, user=user)
+            elif not created:
                 task_cancel_mandrill_email.delay(registration.starting_soon_mandrill_reminder_id)
                 task_cancel_mandrill_email.delay(registration.week_before_mandrill_reminder_id)
 
