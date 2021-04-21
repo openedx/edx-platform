@@ -13,7 +13,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from social_django.models import UserSocialAuth
 
-from common.djangoapps.third_party_auth.config.waffle import ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -201,16 +200,6 @@ def is_multiple_user_enterprises_feature_enabled():
         Boolean value representing switch status
     """
     return ENABLE_MULTIPLE_USER_ENTERPRISES_FEATURE.is_enabled()
-
-
-def is_multiple_sso_accounts_association_to_saml_user_enabled():
-    """
-    Checks to see if the django-waffle switch for enabling the multiple sso accounts association to saml user is active
-
-    Returns:
-        Boolean value representing switch status
-    """
-    return ENABLE_MULTIPLE_SSO_ACCOUNTS_ASSOCIATION_TO_SAML_USER.is_enabled()
 
 
 def create_retirement_request_and_deactivate_account(user):
