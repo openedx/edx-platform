@@ -489,6 +489,15 @@ class UserRetirementStatusSerializer(serializers.ModelSerializer):
         exclude = ['responses', ]
 
 
+class UserSearchEmailSerializer(serializers.ModelSerializer):
+    """
+    Perform serialization for the User model used in accounts/search_emails endpoint.
+    """
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username')
+
+
 class UserRetirementPartnerReportSerializer(serializers.Serializer):
     """
     Perform serialization for the UserRetirementPartnerReportingStatus model
