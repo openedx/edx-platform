@@ -5,10 +5,14 @@ Utility functions used during user authentication.
 import random
 import string
 from urllib.parse import urlparse  # pylint: disable=import-error
+from uuid import uuid4
 
 from django.conf import settings
 from django.utils import http
 from oauth2_provider.models import Application
+
+from common.djangoapps.student.models import username_exists_or_retired
+from openedx.core.djangoapps.user_api import accounts
 
 
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):
@@ -66,3 +70,18 @@ def is_registration_api_v1(request):
     :return: Bool
     """
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
+
+
+def generate_username_suggestions(username):
+    """ Generate available username suggestions """
+    min_length = accounts.USERNAME_MIN_LENGTH
+    max_length = accounts.USERNAME_MAX_LENGTH
+    short_username = username[:max_length - min_length] if max_length is not None else username
+
+    username_suggestions = []
+    while len(username_suggestions) < 3:
+        username = f'{short_username}_{uuid4().hex[:min_length]}'
+        if not username_exists_or_retired(username):
+            username_suggestions.append(username)
+
+    return username_suggestions

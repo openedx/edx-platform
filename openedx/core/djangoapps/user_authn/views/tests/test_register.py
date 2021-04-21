@@ -180,6 +180,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         assert response.status_code == 409
 
         response_json = json.loads(response.content.decode('utf-8'))
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
         self.assertDictEqual(
             response_json,
             {
@@ -293,6 +295,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
         assert response.status_code == 409
         response_json = json.loads(response.content.decode('utf-8'))
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
         self.assertDictEqual(
             response_json,
             {
@@ -330,6 +334,8 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
 
         assert response.status_code == 409
         response_json = json.loads(response.content.decode('utf-8'))
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
         self.assertDictEqual(
             response_json,
             {
@@ -1488,6 +1494,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         assert response.status_code == 409
         response_json = json.loads(response.content.decode('utf-8'))
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
         self.assertDictEqual(
             response_json,
             {
@@ -1525,6 +1533,8 @@ class RegistrationViewTestV1(ThirdPartyAuthTestMixin, UserAPITestCase):
 
         assert response.status_code == 409
         response_json = json.loads(response.content.decode('utf-8'))
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
         self.assertDictEqual(
             response_json,
             {
@@ -2175,15 +2185,24 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         super().setUp()
         cache.clear()
 
-    def get_validation_decision(self, data):
-        response = self.client.post(self.path, data)
+    def get_validation_response(self, data):
+        return self.client.post(self.path, data)
+
+    def get_validation_decision(self, response):
         return response.data.get('validation_decisions', {})
 
-    def assertValidationDecision(self, data, decision):
-        assert self.get_validation_decision(data) == decision
+    def get_username_suggestions(self, response):
+        return response.data.get('username_suggestions', [])
+
+    def assertValidationDecision(self, data, decision, validate_suggestions=False):
+        response = self.get_validation_response(data)
+        assert self.get_validation_decision(response) == decision
+        if validate_suggestions:
+            assert len(self.get_username_suggestions(response)) == 3
 
     def assertNotValidationDecision(self, data, decision):
-        assert self.get_validation_decision(data) != decision
+        response = self.get_validation_response(data)
+        assert self.get_validation_decision(response) != decision
 
     def test_no_decision_for_empty_request(self):
         self.assertValidationDecision(
@@ -2233,13 +2252,13 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     @ddt.data(
-        ['username', 'username@email.com'],  # No conflict
-        ['user', 'username@email.com'],  # Username conflict
-        ['username', 'user@email.com'],  # Email conflict
-        ['user', 'user@email.com']  # Both conflict
+        ['username', 'username@email.com', False],  # No conflict
+        ['user', 'username@email.com', True],  # Username conflict
+        ['username', 'user@email.com', False],  # Email conflict
+        ['user', 'user@email.com', True]  # Both conflict
     )
     @ddt.unpack
-    def test_existence_conflict(self, username, email):
+    def test_existence_conflict(self, username, email, validate_suggestions):
         """
         Test if username '{0}' and email '{1}' have conflicts with
         username 'user' and email 'user@email.com'.
@@ -2259,7 +2278,8 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
                 "email": EMAIL_CONFLICT_MSG.format(
                     email_address=user.email
                 ) if email == user.email else ''
-            }
+            },
+            validate_suggestions
         )
 
     @ddt.data('', ('e' * EMAIL_MAX_LENGTH) + '@email.com')

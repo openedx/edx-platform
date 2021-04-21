@@ -51,7 +51,9 @@ from openedx.core.djangoapps.user_api.accounts.api import (
 )
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
-from openedx.core.djangoapps.user_authn.utils import generate_password, is_registration_api_v1
+from openedx.core.djangoapps.user_authn.utils import (
+    generate_password, generate_username_suggestions, is_registration_api_v1
+)
 from openedx.core.djangoapps.user_authn.views.registration_form import (
     AccountCreationForm,
     RegistrationFormFactory,
@@ -546,11 +548,12 @@ class RegistrationView(APIView):
         error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
             error_code += '-email'
-            errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
+            errors['email'] = [{'user_message': accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
         if username is not None and username_exists_or_retired(username):
             error_code += '-username'
-            errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
+            errors['username'] = [{'user_message': accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
+            errors['username_suggestions'] = generate_username_suggestions(username)
 
         if errors:
             return self._create_response(request, errors, status_code=409, error_code=error_code)
@@ -714,6 +717,7 @@ class RegistrationValidationView(APIView):
 
     # This end-point is available to anonymous users, so no authentication is needed.
     authentication_classes = []
+    username_suggestions = []
 
     def name_handler(self, request):
         name = request.data.get('name')
@@ -724,6 +728,8 @@ class RegistrationValidationView(APIView):
         username = request.data.get('username')
         invalid_username_error = get_username_validation_error(username)
         username_exists_error = get_username_existence_validation_error(username)
+        if username_exists_error:
+            self.username_suggestions = generate_username_suggestions(username)
         # We prefer seeing for invalidity first.
         # Some invalid usernames (like for superusers) may exist.
         return invalid_username_error or username_exists_error
@@ -794,9 +800,8 @@ class RegistrationValidationView(APIView):
                     form_field_key: handler(self, request)
                 })
 
-        field_name = request.data.get('fieldName')  # adding field name for authn MFE use case
-        if field_name:
-            validation_decisions.update({
-                'fieldName': field_name
-            })
-        return Response({"validation_decisions": validation_decisions})
+        response_dict = {"validation_decisions": validation_decisions}
+        if self.username_suggestions:
+            response_dict['username_suggestions'] = self.username_suggestions
+
+        return Response(response_dict)
