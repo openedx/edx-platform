@@ -26,12 +26,12 @@ from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from common.djangoapps.student.signals import REFUND_ORDER
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.milestones_helpers import (  # lint-amnesty, pylint: disable=line-too-long
+from common.djangoapps.util.milestones_helpers import (
     get_course_milestones,
     remove_prerequisite_course,
     set_prerequisite_courses
 )
-from common.djangoapps.util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
