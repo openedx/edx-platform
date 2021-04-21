@@ -674,9 +674,10 @@ def validate_course_olx(courselike_key, course_dir, status):
         course_dir: complete path to the course olx
         status: UserTaskStatus object.
     """
-    is_library = isinstance(courselike_key, LibraryLocator)
     olx_is_valid = True
     log_prefix = f'Course import {courselike_key}'
+    validation_failed_mesg = 'CourseOlx validation failed.'
+    is_library = isinstance(courselike_key, LibraryLocator)
 
     if is_library:
         return olx_is_valid
@@ -698,13 +699,14 @@ def validate_course_olx(courselike_key, course_dir, status):
     if not has_errors:
         return olx_is_valid
 
-    LOGGER.error(f'{log_prefix}: CourseOlx validation failed.')
+    LOGGER.error(f'{log_prefix}: {validation_failed_mesg}')
     log_errors_to_artifact(errorstore, status)
 
     if bypass_olx_failure_enabled():
         return olx_is_valid
 
     status.fail(UserErrors.OLX_VALIDATION_FAILED)
+    monitor_import_failure(courselike_key, status.state, message=validation_failed_mesg)
     return False
 
 
