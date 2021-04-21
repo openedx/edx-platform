@@ -3,21 +3,25 @@ All views for webinars app
 """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseServerError
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .helpers import send_webinar_registration_email
 from .models import Webinar, WebinarRegistration
 
 
-def webinar_description_page_view(request, pk):
-    # TODO This is a temp view and will be properly functional in LP-2623
-    return render(request, 'adg/lms/webinar/description_page.html', context={'pk': pk})
+class WebinarDetailView(DetailView):
+    """
+    A view to get description about a specific webinar.
+    """
+
+    model = Webinar
+    template_name = 'adg/lms/webinar/description_page.html'
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
