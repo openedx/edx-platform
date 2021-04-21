@@ -13,6 +13,7 @@ import logging
 from pkg_resources import resource_string
 
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_module import EditingMixin
 from xmodule.raw_module import EmptyDataRawMixin
@@ -272,6 +273,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
                 'error': 'Unknown Command!'
             })
 
+    @XBlock.supports('multi_device')
     def student_view(self, context):  # lint-amnesty, pylint: disable=unused-argument
         """
         Renders the output that a student will see.
