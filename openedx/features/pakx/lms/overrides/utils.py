@@ -14,6 +14,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block
 
+from openedx.core.lib.request_utils import get_request_or_stub
 
 log = getLogger(__name__)
 
@@ -165,6 +166,22 @@ def _serialize_course_block_structure(request, course_block_structure):
     return course_block_structure_serializer.data, block_keys
 
 
+def create_dummy_request(site, user):
+    """
+    create a dummy request for a given site and user
+    :param site: Site object
+    :param user: User object
+
+    :return: (WSGI Request) Dummy WSGI Request
+    """
+
+    request = get_request_or_stub()
+    request.site = site
+    request.user = user
+
+    return request
+
+
 def get_course_progress_percentage(request, course_key):
     """
     get course progress in percentage for a given course key
@@ -206,7 +223,7 @@ def get_course_progress_percentage(request, course_key):
     total_completed_blocks = sum(list(filter(lambda value: value is not None, total_completed_block_types.values()))) \
         if total_completed_block_types and total_completed_block_types.values() else 0
 
-    return format((total_completed_blocks/total_blocks)*100, '.0f') if total_blocks > 0 else total_blocks
+    return format((total_completed_blocks / total_blocks) * 100, '.0f') if total_blocks > 0 else total_blocks
 
 
 def get_rtl_class(course_name):

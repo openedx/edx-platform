@@ -82,7 +82,7 @@ git+https://github.com/jazzband/sorl-thumbnail.git@13bedfb7d2970809eda597e3ef793
 # Forked to fix predicate inversion and keep support for Django 1.1 alive
 # Once https://github.com/excitedleigh/bridgekeeper/pull/10 is merged, and we get to django 2, we can
 # remove this fork
-git+https://github.com/edx/bridgekeeper.git@2423e8d8788c2132ebeec509e1a7b17e1f5b9364#egg=bridgekeeper==0.0
+git+https://github.com/edly-io/bridgekeeper.git@edly-1.0#egg=bridgekeeper==edly-1.0
 
 # Our libraries:
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail
