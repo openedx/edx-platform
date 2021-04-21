@@ -298,7 +298,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         except Exception as err:  # pylint: disable=broad-except
             msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=str(self.location), err=err)
-            raise Exception(msg).with_traceback(sys.exc_info()[2])
+            raise LoncapaProblemError(msg).with_traceback(sys.exc_info()[2])
 
         if self.score is None:
             self.set_score(self.score_from_lcp(lcp))

@@ -170,7 +170,18 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         # specific events from CAPA are not propagated up the stack. Do we want this?
         try:
             instance.rescore(only_if_higher=task_input['only_if_higher'])
-        except (LoncapaProblemError, StudentInputError, ResponseError):
+        except (LoncapaProblemError, ResponseError):
+            # Capture a backtrace for these errors, but only a warning below for student input errors.
+            TASK_LOG.exception(
+                "error processing rescore call for course %(course)s, problem %(loc)s "
+                "and student %(student)s",
+                dict(
+                    course=course_id,
+                    loc=usage_key,
+                    student=student
+                )
+            )
+        except StudentInputError:
             TASK_LOG.warning(
                 "error processing rescore call for course %(course)s, problem %(loc)s "
                 "and student %(student)s",
