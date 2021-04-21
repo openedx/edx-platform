@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import json
 import unittest
 from string import capwords

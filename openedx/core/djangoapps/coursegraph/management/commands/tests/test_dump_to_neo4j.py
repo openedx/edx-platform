@@ -297,7 +297,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
               constituent nodes.
         """
         relationship_pairs = [
-            tuple([node["location"] for node in rel.nodes()])
+            tuple([node["location"] for node in rel.nodes()])  # lint-amnesty, pylint: disable=consider-using-generator
             for rel in relationships if rel.type() == relationship_type
         ]
         return relationship_pairs
