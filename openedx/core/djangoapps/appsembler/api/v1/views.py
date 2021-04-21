@@ -212,7 +212,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
                 request=request,
                 params=data,
             )
-            if not password_provided:
+            if password_provided:
                 # if send_activation_email is True, we want to keep the user
                 # inactive until the email is properly validated. If the param
                 # is False, we activate it.
