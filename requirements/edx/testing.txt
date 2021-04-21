@@ -49,7 +49,6 @@ contextlib2==0.6.0.post1  # via -r requirements/edx/base.txt
 coreapi==2.3.3            # via -r requirements/edx/base.txt, drf-yasg
 coreschema==0.0.4         # via -r requirements/edx/base.txt, coreapi, drf-yasg
 coverage==5.5             # via -r requirements/edx/coverage.txt, pytest-cov
-git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0  # via -r requirements/edx/testing.in
 crowdsourcehinter-xblock==0.6  # via -r requirements/edx/base.txt
 cryptography==3.2.1       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, django-fernet-fields, edx-enterprise, pyjwt, social-auth-core
 cssselect==1.1.0          # via -r requirements/edx/testing.in, pyquery
