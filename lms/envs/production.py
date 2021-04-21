@@ -937,7 +937,7 @@ DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
 
 ########################## Set Course Progress Reminder Email Days #######################
 
-COURSE_PROGRESS_REMINDER_EMAIL_DAYS = ENV_TOKENS.get('COURSE_PROGRESS_REMINDER_EMAIL_DAYS', 10)
+COURSE_PROGRESS_REMINDER_EMAIL_DAYS = ENV_TOKENS.get('COURSE_PROGRESS_REMINDER_EMAIL_DAYS', 5)
 
 ############################### Plugin Settings ###############################
 
