@@ -35,7 +35,6 @@ pyquery                   # jQuery-like API for retrieving fragments of HTML and
 pytest                    # Testing framework
 pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage
-git+https://github.com/nedbat/coverage_pytest_plugin.git@29de030251471e200ff255eb9e549218cd60e872#egg=coverage_pytest_plugin==0.0
 pytest-django             # Django support for pytest
 pytest-json-report        # Output json formatted warnings after running pytest
 pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
