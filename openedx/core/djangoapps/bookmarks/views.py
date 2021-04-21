@@ -91,7 +91,7 @@ class BookmarksViewMixin:
         return Response(
             {
                 "developer_message": developer_message,
-                "user_message": _(user_message)
+                "user_message": _(user_message)  # lint-amnesty, pylint: disable=translation-of-non-string
             },
             status=error_status
         )
@@ -202,7 +202,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         return page
 
     @apidocs.schema()
-    def post(self, request, *unused_args, **unused_kwargs):
+    def post(self, request, *unused_args, **unused_kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """Create a new bookmark for a user.
 
         The POST request only needs to contain one parameter "usage_id".
@@ -312,7 +312,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
             return self.error_response(error_message, error_status=status.HTTP_404_NOT_FOUND)
 
     @apidocs.schema()
-    def get(self, request, username=None, usage_id=None):
+    def get(self, request, username=None, usage_id=None):  # lint-amnesty, pylint: disable=unused-argument
         """
         Get a specific bookmark for a user.
 

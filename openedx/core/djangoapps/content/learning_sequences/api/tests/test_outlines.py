@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=reimported
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -361,10 +361,11 @@ class ContentGatingTestCase(OutlineProcessorTestCase):
         # Enroll student in the course
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="verified")
 
+    # lint-amnesty, pylint: disable=pointless-string-statement
     """
     Currently returns all, and only, sequences in required content, not just the first.
     This logic matches the existing transformer. Is this right?
-    """  # lint-amnesty, pylint: disable=pointless-string-statement
+    """
 
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.EntranceExamConfiguration.user_can_skip_entrance_exam')  # lint-amnesty, pylint: disable=line-too-long
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.milestones_helpers.get_required_content')  # lint-amnesty, pylint: disable=line-too-long
@@ -1217,7 +1218,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
 
                 assert len(user_course_outline.sections) == 3
                 assert len(user_course_outline.sequences) == 6
-                assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in
+                assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in  # lint-amnesty, pylint: disable=use-a-generator
                             user_course_outline.sequences.values()]),\
                     'Sequences should be accessible to all users for a public course'
 
