@@ -92,7 +92,10 @@ class RegistrationApiViewTests(TestCase):
             res = self.client.post(self.url, params)
             self.assertContains(res, 'user_id', status_code=200)
             new_user = User.objects.get(username=params['username'])
-            assert new_user.is_active != send_activation_email
+            if send_activation_email in [False, 'False', 'false']:
+                self.assertTrue(new_user.is_active)
+            else:
+                self.assertFalse(new_user.is_active)
 
     @ddt.data(True, False, 'True', 'False', 'true', 'false')
     def test_send_activation_email_without_password(self, send_activation_email):
