@@ -15,9 +15,6 @@
 # celery 5.0 has dropped python3.5 support.
 celery<5.0
 
-# cryptography 3.3 has dropped python3.5 support.
-cryptography<3.3
-
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
