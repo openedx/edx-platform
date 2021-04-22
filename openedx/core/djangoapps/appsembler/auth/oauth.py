@@ -38,5 +38,10 @@ def destroy_oauth_tokens(user):
         dot_refresh_query = dot_refresh_query.exclude(
             application__in=trusted_applications)
 
-    dot_access_query.delete()
+    # This is a quick hack fix to work around the oauth2_provider migrations
+    # problem where refresh token has a non-nullable foreign key field to the
+    # access token table
+    # For more details see the PR:
+    # https://github.com/appsembler/edx-platform/pull/883
     dot_refresh_query.delete()
+    dot_access_query.delete()
