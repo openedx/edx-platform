@@ -343,4 +343,4 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         self.certificate.invalidate()
 
         assert mock_revoke_task.call_count == 1
-        assert mock_revoke_task.call_args[0] == (self.user.username, self.course_id)
+        assert mock_revoke_task.call_args[0] == (self.user.username, str(self.course_id))
