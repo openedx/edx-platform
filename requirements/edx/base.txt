@@ -9,7 +9,7 @@
 -e git+https://github.com/edx/codejail.git@3.1.3#egg=codejail==3.1.3  # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-wiki.git@1.0.0#egg=django-wiki  # via -r requirements/edx/github.in
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock  # via -r requirements/edx/github.in
--e git+https://github.com/edx/edx-drf-extensions.git@3401926966d812cdbdd8c812571c3ae847f0d547#egg=edx-drf-extensions  # via -r requirements/edx/github.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
+-e git+https://github.com/edx/edx-drf-extensions.git@8f7ac8ad47c03df99fc82cd59ccfef6535e69f50#egg=edx-drf-extensions  # via -r requirements/edx/github.in, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/github.in
 -e .  # via -r requirements/edx/local.in
 -e git+https://github.com/technige/py2neo.git@py2neo-3.1.2#egg=py2neo==3.1.2  # via -r requirements/edx/github.in
