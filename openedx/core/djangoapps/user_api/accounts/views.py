@@ -16,7 +16,6 @@ from consent.models import DataSharingConsent
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, logout
-from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import ugettext as _
@@ -49,6 +48,7 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
@@ -447,7 +447,7 @@ class DeactivateLogoutView(APIView):
 
                 try:
                     # Send notification email to user
-                    site = Site.objects.get_current()
+                    site = get_current_site()
                     notification_context = get_base_template_context(site)
                     notification_context.update({'full_name': request.user.profile.name})
                     language_code = request.user.preferences.model.get_value(
