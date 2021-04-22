@@ -126,23 +126,22 @@ def check_and_send_email_to_course_learners():
         course_progress = float(
             get_course_progress_percentage(create_dummy_request(Site.objects.get_current(), item.user),
                                            text_type(item.course_id)))
-
         course_overview = CourseOverview.get_from_id(item.course_id)
         grades = CourseGradeFactory().read(user=item.user, course_key=item.course_id)
+        completed = grades.passed and course_progress >= 100
+
         data = {'course_name': course_overview.display_name, 'username': item.user.username, 'email': item.user.email,
                 'language': get_user_preference(item.user, LANGUAGE_KEY),
-                'completed': grades.passed and course_progress >= 100,
-                'status_message': "Completed" if grades.passed and course_progress >= 100 else "Pending",
+                'completed': completed,
+                'status_message': "Completed" if completed else "Pending",
                 'course_progress': course_progress}
 
-        if not data["completed"]:
+        if data["completed"]:
             send_reminder_email.delay(data, text_type(item.course_id))
             item.status = 2
             item.save()
         elif course_overview.end_date:
             remaining_days = get_date_diff_in_days(course_overview.end_date)
-
-            log.info("******* COURSE_PROGRESS_REMINDER_EMAIL_DAYS: {}".format(settings.COURSE_PROGRESS_REMINDER_EMAIL_DAYS))
 
             if remaining_days <= settings.COURSE_PROGRESS_REMINDER_EMAIL_DAYS and item.status == 0:
                 send_reminder_email.delay(data, text_type(item.course_id))
