@@ -69,7 +69,7 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 -e git+https://github.com/edx/RateXBlock.git@2.0.1#egg=rate-xblock
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
--e git+https://github.com/edx/edx-drf-extensions.git@8f7ac8ad47c03df99fc82cd59ccfef6535e69f50#egg=edx-drf-extensions
+-e git+https://github.com/edx/edx-drf-extensions.git@c2ade979f31efa0764713f677402c90015ad236a#egg=edx-drf-extensions
 
 # Third Party XBlocks
 
