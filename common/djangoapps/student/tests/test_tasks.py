@@ -97,7 +97,7 @@ class SendActivationEmailTestCase(TestCase):
         assert mock_log.exception.call_count == 1
 
     @mock.patch('student.tasks.log')
-    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
     @mock.patch('common.djangoapps.student.views.management.theming_helpers.get_current_site')
     @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_current_site_configuration')
     def test_from_address_in_send_email(self, mock_site_configuration, mock_get_current_site, mock_log):
