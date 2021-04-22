@@ -35,7 +35,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert response.status_code == 200
         assert not response.data.get('is_staff')
         # 'Course', 'Wiki', 'Progress' tabs
-        assert len(response.data.get('tabs', [])) == 3
+        assert len(response.data.get('tabs', [])) == 4
 
     def test_get_authenticated_staff_user(self):
         self.client.logout()
@@ -51,7 +51,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         assert response.data['is_staff']
         # This differs for a staff user because they also receive the Instructor tab
         # 'Course', 'Wiki', 'Progress', and 'Instructor' tabs
-        assert len(response.data.get('tabs', [])) == 4
+        assert len(response.data.get('tabs', [])) == 5
 
     def test_get_unknown_course(self):
         url = reverse('course-home-course-metadata', args=['course-v1:unknown+course+2T2020'])

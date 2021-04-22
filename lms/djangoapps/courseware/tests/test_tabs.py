@@ -400,7 +400,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
             milestone
         )
         course_tab_list = get_course_tab_list(self.user, self.course)
-        assert len(course_tab_list) == 1
+        assert len(course_tab_list) == 2
         assert course_tab_list[0]['tab_id'] == 'courseware'
         assert course_tab_list[0]['name'] == 'Entrance Exam'
 
@@ -425,7 +425,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         self.client.logout()
         self.login(self.email, self.password)
         course_tab_list = get_course_tab_list(self.user, self.course)
-        assert len(course_tab_list) == 4
+        assert len(course_tab_list) == 5
 
     def test_course_tabs_list_for_staff_members(self):
         """
@@ -437,7 +437,7 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, Mi
         staff_user = StaffFactory(course_key=self.course.id)
         self.client.login(username=staff_user.username, password='test')
         course_tab_list = get_course_tab_list(staff_user, self.course)
-        assert len(course_tab_list) == 4
+        assert len(course_tab_list) == 5
 
 
 class TextBookCourseViewsTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
@@ -652,16 +652,13 @@ class CourseTabListTestCase(TabListTestCase):
         # enumerate the tabs with a staff user
         user = UserFactory(is_staff=True)
         CourseEnrollment.enroll(user, self.course.id)
-        # Need to mock this flag as we care that orders match, and a tab not enabled will result in a failure
-        with patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG') as mock_flag:
-            mock_flag.is_enabled().return_value = True
-            for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
-                if getattr(tab, 'is_collection_item', False):
-                    # a collection item was found as a result of a collection tab
-                    assert getattr(self.course.tabs[i], 'is_collection', False)
-                else:
-                    # all other tabs must match the expected type
-                    assert tab.type == self.course.tabs[i].type
+        for i, tab in enumerate(xmodule_tabs.CourseTabList.iterate_displayable(self.course, user=user)):
+            if getattr(tab, 'is_collection_item', False):
+                # a collection item was found as a result of a collection tab
+                assert getattr(self.course.tabs[i], 'is_collection', False)
+            else:
+                # all other tabs must match the expected type
+                assert tab.type == self.course.tabs[i].type
 
         # test including non-empty collections
         assert {'type': 'html_textbooks'} in\
@@ -894,11 +891,8 @@ class DiscussionLinkTestCase(TabTestCase):
 
 class DatesTabTestCase(TabListTestCase):
     """Test cases for dates tab"""
-
-    @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
     @patch('common.djangoapps.student.models.CourseEnrollment.is_enrolled')
-    def test_dates_tab_disabled_if_unenrolled(self, is_enrolled, mock_flag):
-        mock_flag.is_enabled().return_value = True
+    def test_dates_tab_disabled_if_unenrolled(self, is_enrolled):
         tab = DatesTab({'type': DatesTab.type, 'name': 'dates'})
 
         is_enrolled.return_value = False
@@ -912,10 +906,8 @@ class DatesTabTestCase(TabListTestCase):
         enrolled_user = self.create_mock_user(is_staff=False, is_enrolled=True)
         assert self.is_tab_enabled(tab, self.course, enrolled_user)
 
-    @patch('lms.djangoapps.courseware.tabs.RELATIVE_DATES_FLAG')
-    def test_singular_dates_tab(self, mock_flag):
+    def test_singular_dates_tab(self):
         """Test cases for making sure no persisted dates tab is surfaced"""
-        mock_flag.is_enabled().return_value = True
         user = self.create_mock_user()
         self.course.tabs = self.all_valid_tab_list
         self.course.save()
