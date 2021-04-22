@@ -9,11 +9,11 @@ from celery.exceptions import MaxRetriesExceededError
 from celery.task import task
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.errors import RecoverableChannelDeliveryError
 from edx_ace.message import Message
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 log = logging.getLogger('edx.celery.task')
@@ -37,7 +37,7 @@ def send_activation_email(self, msg_string, from_address=None):
 
     dest_addr = msg.recipient.email_address
 
-    site = Site.objects.get_current()
+    site = get_current_site()
     user = User.objects.get(username=msg.recipient.username)
 
     try:
