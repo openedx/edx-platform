@@ -232,6 +232,31 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.debug('Search indexing successful for library %s', library_id)
 
 
+@shared_task
+@set_code_owner_attribute
+def update_special_exams_and_publish(course_key_str):
+    """
+    Registers special exams for a given course and calls publishing flow.
+
+    on_course_publish expects that the edx-proctoring subsystem has been refreshed
+    before being executed, so both functions are called here synchronously.
+    """
+    from cms.djangoapps.contentstore.proctoring import register_special_exams
+    from openedx.core.djangoapps.credit.signals import on_course_publish
+
+    course_key = CourseKey.from_string(course_key_str)
+    LOGGER.info('Attempting to register exams for course %s', course_key_str)
+    try:
+        register_special_exams(course_key)
+        LOGGER.info('Successfully registered exams for course %s', course_key_str)
+    # pylint: disable=broad-except
+    except Exception as exception:
+        LOGGER.exception(exception)
+
+    LOGGER.info('Publishing course %s', course_key_str)
+    on_course_publish(course_key)
+
+
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for course and library export tasks.
