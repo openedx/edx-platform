@@ -46,7 +46,7 @@ jobs:
       - name: Install requirements
         env:
           PHILU_PAT: ${{ secrets.PHILU_PAT }}
-          MSP_XBLOCK_BRANCH: ${{ github.base_ref }}
+          ADG_XBLOCKS_BRANCH: ${{ github.base_ref }}
         run: |
           sudo apt-get install libxmlsec1-dev pkg-config
           sudo apt-get update
