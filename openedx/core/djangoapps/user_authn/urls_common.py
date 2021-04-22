@@ -54,7 +54,7 @@ urlpatterns = [
 
     # Moved from user_api/legacy_urls.py
     url(
-        r'^api/user/v1/account/login_session/$',
+        r'^api/user/(?P<api_version>v(1|2))/account/login_session/$',
         login.LoginSessionView.as_view(),
         name="user_api_login_session"
     ),
