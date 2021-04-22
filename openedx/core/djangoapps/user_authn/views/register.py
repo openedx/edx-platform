@@ -30,6 +30,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
+from openedx_filters import trigger_filter
+from openedx_filters.exceptions import HookException
 
 from common.djangoapps import third_party_auth
 # Note that this lives in LMS, so this dependency should be refactored.
@@ -525,6 +527,16 @@ class RegistrationView(APIView):
         response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
+
+        try:
+            filter_result = trigger_filter("openedx.lms.auth.pre_register.filter.v1", data=data)
+            data = filter_result.get("data")
+        except HookException as err:
+            errors = {
+                "hook_error": [{"user_message": err.message}]
+            }
+
+            return  self._create_response(request, errors, status_code=err.status_code)
 
         response, user = self._create_account(request, data)
         if response:
