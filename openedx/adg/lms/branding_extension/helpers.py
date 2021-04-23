@@ -5,6 +5,7 @@ from datetime import datetime
 from urllib import parse
 
 from django.conf import settings
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
@@ -21,7 +22,7 @@ def get_footer_navigation_links():
     """
     links = [
         (marketing_link('ABOUT'), _('About')),
-        (marketing_link('OUR_TEAM'), _('Our Team')),
+        (reverse('our_team'), _('Our Team')),
         (marketing_link('TOS'), _('Terms')),
         (marketing_link('CONTACT'), _('Contact')),
     ]
