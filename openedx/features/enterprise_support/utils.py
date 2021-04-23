@@ -183,8 +183,10 @@ def update_third_party_auth_context_for_enterprise(request, context, enterprise_
             line_break=HTML('<br/>')
         )
 
+    # The hinted login frontend `HintedLoginView.js`, expects a list of providers
+    # so not clearing `providers` here anymore. It is unclear if removing the `secondaryProviders`
+    # is necessary either.
     if enterprise_customer:
-        context['data']['third_party_auth']['providers'] = []
         context['data']['third_party_auth']['secondaryProviders'] = []
 
     running_pipeline = third_party_auth.pipeline.get(request)

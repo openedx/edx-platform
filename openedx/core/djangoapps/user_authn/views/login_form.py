@@ -161,7 +161,7 @@ def login_and_registration_form(request, initial_mode="login"):
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
 
-    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
+    # Our URL may itself contain a parameter 'tpa_hint=x' that we need to check.
     # If present, we display a login page focused on third-party auth with that provider.
     third_party_auth_hint = None
     if '?' in redirect_to:  # lint-amnesty, pylint: disable=too-many-nested-blocks

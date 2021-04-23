@@ -22,6 +22,7 @@
                 },
 
                 render: function() {
+                    if (!this.hintedProvider) return this;
                     HtmlUtils.setHtml(
                         $(this.el),
                         HtmlUtils.template(this.tpl)({
