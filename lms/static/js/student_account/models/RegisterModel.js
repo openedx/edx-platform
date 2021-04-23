@@ -20,11 +20,12 @@
                 initialize: function(attributes, options) {
                     this.ajaxType = options.method;
                     this.urlRoot = options.url;
+                    this.nextUrl = options.nextUrl;
                 },
 
                 sync: function(method, model) {
                     var headers = {'X-CSRFToken': $.cookie('csrftoken')},
-                        data = {},
+                        data = {next: model.nextUrl},
                         courseId = $.url('?course_id');
 
                 // If there is a course ID in the query string param,

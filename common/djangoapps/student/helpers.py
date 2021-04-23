@@ -366,7 +366,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             redirect_to = None
         elif mime_type:
             log.warning(
-                "Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
+                "Redirect to url path with specified file type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
