@@ -39,5 +39,8 @@ class ModelRetirer(object):
 
 
 def retire_dot_oauth2_models(user):
-    dot_models = [DOTAccessToken, DOTApplication, DOTGrant, DOTRefreshToken]
+    # Original order is [DOTAccessToken, DOTApplication, DOTGrant, DOTRefreshToken]
+    # This is a hack fix around the database. See this PR for additional info:
+    # https://github.com/appsembler/edx-platform/pull/886
+    dot_models = [DOTRefreshToken, DOTAccessToken, DOTApplication, DOTGrant]
     ModelRetirer(dot_models).retire_user_by_id(user.id)
