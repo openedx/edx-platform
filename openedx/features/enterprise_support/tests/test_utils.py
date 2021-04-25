@@ -211,7 +211,6 @@ class TestEnterpriseUtils(TestCase):
 
         assert 'We are sorry, you are not authorized' in str(context['data']['third_party_auth']['errorMessage'])
         assert 'Widget error.' in str(context['data']['third_party_auth']['errorMessage'])
-        assert [] == context['data']['third_party_auth']['providers']
         assert [] == context['data']['third_party_auth']['secondaryProviders']
         assert not context['data']['third_party_auth']['autoSubmitRegForm']
         assert 'Just a couple steps' in str(context['data']['third_party_auth']['autoRegisterWelcomeMessage'])
