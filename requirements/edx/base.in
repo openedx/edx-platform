@@ -137,7 +137,9 @@ python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 rest-condition                      # DRF's recommendation for supporting complex permissions
-social-auth-core
+# Pinned social-auth-core to <4.0.3 untill drf-jwt adds support for PyJWT>2.0
+# https://github.com/Styria-Digital/django-rest-framework-jwt/issues/76
+social-auth-core<4.0.3
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
