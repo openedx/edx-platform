@@ -98,10 +98,6 @@ pymongo<3.11
 # sympy latest version causing test failures.
 sympy==1.6.2
 
-# greater versions breaking the code
-Sphinx==3.3.0
-
-
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
