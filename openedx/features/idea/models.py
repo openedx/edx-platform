@@ -38,7 +38,7 @@ class Location(models.Model):
 
 class VisualAttachment(models.Model):
     """
-    Model contains fields related to visual attachment
+    Model contains fields related to visual attachment.
     """
     video_link = models.URLField(blank=True, null=True, verbose_name=_('VIDEO LINK'))
     image = models.ImageField(
