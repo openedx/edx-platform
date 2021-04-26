@@ -409,16 +409,40 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
         expected_providers = [
             {
-                "id": "oa2-dummy", "name": "Dummy", "iconClass": None, "iconImage": "/static/uploads/icon.svg", "skipHintedLogin": False, "loginUrl": "/auth/login/dummy/?auth_entry=login&next=%2Fdashboard", "registerUrl": "/auth/login/dummy/?auth_entry=register&next=%2Fdashboard"
+                "id":
+                "oa2-dummy",
+                "name": "Dummy",
+                "iconClass": None,
+                "iconImage": "/static/uploads/icon.svg",
+                "skipHintedLogin": False,
+                "loginUrl": "/auth/login/dummy/?auth_entry=login&next=%2Fdashboard",
+                "registerUrl": "/auth/login/dummy/?auth_entry=register&next=%2Fdashboard",
             },
             {
-                "id": "oa2-facebook", "name": "Facebook", "iconClass": "fa-facebook", "iconImage": None, "skipHintedLogin": False, "loginUrl": "/auth/login/facebook/?auth_entry=login&next=%2Fdashboard", "registerUrl": "/auth/login/facebook/?auth_entry=register&next=%2Fdashboard"
+                "id": "oa2-facebook",
+                "name": "Facebook",
+                "iconClass": "fa-facebook",
+                "iconImage": None,
+                "skipHintedLogin": False,
+                "loginUrl": "/auth/login/facebook/?auth_entry=login&next=%2Fdashboard",
+                "registerUrl": "/auth/login/facebook/?auth_entry=register&next=%2Fdashboard",
             },
             {
-                "id": "oa2-google-oauth2", "name": "Google", "iconClass": "fa-google-plus", "iconImage": None, "skipHintedLogin": False, "loginUrl": "/auth/login/google-oauth2/?auth_entry=login&next=%2Fdashboard", "registerUrl": "/auth/login/google-oauth2/?auth_entry=register&next=%2Fdashboard"
+                "id": "oa2-google-oauth2",
+                "name": "Google",
+                "iconClass": "fa-google-plus",
+                "iconImage": None,
+                "skipHintedLogin": False,
+                "loginUrl": "/auth/login/google-oauth2/?auth_entry=login&next=%2Fdashboard",
+                "registerUrl": "/auth/login/google-oauth2/?auth_entry=register&next=%2Fdashboard",
             },
             {
-                "id": "saml-testshib", "name": "TestShib", "iconClass": "fa-university", "iconImage": None, "skipHintedLogin": True, "loginUrl": "/auth/login/tpa-saml/?auth_entry=login&next=%2Fdashboard&idp=testshib", "registerUrl": "/auth/login/tpa-saml/?auth_entry=register&next=%2Fdashboard&idp=testshib"
+                "id": "saml-testshib",
+                "name": "TestShib",
+                "iconClass": "fa-university",
+                "iconImage": None, "skipHintedLogin": True,
+                "loginUrl": "/auth/login/tpa-saml/?auth_entry=login&next=%2Fdashboard&idp=testshib",
+                "registerUrl": "/auth/login/tpa-saml/?auth_entry=register&next=%2Fdashboard&idp=testshib",
             }]
         self._assert_saml_auth_data_with_error(
             response,
