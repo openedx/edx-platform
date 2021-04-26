@@ -3,7 +3,7 @@
 
 from logging import getLogger
 
-
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
 from common.djangoapps.student.roles import GlobalStaff
 from .exceptions import ItemNotFoundError, NoPathToItem
@@ -130,7 +130,7 @@ def get_child_locations(section_desc, request, course_id):
     Returns all child locations for a section. If user is learner or masquerading as learner,
     staff only blocks are excluded.
     """
-    is_staff_user = GlobalStaff().has_user(request.user) if request else False
+    is_staff_user = has_access(request.user, 'staff', course_id).has_access if request else False
 
     def is_masquerading_as_student():
         """
