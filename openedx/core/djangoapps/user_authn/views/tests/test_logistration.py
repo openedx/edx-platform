@@ -639,9 +639,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             "syncLearnerProfileData": False,
             "pipeline_user_details": {"email": "test@test.com"} if add_user_details else {}
         }
-        if expected_ec is not None:
-            # If we set an EnterpriseCustomer, third-party auth providers ought to be hidden.
-            auth_info['providers'] = []
         auth_info = dump_js_escaped_json(auth_info)
 
         expected_data = '"third_party_auth": {auth_info}'.format(
