@@ -341,7 +341,14 @@ class GeneratedCertificate(models.Model):
 
     def invalidate(self):
         """
-        Invalidate Generated Certificate by marking it 'unavailable'.
+        Invalidate Generated Certificate by marking it 'unavailable'. This will prevent the learner from being able to
+        access their certiticate in the associated Course. In addition, we remove any errors and grade information
+        associated with the certificate record.
+
+        We remove the `download_uuid` and the `download_url` as well, but this is only important to PDF certificates.
+
+        Invalidating a certificate fires the `COURSE_CERT_REVOKED` signal. This kicks off a task to determine if there
+        are any program certificates that need to be revoked from the learner.
         """
         log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
 
@@ -362,7 +369,8 @@ class GeneratedCertificate(models.Model):
 
     def mark_notpassing(self, grade):
         """
-        Invalidates a Generated Certificate by marking it as notpassing
+        Invalidates a Generated Certificate by marking it as 'notpassing'. For additional information, please see the
+        comments of the `invalidate` function above as they also apply here.
         """
         log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
 
@@ -389,9 +397,14 @@ class GeneratedCertificate(models.Model):
 
     def save(self, *args, **kwargs):  # pylint: disable=signature-differs
         """
-        After the base save() method finishes, fire the COURSE_CERT_AWARDED
-        signal iff we are saving a record of a learner passing the course.
-        As well as the COURSE_CERT_CHANGED for any save event.
+        After the base save() method finishes, fire the COURSE_CERT_CHANGED signal. If the learner is currently passing
+        the course we also fire the COURSE_CERT_AWARDED signal.
+
+        The COURSE_CERT_CHANGED signal helps determine if a Course Certificate can be awarded to a learner in the
+        Credentials IDA.
+
+        The COURSE_CERT_AWARDED signal helps determine if a Program Certificate can be awarded to a learner in the
+        Credentials IDA.
         """
         super().save(*args, **kwargs)
         COURSE_CERT_CHANGED.send_robust(
