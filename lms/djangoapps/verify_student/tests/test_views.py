@@ -1664,6 +1664,31 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
+    @patch.dict(settings.VERIFY_STUDENT, {'USE_DJANGO_MAIL': True})
+    def test_approved_email_without_ace(self):
+        """
+        Test basic email for verification approved.
+        """
+        expiration_datetime = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+
+        self._assert_verification_approved_email(expiration_datetime.date())
+
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
