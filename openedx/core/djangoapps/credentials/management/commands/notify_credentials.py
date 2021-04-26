@@ -12,38 +12,21 @@ signals.)
 
 
 import logging
-import math
 import shlex
 import sys
-import time
 
 from datetime import datetime, timedelta
 import dateutil.parser
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from MySQLdb import OperationalError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from lms.djangoapps.certificates.api import get_recently_modified_certificates
-from lms.djangoapps.grades.api import get_recently_modified_grades
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
-from lms.djangoapps.certificates.models import CertificateStatuses
-from openedx.core.djangoapps.credentials.signals import send_grade_if_interesting  # lint-amnesty, pylint: disable=unused-import
-from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
 
-User = get_user_model()
 log = logging.getLogger(__name__)
-
-
-def certstr(cert):
-    return f'{cert.course_id} for user {cert.user.username}'
-
-
-def gradestr(grade):
-    return f'{grade.course_id} for user {grade.user_id}'
 
 
 def parsetime(timestr):
@@ -51,41 +34,6 @@ def parsetime(timestr):
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=UTC)
     return dt
-
-
-def paged_query(queryset, delay, page_size):
-    """
-    A generator that iterates through a queryset but only resolves chunks of it at once, to avoid overwhelming memory
-    with a giant query. Also adds an optional delay between yields, to help with load.
-    """
-    count = queryset.count()
-    pages = int(math.ceil(count / page_size))
-
-    for page in range(pages):
-        page_start = page * page_size
-        page_end = page_start + page_size
-        subquery = queryset[page_start:page_end]
-
-        if delay and page:
-            time.sleep(delay)
-
-        index = 0
-        try:
-            for item in subquery.iterator():
-                index += 1
-                yield page_start + index, item
-        except OperationalError:
-            # When running the notify_credentials command locally there is an
-            # OperationalError thrown by MySQL when there are no more results
-            # available for the queryset iterator. This change catches that exception,
-            # checks state, and then logs according to that state. This code runs in
-            # production without issue. This changes allows for the code to be run
-            # locally without a separate code path.
-            if index == count:
-                log.info('OperationalError Exception caught, all known results processed in paged_query')
-            else:
-                log.warning('OperationalError Exception caught, it is possible some results were missed')
-            continue
 
 
 class Command(BaseCommand):
@@ -104,9 +52,9 @@ class Command(BaseCommand):
 
         DRY-RUN: This command would have handled changes for...
         3 Certificates:
-            course-v1:edX+RecordsSelfPaced+1 for user records_one_cert
-            course-v1:edX+RecordsSelfPaced+1 for user records
-            course-v1:edX+RecordsSelfPaced+1 for user records_unverified
+            course-v1:edX+RecordsSelfPaced+1 for user 14
+            course-v1:edX+RecordsSelfPaced+1 for user 17
+            course-v1:edX+RecordsSelfPaced+1 for user 18
         3 Grades:
             course-v1:edX+RecordsSelfPaced+1 for user 14
             course-v1:edX+RecordsSelfPaced+1 for user 17
@@ -216,110 +164,11 @@ class Command(BaseCommand):
             'auto' if options['auto'] else 'manual',
         )
 
-        try:
-            site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
-        except SiteConfiguration.DoesNotExist:
-            log.error('No site configuration found for site %s', options['site'])
-
         course_keys = self.get_course_keys(options['courses'])
         if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
             raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
 
-        certs = get_recently_modified_certificates(
-            course_keys, options['start_date'], options['end_date'], options['user_ids']
-        )
-
-        users = None
-        if options['user_ids']:
-            users = User.objects.filter(id__in=options['user_ids'])
-        grades = get_recently_modified_grades(
-            course_keys, options['start_date'], options['end_date'], users
-        )
-
-        log.info('notify_credentials Sending notifications for {certs} certificates and {grades} grades'.format(
-            certs=certs.count(),
-            grades=grades.count()
-        ))
-        if options['dry_run']:
-            self.print_dry_run(certs, grades)
-        else:
-            self.send_notifications(
-                certs,
-                grades,
-                site_config=site_config,
-                delay=options['delay'],
-                page_size=options['page_size'],
-                verbose=options['verbose'],
-                notify_programs=options['notify_programs']
-            )
-
-        log.info('notify_credentials finished')
-
-    def send_notifications(
-        self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False, notify_programs=False
-    ):
-        """ Run actual handler commands for the provided certs and grades. """
-
-        course_cert_info = {}
-
-        # First, do certs
-        for i, cert in paged_query(certs, delay, page_size):
-            if site_config and not site_config.has_org(cert.course_id.org):
-                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
-                continue
-
-            log.info(
-                "Handling credential changes %d for certificate %s",
-                i, certstr(cert),
-            )
-
-            signal_args = {
-                'sender': None,
-                'user': cert.user,
-                'course_key': cert.course_id,
-                'mode': cert.mode,
-                'status': cert.status,
-                'verbose': verbose,
-            }
-
-            data = {
-                'mode': cert.mode,
-                'status': cert.status
-            }
-
-            course_cert_info[(cert.user.id, str(cert.course_id))] = data
-            handle_course_cert_changed(**signal_args)
-            if notify_programs and CertificateStatuses.is_passing_status(cert.status):
-                handle_course_cert_awarded(**signal_args)
-
-        # Then do grades
-        for i, grade in paged_query(grades, delay, page_size):
-            if site_config and not site_config.has_org(grade.course_id.org):
-                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
-                continue
-
-            log.info(
-                "Handling grade changes %d for grade %s",
-                i, gradestr(grade),
-            )
-
-            user = User.objects.get(id=grade.user_id)
-
-            # Grab mode/status from cert call
-            key = (user.id, str(grade.course_id))
-            cert_info = course_cert_info.get(key, {})
-            mode = cert_info.get('mode', None)
-            status = cert_info.get('status', None)
-
-            send_grade_if_interesting(
-                user,
-                grade.course_id,
-                mode,
-                status,
-                grade.letter_grade,
-                grade.percent_grade,
-                verbose=verbose
-            )
+        handle_notify_credentials.delay(options, course_keys)
 
     def get_course_keys(self, courses=None):
         """
@@ -339,26 +188,11 @@ class Command(BaseCommand):
         log.info("%d courses specified: %s", len(courses), ", ".join(courses))
         for course_id in courses:
             try:
-                course_keys.append(CourseKey.from_string(course_id))
+                # Use CourseKey to check if the course_id is parsable, but just
+                # keep the string; the celery task needs JSON serializable data.
+                course_keys.append(str(CourseKey.from_string(course_id)))
             except InvalidKeyError:
                 log.fatal("%s is not a parseable CourseKey", course_id)
                 sys.exit(1)
 
         return course_keys
-
-    def print_dry_run(self, certs, grades):
-        """Give a preview of what certs/grades we will handle."""
-        print("DRY-RUN: This command would have handled changes for...")
-        ITEMS_TO_SHOW = 10
-
-        print(certs.count(), "Certificates:")
-        for cert in certs[:ITEMS_TO_SHOW]:
-            print("   ", certstr(cert))
-        if certs.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(certs.count() - ITEMS_TO_SHOW))
-
-        print(grades.count(), "Grades:")
-        for grade in grades[:ITEMS_TO_SHOW]:
-            print("   ", gradestr(grade))
-        if grades.count() > ITEMS_TO_SHOW:
-            print("    (+ {} more)".format(grades.count() - ITEMS_TO_SHOW))
