@@ -5,7 +5,7 @@
     'use strict';
 
     this.Sequence = (function() {
-        function Sequence(element) {
+        function Sequence(element, runtime) {
             var self = this;
 
             this.removeBookmarkIconFromActiveNavItem = function(event) {
@@ -54,7 +54,8 @@
             this.sr_container = this.$('.sr-is-focusable');
             this.num_contents = this.contents.length;
             this.id = this.el.data('id');
-            this.ajaxUrl = this.el.data('ajax-url');
+            this.getCompletionUrl = runtime.handlerUrl(element, 'get_completion');
+            this.gotoPositionUrl = runtime.handlerUrl(element, 'goto_position');
             this.nextUrl = this.el.data('next-url');
             this.prevUrl = this.el.data('prev-url');
             this.savePosition = this.el.data('save-position');
@@ -227,7 +228,7 @@
         };
 
         Sequence.prototype.render = function(newPosition) {
-            var bookmarked, currentTab, modxFullUrl, sequenceLinks,
+            var bookmarked, currentTab, sequenceLinks,
                 self = this;
             if (this.position !== newPosition) {
                 if (this.position) {
@@ -236,10 +237,9 @@
                         this.update_completion(this.position);
                     }
                     if (this.savePosition) {
-                        modxFullUrl = '' + this.ajaxUrl + '/goto_position';
-                        $.postWithPrefix(modxFullUrl, {
+                        $.postWithPrefix(this.gotoPositionUrl, JSON.stringify({
                             position: newPosition
-                        });
+                        }));
                     }
                 }
 
@@ -414,13 +414,12 @@
 
         Sequence.prototype.update_completion = function(position) {
             var element = this.link_for(position);
-            var completionUrl = this.ajaxUrl + '/get_completion';
             var usageKey = element[0].attributes['data-id'].value;
             var completionIndicators = element.find('.check-circle');
             if (completionIndicators.length) {
-                $.postWithPrefix(completionUrl, {
+                $.postWithPrefix(this.getCompletionUrl, JSON.stringify({
                     usage_key: usageKey
-                }, function(data) {
+                }), function(data) {
                     if (data.complete === true) {
                         completionIndicators.removeClass('is-hidden');
                     }

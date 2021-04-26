@@ -514,7 +514,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
 
-        return Response(json.loads(sequence.handle_ajax('metadata', None, view=view)))
+        return Response(sequence.get_metadata(view=view))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):
