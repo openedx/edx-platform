@@ -138,7 +138,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 enrollment = response.data['enrollment']
                 assert enrollment_mode == enrollment['mode']
                 assert enrollment['is_active']
-                assert len(response.data['tabs']) == 5
+                assert len(response.data['tabs']) == 6
                 found = False
                 for tab in response.data['tabs']:
                     if tab['type'] == 'external_link':
