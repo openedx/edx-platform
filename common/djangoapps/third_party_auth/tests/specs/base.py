@@ -448,7 +448,7 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
         # Now the user enters their username and password.
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
-            reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
+            reverse('user_api_login_session'),
             {'email': self.user.email, 'password': 'test'}
         )
         assert ajax_login_response.status_code == 200

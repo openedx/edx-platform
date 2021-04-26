@@ -199,7 +199,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Login, check that the corresponding view's response has a 200 status code.
         """
-        resp = self.client.post(reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
+        resp = self.client.post(reverse('user_api_login_session'),
                                 {'email': email, 'password': password})
         assert resp.status_code == 200
 

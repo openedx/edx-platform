@@ -29,7 +29,7 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         returned json
         """
         resp = self.client.post(
-            reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
+            reverse('user_api_login_session'),
             {'email': email, 'password': password}
         )
         return resp

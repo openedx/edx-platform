@@ -186,7 +186,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         # Use an actual call to the login endpoint, to validate that the middleware
         # stack does the right thing
         response = self.client.post(
-            reverse('user_api_login_session', kwargs={'api_version': 'v1'}),
+            reverse('user_api_login_session'),
             data={
                 'email': self.user.email,
                 'password': UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
