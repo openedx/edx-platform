@@ -101,7 +101,6 @@ sympy==1.6.2
 # greater versions breaking the code
 Sphinx==3.3.0
 
-
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
@@ -113,3 +112,7 @@ diff-cover==4.0.0
 
 # 3.8.6 causes an issue in the instructor dashboard
 edx-proctoring<=3.8.5
+
+Pinned social-auth-core to <4.0.3 untill drf-jwt adds support for PyJWT>2.0
+# https://github.com/Styria-Digital/django-rest-framework-jwt/issues/76
+social-auth-core<4.0.3
