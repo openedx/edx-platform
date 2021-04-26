@@ -3,9 +3,9 @@ All models for our team app
 """
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from .constants import ALLOWED_PROFILE_IMAGE_EXTENSIONS
+from .constants import ALLOWED_PROFILE_IMAGE_EXTENSIONS, MAX_DESCRIPTION_LENGTH, MAX_DESIGNATION_LENGTH, MAX_NAME_LENGTH
 from .helpers import validate_profile_image_size
 
 
@@ -27,18 +27,32 @@ class OurTeamManager(models.Manager):
         return super().get_queryset().filter(member_type=OurTeamMember.BOARD_MEMBER)
 
 
+#  pylint: disable=no-member
 class OurTeamMember(models.Model):
     """
     Model for team members and board of trustees in about page
     """
 
-    name = models.CharField(verbose_name=_('Name'), max_length=150, )
-    designation = models.CharField(verbose_name=_('Designation'), max_length=150, )
+    name = models.CharField(
+        verbose_name=_('Name'),
+        max_length=MAX_NAME_LENGTH,
+        help_text=_('Add a name of max {char_limit} characters').format(char_limit=MAX_NAME_LENGTH),
+    )
+    designation = models.CharField(
+        verbose_name=_('Designation'),
+        max_length=MAX_DESIGNATION_LENGTH,
+        help_text=_('Add a designation of max {char_limit} characters').format(char_limit=MAX_DESIGNATION_LENGTH),
+    )
     image = models.ImageField(
         upload_to='team-members/images/', verbose_name=_('Image'),
         validators=[FileExtensionValidator(ALLOWED_PROFILE_IMAGE_EXTENSIONS), validate_profile_image_size],
+        help_text=_('Add a square image i.e image with 1:1 aspect ratio for optimal results')
     )
-    description = models.TextField(verbose_name=_('Description'), )
+    description = models.TextField(
+        verbose_name=_('Description'),
+        max_length=MAX_DESCRIPTION_LENGTH,
+        help_text=_('Add a description of max {char_limit} characters').format(char_limit=MAX_DESCRIPTION_LENGTH),
+    )
     url = models.URLField(default='', verbose_name=_('URL'), blank=True, )
 
     TEAM_MEMBER = 'team_member'
