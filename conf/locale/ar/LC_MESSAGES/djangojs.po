@@ -51,7 +51,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-26 09:02+0000\n"
+"POT-Creation-Date: 2021-04-26 15:45+0000\n"
 "PO-Revision-Date: 2020-10-27 19:11+0000\n"
 "Last-Translator: Imran Bashir <admin@omnipreneurshipacademy.com>, 2021\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -5861,26 +5861,6 @@ msgstr "لايمكن أن يسبق تاريخ الاستحقاق تاريخ ال
 msgid "Please save the previous record first to add a new form"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/static/js/webinars/admin/webinar_submission.js
-msgid "The existing webinar event will be updated."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/webinars/admin/webinar_submission.js
-msgid "A new webinar event will be created."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/webinars/admin/webinar_submission.js
-msgid "Are you sure you want to proceed?"
-msgstr "هل أنت واثق من أنّك تودّ حذف هذا المنشور؟"
-
-#: themes/edx-platform/adg/lms/static/js/webinars/admin/webinar_submission.js
-msgid "YES, SUBMIT"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/static/js/webinars/admin/webinar_submission.js
-msgid "KEEP EDITING"
-msgstr ""
-
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
 msgstr ""
@@ -11594,3 +11574,6 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "استخدم النص الحالي"
+
+#~ msgid "Are you sure you want to proceed?"
+#~ msgstr "هل أنت واثق من أنّك تودّ حذف هذا المنشور؟"
