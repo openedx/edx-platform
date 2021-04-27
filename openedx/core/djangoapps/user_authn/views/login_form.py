@@ -191,6 +191,8 @@ def login_and_registration_form(request, initial_mode="login"):
     # AND
     #   user is not an enterprise user
     # AND
+    #   tpa_hint_provider is not available
+    # AND
     #   user is not coming from a SAML IDP.
     saml_provider = False
     running_pipeline = pipeline.get(request)
