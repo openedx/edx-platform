@@ -6,8 +6,8 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
-# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 # Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
+# Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-26 09:03+0000\n"
+"POT-Creation-Date: 2021-04-26 15:45+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -21159,26 +21159,6 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
-msgid "Our Board of Trustees"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
-msgid "Our Partners"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
-msgid "PhilU"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Thinking Like a Brand Strategist"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Tuesday, March 23, 2021 1:00 PM SAST"
-msgstr ""
-
 #: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
 msgid "REGISTER"
 msgstr ""
@@ -21200,101 +21180,11 @@ msgid "EVENT DETAILS"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "March 23, 2021"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "1:00 PM SAST"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "English"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
 msgid "ABOUT THIS EVENT"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"Save your spot today to attend our upcoming webinar focused entirely on "
-"branding."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"Join brand developer extraordinaire, Anne Miltenburg, for an interactive "
-"virtual event as "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"she provides the techniques and tools you need to think like a brand "
-"strategist."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"Anne’s Nairobi-based education company, The Brandling, trains change-makers "
-"in brand "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"thinking skills. Her “Brand Thinking Canvas” model is the basis for the "
-"Philanthropy U "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Branding 101 course."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"This free, one-hour Branding webinar is more than just a presentation for "
-"you to watch. "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"You will also have the chance to ask questions or to comment on the "
-"challenges you face "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "with your current branding efforts."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"An effective brand strategy is a key component of finding the right audience"
-" and "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid ""
-"delivering impactful change. Build a brand that captivates your "
-"stakeholders. "
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Learn how with our interactive webinar."
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
 msgid "FEATURED SPEAKERS"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Anne Miltenburg"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Lina Hashemi"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
-msgid "Fatima Haque"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/courseware/course_about.html
@@ -21337,6 +21227,30 @@ msgstr ""
 msgid "Upcoming Webinars"
 msgstr ""
 
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Thinking Like a Brand Strategist"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Mar. 23, 2021 1:00 PM SAST"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Alumni Spotlight: Lina Hashemi"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Apr. 12, 2021 6:00 PM SAST"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Google Analytics Workshop"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "May 15, 2021 1:00 PM SAST"
+msgstr ""
+
 #: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
 #: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "ABOUT"
@@ -21353,10 +21267,6 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "apply"
-msgstr ""
-
-#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
-msgid "Administration"
 msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
@@ -21619,6 +21529,10 @@ msgstr ""
 
 #: themes/edx-platform/adg/lms/templates/static_templates/contact.html
 msgid "P.O Box 1039, Jeddah 21431 Saudi Arabia"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/our_team.html
+msgid "Content to be finalized ..."
 msgstr ""
 
 #: cms/templates/404.html
