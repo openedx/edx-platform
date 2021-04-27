@@ -344,3 +344,60 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
 
         assert mock_revoke_task.call_count == 1
         assert mock_revoke_task.call_args[0] == (self.user.username, str(self.course_id))
+
+
+class GeneratedCertificateTest(SharedModuleStoreTestCase):
+    """
+    Test GeneratedCertificates
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+
+        self.course = CourseOverviewFactory()
+        self.course_key = self.course.id
+
+    def test_invalidate(self):
+        """
+        Test the invalidate method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        cert.invalidate()
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.unavailable
+
+    def test_notpassing(self):
+        """
+        Test the notpassing method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        grade = '.3'
+        cert.mark_notpassing(grade)
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.notpassing
+        assert cert.grade == grade
+
+    def test_unverified(self):
+        """
+        Test the unverified method
+        """
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_key
+        )
+        cert.mark_unverified()
+
+        cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
+        assert cert.status == CertificateStatuses.unverified
