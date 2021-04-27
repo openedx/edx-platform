@@ -12,6 +12,8 @@ import uuid
 from functools import wraps
 
 import pytz
+from rest_framework.exceptions import UnsupportedMediaType
+
 from consent.models import DataSharingConsent
 from django.apps import apps
 from django.conf import settings
@@ -138,7 +140,7 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
-            POST /api/user/v1/accounts/search_emails "application/merge-patch+json"
+            POST /api/user/v1/accounts/search_emails "application/json"
 
         **Notes for PATCH requests to /accounts endpoints**
             * Requested updates to social_links are automatically merged with
@@ -286,7 +288,7 @@ class AccountViewSet(ViewSet):
         JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
-    parser_classes = (MergePatchParser,)
+    parser_classes = (JSONParser, MergePatchParser,)
 
     def get(self, request):
         """
@@ -321,7 +323,7 @@ class AccountViewSet(ViewSet):
     def search_emails(self, request):
         """
         POST /api/user/v1/accounts/search_emails
-        Content Type: "application/merge-patch+json"
+        Content Type: "application/json"
         {
             "emails": ["edx@example.com", "staff@example.com"]
         }
@@ -374,6 +376,9 @@ class AccountViewSet(ViewSet):
         https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
         else an error response with status code 415 will be returned.
         """
+        if request.content_type != MergePatchParser.media_type:
+            raise UnsupportedMediaType(request.content_type)
+
         try:
             with transaction.atomic():
                 update_account_settings(request.user, request.data, username=username)
