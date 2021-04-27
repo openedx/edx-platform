@@ -778,6 +778,10 @@
 
     // TYPE: upsell
     &.message-upsell {
+      padding-left: $baseline;
+      padding-top: $baseline;
+      padding-bottom: $baseline;
+
       .wrapper-tip {
         @include clearfix();
 
@@ -801,13 +805,55 @@
       }
 
       .wrapper-extended {
-        padding: ($baseline/4) 0;
+        display: flex;
+        flex-flow: column wrap;
 
-        .message-copy {
-          display: inline-block;
+        .wrapper-icon-message {
+          width: 100%;
+          display: inline-flex;
+          flex-wrap: wrap;
 
-          .message-copy-bold {
-            font-weight: 600;
+          svg {
+            flex-shrink: 0;
+            width: 41px;
+            height: 41px;
+            margin-left: -5px;
+          }
+
+          .message-copy {
+            margin-left: $baseline/2;
+            min-width: 15rem;
+            flex: 2;
+
+            .message-copy-bold {
+              font-weight: 600;
+            }
+          }
+        }
+
+        .action-upgrade-container {
+          flex-shrink: 0;
+          flex-grow: 1;
+          align-self: flex-end;
+        }
+
+        @include media-breakpoint-down(xs) {
+          .action-upgrade-container {
+            width: 100%;
+            margin-top: $baseline;
+          }
+
+          .action-upgrade {
+            width: 100%;
+            flex: 2 100%;
+          }
+        }
+
+        @include media-breakpoint-up(xl) {
+          flex-flow: nowrap;
+
+          .action-upgrade-container {
+            margin-left: 16px;
           }
         }
       }

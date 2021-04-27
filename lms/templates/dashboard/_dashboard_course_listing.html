@@ -405,22 +405,22 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
         % if course_mode_info and course_mode_info['show_upsell'] and not entitlement:
           <div class="message message-upsell has-actions is-shown">
             <div class="wrapper-extended">
-              <p class="message-copy" align="auto">
-                <b class="message-copy-bold">
-                  ${_("Pursue a {cert_name_long} to highlight the knowledge and skills you gain in this course.").format(cert_name_long=cert_name_long)}
-                </b><br>
-                  ${Text(_("It's official. It's easily shareable. "
-                      "It's a proven motivator to complete the course. {line_break}"
-                      "{link_start}Learn more about the verified {cert_name_long}{link_end}.")).format(
-                        line_break=HTML('<br>'),
-                        link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
-                          marketing_link('WHAT_IS_VERIFIED_CERT'),
-                          enrollment.course_id
-                        ),
-                        link_end=HTML('</a>'),
-                        cert_name_long=cert_name_long
-                      )}
-              </p>
+              <div class="wrapper-icon-message">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="" aria-hidden="true" focusable="false">
+                  <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 003.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" fill="currentColor"></path>
+                </svg>
+                <div class="message-copy" align="auto">
+  ${Text(_("Get the most out of your course! Upgrade to get full access to the course material, unlock both graded and non-graded assignments, and earn a {link_start}verified certificate{link_end} to showcase on your resume.")).format(
+                          link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
+                            marketing_link('WHAT_IS_VERIFIED_CERT'),
+                            enrollment.course_id
+                          ),
+                          link_end=HTML('</a>'),
+                          cert_name_long=cert_name_long
+                        )}
+
+                </div>
+              </div>
               <div class="action-upgrade-container">
                 % if use_ecommerce_payment_flow and course_mode_info['verified_sku']:
                   <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
