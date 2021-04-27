@@ -70,6 +70,10 @@ def _get_edly_user_info_cookie_string(request):
     """
     try:
         edly_sub_organization = request.site.edly_sub_org_for_lms
+        user_groups = []
+        if getattr(request, 'user', None):
+            user_groups.extend(request.user.groups.all().values_list('name', flat=True))
+
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
             'edly-sub-org': edly_sub_organization.slug,
@@ -78,6 +82,7 @@ def _get_edly_user_info_cookie_string(request):
                 request.user,
                 CourseCreatorRole()
             ) if getattr(request, 'user', None) else False,
+            'group_name': user_groups,
         }
         return encode_edly_user_info_cookie(edly_user_info_cookie_data)
     except EdlySubOrganization.DoesNotExist:
