@@ -16,19 +16,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 from .models import DEFAULT_PROVIDER_TYPE
 from .models import DiscussionsConfiguration
-
-
-PROVIDER_FEATURE_MAP = {
-    'legacy': [
-        'discussion-page',
-        'embedded-course-sections',
-        'wcag-2.1',
-    ],
-    'piazza': [
-        'discussion-page',
-        'lti',
-    ],
-}
+from .models import PROVIDER_FEATURE_MAP
 
 
 class IsStaff(BasePermission):
@@ -132,7 +120,11 @@ class DiscussionsConfigurationView(APIView):
             Serialize data into a dictionary, to be used as a response
             """
             payload = super().to_representation(instance)
-            lti_configuration = LtiSerializer(instance.lti_configuration)
+            lti_configuration_data = {}
+            supports_lti = instance.supports('lti')
+            if supports_lti:
+                lti_configuration = LtiSerializer(instance.lti_configuration)
+                lti_configuration_data = lti_configuration.data
             payload.update({
                 'features': {
                     'discussion-page',
@@ -140,16 +132,11 @@ class DiscussionsConfigurationView(APIView):
                     'lti',
                     'wcag-2.1',
                 },
-                'lti_configuration': lti_configuration.data,
+                'lti_configuration': lti_configuration_data,
                 'plugin_configuration': instance.plugin_configuration,
                 'providers': {
                     'active': instance.provider_type or DEFAULT_PROVIDER_TYPE,
-                    'available': {
-                        provider: {
-                            'features': PROVIDER_FEATURE_MAP.get(provider) or [],
-                        }
-                        for provider in instance.available_providers
-                    },
+                    'available': PROVIDER_FEATURE_MAP,
                 },
             })
             return payload
@@ -167,6 +154,8 @@ class DiscussionsConfigurationView(APIView):
                 value = validated_data.get(key)
                 if value is not None:
                     setattr(instance, key, value)
+            # _update_* helpers assume `enabled` and `provider_type`
+            # have already been set
             instance = self._update_lti(instance, validated_data)
             instance.save()
             return instance
@@ -176,15 +165,19 @@ class DiscussionsConfigurationView(APIView):
             Update LtiConfiguration
             """
             lti_configuration_data = validated_data.get('lti_configuration')
-            if lti_configuration_data:
-                instance.lti_configuration = instance.lti_configuration or LtiConfiguration()
-                lti_configuration = LtiSerializer(
-                    instance.lti_configuration,
+            supports_lti = instance.supports('lti')
+            if not supports_lti:
+                instance.lti_configuration = None
+            elif lti_configuration_data:
+                lti_configuration = instance.lti_configuration or LtiConfiguration()
+                lti_serializer = LtiSerializer(
+                    lti_configuration,
                     data=lti_configuration_data,
                     partial=True,
                 )
-                if lti_configuration.is_valid(raise_exception=True):
-                    lti_configuration.save()
+                if lti_serializer.is_valid(raise_exception=True):
+                    lti_serializer.save()
+                instance.lti_configuration = lti_configuration
             return instance
 
     # pylint: disable=redefined-builtin

@@ -23,6 +23,17 @@ log = logging.getLogger(__name__)
 
 
 DEFAULT_PROVIDER_TYPE = 'legacy'
+PROVIDER_FEATURE_MAP = {
+    'legacy': [
+        'discussion-page',
+        'embedded-course-sections',
+        'wcag-2.1',
+    ],
+    'piazza': [
+        'discussion-page',
+        'lti',
+    ],
+}
 
 
 def get_supported_providers() -> list[str]:
@@ -178,6 +189,14 @@ class DiscussionsConfiguration(TimeStampedModel):
             provider=self.provider_type,
             enabled=self.enabled,
         )
+
+    def supports(self, feature: str) -> bool:
+        """
+        Check if the provider supports some feature
+        """
+        features = PROVIDER_FEATURE_MAP.get(self.provider_type) or []
+        has_support = bool(feature in features)
+        return has_support
 
     @classmethod
     def is_enabled(cls, context_key: CourseKey) -> bool:
