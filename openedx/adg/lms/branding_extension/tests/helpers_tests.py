@@ -4,6 +4,7 @@ Tests for helpers of branding_extension app
 import mock
 import pytest
 from django.test import RequestFactory
+from django.urls import reverse
 from freezegun import freeze_time
 
 from openedx.adg.lms.branding_extension.helpers import (
@@ -28,7 +29,7 @@ def test_get_footer_navigation_links(mocker):
             'title': 'About',
         },
         {
-            'url': test_url,
+            'url': reverse('our_team'),
             'title': 'Our Team',
         },
         {

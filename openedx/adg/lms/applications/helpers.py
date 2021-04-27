@@ -22,6 +22,7 @@ from .constants import (
     MONTH_NAME_DAY_YEAR_FORMAT,
     SCORES
 )
+from .rules import is_adg_admin
 
 
 def validate_logo_size(file_):
@@ -268,3 +269,19 @@ def get_extra_context_for_application_review_page(application):
     }
 
     return extra_context
+
+
+def has_admin_permissions(user):
+    """
+    Checks if the user is a superuser or an ADG admin or the admin of any business line while having the staff status
+
+    Arguments:
+        user (User): User object to check for permissions
+
+    Returns:
+        boolean: True if the user has admin permissions of any kind else False
+    """
+    from openedx.adg.lms.applications.models import BusinessLine
+
+    is_user_admin = user.is_superuser or is_adg_admin(user) or BusinessLine.is_user_business_line_admin(user)
+    return user.is_staff and is_user_admin

@@ -116,6 +116,19 @@ class BusinessLine(TimeStampedModel):
     class Meta:
         app_label = 'applications'
 
+    @classmethod
+    def is_user_business_line_admin(cls, user):
+        """
+        Checks if the user is a business line admin i.e Belongs to atleast one business line group
+
+        Arguments:
+             user (User): User object to check permissions for
+
+        Returns:
+            boolean: Returns True if the user is an admin and False if not
+        """
+        return cls.objects.filter(group__user=user).exists()
+
     def __str__(self):
         return '{}'.format(self.title)
 

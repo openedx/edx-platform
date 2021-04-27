@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.applications.helpers import validate_file_size
+from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .constants import ALLOWED_BANNER_EXTENSIONS, BANNER_MAX_SIZE
 from .helpers import send_cancellation_emails_for_given_webinars
@@ -99,13 +100,13 @@ class Webinar(TimeStampedModel):
 
         errors = {}
         if self.start_time and self.start_time < now():
-            errors['start_time'] = _('Start date should be in future')
+            errors['start_time'] = _('Start date/time should be in future')
 
         if self.end_time and self.end_time < now():
-            errors['end_time'] = _('End date should be in future')
+            errors['end_time'] = _('End date/time should be in future')
 
         if self.start_time and self.end_time and self.start_time > self.end_time:
-            errors['start_time'] = _('End date must be greater than start date')
+            errors['start_time'] = _('End date/time must be greater than start date/time')
 
         if self.banner:
             error_message = validate_file_size(self.banner, BANNER_MAX_SIZE)
@@ -120,6 +121,21 @@ class Webinar(TimeStampedModel):
             send_cancellation_emails_for_given_webinars([self])
         self.status = self.CANCELLED
         self.save()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        """
+        Extension of save for webinar to set the created_by and modified_by fields.
+        """
+        request = get_current_request()
+        if request:
+            if hasattr(self, 'created_by'):
+                self.modified_by = request.user
+            else:
+                self.created_by = request.user
+
+        return super(Webinar, self).save(
+            force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields
+        )
 
 
 class CancelledWebinar(Webinar):
