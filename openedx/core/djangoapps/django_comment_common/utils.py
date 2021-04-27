@@ -2,21 +2,16 @@
 """
 Common comment client utility functions.
 """
-
-
 from contracts import new_contract
 
-from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    CourseDiscussionSettings,
     Role
 )
-from openedx.core.lib.cache_utils import request_cached
 
 new_contract('basestring', str)
 
@@ -115,22 +110,3 @@ def are_permissions_roles_seeded(course_id):
             return False
 
     return True
-
-
-@request_cached()
-def get_course_discussion_settings(course_key):
-    try:
-        course_discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key)
-    except CourseDiscussionSettings.DoesNotExist:
-        legacy_discussion_settings = get_legacy_discussion_settings(course_key)
-        course_discussion_settings, _ = CourseDiscussionSettings.objects.get_or_create(
-            course_id=course_key,
-            defaults={
-                'always_divide_inline_discussions': legacy_discussion_settings['always_cohort_inline_discussions'],
-                'divided_discussions': legacy_discussion_settings['cohorted_discussions'],
-                'division_scheme': CourseDiscussionSettings.COHORT if legacy_discussion_settings['is_cohorted']
-                else CourseDiscussionSettings.NONE
-            }
-        )
-
-    return course_discussion_settings

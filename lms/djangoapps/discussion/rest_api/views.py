@@ -47,9 +47,7 @@ from lms.djangoapps.discussion.views import get_divided_discussions
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.django_comment_common.utils import (
-    get_course_discussion_settings,
-)
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -769,7 +767,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
 
         course_key = form.cleaned_data['course_key']
         course = form.cleaned_data['course']
-        discussion_settings = get_course_discussion_settings(course_key)
+        discussion_settings = CourseDiscussionSettings.get(course_key)
         serializer = DiscussionSettingsSerializer(
             discussion_settings,
             context={
@@ -795,7 +793,7 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
 
         course = form.cleaned_data['course']
         course_key = form.cleaned_data['course_key']
-        discussion_settings = get_course_discussion_settings(course_key)
+        discussion_settings = CourseDiscussionSettings.get(course_key)
 
         serializer = DiscussionSettingsSerializer(
             discussion_settings,
@@ -894,7 +892,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         role = form.cleaned_data['role']
 
         data = {'course_id': course_id, 'users': role.users.all()}
-        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+        context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
 
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
@@ -924,6 +922,6 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
 
         role = form.cleaned_data['role']
         data = {'course_id': course_id, 'users': role.users.all()}
-        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+        context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)

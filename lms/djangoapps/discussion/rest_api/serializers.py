@@ -36,7 +36,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     Role
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 
 
 def get_context(course, request, thread=None):
@@ -61,7 +60,7 @@ def get_context(course, request, thread=None):
     requester = request.user
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
-    course_discussion_settings = get_course_discussion_settings(course.id)
+    course_discussion_settings = CourseDiscussionSettings.get(course.id)
     return {
         "course": course,
         "request": request,

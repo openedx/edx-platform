@@ -8,12 +8,9 @@ from unittest.mock import patch
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.models import ForumsConfig, Role
-from openedx.core.djangoapps.django_comment_common.utils import (
-    CourseDiscussionSettings,
-    get_course_discussion_settings,
-    seed_permissions_roles,
-)
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -108,7 +105,7 @@ def config_course_discussions(
         """Convert name to id."""
         return topic_name_to_id(course, name)
 
-    discussion_settings = get_course_discussion_settings(course.id)
+    discussion_settings = CourseDiscussionSettings.get(course.id)
     discussion_settings.update({
         'divided_discussions': [
             to_id(name)

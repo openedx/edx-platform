@@ -8,7 +8,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 
 
 class GroupIdAssertionMixin:
@@ -108,7 +107,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_request):
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
-        discussion_settings = get_course_discussion_settings(self.course.id)
+        discussion_settings = CourseDiscussionSettings.get(self.course.id)
         discussion_settings.update({
             'divided_discussions': ['cohorted_topic'],
             'division_scheme': CourseDiscussionSettings.ENROLLMENT_TRACK,
