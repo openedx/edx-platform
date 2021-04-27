@@ -70,7 +70,7 @@ class UserAPITestCase(APITestCase):
         assert expected_status == response.status_code
         return response
 
-    def post_search_api(self, client, json_data, content_type='application/merge-patch+json', expected_status=200):
+    def post_search_api(self, client, json_data, content_type='application/json', expected_status=200):
         """
         Helper method for sending a post to the server, defaulting to application/merge-patch+json content_type.
         Verifies the expected status and returns the response.
