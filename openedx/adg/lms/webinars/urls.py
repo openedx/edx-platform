@@ -1,13 +1,10 @@
 """
 All urls for webinars app
 """
-from django.urls import path, re_path
+from django.urls import path
 
-from .views import WebinarDetailView, WebinarRegistrationView
+from .views import WebinarDetailView
 
 urlpatterns = [
     path('<int:pk>/', WebinarDetailView.as_view(), name='webinar_event'),
-    re_path(
-        '(?P<pk>[0-9]+)/(?P<action>register|cancel)/$', WebinarRegistrationView.as_view(), name='webinar_registration'
-    ),
 ]
