@@ -10,7 +10,7 @@ from openedx.features.edly.tests.factories import SiteFactory, EdlySubOrganizati
 from openedx.features.edly import cookies as cookies_api
 from student import auth
 from student.roles import CourseCreatorRole
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, GroupFactory
 
 
 class CookieTests(TestCase):
@@ -24,6 +24,8 @@ class CookieTests(TestCase):
         """
         super(CookieTests, self).setUp()
         self.user = UserFactory.create()
+        edly_panel_users_group = GroupFactory(name=settings.EDLY_PANEL_USERS_GROUP)
+        self.user.groups.add(edly_panel_users_group)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
         self.request.session = self._get_stub_session()
@@ -54,6 +56,7 @@ class CookieTests(TestCase):
                 'edly-sub-org': edly_sub_organization.slug,
                 'edx-org': edly_sub_organization.edx_organization.short_name,
                 'is_course_creator': auth.user_has_role(self.request.user, CourseCreatorRole()),
+                'group_name': list(self.user.groups.all().values_list('name', flat=True))
             },
             settings.EDLY_COOKIE_SECRET_KEY,
             algorithm=settings.EDLY_JWT_ALGORITHM
