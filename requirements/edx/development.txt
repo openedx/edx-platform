@@ -119,7 +119,7 @@ edx-milestones==0.3.1     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
-edx-proctoring==3.8.8     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-proctoring-proctortrack
+edx-proctoring==3.8.5     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.2           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/testing.txt
@@ -131,7 +131,7 @@ edx-toggles==4.1.0        # via -r requirements/edx/testing.txt, edx-completion,
 edx-user-state-client==1.3.0  # via -r requirements/edx/testing.txt
 edx-when==2.0.0           # via -r requirements/edx/testing.txt, edx-proctoring
 edxval==2.0.3             # via -r requirements/edx/testing.txt
-elasticsearch==7.12.0     # via -r requirements/edx/testing.txt, edx-search
+elasticsearch==7.12.1     # via -r requirements/edx/testing.txt, edx-search
 enmerkar-underscore==2.0.0  # via -r requirements/edx/testing.txt
 enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-underscore
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
@@ -288,7 +288,7 @@ sphinxcontrib-openapi[markdown]==0.6.0  # via -r requirements/edx/development.in
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
 sqlparse==0.4.1           # via -r requirements/edx/testing.txt, django, django-debug-toolbar
-staff-graded-xblock==1.5  # via -r requirements/edx/testing.txt
+staff-graded-xblock==1.5.1  # via -r requirements/edx/testing.txt
 stevedore==1.32.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, code-annotations, edx-ace, edx-django-utils, edx-enterprise, edx-opaque-keys
 super-csv==2.0.1          # via -r requirements/edx/testing.txt, edx-bulk-grades
 sympy==1.6.2              # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, symmath
