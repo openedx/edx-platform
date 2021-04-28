@@ -244,4 +244,4 @@ def _user_friendly_size(size):
     while size >= 1024 and i < len(units):
         size //= 1024
         i += 1
-    return '{} {}'.format(size, units[i])
+    return f'{size} {units[i]}'

@@ -325,7 +325,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     if not is_course_run_in_a_program(course_run_key):
         if verbose:
             logger.info(
-                "Skipping send grade: course run not in a program. [{course_id}]".format(course_id=str(course_run_key))
+                f"Skipping send grade: course run not in a program. [{str(course_run_key)}]"
             )
         return
 

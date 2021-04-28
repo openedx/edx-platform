@@ -390,8 +390,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if request.safe_cookie_verified_user_id != request.user.id and request.user.id is not None:
                 log.warning(
                     (
-                        "SafeCookieData user at request '{0}' does not match user at response: '{1}' "
-                        "for request path '{2}'"
+                        "SafeCookieData user at request '{}' does not match user at response: '{}' "
+                        "for request path '{}'"
                     ).format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id, request.user.id, request.path,
                     ),
@@ -402,8 +402,8 @@ class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
             if request.safe_cookie_verified_user_id != userid_in_session and userid_in_session is not None:
                 log.warning(
                     (
-                        "SafeCookieData user at request '{0}' does not match user in session: '{1}' "
-                        "for request path '{2}'"
+                        "SafeCookieData user at request '{}' does not match user in session: '{}' "
+                        "for request path '{}'"
                     ).format(  # pylint: disable=logging-format-interpolation
                         request.safe_cookie_verified_user_id, userid_in_session, request.path,
                     ),
