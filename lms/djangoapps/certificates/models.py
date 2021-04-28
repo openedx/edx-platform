@@ -1261,7 +1261,7 @@ class CertificateGenerationCommandConfiguration(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
         verbose_name = "cert_generation argument"
 

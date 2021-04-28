@@ -37,7 +37,7 @@ class DatesTabTestViews(BaseCourseHomeTests):
         # Pulling out the date blocks to check learner has access.
         date_blocks = response.data.get('course_date_blocks')
         assert response.data.get('learner_is_full_access') == (enrollment_mode == CourseMode.VERIFIED)
-        assert all((block.get('learner_has_access') for block in date_blocks))
+        assert all(block.get('learner_has_access') for block in date_blocks)
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_DATES_TAB, active=True)

@@ -25,7 +25,7 @@ def get_user_from_identifier(identifier):
     """
     user = User.objects.filter(Q(username=identifier) | Q(email=identifier)).first()
     if not user:
-        raise CommandError("User {} does not exist.".format(identifier))
+        raise CommandError(f"User {identifier} does not exist.")
     return user
 
 

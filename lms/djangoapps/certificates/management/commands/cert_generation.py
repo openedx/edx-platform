@@ -89,7 +89,7 @@ class Command(BaseCommand):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
-                log.warning('User {user} could not be found'.format(user=user_id))
+                log.warning(f'User {user_id} could not be found')
             if user is not None:
                 log.info(
                     'Calling generate_certificate_task for {user} : {course}'.format(
