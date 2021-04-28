@@ -92,7 +92,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         not_en = "Not "
         if self.enabled:
             not_en = ""
-        return "Course '{}': Persistent Grades {}Enabled".format(str(self.course_id), not_en)
+        return f"Course '{str(self.course_id)}': Persistent Grades {not_en}Enabled"
 
 
 class ComputeGradesSetting(ConfigurationModel):
