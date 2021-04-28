@@ -1821,7 +1821,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
                 'subsection_id': subsection_id or self.subsection_id,
             }
         )
-        return "{}?user_id={}".format(base_url, user_id or self.user_id)
+        return f"{base_url}?user_id={user_id or self.user_id}"
 
     @patch('lms.djangoapps.grades.subsection_grade_factory.SubsectionGradeFactory.create')
     @ddt.data(

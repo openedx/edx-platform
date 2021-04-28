@@ -234,7 +234,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
         # TODO: Remove as part of EDUCATOR-4602.
         if str(block.location.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
             log.info('Using latest block content to calculate score for block: ***{}***.')
-            log.info('weight for block: ***{}*** is {}.'.format(str(block.location), raw_possible))
+            log.info(f'weight for block: ***{str(block.location)}*** is {raw_possible}.')
 
     # TODO TNL-5982 remove defensive code for scorables without max_score
     if raw_possible is None:

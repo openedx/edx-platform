@@ -422,7 +422,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
                 # If we've already seen this title, append an incrementing number to disambiguate
                 # the category from other categores sharing the same title in the course discussion UI.
                 dupe_counters[title] += 1
-                title = "{title} ({counter})".format(title=title, counter=dupe_counters[title])
+                title = f"{title} ({dupe_counters[title]})"
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],

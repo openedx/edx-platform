@@ -24,7 +24,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             cc_user = cc.User.from_django_user(user)
             cc_user.save()
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
-            print('update user info to discussion failed for user with id: {}, error={}'.format(user, str(err)))
+            print(f'update user info to discussion failed for user with id: {user}, error={str(err)}')
 
     def handle(self, *args, **options):
         if len(options['usernames']) >= 1:
