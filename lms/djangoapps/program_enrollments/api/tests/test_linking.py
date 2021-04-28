@@ -121,7 +121,7 @@ class TestLinkProgramEnrollmentsMixin:
             program_course_enrollment.course_enrollment
             for program_course_enrollment in program_course_enrollments
         ]
-        assert all((course_enrollment.is_active for course_enrollment in course_enrollments))
+        assert all(course_enrollment.is_active for course_enrollment in course_enrollments)
         self.assertCountEqual(
             course_keys,
             [course_enrollment.course.id for course_enrollment in course_enrollments]

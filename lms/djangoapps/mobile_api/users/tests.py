@@ -126,9 +126,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         assert len(courses) == 1
 
         found_course = courses[0]['course']
-        assert 'courses/{}/about'.format(self.course.id) in found_course['course_about']
-        assert 'course_info/{}/updates'.format(self.course.id) in found_course['course_updates']
-        assert 'course_info/{}/handouts'.format(self.course.id) in found_course['course_handouts']
+        assert f'courses/{self.course.id}/about' in found_course['course_about']
+        assert f'course_info/{self.course.id}/updates' in found_course['course_updates']
+        assert f'course_info/{self.course.id}/handouts' in found_course['course_handouts']
         assert found_course['id'] == str(self.course.id)
         assert courses[0]['mode'] == CourseMode.DEFAULT_MODE_SLUG
         assert courses[0]['course']['subscription_id'] == self.course.clean_id(padding_char='_')
@@ -237,7 +237,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         response = self.api_response(api_version=api_version)
         response_discussion_url = response.data[0]['course']['discussion_url']
-        assert '/api/discussion/v1/courses/{}'.format(self.course.id) in response_discussion_url
+        assert f'/api/discussion/v1/courses/{self.course.id}' in response_discussion_url
 
     @ddt.data(API_V05, API_V1)
     def test_org_query(self, api_version):
