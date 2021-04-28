@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
             updated_count += curr
 
-            print('Updated rows {} to {}, {} rows affected'.format(start, end - 1, curr))
+            print(f'Updated rows {start} to {end - 1}, {curr} rows affected')
 
             if end >= max_id:
                 break

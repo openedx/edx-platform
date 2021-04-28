@@ -77,7 +77,7 @@ class Command(BaseCommand):
             user for user in users
             if UserAttribute.get_user_attribute(user, 'created_on_site') == site_domain
         ]
-        self.stdout.write('\tSite Users={count}'.format(count=len(site_users)))
+        self.stdout.write(f'\tSite Users={len(site_users)}')
 
         return site_users
 
@@ -217,7 +217,7 @@ class Command(BaseCommand):
         try:
             self.stdout.write(f'Command execution started with options = {options}.')
             hubspot_sites = self._get_hubspot_enabled_sites()
-            self.stdout.write('{count} hubspot enabled sites found.'.format(count=len(hubspot_sites)))
+            self.stdout.write(f'{len(hubspot_sites)} hubspot enabled sites found.')
             users_queryset = self._get_users_queryset(initial_sync_days)
             users_count = users_queryset.count()
             self.stdout.write(f'Users count={users_count}')

@@ -163,7 +163,7 @@ def update_account_settings(requesting_user, update, username=None):
         raise err
     except Exception as err:
         raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-            "Error thrown when saving account updates: '{}'".format(str(err))
+            f"Error thrown when saving account updates: '{str(err)}'"
         )
 
     _send_email_change_requests_if_needed(update, user)
@@ -200,7 +200,7 @@ def _validate_email_change(user, data, field_errors):
         student_views.validate_new_email(user, new_email)
     except ValueError as err:
         field_errors["email"] = {
-            "developer_message": "Error thrown from validate_new_email: '{}'".format(str(err)),
+            "developer_message": f"Error thrown from validate_new_email: '{str(err)}'",
             "user_message": str(err)
         }
         return
@@ -222,7 +222,7 @@ def _validate_secondary_email(user, data, field_errors):
         student_views.validate_secondary_email(user, secondary_email)
     except ValueError as err:
         field_errors["secondary_email"] = {
-            "developer_message": "Error thrown from validate_secondary_email: '{}'".format(str(err)),
+            "developer_message": f"Error thrown from validate_secondary_email: '{str(err)}'",
             "user_message": str(err)
         }
     else:
@@ -321,7 +321,7 @@ def _send_email_change_requests_if_needed(data, user):
             student_views.do_email_change_request(user, new_email)
         except ValueError as err:
             raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                f"Error thrown from do_email_change_request: '{str(err)}'",
                 user_message=str(err)
             )
 
@@ -335,7 +335,7 @@ def _send_email_change_requests_if_needed(data, user):
             )
         except ValueError as err:
             raise AccountUpdateError(  # lint-amnesty, pylint: disable=raise-missing-from
-                "Error thrown from do_email_change_request: '{}'".format(str(err)),
+                f"Error thrown from do_email_change_request: '{str(err)}'",
                 user_message=str(err)
             )
 

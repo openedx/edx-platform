@@ -210,7 +210,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase, ModuleStoreTestCase):
         if settings.ROOT_URLCONF == 'lms.urls':
             url_pattern = '/course/'
         else:
-            url_pattern = '/course/{}'.format(str(course_key))
+            url_pattern = f'/course/{str(course_key)}'
 
         assert response.url.endswith(url_pattern)
 

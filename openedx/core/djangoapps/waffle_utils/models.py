@@ -62,4 +62,4 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
 
     def __str__(self):
         enabled_label = "Enabled" if self.enabled else "Not Enabled"
-        return "Course '{}': Persistent Grades {}".format(str(self.course_id), enabled_label)
+        return f"Course '{str(self.course_id)}': Persistent Grades {enabled_label}"

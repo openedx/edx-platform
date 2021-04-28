@@ -40,7 +40,7 @@ class EphemeralKeyValueStore(KeyValueStore):
         """
         Expand the given XBlock key tuple to a format we can use as a key.
         """
-        return "ephemeral-xblock:{}".format(repr(tuple(key)))
+        return f"ephemeral-xblock:{repr(tuple(key))}"
 
     @property
     def _cache(self):
