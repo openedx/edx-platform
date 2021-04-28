@@ -68,7 +68,7 @@ class TypedFileUploadParser(FileUploadParser):
             if len(fileparts) < 2:
                 ext = ''
             else:
-                ext = '.{}'.format(fileparts[1])
+                ext = f'.{fileparts[1]}'
             if ext.lower() not in self.file_extensions[media_type]:
                 errmsg = (
                     'File extension does not match requested Content-type. '

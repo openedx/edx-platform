@@ -102,7 +102,7 @@ def read_warning_data(dir_path):
     # go through each warning file and aggregate warnings into warnings_data
     warnings_data = []
     for temp_file in warnings_files:
-        with io.open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
+        with open(os.path.expanduser(dir_path + "/" + temp_file), "r") as read_file:
             json_input = json.load(read_file)
             if "warnings" in json_input:
                 data = [
@@ -183,17 +183,17 @@ def write_html_report(warnings_data, html_path):
         location_of_last_dir = html_path.rfind("/")
         dir_path = html_path[:location_of_last_dir]
         os.makedirs(dir_path, exist_ok=True)
-    with io.open(html_path, "w") as fout:
+    with open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
         category_sorted_by_count = group_and_sort_by_sumof(
             warnings_data, "category", "num"
         )
         for category, group_in_category, category_count in category_sorted_by_count:
             # xss-lint: disable=python-wrap-html
-            html = u'<span class="count">{category}, count: {count}</span> '.format(
+            html = '<span class="count">{category}, count: {count}</span> '.format(
                 category=category, count=category_count
             )
-            html_writer.start_section(html, klass=u"category")
+            html_writer.start_section(html, klass="category")
             locations_sorted_by_count = group_and_sort_by_sumof(
                 group_in_category, "high_location", "num"
             )
@@ -204,10 +204,10 @@ def write_html_report(warnings_data, html_path):
                 location_count,
             ) in locations_sorted_by_count:
                 # xss-lint: disable=python-wrap-html
-                html = u'<span class="count">{location}, count: {count}</span> '.format(
+                html = '<span class="count">{location}, count: {count}</span> '.format(
                     location=location, count=location_count
                 )
-                html_writer.start_section(html, klass=u"location")
+                html_writer.start_section(html, klass="location")
                 message_group_sorted_by_count = group_and_sort_by_sumof(
                     group_in_location, "message", "num"
                 )
@@ -217,24 +217,24 @@ def write_html_report(warnings_data, html_path):
                     message_count,
                 ) in message_group_sorted_by_count:
                     # xss-lint: disable=python-wrap-html
-                    html = u'<span class="count">{warning_text}, count: {count}</span> '.format(
+                    html = '<span class="count">{warning_text}, count: {count}</span> '.format(
                         warning_text=message, count=message_count
                     )
-                    html_writer.start_section(html, klass=u"warning_text")
+                    html_writer.start_section(html, klass="warning_text")
                     # warnings_object[location][warning_text] is a list
                     for warning in message_group:
                         # xss-lint: disable=python-wrap-html
-                        html = u'<span class="count">{warning_file_path}</span> '.format(
+                        html = '<span class="count">{warning_file_path}</span> '.format(
                             warning_file_path=warning[columns_index_dict["filename"]]
                         )
-                        html_writer.start_section(html, klass=u"warning")
+                        html_writer.start_section(html, klass="warning")
                         # xss-lint: disable=python-wrap-html
-                        html = u'<p class="lineno">lineno: {lineno}</p> '.format(
+                        html = '<p class="lineno">lineno: {lineno}</p> '.format(
                             lineno=warning[columns_index_dict["lineno"]]
                         )
                         html_writer.write(html)
                         # xss-lint: disable=python-wrap-html
-                        html = u'<p class="num">num_occur: {num}</p> '.format(
+                        html = '<p class="num">num_occur: {num}</p> '.format(
                             num=warning[columns_index_dict["num"]]
                         )
                         html_writer.write(html)

@@ -105,7 +105,7 @@ def wrap_xblock(
 
     css_classes = [
         'xblock',
-        'xblock-{}'.format(markupsafe.escape(view)),
+        f'xblock-{markupsafe.escape(view)}',
         'xblock-{}-{}'.format(
             markupsafe.escape(view),
             markupsafe.escape(block.scope_ids.block_type),
@@ -147,7 +147,7 @@ def wrap_xblock(
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default_escaped,  # xss-lint: disable=python-deprecated-display-name
-        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+        'data_attributes': ' '.join(f'data-{markupsafe.escape(key)}="{markupsafe.escape(value)}"'
                                     for key, value in data.items()),
     }
 
@@ -198,7 +198,7 @@ def wrap_xblock_aside(
     data.update(extra_data)
 
     css_classes = [
-        'xblock-{}'.format(markupsafe.escape(view)),
+        f'xblock-{markupsafe.escape(view)}',
         'xblock-{}-{}'.format(
             markupsafe.escape(view),
             markupsafe.escape(aside.scope_ids.block_type),
@@ -220,7 +220,7 @@ def wrap_xblock_aside(
     template_context = {
         'content': frag.content,
         'classes': css_classes,
-        'data_attributes': ' '.join('data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
+        'data_attributes': ' '.join(f'data-{markupsafe.escape(key)}="{markupsafe.escape(value)}"'
                                     for key, value in data.items()),
     }
 

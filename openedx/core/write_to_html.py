@@ -5,12 +5,12 @@ import textwrap
 import six
 
 
-class HtmlOutlineWriter(object):
+class HtmlOutlineWriter:
     """
     writer to handle html writing
     """
     HEAD = textwrap.dedent(
-        u"""
+        """
         <!DOCTYPE html>
         <html>
         <head>
@@ -70,7 +70,7 @@ class HtmlOutlineWriter(object):
     )
 
     SECTION_START = textwrap.dedent(
-        u"""\
+        """\
         <div class="{klass}">
         <input class="toggle-box {klass}" id="sect_{id:05d}" type="checkbox">
         <label for="sect_{id:05d}">{html}</label>
@@ -78,7 +78,7 @@ class HtmlOutlineWriter(object):
     """
     )
 
-    SECTION_END = six.u("</div></div>")
+    SECTION_END = "</div></div>"
 
     def __init__(self, fout):
         self.fout = fout
