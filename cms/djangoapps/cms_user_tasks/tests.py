@@ -4,6 +4,7 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 import json
 import logging
 from unittest import mock
+from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
@@ -14,7 +15,6 @@ from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from mock import patch
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer

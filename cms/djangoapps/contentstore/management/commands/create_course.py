@@ -22,7 +22,7 @@ class Command(BaseCommand):
     """
 
     # can this query modulestore for the list of write accessible stores or does that violate command pattern?
-    help = "Create a course in one of {}".format([ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split])
+    help = f"Create a course in one of {[ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split]}"
 
     def add_arguments(self, parser):
         parser.add_argument('modulestore',
@@ -86,6 +86,6 @@ class Command(BaseCommand):
                 run,
                 fields
             )
-            self.stdout.write("Created {}".format(str(new_course.id)))
+            self.stdout.write(f"Created {str(new_course.id)}")
         except DuplicateCourseError:
             self.stdout.write("Course already exists")

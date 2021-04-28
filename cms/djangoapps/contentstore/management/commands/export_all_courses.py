@@ -27,8 +27,8 @@ class Command(BaseCommand):
 
         print("=" * 80)
         print("=" * 30 + "> Export summary")
-        print("Total number of courses to export: {}".format(len(courses)))
-        print("Total number of courses which failed to export: {}".format(len(failed_export_courses)))
+        print(f"Total number of courses to export: {len(courses)}")
+        print(f"Total number of courses which failed to export: {len(failed_export_courses)}")
         print("List of export failed courses ids:")
         print("\n".join(failed_export_courses))
         print("=" * 80)

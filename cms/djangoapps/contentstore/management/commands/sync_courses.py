@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     course_key.run,
                     fields,
                 )
-                logger.info("Created {}".format(str(new_course.id)))
+                logger.info(f"Created {str(new_course.id)}")
             except DuplicateCourseError:
                 logger.warning(
                     "Course already exists for %s, %s, %s. Skipping",

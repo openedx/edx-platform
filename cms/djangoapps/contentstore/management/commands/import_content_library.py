@@ -51,7 +51,7 @@ class Command(BaseCommand):
         try:
             safetar_extractall(tar_file, course_dir.encode('utf-8'))
         except SuspiciousOperation as exc:
-            raise CommandError('\n=== Course import {}: Unsafe tar file - {}\n'.format(archive_path, exc.args[0]))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n')  # lint-amnesty, pylint: disable=raise-missing-from
         finally:
             tar_file.close()
 
