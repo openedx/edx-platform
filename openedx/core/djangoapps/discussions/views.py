@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.roles import CourseStaffRole
+from lms.djangoapps.discussion.rest_api.serializers import DiscussionSettingsSerializer
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -111,7 +113,6 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
         payload = {
             key: value
             for key, value in data.items()
-            if key in self.Meta.fields
         }
         return payload
 
@@ -124,6 +125,20 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
             for field in instance.fields.values()
             if field.name in self.Meta.fields
         }
+        discussion_settings = CourseDiscussionSettings.get(instance.id)
+        serializer = DiscussionSettingsSerializer(
+            discussion_settings,
+            context={
+                'course': instance,
+                'settings': discussion_settings,
+            },
+            partial=True,
+        )
+        settings.update({
+            key: value
+            for key, value in serializer.data.items()
+            if key != 'id'
+        })
         return settings
 
     def update(self, instance, validated_data: dict):
@@ -131,11 +146,26 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
         Update and save an existing instance
         """
         save = False
-        for field in self.Meta.fields:
-            if field in validated_data:
-                value = validated_data[field]
+        cohort_settings = {}
+        for field, value in validated_data.items():
+            if field in self.Meta.fields:
                 setattr(instance, field, value)
                 save = True
+            else:
+                cohort_settings[field] = value
+        if cohort_settings:
+            discussion_settings = CourseDiscussionSettings.get(instance.id)
+            serializer = DiscussionSettingsSerializer(
+                discussion_settings,
+                context={
+                    'course': instance,
+                    'settings': discussion_settings,
+                },
+                data=cohort_settings,
+                partial=True,
+            )
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
         if save:
             modulestore().update_item(instance, self.context['user_id'])
         return instance
