@@ -2,8 +2,14 @@
 Tests for Progress Tab API in the Course Home API
 """
 
+import dateutil
 import ddt
+import mock
+from datetime import timedelta
+from pytz import UTC
+from unittest.mock import patch
 from django.urls import reverse
+from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -14,6 +20,7 @@ from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, CO
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import ManualVerification
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from xmodule.modulestore.tests.factories import ItemFactory
 
 CREDIT_SUPPORT_URL = 'https://support.edx.org/hc/en-us/sections/115004154688-Purchasing-Academic-Credit'
 
@@ -97,3 +104,36 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         # Masquerade as verified user
         self.update_masquerade(username=verified_user.username)
         assert self.client.get(self.url).data.get('enrollment_mode') == 'verified'
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_has_scheduled_content_data(self):
+        CourseEnrollment.enroll(self.user, self.course.id)
+        future = now() + timedelta(days=30)
+        chapter = ItemFactory(parent=self.course, category='chapter', start=future)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.json()['has_scheduled_content']
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_end(self):
+        CourseEnrollment.enroll(self.user, self.course.id)
+        future = now() + timedelta(days=30)
+        self.course.end = future
+        self.update_course(self.course, self.user.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=UTC)
+        assert end.date() == future.date()
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_user_has_passing_grade(self):
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.course._grading_policy['GRADE_CUTOFFS']['Pass'] = 0
+        self.update_course(self.course, self.user.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.json()['user_has_passing_grade']
