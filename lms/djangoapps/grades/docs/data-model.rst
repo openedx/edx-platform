@@ -12,16 +12,16 @@ Course Grades
 
 **Indices from Uniqueness Constraint**: ('course_id', 'user_id')
 
- * course_id
- * course_id, user_id
+* course_id
+* course_id, user_id
 
 **Additional Indices:**
 
- * user_id
- * course_id, passed_timestamp
- 
- **Fields:**
- 
+* user_id
+* course_id, passed_timestamp
+
+**Fields:**
+
 +-------------------------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+
 | Field name              | Type         | Description                                                                                                                                                                                                                                   | Include in Data Package |
 +-------------------------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------+
@@ -83,6 +83,9 @@ Subsection Grades
 
 There are two tables that work in conjunction for storing subsection grades: Subsection Grade and Visible Blocks.
 
+Subsection grades can also be overridden by staff/instructors. The most recent override for a subsection lives in the Subsection Grade Override table.
+A history of subsection gtade overrides is also saved in the Subsection Grade Override History table, for auditing purposes.
+
 Subsection Grade Table
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -92,13 +95,13 @@ Subsection Grade Table
 
 **Indices from Uniqueness Constraint:** ('course_id', 'user_id', 'usage_key')
 
-course_id
-course_id, user_id
-course_id, user_id, usage_key
+* course_id
+* course_id, user_id
+* course_id, user_id, usage_key
 
 **Additional Indices:**
 
-visible_blocks_hash
+* visible_blocks_hash
 
 **Fields:**
 
@@ -165,13 +168,13 @@ Visible Blocks Table
 
 **Table Description:** Stores an ordered list of visible blocks within a subsection for a learner at the time of computing the subsection grade.  It is expected that multiple learners will share access to the same list of visible blocks and hence this data is stored in a separate table so it can be referred to by multiple rows in the Subsection Grade table.
 
-**Indices from Uniqueness Constraint:** ('hashed)
+**Indices from Uniqueness Constraint:** ('hashed')
 
- * hashed
- 
+* hashed
+
 **Additional Indices:**
 
- * course_id
+* course_id
 
 **Fields:**
 
@@ -189,6 +192,51 @@ Visible Blocks Table
 |             |              | Note: The blocks field contains a list of usage keys of all blocks within a subsection that are visible to the user at the time of computing the user's subsection grade.  The value changes whenever users' access to content within the subsection changes: cohort assignment change, role change, course team adds/removes unit/problem, etc. When changed, a new row is created in the table with a corresponding new hash value. |               |
 +-------------+--------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+
 
+Subsection Grade Overrides
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Table Name:** grades_persistentsubsectiongradeoverride
+
+**Table Description:** Stores the most recent override for a given subsection. In grade calculation, supersedes persisted subsection grade totals. The historical version of this table (grades_historicalpersistentsubsectiongradeoverride) captures a rolling list of previous overrides for audit purposes.
+
+**Indices from Uniqueness Constraint:** ('id')
+
+* id
+
+**Additional Indices:**
+
+* created
+* modified
+* grade_id
+
+**Fields:**
+
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| Field name               | Type                | Description                                                                                                               |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| id                       | int(11)             | Auto-incrementing ID of the override.                                                                                     |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| created                  | datetime(6)         | When the override was first created.                                                                                      |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| modified                 | datetime(6)         | When the override was last modified.                                                                                      |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| earned_all_override      | double              | The total number of earned points (graded and ungraded) to be overridden.                                                 |
+|                          |                     | Note: It’s unclear how this is actually used since this is null in some cases and wouldn’t factor into grade calculation. |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| possible_all_override    | double              | Total number of possible points (both graded and ungraded) for a subsection.                                              |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| earned_graded_override   | double              | The points to be overridden for for the subsection.                                                                       |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| possible_graded_override | double              | The total possible graded score for the subsection.                                                                       |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| grade_id                 | bigint(20) unsigned | 1:1 mapping to a grades_persistentsubsectiongrade.id, specifying which grade this override applies to.                    |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| override_reason          | varchar(300)        | Instructor provided reason for override. Example: Student bribed me with doughnuts so I’m increasing their score.         |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+| system                   | varchar(100)        | Where the override was performed.                                                                                         |
+|                          |                     | Examples: GRADEBOOK, grade-import                                                                                         |
++--------------------------+---------------------+---------------------------------------------------------------------------------------------------------------------------+
+
 
 Problem Scores
 --------------
@@ -201,7 +249,7 @@ Courseware Student Module
 
 **Table Description:** A general-purpose storage for user-specific state for any xBlock/xModule (not just problem-types).  In addition to user-state, separate fields exist to store "earned" and "possible" grades for scorable blocks.
 
-**Indices from Uniqueness Constraint: ('student', 'module_id', 'course_id')**
+**Indices from Uniqueness Constraint:** ('student', 'module_id', 'course_id')
 
 * student
 * student, module_id
@@ -251,16 +299,16 @@ ORA Submissions
 
 **Table Description:** One of the tables amongst the suite of tables used for ORA submissions.  This particular table stores the scores for ORA problems.
 
-**Indices from Uniqueness Constraint: ('id')**
+**Indices from Uniqueness Constraint:** ('id')
 
- * id
- 
+* id
+
 **Additional Indices:**
 
- * student_item_id
- * submission_id
- * created_at
- 
+* student_item_id
+* submission_id
+* created_at
+
 **Fields:**
 
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -279,6 +327,3 @@ ORA Submissions
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | submission      | Submission       | Foreign key to the submissions_submission table.                                                                                                                                                              |
 +-----------------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-
-
