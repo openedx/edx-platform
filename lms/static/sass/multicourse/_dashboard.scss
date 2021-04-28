@@ -781,6 +781,7 @@
       padding-left: $baseline;
       padding-top: $baseline;
       padding-bottom: $baseline;
+      background-color: #F5F5F5;
 
       .wrapper-tip {
         @include clearfix();
@@ -815,8 +816,8 @@
 
           svg {
             flex-shrink: 0;
-            width: 41px;
-            height: 41px;
+            width: 43px;
+            height: 43px;
             margin-left: -5px;
           }
 
@@ -828,6 +829,11 @@
             .message-copy-bold {
               font-weight: 600;
             }
+          }
+
+          a.verified-info {
+            color: #454545;
+            text-decoration: underline;
           }
         }
 
