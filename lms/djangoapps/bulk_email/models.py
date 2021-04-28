@@ -462,7 +462,7 @@ class CourseAuthorization(models.Model):
         not_en = "Not "
         if self.email_enabled:
             not_en = ""
-        return "Course '{}': Instructor Email {}Enabled".format(str(self.course_id), not_en)
+        return f"Course '{str(self.course_id)}': Instructor Email {not_en}Enabled"
 
 
 @python_2_unicode_compatible

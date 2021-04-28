@@ -680,8 +680,8 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
                f'{scheme}://edx.org/courses/{self.course_org}/{self.course_number}/{self.course_run}/'
         assert email_context['course_image_url'] == \
                f'{scheme}://edx.org/c4x/{self.course_org}/{self.course_number}/asset/images_course_image.jpg'
-        assert email_context['email_settings_url'] == '{}://edx.org/dashboard'.format(scheme)
-        assert email_context['account_settings_url'] == '{}://edx.org/account/settings'.format(scheme)
+        assert email_context['email_settings_url'] == f'{scheme}://edx.org/dashboard'
+        assert email_context['account_settings_url'] == f'{scheme}://edx.org/account/settings'
 
     @override_settings(LMS_ROOT_URL="http://edx.org")
     def test_insecure_email_context(self):
