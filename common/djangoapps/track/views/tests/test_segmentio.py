@@ -2,12 +2,12 @@
 
 
 import json
+from unittest.mock import sentinel
 
 from dateutil import parser
 from ddt import data, ddt, unpack
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
-from mock import sentinel
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from common.djangoapps.track.middleware import TrackMiddleware
@@ -32,7 +32,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
     """
 
     def setUp(self):
-        super(SegmentIOTrackingTestCase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
 
         User.objects.create(pk=SEGMENTIO_TEST_USER_ID, username=str(sentinel.username))
 
@@ -153,7 +153,7 @@ class SegmentIOTrackingTestCase(SegmentIOTrackingTestCaseBase):
                     },
                     'user_id': SEGMENTIO_TEST_USER_ID,
                     'course_id': course_id,
-                    'org_id': u'foo',
+                    'org_id': 'foo',
                     'path': SEGMENTIO_TEST_ENDPOINT,
                     'client': {
                         'library': {

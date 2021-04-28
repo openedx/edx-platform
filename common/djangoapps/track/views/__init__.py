@@ -80,7 +80,7 @@ def user_track(request):
     data = _get_request_value(request, 'event', {})
     page = _get_request_value(request, 'page')
 
-    if isinstance(data, six.string_types) and len(data) > 0:
+    if isinstance(data, str) and len(data) > 0:
         try:
             data = json.loads(data)
             _add_user_id_for_username(data)

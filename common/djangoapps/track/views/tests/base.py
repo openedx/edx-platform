@@ -6,9 +6,9 @@ Base class for tests related to emitted events to one of the tracking 'views'
 
 import json
 
+from unittest.mock import sentinel
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import sentinel
 
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.track.views import segmentio
@@ -37,7 +37,7 @@ class SegmentIOTrackingTestCaseBase(EventTrackingTestCase):
     """
 
     def setUp(self):
-        super(SegmentIOTrackingTestCaseBase, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         self.maxDiff = None  # pylint: disable=invalid-name
         self.request_factory = RequestFactory()
 
