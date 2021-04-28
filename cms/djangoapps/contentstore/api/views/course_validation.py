@@ -36,6 +36,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         * grades
         * certificates
         * updates
+        * proctoring
         * graded_only (boolean) - whether to included graded subsections only in the assignments information.
         * validate_oras (boolean) - whether to check the dates in ORA problems in addition to assignment due dates.
 
@@ -59,6 +60,9 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             * has_certificate - whether the course has a certificate.
         * updates
             * has_update - whether at least one course update exists.
+        * proctoring
+            * needs_proctoring_escalation_email - whether the course requires a proctoring escalation email
+            * has_proctoring_escalation_email - whether the course has a proctoring escalation email
 
     """
     @course_author_access_required
@@ -94,6 +98,10 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             if get_bool_param(request, 'updates', all_requested):
                 response.update(
                     updates=self._updates_validation(course, request)
+                )
+            if get_bool_param(request, 'proctoring', all_requested):
+                response.update(
+                    proctoring=self._proctoring_validation(course)
                 )
 
         return Response(response)
@@ -325,3 +333,10 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
                     return True
 
         return False
+
+    def _proctoring_validation(self, course):
+        # A proctoring escalation email is currently only required for courses using Proctortrack
+        return dict(
+            needs_proctoring_escalation_email=course.proctoring_provider == 'proctortrack',
+            has_proctoring_escalation_email=bool(course.proctoring_escalation_email)
+        )
