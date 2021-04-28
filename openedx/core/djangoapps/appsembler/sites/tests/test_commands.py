@@ -14,6 +14,7 @@ from django.test import override_settings, TestCase
 from openedx.core.djangoapps.appsembler.sites.management.commands.create_devstack_site import Command
 from openedx.core.djangoapps.appsembler.sites.management.commands.export_site import Command as ExportSiteCommand
 from openedx.core.djangoapps.appsembler.sites.management.commands.offboard import Command as OffboardSiteCommand
+from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration, SiteConfigurationHistory
 from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -855,11 +856,11 @@ class DisableCustomDomainCommandTestCase(TestCase):
         call_command('disable_custom_domain', disable_domain)
 
         # we expect the Site now has `subdomain`
-        assert Site.objects.get(domain=subdomain).exists()
+        assert Site.objects.filter(domain=subdomain).exists()
         # and that the AlternativeDomain is gone
         assert not AlternativeDomain.objects.filter(domain=subdomain).exists()
 
         # there shouldn't be an AlternativeDomain for
         assert not AlternativeDomain.objects.filter(domain=disable_domain).exists()
         # and there shouldn't be a lingering/duplicate Site for the old one either
-        assert not Site.objects.get(domain=disable_subdomain).exists()
+        assert not Site.objects.filter(domain=disable_domain).exists()
