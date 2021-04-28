@@ -580,7 +580,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
             send_mail_to_student(email, email_params)
         except Exception as ex:  # pylint: disable=broad-except
             log.exception(
-                "Exception '{exception}' raised while sending email to new user.".format(exception=type(ex).__name__)
+                f"Exception '{type(ex).__name__}' raised while sending email to new user."
             )
             errors.append({
                 'username': username,
@@ -2318,7 +2318,7 @@ def _display_unit(unit):
     """
     name = getattr(unit, 'display_name', None)
     if name:
-        return '{} ({})'.format(name, str(unit.location))
+        return f'{name} ({str(unit.location)})'
     else:
         return str(unit.location)
 

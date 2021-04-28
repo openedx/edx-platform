@@ -46,7 +46,7 @@ def expected_result_repr(self):
     for consistency of ddt-generated test methods across pytest-xdist workers.
     """
     included = ('raw_earned', 'raw_possible', 'weighted_earned', 'weighted_possible', 'weight', 'graded')
-    attributes = ['{}={}'.format(name, getattr(self, name)) for name in included]
+    attributes = [f'{name}={getattr(self, name)}' for name in included]
     return '<ExpectedResult {}>'.format(' '.join(attributes))
 
 

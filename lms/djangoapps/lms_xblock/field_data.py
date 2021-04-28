@@ -36,4 +36,4 @@ class LmsFieldData(SplitFieldData):
         })
 
     def __repr__(self):
-        return "LmsFieldData{!r}".format((self._authored_data, self._student_data))
+        return f"LmsFieldData{(self._authored_data, self._student_data)!r}"

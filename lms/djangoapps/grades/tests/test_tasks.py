@@ -494,7 +494,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
 
     def _assert_log(self, mock_log, method_name):
         assert mock_log.info.called
-        log_message = "Attempted {} for course '%s', but grades are frozen.".format(method_name)
+        log_message = f"Attempted {method_name} for course '%s', but grades are frozen."
         assert log_message in mock_log.info.call_args_list[0][0][0]
 
     def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring

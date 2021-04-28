@@ -1218,7 +1218,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == 'The student {student} does not have certificate for the course {course}. Kindly verify student username/email and the selected course are correct and try again.'.format(student=self.enrolled_user_2.username, course=self.course.number)  # pylint: disable=line-too-long
+        assert res_json['message'] == f'The student {self.enrolled_user_2.username} does not have certificate for the course {self.course.number}. Kindly verify student username/email and the selected course are correct and try again.'  # pylint: disable=line-too-long
 
     def test_certificate_already_invalid_error(self):
         """
@@ -1238,7 +1238,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == 'Certificate for student {user} is already invalid, kindly verify that certificate was generated for this student and then proceed.'.format(user=self.enrolled_user_1.username)  # pylint: disable=line-too-long
+        assert res_json['message'] == f'Certificate for student {self.enrolled_user_1.username} is already invalid, kindly verify that certificate was generated for this student and then proceed.'  # pylint: disable=line-too-long
 
     def test_duplicate_certificate_invalidation_error(self):
         """
@@ -1262,7 +1262,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == 'Certificate of {user} has already been invalidated. Please check your spelling and retry.'.format(user=self.enrolled_user_1.username)  # pylint: disable=line-too-long
+        assert res_json['message'] == f'Certificate of {self.enrolled_user_1.username} has already been invalidated. Please check your spelling and retry.'  # pylint: disable=line-too-long
 
     def test_remove_certificate_invalidation(self):
         """

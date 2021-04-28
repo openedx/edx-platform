@@ -12,7 +12,6 @@ from unittest.mock import Mock, NonCallableMock, patch
 
 import ddt
 import pytest
-import six
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -756,7 +755,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         assert len(data['row_errors']) != 0
         assert len(data['warnings']) == 0
         assert len(data['general_errors']) == 0
-        assert data['row_errors'][0]['response'] == 'Invalid email {0}.'.format('test_student.example.com')
+        assert data['row_errors'][0]['response'] == 'Invalid email {}.'.format('test_student.example.com')
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 0
@@ -821,7 +820,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         user.save()
 
         csv_content = "{email},{username},tester,USA".format(email=conflicting_email, username='new_test_student')
-        uploaded_file = SimpleUploadedFile("temp.csv", six.b(csv_content))
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content.encode())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -1142,7 +1141,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll',
                                           'email_students': False})
-        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
+        print(f"type(self.notenrolled_student.email): {type(self.notenrolled_student.email)}")
         assert response.status_code == 200
 
         # test that the user is now enrolled
@@ -1188,7 +1187,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
 
-        print("type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email)))
+        print(f"type(self.notenrolled_student.email): {type(self.notenrolled_student.email)}")
         assert response.status_code == 200
 
         # test that the user is now enrolled
@@ -1330,7 +1329,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
+        print(f"type(self.notregistered_email): {type(self.notregistered_email)}")
         assert response.status_code == 200
 
         # Check the outbox
@@ -1375,7 +1374,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': False})
-        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
+        print(f"type(self.enrolled_student.email): {type(self.enrolled_student.email)}")
         assert response.status_code == 200
 
         # test that the user is now unenrolled
@@ -1418,7 +1417,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': True})
-        print("type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email)))
+        print(f"type(self.enrolled_student.email): {type(self.enrolled_student.email)}")
         assert response.status_code == 200
 
         # test that the user is now unenrolled
@@ -1476,7 +1475,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url,
                                     {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
-        print(u"type(self.allowed_email): {}".format(type(self.allowed_email)))
+        print(f"type(self.allowed_email): {type(self.allowed_email)}")
         assert response.status_code == 200
 
         # test the response data
@@ -1595,7 +1594,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print("type(self.notregistered_email): {}".format(type(self.notregistered_email)))
+        print(f"type(self.notregistered_email): {type(self.notregistered_email)}")
         assert response.status_code == 200
 
         # Check the outbox
@@ -2622,7 +2621,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         if has_program_enrollments:
             for i in range(len(self.students)):
                 student = self.students[i]
-                external_key = "{}_{}".format(student.username, i)
+                external_key = f"{student.username}_{i}"
                 ProgramEnrollmentFactory.create(user=student, external_user_key=external_key)
                 external_key_dict[student.username] = external_key
 
@@ -3969,10 +3968,11 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(url, {'url': str(self.week1.location)})
         assert response.status_code == 200, response.content
         assert json.loads(response.content.decode('utf-8')) ==\
-               {u'data': [{'Extended Due Date': '2013-12-30 00:00',
-                           'Full Name': self.user1.profile.name, 'Username': self.user1.username}],
-                u'header': ['Username', 'Full Name', 'Extended Due Date'],
-                u'title': ('Users with due date extensions for %s' % self.week1.display_name)}
+               {'data': [{'Extended Due Date': '2013-12-30 00:00',
+                          'Full Name': self.user1.profile.name,
+                          'Username': self.user1.username}],
+                'header': ['Username', 'Full Name', 'Extended Due Date'],
+                'title': ('Users with due date extensions for %s' % self.week1.display_name)}
 
     def test_show_student_extensions(self):
         self.test_change_due_date()
@@ -3983,7 +3983,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert json.loads(response.content.decode('utf-8')) ==\
                {'data': [{'Extended Due Date': '2013-12-30 00:00', 'Unit': self.week1.display_name}],
                 'header': ['Unit', 'Extended Due Date'],
-                'title': ('Due date extensions for %s (%s)' % (self.user1.profile.name, self.user1.username))}
+                'title': (f'Due date extensions for {self.user1.profile.name} ({self.user1.username})')}
 
 
 class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -4201,7 +4201,7 @@ class TestCourseIssuedCertificatesData(SharedModuleStoreTestCase):
         current_date = datetime.date.today().strftime("%B %d, %Y")
         response = self.client.get(url, {'csv': 'true'})
         assert response['Content-Type'] == 'text/csv'
-        assert response['Content-Disposition'] == u'attachment; filename={0}'.format('issued_certificates.csv')
+        assert response['Content-Disposition'] == 'attachment; filename={}'.format('issued_certificates.csv')
         assert response.content.strip().decode('utf-8') == \
                (((('"CourseID","Certificate Type","Total Certificates Issued","Date Report Run"\r\n"' +
                    str(self.course.id)) + '","honor","3","') + current_date) + '"')
