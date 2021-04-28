@@ -69,7 +69,7 @@ class Command(BaseCommand):
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='must_retry')
             force_must_retry = False
 
-        log.info("Attempting to retry {} failed PhotoVerification submissions".format(len(attempts_to_retry)))
+        log.info(f"Attempting to retry {len(attempts_to_retry)} failed PhotoVerification submissions")
         for index, attempt in enumerate(attempts_to_retry):
             log.info(f"Retrying submission #{index} (ID: {attempt.id}, User: {attempt.user})")
 

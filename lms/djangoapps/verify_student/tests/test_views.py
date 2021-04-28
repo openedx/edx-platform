@@ -115,7 +115,7 @@ class StartView(TestCase):
     """
 
     def start_url(self, course_id=""):
-        return "/verify_student/{}".format(urllib.parse.quote(course_id))
+        return f"/verify_student/{urllib.parse.quote(course_id)}"
 
     def test_start_new_verification(self):
         """
