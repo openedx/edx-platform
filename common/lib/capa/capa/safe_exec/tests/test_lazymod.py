@@ -7,7 +7,7 @@ import unittest
 from capa.safe_exec.lazymod import LazyModule
 
 
-class ModuleIsolation(object):
+class ModuleIsolation:
     """
     Manage changes to sys.modules so that we can roll back imported modules.
 
@@ -29,7 +29,7 @@ class ModuleIsolation(object):
 class TestLazyMod(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
-        super(TestLazyMod, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        super().setUp()
         # Each test will remove modules that it imported.
         self.addCleanup(ModuleIsolation().clean_up)
 

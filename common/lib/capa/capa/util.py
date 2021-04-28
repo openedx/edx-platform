@@ -207,7 +207,7 @@ def get_inner_html_from_xpath(xpath_node):
     html = etree.tostring(xpath_node).strip().decode('utf-8')
     # strips outer tag from html string
     # xss-lint: disable=python-interpolate-html
-    inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
+    inner_html = re.sub(f'(?ms)<{xpath_node.tag}[^>]*>(.*)</{xpath_node.tag}>', '\\1', html)
     return inner_html.strip()
 
 

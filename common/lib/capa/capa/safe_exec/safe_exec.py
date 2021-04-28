@@ -51,7 +51,7 @@ with open(lazymod_py_file) as f:
 
 LAZY_IMPORTS = [lazymod_py]
 for name, modname in ASSUMED_IMPORTS:
-    LAZY_IMPORTS.append("{} = LazyModule('{}')\n".format(name, modname))
+    LAZY_IMPORTS.append(f"{name} = LazyModule('{modname}')\n")
 
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
 
@@ -127,7 +127,7 @@ def safe_exec(
         md5er = hashlib.md5()
         md5er.update(repr(code).encode('utf-8'))
         update_hash(md5er, safe_globals)
-        key = "safe_exec.%r.%s" % (random_seed, md5er.hexdigest())
+        key = f"safe_exec.{random_seed!r}.{md5er.hexdigest()}"
         cached = cache.get(key)
         if cached is not None:
             # We have a cached result.  The result is a pair: the exception
@@ -160,7 +160,7 @@ def safe_exec(
     except SafeExecException as e:
         # Saving SafeExecException e in exception to be used later.
         exception = e
-        emsg = text_type(e)
+        emsg = str(e)
     else:
         emsg = None
 

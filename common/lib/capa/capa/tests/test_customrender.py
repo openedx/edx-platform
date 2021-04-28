@@ -46,7 +46,7 @@ class SolutionRenderTest(unittest.TestCase):
 
     def test_rendering(self):
         solution = 'To compute unicorns, count them.'
-        xml_str = """<solution id="solution_12">{s}</solution>""".format(s=solution)
+        xml_str = f"""<solution id="solution_12">{solution}</solution>"""
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag('solution')(test_capa_system(), element)
@@ -65,7 +65,7 @@ class MathRenderTest(unittest.TestCase):
     '''
 
     def check_parse(self, latex_in, mathjax_out):  # lint-amnesty, pylint: disable=missing-function-docstring
-        xml_str = """<math>{tex}</math>""".format(tex=latex_in)
+        xml_str = f"""<math>{latex_in}</math>"""
         element = etree.fromstring(xml_str)
 
         renderer = lookup_tag('math')(test_capa_system(), element)
