@@ -97,18 +97,25 @@ jobs:
         id: isort-report
         continue-on-error: true
         run: |
-          isort -ns ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
+          isort ${{ env.GIT_DIFF }} -c && isort_status=$?
 
-          body=$(cat report_isort.txt)
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
+          if [[ ${isort_status} == 0 ]]; then
+            echo ::set-output name=icon::":heavy_check_mark:"
+            echo ::set-output name=status::success
+          else
+            isort ${{ env.GIT_DIFF }} -c 2>&1 | tee report_isort.txt
 
-          echo ::set-output name=icon::":x:"
-          title="**Please fix following iSort issues:**"
-          [[ ${#body} == 0 ]] && echo ::set-output name=icon::":heavy_check_mark:" && \
-          echo ::set-output name=status::success || (body="\`\`\` %0A $body %0A \`\`\`" \
-          && echo ::set-output name=title::$title && echo ::set-output name=body::$body)
+            body=$(cat report_isort.txt)
+            body="${body//'%'/'%25'}"
+            body="${body//$'\n'/'%0A'}"
+            body="${body//$'\r'/'%0D'}"
+            body="\`\`\` %0A $body %0A \`\`\`"
+
+            title="**Please fix following iSort issues:**"
+            echo ::set-output name=body::$body
+            echo ::set-output name=title::$title
+            echo ::set-output name=icon::":x:"
+          fi
         if: env.GIT_DIFF
 
       - name: Post report on PR
