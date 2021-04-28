@@ -202,7 +202,7 @@ class EligibleAvailableCertificateManager(EligibleCertificateManager):
     A manager for `GeneratedCertificate` models that automatically
     filters out ineligible certs and any linked to nonexistent courses.
 
-    Adds to the super class filtering ot also exclude certificates for
+    Adds to the super class filtering to also exclude certificates for
     courses that do not have a corresponding CourseOverview.
     """
 
@@ -233,6 +233,11 @@ class GeneratedCertificate(models.Model):
     # the course_modes app is loaded, resulting in a Django deprecation warning.
     from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=reimported
 
+    # Normal object manager, which should only be used when ineligible
+    # certificates (i.e. new audit certs) should be included in the
+    # results. Django requires us to explicitly declare this.
+    objects = models.Manager()
+
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
     eligible_certificates = EligibleCertificateManager()
@@ -240,11 +245,6 @@ class GeneratedCertificate(models.Model):
     # Only returns eligible certificates for courses that have an
     # associated CourseOverview
     eligible_available_certificates = EligibleAvailableCertificateManager()
-
-    # Normal object manager, which should only be used when ineligible
-    # certificates (i.e. new audit certs) should be included in the
-    # results. Django requires us to explicitly declare this.
-    objects = models.Manager()
 
     MODES = Choices(
         'verified',
