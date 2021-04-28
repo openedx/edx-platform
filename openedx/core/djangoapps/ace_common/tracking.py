@@ -107,7 +107,7 @@ class GoogleAnalyticsTrackingPixel:
             param_name = fields.event_label.metadata['param_name']
             parameters[param_name] = str(self.course_id)
 
-        return "https://www.google-analytics.com/collect?{params}".format(params=urlencode(parameters))
+        return f"https://www.google-analytics.com/collect?{urlencode(parameters)}"
 
     def _get_tracking_id(self):
         tracking_id = get_config_value_from_site_or_settings("GOOGLE_ANALYTICS_ACCOUNT", site=self.site)

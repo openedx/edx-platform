@@ -110,25 +110,25 @@ class Command(BaseCommand):
             ))
             cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
 
-        logger.info('Caching details for {} programs.'.format(len(programs)))
+        logger.info(f'Caching details for {len(programs)} programs.')
         cache.set_many(programs, None)
 
-        logger.info('Caching details for {} pathways.'.format(len(pathways)))
+        logger.info(f'Caching details for {len(pathways)} pathways.')
         cache.set_many(pathways, None)
 
-        logger.info('Caching programs uuids for {} courses.'.format(len(courses)))
+        logger.info(f'Caching programs uuids for {len(courses)} courses.')
         cache.set_many(courses, None)
 
-        logger.info('Caching programs uuids for {} catalog courses.'.format(len(catalog_courses)))
+        logger.info(f'Caching programs uuids for {len(catalog_courses)} catalog courses.')
         cache.set_many(catalog_courses, None)
 
-        logger.info(str('Caching program UUIDs by {} program types.'.format(len(programs_by_type))))
+        logger.info(str(f'Caching program UUIDs by {len(programs_by_type)} program types.'))
         cache.set_many(programs_by_type, None)
 
-        logger.info(str('Caching program UUIDs by {} program type slugs.'.format(len(programs_by_type_slug))))
+        logger.info(str(f'Caching program UUIDs by {len(programs_by_type_slug)} program type slugs.'))
         cache.set_many(programs_by_type_slug, None)
 
-        logger.info('Caching programs uuids for {} organizations'.format(len(organizations)))
+        logger.info(f'Caching programs uuids for {len(organizations)} organizations')
         cache.set_many(organizations, None)
 
         if failure:

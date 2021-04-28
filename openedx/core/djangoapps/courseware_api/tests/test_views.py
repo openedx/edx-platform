@@ -70,7 +70,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
         )
         cls.instructor = UserFactory(
             username='instructor',
-            email=u'instructor@example.com',
+            email='instructor@example.com',
             password='foo',
             is_staff=False
         )
