@@ -1895,7 +1895,7 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def get_unsucceeded_course_action_elements(self, html, course_key):
         """Returns the elements in the unsucceeded course action section that have the given course_key"""
-        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(str(course_key)))
+        return html.cssselect(f'.courses-processing li[data-course-key="{str(course_key)}"]')
 
     def assertInCourseListing(self, course_key):
         """

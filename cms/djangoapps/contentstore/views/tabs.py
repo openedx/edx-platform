@@ -111,7 +111,7 @@ def reorder_tabs_handler(course_item, request):
         CourseTabList.validate_tabs(new_tab_list)
     except InvalidTabsException as exception:
         return JsonResponse(
-            {"error": "New list of tabs is not valid: {}.".format(str(exception))}, status=400
+            {"error": f"New list of tabs is not valid: {str(exception)}."}, status=400
         )
 
     # persist the new order of the tabs

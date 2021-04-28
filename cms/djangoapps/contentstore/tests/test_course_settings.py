@@ -1652,7 +1652,7 @@ class CourseGraderUpdatesTest(CourseTestCase):
             "short_label": "yo momma",
             "weight": 17.3,
         }
-        resp = self.client.ajax_post('{}/{}'.format(self.url, len(self.starting_graders) + 1), grader)
+        resp = self.client.ajax_post(f'{self.url}/{len(self.starting_graders) + 1}', grader)
         self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content.decode('utf-8'))
         self.assertEqual(obj['id'], len(self.starting_graders))

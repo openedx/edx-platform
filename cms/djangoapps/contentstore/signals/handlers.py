@@ -35,7 +35,7 @@ def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-functi
     def task_decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            cache_key = '{}-{}'.format(func.__name__, kwargs[key])
+            cache_key = f'{func.__name__}-{kwargs[key]}'
             if cache.add(cache_key, "true", expiry_seconds):
                 log.info('Locking task in cache with key: %s for %s seconds', cache_key, expiry_seconds)
                 return func(*args, **kwargs)
