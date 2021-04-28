@@ -326,8 +326,6 @@ class DiscussionsConfigurationView(APIView):
     def post(self, request, course_key_string: str, **_kwargs) -> Response:
         """
         Handle HTTP/POST requests
-
-        TODO: Should we cleanup orphaned LTI config when swapping to cs_comments_service?
         """
         course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
