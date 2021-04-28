@@ -25,7 +25,7 @@
     $('#csrfmiddlewaretoken').attr('value', $.cookie('csrftoken'));
     new Calculator;
     new FeedbackForm;
-    if ($('body').hasClass('courseware')) {
+    if ($('body').hasClass('courseware') && typeof Courseware !== 'undefined' ) {
       Courseware.start();
     }
     window.postJSON = function(url, data, callback) {
