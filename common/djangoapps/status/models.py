@@ -34,7 +34,7 @@ class GlobalStatusMessage(ConfigurationModel):
 
     def full_message(self, course_key):
         """ Returns the full status message, including any course-specific status messages. """
-        cache_key = "status_message.{course_id}".format(course_id=str(course_key))
+        cache_key = f"status_message.{str(course_key)}"
         if cache.get(cache_key):
             return cache.get(cache_key)
 

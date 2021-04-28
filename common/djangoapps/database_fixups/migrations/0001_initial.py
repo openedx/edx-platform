@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 from django.db import migrations, models
 
 # We used to have a uniqueness constraint on auth_user.email:

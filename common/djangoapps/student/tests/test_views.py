@@ -722,7 +722,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             ItemFactory.create(
                 category='video',
                 parent_location=course.location,
-                display_name='Video {}'.format(str(number))
+                display_name=f'Video {str(number)}'
             ).location
             for number in range(5)
         ]
@@ -823,7 +823,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     ItemFactory.create(
                         category='video',
                         parent_location=course.location,
-                        display_name='Video {}'.format(str(number))
+                        display_name=f'Video {str(number)}'
                     ).location
                     for number in range(5)
                 ]

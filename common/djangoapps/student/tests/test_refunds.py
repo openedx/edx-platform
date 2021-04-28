@@ -197,7 +197,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         """ Order with mutiple refunds will not throw 500 error when dashboard page will access."""
         now = datetime.now(pytz.UTC).replace(microsecond=0)
         order_date = now + timedelta(days=1)
-        expected_content = '{{"date_placed": "{date}"}}'.format(date=order_date.strftime(ECOMMERCE_DATE_FORMAT))
+        expected_content = f'{{"date_placed": "{order_date.strftime(ECOMMERCE_DATE_FORMAT)}"}}'
 
         httpretty.register_uri(
             httpretty.GET,

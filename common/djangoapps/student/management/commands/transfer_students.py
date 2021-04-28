@@ -66,7 +66,7 @@ class Command(TrackedCommand):
                 mode = enrollment.mode
                 old_is_active = enrollment.is_active
                 CourseEnrollment.unenroll(user, source_key, skip_refund=True)
-                print('Unenrolled {} from {}'.format(user.username, str(source_key)))
+                print(f'Unenrolled {user.username} from {str(source_key)}')
 
                 for dest_key in dest_keys:
                     if CourseEnrollment.is_enrolled(user, dest_key):

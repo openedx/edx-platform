@@ -134,7 +134,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 })
             )
         })
-        response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
+        response = f"{callback}({json.dumps(data)})".encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message(f"Youtube: sent response {message}")
@@ -158,7 +158,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 "message": message,
             })
         })
-        response = "{cb}({data})".format(cb=callback, data=json.dumps(data)).encode('utf-8')
+        response = f"{callback}({json.dumps(data)})".encode('utf-8')
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message(f"Youtube: sent response {message}")
