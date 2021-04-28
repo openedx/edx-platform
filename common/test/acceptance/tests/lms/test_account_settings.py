@@ -36,7 +36,7 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
         """
         Create a unique user and return the account's username and id.
         """
-        username = "test_{uuid}".format(uuid=self.unique_id[0:6])
+        username = f"test_{self.unique_id[0:6]}"
         auto_auth_page = AutoAuthPage(
             self.browser,
             username=username,

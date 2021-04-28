@@ -240,13 +240,13 @@ class SubsectionGradingPolicyA11yTest(SubsectionGradingPolicyBase):
             for i in range(1, 10):
                 self._check_tick_text(
                     i,
-                    ['Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    'HW 0{index}'.format(index=i + 1) if i < 9 else 'HW {index}'.format(index=i + 1)
+                    [f'Homework {i + 1} Unreleased - 0% (?/?)'],
+                    f'HW 0{i + 1}' if i < 9 else f'HW {i + 1}'
                 )
                 self._check_tick_text(
                     i + 13,
-                    ['Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
-                    'Lab 0{index}'.format(index=i + 1) if i < 9 else 'Lab {index}'.format(index=i + 1)
+                    [f'Lab {i + 1} Unreleased - 0% (?/?)'],
+                    f'Lab 0{i + 1}' if i < 9 else f'Lab {i + 1}'
                 )
 
             # Verify the overall score. The first element in the array is the sr-only text, and the

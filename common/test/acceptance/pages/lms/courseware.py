@@ -45,7 +45,7 @@ class CoursewarePage(CoursePage):
             except IndexError:
                 return False
 
-        sequential_position_css = '#sequence-list #tab_{}'.format(sequential_position - 1)
+        sequential_position_css = f'#sequence-list #tab_{sequential_position - 1}'
         self.q(css=sequential_position_css).first.click()
         EmptyPromise(is_at_new_position, "Position navigation fulfilled").fulfill()
 

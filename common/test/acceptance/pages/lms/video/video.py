@@ -137,7 +137,7 @@ class VideoPage(PageObject):
             video_display_names = self.q(css=CSS_CLASS_NAMES['video_display_name']).text
             if video_display_name not in video_display_names:
                 raise ValueError(f"Incorrect Video Display Name: '{video_display_name}'")
-            return '.vert.vert-{}'.format(video_display_names.index(video_display_name))
+            return f'.vert.vert-{video_display_names.index(video_display_name)}'
         else:
             return '.vert.vert-0'
 
