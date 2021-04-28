@@ -25,6 +25,12 @@ from openedx.core.djangoapps.appsembler.api.tests.factories import (
     OrganizationCourseFactory,
     UserOrganizationMappingFactory,
 )
+from openedx.core.djangoapps.appsembler.sites.tests.factories import (
+    AlternativeDomainFactory,
+)
+from openedx.core.djangoapps.site_configuration.tests.factories import (
+    SiteFactory,
+)
 from student.models import (
     CourseAccessRole,
     CourseEnrollment,
@@ -833,3 +839,27 @@ class TestOffboardSiteCommand(ModuleStoreTestCase):
     def create_org_users(org, new_user_count):
         return [UserOrganizationMappingFactory(
             organization=org).user for i in range(new_user_count)]
+
+
+class DisableCustomDomainCommandTestCase(TestCase):
+    """
+    Test ./manage.py lms disable_custom_domain mysite.example.com
+    """
+    def test_disable_custom_domain(self):
+        disable_domain = "test-custom-domain.example.com"
+        subdomain = "test-custom-domain.tahoe.appsembler.com"
+
+        s = SiteFactory.create(domain=disable_domain)
+        AlternativeDomainFactory.create(domain=subdomain, site=s)
+
+        call_command('disable_custom_domain', disable_domain)
+
+        # we expect the Site now has `subdomain`
+        assert Site.objects.get(domain=subdomain).exists()
+        # and that the AlternativeDomain is gone
+        assert not AlternativeDomain.objects.filter(domain=subdomain).exists()
+
+        # there shouldn't be an AlternativeDomain for
+        assert not AlternativeDomain.objects.filter(domain=disable_domain).exists()
+        # and there shouldn't be a lingering/duplicate Site for the old one either
+        assert not Site.objects.get(domain=disable_subdomain).exists()
