@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for instructor.basic
 """
@@ -11,7 +10,6 @@ import json  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from opaque_keys.edx.locator import UsageKey
-from six.moves import range, zip
 from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint: disable=unused-import
     AVAILABLE_FEATURES,
     PROFILE_FEATURES,
@@ -233,7 +231,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             # Setup some users with ProgramEnrollments
             if i % 2 == 0:
                 user = self.users[i]
-                external_user_key = '{}_{}'.format(user.username, i)
+                external_user_key = f'{user.username}_{i}'
                 ProgramEnrollmentFactory.create(user=user, external_user_key=external_user_key)
                 username_with_external_user_key_dict[user.username] = external_user_key
 
@@ -249,8 +247,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 assert '' == report['external_user_key']
 
     def test_available_features(self):
-        assert len(AVAILABLE_FEATURES) == len((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))
-        assert set(AVAILABLE_FEATURES) == set((STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES))
+        assert len(AVAILABLE_FEATURES) == len(STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES)
+        assert set(AVAILABLE_FEATURES) == set(STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES)
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])

@@ -150,7 +150,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
 
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-        assert any((('grade_report_err' in item[0]) for item in report_store.links_for(self.course.id)))
+        assert any(('grade_report_err' in item[0]) for item in report_store.links_for(self.course.id))
 
     def test_cohort_data_in_grading(self):
         """
@@ -2723,7 +2723,7 @@ class TestInstructorOra2AttachmentsExport(SharedModuleStoreTestCase):
 
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
                     course_id_string = quote(str(self.course.id).replace('/', '_'))
-                    filename = '{}_ORA_summary_{}.csv'.format(course_id_string, timestamp_str)
+                    filename = f'{course_id_string}_ORA_summary_{timestamp_str}.csv'
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)

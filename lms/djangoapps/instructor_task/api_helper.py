@@ -10,7 +10,6 @@ import hashlib
 import json
 import logging
 
-import six
 from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
@@ -390,13 +389,13 @@ def encode_problem_and_student_input(usage_key, student=None):
     assert isinstance(usage_key, UsageKey)
     if student is not None:
         task_input = {'problem_url': str(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=str(usage_key))
+        task_key_stub = f"{student.id}_{str(usage_key)}"
     else:
         task_input = {'problem_url': str(usage_key)}
-        task_key_stub = "_{problem}".format(problem=str(usage_key))
+        task_key_stub = f"_{str(usage_key)}"
 
     # create the key value by using MD5 hash:
-    task_key = hashlib.md5(six.b(task_key_stub)).hexdigest()
+    task_key = hashlib.md5(task_key_stub.encode()).hexdigest()
 
     return task_input, task_key
 
@@ -412,10 +411,10 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):
     assert isinstance(usage_key, UsageKey)
     if student is not None:
         task_input = {'entrance_exam_url': str(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=str(usage_key))
+        task_key_stub = f"{student.id}_{str(usage_key)}"
     else:
         task_input = {'entrance_exam_url': str(usage_key)}
-        task_key_stub = "_{entranceexam}".format(entranceexam=str(usage_key))
+        task_key_stub = f"_{str(usage_key)}"
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub.encode('utf-8')).hexdigest()
