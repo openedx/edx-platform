@@ -83,7 +83,6 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         """
         Test that the `verify_uuid` value of a certificate does not change when it is revoked and re-awarded.
         """
-        # Create user, a course run, and an enrollment
         generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
 
@@ -104,3 +103,19 @@ class CertificateTests(EventTestMixin, ModuleStoreTestCase):
         generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
         assert generated_cert.status, CertificateStatuses.downloadable
         assert generated_cert.verify_uuid, verify_uuid
+
+    def test_generation_creates_verify_uuid_when_needed(self):
+        """
+        Test that ensures we will create a verify_uuid when needed.
+        """
+        GeneratedCertificateFactory(
+            user=self.u,
+            course_id=self.key,
+            mode='verified',
+            status=CertificateStatuses.unverified,
+            verify_uuid=''
+        )
+
+        generated_cert = generate_course_certificate(self.u, self.key, self.gen_mode)
+        assert generated_cert.status, CertificateStatuses.downloadable
+        assert generated_cert.verify_uuid != ''
