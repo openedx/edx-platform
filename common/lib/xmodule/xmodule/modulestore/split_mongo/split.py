@@ -1064,7 +1064,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if len(course_block) > 1:
                 raise MultipleCourseBlocksFound(
-                    "Expected 1 course block to be found in the course, but found {}".format(len(course_block))
+                    f"Expected 1 course block to be found in the course, but found {len(course_block)}"
                 )
             course_summary = extract_course_summary(course_block[0])
             courses_summaries.append(
@@ -1106,7 +1106,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if len(library_block) > 1:
                 raise MultipleLibraryBlocksFound(
-                    "Expected 1 library block, but found {}".format(len(library_block))
+                    f"Expected 1 library block, but found {len(library_block)}"
                 )
 
             library_block_fields = library_block[0].fields
