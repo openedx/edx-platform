@@ -136,7 +136,7 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         Assert content has/hasn't all the bookmark info.
         """
         assertion('bookmark_id', content)
-        assertion('{},{}'.format(self.username, str(self.vertical.location)), content)
+        assertion(f'{self.username},{str(self.vertical.location)}', content)
         assertion('bookmarked', content)
         assertion('show_bookmark_button', content)
 
@@ -180,8 +180,8 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         if context:
             assert "'has_assignments': True" in html
             assert "'subsection_format': '{}'".format(context['format']) in html
-            assert "'completed': {}".format(completion_value == 1) in html
-            assert "'past_due': {}".format(self.vertical.due < now) in html
+            assert f"'completed': {completion_value == 1}" in html
+            assert f"'past_due': {self.vertical.due < now}" in html
 
     @ddt.data(True, False)
     def test_render_problem_without_score(self, has_score):

@@ -1059,7 +1059,7 @@ class CourseBlock(
             if not getattr(self, "tabs", []):
                 CourseTabList.initialize_default(self)
         except InvalidTabsException as err:
-            raise type(err)('{msg} For course: {course_id}'.format(msg=str(err), course_id=str(self.id)))  # lint-amnesty, pylint: disable=line-too-long
+            raise type(err)(f'{str(err)} For course: {str(self.id)}')  # lint-amnesty, pylint: disable=line-too-long
 
         self.set_default_certificate_available_date()
 
