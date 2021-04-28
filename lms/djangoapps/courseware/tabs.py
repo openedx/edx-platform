@@ -117,7 +117,7 @@ class ProgressTab(EnrolledTab):
                 return reverse_func(self.view_name, args=[str(course.id)])
 
         tab_dict['link_func'] = link_func
-        super(ProgressTab, self).__init__(tab_dict)  # pylint: disable=super-with-arguments
+        super().__init__(tab_dict)  # pylint: disable=super-with-arguments
 
     @classmethod
     def is_enabled(cls, course, user=None):

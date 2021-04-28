@@ -1592,7 +1592,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        assert '/courses/{course_id}/bar/content'.format(course_id=str(self.course.id)) in result_fragment.content
+        assert f'/courses/{str(self.course.id)}/bar/content' in result_fragment.content
 
 
 class XBlockWithJsonInitData(XBlock):
