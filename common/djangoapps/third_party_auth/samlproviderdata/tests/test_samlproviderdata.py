@@ -81,7 +81,7 @@ class SAMLProviderDataTests(APITestCase):
         # GET auth/saml/v0/providerdata/?enterprise_customer_uuid=id
         url_base = reverse('saml_provider_data-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(url_base, urlencode(query_kwargs))
+        url = f'{url_base}?{urlencode(query_kwargs)}'
 
         response = self.client.get(url, format='json')
 
@@ -140,7 +140,7 @@ class SAMLProviderDataTests(APITestCase):
         # DELETE auth/saml/v0/providerdata/ -d data
         url_base = reverse('saml_provider_data-detail', kwargs={'pk': self.saml_provider_data.id})
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(url_base, urlencode(query_kwargs))
+        url = f'{url_base}?{urlencode(query_kwargs)}'
         orig_count = SAMLProviderData.objects.count()
 
         response = self.client.delete(url)
@@ -157,7 +157,7 @@ class SAMLProviderDataTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         url_base = reverse('saml_provider_data-list')
         query_kwargs = {'enterprise_customer_uuid': BAD_ENTERPRISE_ID}
-        url = '{}?{}'.format(url_base, urlencode(query_kwargs))
+        url = f'{url_base}?{urlencode(query_kwargs)}'
 
         response = self.client.get(url, format='json')
 
@@ -167,7 +167,7 @@ class SAMLProviderDataTests(APITestCase):
         self.client.logout()
         urlbase = reverse('saml_provider_data-list')
         query_kwargs = {'enterprise_customer_uuid': ENTERPRISE_ID}
-        url = '{}?{}'.format(urlbase, urlencode(query_kwargs))
+        url = f'{urlbase}?{urlencode(query_kwargs)}'
         set_jwt_cookie(self.client, self.user, [(ENTERPRISE_LEARNER_ROLE, ENTERPRISE_ID)])
         response = self.client.get(url, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN

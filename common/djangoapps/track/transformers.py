@@ -16,7 +16,7 @@ from opaque_keys.edx.keys import UsageKey
 log = logging.getLogger(__name__)
 
 
-class DottedPathMapping(object):
+class DottedPathMapping:
     """
     Dictionary-like object for creating keys of dotted paths.
 
@@ -48,12 +48,12 @@ class DottedPathMapping(object):
     def __getitem__(self, key):
         if key in self._match_registry:
             return self._match_registry[key]
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             # Reverse-sort the keys to find the longest matching prefix.
             for prefix in sorted(self._prefix_registry, reverse=True):
                 if key.startswith(prefix):
                     return self._prefix_registry[prefix]
-        raise KeyError('Key {} not found in {}'.format(key, type(self)))
+        raise KeyError(f'Key {key} not found in {type(self)}')
 
     def __setitem__(self, key, value):
         if key.endswith('.'):
@@ -92,7 +92,7 @@ class DottedPathMapping(object):
         return list(self._match_registry.keys()) + list(self._prefix_registry.keys())
 
 
-class EventTransformerRegistry(object):
+class EventTransformerRegistry:
     """
     Registry to track which EventTransformers handle which events.  The
     EventTransformer must define a `match_key` attribute which contains the
@@ -119,7 +119,7 @@ class EventTransformerRegistry(object):
         If no transformer is registered to handle the event, this raises a
         KeyError.
         """
-        name = event.get(u'name')
+        name = event.get('name')
         return cls.mapping[name](event)
 
 
@@ -184,7 +184,7 @@ class EventTransformer(dict):
             always be run.
     """
     def __init__(self, *args, **kwargs):
-        super(EventTransformer, self).__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
+        super().__init__(*args, **kwargs)  # lint-amnesty, pylint: disable=super-with-arguments
         self.load_payload()
 
     # Properties to be overridden
@@ -206,14 +206,14 @@ class EventTransformer(dict):
         """
         Returns the event's name.
         """
-        return self[u'name']
+        return self['name']
 
     @property
     def context(self):
         """
         Returns the event's context dict.
         """
-        return self.get(u'context', {})
+        return self.get('context', {})
 
     # Transform methods
 
@@ -221,11 +221,11 @@ class EventTransformer(dict):
         """
         Create a data version of self[u'event'] at self.event
         """
-        if u'event' in self:
-            if isinstance(self[u'event'], six.string_types):
-                self.event = json.loads(self[u'event'])
+        if 'event' in self:
+            if isinstance(self['event'], str):
+                self.event = json.loads(self['event'])
             else:
-                self.event = self[u'event']
+                self.event = self['event']
 
     def dump_payload(self):
         """
@@ -233,10 +233,10 @@ class EventTransformer(dict):
 
         Keep the same format we were originally given.
         """
-        if isinstance(self.get(u'event'), six.string_types):
-            self[u'event'] = json.dumps(self.event)
+        if isinstance(self.get('event'), str):
+            self['event'] = json.dumps(self.event)
         else:
-            self[u'event'] = self.event
+            self['event'] = self.event
 
     def transform(self):
         """
@@ -277,13 +277,13 @@ class SequenceTabSelectedEventTransformer(EventTransformer):
     Transformer to maintain backward compatiblity with seq_goto events.
     """
 
-    match_key = u'edx.ui.lms.sequence.tab_selected'
+    match_key = 'edx.ui.lms.sequence.tab_selected'
     is_legacy_event = True
-    legacy_event_type = u'seq_goto'
+    legacy_event_type = 'seq_goto'
 
     def process_legacy_fields(self):
-        self.event[u'old'] = self.event[u'current_tab']
-        self.event[u'new'] = self.event[u'target_tab']
+        self.event['old'] = self.event['current_tab']
+        self.event['new'] = self.event['target_tab']
 
 
 class _BaseLinearSequenceEventTransformer(EventTransformer):
@@ -308,8 +308,8 @@ class _BaseLinearSequenceEventTransformer(EventTransformer):
             old: equal to the new current_tab field
             new: the tab to which the user is navigating
         """
-        self.event[u'old'] = self.event[u'current_tab']
-        self.event[u'new'] = self.event[u'current_tab'] + self.offset
+        self.event['old'] = self.event['current_tab']
+        self.event['new'] = self.event['current_tab'] + self.offset
 
     def crosses_boundary(self):
         """
@@ -325,15 +325,15 @@ class NextSelectedEventTransformer(_BaseLinearSequenceEventTransformer):
     Transformer to maintain backward compatiblity with seq_next events.
     """
 
-    match_key = u'edx.ui.lms.sequence.next_selected'
+    match_key = 'edx.ui.lms.sequence.next_selected'
     offset = 1
-    legacy_event_type = u'seq_next'
+    legacy_event_type = 'seq_next'
 
     def crosses_boundary(self):
         """
         Returns true if the navigation moves the focus to the next sequence.
         """
-        return self.event[u'current_tab'] == self.event[u'tab_count']
+        return self.event['current_tab'] == self.event['tab_count']
 
 
 @EventTransformerRegistry.register
@@ -342,16 +342,16 @@ class PreviousSelectedEventTransformer(_BaseLinearSequenceEventTransformer):
     Transformer to maintain backward compatiblity with seq_prev events.
     """
 
-    match_key = u'edx.ui.lms.sequence.previous_selected'
+    match_key = 'edx.ui.lms.sequence.previous_selected'
     offset = -1
-    legacy_event_type = u'seq_prev'
+    legacy_event_type = 'seq_prev'
 
     def crosses_boundary(self):
         """
         Returns true if the navigation moves the focus to the previous
         sequence.
         """
-        return self.event[u'current_tab'] == 1
+        return self.event['current_tab'] == 1
 
 
 @EventTransformerRegistry.register
@@ -365,19 +365,19 @@ class VideoEventTransformer(EventTransformer):
     that converts the events they *can* easily emit and converts them into the
     legacy format.
     """
-    match_key = u'edx.video.'
+    match_key = 'edx.video.'
 
     name_to_event_type_map = {
-        u'edx.video.played': u'play_video',
-        u'edx.video.paused': u'pause_video',
-        u'edx.video.stopped': u'stop_video',
-        u'edx.video.loaded': u'load_video',
-        u'edx.video.position.changed': u'seek_video',
-        u'edx.video.seeked': u'seek_video',
-        u'edx.video.transcript.shown': u'show_transcript',
-        u'edx.video.transcript.hidden': u'hide_transcript',
-        u'edx.video.language_menu.shown': u'video_show_cc_menu',
-        u'edx.video.language_menu.hidden': u'video_hide_cc_menu',
+        'edx.video.played': 'play_video',
+        'edx.video.paused': 'pause_video',
+        'edx.video.stopped': 'stop_video',
+        'edx.video.loaded': 'load_video',
+        'edx.video.position.changed': 'seek_video',
+        'edx.video.seeked': 'seek_video',
+        'edx.video.transcript.shown': 'show_transcript',
+        'edx.video.transcript.hidden': 'hide_transcript',
+        'edx.video.language_menu.shown': 'video_show_cc_menu',
+        'edx.video.language_menu.hidden': 'video_hide_cc_menu',
     }
 
     is_legacy_event = True
@@ -395,7 +395,7 @@ class VideoEventTransformer(EventTransformer):
         expected types of events.
         """
         if self.name in self.name_to_event_type_map:
-            super(VideoEventTransformer, self).transform()  # lint-amnesty, pylint: disable=super-with-arguments
+            super().transform()  # lint-amnesty, pylint: disable=super-with-arguments
 
     def process_event(self):
         """
@@ -480,17 +480,17 @@ class VideoEventTransformer(EventTransformer):
         """
         if self._build_requests_plus_30_for_minus_30():
             if self._user_requested_plus_30_skip():
-                self.event[u'requested_skip_interval'] = -30
+                self.event['requested_skip_interval'] = -30
 
     def _build_requests_plus_30_for_minus_30(self):
         """
         Returns True if this build contains the seek bug
         """
-        if u'application' in self.context:
-            if all(key in self.context[u'application'] for key in (u'version', u'name')):
-                app_version = self.context[u'application'][u'version']
-                app_name = self.context[u'application'][u'name']
-                return app_version == u'1.0.02' and app_name == u'edx.mobileapp.iOS'
+        if 'application' in self.context:
+            if all(key in self.context['application'] for key in ('version', 'name')):
+                app_version = self.context['application']['version']
+                app_name = self.context['application']['name']
+                return app_version == '1.0.02' and app_name == 'edx.mobileapp.iOS'
         return False
 
     def _user_requested_plus_30_skip(self):
@@ -498,9 +498,9 @@ class VideoEventTransformer(EventTransformer):
         If the user requested a +30 second skip, return True.
         """
 
-        if u'requested_skip_interval' in self.event and u'type' in self.event:
-            interval = self.event[u'requested_skip_interval']
-            action = self.event[u'type']
-            return interval == 30 and action == u'onSkipSeek'
+        if 'requested_skip_interval' in self.event and 'type' in self.event:
+            interval = self.event['requested_skip_interval']
+            action = self.event['type']
+            return interval == 30 and action == 'onSkipSeek'
         else:
             return False

@@ -81,14 +81,14 @@ def context_dict_for_learning_context(context_key):
 
     """
     context_dict = {
-        'context_id': text_type(context_key) if context_key else '',
+        'context_id': str(context_key) if context_key else '',
         'course_id': '',
         'org_id': '',
     }
     if context_key is not None:
         assert isinstance(context_key, LearningContextKey)
         if context_key.is_course:
-            context_dict['course_id'] = text_type(context_key)
+            context_dict['course_id'] = str(context_key)
         if hasattr(context_key, 'org'):
             context_dict['org_id'] = context_key.org
     return context_dict
