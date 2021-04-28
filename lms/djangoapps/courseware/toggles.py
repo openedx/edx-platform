@@ -148,6 +148,31 @@ def courseware_mfe_is_visible(
     return courseware_mfe_is_active(course_key)
 
 
+def courseware_mfe_is_advertised(
+        course_key: CourseKey,
+        is_global_staff=False,
+        is_course_staff=False,
+) -> bool:
+    """
+    Should we invite the user to view a course run's content in the Learning MFE?
+
+    This check is slightly different than `courseware_mfe_is_visible`, in that
+    we always *permit* global staff to view MFE content (assuming it's deployed),
+    but we do not shove the New Experience in their face if the preview isn't
+    enabled.
+    """
+    # DENY: Old Mongo courses don't work in the MFE.
+    if course_key.deprecated:
+        return False
+    # ALLOW: Both global and course staff can see the MFE link if the course team
+    #        preview is enabled.
+    is_staff = is_global_staff or is_course_staff
+    if is_staff and COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW.is_enabled(course_key):
+        return True
+    # OTHERWISE: The MFE is only advertised if it's the active (ie canonical) experience.
+    return courseware_mfe_is_active(course_key)
+
+
 def courseware_legacy_is_visible(
         course_key: CourseKey,
         is_global_staff=False,

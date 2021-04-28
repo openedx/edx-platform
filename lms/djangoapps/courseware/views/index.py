@@ -64,7 +64,7 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..module_render import get_module_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import courseware_legacy_is_visible, courseware_mfe_is_visible
+from ..toggles import courseware_legacy_is_visible, courseware_mfe_is_advertised
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -495,7 +495,11 @@ class CoursewareIndex(View):
                 self._add_sequence_title_to_context(courseware_context)
 
         # Courseware MFE link
-        if show_courseware_mfe_link(request.user, staff_access, self.course.id):
+        if courseware_mfe_is_advertised(
+                is_global_staff=request.user.is_staff,
+                is_course_staff=staff_access,
+                course_key=self.course.id,
+        ):
             courseware_context['microfrontend_link'] = self.microfrontend_url
         else:
             courseware_context['microfrontend_link'] = None
@@ -618,14 +622,3 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
             save_child_position(parent, current_module.location.block_id)
 
         current_module = parent
-
-
-def show_courseware_mfe_link(user, staff_access, course_key):
-    """
-    Return whether to display the button to switch to the Courseware MFE.
-    """
-    return courseware_mfe_is_visible(
-        course_key=course_key,
-        is_global_staff=user.is_staff,
-        is_course_staff=staff_access,
-    )
