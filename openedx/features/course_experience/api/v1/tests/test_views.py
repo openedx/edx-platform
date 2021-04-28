@@ -6,7 +6,7 @@ import ddt
 
 from django.urls import reverse
 from django.utils import timezone
-from mock import patch
+from unittest.mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment

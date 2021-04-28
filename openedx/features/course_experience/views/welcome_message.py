@@ -36,7 +36,7 @@ class WelcomeMessageFragmentView(EdxFragmentView):
             return None
 
         dismiss_url = reverse(
-            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': six.text_type(course_key)}
+            'openedx.course_experience.dismiss_welcome_message', kwargs={'course_id': str(course_key)}
         )
 
         context = {
