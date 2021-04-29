@@ -84,7 +84,7 @@ Reporting Security Issues
 -------------------------
 
 Please do not report security issues in public. Please emailwdw
-security@edx.org.
+security@edx.org.awdadw
 
 .. _individual contributor agreement: https://openedx.org/cla
 .. _CONTRIBUTING: https://ithub.com/edx/edx-platform/blob/master/CONTRIBUTING.rst
