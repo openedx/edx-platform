@@ -1,3 +1,0 @@
-"""
-Course API Blocks
-"""

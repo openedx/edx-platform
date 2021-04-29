@@ -1,6 +1,0 @@
-[
-    "foo/bar.py:192: [C0111(missing-docstring), Bliptv] Missing docstring",
-    "foo/bar/test.py:74: [C0322(no-space-before-operator)] Operator not preceded by a space",
-    "ugly/string/test.py:16: [C0103(invalid-name)] Invalid name \"whats up\" for type constant (should match (([A-Z_][A-Z0-9_]*)|(__.*__)|log|urlpatterns)$)",
-    "multiple/lines/test.py:72: [C0322(no-space-before-operator)] Operator not preceded by a space\nFOO_BAR='pipeline.storage.NonPackagingPipelineStorage'\n                   ^"
-]

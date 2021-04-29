@@ -1,1 +1,0 @@
-../../../assets/split_test/public/js/split_test_author_view.js

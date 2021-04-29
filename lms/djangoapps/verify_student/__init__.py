@@ -1,3 +1,0 @@
-"""
-Student Identity Verification App
-"""
