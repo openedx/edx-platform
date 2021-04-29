@@ -22,6 +22,8 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
+    AUTHN_EMAIL_CONFLICT_MSG,
+    AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
     EMAIL_CONFLICT_MSG,
     EMAIL_INVALID_MSG,
@@ -354,6 +356,44 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                     ).format(
                         self.EMAIL
                     )
+                }],
+                "error_code": "duplicate-email-username"
+            }
+        )
+
+    def test_duplicate_email_username_error_with_is_authn_check(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username and email
+        response = self.client.post(self.url, {
+            "is_authn_mfe": True,
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        assert response.status_code == 409
+        username_suggestions = response_json.pop('username_suggestions')
+        assert len(username_suggestions) == 3
+        self.assertDictEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
+                }],
+                "email": [{
+                    "user_message": AUTHN_EMAIL_CONFLICT_MSG
                 }],
                 "error_code": "duplicate-email-username"
             }
@@ -2393,3 +2433,16 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
             assert response.status_code != 403
         response = self.request_without_auth('post', self.path)
         assert response.status_code == 403
+
+    def test_single_field_validation(self):
+        """
+        Test that if `is_authn_mfe` is provided in request along with form_field_key, only
+        error message for that field is returned.
+        """
+        User.objects.create_user(username='user', email='user@email.com')
+        # using username and email that have conflicts but sending form_field_key will return
+        # validation for only email
+        self.assertValidationDecision(
+            {'username': 'user', 'email': 'user@email.com', 'is_authn_mfe': True, 'form_field_key': 'email'},
+            {'email': AUTHN_EMAIL_CONFLICT_MSG}
+        )
