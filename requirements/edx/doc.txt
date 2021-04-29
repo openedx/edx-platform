@@ -5,7 +5,7 @@
 #    make upgrade
 #
 alabaster==0.7.12         # via sphinx
-babel==2.9.0              # via sphinx
+babel==2.9.1              # via sphinx
 certifi==2020.12.5        # via requests
 chardet==4.0.0            # via requests
 click==7.1.2              # via code-annotations
