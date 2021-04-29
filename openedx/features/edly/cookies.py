@@ -82,7 +82,7 @@ def _get_edly_user_info_cookie_string(request):
                 request.user,
                 CourseCreatorRole()
             ) if getattr(request, 'user', None) else False,
-            'group_name': user_groups,
+            'user_groups': user_groups,
         }
         return encode_edly_user_info_cookie(edly_user_info_cookie_data)
     except EdlySubOrganization.DoesNotExist:

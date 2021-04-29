@@ -56,7 +56,7 @@ class CookieTests(TestCase):
                 'edly-sub-org': edly_sub_organization.slug,
                 'edx-org': edly_sub_organization.edx_organization.short_name,
                 'is_course_creator': auth.user_has_role(self.request.user, CourseCreatorRole()),
-                'group_name': list(self.user.groups.all().values_list('name', flat=True))
+                'user_groups': list(self.user.groups.all().values_list('name', flat=True))
             },
             settings.EDLY_COOKIE_SECRET_KEY,
             algorithm=settings.EDLY_JWT_ALGORITHM
