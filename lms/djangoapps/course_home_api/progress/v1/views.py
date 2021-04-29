@@ -27,6 +27,7 @@ from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
@@ -87,9 +88,9 @@ class ProgressTabView(RetrieveAPIView):
                          'Pass' is not included.
         studio_url: (str) a str of the link to the grading in studio for the course
         verification_data: an object containing
-            link: (str) the link to either start or retry verification
-            status: (str) the status of the verification
-            status_date: (str) the date time string of when the verification status was set
+            link: (str) the link to either start or retry ID verification
+            status: (str) the status of the ID verification
+            status_date: (str) the date time string of when the ID verification status was set
 
     **Returns**
 
@@ -128,7 +129,9 @@ class ProgressTabView(RetrieveAPIView):
 
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
-        enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+        course_overview = CourseOverview.get_from_id(course_key)
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
+        enrollment_mode = getattr(enrollment, 'mode', None)
 
         # The block structure is used for both the course_grade and has_scheduled content fields
         # So it is called upfront and reused for optimization purposes
@@ -184,6 +187,9 @@ class ProgressTabView(RetrieveAPIView):
         context = self.get_serializer_context()
         context['staff_access'] = bool(has_access(request.user, 'staff', course))
         context['course_key'] = course_key
+        # course_overview and enrollment will be used by VerifiedModeSerializerMixin
+        context['course_overview'] = course_overview
+        context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
 
         return Response(serializer.data)

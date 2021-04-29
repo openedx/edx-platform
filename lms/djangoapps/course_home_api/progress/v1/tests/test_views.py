@@ -5,7 +5,7 @@ Tests for Progress Tab API in the Course Home API
 import dateutil
 import ddt
 import mock
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pytz import UTC
 from unittest.mock import patch
 from django.urls import reverse
@@ -19,7 +19,9 @@ from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import ManualVerification
+from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from xmodule.modulestore.tests.factories import ItemFactory
 
 CREDIT_SUPPORT_URL = 'https://support.edx.org/hc/en-us/sections/115004154688-Purchasing-Academic-Credit'
@@ -137,3 +139,15 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.json()['user_has_passing_grade']
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_verified_mode(self):
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION),
+                                                  'currency': 'USD', 'currency_symbol': '$', 'price': 149,
+                                                  'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}

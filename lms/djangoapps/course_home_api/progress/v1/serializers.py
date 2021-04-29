@@ -3,6 +3,7 @@ Progress Tab Serializers
 """
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+from lms.djangoapps.course_home_api.mixins import VerifiedModeSerializerMixin
 
 
 class CourseGradeSerializer(serializers.Serializer):
@@ -79,7 +80,7 @@ class VerificationDataSerializer(serializers.Serializer):
     status_date = serializers.DateTimeField()
 
 
-class ProgressTabSerializer(serializers.Serializer):
+class ProgressTabSerializer(VerifiedModeSerializerMixin):
     """
     Serializer for progress tab
     """
