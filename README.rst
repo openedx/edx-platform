@@ -83,7 +83,7 @@ quality, which will make your contribution more likely to be accepted.
 Reporting Security Issues
 -------------------------
 
-Please do not report security issues in public. Please email
+Please do not report security issues in public. Please emailwdw
 security@edx.org.
 
 .. _individual contributor agreement: https://openedx.org/cla
