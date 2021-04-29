@@ -37,7 +37,7 @@ UTM_COOKIE_CONTENTS = {
 
 
 @ddt.ddt
-class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
+class BasketsViewTests(UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce Baskets view.
     """
@@ -85,9 +85,6 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
                 sku=sku_string,
                 bulk_sku=f'BULK-{sku_string}'
             )
-
-        # Ignore events fired from UserFactory creation
-        self.reset_tracker()
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restriction(self):
