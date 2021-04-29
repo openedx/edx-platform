@@ -101,6 +101,7 @@ def _bubbled_up_groups_from_units(group_access_from_units):
         return {
             user_partition_id: sorted(group_ids)  # sorted for easier comparison
             for user_partition_id, group_ids in group_access.items()
+            if group_ids  # Ignore empty groups
         }
 
     normalized_group_access_dicts = [

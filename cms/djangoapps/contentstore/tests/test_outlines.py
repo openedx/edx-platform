@@ -348,7 +348,10 @@ class OutlineFromModuleStoreTestCase(ModuleStoreTestCase):
                 parent_location=seq_1.location,
                 category='vertical',
                 display_name='Single Vertical',
-                group_access={50: [1, 2]},
+                group_access={
+                    50: [1, 2],
+                    51: [],  # Empty group shouldn't bubble up.
+                },
             )
 
         outline, errs = get_outline_from_modulestore(self.course_key)
