@@ -1,6 +1,8 @@
 """
 All test cases for webinars app views
 """
+
+import mock
 import pytest
 from django.urls import reverse
 
@@ -30,6 +32,30 @@ def test_webinar_registration_view_object_does_not_exist(user_client):
     response = client.post(reverse('webinar_registration', kwargs={'pk': 100, 'action': 'register'}))
 
     assert response.status_code == 404
+
+
+def test_webinar_description_view_invalid_pk(user_client):
+    """
+    Test webinar description with invalid pk
+    """
+    _, client = user_client
+    response = client.get(reverse('webinar_event', kwargs={'pk': 999}))
+    assert response.status_code == 404
+
+
+@mock.patch('django.template.response.select_template')
+def test_webinar_description_view_valid_pk(mock_select_template, user_client):
+    """
+    Test webinar description with valid pk
+    """
+    _, client = user_client
+    webinar = WebinarFactory(status=Webinar.CANCELLED)
+
+    client.get(reverse('webinar_event', kwargs={'pk': webinar.id}))
+
+    mock_select_template.assert_called_once_with(
+        ['adg/lms/webinar/description_page.html'], using=None
+    )
 
 
 def test_webinar_registration_view_cancelled_webinar(client, user_client):
