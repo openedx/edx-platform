@@ -111,6 +111,16 @@ from common.djangoapps.student.models import CourseEnrollment
         banner.showMessage(${enterprise_learner_portal_enabled_message | n, dump_js_escaped_json})
       </%static:require_module>
   % endif
+% if enterprise_customer_name and enterprise_customer_learner_portal_slug:
+  ${static.renderReact(
+    component="EnterpriseLearnerPortalAlert",
+    id="enterprise-learner-portal-modal-react",
+    props={
+      'enterpriseCustomerName': enterprise_customer_name,
+      'enterpriseCustomerSlug': enterprise_customer_learner_portal_slug,
+    },
+  )}
+%endif
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">

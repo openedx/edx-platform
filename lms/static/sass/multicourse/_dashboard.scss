@@ -1584,3 +1584,144 @@ a.fade-cover {
     text-decoration: none;
   }
 }
+
+$modal-inner-padding:               1rem !default;
+
+// Margin between elements in footer, must be lower than or equal to 2 * $modal-inner-padding
+$modal-footer-margin-between:       .5rem !default;
+
+$modal-dialog-margin:               .5rem !default;
+$modal-dialog-margin-y-sm-up:       1.75rem !default;
+
+$modal-title-line-height:           $line-height-base !default;
+
+$modal-content-color:               null !default;
+$modal-content-bg:                  $white !default;
+$modal-content-border-color:        rgba($black, .2) !default;
+$modal-content-border-width:        $border-width !default;
+$modal-content-border-radius:       $border-radius-lg !default;
+$modal-content-inner-border-radius: subtract($modal-content-border-radius, $modal-content-border-width) !default;
+$modal-content-box-shadow-xs:       0 .25rem .5rem rgba($black, .5) !default;
+$modal-content-box-shadow-sm-up:    0 .5rem 1rem rgba($black, .5) !default;
+
+$modal-backdrop-bg:                 $black !default;
+$modal-backdrop-opacity:            .5 !default;
+$modal-header-border-color:         $border-color !default;
+$modal-footer-border-color:         $modal-header-border-color !default;
+$modal-header-border-width:         $modal-content-border-width !default;
+$modal-footer-border-width:         $modal-header-border-width !default;
+$modal-header-padding-y:            1rem !default;
+$modal-header-padding-x:            1rem !default;
+$modal-header-padding:              $modal-header-padding-y $modal-header-padding-x !default; // Keep this for backwards compatibility
+
+$modal-xl:                          1140px !default;
+$modal-lg:                          800px !default;
+$modal-md:                          500px !default;
+$modal-sm:                          300px !default;
+
+$modal-fade-transform:              translate(0, -50px) !default;
+$modal-show-transform:              none !default;
+$modal-transition:                  transform .3s ease-out !default;
+$modal-scale-transform:             scale(1.02) !default;
+
+
+.pgn__modal-layer {
+  height: 100vh;
+  left: 0;
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 3050;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pgn__modal-backdrop {
+  background: $modal-backdrop-bg;
+  bottom: 0;
+  left: 0;
+  opacity: $modal-backdrop-opacity;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
+.pgn__modal-content-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 0.1px;
+  position: relative;
+  & > *:not(.pgn__modal-backdrop) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+
+// Bootstrap modal styles
+
+.modal.show {
+  position: fixed;
+  background-color: transparent;
+  max-height: 100%;
+  width: 100%;
+
+  &:focus {
+    .modal-dialog {
+      box-shadow: $btn-focus-box-shadow;
+    }
+  }
+}
+
+.modal.is-ie11 {
+  // fix browser that likes to do things its own way
+  overflow-y: scroll;
+  height: auto;
+
+  .modal-content {
+    height: auto;
+    max-height: none;
+  }
+}
+
+.modal-backdrop {
+  background-color: rgba(0,0,0,0.3);
+
+  // Fade for backdrop
+  &.fade { opacity: 0; }
+  &.show { opacity: 1; }
+}
+
+.modal-dialog {
+  height: 100%;
+  margin: auto;
+  padding: $spacer / 2;
+
+  @media (min-width: map-get($grid-breakpoints, 'sm')) {
+    padding: $spacer;
+  }
+}
+
+.modal-content {
+  max-height: calc(100vh - (#{$spacer} * 2));
+
+  &:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
+}
+
+.modal-header {
+  flex: 0 0 auto;
+}
+
+.modal-body {
+  overflow: auto;
+}
+
+.modal-footer {
+  flex: 0 0 auto;
+}
