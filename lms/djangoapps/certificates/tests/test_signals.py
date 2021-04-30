@@ -68,14 +68,8 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(self_paced=True)
         self.user = UserFactory.create()
-        CourseEnrollmentFactory(
-            user=self.user,
-            course_id=self.course.id,
-            is_active=True,
-            mode="verified",
-        )
+        # Instructor paced course
         self.ip_course = CourseFactory.create(self_paced=False)
         CourseEnrollmentFactory(
             user=self.user,
@@ -84,86 +78,10 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
             mode="verified",
         )
 
-    def test_cert_generation_on_allowlist_append_self_paced_auto_cert_generation_disabled(self):
-        """
-        Verify that signal is sent, received, and fires task
-        based on 'AUTO_CERTIFICATE_GENERATION' flag
-        """
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.course.id
-                )
-                mock_generate_certificate_apply_async.assert_not_called()
-
-    def test_cert_generation_on_allowlist_append_self_paced_auto_cert_generation_enabled(self):
-        """
-        Verify that signal is sent, received, and fires task
-        based on 'AUTO_CERTIFICATE_GENERATION' flag
-        """
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.course.id
-                )
-                mock_generate_certificate_apply_async.assert_called_with(
-                    countdown=CERTIFICATE_DELAY_SECONDS,
-                    kwargs={
-                        'student': str(self.user.id),
-                        'course_key': str(self.course.id),
-                    }
-                )
-
-    def test_cert_generation_on_allowlist_append_instructor_paced_cert_generation_disabled(self):
-        """
-        Verify that signal is sent, received, and fires task
-        based on 'AUTO_CERTIFICATE_GENERATION' flag
-        """
-        with mock.patch(
-                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-                return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.ip_course.id
-                )
-                mock_generate_certificate_apply_async.assert_not_called()
-
-    def test_cert_generation_on_allowlist_append_instructor_paced_cert_generation_enabled(self):
-        """
-        Verify that signal is sent, received, and fires task
-        based on 'AUTO_CERTIFICATE_GENERATION' flag
-        """
-        with mock.patch(
-                'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-                return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                CertificateWhitelistFactory(
-                    user=self.user,
-                    course_id=self.ip_course.id
-                )
-                mock_generate_certificate_apply_async.assert_called_with(
-                    countdown=CERTIFICATE_DELAY_SECONDS,
-                    kwargs={
-                        'student': str(self.user.id),
-                        'course_key': str(self.ip_course.id),
-                    }
-                )
-
     @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
-    def test_fire_task_allowlist_enabled(self):
+    def test_fire_task_allowlist_auto_enabled(self):
         """
-        Test that the allowlist generation is invoked if the allowlist is enabled for a user on the list
+        Test that the allowlist generation is invoked if automatic generation is enabled
         """
         with mock.patch(
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
@@ -182,9 +100,31 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_not_called()
                     mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
 
+    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
+    def test_fire_task_allowlist_auto_disabled(self):
+        """
+        Test that the allowlist generation is not invoked if automatic generation is disabled
+        """
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_generate_certificate_apply_async:
+            with mock.patch(
+                'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
+                return_value=None
+            ) as mock_generate_allowlist_task:
+                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
+                    CertificateWhitelistFactory(
+                        user=self.user,
+                        course_id=self.ip_course.id,
+                        whitelist=True
+                    )
+                    mock_generate_certificate_apply_async.assert_not_called()
+                    mock_generate_allowlist_task.assert_not_called()
+
     def test_fire_task_allowlist_disabled(self):
         """
-        Test that the normal logic is followed if the allowlist is disabled for a user on the list
+        Test that the V1 logic is followed if the allowlist is disabled
         """
         with mock.patch(
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',

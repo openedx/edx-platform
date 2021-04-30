@@ -1999,19 +1999,19 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         """
         Verify that certificates generated for all eligible students enrolled in a course.
         """
-        # create 10 students
+        # Create 10 students
         students = self._create_students(10)
 
-        # mark 2 students to have certificates generated already
+        # Grant 2 students downloadable certs
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # white-list 5 students
+        # Allowlist 5 students
         for student in students[2:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
@@ -2027,37 +2027,27 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         with self.assertNumQueries(170):
             self.assertCertificatesGenerated(task_input, expected_results)
 
-        expected_results = {
-            'action_name': 'certificates generated',
-            'total': 10,
-            'attempted': 0,
-            'succeeded': 0,
-            'failed': 0,
-            'skipped': 10
-        }
-        with self.assertNumQueries(3):
-            self.assertCertificatesGenerated(task_input, expected_results)
-
     @ddt.data(
         CertificateStatuses.downloadable,
         CertificateStatuses.generating,
         CertificateStatuses.notpassing,
         CertificateStatuses.audit_passing,
     )
-    def test_certificate_generation_all_whitelisted(self, status):
+    def test_certificate_generation_all_allowlisted(self, status):
         """
-        Verify that certificates are generated for all white-listed students,
+        Verify that certificates are generated for all allowlisted students,
         whether or not they already had certs generated for them.
         """
+        # Create 5 students
         students = self._create_students(5)
 
-        # whitelist 3
+        # Allowlist 3 students
         for student in students[:3]:
             CertificateWhitelistFactory.create(
                 user=student, course_id=self.course.id, whitelist=True
             )
 
-        # generate certs for 2
+        # Grant certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
@@ -2066,7 +2056,8 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             )
 
         task_input = {'student_set': 'all_whitelisted'}
-        # only certificates for the 3 whitelisted students should have been run
+
+        # Only certificates for the 3 allowlisted students should have been run
         expected_results = {
             'action_name': 'certificates generated',
             'total': 3,
@@ -2077,16 +2068,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         }
         self.assertCertificatesGenerated(task_input, expected_results)
 
-        # the first 3 students (who were whitelisted) have passing
-        # certificate statuses
-        for student in students[:3]:
-            assert GeneratedCertificate.certificate_for_student(student, self.course.id).status in\
-                   CertificateStatuses.PASSED_STATUSES
-
-        # The last 2 students still don't have certs
-        for student in students[3:]:
-            assert GeneratedCertificate.certificate_for_student(student, self.course.id) is None
-
     @ddt.data(
         (CertificateStatuses.downloadable, 2),
         (CertificateStatuses.generating, 2),
@@ -2094,15 +2075,15 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         (CertificateStatuses.audit_passing, 4),
     )
     @ddt.unpack
-    def test_certificate_generation_whitelisted_not_generated(self, status, expected_certs):
+    def test_certificate_generation_allowlist_not_generated(self, status, expected_certs):
         """
         Verify that certificates are generated only for those students
         who do not have `downloadable` or `generating` certificates.
         """
-        # create 5 students
+        # Create 5 students
         students = self._create_students(5)
 
-        # mark 2 students to have certificates generated already
+        # Grant certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
@@ -2110,7 +2091,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 status=status,
             )
 
-        # white-list 4 students
+        # Allowlist 4 students
         for student in students[:4]:
             CertificateWhitelistFactory.create(
                 user=student, course_id=self.course.id, whitelist=True
@@ -2118,7 +2099,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         task_input = {'student_set': 'whitelisted_not_generated'}
 
-        # certificates should only be generated for the whitelisted students
+        # Certificates should only be generated for the allowlisted students
         # who do not yet have passing certificates.
         expected_results = {
             'action_name': 'certificates generated',
@@ -2132,15 +2113,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             task_input,
             expected_results
         )
-
-        # the first 4 students have passing certificate statuses since
-        # they either were whitelisted or had one before
-        for student in students[:4]:
-            assert GeneratedCertificate.certificate_for_student(student, self.course.id).status in\
-                   CertificateStatuses.PASSED_STATUSES
-
-        # The last student still doesn't have a cert
-        assert GeneratedCertificate.certificate_for_student(students[4], self.course.id) is None
 
     def test_certificate_generation_specific_student(self):
         """
@@ -2187,37 +2159,37 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
         certificate statuses lies in the list 'statuses_to_regenerate' given in task_input.
         """
-        # create 10 students
+        # Create 10 students
         students = self._create_students(10)
 
-        # mark 2 students to have certificates generated already
+        # Grant downloadable certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # mark 3 students to have certificates generated with status 'error'
+        # Grant error certs to 3 students
         for student in students[2:5]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.error,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # mark 6th students to have certificates generated with status 'deleted'
+        # Grant a deleted cert to the 6th student
         for student in students[5:6]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.deleted,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # white-list 7 students
+        # Allowlist 7 students
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
@@ -2247,53 +2219,50 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # Default grade for students
         default_grade = '-1'
 
-        # create 10 students
+        # Create 10 students
         students = self._create_students(10)
 
-        # mark 2 students to have certificates generated already
+        # Grant downloadable certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark 3 students to have certificates generated with status 'error'
+        # Grant error certs to 3 students
         for student in students[2:5]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.error,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark 6th students to have certificates generated with status 'deleted'
+        # Grant a deleted cert to the 6th student
         for student in students[5:6]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.deleted,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark rest of the 4 students with having generated certificates with status 'generating'
-        # These students are not added in white-list and they have not completed grades so certificate generation
-        # for these students should fail other than the one student that has been added to white-list
-        # so from these students 3 failures and 1 success
+        # Grant generating certs to 4 students
         for student in students[6:]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.generating,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # white-list 7 students
+        # Allowlist 7 students
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
@@ -2312,26 +2281,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         self.assertCertificatesGenerated(task_input, expected_results)
 
-        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
-            user__in=students,
-            course_id=self.course.id,
-            mode='honor'
-        )
-        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
-        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
-
-        # Verify from results from database
-        # Certificates are being generated for 2 white-listed students that had statuses in 'deleted'' and 'generating'
-        assert certificate_statuses.count(CertificateStatuses.generating) == 2
-        # 5 students are skipped that had Certificate Status 'downloadable' and 'error'
-        assert certificate_statuses.count(CertificateStatuses.downloadable) == 2
-        assert certificate_statuses.count(CertificateStatuses.error) == 3
-
-        # grades will be '0.0' as students are either white-listed or ending in error
-        assert certificate_grades.count('0.0') == 5
-        # grades will be '-1' for students that were skipped
-        assert certificate_grades.count(default_grade) == 5
-
     def test_certificate_regeneration_with_existing_unavailable_status(self):
         """
         Verify that certificates are regenerated for all eligible students enrolled in a course whose generated
@@ -2341,50 +2290,50 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # Default grade for students
         default_grade = '-1'
 
-        # create 10 students
+        # Create 10 students
         students = self._create_students(10)
 
-        # mark 2 students to have certificates generated already
+        # Grant downloadable certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark 3 students to have certificates generated with status 'error'
+        # Grant error certs to 3 students
         for student in students[2:5]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.error,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark 2 students to have generated certificates with status 'unavailable'
+        # Grant unavailable certs to 2 students
         for student in students[5:7]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.unavailable,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # mark 3 students to have generated certificates with status 'generating'
+        # Grant generating certs to 3 students
         for student in students[7:]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.generating,
-                mode='honor',
+                mode=GeneratedCertificate.CourseMode.VERIFIED,
                 grade=default_grade
             )
 
-        # white-list all students
+        # Allowlist all students
         for student in students[:]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
@@ -2412,76 +2361,50 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             expected_results
         )
 
-        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
-            user__in=students,
-            course_id=self.course.id,
-            mode='honor'
-        )
-        certificate_statuses = [generated_certificate.status for generated_certificate in generated_certificates]
-        certificate_grades = [generated_certificate.grade for generated_certificate in generated_certificates]
-
-        # Verify from results from database
-        # Certificates are being generated for 8 students that had statuses in 'downloadable', 'error' and 'generating'
-        assert certificate_statuses.count(CertificateStatuses.generating) == 8
-        # 2 students are skipped that had Certificate Status 'unavailable'
-        assert certificate_statuses.count(CertificateStatuses.unavailable) == 2
-
-        # grades will be '0.0' as students are white-listed and have not completed any tasks
-        assert certificate_grades.count('0.0') == 8
-        # grades will be '-1' for students that have not been processed
-        assert certificate_grades.count(default_grade) == 2
-
-        # Verify that students with status 'unavailable were skipped
-        unavailable_certificates = \
-            [cert for cert in generated_certificates
-             if cert.status == CertificateStatuses.unavailable and cert.grade == default_grade]
-
-        assert len(unavailable_certificates) == 2
-
     def test_certificate_regeneration_for_students(self):
         """
         Verify that certificates are regenerated for all students passed in task_input.
         """
-        # create 10 students
+        # Create 10 students
         students = self._create_students(10)
 
-        # mark 2 students to have certificates generated already
+        # Grant downloadable certs to 2 students
         for student in students[:2]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.downloadable,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # mark 3 students to have certificates generated with status 'error'
+        # Grant error certs to 3 students
         for student in students[2:5]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.error,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # mark 6th students to have certificates generated with status 'deleted'
+        # Grant a deleted cert to the 6th student
         for student in students[5:6]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.deleted,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # mark 7th students to have certificates generated with status 'notpassing'
+        # Grant a notpassing cert to the 7th student
         for student in students[6:7]:
             GeneratedCertificateFactory.create(
                 user=student,
                 course_id=self.course.id,
                 status=CertificateStatuses.notpassing,
-                mode='honor'
+                mode=GeneratedCertificate.CourseMode.VERIFIED
             )
 
-        # white-list 7 students
+        # Allowlist 7 students
         for student in students[:7]:
             CertificateWhitelistFactory.create(user=student, course_id=self.course.id, whitelist=True)
 
@@ -2516,7 +2439,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 mode='verified'
             )
 
-        # Whitelist a student
+        # Allowlist a student
         CertificateWhitelistFactory.create(user=s1, course_id=self.course.id)
 
         statuses = [CertificateStatuses.downloadable]
