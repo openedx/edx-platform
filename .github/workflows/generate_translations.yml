@@ -27,6 +27,8 @@ jobs:
           sudo apt-get update
 
       - name: Install pip requirements
+        env:
+          ADG_XBLOCKS_BRANCH: ${{ github.base_ref }}
         run: |
           python3 -m pip install pip==20.0.2
           python3 -m pip install setuptools==50.3.0
