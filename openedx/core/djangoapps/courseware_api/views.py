@@ -33,7 +33,11 @@ from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
-from lms.djangoapps.courseware.toggles import courseware_mfe_is_visible, course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import (
+    courseware_mfe_is_visible,
+    course_exit_page_is_active,
+    special_exams_is_active,
+)
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -106,6 +110,10 @@ class CoursewareMeta:
             is_global_staff=self.original_user_is_global_staff,
             is_course_staff=self.original_user_is_staff
         )
+
+    @property
+    def is_special_exams_enabled(self):
+        return special_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
