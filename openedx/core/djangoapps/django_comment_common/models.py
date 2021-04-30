@@ -16,6 +16,7 @@ from jsonfield.fields import JSONField
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from openedx.core.lib.cache_utils import request_cached
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
@@ -266,6 +267,47 @@ class CourseDiscussionSettings(models.Model):
         Un-Jsonify the divided_discussions
         """
         self._divided_discussions = json.dumps(value)
+
+    @request_cached()
+    @classmethod
+    def get(cls, course_key):
+        """
+        Get and/or create settings
+        """
+        try:
+            course_discussion_settings = cls.objects.get(course_id=course_key)
+        except cls.DoesNotExist:
+            from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
+            legacy_discussion_settings = get_legacy_discussion_settings(course_key)
+            course_discussion_settings, _ = cls.objects.get_or_create(
+                course_id=course_key,
+                defaults={
+                    'always_divide_inline_discussions': legacy_discussion_settings['always_cohort_inline_discussions'],
+                    'divided_discussions': legacy_discussion_settings['cohorted_discussions'],
+                    'division_scheme': cls.COHORT if legacy_discussion_settings['is_cohorted'] else cls.NONE
+                },
+            )
+        return course_discussion_settings
+
+    def update(self, validated_data: dict):
+        """
+        Set discussion settings for a course
+
+        Returns:
+            A CourseDiscussionSettings object
+        """
+        fields = {
+            'division_scheme': (str,)[0],
+            'always_divide_inline_discussions': bool,
+            'divided_discussions': list,
+        }
+        for field, field_type in fields.items():
+            if field in validated_data:
+                if not isinstance(validated_data[field], field_type):
+                    raise ValueError(f"Incorrect field type for `{field}`. Type must be `{field_type.__name__}`")
+                setattr(self, field, validated_data[field])
+        self.save()
+        return self
 
 
 class DiscussionsIdMapping(models.Model):

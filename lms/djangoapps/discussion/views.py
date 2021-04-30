@@ -51,11 +51,7 @@ from lms.djangoapps.discussion.exceptions import TeamDiscussionHiddenFromUserExc
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.teams import api as team_api
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
-from openedx.core.djangoapps.django_comment_common.utils import (
-    ThreadContext,
-    get_course_discussion_settings,
-    set_course_discussion_settings
-)
+from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from xmodule.modulestore.django import modulestore
@@ -76,7 +72,7 @@ def make_course_settings(course, user, include_category_map=True):
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
     """
-    course_discussion_settings = get_course_discussion_settings(course.id)
+    course_discussion_settings = CourseDiscussionSettings.get(course.id)
     group_names_by_id = get_group_names_by_id(course_discussion_settings)
     course_setting = {
         'is_discussion_division_enabled': course_discussion_division_enabled(course_discussion_settings),
@@ -225,7 +221,7 @@ def inline_discussion(request, course_key, discussion_id):
 
     with function_trace('determine_group_permissions'):
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
-        course_discussion_settings = get_course_discussion_settings(course.id)
+        course_discussion_settings = CourseDiscussionSettings.get(course.id)
         group_names_by_id = get_group_names_by_id(course_discussion_settings)
         course_is_divided = course_discussion_settings.division_scheme is not CourseDiscussionSettings.NONE
 
@@ -378,7 +374,7 @@ def _find_thread(request, course, discussion_id, thread_id):
 
     # verify that the thread belongs to the requesting student's group
     is_moderator = has_permission(request.user, "see_all_cohorts", course.id)
-    course_discussion_settings = get_course_discussion_settings(course.id)
+    course_discussion_settings = CourseDiscussionSettings.get(course.id)
     if is_commentable_divided(course.id, discussion_id, course_discussion_settings) and not is_moderator:
         user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
@@ -489,7 +485,7 @@ def _create_discussion_board_context(request, base_context, thread=None):
         add_courseware_context(threads, course, user)
 
     with function_trace("get_cohort_info"):
-        course_discussion_settings = get_course_discussion_settings(course_key)
+        course_discussion_settings = CourseDiscussionSettings.get(course_key)
         user_group_id = get_group_id_for_user(user, course_discussion_settings)
 
     context.update({
@@ -563,7 +559,7 @@ def create_user_profile_context(request, course_key, user_id):
         ).order_by("name").values_list("name", flat=True).distinct()
 
         with function_trace("get_cohort_info"):
-            course_discussion_settings = get_course_discussion_settings(course_key)
+            course_discussion_settings = CourseDiscussionSettings.get(course_key)
             user_group_id = get_group_id_for_user(request.user, course_discussion_settings)
 
         context = _create_base_discussion_view_context(request, course_key)
@@ -909,7 +905,7 @@ def course_discussions_settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
-    discussion_settings = get_course_discussion_settings(course_key)
+    discussion_settings = CourseDiscussionSettings.get(course_key)
 
     if request.method == 'PATCH':
         divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
@@ -941,7 +937,7 @@ def course_discussions_settings_handler(request, course_key_string):
 
         try:
             if settings_to_change:
-                discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+                discussion_settings.update(settings_to_change)
 
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).

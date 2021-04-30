@@ -33,7 +33,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     DiscussionsIdMapping,
     Role
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
@@ -358,7 +357,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
 
     xblocks = get_accessible_discussion_xblocks(course, user)
 
-    discussion_settings = get_course_discussion_settings(course.id)
+    discussion_settings = CourseDiscussionSettings.get(course.id)
     discussion_division_enabled = course_discussion_division_enabled(discussion_settings)
     divided_discussion_ids = discussion_settings.divided_discussions
 
@@ -797,7 +796,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
             del endorsement["user_id"]
 
     if discussion_division_enabled is None:
-        discussion_division_enabled = course_discussion_division_enabled(get_course_discussion_settings(course_key))
+        discussion_division_enabled = course_discussion_division_enabled(CourseDiscussionSettings.get(course_key))
 
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
@@ -816,7 +815,7 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
     if discussion_division_enabled:
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
-            course_discussion_settings = get_course_discussion_settings(course_key)
+            course_discussion_settings = CourseDiscussionSettings.get(course_key)
             if group_names_by_id:
                 content['group_name'] = group_names_by_id.get(content.get('group_id'))
             else:
@@ -843,7 +842,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
     Raises:
         ValueError if the requested group_id is invalid
     """
-    course_discussion_settings = get_course_discussion_settings(course_key)
+    course_discussion_settings = CourseDiscussionSettings.get(course_key)
     if commentable_id is None or is_commentable_divided(course_key, commentable_id, course_discussion_settings):
         if request.method == "GET":
             requested_group_id = request.GET.get('group_id')
@@ -870,7 +869,7 @@ def get_group_id_for_user_from_cache(user, course_id):
     Caches the results of get_group_id_for_user, but serializes the course_id
     instead of the course_discussions_settings object as cache keys.
     """
-    return get_group_id_for_user(user, get_course_discussion_settings(course_id))
+    return get_group_id_for_user(user, CourseDiscussionSettings.get(course_id))
 
 
 def get_group_id_for_user(user, course_discussion_settings):
@@ -922,7 +921,7 @@ def is_commentable_divided(course_key, commentable_id, course_discussion_setting
         Http404 if the course doesn't exist.
     """
     if not course_discussion_settings:
-        course_discussion_settings = get_course_discussion_settings(course_key)
+        course_discussion_settings = CourseDiscussionSettings.get(course_key)
 
     course = get_course_by_id(course_key)
 

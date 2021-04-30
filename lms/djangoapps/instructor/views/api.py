@@ -77,7 +77,6 @@ from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_course_discussion_settings,
     get_group_id_for_user,
     get_group_name,
     has_forum_access
@@ -103,6 +102,7 @@ from lms.djangoapps.instructor_task.models import ReportStore
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.django_comment_common.models import (
+    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
@@ -2131,7 +2131,7 @@ def list_forum_members(request, course_id):
     except Role.DoesNotExist:
         users = []
 
-    course_discussion_settings = get_course_discussion_settings(course_id)
+    course_discussion_settings = CourseDiscussionSettings.get(course_id)
 
     def extract_user_info(user):
         """ Convert user to dict for json rendering. """

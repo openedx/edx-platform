@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -48,10 +47,7 @@ from lms.djangoapps.discussion.views import get_divided_discussions
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.django_comment_common.utils import (
-    get_course_discussion_settings,
-    set_course_discussion_settings
-)
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -756,22 +752,6 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
     parser_classes = (JSONParser, MergePatchParser,)
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
 
-    def _get_representation(self, course, course_key, discussion_settings):
-        """
-        Return a serialized representation of the course discussion settings.
-        """
-        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-            course, discussion_settings
-        )
-        return JsonResponse({
-            'id': discussion_settings.id,
-            'divided_inline_discussions': divided_inline_discussions,
-            'divided_course_wide_discussions': divided_course_wide_discussions,
-            'always_divide_inline_discussions': discussion_settings.always_divide_inline_discussions,
-            'division_scheme': discussion_settings.division_scheme,
-            'available_division_schemes': available_division_schemes(course_key)
-        })
-
     def _get_request_kwargs(self, course_id):
         return dict(course_id=course_id)
 
@@ -787,8 +767,17 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
 
         course_key = form.cleaned_data['course_key']
         course = form.cleaned_data['course']
-        discussion_settings = get_course_discussion_settings(course_key)
-        return self._get_representation(course, course_key, discussion_settings)
+        discussion_settings = CourseDiscussionSettings.get(course_key)
+        serializer = DiscussionSettingsSerializer(
+            discussion_settings,
+            context={
+                'course': course,
+                'settings': discussion_settings,
+            },
+            partial=True,
+        )
+        response = Response(serializer.data)
+        return response
 
     def patch(self, request, course_id):
         """
@@ -804,24 +793,20 @@ class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
 
         course = form.cleaned_data['course']
         course_key = form.cleaned_data['course_key']
-        discussion_settings = get_course_discussion_settings(course_key)
+        discussion_settings = CourseDiscussionSettings.get(course_key)
 
         serializer = DiscussionSettingsSerializer(
+            discussion_settings,
+            context={
+                'course': course,
+                'settings': discussion_settings,
+            },
             data=request.data,
             partial=True,
-            course=course,
-            discussion_settings=discussion_settings
         )
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
-
-        settings_to_change = serializer.validated_data['settings_to_change']
-
-        try:
-            discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
-        except ValueError as e:
-            raise ValidationError(str(e))  # lint-amnesty, pylint: disable=raise-missing-from
-
+        serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -907,7 +892,7 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         role = form.cleaned_data['role']
 
         data = {'course_id': course_id, 'users': role.users.all()}
-        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+        context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
 
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
@@ -937,6 +922,6 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
 
         role = form.cleaned_data['role']
         data = {'course_id': course_id, 'users': role.users.all()}
-        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+        context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
