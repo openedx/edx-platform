@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
+from django.db import transaction
 
 
 class Command(BaseCommand):
@@ -16,6 +17,7 @@ class Command(BaseCommand):
             type=str,
         )
 
+    @transaction.atomic
     def handle(self, *args, **options):
         domain = options['domain']
         try:
