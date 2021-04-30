@@ -124,20 +124,23 @@ def _assert_block_is_gated(block, is_gated, user, course, request_factory, has_u
             assert 'content-paywall' not in content
 
     fake_request = request_factory.get('')
-    with patch('lms.djangoapps.course_api.blocks.api.is_request_from_mobile_app', return_value=False):
-        requested_fields = ['display_name', 'block_id', 'student_view_url', 'student_view_data']
-        blocks = get_blocks(fake_request, course.location, user=user, requested_fields=requested_fields, student_view_data=['html'])
-        course_api_block = blocks['blocks'][str(block.location)]
-        if is_gated:
-            assert 'authorization_denial_reason' in course_api_block
-            assert "display_name" in course_api_block
-            assert "block_id" in course_api_block
-            assert "student_view_url" in course_api_block
-            assert "student_view_data" not in course_api_block
-        else:
-            assert 'authorization_denial_reason' not in course_api_block
-            if block.category == 'html':
-                assert 'student_view_data' in course_api_block
+    requested_fields = ['block_id', 'contains_gated_content', 'display_name', 'student_view_data', 'student_view_url']
+    blocks = get_blocks(fake_request, course.location, user=user, requested_fields=requested_fields,
+                        student_view_data=['html'])
+    course_api_block = blocks['blocks'][str(block.location)]
+
+    assert course_api_block.get('contains_gated_content', False) == is_gated
+
+    if is_gated:
+        assert 'authorization_denial_reason' in course_api_block
+        assert 'block_id' in course_api_block
+        assert 'display_name' in course_api_block
+        assert 'student_view_data' not in course_api_block
+        assert 'student_view_url' in course_api_block
+    else:
+        assert 'authorization_denial_reason' not in course_api_block
+        if block.category == 'html':
+            assert 'student_view_data' in course_api_block
 
 
 def _assert_block_is_empty(block, user_id, course, request_factory):
