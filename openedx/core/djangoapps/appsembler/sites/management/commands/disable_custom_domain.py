@@ -24,7 +24,7 @@ class Command(BaseCommand):
             # find the site that matches the custom domain to disable
             s = Site.objects.get(domain=domain)
 
-            # update it's corresponding Site
+            # update its corresponding Site
             ad = s.alternative_domain
             s.domain = ad.domain
             s.save()
