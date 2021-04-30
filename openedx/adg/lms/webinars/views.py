@@ -11,7 +11,7 @@ from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .helpers import send_webinar_registration_email
+from .helpers import cancel_all_reminders, schedule_webinar_reminders, send_webinar_registration_email
 from .models import Webinar, WebinarRegistration
 
 
@@ -57,10 +57,16 @@ class WebinarRegistrationView(LoginRequiredMixin, SingleObjectMixin, View):
         ).first()
 
         if not registered_webinar_for_user:
-            WebinarRegistration.objects.update_or_create(
+            registration, created = WebinarRegistration.objects.update_or_create(
                 webinar=self.object, user=user, defaults={'is_registered': is_registering}
             )
-            # pylint: disable=expression-not-assigned
-            send_webinar_registration_email(self.object, user.email) if is_registering else None
+
+            if is_registering:
+                send_webinar_registration_email(self.object, user.email)
+                if not registration.is_team_member_registration:
+                    schedule_webinar_reminders([user.email], self.object.to_dict())
+
+            elif not created and not registration.is_team_member_registration:
+                cancel_all_reminders([registration])
 
         return redirect(reverse('webinar_event', kwargs={'pk': pk}))
