@@ -41,7 +41,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
 from common.djangoapps.student.tests.test_email import mock_render_to_string
-from common.djangoapps.student.models import AccountRecovery
+from common.djangoapps.student.models import AccountRecovery, LoginFailures
 
 from common.djangoapps.util.password_policy_validators import create_validator_config
 from common.djangoapps.util.testing import EventTestMixin
@@ -611,6 +611,66 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertRaises(Http404, PasswordResetConfirmWrapper.as_view(), reset_request, uidb36=self.uidb36,
                           token=self.token)
 
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True}, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_with_login_failures_feature_enabled(self):
+        """
+        Tests that user's login failures lockout counter is reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password1'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+
+        # Verify the response status code is 302 with password reset success and also verify that
+        # the user's login failures lockout count is reset.
+        assert resp.status_code == 302
+        assert not LoginFailures.is_user_locked_out(confirm_request.user)
+
+        # Verify that the user's login failures lockout counter is not reset upon
+        # password reset failure.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request with mismatching passwords.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+        assert resp.status_code == 200
+        assert LoginFailures.is_user_locked_out(self.user)
+
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_with_login_failures_feature_disabled(self):
+        """
+        Tests that user's login failures lockout counter is not reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # does not reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        request_params = {'new_password1': 'password1', 'new_password2': 'password1'}
+        confirm_request = self.request_factory.post(self.password_reset_confirm_url, data=request_params)
+        self.setup_request_session_with_token(confirm_request)
+        confirm_request.user = self.user
+
+        # Make a password reset request.
+        resp = PasswordResetConfirmWrapper.as_view()(confirm_request, uidb36=self.uidb36, token=self.token)
+
+        # Verify that the user's login failures lockout count is not reset.
+        assert resp.status_code == 302
+        assert not LoginFailures.is_feature_enabled()
+        assert LoginFailures.is_user_locked_out(confirm_request.user)
+
 
 @ddt.ddt
 @skip_unless_lms
@@ -872,3 +932,53 @@ class ResetPasswordAPITests(EventTestMixin, CacheIsolationTestCase):
             assert response.status_code != 429
         response = self.client.post(path, request_param)
         assert response.status_code == 429
+
+    @override_settings(FEATURES={'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True}, MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_request_with_login_failures_feature_enabled(self):
+        """
+        Tests that user's login failures lockout counter is reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False)
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        json_response = reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+        json_response = json.loads(json_response.content.decode('utf-8'))
+
+        # Verify that the user's login failures lockout count is reset.
+        assert json_response.get('reset_status')
+        assert not LoginFailures.is_user_locked_out(self.user)
+
+        # Verify that the user's login failures lockout counter is not reset upon
+        # password reset failure.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False, 'new_password2')
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+
+        assert LoginFailures.is_user_locked_out(self.user)
+
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=1)
+    def test_password_reset_request_with_login_failures_feature_disabled(self):
+        """
+        Tests that user's login failures lockout counter is not reset upon successful password reset.
+        """
+
+        # Adding an entry in LoginFailures to verify the password reset endpoint
+        # does not reset the user's login failures lockout counter.
+        LoginFailures.increment_lockout_counter(self.user)
+
+        post_request = self.create_reset_request(self.uidb36, self.token, False)
+        post_request.user = AnonymousUser()
+        reset_view = LogistrationPasswordResetView.as_view()
+        reset_view(post_request, uidb36=self.uidb36, token=self.token).render()
+
+        # Verify that the user's login failures lockout count is not reset.
+        assert not LoginFailures.is_feature_enabled()
+        assert LoginFailures.is_user_locked_out(self.user)
