@@ -25,8 +25,8 @@ from lms.djangoapps.certificates.generation_handler import (
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import (
+    CertificateAllowlistFactory,
     CertificateInvalidationFactory,
-    CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -64,7 +64,7 @@ class AllowlistTests(ModuleStoreTestCase):
         )
 
         # Whitelist user
-        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
 
     def test_is_using_allowlist_true(self):
         """
@@ -89,7 +89,7 @@ class AllowlistTests(ModuleStoreTestCase):
             is_active=True,
             mode="verified",
         )
-        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=u, whitelist=False)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=u, whitelist=False)
         assert not is_using_certificate_allowlist_and_is_on_allowlist(u, self.course_run_key)
 
     @ddt.data(
@@ -171,7 +171,7 @@ class AllowlistTests(ModuleStoreTestCase):
         u = UserFactory()
         cr = CourseFactory()
         key = cr.id  # pylint: disable=no-member
-        CertificateWhitelistFactory.create(course_id=key, user=u)
+        CertificateAllowlistFactory.create(course_id=key, user=u)
         assert not _can_generate_allowlist_certificate(u, key)
         assert _set_allowlist_cert_status(u, key) is None
 
@@ -188,7 +188,7 @@ class AllowlistTests(ModuleStoreTestCase):
             is_active=True,
             mode="audit",
         )
-        CertificateWhitelistFactory.create(course_id=key, user=u)
+        CertificateAllowlistFactory.create(course_id=key, user=u)
 
         assert not _can_generate_allowlist_certificate(u, key)
         assert _set_allowlist_cert_status(u, key) is None
@@ -228,7 +228,7 @@ class AllowlistTests(ModuleStoreTestCase):
             mode=GeneratedCertificate.MODES.verified,
             status=CertificateStatuses.downloadable
         )
-        CertificateWhitelistFactory.create(course_id=key, user=u)
+        CertificateAllowlistFactory.create(course_id=key, user=u)
         CertificateInvalidationFactory.create(
             generated_certificate=cert,
             invalidated_by=self.user,

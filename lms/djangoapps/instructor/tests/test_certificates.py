@@ -32,8 +32,8 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tests.factories import (
+    CertificateAllowlistFactory,
     CertificateInvalidationFactory,
-    CertificateWhitelistFactory,
     GeneratedCertificateFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
@@ -495,7 +495,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.user2, self.course.id)
         self.url = reverse('certificate_exception_view', kwargs={'course_id': str(self.course.id)})
 
-        certificate_white_list_item = CertificateWhitelistFactory.create(
+        certificate_white_list_item = CertificateAllowlistFactory.create(
             user=self.user2,
             course_id=self.course.id,
         )
@@ -797,7 +797,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.user = UserFactory()
         CourseEnrollment.enroll(self.user, self.course.id)
-        certificate_exception = CertificateWhitelistFactory.create(
+        certificate_exception = CertificateAllowlistFactory.create(
             user=self.user,
             course_id=self.course.id,
         )
@@ -1321,7 +1321,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         invalidation lists.
         """
         # add test learner to the allowlist
-        CertificateWhitelistFactory.create(user=self.enrolled_user_1, course_id=self.course.id)
+        CertificateAllowlistFactory.create(user=self.enrolled_user_1, course_id=self.course.id)
 
         # now try and add them to the invalidation list, expect an error
         response = self.client.post(
