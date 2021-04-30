@@ -44,6 +44,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     course_end = serializers.DateTimeField(source="end", format=None)
     invite_only = serializers.BooleanField(source="invitation_only")
     course_modes = serializers.SerializerMethodField()
+    pacing_type = serializers.SerializerMethodField()
 
     class Meta:
         # For disambiguating within the drf-yasg swagger schema
@@ -66,6 +67,12 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
             ModeSerializer(mode).data
             for mode in course_modes
         ]
+
+    def get_pacing_type(self, obj):
+        """
+        Get a string representation of the course pacing.
+        """
+        return "Self Paced" if obj.self_paced else "Instructor Paced"
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):

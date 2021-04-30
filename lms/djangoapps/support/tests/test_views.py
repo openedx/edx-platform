@@ -37,6 +37,7 @@ from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -290,6 +291,26 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         }, data[0])
         assert {CourseMode.VERIFIED, CourseMode.AUDIT, CourseMode.HONOR, CourseMode.NO_ID_PROFESSIONAL_MODE,
                 CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE} == {mode['slug'] for mode in data[0]['course_modes']}
+
+    @ddt.data(
+        (True, 'Self Paced'),
+        (False, 'Instructor Paced')
+    )
+    @ddt.unpack
+    def test_pacing_type(self, is_self_paced, pacing_type):
+        """
+        Test correct pacing type is returned in the enrollment.
+        """
+        # Course enrollment is made against course overview. Therefore, the self_paced
+        # attr of course overview needs to be updated before getting the enrollment data.
+        course_overview = CourseOverview.get_from_id(self.course.id)
+        course_overview.self_paced = is_self_paced
+        course_overview.save()
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert len(data) == 1
+        self.assertEqual(data[0]['pacing_type'], pacing_type)
 
     def test_get_manual_enrollment_history(self):
         ManualEnrollmentAudit.create_manual_enrollment_audit(
