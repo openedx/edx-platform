@@ -16,6 +16,50 @@ securityDefinitions:
 security:
   - Basic: []
 paths:
+  /agreements/v1/integrity_signature/{course_id}:
+    get:
+      operationId: agreements_v1_integrity_signature_read
+      summary: In order to check whether the user has signed the integrity agreement
+        for a given course.
+      description: |-
+        Should return the following:
+            username (str)
+            course_id (str)
+            created_at (str)
+
+        If a username is not given, it should default to the requesting user (or masqueraded user).
+        Only staff should be able to access this endpoint for other users.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - agreements
+    post:
+      operationId: agreements_v1_integrity_signature_create
+      description: |-
+        Create an integrity signature for the requesting user and course. If a signature
+        already exists, returns the existing signature instead of creating a new one.
+
+        /api/agreements/v1/integrity_signature/{course_id}
+
+        Example response:
+            {
+                username: "janedoe",
+                course_id: "org.2/course_2/Run_2",
+                created_at: "2021-04-23T18:25:43.511Z"
+            }
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - agreements
+    parameters:
+      - name: course_id
+        in: path
+        required: true
+        type: string
   /badges/v1/assertions/user/{username}/:
     get:
       operationId: badges_v1_assertions_user_read
@@ -1316,15 +1360,14 @@ paths:
                              'Pass' is not included.
             studio_url: (str) a str of the link to the grading in studio for the course
             verification_data: an object containing
-                link: (str) the link to either start or retry verification
-                status: (str) the status of the verification
-                status_date: (str) the date time string of when the verification status was set
+                link: (str) the link to either start or retry ID verification
+                status: (str) the status of the ID verification
+                status_date: (str) the date time string of when the ID verification status was set
 
         **Returns**
 
             * 200 on success with above fields.
-            * 302 if the user is not enrolled.
-            * 401 if the user is not authenticated.
+            * 401 if the user is not authenticated or not enrolled.
             * 404 if the course is not available or cannot be seen.
       parameters: []
       responses:
@@ -2517,6 +2560,7 @@ paths:
             * can_load_course: Whether the user can view the course (AccessResponse object)
             * is_staff: Whether the effective user has staff access to the course
             * original_user_is_staff: Whether the original user has staff access to the course
+            * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
             * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
                 passing grade
             * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
@@ -5992,35 +6036,6 @@ paths:
       tags:
         - toggles
     parameters: []
-  /user/v1/account/login_session/:
-    get:
-      operationId: user_v1_account_login_session_list
-      description: HTTP end-points for logging in users.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - user
-    post:
-      operationId: user_v1_account_login_session_create
-      summary: Log in a user.
-      description: |-
-        See `login_user` for details.
-
-        Example Usage:
-
-            POST /api/user/v1/login_session
-            with POST params `email`, `password`.
-
-            200 {'success': true}
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-        - user
-    parameters: []
   /user/v1/account/password_reset/:
     get:
       operationId: user_v1_account_password_reset_list
@@ -6861,6 +6876,39 @@ paths:
       tags:
         - user
     parameters: []
+  /user/{api_version}/account/login_session/:
+    get:
+      operationId: user_account_login_session_list
+      description: HTTP end-points for logging in users.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - user
+    post:
+      operationId: user_account_login_session_create
+      summary: Log in a user.
+      description: |-
+        See `login_user` for details.
+
+        Example Usage:
+
+            POST /api/user/v1/login_session
+            with POST params `email`, `password`.
+
+            200 {'success': true}
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - user
+    parameters:
+      - name: api_version
+        in: path
+        required: true
+        type: string
   /val/v0/videos/:
     get:
       operationId: val_v0_videos_list
@@ -7394,6 +7442,14 @@ definitions:
       - celebrations
     type: object
     properties:
+      can_show_upgrade_sock:
+        title: Can show upgrade sock
+        type: string
+        readOnly: true
+      verified_mode:
+        title: Verified mode
+        type: string
+        readOnly: true
       course_id:
         title: Course id
         type: string
@@ -7815,6 +7871,14 @@ definitions:
       - verification_data
     type: object
     properties:
+      can_show_upgrade_sock:
+        title: Can show upgrade sock
+        type: string
+        readOnly: true
+      verified_mode:
+        title: Verified mode
+        type: string
+        readOnly: true
       certificate_data:
         $ref: '#/definitions/CertificateData'
       completion_summary:
