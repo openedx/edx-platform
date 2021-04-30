@@ -56,7 +56,6 @@ from lms.djangoapps.certificates.api import (
     remove_allowlist_entry,
     set_cert_generation_enabled
 )
-from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_ALLOWLIST
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
@@ -802,7 +801,6 @@ class CertificatesBrandingTest(ModuleStoreTestCase):
         assert self.configuration['urls']['TOS_AND_HONOR'] in data['company_tos_url']
 
 
-@override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 class AllowlistTests(ModuleStoreTestCase):
     """
     Tests for handling allowlist certificates
@@ -867,20 +865,6 @@ class AllowlistTests(ModuleStoreTestCase):
         users = get_allowlisted_users(self.second_course_run_key)
         assert 1 == users.count()
         assert users[0].id == self.user4.id
-
-        users = get_allowlisted_users(self.third_course_run_key)
-        assert 0 == users.count()
-
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
-    def test_get_users_allowlist_false(self):
-        """
-        Test
-        """
-        users = get_allowlisted_users(self.course_run_key)
-        assert 0 == users.count()
-
-        users = get_allowlisted_users(self.second_course_run_key)
-        assert 0 == users.count()
 
         users = get_allowlisted_users(self.third_course_run_key)
         assert 0 == users.count()
