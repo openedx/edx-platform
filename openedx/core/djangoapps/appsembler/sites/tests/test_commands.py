@@ -138,6 +138,7 @@ class TestCandidateSitesCleanupCommand(TestCase):
         assert self.get_site().domain == 'blue.newlocalhost:18000'
         assert not self.get_site().configuration.get_value('customer_gtm_id')
         assert not self.get_site().configuration.get_value('SEGMENT_KEY')
+        assert self.get_site().configuration.get_value('SITE_NAME') == self.get_site().domain
 
 
 @override_settings(
