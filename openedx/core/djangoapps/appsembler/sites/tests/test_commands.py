@@ -109,6 +109,39 @@ class CreateDevstackSiteCommandTestCase(TestCase):
 
 @override_settings(
     DEBUG=True,
+)
+class TestCandidateSitesCleanupCommand(TestCase):
+    """
+    Tests for the `danger_candidate_sites_cleanup` management command.
+    """
+    def setUp(self):
+        Application.objects.create(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID,
+                                   client_type=Application.CLIENT_CONFIDENTIAL)
+        call_command('create_devstack_site', 'blue', 'oldlocalhost')
+        site_config = self.get_site().configuration
+        site_config.site_values.update({
+            'SEGMENT_KEY': 'test1',
+            'customer_gtm_id': 'test2',
+        })
+        site_config.save()
+
+    def get_site(self):
+        return Site.objects.get(domain__startswith='blue.')
+
+    def test_run(self):
+        assert self.get_site().domain == 'blue.oldlocalhost:18000'
+        active_orgs = Organization.objects.all()
+        active_orgs_function_path = 'openedx.core.djangoapps.appsembler.sites.utils.get_active_organizations'
+        with patch(active_orgs_function_path, return_value=active_orgs):
+            # Side-step the `Tier` model.
+            call_command('danger_candidate_sites_cleanup', 'oldlocalhost:18000', 'newlocalhost:18000')
+        assert self.get_site().domain == 'blue.newlocalhost:18000'
+        assert not self.get_site().configuration.get_value('customer_gtm_id')
+        assert not self.get_site().configuration.get_value('SEGMENT_KEY')
+
+
+@override_settings(
+    DEBUG=True,
     DEFAULT_SITE_THEME='edx-theme-codebase',
 )
 @patch.dict('django.conf.settings.FEATURES', {
