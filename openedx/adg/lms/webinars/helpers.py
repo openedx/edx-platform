@@ -1,6 +1,7 @@
 """
 Helpers for webinars app
 """
+from datetime import datetime, timedelta
 from itertools import chain
 
 from django.core.exceptions import ValidationError
@@ -8,30 +9,32 @@ from django.core.validators import validate_email
 from django.utils.timezone import now
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
+from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
+
+from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINARS_TIME_FORMAT
 
 
-def send_webinar_emails(template_slug, webinar_title, webinar_description, webinar_start_time, recipient_emails):
+def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
     """
     Send webinar email to the list of given email addresses using the given template and data
 
     Arguments:
         template_slug (str): Slug for the chosen email template
-        webinar_title (str): Title of the webinar
-        webinar_description (str): Description of the webinar
-        webinar_start_time (Datetime): Start datetime of the webinar
+        webinar (Webinar): Webinar object
         recipient_emails (list):  List of email addresses (str) to send the email to
+        send_at (str): A String containing the time at which email will be sent
 
     Returns:
         None
     """
     context = {
-        'webinar_title': webinar_title,
-        'webinar_description': webinar_description,
-        'webinar_start_time': webinar_start_time.strftime("%B %d, %Y %I:%M %p %Z")
+        'webinar_id': webinar.id,
+        'webinar_title': webinar.title,
+        'webinar_description': webinar.description,
+        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
     }
 
-    task_send_mandrill_email.delay(template_slug, recipient_emails, context)
+    task_send_mandrill_email.delay(template_slug, recipient_emails, context, send_at)
 
 
 def send_cancellation_emails_for_given_webinars(cancelled_webinars):
@@ -58,10 +61,24 @@ def send_cancellation_emails_for_given_webinars(cancelled_webinars):
 
         send_webinar_emails(
             MandrillClient.WEBINAR_CANCELLATION,
-            cancelled_webinar.title,
-            cancelled_webinar.description,
-            cancelled_webinar.start_time,
+            cancelled_webinar,
             list(webinar_email_addresses)
+        )
+
+
+def cancel_reminders_for_given_webinars(webinars):
+    """
+    Cancels all the reminders for the given webinars.
+
+    Args:
+        webinars (list): List of webinars for which reminders will be cancelled.
+
+    Returns:
+        None
+    """
+    for webinar in webinars:
+        cancel_all_reminders(
+            webinar.registrations.webinar_team_and_active_user_registrations()
         )
 
 
@@ -82,6 +99,62 @@ def send_webinar_registration_email(webinar, email):
         'webinar_link': webinar.meeting_link,
         'webinar_start_time': webinar.start_time.strftime('%b %d, %Y %I:%M %p GMT'),
     })
+
+
+def schedule_webinar_reminders(user_emails, email_context):
+    """
+    Schedule reminders for a webinar on mandrill.
+
+    Args:
+        user_emails (list): List of user emails to schedule reminders.
+        email_context (dict): Webinar reminders context.
+
+    Returns:
+        None
+    """
+    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINARS_TIME_FORMAT)
+
+    task_send_mandrill_email.delay(
+        MandrillClient.WEBINAR_TWO_HOURS_REMINDER,
+        user_emails,
+        email_context,
+        webinar_start_time - timedelta(hours=2),
+    )
+
+    if (webinar_start_time - timedelta(days=6)) > datetime.now():
+        task_send_mandrill_email.delay(
+            MandrillClient.WEBINAR_ONE_WEEK_REMINDER,
+            user_emails,
+            email_context,
+            webinar_start_time - timedelta(days=7),
+        )
+
+
+def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
+    """
+    Saves mandrill msg ids of the reminders for a webinar registration.
+
+    Args:
+        webinar_id (int): Webinar Id
+        mandrill_response (list): List containing the response from mandrill
+        template_name (str): Mandrill email template slug
+
+    Returns:
+        None
+    """
+    from openedx.adg.lms.webinars.models import WebinarRegistration
+
+    template_name_to_field_map = {
+        MandrillClient.WEBINAR_TWO_HOURS_REMINDER: STARTING_SOON_REMINDER_ID_FIELD_NAME,
+        MandrillClient.WEBINAR_ONE_WEEK_REMINDER: ONE_WEEK_REMINDER_ID_FIELD_NAME,
+    }
+
+    for response in mandrill_response:
+        registration = WebinarRegistration.objects.filter(
+            user__email=response['email'], webinar__id=webinar_id
+        ).first()
+        setattr(registration, template_name_to_field_map[template_name], response['_id'])
+        registration.save()
 
 
 def validate_email_list(emails):
@@ -151,3 +224,76 @@ def is_webinar_upcoming(webinar):
         Boolean: True if webinar is of future date, False otherwise and webinar `is_cancelled` state must be False.
     """
     return webinar.start_time > now() and not webinar.is_cancelled
+
+
+def update_webinar_team_registrations(webinar_form):
+    """
+    Updates webinar team registrations if webinar presenter, cohosts or panelists are updated.
+
+    Args:
+        webinar_form (Form): Model form with updated data.
+
+    Returns:
+        None
+    """
+    from openedx.adg.lms.webinars.models import WebinarRegistration
+
+    webinar = webinar_form.instance
+    cleaned_data = webinar_form.cleaned_data
+    old_team = webinar.webinar_team()
+    new_team = set(chain(cleaned_data['co_hosts'], cleaned_data['panelists'], {cleaned_data['presenter']}))
+
+    newly_added_members = list(new_team - old_team)
+    removed_members = list(old_team - new_team)
+
+    if newly_added_members:
+        WebinarRegistration.create_team_registrations(newly_added_members, webinar)
+        schedule_webinar_reminders([user.email for user in newly_added_members], webinar.to_dict())
+
+    if removed_members:
+        WebinarRegistration.remove_team_registrations(removed_members, webinar)
+
+        registrations = WebinarRegistration.objects.filter(
+            webinar=webinar, user__in=removed_members, is_registered=False
+        )
+        cancel_all_reminders(registrations)
+
+
+def cancel_all_reminders(registrations, is_rescheduling=False):
+    """
+    Cancels reminders by extracting msg ids from the given registrations. In case the `is_rescheduling` is `True`, we
+    will not run the task `task_cancel_mandrill_emails` asynchronously.
+
+    Args:
+        is_rescheduling (bool): It shows whether we are rescheduling emails or just cancelling them.
+        registrations (list): List of registrations for which reminders will be cancelled.
+
+    Returns:
+        None
+    """
+    from openedx.adg.lms.webinars.models import WebinarRegistration
+
+    msg_id_map = {
+        'starting_soon_msg_ids': [],
+        'one_week_before_msg_ids': [],
+    }
+
+    for registration in registrations:
+        if registration.starting_soon_mandrill_reminder_id:
+            msg_id_map['starting_soon_msg_ids'].append(registration.starting_soon_mandrill_reminder_id)
+            registration.starting_soon_mandrill_reminder_id = ''
+
+        if registration.week_before_mandrill_reminder_id:
+            msg_id_map['one_week_before_msg_ids'].append(registration.week_before_mandrill_reminder_id)
+            registration.week_before_mandrill_reminder_id = ''
+
+    if is_rescheduling:
+        task_cancel_mandrill_emails(msg_id_map['starting_soon_msg_ids'])
+        task_cancel_mandrill_emails(msg_id_map['one_week_before_msg_ids'])
+    else:
+        task_cancel_mandrill_emails.delay(msg_id_map['starting_soon_msg_ids'])
+        task_cancel_mandrill_emails.delay(msg_id_map['one_week_before_msg_ids'])
+
+    WebinarRegistration.objects.bulk_update(
+        registrations, ['starting_soon_mandrill_reminder_id', 'week_before_mandrill_reminder_id'], batch_size=999
+    )

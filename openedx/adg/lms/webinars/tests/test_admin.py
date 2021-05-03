@@ -162,13 +162,13 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
         WebinarRegistrationFactory(user=user, webinar=webinar)
         WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
         mock_send_webinar_emails.assert_has_calls([
-            call(MandrillClient.WEBINAR_UPDATED, webinar.title, webinar.description, webinar.start_time, [user.email]),
-            call(MandrillClient.WEBINAR_CREATED, webinar.title, webinar.description, webinar.start_time, [])
+            call(MandrillClient.WEBINAR_UPDATED, webinar, [user.email]),
+            call(MandrillClient.WEBINAR_CREATED, webinar, [])
         ])
     else:
         WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
         mock_send_webinar_emails.assert_called_once_with(
-            MandrillClient.WEBINAR_CREATED, webinar.title, webinar.description, webinar.start_time, []
+            MandrillClient.WEBINAR_CREATED, webinar, []
         )
 
 
@@ -185,6 +185,9 @@ def test_webinars_in_webinar_registration_admin(webinar_registration_admin, requ
 
 
 def create_test_webinars_as_per_status(webinar_statues):
+    """
+    Prepare multiple webinars for test data, one for every status i-e upcoming, delivered and cancelled
+    """
     for status in webinar_statues:
         if status == Webinar.UPCOMING:
             WebinarFactory()

@@ -9,7 +9,7 @@ from django.utils.timezone import now
 from openedx.adg.lms.applications.admin import adg_admin_site
 from openedx.adg.lms.webinars.admin import WebinarAdmin
 from openedx.adg.lms.webinars.models import Webinar
-from openedx.adg.lms.webinars.tests.factories import WebinarFactory
+from openedx.adg.lms.webinars.tests.factories import WebinarFactory, WebinarRegistrationFactory
 
 
 @pytest.fixture
@@ -20,6 +20,11 @@ def webinar():
 @pytest.fixture
 def delivered_webinar():
     return WebinarFactory(start_time=now() - timedelta(days=1))
+
+
+@pytest.fixture
+def webinar_registration():
+    return WebinarRegistrationFactory()
 
 
 @pytest.fixture

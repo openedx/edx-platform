@@ -6,6 +6,7 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
+# Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
 # Imran Bashir <admin@omnipreneurshipacademy.com>, 2021
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
@@ -16,6 +17,7 @@
 #
 # Translators:
 # Rana Waqar <rana.waqar@arbisoft.com>, 2020
+# Ryan Alfaddaghi <RyanAlfaddaghi@protonmail.com>, 2021
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
@@ -59,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-19 08:33+0000\n"
+"POT-Creation-Date: 2021-04-30 14:20+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -84,8 +86,10 @@ msgstr "المناقشة"
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
-msgstr ""
+msgstr "سؤال"
 
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
 msgstr "فيديو"
@@ -402,12 +406,12 @@ msgstr ""
 #, python-format
 msgid "%(count)d student account was unlocked."
 msgid_plural "%(count)d student accounts were unlocked."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] " تم إعادة فتح عدد%(count)d من حسابات الطلاب. "
+msgstr[1] "تم إعادة فتح حساب طالب %(count)d ."
+msgstr[2] "تم إعادة فتح عدد %(count)dمن حسابات الطلاب. "
+msgstr[3] "تم إعادة فتح عدد %(count)d من حسابات الطلاب."
+msgstr[4] "تم إعادة فتح عدد %(count)d من حسابات الطلاب"
+msgstr[5] " تم إعادة فتح عدد%(count)d من حسابات الطلاب. "
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
@@ -715,7 +719,7 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Add a reason"
-msgstr ""
+msgstr "أضف مسبب"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -2247,7 +2251,7 @@ msgstr "أُجيب"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Attempted or Past Due"
-msgstr ""
+msgstr "جرى المحاولة أو مضى استحقاقه"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
@@ -2267,11 +2271,11 @@ msgstr "بعد عدد من المحاولات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After All Attempts"
-msgstr ""
+msgstr "بعد كل المحاولات"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "After All Attempts or Correct"
-msgstr ""
+msgstr "بعد كل المحاولات أو صحيح"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Attempted"
@@ -3936,7 +3940,7 @@ msgstr "يُرجى إدخال أسماء المكوِّنات المتقدّمة
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid "Library Blocks List"
-msgstr ""
+msgstr "لائحة أجزاء المكتبة"
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid "Enter the IDs of the library XBlocks that you wish to use."
@@ -3945,7 +3949,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 #, python-brace-format
 msgid "A maximum of {0} components may be added."
-msgstr ""
+msgstr "يمكن إضافة أجزاء شريطة عدم تجاوزها للعدد: {0}"
 
 #: common/lib/xmodule/xmodule/library_sourced_block.py
 msgid ""
@@ -4667,7 +4671,7 @@ msgstr "المساق "
 
 #: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
 msgid "Save and Import"
-msgstr ""
+msgstr "خزن واستورد"
 
 #: common/lib/xmodule/xmodule/templates/library-sourced-block-studio-view.html
 #: lms/templates/oauth2_provider/authorize.html
@@ -6073,12 +6077,12 @@ msgstr "لست متأكدا بعد"
 #, python-brace-format
 msgid "({number} Question)"
 msgid_plural "({number} Questions)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "(عدد الأسئلة {number})"
+msgstr[1] "(عدد الأسئلة {number})"
+msgstr[2] "(عدد الأسئلة {number})"
+msgstr[3] "(عدد الأسئلة {number})"
+msgstr[4] "(عدد الأسئلة {number})"
+msgstr[5] "(عدد الأسئلة {number})"
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid ""
@@ -6088,11 +6092,11 @@ msgstr ""
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "'course_id' is required."
-msgstr ""
+msgstr "يجب إدخال الرقم التعريفي للمساق"
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "Only 'course_id' is expected."
-msgstr ""
+msgstr "ينبغي إضافة الرقم التعريفي للمساق فقط"
 
 #: lms/djangoapps/course_home_api/outline/v1/views.py
 msgid "Welcome message successfully dismissed."
@@ -9494,16 +9498,17 @@ msgstr ""
 
 #: openedx/adg/lms/applications/admin.py
 msgid "Resume"
-msgstr ""
+msgstr "السيرة الذاتية"
 
 #: openedx/adg/lms/applications/admin.py
 #: openedx/adg/lms/applications/models.py
 msgid "Cover Letter"
-msgstr ""
+msgstr "رسالة تعريفية"
 
+#: openedx/adg/lms/applications/admin.py
 #: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
-msgstr "المتطلّبات الأساسية"
+msgstr "المتطلبات المسبقة:"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "APPLICANT INFORMATION"
@@ -9511,19 +9516,19 @@ msgstr ""
 
 #: openedx/adg/lms/applications/constants.py
 msgid "RESUME & COVER LETTER"
-msgstr ""
+msgstr "السيرة الذاتية والرسالة التعريفية"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "RESUME"
-msgstr ""
+msgstr "السيرة الذاتية"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "COVER LETTER"
-msgstr ""
+msgstr "الرسالة التعريفية"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "SCORES"
-msgstr ""
+msgstr "العلامات"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "APPLICATIONS"
@@ -9543,15 +9548,15 @@ msgstr ""
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Man"
-msgstr ""
+msgstr "ذكر"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Woman"
-msgstr ""
+msgstr "مؤنث"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Prefer not to answer"
-msgstr ""
+msgstr "أفضّل عدم الإفصاح"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Please make a decision before submitting."
@@ -9567,7 +9572,7 @@ msgstr ""
 
 #: openedx/adg/lms/applications/forms.py
 msgid "Sorry, only a Saudi national can enter this program"
-msgstr ""
+msgstr "عذراً، التسجيل في هذا البرنامج مقتصر على السعوديين فقط"
 
 #: openedx/adg/lms/applications/forms.py
 msgid "Either upload a cover letter file or type text"
@@ -9803,16 +9808,47 @@ msgid "Are you a Saudi National?"
 msgstr ""
 
 #: openedx/adg/lms/our_team/models.py
+#, python-brace-format
+msgid "Add a name of max {char_limit} characters"
+msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
 msgid "Designation"
 msgstr "السؤال"
+
+#: openedx/adg/lms/our_team/models.py
+#, python-brace-format
+msgid "Add a designation of max {char_limit} characters"
+msgstr ""
 
 #: openedx/adg/lms/our_team/models.py
 msgid "Image"
 msgstr ""
 
 #: openedx/adg/lms/our_team/models.py
+msgid "Add a square image i.e image with 1:1 aspect ratio for optimal results"
+msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
+#, python-brace-format
+msgid "Add a description of max {char_limit} characters"
+msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
 msgid "URL"
 msgstr "رابط ’LTI‘"
+
+#: openedx/adg/lms/our_team/models.py
+msgid "Team Member"
+msgstr "ديسمبر"
+
+#: openedx/adg/lms/our_team/models.py
+msgid "Board Of Trustee"
+msgstr ""
+
+#: openedx/adg/lms/our_team/models.py
+msgid "Member Type"
+msgstr "العضوية"
 
 #: openedx/adg/lms/registration_extension/constants.py
 msgid "Yanbu"
@@ -10215,6 +10251,18 @@ msgstr "التسجيل"
 #: openedx/adg/lms/webinars/models.py
 msgid "Registered"
 msgstr "التسجيل"
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Is Presenter, Co-Host, or Panelist"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Scheduled Starting Soon Reminder Id On Mandrill"
+msgstr ""
+
+#: openedx/adg/lms/webinars/models.py
+msgid "Scheduled Week Before Reminder Id On Mandrill"
+msgstr ""
 
 #: openedx/adg/lms/webinars/views.py
 msgid "You cannot register cancelled event"
@@ -12600,7 +12648,7 @@ msgstr "استمرار"
 
 #: lms/templates/dates_banner.html
 msgid "Shift due dates"
-msgstr "تغيير تواريخ التسليم"
+msgstr "تغيير تواريخ الاستحقاق"
 
 #: openedx/features/personalized_learner_schedules/call_to_action.py
 msgid ""
@@ -12970,7 +13018,7 @@ msgstr "نأسف لفشل تحميل الملف. يُرجى المحاولة م�
 #: cms/djangoapps/contentstore/views/item.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
-msgstr ""
+msgstr "لا يمكن احتواء المكتبات على أكثر من {limit} جزء."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data"
@@ -13150,7 +13198,7 @@ msgstr "ليس هناك من ’دور‘ محدَّد "
 #: cms/djangoapps/contentstore/views/user.py
 #, python-brace-format
 msgid "User {email} has registered but has not yet activated their account."
-msgstr ""
+msgstr "قام المستخدم {email} بالتسجيل ولكنّه لم يفعّل حسابه بعد."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -13257,7 +13305,7 @@ msgstr "تاريخ الإضافة "
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Status"
-msgstr ""
+msgstr "الحالة"
 
 #. Translators: This is the suggested filename when downloading the URL
 #. listing for videos uploaded through Studio
@@ -13788,7 +13836,7 @@ msgstr ""
 msgid ""
 " Don't worry—you won't lose any of the progress you've made when you shift "
 "your due dates."
-msgstr "لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ التسليم."
+msgstr "لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ الاستحقاق."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13804,8 +13852,8 @@ msgid ""
 "progress you've made when you shift your due dates."
 msgstr ""
 "للبقاء على المسار الصحيح ، يمكنك تحديث هذا الجدول وتحويل المهام السابقة "
-"المستحقة إلى المستقبل. لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير التواريخ "
-"المستحقة. لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ التسليم."
+"المستحقة إلى المستقبل. لا تقلق - لن تفقد أي تقدم أحرزته عند تغيير تواريخ "
+"الاستحقاق. "
 
 #: lms/templates/dates_banner.html
 msgid "You are auditing this course,"
@@ -13821,6 +13869,9 @@ msgid ""
 "schedule. Graded assignments and schedule adjustment are available to "
 "Verified Track learners."
 msgstr ""
+"يبدو أنك فاتتك بعض المواعيد النهائية المهمة بناءً على جدولنا الزمني المقترح."
+" يمكن للمتعلمين المسجلين في مسار التدريب المعتمد الاستفادة من خدمة تصحيح "
+"الواجبات وتعديل الجداول."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -13838,7 +13889,7 @@ msgstr "قم بالترقية لتغيير التواريخ المستحقة"
 
 #: lms/templates/dates_banner.html
 msgid "Graded assignments are available to Verified Track learners."
-msgstr ""
+msgstr "خدمة تصحيح الواجبات متوفرة ضمن مسار التدريب المعتمد."
 
 #: lms/templates/dates_banner.html
 msgid ""
@@ -14160,6 +14211,8 @@ msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. "
 msgstr ""
+"نعتذر هذه الوحدة غير متاحة حالياً. يعمل كادرنا على معالجة الإشكالية في أسرع "
+"وقت."
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
@@ -14204,15 +14257,15 @@ msgstr "أنت الآن تستعرض المساق بصفتك {i_start}{user_name
 
 #: lms/templates/preview_menu.html
 msgid "View in the new experience"
-msgstr ""
+msgstr "العرض في التجربة الجديدة."
 
 #: lms/templates/preview_menu.html
 msgid "View in Studio"
-msgstr ""
+msgstr "العرض في الاستديو"
 
 #: lms/templates/preview_menu.html
 msgid "View in Insights"
-msgstr ""
+msgstr "العرض في التنويهات"
 
 #: lms/templates/problem.html
 msgid "Hint"
@@ -14228,7 +14281,7 @@ msgstr "تغيير إجابتك"
 
 #: lms/templates/problem.html
 msgid "Show answer"
-msgstr ""
+msgstr "إظهار الإجابة"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
@@ -14545,7 +14598,7 @@ msgstr "سجلّات نظام Git "
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
+msgstr "ملاحظة: ستستبدل واجهة المشرف على النظام في الإصدار القادم."
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
@@ -14729,7 +14782,7 @@ msgstr "{subsection_format} مستحق في {{date}}"
 
 #: lms/templates/vert_module.html
 msgid "Due {date}"
-msgstr ""
+msgstr "تاريخ الاستحقاق {date}"
 
 #: lms/templates/video.html
 msgid "Loading video player"
@@ -17196,7 +17249,7 @@ msgstr "الإجراءات المتاحة"
 msgid ""
 "You are enrolled by your institution and you should reach out to your "
 "institution to drop this course."
-msgstr ""
+msgstr "قامت مؤسستك بتسجيلك في الدورة ويتعين عليك مخاطبتهم لإلغاء الدورة."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
@@ -17980,6 +18033,8 @@ msgid ""
 "Your verification is effective for one year. It will expire on "
 "{expiration_datetime}"
 msgstr ""
+"عضويتك في مسار التدريب المعتمد صالح لمدة سنة واحدة. وتنتهي بتاريخ "
+"{expiration_datetime}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -18208,7 +18263,7 @@ msgstr "المشرف على النظام"
 
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
-msgstr ""
+msgstr "لوحة المعلومات الخاصة بـ{name}"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
@@ -18437,7 +18492,7 @@ msgstr "مهني"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Executive Education"
-msgstr ""
+msgstr "التعليم المتعلق بالإدارة التنفيذية"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Master's"
@@ -18657,11 +18712,11 @@ msgstr "أعِدَّ تقريرَ بيانات ORA"
 msgid ""
 "Click to generate a ZIP file that contains all submission texts and "
 "attachments."
-msgstr ""
+msgstr "انقر لإنشاء ملف مضغوط يحتوي النصوص النصوص المسلّمة والمرفقات كافة."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Submission Files Archive"
-msgstr ""
+msgstr "إنشاء ملف أرشيف الملفات المسلّمة."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
@@ -18707,6 +18762,10 @@ msgid ""
 "submitted after the process starts are included in a subsequent report."
 "         The report is generated several times per day."
 msgstr ""
+"يتم إعداد تقارير توزيع الإجابات الموضحة أسفل دوريّاً من خلال عملية يتم "
+"تنفيذها في الخلفية بشكلٍ تلقائي. ويتّسم هذا التقرير بأنه تراكمي، لذا فإن "
+"الإجابات التي يتم تقديمها بعد ابتداء العملية سيتم تضمينها في تقرير لاحق. "
+"وهذا النوع من التقارير يتم إصداره عدة مراتٍ يومياً."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2.html
 msgid ""
@@ -18717,6 +18776,12 @@ msgid ""
 "old reports, download and store the files,         in accordance with your "
 "institution's data security policies.{li_end}{ul_end}"
 msgstr ""
+"{strong_start} ملاحظة {strong_end}: {ul_start} {li_start} للحفاظ على أمان "
+"بيانات الطالب ، لا يمكنك حفظ روابط  الوصول المباشر أو إرسالها بالبريد "
+"الإلكتروني. تنتهي صلاحية نسخ الروابط في غضون ٥ دقائق. {li_end} {li_start} "
+"يتم حذف ملفات التقارير بعد ٩٠ يومًا من إنشائها. إذا كنت بحاجة الوصول إلى "
+"التقارير القديمة ، فقم بتنزيل الملفات وتخزينها وفقًا لسياسات حماية البيانات "
+"في مؤسستك. {li_end}{ul_end}"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Edit Coupon Code"
@@ -19397,7 +19462,7 @@ msgstr "السعر المحدد"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Proctortrack Escalation Email:"
-msgstr ""
+msgstr "البريد الإلكتروني لتصعيد مسألة لشركة بروكتورتراك:"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Allowance Section"
@@ -19633,7 +19698,7 @@ msgstr "عرض حالة المهام التي قدمتها في هذه المس�
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/grading.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid "Note"
-msgstr ""
+msgstr "ملاحظة"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/problem_report.html
 msgid ""
@@ -19641,6 +19706,8 @@ msgid ""
 "answers to the problem. You also select a section or chapter to include"
 "         results of all problems in that section or chapter."
 msgstr ""
+"حدد سؤال لإنشاء ملف بصيغة CSV يسرد جميع إجابات الطلاب على السؤال. يمكنك "
+"أيضًا تحديد قسم أو فصل لتضمين نتائج جميع الأسئلة في ذلك القسم أو الفصل."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -19649,10 +19716,16 @@ msgid ""
 "course                 (such as exams and problem sets), and can be changed "
 "on the 'Grading'                 page (under 'Settings') in Studio."
 msgstr ""
+"يمكن الضغط هنا لعرض طريقة توزيع الدرجات لهذا المساق. وطريقة توزيع الدرجات هي"
+" عبارة عن تفصيل الدرجات للأقسام الفرعية للمساق التي تم تقييمها (مثل "
+"الامتحانات ومجموعات الأسئلة)، ويمكن تغيير ذلك على صفحة ’التقييم‘ (تحت قائمة "
+"’الإعدادات‘) في الاستديو."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid "Click to download a CSV of                 anonymized student IDs:"
 msgstr ""
+"يمكن الضغط هنا لتنزيل ملف بصيغة CSV يضم الرمز التعريفي فقط لكافة الطلاب "
+"المسجّلين دون كشف هويتهم:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -19663,6 +19736,10 @@ msgid ""
 " navigate away from this page while your report is                 "
 "generating."
 msgstr ""
+"يمكن أن يستغرق إنشاء التقارير للمساقات الكبيرة بضع ساعات، وعندما ينتهي إنشاء"
+" التقرير سوف يظهر في أسفل الجدول رابط يتضمن تاريخ ووقت إنشاء التقرير. ويتم "
+"إنشاء هذه التقارير في الخلفية أي أنه يمكنك مغادرة هذه الصفحة بينما يتم إنشاء"
+" التقرير."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -19670,12 +19747,16 @@ msgid ""
 "times. Clicking these buttons multiple times will significantly slow the "
 "generation                 process."
 msgstr ""
+"يرجى الصبر وعدم النقر على الأزرار عدة مرات، لأن تكرار النقر على هذه الأزرار "
+"سوف يبطئ عملية إنشاء التقرير بشكل ملحوظ."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "For smaller courses, click to list                 profile information for "
 "enrolled students directly on this page:"
 msgstr ""
+"بالنسبة للمساقات التي تضم عدداّ أقل من الطلاب، يمكن الضغط هنا لإظهار قائمة "
+"بمعلومات الملف الشخصي للطلاب المسجّلين في المساق على هذه الصفحة:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
@@ -19683,36 +19764,45 @@ msgid ""
 "this course, along with profile information such as email address and"
 "                 username:"
 msgstr ""
+"يمكن الضغط هنا ليتم إنشاء ملف بصيغة CSV يضم كافة الطلاب المسجّلين في هذا "
+"المساق، إلى جانب معلومات الملف الشخصي مثل البريد الإلكتروني واسم المستخدم:"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "Click to generate a CSV file                 that lists learners who can "
 "enroll in the course but have not yet done so."
 msgstr ""
+"انقر لإنشاء ملف بصيغة CSV يحتوي على أسماء المتعلمين الذين يمكنهم التسجيل في "
+"المساق ولكنهم لم يقوموا بالتسجيل بعد."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "Click to generate a CSV file                 of all proctored exam results "
 "in this course."
 msgstr ""
+"انقر لإنشاء ملف بصيغة CSV بجميع نتائج الامتحانات المراقبة لهذا المساق."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "Click to generate a CSV file of                 survey results for this "
 "course."
-msgstr ""
+msgstr "انقر لإعداد ملف بصيغة CSV بنتائج استبيان هذا المساق."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "Click to generate a CSV                 ORA grade report for all currently "
 "enrolled students."
 msgstr ""
+"انقر هنا لإنشاء  تقرير علامات الواجبات مفتوحة الإجابة بصيفة CSV لجميع الطلاب"
+" المسجلين حاليًا."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download_2/reports.html
 msgid ""
 "Click to generate a CSV                 problem grade report for all "
 "currently enrolled students."
 msgstr ""
+"انقر هنا لإنشاء  تقرير علامات الأسئلة بصيفة CSV لجميع الطلاب المسجلين "
+"حاليًا."
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_courses.html
 msgid "My Courses"
@@ -19755,7 +19845,7 @@ msgstr ""
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
-msgstr "استكشاف الدورات التدريبية"
+msgstr "تصفح المساقات"
 
 #: lms/templates/navigation/navigation.html
 msgid "Global"
@@ -20011,6 +20101,10 @@ msgid ""
 "with export controls, we cannot allow you to access this course at this "
 "time."
 msgstr ""
+"يشير نظامنا إلى أنك تحاول الوصول إلى مساق {platform_name} من بلد أو منطقة "
+"تخضع حاليًا لعقوبات اقتصادية وتجارية أمريكية. لسوء الحظ ، نظرًا لكون "
+"{platform_name} مطالب بالامتثال لضوابط التصدير ، لا يمكننا السماح لك بالوصول"
+" إلى هذا المساق في الوقت الحالي."
 
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
