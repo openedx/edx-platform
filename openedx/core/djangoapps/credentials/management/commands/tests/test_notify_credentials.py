@@ -87,7 +87,7 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--program_uuids', program['uuid'])
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
-        assert mock_task.call_args[0][1] == [course_1_id, course_2_id]
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
     @mock.patch(NOTIFY_CREDENTIALS_TASK)
     @mock.patch(
@@ -123,7 +123,7 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--program_uuids', program['uuid'], program2['uuid'])
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
-        assert mock_task.call_args[0][1] == [course_1_id, course_2_id]
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
     @freeze_time(datetime(2017, 5, 1, 4))
     @mock.patch(NOTIFY_CREDENTIALS_TASK)

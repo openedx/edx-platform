@@ -25,12 +25,11 @@ def get_programs_by_type(site, program_type_slug):
 
 def get_programs_from_cache_by_uuid(uuids):
     """
-    Retrieves the programs for the provided UUIDS within the site. Relies on
+    Retrieves the programs for the provided UUIDS. Relies on
     the Program cache, if it is not updated or data is missing the result
     will be missing data or empty.
 
     Params:
-        site (Site): The corresponding Site object to fetch programs for.
         uuids (list): A list of Program UUIDs to get Program data for from the cache.
     Returns:
         (list): list of dictionaries representing programs.
@@ -45,6 +44,6 @@ def get_course_run_key_for_program_from_cache(program):
     Params:
         program (dict): A dictionary from the program cache containing the data for a program.
     Returns:
-        A set of Course Run Keys.
+        (set): A set of Course Run Keys.
     """
     return _course_run_keys_for_program(parent_program=program)
