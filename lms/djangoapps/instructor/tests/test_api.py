@@ -1903,9 +1903,10 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         in which he/she is a beta-tester.
         """
         with LogCapture() as capture:
-            message = 'Cancelling course certificate generation for user [{}] against course [{}], ' \
-                      'user is a Beta Tester.'
-            message = message.format(self.beta_tester.username, self.course.id)
+            message = (
+                f'Canceling Certificate Generation task for user {self.beta_tester.id} : {self.course.id}. User is a '
+                'Beta Tester.'
+            )
 
             generate_user_certificates(self.beta_tester, self.course.id, self.course)
             capture.check_present(('lms.djangoapps.certificates.generation_handler', 'INFO', message))
