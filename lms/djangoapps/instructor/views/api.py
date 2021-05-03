@@ -656,7 +656,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
 
     results = []
     for identifier in identifiers:  # lint-amnesty, pylint: disable=too-many-nested-blocks
-        # First try to get a user object from the identifer
+        # First try to get a user object from the identifier
         user = None
         email = None
         language = None
@@ -855,7 +855,7 @@ def modify_access(request, course_id):
     NOTE: instructors cannot remove their own instructor access.
 
     Query parameters:
-    unique_student_identifer is the target user's username or email
+    unique_student_identifier is the target user's username or email
     rolename is one of ['instructor', 'staff', 'beta', 'ccx_coach']
     action is one of ['allow', 'revoke']
     """
@@ -1474,7 +1474,7 @@ def reset_student_attempts(request, course_id):
     attempts counters. Optionally deletes student state for a problem. Limited
     to staff access. Some sub-methods limited to instructor access.
 
-    Takes some of the following query paremeters
+    Takes some of the following query parameters
         - problem_to_reset is a urlname of a problem
         - unique_student_identifier is an email or username
         - all_students is a boolean
@@ -1632,7 +1632,7 @@ def rescore_problem(request, course_id):
     Starts a background process a students attempts counter. Optionally deletes student state for a problem.
     Rescore for all students is limited to instructor access.
 
-    Takes either of the following query paremeters
+    Takes either of the following query parameters
         - problem_to_reset is a urlname of a problem
         - unique_student_identifier is an email or username
         - all_students is a boolean
@@ -1860,7 +1860,7 @@ def list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
 
-    Takes optional query paremeters.
+    Takes optional query parameters.
         - With no arguments, lists running tasks.
         - `problem_location_str` lists task history for problem
         - `problem_location_str` and `unique_student_identifier` lists task
@@ -2455,7 +2455,7 @@ def generate_example_certificates(request, course_id=None):
     Example certificates are used to verify that certificates have
     been configured correctly for the course.
 
-    Redirects back to the intructor dashboard once certificate
+    Redirects back to the instructor dashboard once certificate
     generation has begun.
 
     """
@@ -2472,7 +2472,7 @@ def enable_certificate_generation(request, course_id=None):
     Once self-generated certificates have been enabled, students
     who have passed the course will be able to generate certificates.
 
-    Redirects back to the intructor dashboard once the
+    Redirects back to the instructor dashboard once the
     setting has been updated.
 
     """
@@ -2577,7 +2577,7 @@ def start_certificate_regeneration(request, course_id):
 @require_http_methods(['POST', 'DELETE'])
 def certificate_exception_view(request, course_id):
     """
-    Add/Remove students to/from certificate white list.
+    Add/Remove students to/from the certificate allowlist.
 
     :param request: HttpRequest object
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
@@ -2610,14 +2610,14 @@ def certificate_exception_view(request, course_id):
 
 def add_certificate_exception(course_key, student, certificate_exception):
     """
-    Add a certificate exception to CertificateWhitelist table.
+    Add a certificate exception.
 
-    Raises ValueError in case Student is already white listed or if they appear on the block list.
+    Raises ValueError in case Student is already allowlisted or if they appear on the block list.
 
     :param course_key: identifier of the course whose certificate exception will be added.
     :param student: User object whose certificate exception will be added.
     :param certificate_exception: A dict object containing certificate exception info.
-    :return: CertificateWhitelist item in dict format containing certificate exception info.
+    :return: Allowlist item in dict format containing certificate exception info.
     """
     log.info(f"Request received to add an allowlist entry for student {student.id} in course {course_key}")
 
@@ -2740,18 +2740,18 @@ def get_student(username_or_email):
 @common_exceptions_400
 def generate_certificate_exceptions(request, course_id, generate_for=None):
     """
-    Generate Certificate for students in the Certificate White List.
+    Generate Certificate for students on the allowlist.
 
     :param request: HttpRequest object,
     :param course_id: course identifier of the course for whom to generate certificates
     :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
-            additions to the certificate white-list
+            additions to the allowlist
     :return: JsonResponse object containing success/failure message and certificate exception data
     """
     course_key = CourseKey.from_string(course_id)
 
     if generate_for == 'all':
-        # Generate Certificates for all white listed students
+        # Generate Certificates for all allowlisted students
         students = 'all_whitelisted'
 
     elif generate_for == 'new':
@@ -2781,18 +2781,18 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 @require_POST
 def generate_bulk_certificate_exceptions(request, course_id):
     """
-    Add Students to certificate white list from the uploaded csv file.
+    Add Students to certificate allowlist from the uploaded csv file.
     :return response in dict format.
     {
         general_errors: [errors related to csv file e.g. csv uploading, csv attachment, content reading etc. ],
         row_errors: {
             data_format_error: [users/data in csv file that are not well formatted],
             user_not_exist: [csv with none exiting users in LMS system],
-            user_already_white_listed: [users that are already white listed],
+            user_already_white_listed: [users that are already allowlisted],
             user_not_enrolled: [rows with not enrolled users in the given course],
             user_on_certificate_invalidation_list: [users that are currently have an active blocklist entry]
         },
-        success: [list of successfully added users to the certificate white list model]
+        success: [list of successfully added users to the certificate allowlist model]
     }
     """
     user_index = 0
