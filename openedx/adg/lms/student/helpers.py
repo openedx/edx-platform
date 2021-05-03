@@ -10,6 +10,7 @@ from django.utils.http import int_to_base36
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 from openedx.adg.lms.helpers import get_user_first_name
+from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import Text
@@ -68,12 +69,12 @@ def compose_and_send_adg_password_reset_email(user, request):
     task_send_mandrill_email(MandrillClient.PASSWORD_RESET, [user.email], context)
 
 
-def compose_and_send_adg_update_email_verification(user, use_https, confirm_link):
+def compose_and_send_adg_update_email_verification(new_email, use_https, confirm_link):
     """
     Prepare and send email for change email verification
 
     Arguments:
-        user (User): Django user object
+        new_email (str): Updated email address for user
         use_https (bool): Boolean to check if request is secure or not
         confirm_link (str): String containing confirmation link
 
@@ -90,7 +91,7 @@ def compose_and_send_adg_update_email_verification(user, use_https, confirm_link
         'update_email_link': update_email_link
     }
 
-    task_send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, [user.email], context)
+    task_send_mandrill_email(MandrillClient.CHANGE_USER_EMAIL_ALERT, [new_email], context)
 
 
 def compose_and_send_adg_update_email_confirmation(user, context):
@@ -154,3 +155,28 @@ def compose_and_send_adg_course_enrollment_invitation_email(user_email, message_
 
     message_context.pop('course')
     task_send_mandrill_email.delay(MandrillClient.COURSE_ENROLLMENT_INVITATION, [user_email], message_context)
+
+
+def send_account_activation_email(user, profile, registration=None):
+    """
+    Send adg account activation emails.
+
+    Args:
+        user (User): User to which email will be sent.
+        profile (UserProfile): Profile of the user.
+        registration (Registration): Registration of the user.
+
+    Returns:
+        None
+    """
+    from common.djangoapps.student.views import compose_and_send_activation_email
+    from common.djangoapps.student.models import Registration
+
+    if is_testing_environment():
+        compose_and_send_activation_email(user, profile, registration)
+        return
+
+    if registration is None:
+        registration = Registration.objects.get(user=user)
+
+    compose_and_send_adg_activation_email(user, registration.activation_key)

@@ -36,7 +36,7 @@ from common.djangoapps import third_party_auth
 # TODO Have the discussions code subscribe to the REGISTER_USER signal instead.
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 from lms.djangoapps.discussion.notification_prefs.views import enable_notifications
-from openedx.adg.lms.student.helpers import compose_and_send_adg_activation_email
+from openedx.adg.lms.student.helpers import send_account_activation_email
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -234,10 +234,7 @@ def create_account_with_params(request, params):
     if skip_email:
         registration.activate()
     else:
-        if is_testing_environment():
-            compose_and_send_activation_email(user, profile, registration)
-        else:
-            compose_and_send_adg_activation_email(user, registration.activation_key)
+        send_account_activation_email(user, profile, registration)
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:

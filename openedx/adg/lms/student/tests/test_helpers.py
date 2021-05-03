@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from mock import patch
 
-from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from openedx.adg.lms.student import helpers as student_helpers
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -110,7 +110,7 @@ def test_compose_and_send_adg_update_email_verification(
         )
     }
 
-    student_helpers.compose_and_send_adg_update_email_verification(user_with_profile, True, confirmation_link)
+    student_helpers.compose_and_send_adg_update_email_verification(user_with_profile.email, True, confirmation_link)
     mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.CHANGE_USER_EMAIL_ALERT, [user_with_profile.email], expected_context
     )
@@ -131,6 +131,24 @@ def test_compose_and_send_adg_update_email_confirmation(
     mock_task_send_mandrill_email.assert_called_once_with(
         mock_mandrill_client.VERIFY_CHANGE_USER_EMAIL, [user_with_profile.email], context
     )
+
+
+@pytest.mark.django_db
+def test_send_account_activation_email(user_with_profile, mocker):
+    """
+    Test `compose_and_send_adg_activation_email` is called for non-test environments.
+    """
+    mock_is_test_env = mocker.patch('openedx.adg.lms.student.helpers.is_testing_environment')
+    mock_is_test_env.return_value = False
+
+    mock_compose_and_send_adg_activation_email = mocker.patch.object(
+        student_helpers, 'compose_and_send_adg_activation_email'
+    )
+
+    RegistrationFactory(user=user_with_profile)
+    student_helpers.send_account_activation_email(user_with_profile, user_with_profile.profile)
+
+    mock_compose_and_send_adg_activation_email.assert_called_once()
 
 
 # pylint: disable=no-member
