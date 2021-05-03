@@ -34,7 +34,23 @@ class GeneratedCertificateFactory(DjangoModelFactory):
 
 class CertificateWhitelistFactory(DjangoModelFactory):
     """
-    CertificateWhitelist factory
+    CertificateWhitelist factory.
+
+    This will be removed once the underlying model is renamed. It is suggested that CertificateAllowlistFactory be used
+    instead of this factory.
+    """
+
+    class Meta:
+        model = CertificateWhitelist
+
+    course_id = None
+    whitelist = True
+    notes = 'Test Notes'
+
+
+class CertificateAllowlistFactory(DjangoModelFactory):
+    """
+    Certificate allowlist factory
     """
 
     class Meta:

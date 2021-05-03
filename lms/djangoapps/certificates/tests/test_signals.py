@@ -20,7 +20,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.signals import _fire_ungenerated_certificate_task
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
@@ -88,7 +88,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                 return_value=None
             ) as mock_generate_allowlist_task:
                 with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                    CertificateWhitelistFactory(
+                    CertificateAllowlistFactory(
                         user=self.user,
                         course_id=self.ip_course.id,
                         whitelist=True
@@ -109,7 +109,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                 return_value=None
             ) as mock_generate_allowlist_task:
                 with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
-                    CertificateWhitelistFactory(
+                    CertificateAllowlistFactory(
                         user=self.user,
                         course_id=self.ip_course.id,
                         whitelist=True
@@ -228,7 +228,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
             u = UserFactory.create()
             c = CourseFactory()
             course_key = c.id  # pylint: disable=no-member
-            CertificateWhitelistFactory(
+            CertificateAllowlistFactory(
                 user=u,
                 course_id=course_key
             )
@@ -365,7 +365,7 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         u = UserFactory.create()
         c = CourseFactory()
         course_key = c.id  # pylint: disable=no-member
-        CertificateWhitelistFactory(
+        CertificateAllowlistFactory(
             user=u,
             course_id=course_key
         )
@@ -478,7 +478,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     is_active=True,
                     mode='verified'
                 )
-                CertificateWhitelistFactory(
+                CertificateAllowlistFactory(
                     user=u,
                     course_id=course_key
                 )
@@ -550,7 +550,7 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
             is_active=True,
             mode='verified',
         )
-        CertificateWhitelistFactory(
+        CertificateAllowlistFactory(
             user=self.user,
             course_id=self.verified_course_key
         )
@@ -563,7 +563,7 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit',
         )
-        CertificateWhitelistFactory(
+        CertificateAllowlistFactory(
             user=self.user,
             course_id=self.audit_course_key
         )
