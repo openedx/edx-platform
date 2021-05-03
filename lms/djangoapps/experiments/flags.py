@@ -11,6 +11,7 @@ from crum import get_current_request
 from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.track import segment
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.experiments.stable_bucketing import stable_bucketing_hash_group
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -262,6 +263,21 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
             # Mark that we've recorded this bucketing, so that we don't do it again this session
             request.session[session_key] = True
+
+            # Temporary event for AA-759 experiment
+            if course_key and self._experiment_name == 'AA-759':
+                modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
+                verified_mode = modes_dict.get('verified', None)
+                if verified_mode:
+                    segment.track(
+                        user_id=user.id,
+                        event_name='edx.bi.experiment.AA759.bucketed',
+                        properties={
+                            'course_id': course_key,
+                            'bucket': bucket,
+                            'sku': verified_mode.sku,
+                        }
+                    )
 
         return self._cache_bucket(experiment_name, bucket)
 

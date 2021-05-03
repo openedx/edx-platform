@@ -11,6 +11,7 @@ from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=reim
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
 
 from common.djangoapps.student.models import CourseEnrollment, UserCelebration
@@ -81,16 +82,14 @@ class CourseHomeMetadataView(RetrieveAPIView):
 
         username = request.user.username if request.user.username else None
         course = course_detail(request, request.user.username, course_key)
-        user_is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key_string)
-        browser_timezone = request.query_params.get('browser_timezone', None)
-        celebrations = {
-            'streak_length_to_celebrate': UserCelebration.perform_streak_updates(
-                request.user, course_key, browser_timezone
-            )
-        }
+        enrollment = CourseEnrollment.get_enrollment(request.user, course_key_string)
+        user_is_enrolled = bool(enrollment)
 
         courseware_meta = CoursewareMeta(course_key, request, request.user.username)
         can_load_courseware = courseware_meta.is_microfrontend_enabled_for_user()
+
+        browser_timezone = self.request.query_params.get('browser_timezone', None)
+        celebrations = get_celebrations_dict(request.user, enrollment, course, browser_timezone)
 
         data = {
             'course_id': course.id,
@@ -108,5 +107,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
         }
         context = self.get_serializer_context()
         context['course'] = course
+        context['course_overview'] = course
+        context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
         return Response(serializer.data)

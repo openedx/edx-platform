@@ -11,10 +11,15 @@ from urllib.parse import urlencode
 import ddt
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from lms.djangoapps.courseware.utils import is_mode_upsellable
 from openedx.features.course_experience.url_helpers import get_courseware_url, ExperienceOption
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .field_overrides import OverrideModulestoreFieldData
@@ -289,3 +294,40 @@ class FieldOverrideTestMixin:
     def tearDown(self):
         super().tearDown()
         OverrideModulestoreFieldData.provider_classes = None
+
+
+@ddt.ddt
+class CoursewareUtilsTests(SharedModuleStoreTestCase):
+    """
+    Tests of the courseware utils file
+    """
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create()
+
+    @ddt.data(
+        (CourseMode.HONOR, True),
+        (CourseMode.PROFESSIONAL, False),
+        (CourseMode.VERIFIED, False),
+        (CourseMode.AUDIT, True),
+        (CourseMode.NO_ID_PROFESSIONAL_MODE, False),
+        (CourseMode.CREDIT_MODE, False),
+        (CourseMode.MASTERS, False),
+        (CourseMode.EXECUTIVE_EDUCATION, False),
+    )
+    @ddt.unpack
+    def test_is_mode_upsellable(self, mode, is_upsellable):
+        """
+        Test if this is a mode that is upsellable
+        """
+        CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
+        if mode == CourseMode.CREDIT_MODE:
+            CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, course_id=self.course.id)
+        enrollment = CourseEnrollmentFactory(
+            is_active=True,
+            mode=mode,
+            course_id=self.course.id,
+            user=self.user
+        )
+        assert is_mode_upsellable(self.user, enrollment) is is_upsellable

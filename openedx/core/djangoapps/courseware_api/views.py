@@ -40,6 +40,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -48,8 +49,7 @@ from openedx.features.discounts.utils import generate_offer_data
 from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentCelebration,
-    LinkedInAddToProfileConfiguration,
-    UserCelebration
+    LinkedInAddToProfileConfiguration
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
@@ -84,6 +84,7 @@ class CoursewareMeta:
         self.original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
+        self.course = get_course_by_id(self.course_key)
         self.course_masquerade, self.effective_user = setup_masquerade(
             self.request,
             course_key,
@@ -195,15 +196,11 @@ class CoursewareMeta:
     @property
     def celebrations(self):
         """
-        Returns a list of celebrations that should be performed.
+        Returns a dict of celebrations that should be performed.
         """
         browser_timezone = self.request.query_params.get('browser_timezone', None)
-        return {
-            'first_section': CourseEnrollmentCelebration.should_celebrate_first_section(self.enrollment_object),
-            'streak_length_to_celebrate': UserCelebration.perform_streak_updates(
-                self.effective_user, self.course_key, browser_timezone
-            ),
-        }
+        celebrations = get_celebrations_dict(self.effective_user, self.enrollment_object, self.course, browser_timezone)
+        return celebrations
 
     @property
     def user_has_passing_grade(self):
