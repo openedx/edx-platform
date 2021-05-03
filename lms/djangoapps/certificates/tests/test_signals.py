@@ -12,10 +12,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import cert_generation_enabled
-from lms.djangoapps.certificates.generation_handler import (
-    CERTIFICATES_USE_ALLOWLIST,
-    CERTIFICATES_USE_UPDATED
-)
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
@@ -78,7 +75,6 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
             mode="verified",
         )
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_fire_task_allowlist_auto_enabled(self):
         """
         Test that the allowlist generation is invoked if automatic generation is enabled
@@ -100,7 +96,6 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                     mock_generate_certificate_apply_async.assert_not_called()
                     mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_fire_task_allowlist_auto_disabled(self):
         """
         Test that the allowlist generation is not invoked if automatic generation is disabled
@@ -120,33 +115,6 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                         whitelist=True
                     )
                     mock_generate_certificate_apply_async.assert_not_called()
-                    mock_generate_allowlist_task.assert_not_called()
-
-    def test_fire_task_allowlist_disabled(self):
-        """
-        Test that the V1 logic is followed if the allowlist is disabled
-        """
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with mock.patch(
-                'lms.djangoapps.certificates.signals.generate_allowlist_certificate_task',
-                return_value=None
-            ) as mock_generate_allowlist_task:
-                with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                    CertificateWhitelistFactory(
-                        user=self.user,
-                        course_id=self.ip_course.id,
-                        whitelist=True
-                    )
-                    mock_generate_certificate_apply_async.assert_called_with(
-                        countdown=CERTIFICATE_DELAY_SECONDS,
-                        kwargs={
-                            'student': str(self.user.id),
-                            'course_key': str(self.ip_course.id),
-                        }
-                    )
                     mock_generate_allowlist_task.assert_not_called()
 
 
@@ -240,7 +208,6 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                 grade_factory.update(self.user, self.course)
                 mock_generate_certificate_apply_async.assert_not_called()
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_passing_grade_allowlist(self):
         with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
             # User who is not on the allowlist
@@ -383,7 +350,6 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         cert = GeneratedCertificate.certificate_for_student(self.user, self.course.id)
         assert cert.status == expected_status
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_failing_grade_allowlist(self):
         # User who is not on the allowlist
         GeneratedCertificateFactory(
@@ -483,7 +449,6 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     }
                 )
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_id_verification_allowlist(self):
         # User is not on the allowlist
         with mock.patch(
@@ -567,7 +532,6 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
                 assert task_created == should_create
 
 
-@override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 @override_waffle_flag(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True)
 class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
     """

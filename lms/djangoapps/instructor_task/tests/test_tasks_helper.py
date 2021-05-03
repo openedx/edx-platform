@@ -30,10 +30,7 @@ from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.generation_handler import (
-    CERTIFICATES_USE_ALLOWLIST,
-    CERTIFICATES_USE_UPDATED
-)
+from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
@@ -2024,7 +2021,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 0,
             'skipped': 2
         }
-        with self.assertNumQueries(170):
+        with self.assertNumQueries(114):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
@@ -2423,7 +2420,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         self.assertCertificatesGenerated(task_input, expected_results)
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
     def test_invalidation(self):
         # Create students
         students = self._create_students(2)

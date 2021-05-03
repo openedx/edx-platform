@@ -373,8 +373,12 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
 def is_using_certificate_allowlist(course_key):
     """
     Check if the course run is using the allowlist, aka v2 of certificate whitelisting
+
+    Currently this returns True for all course runs, as we're enabling the allowlist for everyone.
+    If all goes well, we'll come back and remove this method and the flag entirely in MICROBA-1073.
     """
-    return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
+    return True
+#    return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
 
 
 def is_using_v2_course_certificates(course_key):

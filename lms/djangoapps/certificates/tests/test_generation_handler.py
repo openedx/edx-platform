@@ -9,7 +9,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import (
-    CERTIFICATES_USE_ALLOWLIST,
     CERTIFICATES_USE_UPDATED,
     _can_generate_allowlist_certificate,
     _can_generate_certificate_for_status,
@@ -42,7 +41,6 @@ PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._has_pass
 WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 
 
-@override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=True)
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))
 @mock.patch(WEB_CERTS_METHOD, mock.Mock(return_value=True))
 @ddt.ddt
@@ -74,25 +72,11 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         assert is_using_certificate_allowlist(self.course_run_key)
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
-    def test_is_using_allowlist_false(self):
-        """
-        Test the allowlist flag without the override
-        """
-        assert not is_using_certificate_allowlist(self.course_run_key)
-
     def test_is_using_allowlist_and_is_on_list(self):
         """
         Test the allowlist flag and the presence of the user on the list
         """
         assert is_using_certificate_allowlist_and_is_on_allowlist(self.user, self.course_run_key)
-
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
-    def test_is_using_allowlist_and_is_on_list_with_flag_off(self):
-        """
-        Test the allowlist flag and the presence of the user on the list when the flag is off
-        """
-        assert not is_using_certificate_allowlist_and_is_on_allowlist(self.user, self.course_run_key)
 
     def test_is_using_allowlist_and_is_on_list_true(self):
         """
@@ -146,7 +130,6 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         assert _can_generate_certificate_for_status(None, None)
 
-    @override_waffle_flag(CERTIFICATES_USE_ALLOWLIST, active=False)
     def test_handle_invalid(self):
         """
         Test handling of an invalid user/course run combo
