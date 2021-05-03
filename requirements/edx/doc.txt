@@ -23,7 +23,7 @@ packaging==20.9           # via sphinx
 pbr==5.6.0                # via stevedore
 pygments==2.8.1           # via sphinx
 pyparsing==2.4.7          # via packaging
-python-slugify==4.0.1     # via code-annotations
+python-slugify==4.0.1     # via -c requirements/edx/../constraints.txt, code-annotations
 pytz==2021.1              # via babel, django
 pyyaml==5.4.1             # via code-annotations
 requests==2.25.1          # via sphinx

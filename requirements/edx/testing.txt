@@ -233,7 +233,7 @@ pytest==6.2.3             # via -r requirements/edx/testing.in, pylint-pytest, p
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, olxcleaner, ora2, xblock
 python-levenshtein==0.12.2  # via -r requirements/edx/base.txt
 python-memcached==1.59    # via -r requirements/edx/base.txt
-python-slugify==4.0.1     # via -r requirements/edx/base.txt, code-annotations, transifex-client
+python-slugify==4.0.1     # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt, code-annotations, transifex-client
 python-swiftclient==3.11.1  # via -r requirements/edx/base.txt, ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.txt, social-auth-core
 python3-saml==1.9.0       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.txt
