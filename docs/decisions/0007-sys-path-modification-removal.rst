@@ -129,8 +129,6 @@ What the old imports are, and their replacements:
 +-------------------------------+----------------------------------------------+
 | ``edxnotes``                  | ``lms.djangoapps.edxnotes``                  |
 +-------------------------------+----------------------------------------------+
-| ``email_marketing``           | ``lms.djangoapps.email_marketing``           |
-+-------------------------------+----------------------------------------------+
 | ``experiments``               | ``lms.djangoapps.experiments``               |
 +-------------------------------+----------------------------------------------+
 | ``gating``                    | ``lms.djangoapps.gating``                    |

@@ -16,7 +16,6 @@ from rest_framework.views import APIView
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.signals import SAILTHRU_AUDIT_PURCHASE
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.courseware import courses
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
@@ -30,7 +29,6 @@ from ...constants import Messages
 from ...http import DetailResponse
 
 log = logging.getLogger(__name__)
-SAILTHRU_CAMPAIGN_COOKIE = 'sailthru_bid'
 
 
 class BasketsView(APIView):
@@ -153,9 +151,6 @@ class BasketsView(APIView):
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR
-            SAILTHRU_AUDIT_PURCHASE.send(
-                sender=None, user=user, mode=mode, course_id=course_id
-            )
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
         else:

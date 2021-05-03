@@ -93,8 +93,6 @@ log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
-# enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
-
 
 # ENROLL signal used for free enrollment only
 class EnrollStatusChange:
