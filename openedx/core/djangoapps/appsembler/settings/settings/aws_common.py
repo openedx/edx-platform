@@ -82,3 +82,11 @@ def plugin_settings(settings):
     settings.TAHOE_DEFAULT_COURSE_VERSION = settings.ENV_TOKENS.get('TAHOE_DEFAULT_COURSE_VERSION', '')
 
     settings.TAHOE_SCORM_XBLOCK_ROOT_DIR = settings.ENV_TOKENS.get('TAHOE_SCORM_XBLOCK_ROOT_DIR', False)
+
+    # DEPRECATE starting with Lilac release: unnecessary
+    # All installed XBlocks need to be listed here whether they require
+    # learner interaction or not.  Otherwise, course outline will
+    # show subsection, section, and course as incomplete.
+    settings.TAHOE_COURSE_OUTLINE_COMPLETABLE_BLOCK_TYPES = settings.ENV_TOKENS.get(
+        'TAHOE_COURSE_OUTLINE_COMPLETABLE_BLOCK_TYPES', []
+    )
