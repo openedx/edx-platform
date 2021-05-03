@@ -769,7 +769,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return "//{}/{}/{}".format(settings.CMS_BASE, page, str(course.id))
+    return f"//{settings.CMS_BASE}/{page}/{str(course.id)}"
 
 
 def get_cms_block_link(block, page):

@@ -538,7 +538,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
         request_factory = RequestFactoryNoCsrf()
-        data = {'input_{}_2_1'.format(str(self.problem_1.location.html_id())): 'choice_2'}
+        data = {f'input_{str(self.problem_1.location.html_id())}_2_1': 'choice_2'}
         request = request_factory.post(
             'problem_check',
             data=data

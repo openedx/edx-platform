@@ -34,7 +34,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
             # See if we are able to view the course. If we are, redirect to it
             try:
                 get_course_overview_with_access(request.user, 'load', course_id)
-                return redirect("/courses/{course_id}/wiki/{path}".format(course_id=str(course_id), path=wiki_path))  # lint-amnesty, pylint: disable=line-too-long
+                return redirect(f"/courses/{str(course_id)}/wiki/{wiki_path}")  # lint-amnesty, pylint: disable=line-too-long
             except Http404:
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
@@ -57,7 +57,7 @@ class WikiAccessMiddleware(MiddlewareMixin):
 
         if course_id:
             # This is a /courses/org/name/run/wiki request
-            course_path = "/courses/{}".format(str(course_id))
+            course_path = f"/courses/{str(course_id)}"
             # HACK: django-wiki monkeypatches the reverse function to enable
             # urls to be rewritten
             reverse._transform_url = lambda url: course_path + url  # pylint: disable=protected-access

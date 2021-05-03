@@ -161,7 +161,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
         def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=invalid-name
             """Asserts that the given thread has the expected set of properties"""
-            assert set(thread.keys()) == set(['commentable_id', 'courseware_url', 'courseware_title'])
+            assert set(thread.keys()) == {'commentable_id', 'courseware_url', 'courseware_title'}
             assert thread.get('courseware_url') == reverse('jump_to', kwargs={'course_id': str(self.course.id), 'location': str(discussion.location)})
             assert thread.get('courseware_title') == expected_title
 
@@ -652,16 +652,16 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         category_map = utils.get_discussion_category_map(self.course, self.user)
 
         chapter1 = category_map["subcategories"]["Chapter 1"]
-        chapter1_discussions = set(["Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"])
-        chapter1_discussions_with_types = set([("Discussion A", TYPE_ENTRY), ("Discussion B", TYPE_ENTRY),
-                                               ("Discussion A (1)", TYPE_ENTRY), ("Discussion A (2)", TYPE_ENTRY)])
+        chapter1_discussions = {"Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"}
+        chapter1_discussions_with_types = {("Discussion A", TYPE_ENTRY), ("Discussion B", TYPE_ENTRY),
+                                           ("Discussion A (1)", TYPE_ENTRY), ("Discussion A (2)", TYPE_ENTRY)}
         assert set(chapter1['children']) == chapter1_discussions_with_types
         assert set(chapter1['entries'].keys()) == chapter1_discussions
 
         chapter2 = category_map["subcategories"]["Chapter 2"]
         subsection1 = chapter2["subcategories"]["Section 1"]["subcategories"]["Subsection 1"]
-        subsection1_discussions = set(["Discussion", "Discussion (1)"])
-        subsection1_discussions_with_types = set([("Discussion", TYPE_ENTRY), ("Discussion (1)", TYPE_ENTRY)])
+        subsection1_discussions = {"Discussion", "Discussion (1)"}
+        subsection1_discussions_with_types = {("Discussion", TYPE_ENTRY), ("Discussion (1)", TYPE_ENTRY)}
         assert set(subsection1['children']) == subsection1_discussions_with_types
         assert set(subsection1['entries'].keys()) == subsection1_discussions
 

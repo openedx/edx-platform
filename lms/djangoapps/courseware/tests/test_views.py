@@ -585,7 +585,7 @@ class ViewsTestCase(BaseViewsTestCase):
         if enrollment:
             self.assertRedirects(response, courseware_url)
         else:
-            self.assertRedirects(response, '/courses/{}/about'.format(str(self.course_key)))
+            self.assertRedirects(response, f'/courses/{str(self.course_key)}/about')
 
     def test_enroll_staff_with_invalid_data(self):
         """
@@ -596,7 +596,7 @@ class ViewsTestCase(BaseViewsTestCase):
         __, enroll_url = self._create_url_for_enroll_staff()
         response = self.client.post(enroll_url, data={'test': "test"})
         assert response.status_code == 302
-        self.assertRedirects(response, '/courses/{}/about'.format(str(self.course_key)))
+        self.assertRedirects(response, f'/courses/{str(self.course_key)}/about')
 
     def assert_enrollment_link_present(self, is_anonymous):
         """
