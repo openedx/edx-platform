@@ -112,9 +112,6 @@ httpretty<1.0
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
 
-# 3.8.6 causes an issue in the instructor dashboard
-edx-proctoring<=3.8.5
-
 # transifex-client==0.14.2(latest) requires python-slugify<5.0.0 for Python 2.0 support.
 # This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
 python-slugify<5.0.0
