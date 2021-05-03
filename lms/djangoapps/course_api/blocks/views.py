@@ -242,7 +242,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 patch_response_headers(response)
             return response
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(str(exception)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise Http404(f"Block not found: {str(exception)}")  # lint-amnesty, pylint: disable=raise-missing-from
 
 
 @view_auth_classes(is_authenticated=False)
@@ -305,7 +305,7 @@ class BlocksInCourseView(BlocksView):
             course_key = CourseKey.from_string(course_key_string)
             course_usage_key = modulestore().make_course_usage_key(course_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid course key.".format(str(course_key_string)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f"'{str(course_key_string)}' is not a valid course key.")  # lint-amnesty, pylint: disable=raise-missing-from
         response = super().list(request, course_usage_key,
                                 hide_access_denials=hide_access_denials)
 

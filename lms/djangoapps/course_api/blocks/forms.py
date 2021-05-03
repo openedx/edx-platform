@@ -75,7 +75,7 @@ class BlockListGetForm(Form):
         try:
             usage_key = UsageKey.from_string(usage_key)
         except InvalidKeyError:
-            raise ValidationError("'{}' is not a valid usage key.".format(str(usage_key)))  # lint-amnesty, pylint: disable=raise-missing-from
+            raise ValidationError(f"'{str(usage_key)}' is not a valid usage key.")  # lint-amnesty, pylint: disable=raise-missing-from
 
         return usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
