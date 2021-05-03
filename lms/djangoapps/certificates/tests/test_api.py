@@ -1024,7 +1024,7 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
 
     def test_can_be_added_to_allowlist_not_enrolled(self):
         """
-        Test to verify that a learner will be rejected from the allowlist without an active enrollmeint in a
+        Test to verify that a learner will be rejected from the allowlist without an active enrollment in a
         course-run.
         """
         new_course_run = CourseFactory()

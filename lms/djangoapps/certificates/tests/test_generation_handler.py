@@ -151,11 +151,13 @@ class AllowlistTests(ModuleStoreTestCase):
         """
         Test handling of an invalid user/course run combo
         """
-        assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
-        assert not generate_allowlist_certificate_task(self.user, self.course_run_key)
-        assert not can_generate_certificate_task(self.user, self.course_run_key)
-        assert not generate_certificate_task(self.user, self.course_run_key)
-        assert _set_allowlist_cert_status(self.user, self.course_run_key) is None
+        u = UserFactory()
+
+        assert not _can_generate_allowlist_certificate(u, self.course_run_key)
+        assert not generate_allowlist_certificate_task(u, self.course_run_key)
+        assert not can_generate_certificate_task(u, self.course_run_key)
+        assert not generate_certificate_task(u, self.course_run_key)
+        assert _set_allowlist_cert_status(u, self.course_run_key) is None
 
     def test_handle_valid(self):
         """
