@@ -1,4 +1,4 @@
 mailchimp3==3.0.14
 pytest-mock==3.3.1
 mandrill==1.0.59
--e git+https://${PHILU_PAT}@github.com/philanthropy-u/edx-msp-assessment-xblock.git@${MSP_XBLOCK_BRANCH}#egg=msp-assessment-xblock
+-e git+https://${PHILU_PAT}@github.com/philanthropy-u/edx-msp-assessment-xblock.git@${ADG_XBLOCKS_BRANCH}#egg=msp-assessment-xblock
