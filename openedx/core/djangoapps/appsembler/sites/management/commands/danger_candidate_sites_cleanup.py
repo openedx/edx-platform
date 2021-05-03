@@ -29,6 +29,8 @@ class Command(BaseCommand):
             self.stdout.write('TO {}'.format(site.domain))
             site.save()
 
+            site.configuration.site_values['SITE_NAME'] = site.domain
+
             try:
                 del site.configuration.site_values['SEGMENT_KEY']
                 self.stdout.write('deleted SEGMENT_KEY')
