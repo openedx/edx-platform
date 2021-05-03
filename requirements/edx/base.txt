@@ -191,7 +191,7 @@ pysrt==1.1.2              # via -r requirements/edx/base.in, edxval
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, icalendar, olxcleaner, ora2, xblock
 python-levenshtein==0.12.2  # via -r requirements/edx/base.in
 python-memcached==1.59    # via -r requirements/edx/paver.txt
-python-slugify==4.0.1     # via code-annotations
+python-slugify==4.0.1     # via -c requirements/edx/../constraints.txt, code-annotations
 python-swiftclient==3.11.1  # via ora2
 python3-openid==3.2.0 ; python_version >= "3"  # via -r requirements/edx/base.in, social-auth-core
 python3-saml==1.9.0       # via -c requirements/edx/../constraints.txt, -r requirements/edx/base.in
