@@ -178,7 +178,6 @@ class CoursewareIndex(View):
         if courseware_legacy_is_visible(
                 course_key=self.course_key,
                 is_global_staff=self.request.user.is_staff,
-                is_course_staff=self.is_staff,
         ):
             return
         # STAY: if we are in a special (ie proctored/timed) exam, which isn't yet
