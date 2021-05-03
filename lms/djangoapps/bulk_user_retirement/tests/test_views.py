@@ -82,7 +82,7 @@ class BulkUserRetirementViewTests(APITestCase):
         }
         with self.settings(RETIREMENT_SERVICE_WORKER_USERNAME=self.user1.username):
             response = self.client.post(user_retirement_url, {
-                "usernames": '{user1},{user2}'.format(user1=self.user3.username, user2=self.user4.username)
+                "usernames": f'{self.user3.username},{self.user4.username}'
             })
             assert response.status_code == 200
             assert response.data == expected_response

@@ -75,7 +75,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         assert not form.is_valid()
 
         msg = 'Course not found.'
-        msg += ' Entered course id was: "{}".'.format(str(bad_id))
+        msg += f' Entered course id was: "{str(bad_id)}".'
         assert msg == form._errors['course_id'][0]  # pylint: disable=protected-access
 
         with self.assertRaisesRegex(
