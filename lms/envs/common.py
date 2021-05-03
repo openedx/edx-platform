@@ -2623,10 +2623,6 @@ INSTALLED_APPS = [
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
-
-    # Added here to make migration from ironwood to juniper easy, will be removed later.
-    'provider',
-    'provider.oauth2',
 ]
 
 ######################### CSRF #########################################
