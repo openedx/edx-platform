@@ -411,8 +411,8 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 </svg>
                 <div class="message-copy" align="auto">
                   ${Text(_("{start_bold}Get the most out of your course!{end_bold} Upgrade to get full access to the course material, unlock both graded and non-graded assignments, and earn a {link_start}verified certificate{link_end} to showcase on your resume.")).format(
-                          start_bold=HTML('<b class="message-copy-bold">'),
-                          end_bold=HTML('</b>'),
+                          start_bold=HTML('<strong class="message-copy-bold">'),
+                          end_bold=HTML('</strong>'),
                           link_start=HTML('<a href="{}" class="verified-info" data-course-key="{}">').format(
                             marketing_link('WHAT_IS_VERIFIED_CERT'),
                             enrollment.course_id

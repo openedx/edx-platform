@@ -827,12 +827,12 @@
             flex: 2;
 
             .message-copy-bold {
-              font-weight: 600;
+              font-weight: $font-weight-bold;
             }
           }
 
           a.verified-info {
-            color: #454545;
+            color: $gray-700;
             text-decoration: underline;
           }
         }
