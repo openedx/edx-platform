@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-04-30 14:20+0000\n"
+"POT-Creation-Date: 2021-05-03 12:01+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -10162,6 +10162,14 @@ msgstr "قريبًا"
 msgid "Delivered"
 msgstr ""
 
+#: openedx/adg/lms/webinars/api_views.py
+msgid "Webinar not found"
+msgstr ""
+
+#: openedx/adg/lms/webinars/api_views.py
+msgid "Webinar has been cancelled"
+msgstr ""
+
 #: openedx/adg/lms/webinars/forms.py
 msgid "Add guests by email address"
 msgstr "عنوان البريد الإلكتروني الثانوي"
@@ -10262,10 +10270,6 @@ msgstr ""
 
 #: openedx/adg/lms/webinars/models.py
 msgid "Scheduled Week Before Reminder Id On Mandrill"
-msgstr ""
-
-#: openedx/adg/lms/webinars/views.py
-msgid "You cannot register cancelled event"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/apps.py
