@@ -5,7 +5,7 @@ import pytest
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.adg.lms.webinars.models import Webinar, WebinarRegistration
+from openedx.adg.lms.webinars.models import WebinarRegistration
 from openedx.adg.lms.webinars.tests.factories import WebinarFactory, WebinarRegistrationFactory
 
 pytestmark = pytest.mark.django_db
@@ -37,7 +37,7 @@ def test_webinar_registration_view_cancelled_webinar(client, user_client):
     Test webinar registration if webinar is cancelled
     """
     _, client = user_client
-    webinar = WebinarFactory(status=Webinar.CANCELLED)
+    webinar = WebinarFactory(is_cancelled=True)
 
     response = client.post(reverse('webinar_registration', kwargs={'pk': webinar.id, 'action': 'register'}))
 
@@ -50,7 +50,7 @@ def test_webinar_registration_view_register_user_with_no_prior_registration(acti
     Test webinar registration and cancellation if webinar was not previously registered by user
     """
     mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.views.send_webinar_registration_email')
-    webinar = WebinarFactory(status=Webinar.UPCOMING)
+    webinar = WebinarFactory()
     user, client = user_client
 
     client.post(reverse('webinar_registration', kwargs={'pk': webinar.id, 'action': action}))

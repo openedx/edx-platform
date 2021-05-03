@@ -14,7 +14,7 @@ from openedx.adg.lms.applications.helpers import validate_file_size
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .constants import ALLOWED_BANNER_EXTENSIONS, BANNER_MAX_SIZE
-from .helpers import send_cancellation_emails_for_given_webinars
+from .helpers import is_webinar_upcoming, send_cancellation_emails_for_given_webinars
 
 
 class WebinarQuerySet(models.QuerySet):
@@ -25,9 +25,10 @@ class WebinarQuerySet(models.QuerySet):
 
     def delete(self):
         cancelled_upcoming_webinars = self.filter(
-            status=Webinar.UPCOMING).select_related('presenter').prefetch_related('co_hosts', 'panelists')
+            is_cancelled=False, start_time__gte=now()
+        ).select_related('presenter').prefetch_related('co_hosts', 'panelists')
         send_cancellation_emails_for_given_webinars(cancelled_upcoming_webinars)
-        self.update(status=Webinar.CANCELLED)
+        self.update(is_cancelled=True)
 
 
 class Webinar(TimeStampedModel):
@@ -62,16 +63,8 @@ class Webinar(TimeStampedModel):
     DELIVERED = 'delivered'
     CANCELLED = 'cancelled'
 
-    STATUS_CHOICES = (
-        (UPCOMING, _('Upcoming')),
-        (DELIVERED, _('Delivered')),
-        (CANCELLED, _('Cancelled'))
-    )
-    status = models.CharField(
-        verbose_name=_('Webinar Status'), choices=STATUS_CHOICES, max_length=10, default=UPCOMING,
-    )
-
     is_virtual = models.BooleanField(default=True, verbose_name=_('Virtual Event'), )
+    is_cancelled = models.BooleanField(default=False, verbose_name=_('Is Event Cancelled'), )
     created_by = models.ForeignKey(
         User, verbose_name=_('Created By'), on_delete=models.CASCADE, blank=True, related_name='webinar_created_by',
     )
@@ -117,9 +110,9 @@ class Webinar(TimeStampedModel):
             raise ValidationError(errors)
 
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
-        if self.status == Webinar.UPCOMING:
+        if is_webinar_upcoming(self):
             send_cancellation_emails_for_given_webinars([self])
-        self.status = self.CANCELLED
+        self.is_cancelled = True
         self.save()
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):

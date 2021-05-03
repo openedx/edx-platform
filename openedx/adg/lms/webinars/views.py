@@ -45,7 +45,7 @@ class WebinarRegistrationView(LoginRequiredMixin, SingleObjectMixin, View):
         is_registering = action == 'register'
         user = request.user
 
-        if is_registering and self.object.status == Webinar.CANCELLED:
+        if is_registering and self.object.is_cancelled:
             return HttpResponseServerError(_('You cannot register cancelled event'))
 
         registered_webinar_for_user = WebinarRegistration.objects.filter(

@@ -1,7 +1,10 @@
 """
 File containing common fixtures used across different test modules
 """
+from datetime import timedelta
+
 import pytest
+from django.utils.timezone import now
 
 from openedx.adg.lms.applications.admin import adg_admin_site
 from openedx.adg.lms.webinars.admin import WebinarAdmin
@@ -12,6 +15,11 @@ from openedx.adg.lms.webinars.tests.factories import WebinarFactory
 @pytest.fixture
 def webinar():
     return WebinarFactory()
+
+
+@pytest.fixture
+def delivered_webinar():
+    return WebinarFactory(start_time=now() - timedelta(days=1))
 
 
 @pytest.fixture

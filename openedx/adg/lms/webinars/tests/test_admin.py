@@ -1,14 +1,22 @@
 """
 All the tests related to admin in webinars app
 """
+from datetime import timedelta
+
 import pytest
 from django.contrib.admin.sites import AdminSite
+from django.utils.timezone import now
 from mock import Mock, call
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.lms.webinars.admin import ActiveWebinarStatusFilter, CancelledWebinarAdmin, WebinarAdmin
-from openedx.adg.lms.webinars.models import CancelledWebinar, Webinar
+from openedx.adg.lms.webinars.admin import (
+    ActiveWebinarStatusFilter,
+    CancelledWebinarAdmin,
+    WebinarAdmin,
+    WebinarRegistrationAdmin
+)
+from openedx.adg.lms.webinars.models import CancelledWebinar, Webinar, WebinarRegistration
 
 from .factories import WebinarFactory, WebinarRegistrationFactory
 
@@ -23,6 +31,12 @@ def cancelled_webinar_admin_fixture():
 def webinar_admin_fixture():
     site = AdminSite()
     return WebinarAdmin(Webinar, site)
+
+
+@pytest.fixture(name='webinar_registration_admin')
+def webinar_registration_admin_fixture():
+    site = AdminSite()
+    return WebinarRegistrationAdmin(WebinarRegistration, site)
 
 
 def test_cancelled_webinar_admin_add_permission():
@@ -63,9 +77,7 @@ def test_cancelled_webinar_admin_get_queryset(
     """
     Test if the queryset for the CancelledWebinarAdmin contains the correct data i.e Cancelled Webinar
     """
-    for webinar_status in webinar_statuses:
-        WebinarFactory(status=webinar_status)
-
+    create_test_webinars_as_per_status(webinar_statuses)
     assert cancelled_webinar_admin.get_queryset(request).count() == expected_webinar_count
 
 
@@ -84,9 +96,7 @@ def test_non_cancelled_webinar_admin_get_queryset(webinar_statuses, expected_web
     """
     Test if the queryset for the WebinarAdmin fetches the correct data i.e Non-cancelled webinars
     """
-    for webinar_status in webinar_statuses:
-        WebinarFactory(status=webinar_status)
-
+    create_test_webinars_as_per_status(webinar_statuses)
     assert webinar_admin.get_queryset(request).count() == expected_webinar_count
 
 
@@ -107,9 +117,7 @@ def test_webinar_admin_custom_status_list_filter(
     """
     Test if the custom list filter `ActiveWebinarStatusFilter` for WebinarAdmin, filters the webinars as expected
     """
-    for webinar_status in webinar_statuses:
-        WebinarFactory(status=webinar_status)
-
+    create_test_webinars_as_per_status(webinar_statuses)
     webinar_admin_queryset = webinar_admin.get_queryset(request)
 
     upcoming_filter = ActiveWebinarStatusFilter(None, {'status': Webinar.UPCOMING}, Webinar, WebinarAdmin)
@@ -162,3 +170,25 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
         mock_send_webinar_emails.assert_called_once_with(
             MandrillClient.WEBINAR_CREATED, webinar.title, webinar.description, webinar.start_time, []
         )
+
+
+@pytest.mark.django_db
+def test_webinars_in_webinar_registration_admin(webinar_registration_admin, request):
+
+    webinar = WebinarFactory()
+    WebinarFactory(start_time=now() - timedelta(days=1))
+    WebinarFactory(is_cancelled=True)
+
+    webinar_admin_queryset = webinar_registration_admin.get_form(request).base_fields['webinar'].queryset
+    assert len(webinar_admin_queryset) == 1
+    assert webinar_admin_queryset.first() == webinar
+
+
+def create_test_webinars_as_per_status(webinar_statues):
+    for status in webinar_statues:
+        if status == Webinar.UPCOMING:
+            WebinarFactory()
+        elif status == Webinar.DELIVERED:
+            WebinarFactory(start_time=now() - timedelta(days=1))
+        else:
+            WebinarFactory(is_cancelled=True)
