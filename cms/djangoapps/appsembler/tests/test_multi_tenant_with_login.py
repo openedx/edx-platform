@@ -20,8 +20,6 @@ our code to explicitly hack  `sys.modules` reloading
 """
 
 import ddt
-import pytest
-from django.core.exceptions import MultipleObjectsReturned
 from django.conf.urls import include, url
 from django.urls import reverse
 from bs4 import BeautifulSoup as soup
@@ -118,15 +116,17 @@ class MultiTenantStudioLoginTestCase(TestCase):
         customer_2 = UserFactory.create(email=self.EMAIL, password='another_password')
         CourseAccessRole.objects.create(user=customer_2, role=CourseInstructorRole.ROLE)
 
-        assert not mock_log.exception.called, 'Not to be called yet'
-        with pytest.raises(MultipleObjectsReturned):
-            self.client.post(self.url, {
-                'email': self.EMAIL,
-                'password': self.PASSWORD,
-            })
-        assert mock_log.exception.called, 'Should be called to log our custom message'
+        response = self.client.post(self.url, {
+            'email': self.EMAIL,
+            'password': self.PASSWORD,
+        })
+        assert response.status_code == status.HTTP_200_OK, response.content
+        # Assert we do NOT have a logged-in session (authorized user)
+        self.assertNotIn('_auth_user_id', self.client.session)
+        assert response['Content-Type'] == 'text/html; charset=utf-8'
+        error_message = self.get_error_message_text(response)
+        assert error_message == LoginView.error_messages['multiple_users_found']
 
-    @pytest.mark.skip(reason="For now, we mandate Studio users have a unique email address")
     def test_login_for_course_staff_but_learner_on_another_site_original(self):
         """
         Test the login for a learner in a site but a staff in another.
@@ -149,25 +149,6 @@ class MultiTenantStudioLoginTestCase(TestCase):
         # Assert we DO have a logged-in session (authorized user)
         self.assertIn('_auth_user_id', self.client.session)
         assert response['Content-Type'] == 'text/html; charset=utf-8'
-
-    @patch('cms.djangoapps.appsembler.views.logger')
-    def test_login_for_course_staff_but_learner_on_another_site(self, mock_log):
-        """
-        Test the login for a learner in a site but a staff in another.
-
-        When APPSEMBLER_MULTI_TENANT_EMAILS feature when enabled in Studio
-        """
-        # Add a learner with the same email.
-        UserFactory.create(email=self.EMAIL, password='another_password')
-
-        CourseAccessRole.objects.create(user=self.customer, role=CourseStaffRole.ROLE)
-        assert not mock_log.exception.called, 'Not to be called yet'
-        with pytest.raises(MultipleObjectsReturned):
-            self.client.post(self.url, {
-                'email': self.EMAIL,
-                'password': self.PASSWORD,
-            })
-        assert mock_log.exception.called, 'Should be called to log our custom message'
 
     def test_login_for_course_staff_in_two_courses(self):
         """
