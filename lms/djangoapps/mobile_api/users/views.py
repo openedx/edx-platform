@@ -152,7 +152,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [str(module.location) for module in path]
+        path_ids = [str(module.location) for module in path if module is not None]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
