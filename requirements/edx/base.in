@@ -79,7 +79,7 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-django-utils>=3.16.0            # Utilities for cache, monitoring, and plugins; 3.16.0+ for the `pluggable_override`
+edx-django-utils>=4.0.0            # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
 edx-enterprise
 edx-event-routing-backends
