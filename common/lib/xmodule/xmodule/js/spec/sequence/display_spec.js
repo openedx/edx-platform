@@ -12,9 +12,10 @@
             };
 
         beforeEach(function() {
+            var runtime = jasmine.createSpyObj('TestRuntime', ['handlerUrl']);
             loadFixtures('sequence.html');
             local.XBlock = window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
-            this.sequence = new Sequence($('.xblock-student_view-sequential'));
+            this.sequence = new Sequence($('.xblock-student_view-sequential'), runtime);
         });
 
         afterEach(function() {
