@@ -7,6 +7,7 @@ from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.auth.signals import user_logged_in
+from django.db import transaction
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -186,6 +187,7 @@ class UserCourseStatus(views.APIView):
         save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
         return self._get_course_info(request, course)
 
+    @transaction.non_atomic_requests
     @mobile_course_access(depth=2)
     def get(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
