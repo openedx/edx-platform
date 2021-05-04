@@ -1549,14 +1549,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         )
         self.assertIn(field_name, test_model)
 
-    def test_create_zendesk_tickets_not_present_for_course_staff(self):
-        """
-        Tests that create zendesk tickets field is filtered out when the user is not an edX staff member.
-        """
-        test_model = CourseMetadata.fetch(self.fullcourse)
-        self.assertNotIn('create_zendesk_tickets', test_model)
-
-    def test_validate_update_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+    def test_validate_update_does_not_filter_out_create_zendesk_tickets_for_course_staff(self):
         """
         Tests that create zendesk tickets field is not returned by validate_and_update_from_json method when
         the user is not an edX staff member.
@@ -1570,9 +1563,9 @@ class CourseMetadataEditingTest(CourseTestCase):
             },
             user=self.user
         )
-        self.assertNotIn(field_name, test_model)
+        self.assertIn(field_name, test_model)
 
-    def test_update_from_json_does_filter_out_create_zendesk_tickets_for_course_staff(self):
+    def test_update_from_json_does_not_filter_out_create_zendesk_tickets_for_course_staff(self):
         """
         Tests that create zendesk tickets field is not returned by update_from_json method when
         the user is not an edX staff member.
@@ -1586,7 +1579,7 @@ class CourseMetadataEditingTest(CourseTestCase):
             },
             user=self.user
         )
-        self.assertNotIn(field_name, test_model)
+        self.assertIn(field_name, test_model)
 
     def _set_request_user_to_staff(self):
         """
