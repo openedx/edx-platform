@@ -4,11 +4,14 @@ Helpers for webinars app
 from datetime import datetime, timedelta
 from itertools import chain
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.urls import reverse
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINARS_TIME_FORMAT
 
@@ -30,10 +33,29 @@ def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime("%B %d, %Y %I:%M %p %Z")
+        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_link': webinar.meeting_link,
     }
 
+    if template_slug == MandrillClient.WEBINAR_CREATED:
+        context['register_link'] = get_webinar_description_link(webinar.id)
+
     task_send_mandrill_email.delay(template_slug, recipient_emails, context, send_at)
+
+
+def get_webinar_description_link(webinar_pk):
+    """
+    Return absolute url of webinar description page to use in webinar invitation emails
+
+    Arguments:
+        webinar_pk (int): Webinar primary key
+
+    Returns:
+        str: absolute url
+    """
+    root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    webinar_description_url = reverse('webinar_event', kwargs={'pk': webinar_pk})
+    return f'{root_url}{webinar_description_url}'
 
 
 def send_cancellation_emails_for_given_webinars(cancelled_webinars):
