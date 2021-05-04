@@ -16,27 +16,38 @@ from openedx.adg.lms.applications.helpers import validate_file_size
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
 from .constants import ALLOWED_BANNER_EXTENSIONS, BANNER_MAX_SIZE, WEBINARS_TIME_FORMAT
-from .helpers import (
-    cancel_reminders_for_given_webinars,
-    is_webinar_upcoming,
-    send_cancellation_emails_for_given_webinars
-)
+from .helpers import cancel_reminders_for_given_webinars, send_cancellation_emails_for_given_webinars
 from .managers import WebinarRegistrationManager
 
 
 class WebinarQuerySet(models.QuerySet):
     """
-    Custom QuerySet that does not allow Webinars to be deleted from the database, instead marks the status of the
-    deleted Webinars as `Cancelled`
+    Class contains custom querySet methods for webinars
     """
 
     def delete(self):
-        cancelled_upcoming_webinars = self.filter(
-            is_cancelled=False, start_time__gte=now()
-        ).select_related('presenter').prefetch_related('co_hosts', 'panelists')
+        """
+        Overriding delete method so that it does not allow Webinars to be deleted from the database,
+        instead marks the status of the deleted Webinars as `Cancelled`
+        """
+        cancelled_upcoming_webinars = self.upcoming_webinars().select_related('presenter').prefetch_related(
+            'co_hosts', 'panelists'
+        )
         send_cancellation_emails_for_given_webinars(cancelled_upcoming_webinars)
         cancel_reminders_for_given_webinars(cancelled_upcoming_webinars)
         self.update(is_cancelled=True)
+
+    def upcoming_webinars(self):
+        """
+        Filter queryset to display upcoming webinars
+        """
+        return self.filter(is_cancelled=False, end_time__gte=now())
+
+    def delivered_webinars(self):
+        """
+        Filter queryset to display delivered webinars
+        """
+        return self.filter(is_cancelled=False, end_time__lt=now())
 
 
 class Webinar(TimeStampedModel):
@@ -93,6 +104,10 @@ class Webinar(TimeStampedModel):
     def __str__(self):
         return self.title
 
+    @property
+    def is_upcoming_webinar(self):
+        return self.end_time > now() and not self.is_cancelled
+
     def to_dict(self):
         return {
             'webinar_id': self.id,
@@ -127,7 +142,7 @@ class Webinar(TimeStampedModel):
             raise ValidationError(errors)
 
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
-        if is_webinar_upcoming(self):
+        if self.is_upcoming_webinar:
             send_cancellation_emails_for_given_webinars([self])
             cancel_reminders_for_given_webinars([self])
         self.is_cancelled = True

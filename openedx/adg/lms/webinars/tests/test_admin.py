@@ -16,6 +16,11 @@ from openedx.adg.lms.webinars.admin import (
     WebinarAdmin,
     WebinarRegistrationAdmin
 )
+from openedx.adg.lms.webinars.constants import (
+    WEBINAR_STATUS_CANCELLED,
+    WEBINAR_STATUS_DELIVERED,
+    WEBINAR_STATUS_UPCOMING
+)
 from openedx.adg.lms.webinars.models import CancelledWebinar, Webinar, WebinarRegistration
 
 from .factories import WebinarFactory, WebinarRegistrationFactory
@@ -101,6 +106,16 @@ def test_non_cancelled_webinar_admin_get_queryset(webinar_statuses, expected_web
 
 
 @pytest.mark.django_db
+def test_webinar_admin_webinar_status(webinar, delivered_webinar, cancelled_webinar, webinar_admin):
+    """
+    Test if the WebinarAdmin has correct status
+    """
+    assert webinar_admin.webinar_status(webinar) == WEBINAR_STATUS_UPCOMING
+    assert webinar_admin.webinar_status(delivered_webinar) == WEBINAR_STATUS_DELIVERED
+    assert webinar_admin.webinar_status(cancelled_webinar) == WEBINAR_STATUS_CANCELLED
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     'webinar_statuses, expected_upcoming_count, expected_delivered_count',
     [
@@ -172,18 +187,6 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
         )
 
 
-@pytest.mark.django_db
-def test_webinars_in_webinar_registration_admin(webinar_registration_admin, request):
-
-    webinar = WebinarFactory()
-    WebinarFactory(start_time=now() - timedelta(days=1))
-    WebinarFactory(is_cancelled=True)
-
-    webinar_admin_queryset = webinar_registration_admin.get_form(request).base_fields['webinar'].queryset
-    assert len(webinar_admin_queryset) == 1
-    assert webinar_admin_queryset.first() == webinar
-
-
 def create_test_webinars_as_per_status(webinar_statues):
     """
     Prepare multiple webinars for test data, one for every status i-e upcoming, delivered and cancelled
@@ -192,6 +195,6 @@ def create_test_webinars_as_per_status(webinar_statues):
         if status == Webinar.UPCOMING:
             WebinarFactory()
         elif status == Webinar.DELIVERED:
-            WebinarFactory(start_time=now() - timedelta(days=1))
+            WebinarFactory(end_time=now() - timedelta(hours=1))
         else:
             WebinarFactory(is_cancelled=True)

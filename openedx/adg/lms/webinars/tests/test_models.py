@@ -86,3 +86,15 @@ def test_delete_multiple_webinars(mocker, webinar, delivered_webinar):
 
     assert Webinar.objects.filter(id=delivered_webinar.id).first().is_cancelled
     assert Webinar.objects.filter(id=webinar.id).first().is_cancelled
+
+
+@pytest.mark.django_db
+def test_upcoming_webinars(webinar, delivered_webinar):  # pylint: disable=unused-argument
+    assert Webinar.objects.upcoming_webinars().count() == 1
+    assert Webinar.objects.upcoming_webinars().first() == webinar
+
+
+@pytest.mark.django_db
+def test_delivered_webinars(webinar, delivered_webinar):  # pylint: disable=unused-argument
+    assert Webinar.objects.delivered_webinars().count() == 1
+    assert Webinar.objects.delivered_webinars().first() == delivered_webinar

@@ -17,7 +17,6 @@ from openedx.adg.lms.webinars.constants import (
 from openedx.adg.lms.webinars.helpers import (
     cancel_all_reminders,
     cancel_reminders_for_given_webinars,
-    is_webinar_upcoming,
     remove_emails_duplicate_in_other_list,
     save_scheduled_reminder_ids,
     send_cancellation_emails_for_given_webinars,
@@ -211,18 +210,6 @@ def test_remove_emails_duplicate_in_other_list(emails, reference_emails, expecte
     Test that only the list of emails that are not present in reference list of emails are returned
     """
     assert sorted(remove_emails_duplicate_in_other_list(emails, reference_emails)) == sorted(expected_emails)
-
-
-@pytest.mark.django_db
-def test_is_webinar_upcoming(webinar, delivered_webinar):
-    """
-    Test that given webinar is upcoming or not.
-    """
-    assert is_webinar_upcoming(webinar)
-    assert not is_webinar_upcoming(delivered_webinar)
-
-    webinar.is_cancelled = True
-    assert not is_webinar_upcoming(webinar)
 
 
 @pytest.mark.django_db

@@ -275,7 +275,7 @@ def courses(request):
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
-            'webinars': Webinar.objects.filter(is_cancelled=False, start_time__gte=now()).order_by('start_time'),
+            'webinars': Webinar.objects.upcoming_webinars().order_by('start_time'),
         }
     )
 

@@ -19,7 +19,12 @@ def webinar():
 
 @pytest.fixture
 def delivered_webinar():
-    return WebinarFactory(start_time=now() - timedelta(days=1))
+    return WebinarFactory(end_time=now() - timedelta(hours=1))
+
+
+@pytest.fixture
+def cancelled_webinar():
+    return WebinarFactory(is_cancelled=True)
 
 
 @pytest.fixture

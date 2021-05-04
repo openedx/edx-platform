@@ -6,7 +6,6 @@ from itertools import chain
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.utils.timezone import now
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
@@ -211,19 +210,6 @@ def remove_emails_duplicate_in_other_list(email_list, reference_email_list):
         emails (list): list of remaining emails
     """
     return [email for email in email_list if email not in reference_email_list]
-
-
-def is_webinar_upcoming(webinar):
-    """
-    Returns True if webinar is upcoming, False otherwise
-
-    Args:
-         webinar (Webinar): Webinar object
-
-    Returns:
-        Boolean: True if webinar is of future date, False otherwise and webinar `is_cancelled` state must be False.
-    """
-    return webinar.start_time > now() and not webinar.is_cancelled
 
 
 def update_webinar_team_registrations(webinar_form):
