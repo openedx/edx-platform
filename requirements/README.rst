@@ -12,15 +12,19 @@ directly in the requirements directory.)
 
 .. _OEP-18: https://github.com/edx/open-edx-proposals/blob/master/oeps/oep-0018-bp-python-dependencies.rst
 
-Upgrading just one dependency
+Upgrading/downgrading just one dependency
 -----------------------------
 
-Want to upgrade/downgrade just *one* dependency without pulling in other upgrades? Here's how:
+Want to upgrade just *one* dependency without pulling in other upgrades? Here's how:
 
-1. Add ``my-dep==1.2.3`` to ``requirements/constraints.txt`` temporarily (pin the specific version you want to upgrade to)
+1. Change your dependency to a minimum-version constraint, e.g. ``my-dep>=1.2.3`` (or update the constraint if it already exists)
 2. Run ``make compile-requirements`` to recompute dependencies with this new constraint
-3. Remove your constraint
 
-The resulting changes can then be committed.
+If you instead need to surgically *downgrade* a dependency, perhaps in order to revert a change which broke things:
 
-This is particularly useful when you need to downgrade a dependency which brought in a bug but don't want to roll back all dependency changes. It's also considerably safer than trying to manually edit the ``*.txt`` files, which can easily result in incompatible dependency versions.
+1. Add an exact-match or max-version constraint to ``constraints.txt`` with a comment explaining why (and ideally a ticket or issue link)
+2. Lower the minimum-version constraint, if it exists
+    - Not sure if there is one? Try going on to the next step and seeing if it complains!
+3. Run ``make compile-requirements``
+
+This is considerably safer than trying to manually edit the ``*.txt`` files, which can easily result in incompatible dependency versions.
