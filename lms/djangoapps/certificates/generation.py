@@ -15,10 +15,10 @@ from uuid import uuid4
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled_from_course_overview
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level
-from xmodule.modulestore.django import modulestore
+from lms.djangoapps.instructor.access import list_with_level_from_course_key
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
 log = logging.getLogger(__name__)
 
@@ -63,8 +63,7 @@ def _generate_certificate(user, course_key):
     profile = UserProfile.objects.get(user=user)
     profile_name = profile.name
 
-    course = modulestore().get_course(course_key, depth=0)
-    course_grade = CourseGradeFactory().read(user, course)
+    course_grade = CourseGradeFactory().read(user, course_key=course_key)
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
 
     # Retain the `verify_uuid` from an existing certificate if possible, this will make it possible for the learner to
@@ -126,22 +125,17 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
-
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    beta_testers_queryset = list_with_level(course, 'beta')
-
+    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
     if beta_testers_queryset.filter(username=student.username):
-        message = 'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(student.username, course_key))
+        log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key}. User is a Beta Tester.")
         return
 
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
 
-    generate_pdf = not has_html_certificates_enabled(course)
+    course_overview = get_course_overview(course_key)
+    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
 
     cert = xqueue.add_cert(
         student,
@@ -151,8 +145,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade=forced_grade
     )
 
-    message = 'Queued Certificate Generation task for {user} : {course}'
-    log.info(message.format(user=student.id, course=course_key))
+    log.info(f"Queued Certificate Generation task for {student.id} : {course_key}")
 
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accessing cert attributes.
