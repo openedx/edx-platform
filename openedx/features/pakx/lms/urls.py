@@ -28,4 +28,7 @@ pakx_url_patterns = [
         course_about,
         name='about_course_with_category',
     ),
+
+    # URL for pakx_admin_app
+    url(r'', include('openedx.features.pakx.lms.pakx_admin_app.urls')),
 ]
