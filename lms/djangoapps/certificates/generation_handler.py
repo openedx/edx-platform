@@ -20,12 +20,15 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
-from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import (
+    emit_certificate_event,
+    has_html_certificates_enabled_from_course_overview
+)
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level
+from lms.djangoapps.instructor.access import list_with_level_from_course_key
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -190,12 +193,11 @@ def _can_generate_v2_certificate(user, course_key):
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
         return False
 
-    course = _get_course(course_key)
-    if _is_beta_tester(user, course):
+    if _is_beta_tester(user, course_key):
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
 
-    if not _has_passing_grade(user, course):
+    if not _has_passing_grade(user, course_key):
         log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
         return False
 
@@ -236,8 +238,8 @@ def _can_generate_certificate_common(user, course_key):
     if not _can_generate_certificate_for_status(user, course_key):
         return False
 
-    course = _get_course(course_key)
-    if not has_html_certificates_enabled(course):
+    course_overview = get_course_overview(course_key)
+    if not has_html_certificates_enabled_from_course_overview(course_overview):
         log.info(f'{course_key} does not have HTML certificates enabled. Certificate cannot be generated for '
                  f'{user.id}.')
         return False
@@ -274,8 +276,7 @@ def _set_v2_cert_status(user, course_key):
     if status is not None:
         return status
 
-    course = _get_course(course_key)
-    course_grade = _get_course_grade(user, course)
+    course_grade = _get_course_grade(user, course_key)
     if not course_grade.passed:
         if cert is None:
             cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
@@ -320,8 +321,7 @@ def _can_set_allowlist_cert_status(user, course_key):
     if not is_on_certificate_allowlist(user, course_key):
         return False
 
-    course = _get_course(course_key)
-    return _can_set_cert_status_common(user, course_key, course)
+    return _can_set_cert_status_common(user, course_key)
 
 
 def _can_set_v2_cert_status(user, course_key):
@@ -334,14 +334,13 @@ def _can_set_v2_cert_status(user, course_key):
     if _is_ccx_course(course_key):
         return False
 
-    course = _get_course(course_key)
-    if _is_beta_tester(user, course):
+    if _is_beta_tester(user, course_key):
         return False
 
-    return _can_set_cert_status_common(user, course_key, course)
+    return _can_set_cert_status_common(user, course_key)
 
 
-def _can_set_cert_status_common(user, course_key, course):
+def _can_set_cert_status_common(user, course_key):
     """
     Determine whether we can set a custom (non-downloadable) cert status
     """
@@ -355,7 +354,8 @@ def _can_set_cert_status_common(user, course_key, course):
     if not modes_api.is_eligible_for_certificate(enrollment_mode):
         return False
 
-    if not has_html_certificates_enabled(course):
+    course_overview = get_course_overview(course_key)
+    if not has_html_certificates_enabled_from_course_overview(course_overview):
         return False
 
     return True
@@ -413,11 +413,11 @@ def _can_generate_certificate_for_status(user, course_key):
     return True
 
 
-def _is_beta_tester(user, course):
+def _is_beta_tester(user, course_key):
     """
     Check if the user is a beta tester in this course run
     """
-    beta_testers_queryset = list_with_level(course, 'beta')
+    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
     return beta_testers_queryset.filter(username=user.username).exists()
 
 
@@ -428,19 +428,19 @@ def _is_ccx_course(course_key):
     return hasattr(course_key, 'ccx')
 
 
-def _has_passing_grade(user, course):
+def _has_passing_grade(user, course_key):
     """
     Check if the user has a passing grade in this course run
     """
-    course_grade = _get_course_grade(user, course)
+    course_grade = _get_course_grade(user, course_key)
     return course_grade.passed
 
 
-def _get_course_grade(user, course):
+def _get_course_grade(user, course_key):
     """
     Get the user's course grade in this course run
     """
-    return CourseGradeFactory().read(user, course)
+    return CourseGradeFactory().read(user, course_key=course_key)
 
 
 def _is_cert_downloadable(user, course_key):
@@ -456,13 +456,6 @@ def _is_cert_downloadable(user, course_key):
         return False
 
     return True
-
-
-def _get_course(course_key):
-    """
-    Get the course from the course key
-    """
-    return modulestore().get_course(course_key, depth=0)
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
@@ -499,21 +492,17 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
                  f'{student.id}.')
         return generate_certificate_task(student, course_key)
 
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    beta_testers_queryset = list_with_level(course, 'beta')
-
+    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
     if beta_testers_queryset.filter(username=student.username):
-        message = 'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(student.username, course_key))
+        log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key}. User is a Beta Tester.")
         return
 
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
 
-    generate_pdf = not has_html_certificates_enabled(course)
+    course_overview = get_course_overview(course_key)
+    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
 
     cert = xqueue.add_cert(
         student,
@@ -523,8 +512,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade=forced_grade
     )
 
-    message = 'Queued Certificate Generation task for {user} : {course}'
-    log.info(message.format(user=student.id, course=course_key))
+    log.info(f"Queued Certificate Generation task for {student.id} : {course_key}")
 
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accessing cert attributes.
@@ -565,22 +553,18 @@ def regenerate_user_certificates(student, course_key, course=None,
         insecure - (Boolean)
     """
     if can_generate_certificate_task(student, course_key):
-        log.info(f'{course_key} is using V2 certificates. Attempt will be made to regenerate a V2 certificate for '
-                 f'user {student.id}.')
+        log.info(f"{course_key} is using V2 certificates. Attempt will be made to regenerate a V2 certificate for "
+                 f"user {student.id}.")
         return generate_certificate_task(student, course_key)
 
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
 
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    generate_pdf = not has_html_certificates_enabled(course)
-    log.info(
-        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
-        student.username, str(course_key), generate_pdf
-    )
+    course_overview = get_course_overview(course_key)
+    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
+    log.info(f"Started regenerating certificates for user {student.id} in course {course_key} with generate_pdf "
+             f"status: {generate_pdf}.")
 
     xqueue.regen_cert(
         student,

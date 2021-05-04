@@ -69,6 +69,19 @@ def has_html_certificates_enabled(course):
     return course.cert_html_view_enabled
 
 
+def has_html_certificates_enabled_from_course_overview(course_overview):
+    """
+    Returns True if HTML certificates are enabled
+
+    This is a companion function to the `has_html_certificates_enabled` function. We are in the process of refactoring
+    and removing the `Certificates` apps dependence on `modulestore`. These functions will be consolidated at a later
+    date. Progress is being tracked in MICROBA-1178.
+    """
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return False
+    return course_overview.cert_html_view_enabled
+
+
 def _certificate_html_url(uuid):
     """
     Returns uuid based certificate URL.
