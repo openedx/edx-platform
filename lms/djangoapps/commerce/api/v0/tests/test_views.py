@@ -28,7 +28,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ....constants import Messages
 from ....tests.mocks import mock_basket_order
 from ....tests.test_views import UserMixin
-from ..views import SAILTHRU_CAMPAIGN_COOKIE
 
 UTM_COOKIE_NAME = 'edx.test.utm'
 UTM_COOKIE_CONTENTS = {
@@ -57,7 +56,6 @@ class BasketsViewTests(UserMixin, ModuleStoreTestCase):
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
 
-        self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
         if include_utm_cookie:
             self.client.cookies[UTM_COOKIE_NAME] = json.dumps(UTM_COOKIE_CONTENTS)
         return self.client.post(self.url, payload)

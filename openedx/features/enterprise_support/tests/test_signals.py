@@ -77,20 +77,6 @@ class EnterpriseSupportSignals(SharedModuleStoreTestCase):
             enterprise_customer_user=enterprise_customer_user,
         )
 
-    @patch('openedx.features.enterprise_support.signals.update_user.delay')
-    def test_register_user(self, mock_update_user):
-        """
-        make sure marketing enterprise user call invokes update_user
-        """
-        self._create_enterprise_enrollment(self.user.id, self.course_id)
-        mock_update_user.assert_called_with(
-            sailthru_vars={
-                'is_enterprise_learner': True,
-                'enterprise_name': self.enterprise_customer.name,
-            },
-            email=self.user.email
-        )
-
     def test_signal_update_dsc_cache_on_course_enrollment(self):
         """
         make sure update_dsc_cache_on_course_enrollment signal clears cache when Enterprise Course Enrollment
