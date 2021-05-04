@@ -58,7 +58,7 @@ defusedxml==0.7.1         # via -r requirements/edx/testing.txt, djangorestframe
 diff-cover==4.0.0         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 distlib==0.3.1            # via -r requirements/edx/testing.txt, virtualenv
 django-appconf==1.0.4     # via -r requirements/edx/testing.txt, django-statici18n
-django-cache-memoize==0.1.8  # via -r requirements/edx/testing.txt, edx-enterprise
+django-cache-memoize==0.1.9  # via -r requirements/edx/testing.txt, edx-enterprise
 django-celery-results==2.0.1  # via -r requirements/edx/testing.txt
 django-classy-tags==2.0.0  # via -r requirements/edx/testing.txt, django-sekizai
 django-config-models==2.1.1  # via -r requirements/edx/testing.txt, edx-enterprise, edx-event-routing-backends
@@ -109,7 +109,7 @@ edx-celeryutils==1.0.0    # via -r requirements/edx/testing.txt, super-csv
 edx-completion==4.0.3     # via -r requirements/edx/testing.txt
 edx-django-release-util==1.0.0  # via -r requirements/edx/testing.txt
 edx-django-sites-extensions==3.0.0  # via -r requirements/edx/testing.txt
-edx-django-utils==3.16.0  # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
+edx-django-utils==4.0.0   # via -r requirements/edx/testing.txt, django-config-models, edx-drf-extensions, edx-enterprise, edx-rest-api-client, edx-toggles, edx-when, ora2, super-csv
 edx-drf-extensions==6.5.0  # via -r requirements/edx/testing.txt, edx-completion, edx-enterprise, edx-organizations, edx-proctoring, edx-rbac, edx-when, edxval
 edx-enterprise==3.22.9    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 edx-event-routing-backends==4.0.1  # via -r requirements/edx/testing.txt
@@ -119,7 +119,7 @@ edx-milestones==0.3.1     # via -r requirements/edx/testing.txt
 edx-opaque-keys[django]==2.2.0  # via -r requirements/edx/testing.txt, edx-bulk-grades, edx-ccx-keys, edx-completion, edx-drf-extensions, edx-enterprise, edx-milestones, edx-organizations, edx-proctoring, edx-user-state-client, edx-when, lti-consumer-xblock, xmodule
 edx-organizations==6.9.0  # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5  # via -r requirements/edx/testing.txt
-edx-proctoring==3.8.8     # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, edx-proctoring-proctortrack
+edx-proctoring==3.8.8     # via -r requirements/edx/testing.txt, edx-proctoring-proctortrack
 edx-rbac==1.4.2           # via -r requirements/edx/testing.txt, edx-enterprise
 edx-rest-api-client==5.3.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 edx-search==3.0.0         # via -r requirements/edx/testing.txt
@@ -216,9 +216,9 @@ pycontracts==1.8.12       # via -r requirements/edx/testing.txt, edx-user-state-
 pycountry==20.7.3         # via -r requirements/edx/testing.txt
 pycparser==2.20           # via -r requirements/edx/testing.txt, cffi
 pycryptodomex==3.10.1     # via -r requirements/edx/testing.txt, edx-proctoring, lti-consumer-xblock, pyjwkest
-pygments==2.8.1           # via -r requirements/edx/testing.txt, diff-cover, sphinx
+pygments==2.9.0           # via -r requirements/edx/testing.txt, diff-cover, sphinx
 pyjwkest==1.4.2           # via -r requirements/edx/testing.txt, edx-drf-extensions, lti-consumer-xblock
-pyjwt[crypto]==1.7.1      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, drf-jwt, edx-rest-api-client, social-auth-core
+pyjwt[crypto]==1.7.1      # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, drf-jwt, edx-proctoring, edx-rest-api-client, social-auth-core
 pylatexenc==2.10          # via -r requirements/edx/testing.txt, olxcleaner
 pylint-celery==0.3        # via -r requirements/edx/testing.txt, edx-lint
 pylint-django==2.4.4      # via -r requirements/edx/testing.txt, edx-lint
