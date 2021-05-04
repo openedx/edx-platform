@@ -226,6 +226,11 @@ class VisibleBlocks(models.Model):
             with transaction.atomic():
                 created_visual_blocks = cls.objects.bulk_create(visual_blocks)
         except IntegrityError:
+            log.warning(
+                'Falling back to create VisualBlocks one by one for user %s in course %s.'
+                % (user_id, course_key)
+            )
+
             # Try to create blocks one by one and mark newly created blocks
             for visual_block in visual_blocks:
                 existing_blocks = cls.objects.filter(hashed=visual_block.hashed)
