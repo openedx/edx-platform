@@ -18,6 +18,7 @@ from common.djangoapps.student.helpers import get_next_url_for_login_page
 from common.djangoapps.student.models import UserProfile
 from common.djangoapps.student.views import compose_and_send_activation_email
 from common.djangoapps.third_party_auth import pipeline, provider
+from openedx.adg.lms.student.helpers import send_account_activation_email
 
 from .models import SAMLConfiguration, SAMLProviderConfig
 
@@ -52,7 +53,7 @@ def inactive_user_view(request):
             user.save()
             activated = True
     if not activated:
-        compose_and_send_activation_email(user, profile)
+        send_account_activation_email(user, profile)
 
     return redirect(request.GET.get('next', 'dashboard'))
 

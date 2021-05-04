@@ -29,6 +29,8 @@ from ratelimitbackend.exceptions import RateLimitException
 from rest_framework.views import APIView
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
+
+from openedx.adg.lms.student.helpers import send_account_activation_email
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login_form import get_login_session_form
@@ -173,7 +175,7 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
         )
 
     profile = UserProfile.objects.get(user=unauthenticated_user)
-    compose_and_send_activation_email(unauthenticated_user, profile)
+    send_account_activation_email(unauthenticated_user, profile)
 
     raise AuthFailedError(error_code='inactive-user')
 
