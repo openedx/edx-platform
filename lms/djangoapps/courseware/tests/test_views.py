@@ -3478,19 +3478,19 @@ class MFERedirectTests(BaseViewsTestCase):  # lint-amnesty, pylint: disable=miss
     def test_staff_no_redirect(self):
         lms_url, mfe_url = self._get_urls()  # lint-amnesty, pylint: disable=unused-variable
 
-        # course staff will not redirect
+        # course staff will redirect in an MFE-enabled course - and not redirect otherwise.
         course_staff = UserFactory.create(is_staff=False)
         CourseStaffRole(self.course_key).add_users(course_staff)
         self.client.login(username=course_staff.username, password='test')
 
         assert self.client.get(lms_url).status_code == 200
         with _set_mfe_flag(True):
-            assert self.client.get(lms_url).status_code == 200
+            assert self.client.get(lms_url).status_code == 302
 
         # global staff will never be redirected
         self._create_global_staff_user()
-        assert self.client.get(lms_url).status_code == 200
 
+        assert self.client.get(lms_url).status_code == 200
         with _set_mfe_flag(True):
             assert self.client.get(lms_url).status_code == 200
 
