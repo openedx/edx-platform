@@ -10,6 +10,7 @@ from django.contrib.auth.signals import user_logged_in
 from django.db import transaction
 from django.shortcuts import redirect
 from django.utils import dateparse
+from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import generics, views
@@ -77,6 +78,7 @@ class UserDetail(generics.RetrieveAPIView):
         return context
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 @mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):
     """
@@ -187,7 +189,6 @@ class UserCourseStatus(views.APIView):
         save_positions_recursively_up(request.user, request, field_data_cache, module, course=course)
         return self._get_course_info(request, course)
 
-    @transaction.non_atomic_requests
     @mobile_course_access(depth=2)
     def get(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
