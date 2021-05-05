@@ -283,13 +283,18 @@ def get_user_course_outline_details(course_key: CourseKey,
     user_course_outline, processors = _get_user_course_outline_and_processors(
         course_key, user, at_time
     )
-    schedule_processor = processors['schedule']
-    special_exams_processor = processors['special_exams']
+    with function_trace('learning_sequences.api.get_user_course_outline_details.schedule'):
+        schedule_processor = processors['schedule']
+        schedule = schedule_processor.schedule_data(user_course_outline)
+
+    with function_trace('learning_sequences.api.get_user_course_outline_details.special_exams'):
+        special_exams_processor = processors['special_exams']
+        special_exam_attempts = special_exams_processor.exam_data(user_course_outline)
 
     return UserCourseOutlineDetailsData(
         outline=user_course_outline,
-        schedule=schedule_processor.schedule_data(user_course_outline),
-        special_exam_attempts=special_exams_processor.exam_data(user_course_outline)
+        schedule=schedule,
+        special_exam_attempts=special_exam_attempts,
     )
 
 
