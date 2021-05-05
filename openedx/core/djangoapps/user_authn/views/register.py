@@ -545,14 +545,23 @@ class RegistrationView(APIView):
         username = data.get('username')
         errors = {}
 
+        # TODO: remove the is_authn_mfe check and use the new error message as default after redesign
+        is_authn_mfe = data.get('is_authn_mfe', False)
+
         error_code = 'duplicate'
         if email is not None and email_exists_or_retired(email):
             error_code += '-email'
-            errors['email'] = [{'user_message': accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
+            error_message = accounts_settings.AUTHN_EMAIL_CONFLICT_MSG if is_authn_mfe else (
+                accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)
+            )
+            errors['email'] = [{'user_message': error_message}]
 
         if username is not None and username_exists_or_retired(username):
             error_code += '-username'
-            errors['username'] = [{'user_message': accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
+            error_message = accounts_settings.AUTHN_USERNAME_CONFLICT_MSG if is_authn_mfe else (
+                accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)
+            )
+            errors['username'] = [{'user_message': error_message}]
             errors['username_suggestions'] = generate_username_suggestions(username)
 
         if errors:
@@ -718,8 +727,10 @@ class RegistrationValidationView(APIView):
     # This end-point is available to anonymous users, so no authentication is needed.
     authentication_classes = []
     username_suggestions = []
+    api_version = 'v1'
 
     def name_handler(self, request):
+        """ Validates whether fullname is valid """
         name = request.data.get('name')
         return get_name_validation_error(name)
 
@@ -727,7 +738,7 @@ class RegistrationValidationView(APIView):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
         invalid_username_error = get_username_validation_error(username)
-        username_exists_error = get_username_existence_validation_error(username)
+        username_exists_error = get_username_existence_validation_error(username, self.api_version)
         if username_exists_error:
             self.username_suggestions = generate_username_suggestions(username)
         # We prefer seeing for invalidity first.
@@ -737,24 +748,27 @@ class RegistrationValidationView(APIView):
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
         email = request.data.get('email')
-        invalid_email_error = get_email_validation_error(email)
-        email_exists_error = get_email_existence_validation_error(email)
+        invalid_email_error = get_email_validation_error(email, self.api_version)
+        email_exists_error = get_email_existence_validation_error(email, self.api_version)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error
 
     def confirm_email_handler(self, request):
+        """ Confirm email validator """
         email = request.data.get('email')
         confirm_email = request.data.get('confirm_email')
         return get_confirm_email_validation_error(confirm_email, email)
 
     def password_handler(self, request):
+        """ Password validator """
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
         return get_password_validation_error(password, username, email)
 
     def country_handler(self, request):
+        """ Country validator """
         country = request.data.get('country')
         return get_country_validation_error(country)
 
@@ -790,17 +804,32 @@ class RegistrationValidationView(APIView):
         can get extra verification checks if entered along with others,
         like when the password may not equal the username.
         """
+        # TODO: remove is_authn_mfe after redesign-master is merged in frontend-app-authn
+        #  and use the new messages as default
+        is_auth_mfe = request.data.get('is_authn_mfe')
+        field_key = request.data.get('form_field_key')
         validation_decisions = {}
-        for form_field_key in self.validation_handlers:
-            # For every field requiring validation from the client,
-            # request a decision for it from the appropriate handler.
-            if form_field_key in request.data:
-                handler = self.validation_handlers[form_field_key]
-                validation_decisions.update({
-                    form_field_key: handler(self, request)
-                })
 
-        response_dict = {"validation_decisions": validation_decisions}
+        def update_validations(field_name):
+            """
+            Updates the validation decisions
+            """
+            validation = self.validation_handlers[field_name](self, request)
+            validation_decisions[field_name] = validation
+
+        if is_auth_mfe:
+            self.api_version = 'v2'
+
+        if field_key and field_key in self.validation_handlers:
+            update_validations(field_key)
+        else:
+            for form_field_key in self.validation_handlers:
+                # For every field requiring validation from the client,
+                # request a decision for it from the appropriate handler.
+                if form_field_key in request.data:
+                    update_validations(form_field_key)
+
+        response_dict = {'validation_decisions': validation_decisions}
         if self.username_suggestions:
             response_dict['username_suggestions'] = self.username_suggestions
 

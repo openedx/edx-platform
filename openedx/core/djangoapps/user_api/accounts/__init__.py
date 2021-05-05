@@ -53,6 +53,7 @@ USERNAME_INVALID_CHARS_UNICODE = _(
 # Translators: This message is shown to users who attempt to create a new account using
 # an invalid email format.
 EMAIL_INVALID_MSG = _('"{email}" is not a valid email address.')
+AUTHN_EMAIL_INVALID_MSG = _('Enter a valid email address')
 
 # Translators: This message is shown to users who attempt to create a new
 # account using an username/email associated with an existing account.
@@ -60,10 +61,12 @@ EMAIL_CONFLICT_MSG = _(
     "It looks like {email_address} belongs to an existing account. "
     "Try again with a different email address."
 )
+AUTHN_EMAIL_CONFLICT_MSG = _("It looks like this email address is already registered")
 USERNAME_CONFLICT_MSG = _(
     "It looks like {username} belongs to an existing account. "
     "Try again with a different username."
 )
+AUTHN_USERNAME_CONFLICT_MSG = _("It looks like this username is already taken")
 
 # Translators: This message is shown to users who enter a username/email/password
 # with an inappropriate length (too short or too long).
