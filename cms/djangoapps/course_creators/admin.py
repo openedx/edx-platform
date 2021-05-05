@@ -43,19 +43,19 @@ class CourseCreatorForm(forms.ModelForm):
 
     def clean(self):
         """
-        Running validation of the form. Validation to stop user from entering
-        false data.
+        Validate the 'state', 'orgs' and 'all_orgs' field before saving.
         """
         all_orgs = self.cleaned_data.get("all_organizations")
         updated_state = self.cleaned_data.get("state")
         orgs = self.cleaned_data.get("orgs").exists()
         add_role = updated_state == CourseCreator.GRANTED
+        is_all_org_role_set = (orgs and all_orgs) or (not orgs and not all_orgs)
         if not add_role and orgs:
             raise ValidationError("Organizations cannot be added if the role is not granted.")
-        if orgs and all_orgs:
-            raise ValidationError("All Organization should be disabled to add organization")
-        if not orgs and not all_orgs:
-            raise ValidationError("Organizations should be added if All Organization is disabled.")
+        if is_all_org_role_set:
+            raise ValidationError("The role can be granted either to all organizations or to "
+                                    "specific organizations but not both.")
+
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
