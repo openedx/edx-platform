@@ -17,6 +17,7 @@ from openedx.adg.lms.webinars.constants import (
 from openedx.adg.lms.webinars.helpers import (
     cancel_all_reminders,
     cancel_reminders_for_given_webinars,
+    get_webinar_description_link,
     remove_emails_duplicate_in_other_list,
     save_scheduled_reminder_ids,
     send_cancellation_emails_for_given_webinars,
@@ -41,22 +42,28 @@ from .factories import WebinarFactory, WebinarRegistrationFactory
 
 
 @pytest.mark.django_db
-def test_send_webinar_emails(mocker):
+@pytest.mark.parametrize('template_slug', ('test_slug', MandrillClient.WEBINAR_CREATED))
+def test_send_webinar_emails(mocker, template_slug):
     """
     Test if `send_webinar_emails` is sending the email with the correct data
     """
     mocked_task_send_mandrill_email = mocker.patch('openedx.adg.lms.webinars.helpers.task_send_mandrill_email')
 
     webinar = WebinarFactory()
-    send_webinar_emails("test_slug", webinar, ["t1@eg.com"])
+    send_webinar_emails(template_slug, webinar, ['t1@eg.com'])
 
     expected_context = {
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT)
+        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_link': webinar.meeting_link,
     }
-    mocked_task_send_mandrill_email.delay.assert_called_with("test_slug", ["t1@eg.com"], expected_context, None)
+
+    if template_slug == MandrillClient.WEBINAR_CREATED:
+        expected_context['register_link'] = get_webinar_description_link(webinar.id)
+
+    mocked_task_send_mandrill_email.delay.assert_called_with(template_slug, ['t1@eg.com'], expected_context, None)
 
 
 @pytest.mark.django_db
@@ -119,7 +126,8 @@ def test_send_cancellation_emails_for_given_webinars(
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT)
+        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_link': webinar.meeting_link,
     }
 
     actual_template, actual_email_addresses, actual_context, _ = mocked_task_send_mandrill_email.delay.call_args.args
