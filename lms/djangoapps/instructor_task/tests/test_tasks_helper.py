@@ -1910,7 +1910,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
     def _create_user_data(self,
                           user_enroll_mode,
                           has_passed,
-                          whitelisted,
                           verification_status,
                           certificate_status,
                           certificate_mode):
@@ -1923,7 +1922,7 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         if has_passed:
             self.submit_student_answer('u1', 'test_problem', ['choice_1'])
 
-        CertificateAllowlistFactory.create(user=user, course_id=self.course.id, whitelist=whitelisted)
+        CertificateAllowlistFactory.create(user=user, course_id=self.course.id)
 
         if user_enroll_mode in CourseMode.VERIFIED_MODES:
             SoftwareSecurePhotoVerificationFactory.create(user=user, status=verification_status)
@@ -1939,19 +1938,19 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
 
     @ddt.data(
         (
-            'verified', False, False, 'approved', 'notpassing', 'honor',
-            ['verified', 'ID Verified', 'N', 'N', 'N/A']
+            'verified', False, 'approved', 'notpassing', 'honor',
+            ['verified', 'ID Verified', 'Y', 'N', 'N/A']
         ),
         (
-            'verified', False, True, 'approved', 'downloadable', 'verified',
+            'verified', False, 'approved', 'downloadable', 'verified',
             ['verified', 'ID Verified', 'Y', 'Y', 'verified']
         ),
         (
-            'honor', True, True, 'approved', 'restricted', 'honor',
+            'honor', True, 'approved', 'restricted', 'honor',
             ['honor', 'N/A', 'Y', 'N', 'N/A']
         ),
         (
-            'verified', True, True, 'must_retry', 'downloadable', 'honor',
+            'verified', True, 'must_retry', 'downloadable', 'honor',
             ['verified', 'Not ID Verified', 'Y', 'Y', 'honor']
         ),
     )
@@ -1960,7 +1959,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
             self,
             user_enroll_mode,
             has_passed,
-            whitelisted,
             verification_status,
             certificate_status,
             certificate_mode,
@@ -1970,7 +1968,6 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         user = self._create_user_data(
             user_enroll_mode,
             has_passed,
-            whitelisted,
             verification_status,
             certificate_status,
             certificate_mode
@@ -2010,7 +2007,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Allowlist 5 students
         for student in students[2:7]:
-            CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+            CertificateAllowlistFactory.create(user=student, course_id=self.course.id,)
 
         task_input = {'student_set': None}
         expected_results = {
@@ -2041,7 +2038,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # Allowlist 3 students
         for student in students[:3]:
             CertificateAllowlistFactory.create(
-                user=student, course_id=self.course.id, whitelist=True
+                user=student, course_id=self.course.id
             )
 
         # Grant certs to 2 students
@@ -2091,7 +2088,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         # Allowlist 4 students
         for student in students[:4]:
             CertificateAllowlistFactory.create(
-                user=student, course_id=self.course.id, whitelist=True
+                user=student, course_id=self.course.id
             )
 
         task_input = {'student_set': 'whitelisted_not_generated'}
@@ -2116,7 +2113,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         Tests generating a certificate for a specific student.
         """
         student = self.create_student(username="Hamnet", email="ham@ardenforest.co.uk")
-        CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+        CertificateAllowlistFactory.create(user=student, course_id=self.course.id)
         task_input = {
             'student_set': 'specific_student',
             'specific_student_id': student.id
@@ -2188,7 +2185,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Allowlist 7 students
         for student in students[:7]:
-            CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+            CertificateAllowlistFactory.create(user=student, course_id=self.course.id)
 
         # Certificates should be regenerated for students having generated certificates with status
         # 'downloadable' or 'error' which are total of 5 students in this test case
@@ -2261,7 +2258,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Allowlist 7 students
         for student in students[:7]:
-            CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+            CertificateAllowlistFactory.create(user=student, course_id=self.course.id)
 
         # Regenerated certificates for students having generated certificates with status
         # 'deleted' or 'generating'
@@ -2332,7 +2329,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Allowlist all students
         for student in students[:]:
-            CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+            CertificateAllowlistFactory.create(user=student, course_id=self.course.id)
 
         # Regenerated certificates for students having generated certificates with status
         # 'downloadable', 'error' or 'generating'
@@ -2403,7 +2400,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Allowlist 7 students
         for student in students[:7]:
-            CertificateAllowlistFactory.create(user=student, course_id=self.course.id, whitelist=True)
+            CertificateAllowlistFactory.create(user=student, course_id=self.course.id)
 
         # Certificates should be regenerated for students having generated certificates with status
         # 'downloadable' or 'error' which are total of 5 students in this test case

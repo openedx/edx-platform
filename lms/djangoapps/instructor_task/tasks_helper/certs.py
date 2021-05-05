@@ -16,6 +16,8 @@ from lms.djangoapps.certificates.api import (
     generate_certificate_task,
     generate_user_certificates,
     get_allowlisted_users,
+    get_enrolled_allowlisted_users,
+    get_enrolled_allowlisted_not_passing_users,
     is_using_v2_course_certificates,
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
@@ -39,21 +41,12 @@ def generate_students_certificates(
 
     student_set = task_input.get('student_set')
     if student_set == 'all_whitelisted':
-        # Generate Certificates for all white listed students.
-        students_to_generate_certs_for = students_to_generate_certs_for.filter(
-            certificatewhitelist__course_id=course_id,
-            certificatewhitelist__whitelist=True
-        )
+        # Generate Certificates for all allowlisted students.
+        students_to_generate_certs_for = get_enrolled_allowlisted_users(course_id)
 
     elif student_set == 'whitelisted_not_generated':
-        # Whitelist students who did not get certificates already.
-        students_to_generate_certs_for = students_to_generate_certs_for.filter(
-            certificatewhitelist__course_id=course_id,
-            certificatewhitelist__whitelist=True
-        ).exclude(
-            generatedcertificate__course_id=course_id,
-            generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
-        )
+        # Allowlisted students who did not yet receive certificates
+        students_to_generate_certs_for = get_enrolled_allowlisted_not_passing_users(course_id)
 
     elif student_set == "specific_student":
         specific_student_id = task_input.get('specific_student_id')

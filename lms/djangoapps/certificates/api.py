@@ -20,6 +20,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from organizations.api import get_course_organization_id
 
 from common.djangoapps.student.api import is_user_enrolled_in_course
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task as _can_generate_certificate_task,
@@ -741,3 +742,30 @@ def get_allowlist(course_key):
     Return the certificate allowlist for the given course run
     """
     return CertificateWhitelist.get_certificate_white_list(course_key)
+
+
+def get_enrolled_allowlisted_users(course_key):
+    """
+    Get all users who:
+    - are enrolled in this course run
+    - are allowlisted in this course run
+    """
+    users = CourseEnrollment.objects.users_enrolled_in(course_key)
+    return users.filter(
+        certificatewhitelist__course_id=course_key,
+        certificatewhitelist__whitelist=True
+    )
+
+
+def get_enrolled_allowlisted_not_passing_users(course_key):
+    """
+    Get all users who:
+    - are enrolled in this course run
+    - are allowlisted in this course run
+    - do not have a course certificate with a passing status
+    """
+    users = get_enrolled_allowlisted_users(course_key)
+    return users.exclude(
+        generatedcertificate__course_id=course_key,
+        generatedcertificate__status__in=CertificateStatuses.PASSED_STATUSES
+    )
