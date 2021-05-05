@@ -26,6 +26,7 @@
 # 4. If the package is not needed in production, add it to another file such
 #    as development.in or testing.in instead.
 
+acid-xblock
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
