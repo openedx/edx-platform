@@ -28,7 +28,6 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tests.factories import (
@@ -495,7 +494,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         CourseEnrollment.enroll(self.user2, self.course.id)
         self.url = reverse('certificate_exception_view', kwargs={'course_id': str(self.course.id)})
 
-        certificate_white_list_item = CertificateAllowlistFactory.create(
+        certificate_allowlist_item = CertificateAllowlistFactory.create(
             user=self.user2,
             course_id=self.course.id,
         )
@@ -509,11 +508,11 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         self.certificate_exception_in_db = dict(
-            id=certificate_white_list_item.id,
-            user_name=certificate_white_list_item.user.username,
-            notes=certificate_white_list_item.notes,
-            user_email=certificate_white_list_item.user.email,
-            user_id=certificate_white_list_item.user.id,
+            id=certificate_allowlist_item.id,
+            user_name=certificate_allowlist_item.user.username,
+            notes=certificate_allowlist_item.notes,
+            user_email=certificate_allowlist_item.user.email,
+            user_id=certificate_allowlist_item.user.id,
         )
 
         # Enable certificate generation
@@ -589,8 +588,8 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
     def test_certificate_exception_duplicate_user_error(self):
         """
-        Test certificates exception addition api endpoint returns failure when called with
-        username/email that already exists in 'CertificateWhitelist' table.
+        Ensure the certificates exception endpoint returns failure when called with
+        username/email that already exists on the certificate allowlist.
         """
         response = self.client.post(
             self.url,
@@ -684,6 +683,9 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
             status=CertificateStatuses.downloadable,
             grade='1.0'
         )
+        # Verify that certificate exception exists
+        assert certs_api.is_on_allowlist(self.user2, self.course.id)
+
         response = self.client.post(
             self.url,
             data=json.dumps(self.certificate_exception_in_db),
@@ -693,12 +695,8 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         # Assert successful request processing
         assert response.status_code == 204
 
-        # Verify that certificate exception successfully removed from CertificateWhitelist and GeneratedCertificate
-        with pytest.raises(ObjectDoesNotExist):
-            CertificateWhitelist.objects.get(user=self.user2, course_id=self.course.id)
-            GeneratedCertificate.eligible_certificates.get(
-                user=self.user2, course_id=self.course.id, status__not=CertificateStatuses.unavailable
-            )
+        # Verify that certificate exception does not exist
+        assert not certs_api.is_on_allowlist(self.user2, self.course.id)
 
     def test_remove_certificate_exception_invalid_request_error(self):
         """
@@ -839,7 +837,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Message
         assert res_json['message'] == 'Certificate generation started for white listed students.'
 
-    def test_generate_certificate_exceptions_whitelist_not_generated(self):
+    def test_generate_certificate_exceptions_allowlist_not_generated(self):
         """
         Test generate certificates exceptions api endpoint returns success
         when calling with new certificate exception.
@@ -891,9 +889,9 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTestCase):
+class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
     """
-    Test Bulk certificates white list exceptions from csv file
+    Test bulk certificates allowlist uploads from csv file
     """
     @classmethod
     def setUpClass(cls):
@@ -905,22 +903,25 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
     def setUp(self):
         super().setUp()
         self.global_staff = GlobalStaffFactory()
+        self.enrolled_user_1_email = 'test_student1@example.com'
         self.enrolled_user_1 = UserFactory(
             username='TestStudent1',
-            email='test_student1@example.com',
+            email=self.enrolled_user_1_email,
             first_name='Enrolled',
             last_name='Student'
         )
+        self.enrolled_user_2_email = 'test_student2@example.com'
         self.enrolled_user_2 = UserFactory(
             username='TestStudent2',
-            email='test_student2@example.com',
+            email=self.enrolled_user_2_email,
             first_name='Enrolled',
             last_name='Student'
         )
 
+        self.not_enrolled_user_email = 'nonenrolled@test.com'
         self.not_enrolled_student = UserFactory(
             username='NotEnrolledStudent',
-            email='nonenrolled@test.com',
+            email=self.not_enrolled_user_email,
             first_name='NotEnrolled',
             last_name='Student'
         )
@@ -930,10 +931,13 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         # Global staff can see the certificates section
         self.client.login(username=self.global_staff.username, password="test")
 
-    def test_create_white_list_exception_record(self):
+    def test_create_allowlist_exception_record(self):
         """
-        Happy path test to create a single new white listed record
+        Happy path test to create a single new allowlisted record
         """
+        assert not certs_api.is_on_allowlist(self.enrolled_user_1, self.course.id)
+        assert not certs_api.is_on_allowlist(self.enrolled_user_2, self.course.id)
+
         csv_content = b"test_student1@example.com,dummy_notes\n" \
                       b"test_student2@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
@@ -943,7 +947,9 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         assert len(data['row_errors']['user_already_white_listed']) == 0
         assert len(data['row_errors']['user_not_enrolled']) == 0
         assert len(data['success']) == 2
-        assert len(CertificateWhitelist.objects.all()) == 2
+
+        assert certs_api.is_on_allowlist(self.enrolled_user_1, self.course.id)
+        assert certs_api.is_on_allowlist(self.enrolled_user_2, self.course.id)
 
     def test_invalid_data_format_in_csv(self):
         """
@@ -956,7 +962,9 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         assert len(data['row_errors']['data_format_error']) == 2
         assert len(data['general_errors']) == 0
         assert len(data['success']) == 0
-        assert len(CertificateWhitelist.objects.all()) == 0
+
+        assert not certs_api.is_on_allowlist(self.enrolled_user_1, self.course.id)
+        assert not certs_api.is_on_allowlist(self.enrolled_user_2, self.course.id)
 
     def test_file_upload_type_not_csv(self):
         """
@@ -990,7 +998,6 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         data = self.upload_file(csv_content=csv_content)
         assert len(data['row_errors']['user_not_exist']) == 1
         assert len(data['success']) == 0
-        assert len(CertificateWhitelist.objects.all()) == 0
 
     def test_csv_user_not_enrolled(self):
         """
@@ -1001,24 +1008,20 @@ class TestCertificatesInstructorApiBulkWhiteListExceptions(SharedModuleStoreTest
         data = self.upload_file(csv_content=csv_content)
         assert len(data['row_errors']['user_not_enrolled']) == 1
         assert len(data['general_errors']) == 0
-        assert len(data['success']) == 0
+
+        assert not certs_api.is_on_allowlist(self.not_enrolled_student, self.course.id)
 
     def test_certificate_exception_already_exist(self):
         """
         Test error if existing user is already in certificates exception list.
         """
-        CertificateWhitelist.objects.create(
-            user=self.enrolled_user_1,
-            course_id=self.course.id,
-            whitelist=True,
-            notes=''
-        )
+        CertificateAllowlistFactory.create(user=self.enrolled_user_1, course_id=self.course.id)
+
         csv_content = b"test_student1@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
         assert len(data['row_errors']['user_already_white_listed']) == 1
         assert len(data['general_errors']) == 0
         assert len(data['success']) == 0
-        assert len(CertificateWhitelist.objects.all()) == 1
 
     def test_csv_file_not_attached(self):
         """

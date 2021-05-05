@@ -713,3 +713,10 @@ def is_using_v2_course_certificates(course_key):
     Determines if the given course run is using V2 of course certificates
     """
     return _is_using_v2_course_certificates(course_key)
+
+
+def get_allowlist(course_key):
+    """
+    Return the certificate allowlist for the given course run
+    """
+    return CertificateWhitelist.get_certificate_white_list(course_key)

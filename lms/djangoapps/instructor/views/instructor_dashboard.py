@@ -44,7 +44,6 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
     CertificateInvalidation,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.courseware.access import has_access
@@ -212,7 +211,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
 
-    certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
+    certificate_allowlist = certs_api.get_allowlist(course_key)
     generate_certificate_exceptions_url = reverse(
         'generate_certificate_exceptions',
         kwargs={'course_id': str(course_key), 'generate_for': ''}
@@ -239,7 +238,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message,
-        'certificate_white_list': certificate_white_list,
+        'certificate_white_list': certificate_allowlist,
         'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
