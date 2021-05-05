@@ -55,12 +55,23 @@ class CourseGradeBase:
         """
         Returns the subsection grade for the given subsection usage key.
 
-        Note: does NOT check whether the user has access to the subsection.
-        Assumes that if a grade exists, the user has access to it.  If the
-        grade doesn't exist then either the user does not have access to
-        it or hasn't attempted any problems in the subsection.
+        Raises `KeyError` if the course structure does not contain the key.
+
+        If the course structure contains the key, this will always succeed
+        (and return a grade) regardless of whether the user can access that section;
+        it is up to the caller to ensure that the grade isn't
+        shown to users that shouldn't be able to access it
+        (e.g. a student shouldn't see a grade for an unreleased subsection);
         """
-        return self._get_subsection_grade(self.course_data.effective_structure[subsection_key])
+        # look in the user structure first and fallback to the collected;
+        # however, we assume the state of course_data is intentional,
+        # so we use effective_structure to avoid additional fetching
+        subsection = (
+            self.course_data.effective_structure[subsection_key]
+            if subsection_key in self.course_data.effective_structure
+            else self.course_data.collected_structure[subsection_key]
+        )
+        return self._get_subsection_grade(subsection)
 
     @lazy
     def graded_subsections_by_format(self):
