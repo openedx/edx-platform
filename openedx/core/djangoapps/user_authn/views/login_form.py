@@ -89,7 +89,7 @@ def get_login_session_form(request):
         HttpResponse
 
     """
-    form_desc = FormDescription("post", reverse("user_api_login_session"))
+    form_desc = FormDescription("post", reverse("user_api_login_session", kwargs={'api_version': 'v1'}))
     _apply_third_party_auth_overrides(request, form_desc)
 
     # Translators: This label appears above a field on the login form

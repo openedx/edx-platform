@@ -54,12 +54,12 @@ urlpatterns = [
 
     # Moved from user_api/legacy_urls.py
     url(
-        r'^api/user/v1/account/login_session/$',
+        r'^api/user/(?P<api_version>v(1|2))/account/login_session/$',
         login.LoginSessionView.as_view(),
         name="user_api_login_session"
     ),
     # `user_api` prefix is preserved for backwards compatibility.
-    url(r'^user_api/v1/account/login_session/$', login.LoginSessionView.as_view(),
+    url(r'^user_api/(?P<api_version>v(1|2))/account/login_session/$', login.LoginSessionView.as_view(),
         name="user_api_login_session_legacy"),
 
     # Login Refresh of JWT Cookies
