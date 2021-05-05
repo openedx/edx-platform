@@ -18,13 +18,16 @@ import sys
 from datetime import datetime, timedelta
 import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
-from MySQLdb import OperationalError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
+from openedx.core.djangoapps.catalog.api import (
+    get_programs_from_cache_by_uuid,
+    get_course_run_key_for_program_from_cache,
+)
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +82,12 @@ class Command(BaseCommand):
         parser.add_argument(
             '--courses',
             nargs='+',
-            help='Send information only for specific courses.',
+            help='Send information only for specific course runs.',
+        )
+        parser.add_argument(
+            '--program_uuids',
+            nargs='+',
+            help='Send user data for course runs for courses within a program based on program uuids provided.',
         )
         parser.add_argument(
             '--start-date',
@@ -164,35 +172,64 @@ class Command(BaseCommand):
             'auto' if options['auto'] else 'manual',
         )
 
-        course_keys = self.get_course_keys(options['courses'])
-        if not (course_keys or options['start_date'] or options['end_date'] or options['user_ids']):
-            raise CommandError('You must specify a filter (e.g. --courses= or --start-date or --user_ids)')
+        program_course_run_keys = self._get_course_run_keys_for_programs(options["program_uuids"])
 
-        handle_notify_credentials.delay(options, course_keys)
+        course_runs = options["courses"]
+        if not course_runs:
+            course_runs = []
+        if program_course_run_keys:
+            course_runs.extend(program_course_run_keys)
 
-    def get_course_keys(self, courses=None):
+        course_run_keys = self._get_validated_course_run_keys(course_runs)
+        if not (
+            course_run_keys or
+            options['start_date'] or
+            options['end_date'] or
+            options['user_ids']
+        ):
+            raise CommandError(
+                'You must specify a filter (e.g. --courses, --program_uuids, --start-date, or --user_ids)'
+            )
+
+        handle_notify_credentials.delay(options, course_run_keys)
+
+    def _get_course_run_keys_for_programs(self, uuids):
         """
-        Return a list of CourseKeys that we will emit signals to.
+        Retrieve all course runs for all of the given program UUIDs.
 
-        `courses` is an optional list of strings that can be parsed into
-        CourseKeys. If `courses` is empty or None, we will default to returning
-        all courses in the modulestore (which can be very expensive). If one of
-        the strings passed in the list for `courses` does not parse correctly,
-        it is a fatal error and will cause us to exit the entire process.
+        Params:
+            uuids (list): List of programs UUIDs.
+
+        Returns:
+            (list): List of Course Run Keys as Strings.
+
         """
-        # Use specific courses if specified, but fall back to all courses.
-        if not courses:
-            courses = []
-        course_keys = []
+        program_course_run_keys = []
+        if uuids:
+            programs = get_programs_from_cache_by_uuid(uuids=uuids)
+            for program in programs:
+                program_course_run_keys.extend(get_course_run_key_for_program_from_cache(program))
+        return program_course_run_keys
 
-        log.info("%d courses specified: %s", len(courses), ", ".join(courses))
-        for course_id in courses:
+    def _get_validated_course_run_keys(self, course_run_keys):
+        """
+        Validates a list of course run keys and returns the validated keys.
+
+        Params:
+            courses (list):  list of strings that can be parsed by CourseKey to verify the keys.
+        Returns:
+            (list): Containing a series of validated course keys as strings.
+        """
+        if not course_run_keys:
+            course_run_keys = []
+        validated_course_run_keys = []
+
+        log.info("%d courses specified: %s", len(course_run_keys), ", ".join(course_run_keys))
+        for course_run_key in course_run_keys:
             try:
                 # Use CourseKey to check if the course_id is parsable, but just
                 # keep the string; the celery task needs JSON serializable data.
-                course_keys.append(str(CourseKey.from_string(course_id)))
-            except InvalidKeyError:
-                log.fatal("%s is not a parseable CourseKey", course_id)
-                sys.exit(1)
-
-        return course_keys
+                validated_course_run_keys.append(str(CourseKey.from_string(course_run_key)))
+            except InvalidKeyError as exc:
+                raise CommandError("{} is not a parsable CourseKey".format(course_run_key)) from exc
+        return validated_course_run_keys

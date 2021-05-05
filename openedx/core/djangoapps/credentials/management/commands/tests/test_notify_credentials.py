@@ -11,6 +11,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
 from freezegun import freeze_time
 
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -41,6 +42,7 @@ class TestNotifyCredentials(TestCase):
             'no_color': False,
             'notify_programs': False,
             'page_size': 100,
+            'program_uuids': None,
             'pythonpath': None,
             'settings': None,
             'site': None,
@@ -61,6 +63,67 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--course', course_1_id, course_2_id)
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
+
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    @mock.patch(
+        'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
+    )
+    def test_program_uuid_args(self, mock_get_programs, mock_task):
+        course_1_id = 'course-v1:edX+Test+1'
+        course_2_id = 'course-v1:edX+Test+2'
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_1_id),
+                        CourseRunFactory(key=course_2_id)
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+        self.expected_options['program_uuids'] = [program['uuid']]
+        mock_get_programs.return_value = [program]
+        call_command(Command(), '--program_uuids', program['uuid'])
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
+
+    @mock.patch(NOTIFY_CREDENTIALS_TASK)
+    @mock.patch(
+        'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
+    )
+    def test_multiple_programs_uuid_args(self, mock_get_programs, mock_task):
+        course_1_id = 'course-v1:edX+Test+1'
+        course_2_id = 'course-v1:edX+Test+2'
+        program = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_1_id),
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+
+        program2 = ProgramFactory(
+            courses=[
+                CourseFactory(
+                    course_runs=[
+                        CourseRunFactory(key=course_2_id)
+                    ]
+                )
+            ],
+            curricula=[],
+        )
+        program_list = [program['uuid'], program2['uuid']]
+        self.expected_options['program_uuids'] = program_list
+        mock_get_programs.return_value = [program, program2]
+        call_command(Command(), '--program_uuids', program['uuid'], program2['uuid'])
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+        assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
     @freeze_time(datetime(2017, 5, 1, 4))
     @mock.patch(NOTIFY_CREDENTIALS_TASK)
