@@ -48,7 +48,7 @@ class CourseCreator(models.Model):
     note = models.CharField(max_length=512, blank=True, help_text=_("Optional notes about this user (for example, "
                                                                     "why course creation access was denied)"))
     orgs = models.ManyToManyField(Organization, blank=True,
-                                  help_text=_("Organizations for which content creator is a part of"))
+                                  help_text=_("Organizations under which the user is allowed to create courses"))
     all_organizations = models.BooleanField(default=True,
                                             help_text=_("Grant the user the permission to create courses "
                                                 "in all organizations"))
