@@ -281,7 +281,7 @@ def send_event(request, method, **params):
     Send event to the main and site segment account.
 
     """
-    data = json.loads(request.body)
+    data = json.loads(request.body.decode('utf-8'))
     # Using the 'browser' api to avoid convert the event to the
     # analytics library format.
     url = 'https://api.segment.io/v1/{0}'.format(method)
