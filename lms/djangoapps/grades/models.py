@@ -16,7 +16,7 @@ from collections import defaultdict, namedtuple
 from hashlib import sha1
 
 from django.apps import apps
-from django.db import models
+from django.db import models, IntegrityError, transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from lazy import lazy
@@ -209,16 +209,45 @@ class VisibleBlocks(models.Model):
         for the block records' course with the new VisibleBlocks.
         Returns the newly created visible blocks.
         """
-        created = cls.objects.bulk_create([
+        visual_blocks = [
             VisibleBlocks(
                 blocks_json=brl.json_value,
                 hashed=brl.hash_value,
                 course_id=course_key,
             )
             for brl in block_record_lists
-        ])
-        cls._update_cache(user_id, course_key, created)
-        return created
+        ]
+
+        created_visual_blocks = []
+        existing_visual_blocks = []
+
+        try:
+            # Try to bulk create the blocks assuming all blocks are new
+            with transaction.atomic():
+                created_visual_blocks = cls.objects.bulk_create(visual_blocks)
+        except IntegrityError:
+            log.warning('Falling back to create VisualBlocks one by one for user {} in course {}'.format(
+                user_id,
+                course_key
+            ))
+
+            # Try to create blocks one by one and mark newly created blocks
+            for visual_block in visual_blocks:
+                existing_blocks = cls.objects.filter(hashed=visual_block.hashed)
+
+                if existing_blocks.exists():
+                    # As only one record has a matching hash it is safe to use first
+                    existing_visual_blocks.append(existing_blocks.first())
+                else:
+                    # Create the visual block and add mark as newly created
+                    visual_block.save()
+                    created_visual_blocks.append(visual_block)
+
+        # Update the cache with the conjunction of created and existing blocks
+        cls._update_cache(user_id, course_key, existing_visual_blocks + created_visual_blocks)
+
+        # Return the new visual blocks
+        return created_visual_blocks
 
     @classmethod
     def bulk_get_or_create(cls, user_id, course_key, block_record_lists):
