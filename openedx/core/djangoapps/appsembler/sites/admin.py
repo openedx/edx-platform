@@ -10,6 +10,7 @@ from hijack_admin.admin import HijackUserAdminMixin
 from ratelimitbackend import admin
 from student.admin import UserAdmin
 
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from organizations.models import UserOrganizationMapping
 
