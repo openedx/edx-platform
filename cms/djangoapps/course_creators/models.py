@@ -50,8 +50,8 @@ class CourseCreator(models.Model):
     orgs = models.ManyToManyField(Organization, blank=True,
                                   help_text=_("Organizations for which content creator is a part of"))
     all_organizations = models.BooleanField(default=True,
-                                            help_text=_("To restrict the course creation by user in \
-                                                specific organizations"))
+                                            help_text=_("Grant the user the permission to create courses "
+                                                "in all organizations"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"
