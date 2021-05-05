@@ -121,7 +121,7 @@ class RegistrationFormFactory(CoreRegistrationFormFactory):
         """)).format(
             terms_of_service=_(u'Terms of Use'),
             terms_of_service_link_start=HTML(u'<a href="{terms_url}" rel="noopener" target="_blank">').format(
-                terms_url=marketing_link('HONOR')
+                terms_url=marketing_link('TOS')
             ),
             terms_of_service_link_end=HTML('</a>')
         )
