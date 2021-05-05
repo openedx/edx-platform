@@ -12,7 +12,7 @@ from django.utils import http
 from oauth2_provider.models import Application
 
 from common.djangoapps.student.models import username_exists_or_retired
-from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.accounts import USERNAME_MAX_LENGTH
 
 
 def is_safe_login_or_logout_redirect(redirect_to, request_host, dot_client_id, require_https):
@@ -73,14 +73,21 @@ def is_registration_api_v1(request):
 
 
 def generate_username_suggestions(username):
-    """ Generate available username suggestions """
-    min_length = accounts.USERNAME_MIN_LENGTH
-    max_length = accounts.USERNAME_MAX_LENGTH
-    short_username = username[:max_length - min_length] if max_length is not None else username
+    """ Generate 3 available username suggestions """
+    max_length = USERNAME_MAX_LENGTH
+    short_username = username[:max_length - 4] if max_length is not None else username
 
     username_suggestions = []
+    int_ranges = {
+        1: {'min': 0, 'max': 9},
+        2: {'min': 10, 'max': 99},
+        3: {'min': 100, 'max': 999},
+    }
     while len(username_suggestions) < 3:
-        username = f'{short_username}_{uuid4().hex[:min_length]}'
+        int_length = len(username_suggestions) + 1
+        int_range = int_ranges[int_length]
+        random_int = random.randint(int_range['min'], int_range['max'])
+        username = f'{short_username}_{random_int}'
         if not username_exists_or_retired(username):
             username_suggestions.append(username)
 
