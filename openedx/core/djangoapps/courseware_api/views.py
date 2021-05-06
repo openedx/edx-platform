@@ -37,7 +37,7 @@ from lms.djangoapps.courseware.toggles import (
     courseware_legacy_is_visible,
     courseware_mfe_is_visible,
     course_exit_page_is_active,
-    special_exams_is_active
+    special_exams_is_active,
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
