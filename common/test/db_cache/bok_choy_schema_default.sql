@@ -2999,7 +2999,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=863 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=864 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3355,38 +3355,6 @@ CREATE TABLE `edxval_videotranscript` (
   KEY `edxval_videotranscript_language_code_d78ce3d1` (`language_code`),
   KEY `edxval_videotranscript_file_format_3adddaf7` (`file_format`),
   CONSTRAINT `edxval_videotranscript_video_id_6ffdfb56_fk_edxval_video_id` FOREIGN KEY (`video_id`) REFERENCES `edxval_video` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `email_marketing_emailmarketingconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `email_marketing_emailmarketingconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `sailthru_key` varchar(32) NOT NULL,
-  `sailthru_secret` varchar(32) NOT NULL,
-  `sailthru_new_user_list` varchar(48) NOT NULL,
-  `sailthru_retry_interval` int(11) NOT NULL,
-  `sailthru_max_retries` int(11) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  `sailthru_abandoned_cart_delay` int(11) NOT NULL,
-  `sailthru_abandoned_cart_template` varchar(20) NOT NULL,
-  `sailthru_content_cache_age` int(11) NOT NULL,
-  `sailthru_enroll_cost` int(11) NOT NULL,
-  `sailthru_enroll_template` varchar(20) NOT NULL,
-  `sailthru_get_tags_from_sailthru` tinyint(1) NOT NULL,
-  `sailthru_purchase_template` varchar(20) NOT NULL,
-  `sailthru_upgrade_template` varchar(20) NOT NULL,
-  `sailthru_lms_url_override` varchar(80) NOT NULL,
-  `welcome_email_send_delay` int(11) NOT NULL,
-  `user_registration_cookie_timeout_delay` double NOT NULL,
-  `sailthru_welcome_template` varchar(20) NOT NULL,
-  `sailthru_verification_failed_template` varchar(20) NOT NULL,
-  `sailthru_verification_passed_template` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `email_marketing_emai_changed_by_id_15ce753b_fk_auth_user` (`changed_by_id`),
-  CONSTRAINT `email_marketing_emai_changed_by_id_15ce753b_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `embargo_country`;
