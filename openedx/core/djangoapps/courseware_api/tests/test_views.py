@@ -24,7 +24,8 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND
+    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
+    COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
 )
 from lms.djangoapps.verify_student.services import IDVerificationService
 from common.djangoapps.student.models import (
@@ -287,6 +288,16 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         response = self.client.get(self.url, content_type='application/json')
         celebrations = response.json()['celebrations']
         assert 'streak_length_to_celebrate' in celebrations
+
+    @ddt.data(True, False)
+    def test_special_exams_enabled_for_course(self, is_enabled):
+        """ Ensure that special exams flag present in courseware meta data with expected value """
+        with override_waffle_flag(COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS, active=is_enabled):
+            response = self.client.get(self.url)
+            assert response.status_code == 200
+            courseware_data = response.json()
+            assert 'is_special_exams_enabled' in courseware_data
+            assert courseware_data['is_special_exams_enabled'] == is_enabled
 
 
 class SequenceApiTestViews(BaseCoursewareTests):
