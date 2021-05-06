@@ -304,7 +304,7 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 assert response.status_code == 200
                 courseware_data = response.json()
                 assert 'is_mfe_special_exams_enabled' in courseware_data
-                assert courseware_data['is_mfe_special_exams_enabled'] == is_globaly_enabled and is_waffle_enabled
+                assert courseware_data['is_mfe_special_exams_enabled'] == (is_globaly_enabled and is_waffle_enabled)
 
 
 class SequenceApiTestViews(BaseCoursewareTests):
