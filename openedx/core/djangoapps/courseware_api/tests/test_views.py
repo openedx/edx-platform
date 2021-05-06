@@ -289,15 +289,22 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         celebrations = response.json()['celebrations']
         assert 'streak_length_to_celebrate' in celebrations
 
-    @ddt.data(True, False)
-    def test_special_exams_enabled_for_course(self, is_enabled):
+    @ddt.data(
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_special_exams_enabled_for_course(self, is_globaly_enabled, is_waffle_enabled):
         """ Ensure that special exams flag present in courseware meta data with expected value """
-        with override_waffle_flag(COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS, active=is_enabled):
-            response = self.client.get(self.url)
-            assert response.status_code == 200
-            courseware_data = response.json()
-            assert 'is_special_exams_enabled' in courseware_data
-            assert courseware_data['is_special_exams_enabled'] == is_enabled
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': is_globaly_enabled}):
+            with override_waffle_flag(COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS, active=is_waffle_enabled):
+                response = self.client.get(self.url)
+                assert response.status_code == 200
+                courseware_data = response.json()
+                assert 'is_special_exams_enabled' in courseware_data
+                assert courseware_data['is_special_exams_enabled'] == is_globaly_enabled and is_waffle_enabled
 
 
 class SequenceApiTestViews(BaseCoursewareTests):

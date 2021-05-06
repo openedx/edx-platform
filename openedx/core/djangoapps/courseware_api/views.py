@@ -6,6 +6,7 @@ import json
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -118,7 +119,7 @@ class CoursewareMeta:
 
     @property
     def is_special_exams_enabled(self):
-        return special_exams_is_active(self.course_key)
+        return settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and special_exams_is_active(self.course_key)
 
     @property
     def enrollment(self):
