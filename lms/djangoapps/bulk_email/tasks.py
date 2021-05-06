@@ -110,7 +110,7 @@ def _get_course_email_context(course):
         settings.LMS_ROOT_URL,
         course_root
     )
-    image_url = '{}{}'.format(settings.LMS_ROOT_URL, course_image_url(course))
+    image_url = f'{settings.LMS_ROOT_URL}{course_image_url(course)}'
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     email_context = {
         'course_title': course_title,

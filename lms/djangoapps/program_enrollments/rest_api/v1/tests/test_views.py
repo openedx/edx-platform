@@ -2096,7 +2096,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
     def test_course_run_url(self):
         self.log_in()
 
-        course_run_url = 'http://testserver/courses/{}/course/'.format(str(self.course_id))
+        course_run_url = f'http://testserver/courses/{str(self.course_id)}/course/'
 
         response_status_code, response_course_runs = self.get_status_and_course_runs()
         assert status.HTTP_200_OK == response_status_code
@@ -2130,7 +2130,7 @@ class ProgramCourseEnrollmentOverviewGetTests(
         course_run_overview = response_course_runs[0]
 
         assert course_run_overview['course_run_id'] == str(self.course_id)
-        assert course_run_overview['display_name'] == '{} Course'.format(str(self.course_id))
+        assert course_run_overview['display_name'] == f'{str(self.course_id)} Course'
 
     def test_emails_enabled(self):
         self.log_in()

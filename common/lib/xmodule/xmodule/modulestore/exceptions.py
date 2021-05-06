@@ -114,13 +114,7 @@ class InvalidProctoringProvider(Exception):
     """
 
     def __init__(self, proctoring_provider, available_providers):
-        super().__init__()
+        super().__init__(f"The selected proctoring provider, {proctoring_provider}, is not a valid provider. "
+                         f"Please select from one of {available_providers}.")
         self.proctoring_provider = proctoring_provider
         self.available_providers = available_providers
-
-    def __str__(self, *args, **kwargs):
-        """
-        Print details about error
-        """
-        return f"The selected proctoring provider, {self.proctoring_provider}, is not a valid provider. " \
-               f"Please select from one of {self.available_providers}."

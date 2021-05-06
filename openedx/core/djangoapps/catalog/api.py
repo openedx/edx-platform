@@ -3,6 +3,8 @@ Python APIs exposed by the catalog app to other in-process apps.
 """
 
 from .utils import get_programs_by_type_slug as _get_programs_by_type_slug
+from .utils import get_programs as _get_programs
+from .utils import course_run_keys_for_program as _course_run_keys_for_program
 
 
 def get_programs_by_type(site, program_type_slug):
@@ -19,3 +21,29 @@ def get_programs_by_type(site, program_type_slug):
         A list of programs (dicts) for the given site with the given type slug
     """
     return _get_programs_by_type_slug(site, program_type_slug)
+
+
+def get_programs_from_cache_by_uuid(uuids):
+    """
+    Retrieves the programs for the provided UUIDS. Relies on
+    the Program cache, if it is not updated or data is missing the result
+    will be missing data or empty.
+
+    Params:
+        uuids (list): A list of Program UUIDs to get Program data for from the cache.
+    Returns:
+        (list): list of dictionaries representing programs.
+    """
+    return _get_programs(uuids=uuids)
+
+
+def get_course_run_key_for_program_from_cache(program):
+    """
+    Retrieves a list of Course Run Keys from the Program.
+
+    Params:
+        program (dict): A dictionary from the program cache containing the data for a program.
+    Returns:
+        (set): A set of Course Run Keys.
+    """
+    return _course_run_keys_for_program(parent_program=program)

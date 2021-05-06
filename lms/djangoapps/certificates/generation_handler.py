@@ -20,12 +20,15 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
-from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
+from lms.djangoapps.certificates.utils import (
+    emit_certificate_event,
+    has_html_certificates_enabled_from_course_overview
+)
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level
+from lms.djangoapps.instructor.access import list_with_level_from_course_key
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -106,11 +109,14 @@ def generate_allowlist_certificate_task(user, course_key, generation_mode=None):
     """
     Create a task to generate an allowlist certificate for this user in this course run.
     """
-    if not _can_generate_allowlist_certificate(user, course_key):
-        log.info(f'Cannot generate an allowlist certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_allowlist_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _set_allowlist_cert_status(user, course_key)
+    if status is not None:
+        return True
+
+    return False
 
 
 def generate_regular_certificate_task(user, course_key, generation_mode=None):
@@ -118,11 +124,14 @@ def generate_regular_certificate_task(user, course_key, generation_mode=None):
     Create a task to generate a regular (non-allowlist) certificate for this user in this course run, if the user is
     eligible and a certificate can be generated.
     """
-    if not _can_generate_v2_certificate(user, course_key):
-        log.info(f'Cannot generate a v2 course certificate for {user.id} : {course_key}')
-        return False
+    if _can_generate_v2_certificate(user, course_key):
+        return _generate_certificate_task(user, course_key, generation_mode)
 
-    return _generate_certificate_task(user, course_key, generation_mode)
+    status = _set_v2_cert_status(user, course_key)
+    if status is not None:
+        return True
+
+    return False
 
 
 def _generate_certificate_task(user, course_key, generation_mode=None):
@@ -184,12 +193,11 @@ def _can_generate_v2_certificate(user, course_key):
         log.info(f'{course_key} is a CCX course. Certificate cannot be generated for {user.id}.')
         return False
 
-    course = _get_course(course_key)
-    if _is_beta_tester(user, course):
+    if _is_beta_tester(user, course_key):
         log.info(f'{user.id} is a beta tester in {course_key}. Certificate cannot be generated.')
         return False
 
-    if not _has_passing_grade(user, course):
+    if not _has_passing_grade(user, course_key):
         log.info(f'{user.id} does not have a passing grade in {course_key}. Certificate cannot be generated.')
         return False
 
@@ -230,10 +238,124 @@ def _can_generate_certificate_common(user, course_key):
     if not _can_generate_certificate_for_status(user, course_key):
         return False
 
-    course = _get_course(course_key)
-    if not has_html_certificates_enabled(course):
+    course_overview = get_course_overview(course_key)
+    if not has_html_certificates_enabled_from_course_overview(course_overview):
         log.info(f'{course_key} does not have HTML certificates enabled. Certificate cannot be generated for '
                  f'{user.id}.')
+        return False
+
+    return True
+
+
+def _set_allowlist_cert_status(user, course_key):
+    """
+    Determine the allowlist certificate status for this user, in this course run and update the cert.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not _can_set_allowlist_cert_status(user, course_key):
+        return None
+
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    return _get_cert_status_common(user, course_key, cert)
+
+
+def _set_v2_cert_status(user, course_key):
+    """
+    Determine the V2 certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if not _can_set_v2_cert_status(user, course_key):
+        return None
+
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    status = _get_cert_status_common(user, course_key, cert)
+    if status is not None:
+        return status
+
+    course_grade = _get_course_grade(user, course_key)
+    if not course_grade.passed:
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.notpassing:
+            cert.mark_notpassing(course_grade.percent)
+        return CertificateStatuses.notpassing
+
+    return None
+
+
+def _get_cert_status_common(user, course_key, cert):
+    """
+    Determine the certificate status for this user, in this course run.
+
+    This is used when a downloadable cert cannot be generated, but we want to provide more info about why it cannot
+    be generated.
+    """
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.unavailable:
+            cert.invalidate()
+        return CertificateStatuses.unavailable
+
+    if not IDVerificationService.user_is_verified(user):
+        if cert is None:
+            cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
+        if cert.status != CertificateStatuses.unverified:
+            cert.mark_unverified()
+        return CertificateStatuses.unverified
+
+    return None
+
+
+def _can_set_allowlist_cert_status(user, course_key):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status for an allowlist certificate
+    """
+    if not is_using_certificate_allowlist(course_key):
+        return False
+
+    if not is_on_certificate_allowlist(user, course_key):
+        return False
+
+    return _can_set_cert_status_common(user, course_key)
+
+
+def _can_set_v2_cert_status(user, course_key):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status for a V2 certificate
+    """
+    if not is_using_v2_course_certificates(course_key):
+        return False
+
+    if _is_ccx_course(course_key):
+        return False
+
+    if _is_beta_tester(user, course_key):
+        return False
+
+    return _can_set_cert_status_common(user, course_key)
+
+
+def _can_set_cert_status_common(user, course_key):
+    """
+    Determine whether we can set a custom (non-downloadable) cert status
+    """
+    if _is_cert_downloadable(user, course_key):
+        return False
+
+    enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+    if enrollment_mode is None:
+        return False
+
+    if not modes_api.is_eligible_for_certificate(enrollment_mode):
+        return False
+
+    course_overview = get_course_overview(course_key)
+    if not has_html_certificates_enabled_from_course_overview(course_overview):
         return False
 
     return True
@@ -251,8 +373,12 @@ def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
 def is_using_certificate_allowlist(course_key):
     """
     Check if the course run is using the allowlist, aka v2 of certificate whitelisting
+
+    Currently this returns True for all course runs, as we're enabling the allowlist for everyone.
+    If all goes well, we'll come back and remove this method and the flag entirely in MICROBA-1073.
     """
-    return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
+    return True
+#    return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
 
 
 def is_using_v2_course_certificates(course_key):
@@ -287,11 +413,11 @@ def _can_generate_certificate_for_status(user, course_key):
     return True
 
 
-def _is_beta_tester(user, course):
+def _is_beta_tester(user, course_key):
     """
     Check if the user is a beta tester in this course run
     """
-    beta_testers_queryset = list_with_level(course, 'beta')
+    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
     return beta_testers_queryset.filter(username=user.username).exists()
 
 
@@ -302,19 +428,34 @@ def _is_ccx_course(course_key):
     return hasattr(course_key, 'ccx')
 
 
-def _has_passing_grade(user, course):
+def _has_passing_grade(user, course_key):
     """
     Check if the user has a passing grade in this course run
     """
-    course_grade = CourseGradeFactory().read(user, course)
+    course_grade = _get_course_grade(user, course_key)
     return course_grade.passed
 
 
-def _get_course(course_key):
+def _get_course_grade(user, course_key):
     """
-    Get the course from the course key
+    Get the user's course grade in this course run
     """
-    return modulestore().get_course(course_key, depth=0)
+    return CourseGradeFactory().read(user, course_key=course_key)
+
+
+def _is_cert_downloadable(user, course_key):
+    """
+    Check if cert already exists, has a downloadable status, and has not been invalidated
+    """
+    cert = GeneratedCertificate.certificate_for_student(user, course_key)
+    if cert is None:
+        return False
+    if cert.status != CertificateStatuses.downloadable:
+        return False
+    if CertificateInvalidation.has_certificate_invalidation(user, course_key):
+        return False
+
+    return True
 
 
 def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
@@ -351,21 +492,17 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
                  f'{student.id}.')
         return generate_certificate_task(student, course_key)
 
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    beta_testers_queryset = list_with_level(course, 'beta')
-
+    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
     if beta_testers_queryset.filter(username=student.username):
-        message = 'Cancelling course certificate generation for user [{}] against course [{}], user is a Beta Tester.'
-        log.info(message.format(student.username, course_key))
+        log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key}. User is a Beta Tester.")
         return
 
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
 
-    generate_pdf = not has_html_certificates_enabled(course)
+    course_overview = get_course_overview(course_key)
+    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
 
     cert = xqueue.add_cert(
         student,
@@ -375,8 +512,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         forced_grade=forced_grade
     )
 
-    message = 'Queued Certificate Generation task for {user} : {course}'
-    log.info(message.format(user=student.id, course=course_key))
+    log.info(f"Queued Certificate Generation task for {student.id} : {course_key}")
 
     # If cert_status is not present in certificate valid_statuses (for example unverified) then
     # add_cert returns None and raises AttributeError while accessing cert attributes.
@@ -417,22 +553,18 @@ def regenerate_user_certificates(student, course_key, course=None,
         insecure - (Boolean)
     """
     if can_generate_certificate_task(student, course_key):
-        log.info(f'{course_key} is using V2 certificates. Attempt will be made to regenerate a V2 certificate for '
-                 f'user {student.id}.')
+        log.info(f"{course_key} is using V2 certificates. Attempt will be made to regenerate a V2 certificate for "
+                 f"user {student.id}.")
         return generate_certificate_task(student, course_key)
 
     xqueue = XQueueCertInterface()
     if insecure:
         xqueue.use_https = False
 
-    if not course:
-        course = modulestore().get_course(course_key, depth=0)
-
-    generate_pdf = not has_html_certificates_enabled(course)
-    log.info(
-        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
-        student.username, str(course_key), generate_pdf
-    )
+    course_overview = get_course_overview(course_key)
+    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
+    log.info(f"Started regenerating certificates for user {student.id} in course {course_key} with generate_pdf "
+             f"status: {generate_pdf}.")
 
     xqueue.regen_cert(
         student,

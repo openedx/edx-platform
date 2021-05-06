@@ -189,21 +189,21 @@ class CourseCohortsSettings(models.Model):
     # in reality the default value at the time that cohorting is enabled for a course comes from
     # course_module.always_cohort_inline_discussions (via `migrate_cohort_settings`).
     # DEPRECATED-- DO NOT USE: Instead use `CourseDiscussionSettings.always_divide_inline_discussions`
-    # via `get_course_discussion_settings` or `set_course_discussion_settings`.
+    # via `CourseDiscussionSettings.get` or `CourseDiscussionSettings.update`.
     always_cohort_inline_discussions = models.BooleanField(default=False)
 
     @property
     def cohorted_discussions(self):
         """
         DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings.divided_discussions`
-        via `get_course_discussion_settings`.
+        via `CourseDiscussionSettings.get`.
         """
         return json.loads(self._cohorted_discussions)
 
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
         """
-        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings` via `set_course_discussion_settings`.
+        DEPRECATED-- DO NOT USE. Instead use `CourseDiscussionSettings.update`
         """
         self._cohorted_discussions = json.dumps(value)
 

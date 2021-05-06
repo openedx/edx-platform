@@ -238,5 +238,5 @@ class IDVerificationService:
         """
         location = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         if course_id:
-            location += '?course_id={}'.format(quote(str(course_id)))
+            location += f'?course_id={quote(str(course_id))}'
         return location

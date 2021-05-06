@@ -5,9 +5,9 @@ from io import BytesIO
 from unittest import mock
 
 import pytest
-import datetime
-import itertools
-import math
+import datetime  # lint-amnesty, pylint: disable=wrong-import-order
+import itertools  # lint-amnesty, pylint: disable=wrong-import-order
+import math  # lint-amnesty, pylint: disable=wrong-import-order
 import ddt
 import pytz
 from django.conf import settings

@@ -676,6 +676,27 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 
         self.inverted_programs = {self.course_key: [{'uuid': 1}, {'uuid': 2}]}
 
+    def _make_side_effect(self, side_effects):
+        """
+        DRY helper.  Returns a side effect function for use with mocks that
+        will be called multiple times, permitting Exceptions to be raised
+        (or not) in a specified order.
+
+        See Also:
+            http://www.voidspace.org.uk/python/mock/examples.html#multiple-calls-with-different-effects
+            http://www.voidspace.org.uk/python/mock/mock.html#mock.Mock.side_effect
+
+        """
+
+        def side_effect(*_a):
+            if side_effects:
+                exc = side_effects.pop(0)
+                if exc:
+                    raise exc
+            return mock.DEFAULT
+
+        return side_effect
+
     def test_inverted_programs(
         self,
         mock_get_inverted_programs,
@@ -689,7 +710,7 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
         mock_get_inverted_programs.assert_any_call(self.student)
 
-    def test_revokinging_certificate(
+    def test_revoke_program_certificate(
         self,
         mock_get_inverted_programs,
         mock_get_certified_programs,
@@ -759,27 +780,6 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         assert mock_get_inverted_programs.called
         assert not mock_get_certified_programs.called
         assert not mock_revoke_program_certificate.called
-
-    def _make_side_effect(self, side_effects):
-        """
-        DRY helper.  Returns a side effect function for use with mocks that
-        will be called multiple times, permitting Exceptions to be raised
-        (or not) in a specified order.
-
-        See Also:
-            http://www.voidspace.org.uk/python/mock/examples.html#multiple-calls-with-different-effects
-            http://www.voidspace.org.uk/python/mock/mock.html#mock.Mock.side_effect
-
-        """
-
-        def side_effect(*_a):
-            if side_effects:
-                exc = side_effects.pop(0)
-                if exc:
-                    raise exc
-            return mock.DEFAULT
-
-        return side_effect
 
     def test_continue_revoking_certs_if_error(
         self,

@@ -52,7 +52,7 @@ from ..videos import (
     convert_video_status
 )
 
-VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = LegacyWaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)
+VIDEO_IMAGE_UPLOAD_ENABLED_SWITCH = LegacyWaffleSwitch(WAFFLE_SWITCHES, VIDEO_IMAGE_UPLOAD_ENABLED)  # lint-amnesty, pylint: disable=toggle-missing-annotation
 
 
 class VideoUploadTestBase:

@@ -356,7 +356,7 @@ FEATURES = {
     'SHOW_FOOTER_LANGUAGE_SELECTOR': False,
     'ENABLE_ENROLLMENT_RESET': False,
     # Settings for course import olx validation
-    'ENABLE_COURSE_OLX_VALIDATION': True,
+    'ENABLE_COURSE_OLX_VALIDATION': False,
     # .. toggle_name: FEATURES['DISABLE_MOBILE_COURSE_AVAILABLE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False

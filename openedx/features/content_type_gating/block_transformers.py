@@ -62,7 +62,9 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
             block_key, UserPartitionTransformer, 'merged_group_access', None
         )
         if merged_access:
-            current_access = merged_access.get_allowed_groups()
+            # merged_access holds a dictionary of sets, but group_access is a dictionary of lists, so we convert here
+            # (sets seem like a better format for this, but existing code already expects lists)
+            current_access = {p: list(g) for (p, g) in merged_access.get_allowed_groups().items()}
         else:
             # This fallback code has a bug if UserPartitionTranformer is not being used -- it does not consider
             # inheritance from parent blocks. This is why our class docstring recommends UserPartitionTranformer.

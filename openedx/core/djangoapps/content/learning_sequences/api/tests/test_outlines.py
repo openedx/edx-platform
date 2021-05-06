@@ -6,21 +6,28 @@ from datetime import datetime, timezone
 from unittest import TestCase
 from unittest.mock import patch
 
+import ddt
 import pytest
 import attr
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.db.models import signals
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from mock import patch
+from mock import patch  # lint-amnesty, pylint: disable=reimported
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.signals import update_masters_access_course
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.tests.factories import BetaTesterFactory
+from common.lib.xmodule.xmodule.partitions.partitions import (
+    ENROLLMENT_TRACK_PARTITION_ID,
+)
 
 from ...data import (
     ContentErrorData,
@@ -40,6 +47,7 @@ from ..outlines import (
     key_supports_outlines,
     replace_course_outline,
 )
+from ..processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 from .test_data import generate_sections
 
 
@@ -114,9 +122,10 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
         # First lets seed the data...
         replace_course_outline(self.course_outline)
 
-        # Uncached access always makes three database checks: LearningContext,
-        # CourseSection, and CourseSectionSequence.
-        with self.assertNumQueries(3):
+        # Uncached access always makes five database checks: LearningContext,
+        # CourseSection (+1 for user partition group prefetch),
+        # CourseSectionSequence (+1 for user partition group prefetch)
+        with self.assertNumQueries(5):
             uncached_outline = get_course_outline(self.course_key)
             assert uncached_outline == self.course_outline
 
@@ -137,7 +146,7 @@ class CourseOutlineTestCase(CacheIsolationTestCase):
 
         # Make sure this new outline is returned instead of the previously
         # cached one.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             uncached_new_version_outline = get_course_outline(self.course_key)  # lint-amnesty, pylint: disable=unused-variable
             assert new_version_outline == new_version_outline  # lint-amnesty, pylint: disable=comparison-with-itself
 
@@ -361,10 +370,11 @@ class ContentGatingTestCase(OutlineProcessorTestCase):
         # Enroll student in the course
         cls.student.courseenrollment_set.create(course_id=cls.course_key, is_active=True, mode="verified")
 
+    # lint-amnesty, pylint: disable=pointless-string-statement
     """
     Currently returns all, and only, sequences in required content, not just the first.
     This logic matches the existing transformer. Is this right?
-    """  # lint-amnesty, pylint: disable=pointless-string-statement
+    """
 
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.EntranceExamConfiguration.user_can_skip_entrance_exam')  # lint-amnesty, pylint: disable=line-too-long
     @patch('openedx.core.djangoapps.content.learning_sequences.api.processors.content_gating.milestones_helpers.get_required_content')  # lint-amnesty, pylint: disable=line-too-long
@@ -1217,7 +1227,7 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
 
                 assert len(user_course_outline.sections) == 3
                 assert len(user_course_outline.sequences) == 6
-                assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in
+                assert all([(seq.usage_key in user_course_outline.accessible_sequences) for seq in  # lint-amnesty, pylint: disable=use-a-generator
                             user_course_outline.sequences.values()]),\
                     'Sequences should be accessible to all users for a public course'
 
@@ -1277,6 +1287,405 @@ class SequentialVisibilityTestCase(CacheIsolationTestCase):
                     assert len(user_course_outline.sequences) == 6
                     assert all(is_sequence_accessible),\
                         'Sequences should be accessible to enrolled, staff users for a public_outline course'
+
+
+@ddt.ddt
+class EnrollmentTrackPartitionGroupsTestCase(OutlineProcessorTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
+    """Tests for enrollment track partitions outline processor that affect outlines"""
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.visibility = VisibilityData(
+            hide_from_toc=False,
+            visible_to_staff_only=False
+        )
+
+    def _add_course_mode(
+        self,
+        course_key,
+        mode_slug=CourseMode.VERIFIED,
+        mode_display_name='Verified Certificate'
+    ):
+        """
+        Add a course mode to the test course_key.
+        Args:
+            course_key
+            mode_slug (str): the slug of the mode to add
+            mode_display_name (str): the display name of the mode to add
+            upgrade_deadline_expired (bool): whether the upgrade deadline has passed
+        """
+        signals.post_save.disconnect(update_masters_access_course, sender=CourseMode)
+        try:
+            CourseMode.objects.create(
+                course_id=course_key,
+                mode_slug=mode_slug,
+                mode_display_name=mode_display_name,
+                min_price=50
+            )
+        finally:
+            signals.post_save.connect(update_masters_access_course, sender=CourseMode)
+
+    def _create_and_enroll_learner(self, username, mode, is_staff=False):
+        """
+        Helper function to create the learner based on the username,
+        then enroll the learner into the test course with the specified
+        mode.
+        Returns created learner
+        """
+        learner = User.objects.create_user(
+            username, email='{}@example.com'.format(username), is_staff=is_staff
+        )
+        learner.courseenrollment_set.create(course_id=self.course_key, is_active=True, mode=mode)
+        return learner
+
+    def _setup_course_outline_with_sections(
+        self,
+        course_sections,
+        course_start_date=datetime(2021, 3, 26, tzinfo=timezone.utc)
+    ):
+        """
+        Helper function to update the course outline under test with
+        the course sections passed in.
+        Returns the newly constructed course outline
+        """
+        set_dates_for_course(
+            self.course_key,
+            [
+                (
+                    self.course_key.make_usage_key('course', 'course'),
+                    {'start': course_start_date}
+                )
+            ]
+        )
+
+        new_outline = CourseOutlineData(
+            course_key=self.course_key,
+            title="User Partition Test Course",
+            published_at=course_start_date,
+            published_version="8ebece4b69dd593d82fe2021",
+            sections=course_sections,
+            self_paced=False,
+            days_early_for_beta=None,
+            entrance_exam_id=None,
+            course_visibility=CourseVisibility.PRIVATE,
+        )
+
+        replace_course_outline(new_outline)
+
+        return new_outline
+
+    def test_roundtrip(self):
+        new_outline = self._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups={
+                        ENROLLMENT_TRACK_PARTITION_ID: frozenset([1, 2]),
+
+                        # Just making these up to add more data
+                        51: frozenset([100]),
+                        52: frozenset([1, 2, 3, 4, 5]),
+                    }
+                )
+            ],
+        )
+
+        replace_course_outline(new_outline)
+        assert new_outline == get_course_outline(self.course_key)
+
+    @ddt.data(
+        (
+            None,
+            None,
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            None,
+            None,
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            set([2]),
+            None,
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            set([7]),
+            None,
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            set([2, 7]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            set([2]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            set([7]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([2]),
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            None,
+            set([7]),
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([2, 7]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 1}
+        ),
+        (
+            None,
+            set([2]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            None,
+            set([7]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+    )
+    @ddt.unpack
+    def test_enrollment_track_partition_on_section(
+        self,
+        section_visible_groups,
+        sequence_visible_groups,
+        course_modes,
+        learners_with_modes,
+        expected_values_dict
+    ):
+        section_user_partition_groups = None
+        sequence_user_partition_groups = None
+        if section_visible_groups:
+            section_user_partition_groups = {
+                ENROLLMENT_TRACK_PARTITION_ID: frozenset(section_visible_groups)
+            }
+        if sequence_visible_groups:
+            sequence_user_partition_groups = {
+                ENROLLMENT_TRACK_PARTITION_ID: frozenset(sequence_visible_groups)
+            }
+
+        self._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups=section_user_partition_groups,
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=self.course_key.make_usage_key('subsection', '0'),
+                            title='Subsection 0',
+                            visibility=self.visibility,
+                            user_partition_groups=sequence_user_partition_groups,
+                        ),
+                    ]
+                )
+            ]
+        )
+
+        for course_mode in course_modes:
+            self._add_course_mode(
+                self.course_key,
+                mode_slug=course_mode,
+                mode_display_name=course_mode,
+            )
+
+        # Enroll students in the course
+        learners_to_verify = set()
+        for username, mode in learners_with_modes.items():
+            learners_to_verify.add(
+                self._create_and_enroll_learner(username, mode)
+            )
+
+        check_date = datetime(2021, 3, 27, tzinfo=timezone.utc)
+
+        # Get details
+        staff_details, _, beta_tester_details = self.get_details(check_date)
+
+        assert len(staff_details.outline.accessible_sequences) == 1
+        assert len(beta_tester_details.outline.accessible_sequences) == 0
+
+        for learner_to_verify in learners_to_verify:
+            learner_details = get_user_course_outline_details(self.course_key, learner_to_verify, check_date)
+            assert len(learner_details.outline.accessible_sequences) == expected_values_dict[learner_to_verify.username]
+
+    @ddt.data(
+        (
+            None,
+            None,
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 0}
+        ),
+        (
+            None,
+            None,
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 0}
+        ),
+        (
+            set([2]),
+            None,
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 2}
+        ),
+        (
+            set([7]),
+            None,
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 2, 'student2': 0}
+        ),
+        (
+            set([2, 7]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 0}
+        ),
+        (
+            set([2]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 2}
+        ),
+        (
+            set([7]),
+            None,
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 2, 'student2': 0}
+        ),
+        (
+            None,
+            set([2]),
+            [CourseMode.VERIFIED],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([7]),
+            [CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+        (
+            None,
+            set([2, 7]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 0}
+        ),
+        (
+            None,
+            set([2]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 0, 'student2': 1}
+        ),
+        (
+            None,
+            set([7]),
+            [CourseMode.VERIFIED, CourseMode.MASTERS],
+            {'student1': 'verified', 'student2': 'masters'},
+            {'student1': 1, 'student2': 0}
+        ),
+    )
+    @ddt.unpack
+    def test_processor_only(
+        self,
+        section_visible_groups,
+        sequence_visible_groups,
+        course_modes,
+        learners_with_modes,
+        expected_values_dict
+    ):
+        section_user_partition_groups = None
+        sequence_user_partition_groups = None
+        if section_visible_groups:
+            section_user_partition_groups = {
+                ENROLLMENT_TRACK_PARTITION_ID: frozenset(section_visible_groups)
+            }
+        if sequence_visible_groups:
+            sequence_user_partition_groups = {
+                ENROLLMENT_TRACK_PARTITION_ID: frozenset(sequence_visible_groups)
+            }
+        full_outline = self._setup_course_outline_with_sections(
+            [
+                CourseSectionData(
+                    usage_key=self.course_key.make_usage_key('chapter', '0'),
+                    title="Section 0",
+                    user_partition_groups=section_user_partition_groups,
+                    sequences=[
+                        CourseLearningSequenceData(
+                            usage_key=self.course_key.make_usage_key('subsection', '0'),
+                            title='Subsection 0',
+                            user_partition_groups=sequence_user_partition_groups,
+                        ),
+                    ]
+                )
+            ]
+        )
+        for course_mode in course_modes:
+            self._add_course_mode(
+                self.course_key,
+                mode_slug=course_mode,
+                mode_display_name=course_mode,
+            )
+
+        # Enroll students in the course
+        learners_to_verify = set()
+        for username, mode in learners_with_modes.items():
+            learners_to_verify.add(
+                self._create_and_enroll_learner(username, mode)
+            )
+
+        check_date = datetime(2021, 3, 27, tzinfo=timezone.utc)
+        for learner_to_verify in learners_to_verify:
+            processor = EnrollmentTrackPartitionGroupsOutlineProcessor(self.course_key, learner_to_verify, check_date)
+            processor.load_data()
+            removed_usage_keys = processor.usage_keys_to_remove(full_outline)
+            assert len(removed_usage_keys) == expected_values_dict[learner_to_verify.username]
 
 
 class ContentErrorTestCase(CacheIsolationTestCase):

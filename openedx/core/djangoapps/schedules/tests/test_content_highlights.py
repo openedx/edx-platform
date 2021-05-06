@@ -1,3 +1,4 @@
+# lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 from unittest.mock import patch
 import pytest
@@ -165,7 +166,7 @@ class TestContentHighlights(ModuleStoreTestCase):  # lint-amnesty, pylint: disab
         mock_get_module.return_value = None
 
         with self.store.bulk_operations(self.course_key):
-            self._create_chapter(highlights='Test highlight')
+            self._create_chapter(highlights=['Test highlight'])
 
         with self.assertRaisesRegex(CourseUpdateDoesNotExist, 'Course module .* not found'):
             get_week_highlights(self.user, self.course_key, 1)

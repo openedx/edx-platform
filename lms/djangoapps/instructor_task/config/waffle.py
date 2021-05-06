@@ -32,12 +32,12 @@ def waffle_flags():
       Instead, replace the string constants above with the actual flag instances.
     """
     return {
-        GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
+        GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_PROBLEM_GRADE_REPORT_VERIFIED_ONLY,
             module_name=__name__,
         ),
-        GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(
+        GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY: CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
             waffle_namespace=INSTRUCTOR_TASK_WAFFLE_FLAG_NAMESPACE,
             flag_name=GENERATE_COURSE_GRADE_REPORT_VERIFIED_ONLY,
             module_name=__name__,

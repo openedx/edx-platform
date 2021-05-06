@@ -162,10 +162,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert mock_block_structure_create.call_count == 1
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 40, True),
-        (ModuleStoreEnum.Type.mongo, 1, 40, False),
-        (ModuleStoreEnum.Type.split, 3, 40, True),
-        (ModuleStoreEnum.Type.split, 3, 40, False),
+        (ModuleStoreEnum.Type.mongo, 1, 39, True),
+        (ModuleStoreEnum.Type.mongo, 1, 39, False),
+        (ModuleStoreEnum.Type.split, 3, 39, True),
+        (ModuleStoreEnum.Type.split, 3, 39, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -177,8 +177,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 40),
-        (ModuleStoreEnum.Type.split, 3, 40),
+        (ModuleStoreEnum.Type.mongo, 1, 39),
+        (ModuleStoreEnum.Type.split, 3, 39),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -223,8 +223,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         )
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 23),
-        (ModuleStoreEnum.Type.split, 3, 23),
+        (ModuleStoreEnum.Type.mongo, 1, 22),
+        (ModuleStoreEnum.Type.split, 3, 22),
     )
     @ddt.unpack
     def test_persistent_grades_not_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -238,8 +238,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             assert len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)) == 0
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, 41),
-        (ModuleStoreEnum.Type.split, 3, 41),
+        (ModuleStoreEnum.Type.mongo, 1, 40),
+        (ModuleStoreEnum.Type.split, 3, 40),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):
@@ -494,7 +494,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
 
     def _assert_log(self, mock_log, method_name):
         assert mock_log.info.called
-        log_message = "Attempted {} for course '%s', but grades are frozen.".format(method_name)
+        log_message = f"Attempted {method_name} for course '%s', but grades are frozen."
         assert log_message in mock_log.info.call_args_list[0][0][0]
 
     def _assert_for_freeze_grade_flag(  # lint-amnesty, pylint: disable=missing-function-docstring

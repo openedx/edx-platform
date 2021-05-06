@@ -31,7 +31,7 @@ def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail
         'task_name': task_name,
         'task_status': task_state_text,
         'detail_url': detail_url,
-        'olx_validation_errors': False
+        'olx_validation_errors': {},
     }
     if olx_validation_text:
         try:

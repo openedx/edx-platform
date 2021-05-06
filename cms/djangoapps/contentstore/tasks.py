@@ -5,13 +5,13 @@ This file contains celery tasks for contentstore views
 import base64
 import json
 import os
-import pkg_resources
-import shutil
-import tarfile
-from datetime import datetime
-from tempfile import NamedTemporaryFile, mkdtemp
+import shutil  # lint-amnesty, pylint: disable=wrong-import-order
+import tarfile  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
+from tempfile import NamedTemporaryFile, mkdtemp  # lint-amnesty, pylint: disable=wrong-import-order
 
 import olxcleaner
+import pkg_resources
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -39,6 +39,7 @@ from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
+import cms.djangoapps.contentstore.errors as UserErrors
 from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
@@ -58,11 +59,13 @@ from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError, InvalidProctoringProvider
+from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-import cms.djangoapps.contentstore.errors as UserErrors
+
+from .exceptions import CourseImportException
 from .outlines import update_outline_from_modulestore
+from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
 User = get_user_model()
@@ -227,6 +230,31 @@ def update_library_index(library_id, triggered_time_isoformat):
         LOGGER.error('Search indexing error for library %s - %s', library_id, str(exc))
     else:
         LOGGER.debug('Search indexing successful for library %s', library_id)
+
+
+@shared_task
+@set_code_owner_attribute
+def update_special_exams_and_publish(course_key_str):
+    """
+    Registers special exams for a given course and calls publishing flow.
+
+    on_course_publish expects that the edx-proctoring subsystem has been refreshed
+    before being executed, so both functions are called here synchronously.
+    """
+    from cms.djangoapps.contentstore.proctoring import register_special_exams
+    from openedx.core.djangoapps.credit.signals import on_course_publish
+
+    course_key = CourseKey.from_string(course_key_str)
+    LOGGER.info('Attempting to register exams for course %s', course_key_str)
+    try:
+        register_special_exams(course_key)
+        LOGGER.info('Successfully registered exams for course %s', course_key_str)
+    # pylint: disable=broad-except
+    except Exception as exception:
+        LOGGER.exception(exception)
+
+    LOGGER.info('Publishing course %s', course_key_str)
+    on_course_publish(course_key)
 
 
 class CourseExportTask(UserTask):  # pylint: disable=abstract-method
@@ -605,7 +633,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             static_content_store=contentstore(),
             target_id=courselike_key,
             verbose=True,
-            status=self.status
         )
 
         new_location = courselike_items[0].location
@@ -613,15 +640,10 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
         LOGGER.info(f'{log_prefix}: Course import successful')
         set_custom_attribute('course_import_completed', True)
+    except (CourseImportException, InvalidProctoringProvider, DuplicateCourseError) as known_exe:
+        handle_course_import_exception(courselike_key, known_exe, self.status)
     except Exception as exception:  # pylint: disable=broad-except
-        msg = str(exception)
-        status_msg = UserErrors.UNKNOWN_ERROR_IN_IMPORT
-        if isinstance(exception, InvalidProctoringProvider):
-            status_msg = msg
-        LOGGER.exception(f'{log_prefix}: Unknown error while importing course {str(exception)}')
-        if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail(status_msg)
-        monitor_import_failure(courselike_key, current_step, exception=exception)
+        handle_course_import_exception(courselike_key, exception, self.status, known=False)
     finally:
         if course_dir.isdir():
             shutil.rmtree(course_dir)
@@ -677,9 +699,10 @@ def validate_course_olx(courselike_key, course_dir, status):
         course_dir: complete path to the course olx
         status: UserTaskStatus object.
     """
-    is_library = isinstance(courselike_key, LibraryLocator)
     olx_is_valid = True
     log_prefix = f'Course import {courselike_key}'
+    validation_failed_mesg = 'CourseOlx validation failed.'
+    is_library = isinstance(courselike_key, LibraryLocator)
 
     if is_library:
         return olx_is_valid
@@ -694,22 +717,22 @@ def validate_course_olx(courselike_key, course_dir, status):
             allowed_xblocks=ALL_ALLOWED_XBLOCKS
         )
     except Exception:  # pylint: disable=broad-except
-        LOGGER.exception(f'{log_prefix}: CourseOlx Could not be validated')
+        LOGGER.exception(f'{log_prefix}: CourseOlx could not be validated')
         return olx_is_valid
-
-    log_errors = len(errorstore.errors) > 0
-    if log_errors:
-        log_errors_to_artifact(errorstore, status)
 
     has_errors = errorstore.return_error(ErrorLevel.ERROR.value)
     if not has_errors:
         return olx_is_valid
 
-    LOGGER.error(f'{log_prefix}: CourseOlx validation failed')
+    LOGGER.error(f'{log_prefix}: {validation_failed_mesg}')
+    log_errors_to_artifact(errorstore, status)
 
-    # TODO: Do not fail the task until we have some data about kinds of
-    #  olx validation failures. TNL-8151
-    return olx_is_valid
+    if bypass_olx_failure_enabled():
+        return olx_is_valid
+
+    status.fail(UserErrors.OLX_VALIDATION_FAILED)
+    monitor_import_failure(courselike_key, status.state, message=validation_failed_mesg)
+    return False
 
 
 def log_errors_to_artifact(errorstore, status):
@@ -726,3 +749,26 @@ def log_errors_to_artifact(errorstore, status):
         'warnings': get_error_by_type(ErrorLevel.WARNING.name),
     })
     UserTaskArtifact.objects.create(status=status, name='OLX_VALIDATION_ERROR', text=message)
+
+
+def handle_course_import_exception(courselike_key, exception, status, known=True):
+    """
+    Handle course import exception and fail task status.
+
+    Arguments:
+        courselike_key: A locator identifies a course resource.
+        exception: Exception object
+        status: UserTaskStatus object.
+        known: boolean indicating if this is a known failure or unknown.
+    """
+    exception_message = str(exception)
+    log_prefix = f"Course import {courselike_key}:"
+    LOGGER.exception(f"{log_prefix} Error while importing course: {exception_message}")
+    task_fail_message = UserErrors.UNKNOWN_ERROR_IN_IMPORT
+    monitor_import_failure(courselike_key, status.state, exception=exception)
+
+    if known:
+        task_fail_message = exception_message
+
+    if status.state != UserTaskStatus.FAILED:
+        status.fail(task_fail_message)

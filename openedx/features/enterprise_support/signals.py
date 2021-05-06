@@ -16,7 +16,6 @@ from integrated_channels.integrated_channel.tasks import (
 )
 from slumber.exceptions import HttpClientError
 
-from lms.djangoapps.email_marketing.tasks import update_user
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED, COURSE_ASSESSMENT_GRADE_CHANGED
 from openedx.features.enterprise_support.api import enterprise_enabled
@@ -25,23 +24,6 @@ from openedx.features.enterprise_support.utils import clear_data_consent_share_c
 from common.djangoapps.student.signals import UNENROLL_DONE
 
 log = logging.getLogger(__name__)
-
-
-@receiver(post_save, sender=EnterpriseCustomerUser)
-def update_email_marketing_user_with_enterprise_vars(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
-    """
-    Update the SailThru user with enterprise-related vars.
-    """
-    user = User.objects.get(id=instance.user_id)
-
-    # perform update asynchronously
-    update_user.delay(
-        sailthru_vars={
-            'is_enterprise_learner': True,
-            'enterprise_name': instance.enterprise_customer.name,
-        },
-        email=user.email
-    )
 
 
 @receiver(post_save, sender=EnterpriseCourseEnrollment)

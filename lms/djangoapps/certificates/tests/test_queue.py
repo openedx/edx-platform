@@ -31,7 +31,7 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.queue import LOGGER, XQueueCertInterface
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -125,7 +125,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             mode='audit'
         )
         # Whitelist student
-        CertificateWhitelistFactory(course_id=self.course.id, user=self.user_2)
+        CertificateAllowlistFactory(course_id=self.course.id, user=self.user_2)
 
         features = settings.FEATURES
         features['DISABLE_AUDIT_CERTIFICATES'] = disable_audit_cert

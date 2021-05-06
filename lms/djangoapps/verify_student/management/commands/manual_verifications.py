@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 len(failed_emails),
                 total_emails
             ))
-            log.error('Failed emails:{}'.format(pformat(failed_emails)))
+            log.error(f'Failed emails:{pformat(failed_emails)}')
         else:
             log.info(f'Successfully generated manual verification for {total_emails} emails.')
 

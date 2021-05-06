@@ -1007,14 +1007,6 @@ EXPLICIT_QUEUES = {
         'queue': GRADES_DOWNLOAD_ROUTING_KEY},
     'lms.djangoapps.instructor_task.tasks.generate_certificates': {
         'queue': GRADES_DOWNLOAD_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.get_email_cookies_via_sailthru': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_user': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_user_email': {
-        'queue': ACE_ROUTING_KEY},
-    'lms.djangoapps.email_marketing.tasks.update_course_enrollment': {
-        'queue': ACE_ROUTING_KEY},
     'lms.djangoapps.verify_student.tasks.send_verification_status_email': {
         'queue': ACE_ROUTING_KEY},
     'lms.djangoapps.verify_student.tasks.send_ace_message': {

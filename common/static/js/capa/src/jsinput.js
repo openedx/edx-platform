@@ -82,7 +82,7 @@ var JSInput = (function($, undefined) {
                 // Setting state presumes getting state, so don't get state
                 // unless set state is defined.
                 if (stateGetter && stateSetter) {
-                    state = unescape(_deepKey(cWindow, stateGetter)());
+                    state = unescape(_deepKey(cWindow, stateGetter)()); // xss-lint: disable=javascript-escape
                     store = {
                         answer: answer,
                         state: state

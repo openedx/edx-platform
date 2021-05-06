@@ -145,7 +145,7 @@ class Command(BaseCommand):
             return len(contacts)
         except (HttpClientError, HttpServerError) as ex:
             message = 'An error occurred while syncing batch of contacts for site {domain}, {message}'.format(
-                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member
+                domain=site_conf.site.domain, message=ex.message  # lint-amnesty, pylint: disable=no-member, exception-message-attribute
             )
             self.stderr.write(message)
             return 0

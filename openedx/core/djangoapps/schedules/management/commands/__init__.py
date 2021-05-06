@@ -17,7 +17,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):  # lint-amnes
 
     # An iterable of day offsets (e.g. -7, -14, -21, -28, ...) that defines the days for
     # which emails are sent out, relative to the 'date' parameter
-    offsets = range(-7, -77, -7)
+    offsets = range(-7, -77, -7)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -42,7 +42,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):  # lint-amnes
         num_weeks = options.get('weeks')
         if num_weeks:
             num_days = (7 * num_weeks) + 1
-            self.offsets = range(-7, -num_days, -7)
+            self.offsets = range(-7, -num_days, -7)  # lint-amnesty, pylint: disable=range-builtin-not-iterating
 
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],

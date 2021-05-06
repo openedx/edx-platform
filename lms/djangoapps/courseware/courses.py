@@ -464,7 +464,7 @@ def get_course_date_blocks(course, user, request=None, include_access=False,
     ]
     blocks.extend([cls(course, user) for cls in default_block_classes])
 
-    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)
+    blocks = filter(lambda b: b.is_allowed and b.date and (include_past_dates or b.is_enabled), blocks)  # lint-amnesty, pylint: disable=filter-builtin-not-iterating
     return sorted(blocks, key=date_block_key_fn)
 
 
@@ -769,7 +769,7 @@ def get_cms_course_link(course, page='course'):
     """
     # This is fragile, but unfortunately the problem is that within the LMS we
     # can't use the reverse calls from the CMS
-    return "//{}/{}/{}".format(settings.CMS_BASE, page, str(course.id))
+    return f"//{settings.CMS_BASE}/{page}/{str(course.id)}"
 
 
 def get_cms_block_link(block, page):

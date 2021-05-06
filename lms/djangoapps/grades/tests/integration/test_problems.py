@@ -42,7 +42,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         password = 'test'
-        self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
+        self.student = UserFactory.create(is_staff=False, username='test_student', password=password)
         self.client.login(username=self.student.username, password=password)
         self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.student)

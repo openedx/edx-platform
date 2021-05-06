@@ -24,7 +24,6 @@ import logging
 import os
 from hashlib import md5, sha256
 
-import six
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.padding import MGF1, OAEP
@@ -93,8 +92,8 @@ def random_aes_key():
 def pad(data):
     """ Pad the given `data` such that it fits into the proper AES block size """
 
-    if six.PY3 and not isinstance(data, (bytes, bytearray)):
-        data = six.b(data)
+    if not isinstance(data, (bytes, bytearray)):
+        data = data.encode()
 
     padder = PKCS7(AES.block_size).padder()
     return padder.update(data) + padder.finalize()
@@ -185,7 +184,7 @@ def signing_format_message(method, headers_dict, body_dict):
     will return a str that represents the normalized version of this messsage
     that will be used to generate a signature.
     """
-    headers_str = "{}\n\n{}".format(method, header_string(headers_dict))
+    headers_str = f"{method}\n\n{header_string(headers_dict)}"
     body_str = body_string(body_dict)
     message = headers_str + body_str
 

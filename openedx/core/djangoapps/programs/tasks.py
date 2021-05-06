@@ -456,7 +456,7 @@ def revoke_program_certificate(client, username, program_uuid):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def revoke_program_certificates(self, username, course_key):
+def revoke_program_certificates(self, username, course_key):  # lint-amnesty, pylint: disable=too-many-statements
     """
     This task is designed to be called whenever a student's course certificate is
     revoked.
@@ -467,7 +467,7 @@ def revoke_program_certificates(self, username, course_key):
 
     Args:
         username (str): The username of the student
-        course_key (str|CourseKey): The course identifier
+        course_key (str): The course identifier
 
     Returns:
         None
@@ -510,7 +510,7 @@ def revoke_program_certificates(self, username, course_key):
 
     try:
         inverted_programs = get_inverted_programs(student)
-        course_specific_programs = inverted_programs.get(str(course_key))
+        course_specific_programs = inverted_programs.get(course_key)
         if not course_specific_programs:
             # No reason to continue beyond this point
             LOGGER.info(

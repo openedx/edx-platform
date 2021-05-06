@@ -7,7 +7,13 @@ import pytest
 
 from common.djangoapps.student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access, update_forum_role
+from lms.djangoapps.instructor.access import (
+    allow_access,
+    list_with_level,
+    list_with_level_from_course_key,
+    revoke_access,
+    update_forum_role
+)
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_MODERATOR, Role
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -32,11 +38,15 @@ class TestInstructorAccessList(SharedModuleStoreTestCase):
 
     def test_list_instructors(self):
         instructors = list_with_level(self.course, 'instructor')
+        instructors_alternative = list_with_level_from_course_key(self.course.id, 'instructor')
         assert set(instructors) == set(self.instructors)
+        assert set(instructors_alternative) == set(self.instructors)
 
     def test_list_beta(self):
         beta_testers = list_with_level(self.course, 'beta')
+        beta_testers_alternative = list_with_level_from_course_key(self.course.id, 'beta')
         assert set(beta_testers) == set(self.beta_testers)
+        assert set(beta_testers_alternative) == set(self.beta_testers)
 
 
 class TestInstructorAccessAllow(EmailTemplateTagMixin, SharedModuleStoreTestCase):

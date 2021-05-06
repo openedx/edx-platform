@@ -77,7 +77,7 @@ class TestVerifyStudentCommand(MockS3BotoMixin, TestVerificationBase):
                     log.check_present(
                         (
                             LOGGER_NAME, 'INFO',
-                            'Attempting to retry {} failed PhotoVerification submissions'.format(1)
+                            f'Attempting to retry {1} failed PhotoVerification submissions'
                         ),
                     )
 

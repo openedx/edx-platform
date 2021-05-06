@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
 from unittest.mock import MagicMock, patch
+from urllib.parse import parse_qs, urlparse
 
 import ddt
 import jwt
@@ -18,7 +19,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from oauth2_provider.models import Application
-from six.moves.urllib.parse import parse_qs, urlparse
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
@@ -932,7 +932,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 # verify that constructed url has only correct params and params have correct values
                 for param, value in params.items():
                     assert param in allowed_params
-                    assert '{}={}'.format(param, value[0]) in expected
+                    assert f'{param}={value[0]}' in expected
 
         next_url, previous_url = helpers.construct_pagination_urls(
             self.request,

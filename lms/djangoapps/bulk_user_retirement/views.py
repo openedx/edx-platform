@@ -59,11 +59,11 @@ class BulkUsersRetirementView(APIView):
                     create_retirement_request_and_deactivate_account(user_to_retire)
 
             except User.DoesNotExist:
-                log.exception('The user "{}" does not exist.'.format(username))
+                log.exception(f'The user "{username}" does not exist.')
                 failed_user_retirements.append(username)
 
             except Exception as exc:  # pylint: disable=broad-except
-                log.exception('500 error retiring account {}'.format(exc))
+                log.exception(f'500 error retiring account {exc}')
                 failed_user_retirements.append(username)
 
         successful_user_retirements = list(set(usernames_to_retire).difference(failed_user_retirements))

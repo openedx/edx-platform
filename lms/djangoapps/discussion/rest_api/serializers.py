@@ -11,6 +11,7 @@ from six.moves.urllib.parse import urlencode, urlunparse
 
 from common.djangoapps.student.models import get_user_by_username_or_email
 from lms.djangoapps.discussion.django_comment_client.utils import (
+    available_division_schemes,
     course_discussion_division_enabled,
     get_group_id_for_user,
     get_group_name,
@@ -29,12 +30,12 @@ from openedx.core.djangoapps.django_comment_common.comment_client.thread import 
 from openedx.core.djangoapps.django_comment_common.comment_client.user import User as CommentClientUser
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
 from openedx.core.djangoapps.django_comment_common.models import (
+    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     Role
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 
 
 def get_context(course, request, thread=None):
@@ -59,7 +60,7 @@ def get_context(course, request, thread=None):
     requester = request.user
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
-    course_discussion_settings = get_course_discussion_settings(course.id)
+    course_discussion_settings = CourseDiscussionSettings.get(course.id)
     return {
         "course": course,
         "request": request,
@@ -466,57 +467,83 @@ class DiscussionSettingsSerializer(serializers.Serializer):
     """
     Serializer for course discussion settings.
     """
+    divided_discussions = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+    )
     divided_course_wide_discussions = serializers.ListField(
         child=serializers.CharField(),
+        read_only=True,
     )
     divided_inline_discussions = serializers.ListField(
         child=serializers.CharField(),
+        read_only=True,
     )
     always_divide_inline_discussions = serializers.BooleanField()
     division_scheme = serializers.CharField()
 
-    def __init__(self, *args, **kwargs):
-        self.course = kwargs.pop('course')
-        self.discussion_settings = kwargs.pop('discussion_settings')
-        super().__init__(*args, **kwargs)
-
-    def validate(self, attrs):
+    def to_internal_value(self, data: dict) -> dict:
         """
-        Validate the fields in combination.
+        Transform the *incoming* primitive data into a native value.
         """
-        if not any(field in attrs for field in self.fields):
-            raise ValidationError('Bad request')
-
-        settings_to_change = {}
-        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
-            self.course, self.discussion_settings
-        )
-
-        if any(item in attrs for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
-            divided_course_wide_discussions = attrs.get(
+        payload = super().to_internal_value(data) or {}
+        course = self.context['course']
+        instance = self.context['settings']
+        if any(item in data for item in ('divided_course_wide_discussions', 'divided_inline_discussions')):
+            divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+                course, instance
+            )
+            divided_course_wide_discussions = data.get(
                 'divided_course_wide_discussions',
                 divided_course_wide_discussions
             )
-            divided_inline_discussions = attrs.get('divided_inline_discussions', divided_inline_discussions)
-            settings_to_change['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
-
+            divided_inline_discussions = data.get('divided_inline_discussions', divided_inline_discussions)
+            try:
+                payload['divided_discussions'] = divided_course_wide_discussions + divided_inline_discussions
+            except TypeError as error:
+                raise ValidationError(str(error)) from error
         for item in ('always_divide_inline_discussions', 'division_scheme'):
-            if item in attrs:
-                settings_to_change[item] = attrs[item]
-        attrs['settings_to_change'] = settings_to_change
-        return attrs
+            if item in data:
+                payload[item] = data[item]
+        return payload
+
+    def to_representation(self, instance: CourseDiscussionSettings) -> dict:
+        """
+        Return a serialized representation of the course discussion settings.
+        """
+        payload = super().to_representation(instance)
+        course = self.context['course']
+        instance = self.context['settings']
+        course_key = course.id
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            course, instance
+        )
+        payload = {
+            'id': instance.id,
+            'divided_inline_discussions': divided_inline_discussions,
+            'divided_course_wide_discussions': divided_course_wide_discussions,
+            'always_divide_inline_discussions': instance.always_divide_inline_discussions,
+            'division_scheme': instance.division_scheme,
+            'available_division_schemes': available_division_schemes(course_key)
+        }
+        return payload
 
     def create(self, validated_data):
         """
-        Overriden create abstract method
+        This method intentionally left empty
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    def update(self, instance, validated_data):
+    def update(self, instance: CourseDiscussionSettings, validated_data: dict) -> CourseDiscussionSettings:
         """
-        Overriden update abstract method
+        Update and save an existing instance
         """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+        if not any(field in validated_data for field in self.fields):
+            raise ValidationError('Bad request')
+        try:
+            instance.update(validated_data)
+        except ValueError as e:
+            raise ValidationError(str(e)) from e
+        return instance
 
 
 class DiscussionRolesSerializer(serializers.Serializer):

@@ -80,7 +80,7 @@ VIDEO_IMAGE_UPLOAD_ENABLED = 'video_image_upload_enabled'
 # Waffle flag namespace for studio
 WAFFLE_STUDIO_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='studio')
 
-ENABLE_VIDEO_UPLOAD_PAGINATION = CourseWaffleFlag(
+ENABLE_VIDEO_UPLOAD_PAGINATION = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     waffle_namespace=WAFFLE_STUDIO_FLAG_NAMESPACE,
     flag_name='enable_video_upload_pagination',
     module_name=__name__,

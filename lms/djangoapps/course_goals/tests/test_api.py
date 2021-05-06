@@ -45,7 +45,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
     def test_add_valid_goal(self, ga_call):
         """ Ensures a correctly formatted post succeeds."""
         response = self.post_course_goal(valid=True, goal_key='certify')
-        assert self.get_event((- 1))['name'] == EVENT_NAME_ADDED
+        assert self.get_event(- 1)['name'] == EVENT_NAME_ADDED
         ga_call.assert_called_with(self.user.id, EVENT_NAME_ADDED)
         assert response.status_code == 201
 
@@ -77,7 +77,7 @@ class TestCourseGoalsAPI(EventTrackingTestCase, SharedModuleStoreTestCase):
         self.post_course_goal(valid=True, goal_key='explore')
         self.post_course_goal(valid=True, goal_key='certify')
         self.post_course_goal(valid=True, goal_key='unsure')
-        assert self.get_event((- 1))['name'] == EVENT_NAME_UPDATED
+        assert self.get_event(- 1)['name'] == EVENT_NAME_UPDATED
 
         ga_call.assert_called_with(self.user.id, EVENT_NAME_UPDATED)
         current_goals = CourseGoal.objects.filter(user=self.user, course_key=self.course.id)

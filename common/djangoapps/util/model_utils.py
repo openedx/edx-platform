@@ -12,7 +12,6 @@ from eventtracking import tracker
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = 'edx.user.settings.changed'
 # Used to signal a field value change
-USER_FIELD_CHANGED = Signal(providing_args=["user", "table", "setting", "old_value", "new_value"])
 USER_FIELDS_CHANGED = Signal(providing_args=["user", "table", "changed_values"])
 
 
@@ -152,10 +151,6 @@ def emit_settings_changed_event(user, db_table, changed_fields: Dict[str, Tuple[
             USER_SETTINGS_CHANGED_EVENT_NAME,
             truncated_fields
         )
-
-        # Announce field change
-        USER_FIELD_CHANGED.send(sender=None, user=user, table=db_table, setting=setting_name,
-                                old_value=old_value, new_value=new_value)
 
     # Announce field change
     USER_FIELDS_CHANGED.send(sender=None, user=user, table=db_table, changed_fields=changed_fields)

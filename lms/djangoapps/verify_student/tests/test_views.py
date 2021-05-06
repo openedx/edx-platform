@@ -115,7 +115,7 @@ class StartView(TestCase):
     """
 
     def start_url(self, course_id=""):
-        return "/verify_student/{}".format(urllib.parse.quote(course_id))
+        return f"/verify_student/{urllib.parse.quote(course_id)}"
 
     def test_start_new_verification(self):
         """
@@ -1621,9 +1621,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_passed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
+    def test_passed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed.
         """
@@ -1664,14 +1663,38 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         }
         mock_segment_track.assert_called_with(attempt.user.id, "edx.bi.experiment.verification.attempt.result", data)
 
+    @patch.dict(settings.VERIFY_STUDENT, {'USE_DJANGO_MAIL': True})
+    def test_approved_email_without_ace(self):
+        """
+        Test basic email for verification approved.
+        """
+        expiration_datetime = now() + timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+
+        data = {
+            "EdX-ID": self.receipt_id,
+            "Result": "PASS",
+            "Reason": "",
+            "MessageType": "You have been verified."
+        }
+        json_data = json.dumps(data)
+        self.client.post(
+            reverse('verify_student_results_callback'), data=json_data,
+            content_type='application/json',
+            HTTP_AUTHORIZATION='test BBBBBBBBBBBBBBBBBBBB:testing',
+            HTTP_DATE='testdate'
+        )
+
+        self._assert_verification_approved_email(expiration_datetime.date())
+
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_first_time_verification(self, mock_segment_track, mock_sailthru_send, mock_log_error):  # pylint: disable=unused-argument
+    def test_first_time_verification(self, mock_segment_track, _mock_log_error):
         """
         Test for verification passed if the learner does not have any previous verification
         """
@@ -1711,9 +1734,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase, TestVerification
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
     @patch('lms.djangoapps.verify_student.views.log.error')
-    @patch('sailthru.sailthru_client.SailthruClient.send')
     @patch('lms.djangoapps.verify_student.views.segment.track')
-    def test_failed_status_template(self, mock_segment_track, _mock_sailthru_send, _mock_log_error):
+    def test_failed_status_template(self, mock_segment_track, _mock_log_error):
         """
         Test for failed verification.
         """

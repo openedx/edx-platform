@@ -44,7 +44,6 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
     CertificateInvalidation,
     CertificateStatuses,
-    CertificateWhitelist,
     GeneratedCertificate
 )
 from lms.djangoapps.courseware.access import has_access
@@ -147,7 +146,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     analytics_dashboard_message = None
     if show_analytics_dashboard_message(course_key) and (access['staff'] or access['instructor']):
         # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{}/courses/{}'.format(settings.ANALYTICS_DASHBOARD_URL, str(course_key))
+        analytics_dashboard_url = f'{settings.ANALYTICS_DASHBOARD_URL}/courses/{str(course_key)}'
         link_start = HTML("<a href=\"{}\" rel=\"noopener\" target=\"_blank\">").format(analytics_dashboard_url)
         analytics_dashboard_message = _(
             "To gain insights into student enrollment and participation {link_start}"
@@ -212,7 +211,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     disable_buttons = not CourseEnrollment.objects.is_small_course(course_key)
 
-    certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
+    certificate_allowlist = certs_api.get_allowlist(course_key)
     generate_certificate_exceptions_url = reverse(
         'generate_certificate_exceptions',
         kwargs={'course_id': str(course_key), 'generate_for': ''}
@@ -239,7 +238,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message,
-        'certificate_white_list': certificate_white_list,
+        'certificate_white_list': certificate_allowlist,
         'certificate_invalidations': certificate_invalidations,
         'generate_certificate_exceptions_url': generate_certificate_exceptions_url,
         'generate_bulk_certificate_exceptions_url': generate_bulk_certificate_exceptions_url,
@@ -430,7 +429,7 @@ def _section_course_info(course, access):
 
     try:
         sorted_cutoffs = sorted(list(course.grade_cutoffs.items()), key=lambda i: i[1], reverse=True)
-        advance = lambda memo, letter_score_tuple: "{}: {}, ".format(letter_score_tuple[0], letter_score_tuple[1]) \
+        advance = lambda memo, letter_score_tuple: f"{letter_score_tuple[0]}: {letter_score_tuple[1]}, " \
                                                    + memo
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
@@ -564,7 +563,7 @@ def _section_student_admin(course, access):
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': str(course_key)}),
     }
     if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
-        section_data['writable_gradebook_url'] = '{}/{}'.format(settings.WRITABLE_GRADEBOOK_URL, str(course_key))
+        section_data['writable_gradebook_url'] = f'{settings.WRITABLE_GRADEBOOK_URL}/{str(course_key)}'
     return section_data
 
 
@@ -693,7 +692,7 @@ def _section_send_email(course, access):
 
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
-    analytics_dashboard_url = '{}/courses/{}'.format(settings.ANALYTICS_DASHBOARD_URL, str(course_key))
+    analytics_dashboard_url = f'{settings.ANALYTICS_DASHBOARD_URL}/courses/{str(course_key)}'
     link = HTML("<a href=\"{0}\" rel=\"noopener\" target=\"_blank\">{1}</a>").format(
         analytics_dashboard_url, settings.ANALYTICS_DASHBOARD_NAME
     )

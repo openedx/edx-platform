@@ -185,7 +185,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
 
             # but shouldn't finish with any
             response = self.api_response(api_version=api_version)
-            assert '/courses/{}/jump_to_id/'.format(self.course.id) in response.data['handouts_html']
+            assert f'/courses/{self.course.id}/jump_to_id/' in response.data['handouts_html']
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, API_V05),
@@ -206,7 +206,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTes
 
             # but shouldn't finish with any
             response = self.api_response(api_version=api_version)
-            assert '/courses/{}/'.format(self.course.id) in response.data['handouts_html']
+            assert f'/courses/{self.course.id}/' in response.data['handouts_html']
 
     def add_mobile_available_toy_course(self):
         """ use toy course with handouts, and make it mobile_available """

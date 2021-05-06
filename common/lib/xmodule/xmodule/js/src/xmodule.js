@@ -78,7 +78,7 @@
         }
 
         try {
-            module = new window[moduleType](element);
+            module = new window[moduleType](element, runtime);
 
             if ($(element).hasClass('xmodule_edit')) {
                 $(document).trigger('XModule.loaded.edit', [element, module]);

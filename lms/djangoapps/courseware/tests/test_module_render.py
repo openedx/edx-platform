@@ -897,6 +897,31 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         assert not mock_score_signal.called
 
+    @ddt.data(
+        # See seq_module.py for the definition of these handlers
+        ('get_completion', True),  # has the 'will_recheck_access' attribute set to True
+        ('goto_position', False),  # does not set it
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.courseware.module_render.get_module_for_descriptor', wraps=get_module_for_descriptor)
+    def test_will_recheck_access_handler_attribute(self, handler, will_recheck_access, mock_get_module):
+        """Confirm that we pay attention to any 'will_recheck_access' attributes on handler methods"""
+        course = CourseFactory.create()
+        descriptor_kwargs = {
+            'category': 'sequential',
+            'parent': course,
+        }
+        descriptor = ItemFactory.create(**descriptor_kwargs)
+        usage_id = str(descriptor.location)
+
+        # Send no special parameters, which will be invalid, but we don't care
+        request = self.request_factory.post('/', data='{}', content_type='application/json')
+        request.user = self.mock_user
+
+        render.handle_xblock_callback(request, str(course.id), usage_id, handler)
+        assert mock_get_module.call_count == 1
+        assert mock_get_module.call_args[1]['will_recheck_access'] == will_recheck_access
+
 
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
@@ -1592,7 +1617,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render(STUDENT_VIEW)
 
-        assert '/courses/{course_id}/bar/content'.format(course_id=str(self.course.id)) in result_fragment.content
+        assert f'/courses/{str(self.course.id)}/bar/content' in result_fragment.content
 
 
 class XBlockWithJsonInitData(XBlock):

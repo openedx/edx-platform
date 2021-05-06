@@ -957,7 +957,7 @@ class LoginSessionViewTest(ApiTestCase):
 
     def setUp(self):
         super().setUp()
-        self.url = reverse("user_api_login_session")
+        self.url = reverse("user_api_login_session", kwargs={'api_version': 'v1'})
 
     @ddt.data("get", "post")
     def test_auth_disabled(self, method):
@@ -986,7 +986,7 @@ class LoginSessionViewTest(ApiTestCase):
         # Verify that the form description matches what we expect
         form_desc = json.loads(response.content.decode('utf-8'))
         assert form_desc['method'] == 'post'
-        assert form_desc['submit_url'] == reverse('user_api_login_session')
+        assert form_desc['submit_url'] == reverse('user_api_login_session', kwargs={'api_version': 'v1'})
         assert form_desc['fields'] == [{'name': 'email', 'defaultValue': '', 'type': 'email', 'required': True,
                                         'label': 'Email', 'placeholder': '',
                                         'instructions': 'The email address you used to register with {platform_name}'
@@ -1049,6 +1049,16 @@ class LoginSessionViewTest(ApiTestCase):
             'edx.bi.user.account.authenticated',
             {'category': 'conversion', 'provider': None, 'label': track_label}
         )
+
+    def test_login_with_username(self):
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        data = {
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        }
+        self.url = reverse("user_api_login_session", kwargs={'api_version': 'v2'})
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
 
     def test_session_cookie_expiry(self):
         # Create a test user

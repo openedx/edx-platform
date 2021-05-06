@@ -6,7 +6,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=reimported
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser

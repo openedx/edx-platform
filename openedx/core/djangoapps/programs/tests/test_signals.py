@@ -230,7 +230,7 @@ class CertRevokedReceiverTest(TestCase):
 
         assert mock_is_learner_issuance_enabled.call_count == 1
         assert mock_task.call_count == 1
-        assert mock_task.call_args[0] == (TEST_USERNAME, TEST_COURSE_KEY)
+        assert mock_task.call_args[0] == (TEST_USERNAME, str(TEST_COURSE_KEY))
 
 
 @skip_unless_lms

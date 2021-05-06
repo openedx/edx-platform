@@ -235,7 +235,7 @@ if (is_proctored_exam) {
                         <% } %>
                     </p>
                 </div>
-            <% } else if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
+            <% } else if ((xblockInfo.get('due_date') && !course.get('self_paced')) || xblockInfo.get('graded')) { %>
                 <div class="status-grading">
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>

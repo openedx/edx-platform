@@ -294,7 +294,7 @@ class TestSendVerificationExpiryEmail(MockS3BotoMixin, TestCase):
                     call_command('send_verification_expiry_email')
 
         logger.check_present(
-            (LOGGER_NAME, 'ERROR', 'Could not send email for verification id {}'.format(verifications[0].id)),
+            (LOGGER_NAME, 'ERROR', f'Could not send email for verification id {verifications[0].id}'),
         )
 
         for verification in verifications:
