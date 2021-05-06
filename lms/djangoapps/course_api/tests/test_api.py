@@ -424,11 +424,12 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
         """
         Tests if number of queries matches expectation.
         """
-        # a total of 5 queries should be executed
-        # - select users matching all the filters
-        # - select user profiles
-        # - select course access
-        # - select course enrollments
-        # - count of matching user rows
-        with self.assertNumQueries(5):
+        # a total of 6 queries should be executed
+        # 1. select course access
+        # 2. select course enrollments
+        # 3. retrieve users using ids
+        # 4. prefetch user profiles
+        # 5. prefetch course access
+        # 6. prefetch course enrollments
+        with self.assertNumQueries(6):
             get_course_members(self.course.id)
