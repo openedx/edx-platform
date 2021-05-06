@@ -24,6 +24,7 @@ class BlockStructureModelTestCase(TestCase):
     """
     Tests for BlockStructureModel.
     """
+
     def setUp(self):
         super().setUp()
         self.course_key = CourseLocator('org', 'course', str(uuid4()))
@@ -58,6 +59,7 @@ class BlockStructureModelTestCase(TestCase):
         Returns the parameters for creating a BlockStructureModel.
         """
         return dict(
+            data='path/to/file',
             data_usage_key=self.usage_key,
             data_version='DV',
             data_edit_timestamp=now(),
