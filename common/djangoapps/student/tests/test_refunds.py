@@ -2,7 +2,7 @@
     Tests for enrollment refund capabilities.
 """
 
-
+import json
 import logging
 import unittest
 from datetime import datetime, timedelta
@@ -17,6 +17,7 @@ from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_django_utils.cache import TieredCache, get_cache_key
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
@@ -165,9 +166,90 @@ class RefundableTest(SharedModuleStoreTestCase):
 
             assert expected_date_placed_attr in CourseEnrollmentAttribute.get_enrollment_attributes(self.enrollment)
 
+    @ddt.data(
+        (datetime.now(pytz.UTC) + timedelta(days=1), True),
+        (datetime.now(pytz.UTC) - timedelta(days=1), False),
+        (datetime.now(pytz.UTC) - timedelta(minutes=5), False),
+    )
+    @ddt.unpack
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
+    def test_is_order_voucher_refundable(self, voucher_expiration_date, expected):
+        """
+        Assert that the correct value is returned based on voucher expiration date.
+        """
+        voucher_expiration_date_str = voucher_expiration_date.strftime(ECOMMERCE_DATE_FORMAT)
+        response = json.dumps({"vouchers": [{"end_datetime": voucher_expiration_date_str}]})
+        httpretty.register_uri(
+            httpretty.GET,
+            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            status=200, body=response,
+            adding_headers={'Content-Type': JSON}
+        )
+
+        self.enrollment.attributes.create(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='order_number',
+            value=self.ORDER_NUMBER
+        )
+        assert self.enrollment.is_order_voucher_refundable() == expected
+
     def test_refund_cutoff_date_no_attributes(self):
         """ Assert that the None is returned when no order number attribute is found."""
         assert self.enrollment.refund_cutoff_date() is None
+
+    @httpretty.activate
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
+    def test_is_order_voucher_refundable_no_attributes(self, ):
+        """ Assert that False is returned when no order number or vouchers attribute is found in response."""
+        # no order number attribute
+        assert self.enrollment.is_order_voucher_refundable() is False
+
+        # no voucher information in orders api response
+        response = json.dumps({"vouchers": []})
+        httpretty.register_uri(
+            httpretty.GET,
+            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            status=200, body=response,
+            adding_headers={'Content-Type': JSON}
+        )
+
+        self.enrollment.attributes.create(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='order_number',
+            value=self.ORDER_NUMBER
+        )
+        assert self.enrollment.is_order_voucher_refundable() is False
+
+        response = json.dumps({"vouchers": None})
+        httpretty.register_uri(
+            httpretty.GET,
+            f'{TEST_API_URL}/orders/{self.ORDER_NUMBER}/',
+            status=200, body=response,
+            adding_headers={'Content-Type': JSON}
+        )
+        assert self.enrollment.is_order_voucher_refundable() is False
+
+    @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
+    def test_get_order_attribute_from_ecommerce(self, mock_ecommerce_api_client):
+        """
+        Assert that the get_order_attribute_from_ecommerce method returns order details if it's already cached,
+        without calling ecommerce.
+        """
+        order_details = {"number": self.ORDER_NUMBER, "vouchers": [{"end_datetime": '2025-09-25T00:00:00Z'}]}
+        cache_key = get_cache_key(user_id=self.user.id, order_number=self.ORDER_NUMBER)
+        TieredCache.set_all_tiers(cache_key, order_details, 60)
+
+        self.enrollment.attributes.create(
+            enrollment=self.enrollment,
+            namespace='order',
+            name='order_number',
+            value=self.ORDER_NUMBER
+        )
+        assert self.enrollment.get_order_attribute_from_ecommerce("vouchers") == order_details["vouchers"]
+        mock_ecommerce_api_client.assert_not_called()
 
     @patch('openedx.core.djangoapps.commerce.utils.ecommerce_api_client')
     def test_refund_cutoff_date_with_date_placed_attr(self, mock_ecommerce_api_client):
