@@ -3086,6 +3086,9 @@ INSTALLED_APPS = [
     # in the LMS process at the moment, so anything that has Django admin access
     # permissions needs to be listed as an LMS app or the script will fail.
     'user_tasks',
+
+    # Agreements
+    'openedx.core.djangoapps.agreements'
 ]
 
 ######################### CSRF #########################################
