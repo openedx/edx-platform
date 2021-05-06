@@ -338,49 +338,52 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
                 ]
             }
     """
-    queryset = User.objects.filter(is_active=True).order_by('id')
+    queryset = User.objects.filter(is_active=True).only('id')
 
     # if access_roles not given, assign all registered access roles
     if access_roles is None:
         access_roles = list(REGISTERED_ACCESS_ROLES.keys())
 
-    # conditions for filtering based on CourseAccessRole
-    access_role_qs = Q(
-        courseaccessrole__course_id=course_key,
-        courseaccessrole__role__in=access_roles
-    )
+    course_access_roles = CourseAccessRole.objects.filter(
+        course_id=course_key,
+        role__in=access_roles
+    ).only('user_id')
+    staff_ids = [role.user_id for role in course_access_roles]
 
-    # conditions for filtering based on CourseEnrollment
-    students_qs = Q(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=True
-    )
-
+    enrolled_ids = []
     if include_students:
-        queryset = queryset.filter(access_role_qs | students_qs)
-    else:
-        queryset = queryset.filter(access_role_qs)
+        enrollments = CourseEnrollment.objects.filter(
+            course_id=course_key,
+            is_active=True
+        ).only('user_id')
+        enrolled_ids = [enrollment.user_id for enrollment in enrollments]
 
-    # prevent duplicates
-    queryset = queryset.distinct()
+    # Evaluate the queryset and build a list of IDS
+    user_ids = set(enrolled_ids + staff_ids)
 
-    # prefetch UserProfile
-    queryset = queryset.prefetch_related('profile')
+    # Filter users by unique user ID
+    queryset = User.objects.filter(pk__in=list(user_ids)).order_by('id')
 
-    # prefetch CourseAccessRole items related to the course and given roles
-    queryset = queryset.prefetch_related(Prefetch(
-        'courseaccessrole_set',
-        CourseAccessRole.objects.filter(course_id=course_key, role__in=access_roles)
-    ))
+    # Prefetch UserProfile, CourseAccessRole and CourseEnrollment
+    # to avoid JOINs in a potentially large dataset.
+    queryset = queryset.prefetch_related(
+        'profile'
+    ).prefetch_related(
+        # Prefetch CourseAccessRole items related to the course and given roles
+        Prefetch(
+            'courseaccessrole_set',
+            CourseAccessRole.objects.filter(course_id=course_key, role__in=access_roles)
+        )
+    ).prefetch_related(
+        # Prefetch CourseEnrollment items related to the course
+        Prefetch(
+            'courseenrollment_set',
+            CourseEnrollment.objects.filter(course_id=course_key)
+        )
+    )
 
-    # prefetch CourseEnrollment items related to the course
-    queryset = queryset.prefetch_related(Prefetch(
-        'courseenrollment_set',
-        CourseEnrollment.objects.filter(course_id=course_key)
-    ))
-
+    # Paginate queryset and serialize data output
     paginator = Paginator(queryset, per_page)
-
     serialized_data = CourseMemberSerializer(paginator.page(page), many=True).data
 
     return {
