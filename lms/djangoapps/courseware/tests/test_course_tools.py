@@ -179,7 +179,7 @@ class FinancialAssistanceToolTest(SharedModuleStoreTestCase):
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course.id)
 
     def test_tool_not_visible_when_end_date_passed(self):
-        self.course_overview.end_date = self.now - datetime.timedelta(days=30)
+        self.course_overview.end = self.now - datetime.timedelta(days=30)
         self.course_overview.save()
         assert not FinancialAssistanceTool().is_enabled(self.request, self.course_overview.id)
 

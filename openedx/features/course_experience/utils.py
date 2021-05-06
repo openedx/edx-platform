@@ -172,11 +172,9 @@ def dates_banner_should_display(course_key, user):
         return False, False
 
     course_overview = CourseOverview.objects.get(id=str(course_key))
-    course_end_date = getattr(course_overview, 'end_date', None)
-    is_self_paced = getattr(course_overview, 'self_paced', False)
 
     # Only display the banner for self-paced courses
-    if not is_self_paced:
+    if not course_overview.self_paced:
         return False, False
 
     # Only display the banner for enrolled users
@@ -184,7 +182,7 @@ def dates_banner_should_display(course_key, user):
         return False, False
 
     # Don't display the banner if the course has ended
-    if course_end_date and course_end_date < timezone.now():
+    if course_overview.end and course_overview.end < timezone.now():
         return False, False
 
     store = modulestore()
