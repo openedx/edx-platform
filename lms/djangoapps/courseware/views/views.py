@@ -1390,7 +1390,7 @@ def submission_history(request, course_id, learner_identifier, location):
     try:
         history_entries = list(user_state_client.get_history(found_user_name, usage_key))
     except DjangoXBlockUserStateClient.DoesNotExist:
-        return HttpResponse(escape(_(u'User {username} has never accessed problem {location}').format(
+        return HttpResponse(escape(_('User {username} has never accessed problem {location}').format(
             username=found_user_name,
             location=location
         )))
@@ -1720,7 +1720,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
         return HttpResponseBadRequest(
-            "Rendering of the xblock view '{}' is not supported.".format(bleach.clean(requested_view, strip=True))
+            f"Rendering of the xblock view '{bleach.clean(requested_view, strip=True)}' is not supported."
         )
 
     staff_access = has_access(request.user, 'staff', course_key)
@@ -1954,7 +1954,7 @@ def financial_assistance_request(request):
         return HttpResponseBadRequest('Could not parse request course key.')
     except KeyError as err:
         # Thrown if fields are missing
-        return HttpResponseBadRequest('The field {} is required.'.format(str(err)))
+        return HttpResponseBadRequest(f'The field {str(err)} is required.')
 
     zendesk_submitted = create_zendesk_ticket(
         legal_name,

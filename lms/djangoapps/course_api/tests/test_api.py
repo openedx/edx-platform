@@ -187,11 +187,11 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         # No filtering.
         unfiltered_courses = self._make_api_call(self.staff_user, self.staff_user)
         for org in [self.course.org, alternate_course.org]:
-            assert any(((course.org == org) for course in unfiltered_courses))
+            assert any((course.org == org) for course in unfiltered_courses)
 
         # With filtering.
         filtered_courses = self._make_api_call(self.staff_user, self.staff_user, org=self.course.org)
-        assert all(((course.org == self.course.org) for course in filtered_courses))
+        assert all((course.org == self.course.org) for course in filtered_courses)
 
     def test_filter(self):
         # Create a second course to be filtered out of queries.

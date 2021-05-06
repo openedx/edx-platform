@@ -68,8 +68,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         dates_widget = response.data.get('dates_widget')
         assert dates_widget
         date_blocks = dates_widget.get('course_date_blocks')
-        assert all(((block.get('title') != '') for block in date_blocks))
-        assert all((block.get('date') for block in date_blocks))
+        assert all((block.get('title') != '') for block in date_blocks)
+        assert all(block.get('date') for block in date_blocks)
 
         resume_course = response.data.get('resume_course')
         resume_course_url = resume_course.get('url')
@@ -91,8 +91,8 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         dates_widget = response.data.get('dates_widget')
         assert dates_widget
         date_blocks = dates_widget.get('course_date_blocks')
-        assert all(((block.get('title') != '') for block in date_blocks))
-        assert all((block.get('date') for block in date_blocks))
+        assert all((block.get('title') != '') for block in date_blocks)
+        assert all(block.get('date') for block in date_blocks)
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
@@ -140,7 +140,7 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
         instructor = UserFactory(
             username='instructor',
-            email=u'instructor@example.com',
+            email='instructor@example.com',
             password='foo',
             is_staff=False
         )
@@ -304,17 +304,11 @@ class OutlineTabTestViews(BaseCourseHomeTests):
             chapter = ItemFactory.create(category='chapter', parent_location=course.location)
             sequential = ItemFactory.create(display_name='Test', category='sequential', graded=True, has_score=True,
                                             parent_location=chapter.location)
-            problem1 = ItemFactory.create(category='problem', graded=True, has_score=True,
-                                          parent_location=sequential.location)
-            problem2 = ItemFactory.create(category='problem', graded=True, has_score=True,
-                                          parent_location=sequential.location)
+            ItemFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
+            ItemFactory.create(category='problem', graded=True, has_score=True, parent_location=sequential.location)
             sequential2 = ItemFactory.create(display_name='Ungraded', category='sequential',
                                              parent_location=chapter.location)
-            problem3 = ItemFactory.create(category='problem', parent_location=sequential2.location)
-        course.children = [chapter]
-        chapter.children = [sequential, sequential2]
-        sequential.children = [problem1, problem2]
-        sequential2.children = [problem3]
+            ItemFactory.create(category='problem', parent_location=sequential2.location)
         url = reverse('course-home-outline-tab', args=[course.id])
 
         CourseEnrollment.enroll(self.user, course.id)

@@ -13,16 +13,16 @@ file and check it in at the same time as your model changes. To do that,
 
 
 import crum
-import hashlib
-import json
-import logging
-import uuid
-from collections import defaultdict, namedtuple
-from datetime import datetime, timedelta
-from functools import total_ordering
-from importlib import import_module
-from urllib.parse import urlencode
-import warnings
+import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
+import json  # lint-amnesty, pylint: disable=wrong-import-order
+import logging  # lint-amnesty, pylint: disable=wrong-import-order
+import uuid  # lint-amnesty, pylint: disable=wrong-import-order
+from collections import defaultdict, namedtuple  # lint-amnesty, pylint: disable=wrong-import-order
+from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
+from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
+from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
+from urllib.parse import urlencode  # lint-amnesty, pylint: disable=wrong-import-order
+import warnings  # lint-amnesty, pylint: disable=wrong-import-order
 
 from config_models.models import ConfigurationModel
 from django.apps import apps
@@ -92,8 +92,6 @@ from openedx.core.toggles import ENTRANCE_EXAMS
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
-
-# enroll status changed events - signaled to email_marketing.  See email_marketing.tasks for more info
 
 
 # ENROLL signal used for free enrollment only
@@ -614,7 +612,6 @@ class UserProfile(models.Model):
     )
     state = models.CharField(blank=True, null=True, max_length=2, choices=STATE_CHOICES)
     goals = models.TextField(blank=True, null=True)
-    allow_certificate = models.BooleanField(default=1)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
@@ -910,7 +907,7 @@ class Registration(models.Model):
         self.user = user
         self.save()
 
-    def activate(self):
+    def activate(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.user.is_active = True
         self.user.save(update_fields=['is_active'])
         self.activation_timestamp = datetime.utcnow()
@@ -1502,6 +1499,8 @@ class CourseEnrollment(models.Model):
                 # This next property is for an experiment, see method's comments for more information
                 segment_properties['external_course_updates'] = set_up_external_updates_for_enrollment(self.user,
                                                                                                        self.course_id)
+                segment_properties['course_start'] = self.course.start
+                segment_properties['course_pacing'] = self.course.pacing
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
                 segment.track(self.user_id, event_name, segment_properties, traits=segment_traits)

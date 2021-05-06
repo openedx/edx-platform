@@ -142,7 +142,7 @@ class CcxListTest(CcxRestApiTest):
         self.list_url = reverse('ccx_api:v0:ccx:list')
         self.list_url_master_course = urllib.parse.urljoin(
             self.list_url,
-            '?master_course_id={}'.format(urllib.parse.quote_plus(self.master_course_key_str))
+            f'?master_course_id={urllib.parse.quote_plus(self.master_course_key_str)}'
         )
 
     def test_authorization(self):
@@ -363,7 +363,7 @@ class CcxListTest(CcxRestApiTest):
         assert resp.data['previous'] is not None
 
         # last page + 1
-        url = '{}&page={}'.format(self.list_url_master_course, num_pages + 1)
+        url = f'{self.list_url_master_course}&page={num_pages + 1}'
         resp = self.client.get(url, {}, HTTP_AUTHORIZATION=self.auth)
         assert resp.status_code == status.HTTP_404_NOT_FOUND
 

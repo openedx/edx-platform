@@ -89,7 +89,7 @@ function jsmolcalc(){
       if (typeof isBodyLoaded == 'undefined' || !isBodyLoaded()) {
         var markerId = '__gwt_marker_jsmolcalc';
         var markerScript;
-        $doc_0.write('<script id="' + markerId + '"><\/script>');
+        $doc_0.write('<script id="' + markerId + '"><\/script>'); // xss-lint: disable=javascript-concat-html
         markerScript = $doc_0.getElementById(markerId);
         thisScript = markerScript && markerScript.previousSibling;
         while (thisScript && thisScript.tagName != 'SCRIPT') {

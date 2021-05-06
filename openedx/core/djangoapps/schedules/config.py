@@ -19,7 +19,7 @@ WAFFLE_SWITCH_NAMESPACE = LegacyWaffleSwitchNamespace(name='schedules')
 # .. toggle_creation_date: 2017-09-17
 DEBUG_MESSAGE_WAFFLE_FLAG = WaffleFlag('schedules.enable_debugging', __name__)
 
-COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = LegacyWaffleSwitch(
+COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = LegacyWaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     WAFFLE_SWITCH_NAMESPACE,
     'course_update_show_unsubscribe',
     __name__
@@ -31,7 +31,7 @@ COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH = LegacyWaffleSwitch(
 # methods below. We save this flag decision at enrollment time and don't change it even if the flag changes. So you
 # can't just directly look at flag result.
 _EXTERNAL_COURSE_UPDATES_EXPERIMENT_ID = 18
-_EXTERNAL_COURSE_UPDATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'external_updates', __name__,
+_EXTERNAL_COURSE_UPDATES_FLAG = ExperimentWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'external_updates', __name__,  # lint-amnesty, pylint: disable=toggle-missing-annotation
                                                      experiment_id=_EXTERNAL_COURSE_UPDATES_EXPERIMENT_ID,
                                                      use_course_aware_bucketing=False)
 

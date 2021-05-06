@@ -56,7 +56,7 @@ class BadgrBackend(BadgeBackend):
         """
         URL for generating a new assertion.
         """
-        return "{}/assertions".format(self._badge_url(slug))
+        return f"{self._badge_url(slug)}/assertions"
 
     def _slugify(self, badge_class):
         """

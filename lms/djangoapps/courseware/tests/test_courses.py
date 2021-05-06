@@ -71,9 +71,9 @@ class CoursesTest(ModuleStoreTestCase):
             org='org', number='num', display_name='name'
         )
 
-        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.id))
+        cms_url = f"//{CMS_BASE_TEST}/course/{str(self.course.id)}"
         assert cms_url == get_cms_course_link(self.course)
-        cms_url = "//{}/course/{}".format(CMS_BASE_TEST, str(self.course.location))
+        cms_url = f"//{CMS_BASE_TEST}/course/{str(self.course.location)}"
         assert cms_url == get_cms_block_link(self.course, 'course')
 
     @ddt.data(GET_COURSE_WITH_ACCESS, GET_COURSE_OVERVIEW_WITH_ACCESS)

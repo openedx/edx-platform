@@ -177,11 +177,11 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         # No filtering.
         unfiltered_response = self.verify_response(params={'username': self.staff_user.username})
         for org in [self.course.org, alternate_course.org]:
-            assert any(((course['org'] == org) for course in unfiltered_response.data['results']))
+            assert any((course['org'] == org) for course in unfiltered_response.data['results'])
 
         # With filtering.
         filtered_response = self.verify_response(params={'org': self.course.org, 'username': self.staff_user.username})
-        assert all(((course['org'] == self.course.org) for course in filtered_response.data['results']))
+        assert all((course['org'] == self.course.org) for course in filtered_response.data['results'])
 
     def test_filter(self):
         self.setup_user(self.staff_user)

@@ -55,10 +55,15 @@ class CertificateStatuses:
     invalidated         - Certificate is not valid.
     notpassing          - The user has not achieved a passing grade.
     requesting          - A request has been made to generate the PDF certificate.
-    restricted          - The user is on the restricted list. This status was previously set if allow_certificate was
-                          set to False in the userprofile table.
+    restricted          - The user is restricted from receiving a certificate.
     unavailable         - Certificate has been invalidated.
-    unverified          - The user is in verified track but does not have an approved, unexpired identity verification.
+    unverified          - The user does not have an approved, unexpired identity verification.
+
+    The following statuses are set by V2 of course certificates:
+      downloadable - See generation.py
+      notpassing - See GeneratedCertificate.mark_notpassing()
+      unavailable - See GeneratedCertificate.invalidate()
+      unverified - See GeneratedCertificate.mark_unverified()
     """
     deleted = 'deleted'
     deleting = 'deleting'
@@ -197,7 +202,7 @@ class EligibleAvailableCertificateManager(EligibleCertificateManager):
     A manager for `GeneratedCertificate` models that automatically
     filters out ineligible certs and any linked to nonexistent courses.
 
-    Adds to the super class filtering ot also exclude certificates for
+    Adds to the super class filtering to also exclude certificates for
     courses that do not have a corresponding CourseOverview.
     """
 
@@ -228,6 +233,11 @@ class GeneratedCertificate(models.Model):
     # the course_modes app is loaded, resulting in a Django deprecation warning.
     from common.djangoapps.course_modes.models import CourseMode  # pylint: disable=reimported
 
+    # Normal object manager, which should only be used when ineligible
+    # certificates (i.e. new audit certs) should be included in the
+    # results. Django requires us to explicitly declare this.
+    objects = models.Manager()
+
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
     eligible_certificates = EligibleCertificateManager()
@@ -235,11 +245,6 @@ class GeneratedCertificate(models.Model):
     # Only returns eligible certificates for courses that have an
     # associated CourseOverview
     eligible_available_certificates = EligibleAvailableCertificateManager()
-
-    # Normal object manager, which should only be used when ineligible
-    # certificates (i.e. new audit certs) should be included in the
-    # results. Django requires us to explicitly declare this.
-    objects = models.Manager()
 
     MODES = Choices(
         'verified',
@@ -341,7 +346,14 @@ class GeneratedCertificate(models.Model):
 
     def invalidate(self):
         """
-        Invalidate Generated Certificate by marking it 'unavailable'.
+        Invalidate Generated Certificate by marking it 'unavailable'. This will prevent the learner from being able to
+        access their certiticate in the associated Course. In addition, we remove any errors and grade information
+        associated with the certificate record.
+
+        We remove the `download_uuid` and the `download_url` as well, but this is only important to PDF certificates.
+
+        Invalidating a certificate fires the `COURSE_CERT_REVOKED` signal. This kicks off a task to determine if there
+        are any program certificates that need to be revoked from the learner.
         """
         log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
 
@@ -362,7 +374,8 @@ class GeneratedCertificate(models.Model):
 
     def mark_notpassing(self, grade):
         """
-        Invalidates a Generated Certificate by marking it as notpassing
+        Invalidates a Generated Certificate by marking it as 'notpassing'. For additional information, please see the
+        comments of the `invalidate` function above as they also apply here.
         """
         log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
 
@@ -381,6 +394,28 @@ class GeneratedCertificate(models.Model):
             status=self.status,
         )
 
+    def mark_unverified(self):
+        """
+        Invalidates a Generated Certificate by marking it as 'unverified'. For additional information, please see the
+        comments of the `invalidate` function above as they also apply here.
+        """
+        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id}')
+
+        self.error_reason = ''
+        self.download_uuid = ''
+        self.download_url = ''
+        self.grade = ''
+        self.status = CertificateStatuses.unverified
+        self.save()
+
+        COURSE_CERT_REVOKED.send_robust(
+            sender=self.__class__,
+            user=self.user,
+            course_key=self.course_id,
+            mode=self.mode,
+            status=self.status,
+        )
+
     def is_valid(self):
         """
         Return True if certificate is valid else return False.
@@ -389,9 +424,14 @@ class GeneratedCertificate(models.Model):
 
     def save(self, *args, **kwargs):  # pylint: disable=signature-differs
         """
-        After the base save() method finishes, fire the COURSE_CERT_AWARDED
-        signal iff we are saving a record of a learner passing the course.
-        As well as the COURSE_CERT_CHANGED for any save event.
+        After the base save() method finishes, fire the COURSE_CERT_CHANGED signal. If the learner is currently passing
+        the course we also fire the COURSE_CERT_AWARDED signal.
+
+        The COURSE_CERT_CHANGED signal helps determine if a Course Certificate can be awarded to a learner in the
+        Credentials IDA.
+
+        The COURSE_CERT_AWARDED signal helps determine if a Program Certificate can be awarded to a learner in the
+        Credentials IDA.
         """
         super().save(*args, **kwargs)
         COURSE_CERT_CHANGED.send_robust(
@@ -1221,7 +1261,7 @@ class CertificateGenerationCommandConfiguration(ConfigurationModel):
     .. no_pii:
     """
 
-    class Meta(object):
+    class Meta:
         app_label = "certificates"
         verbose_name = "cert_generation argument"
 

@@ -79,8 +79,8 @@ class CourseDataTest(ModuleStoreTestCase):
             assert course_data.course.id == self.course.id
             assert course_data.version == self.course.course_version
             assert course_data.edited_on == expected_edited_on
-            assert u'Course: course_key' in str(course_data)
-            assert u'Course: course_key' in course_data.full_string()
+            assert 'Course: course_key' in str(course_data)
+            assert 'Course: course_key' in course_data.full_string()
 
     def test_no_data(self):
         with pytest.raises(ValueError):
@@ -95,7 +95,7 @@ class CourseDataTest(ModuleStoreTestCase):
         course_data = CourseData(
             self.user, structure=empty_structure, collected_block_structure=self.collected_structure,
         )
-        assert 'Course: course_key: {}, version:'.format(self.course.id) in course_data.full_string()
+        assert f'Course: course_key: {self.course.id}, version:' in course_data.full_string()
 
         # full_string returns minimal value when structures aren't readily available.
         course_data = CourseData(self.user, course_key=self.course.id)

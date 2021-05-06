@@ -43,7 +43,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.user_authn.message_types import PasswordReset, PasswordResetSuccess
 from openedx.core.djangolib.markup import HTML
 from common.djangoapps.student.forms import send_account_recovery_email_for_user
-from common.djangoapps.student.models import AccountRecovery
+from common.djangoapps.student.models import AccountRecovery, LoginFailures
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.password_policy_validators import normalize_password, validate_password
 
@@ -505,6 +505,10 @@ class PasswordResetConfirmWrapper(PasswordResetConfirmView):
         if password_reset_successful and is_account_recovery:
             self._handle_password_creation(request, updated_user)
 
+        # Handles clearing the failed login counter upon password reset.
+        if LoginFailures.is_feature_enabled():
+            LoginFailures.clear_lockout_counter(updated_user)
+
         send_password_reset_success_email(updated_user, request)
         return response
 
@@ -763,6 +767,11 @@ class LogistrationPasswordResetView(APIView):  # lint-amnesty, pylint: disable=m
                     except ObjectDoesNotExist:
                         err = 'Account recovery process initiated without AccountRecovery instance for user {username}'
                         log.error(err.format(username=user.username))
+
+                # Handles clearing the failed login counter upon password reset.
+                if LoginFailures.is_feature_enabled():
+                    LoginFailures.clear_lockout_counter(user)
+
                 send_password_reset_success_email(user, request)
         except ValidationError as err:
             AUDIT_LOG.exception("Password validation failed")

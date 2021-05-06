@@ -99,7 +99,7 @@ class EnrollmentSupportListView(GenericAPIView):
                     old_mode=old_mode
                 ))
         except KeyError as err:
-            return HttpResponseBadRequest('The field {} is required.'.format(str(err)))
+            return HttpResponseBadRequest(f'The field {str(err)} is required.')
         except InvalidKeyError:
             return HttpResponseBadRequest('Could not parse course key.')
         except (CourseEnrollment.DoesNotExist, User.DoesNotExist):

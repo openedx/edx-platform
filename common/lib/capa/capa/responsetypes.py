@@ -987,7 +987,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     whole software stack works with just the one system of naming.
     The .has_mask() test on a response checks for masking, implemented by a
     ._has_mask attribute on the response object.
-    The logging functionality in capa_base calls the unmask functions here
+    The logging functionality in capa_module calls the unmask functions here
     to translate back to choice_0 name style for recording in the logs, so
     the logging is in terms of the regular names.
     """

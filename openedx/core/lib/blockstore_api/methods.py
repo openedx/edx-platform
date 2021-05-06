@@ -323,7 +323,7 @@ def get_bundle_files(bundle_uuid, use_draft=None):
     """
     Get an iterator over all the files in the specified bundle or draft.
     """
-    return get_bundle_files_dict(bundle_uuid, use_draft).values()
+    return get_bundle_files_dict(bundle_uuid, use_draft).values()  # lint-amnesty, pylint: disable=dict-values-not-iterating
 
 
 def get_bundle_links(bundle_uuid, use_draft=None):

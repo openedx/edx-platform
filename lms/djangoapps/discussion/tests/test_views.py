@@ -2079,7 +2079,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
             expected_response_code=400,
             handler=views.course_discussions_settings_handler
         )
-        assert u'Incorrect field type for `{}`. Type must be `{}`'.format(
+        assert 'Incorrect field type for `{}`. Type must be `{}`'.format(
             'always_divide_inline_discussions',
             bool.__name__
         ) == response.get('error')

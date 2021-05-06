@@ -46,9 +46,9 @@ from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 
+from ..exceptions import AssetNotFoundException
 from ..utils import get_lms_link_for_certificate_web_view, get_proctored_exam_settings_url, reverse_course_url
 from .assets import delete_asset
-from .exception import AssetNotFoundException
 
 CERTIFICATE_SCHEMA_VERSION = 1
 CERTIFICATE_MINIMUM_ID = 100

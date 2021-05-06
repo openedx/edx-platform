@@ -178,8 +178,8 @@ class TestFooter(TestCase):
         Test retrieving the footer with disabled contact form.
         """
         actual_footer = get_footer(is_secure=True)
-        assert any(((l['name'] == 'contact') for l in actual_footer['connect_links'])) is False
-        assert any(((l['name'] == 'contact') for l in actual_footer['navigation_links'])) is False
+        assert any((l['name'] == 'contact') for l in actual_footer['connect_links']) is False
+        assert any((l['name'] == 'contact') for l in actual_footer['navigation_links']) is False
 
     @with_site_configuration(configuration=test_config_custom_url_contact_us)
     def test_get_footer_custom_contact_url(self):

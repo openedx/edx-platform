@@ -34,9 +34,10 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.toggles import (
+    courseware_legacy_is_visible,
     courseware_mfe_is_visible,
     course_exit_page_is_active,
-    special_exams_is_active,
+    special_exams_is_active
 )
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -97,6 +98,10 @@ class CoursewareMeta:
         self.is_staff = has_access(self.effective_user, 'staff', self.overview).has_access
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
+        self.can_view_legacy_courseware = courseware_legacy_is_visible(
+            course_key=course_key,
+            is_global_staff=self.original_user_is_global_staff,
+        )
 
     def __getattr__(self, name):
         return getattr(self.overview, name)
@@ -394,6 +399,7 @@ class CoursewareInformation(RetrieveAPIView):
         * can_load_course: Whether the user can view the course (AccessResponse object)
         * is_staff: Whether the effective user has staff access to the course
         * original_user_is_staff: Whether the original user has staff access to the course
+        * can_view_legacy_courseware: Indicates whether the user is able to see the legacy courseware view
         * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
             passing grade
         * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
@@ -522,7 +528,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
         if request.user.is_anonymous:
             view = PUBLIC_VIEW
 
-        return Response(json.loads(sequence.handle_ajax('metadata', None, view=view)))
+        return Response(sequence.get_metadata(view=view))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

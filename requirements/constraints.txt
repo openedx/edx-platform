@@ -18,6 +18,11 @@ celery<5.0
 # cryptography 3.3 has dropped python3.5 support.
 cryptography<3.3
 
+# PYJWT[crypto]==2.0.1 requires cryptography>=3.3.1
+PyJWT[crypto]<2.0.0
+# social-auth-core>=4.0.0 requires PYJWT>=2.0.0
+social-auth-core<4.0.0
+
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
@@ -31,7 +36,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.22.5
+edx-enterprise==3.22.12
 
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
@@ -98,10 +103,6 @@ pymongo<3.11
 # sympy latest version causing test failures.
 sympy==1.6.2
 
-# greater versions breaking the code
-Sphinx==3.3.0
-
-
 # python3-saml==1.10.0 version started breaking a11y tests
 python3-saml<1.10.0
 
@@ -111,5 +112,6 @@ httpretty<1.0
 # latest version of diff-cover conflicts with pygments version see https://github.com/Bachmann1234/diff_cover/commit/01f91760321cee1ad28cfa0d801c4acd8b9765a6
 diff-cover==4.0.0
 
-# 3.8.6 causes an issue in the instructor dashboard
-edx-proctoring<=3.8.5
+# transifex-client==0.14.2(latest) requires python-slugify<5.0.0 for Python 2.0 support.
+# This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
+python-slugify<5.0.0

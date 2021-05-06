@@ -7,7 +7,7 @@ from django.core.management import call_command
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.models import CertificateWhitelist
-from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory
+from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -71,7 +71,7 @@ class CertAllowlistManagementCommandTests(ModuleStoreTestCase):
         """
         Verify an allowlist entry can be removed using the management command.
         """
-        CertificateWhitelistFactory.create(course_id=self.course_run_key, user=self.user)
+        CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
 
         call_command(
             "cert_whitelist",

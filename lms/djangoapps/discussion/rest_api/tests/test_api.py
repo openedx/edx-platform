@@ -6,6 +6,7 @@ Tests for Discussion API internal interface
 import itertools
 from datetime import datetime, timedelta
 from unittest import mock
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import ddt
 import httpretty
@@ -15,7 +16,6 @@ from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
-from six.moves.urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from common.djangoapps.student.tests.factories import BetaTesterFactory
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -1899,7 +1899,7 @@ class CreateCommentTest(
         }
         self.assertEqual(actual, expected)
         expected_url = (
-            "/api/v1/comments/{}".format(parent_id) if parent_id else
+            f"/api/v1/comments/{parent_id}" if parent_id else
             "/api/v1/threads/test_thread/comments"
         )
         self.assertEqual(

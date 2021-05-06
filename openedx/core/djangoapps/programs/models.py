@@ -22,21 +22,3 @@ class ProgramsApiConfig(ConfigurationModel):
             'Path used to construct URLs to programs marketing pages (e.g., "/foo").'
         )
     )
-
-
-class CustomProgramsConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
-    """
-    Manages configuration for a run of the backpopulate_program_credentials management command.
-    """
-    class Meta:
-        app_label = 'programs'
-        verbose_name = 'backpopulate_program_credentials argument'
-
-    arguments = models.TextField(
-        blank=True,
-        help_text='Useful for manually running a Jenkins job. Specify like "--usernames A B --program-uuids X Y".',
-        default='',
-    )
-
-    def __str__(self):
-        return str(self.arguments)

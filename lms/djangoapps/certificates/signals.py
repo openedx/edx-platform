@@ -75,13 +75,19 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
 @receiver(COURSE_GRADE_NOW_PASSED, dispatch_uid="new_passing_learner")
 def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disable=unused-argument
     """
-    Listen for a learner passing a course, send cert generation task,
-    downstream signal from COURSE_GRADE_CHANGED
+    Listen for a signal indicating that the user has passed a course run.
+
+    If needed, generate a certificate task.
     """
     if not auto_certificate_generation_enabled():
         return
 
     if can_generate_certificate_task(user, course_id):
+        cert = GeneratedCertificate.certificate_for_student(user, course_id)
+        if cert is not None and CertificateStatuses.is_passing_status(cert.status):
+            log.info(f'{course_id} is using V2 certificates, and the cert status is already passing for user '
+                     f'{user.id}. Passing grade signal will be ignored.')
+            return
         log.info(f'{course_id} is using V2 certificates. Attempt will be made to generate a V2 certificate for '
                  f'{user.id} as a passing grade was received.')
         return generate_certificate_task(user, course_id)
@@ -96,9 +102,9 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
 @receiver(COURSE_GRADE_NOW_FAILED, dispatch_uid="new_failing_learner")
 def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pylint: disable=unused-argument
     """
-    Listen for a learner failing a course, mark the cert as notpassing
-    if it is currently passing,
-    downstream signal from COURSE_GRADE_CHANGED
+    Listen for a signal indicating that the user has failed a course run.
+
+    If needed, mark the certificate as notpassing.
     """
     if is_using_certificate_allowlist_and_is_on_allowlist(user, course_id):
         log.info('{course_id} is using allowlist certificates, and the user {user_id} is on its allowlist. The '
@@ -119,8 +125,9 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
 def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
-    Catches a track change signal, determines user status,
-    calls _fire_ungenerated_certificate_task for passing grades
+    Listen for a signal indicating that the user's id verification status has changed.
+
+    If needed, generate a certificate task.
     """
     if not auto_certificate_generation_enabled():
         return

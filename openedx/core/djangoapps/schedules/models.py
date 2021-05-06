@@ -38,7 +38,7 @@ class Schedule(TimeStampedModel):
 
     def get_experience_type(self):
         try:
-            return self.experience.experience_type
+            return self.experience.experience_type  # lint-amnesty, pylint: disable=no-member
         except ScheduleExperience.DoesNotExist:
             return ScheduleExperience.EXPERIENCES.default
 

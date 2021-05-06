@@ -1,3 +1,4 @@
+/* eslint-disable */
 var Markdown;
 
 if (typeof exports === 'object' && typeof require === 'function') // we're in a CommonJS (e.g. Node.js) module
@@ -580,7 +581,7 @@ else
                 }
             }
             url = attributeSafeUrl(url);
-            var result = '<a href="' + url + '"';
+            var result = '<a href="' + url + '"'; // xss-lint: disable=javascript-concat-html
 
             if (title != '') {
                 title = attributeEncode(title);
@@ -588,7 +589,7 @@ else
                 result += ' title="' + title + '"';
             }
 
-            result += '>' + link_text + '</a>';
+            result += '>' + link_text + '</a>'; // xss-lint: disable=javascript-concat-html
 
             return result;
         }
@@ -686,7 +687,7 @@ else
 
             alt_text = escapeCharacters(attributeEncode(alt_text), '*_[]()');
             url = escapeCharacters(url, '*_');
-            var result = '<img src="' + url + '" alt="' + alt_text + '"';
+            var result = '<img src="' + url + '" alt="' + alt_text + '"'; // xss-lint: disable=javascript-concat-html
 
             // attacklab: Markdown.pl adds empty title attributes to images.
             // Replicate this bug.
@@ -711,11 +712,11 @@ else
             //  --------
             //
             text = text.replace(/^(.+)[ \t]*\n=+[ \t]*\n+/gm,
-                function(wholeMatch, m1) { return '<h1>' + _RunSpanGamut(m1) + '</h1>\n\n'; }
+                function(wholeMatch, m1) { return '<h1>' + _RunSpanGamut(m1) + '</h1>\n\n'; } // xss-lint: disable=javascript-concat-html
             );
 
             text = text.replace(/^(.+)[ \t]*\n-+[ \t]*\n+/gm,
-                function(matchFound, m1) { return '<h2>' + _RunSpanGamut(m1) + '</h2>\n\n'; }
+                function(matchFound, m1) { return '<h2>' + _RunSpanGamut(m1) + '</h2>\n\n'; } // xss-lint: disable=javascript-concat-html
             );
 
             // atx-style headers:
@@ -740,7 +741,7 @@ else
             text = text.replace(/^(\#{1,6})[ \t]*(.+?)[ \t]*\#*\n+/gm,
                 function(wholeMatch, m1, m2) {
                     var h_level = m1.length;
-                    return '<h' + h_level + '>' + _RunSpanGamut(m2) + '</h' + h_level + '>\n\n';
+                    return '<h' + h_level + '>' + _RunSpanGamut(m2) + '</h' + h_level + '>\n\n'; // xss-lint: disable=javascript-concat-html
                 }
             );
 
@@ -794,7 +795,7 @@ else
                     // HTML block parser. This is a hack to work around the terrible
                     // hack that is the HTML block parser.
                     result = result.replace(/\s+$/, '');
-                    result = '<' + list_type + '>' + result + '</' + list_type + '>\n';
+                    result = '<' + list_type + '>' + result + '</' + list_type + '>\n'; // xss-lint: disable=javascript-concat-html
                     return result;
                 });
             } else {
@@ -805,7 +806,7 @@ else
 
                     var list_type = (m3.search(/[*+-]/g) > -1) ? 'ul' : 'ol';
                     var result = _ProcessListItems(list, list_type);
-                    result = runup + '<' + list_type + '>\n' + result + '</' + list_type + '>\n';
+                    result = runup + '<' + list_type + '>\n' + result + '</' + list_type + '>\n'; // xss-lint: disable=javascript-concat-html
                     return result;
                 });
             }
@@ -898,7 +899,7 @@ else
                         item = _RunSpanGamut(item);
                     }
                     last_item_had_a_double_newline = ends_with_double_newline;
-                    return '<li>' + item + '</li>\n';
+                    return '<li>' + item + '</li>\n'; // xss-lint: disable=javascript-concat-html
                 }
             );
 
@@ -940,7 +941,7 @@ else
                     codeblock = codeblock.replace(/^\n+/g, ''); // trim leading newlines
                     codeblock = codeblock.replace(/\n+$/g, ''); // trim trailing whitespace
 
-                    codeblock = '<pre><code>' + codeblock + '\n</code></pre>';
+                    codeblock = '<pre><code>' + codeblock + '\n</code></pre>'; // xss-lint: disable=javascript-concat-html
 
                     return '\n\n' + codeblock + '\n\n' + nextChar;
                 }
@@ -1003,7 +1004,7 @@ else
                     c = c.replace(/[ \t]*$/g, ''); // trailing whitespace
                     c = _EncodeCode(c);
                     c = c.replace(/:\/\//g, '~P'); // to prevent auto-linking. Not necessary in code *blocks*, but in code spans. Will be converted back after the auto-linker runs.
-                    return m1 + '<code>' + c + '</code>';
+                    return m1 + '<code>' + c + '</code>'; // xss-lint: disable=javascript-concat-html
                 }
             );
 
@@ -1092,7 +1093,7 @@ else
                             return pre;
                         });
 
-                    return hashBlock('<blockquote>\n' + bq + '\n</blockquote>');
+                    return hashBlock('<blockquote>\n' + bq + '\n</blockquote>'); // xss-lint: disable=javascript-concat-html
                 }
             );
             return text;
@@ -1193,7 +1194,7 @@ else
 
             //  autolink anything like <http://example.com>
 
-            var replacer = function(wholematch, m1) { return '<a href="' + m1 + '">' + pluginHooks.plainLinkText(m1) + '</a>'; };
+            var replacer = function(wholematch, m1) { return '<a href="' + m1 + '">' + pluginHooks.plainLinkText(m1) + '</a>'; }; // xss-lint: disable=javascript-concat-html
             text = text.replace(/<((https?|ftp):[^'">\s]+)>/gi, replacer);
 
             // Email addresses: <address@domain.foo>

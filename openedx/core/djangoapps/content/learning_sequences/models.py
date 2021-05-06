@@ -148,12 +148,46 @@ class CourseContentVisibilityMixin(models.Model):
         abstract = True
 
 
+class UserPartitionGroup(models.Model):
+    """
+    Each row represents a Group in a UserPartition.
+
+    UserPartitions is a pluggable interface. Some IDs are static (with values
+    less than 100). Others are dynamic, picking a range between 100 and 2^31-1.
+    That means that technically, we could use IntegerField instead of
+    BigIntegerField, but a) that limit isn't actually enforced as far as I can
+    tell; and b) it's not _that_ much extra storage, so I'm using BigInteger
+    instead (2^63-1).
+
+    It's a pluggable interface (entry points: openedx.user_partition_scheme,
+    openedx.dynamic_partition_generator), so there's no "UserPartition" model.
+    We need to actually link this against the values passed back from the
+    partitions service in order to map them to names and descriptions.
+
+    Any CourseSection or CourseSectionSequence may be associated with any number
+    of UserPartitionGroups. An individual _user_ may only be in one Group for
+    any given User Partition, but a piece of _content_ can be associated with
+    multiple groups. So for instance, for the Enrollment Track user partition,
+    a piece of content may be associated with both "Verified" and "Masters"
+    tracks, while a user may only be in one or the other.
+
+    UserPartitionGroups are not associated with LearningSequence directly
+    because User Partitions often carry course-level assumptions (e.g.
+    Enrollment Track) that don't make sense outside of a Course.
+    """
+    id = models.BigAutoField(primary_key=True)
+    partition_id = models.BigIntegerField(null=False)
+    group_id = models.BigIntegerField(null=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['partition_id', 'group_id']),
+        ]
+
+
 class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
     """
     Course Section data, mapping to the 'chapter' block type.
-
-    Do NOT make a foreign key against this table, as the values are deleted and
-    re-created on course publish.
     """
     id = models.BigAutoField(primary_key=True)
     course_context = models.ForeignKey(
@@ -164,6 +198,8 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
 
     # What is our position within the Course? (starts with 0)
     ordering = models.PositiveIntegerField(null=False)
+
+    user_partition_groups = models.ManyToManyField(UserPartitionGroup)
 
     class Meta:
         unique_together = [
@@ -202,6 +238,8 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
     # Ordering, starts with 0, but global for the course. So if you had 200
     # sequences across 20 sections, the numbering here would be 0-199.
     ordering = models.PositiveIntegerField(null=False)
+
+    user_partition_groups = models.ManyToManyField(UserPartitionGroup)
 
     class Meta:
         unique_together = [

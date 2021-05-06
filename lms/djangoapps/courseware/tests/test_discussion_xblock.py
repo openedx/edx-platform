@@ -246,8 +246,8 @@ class TestTemplates(TestDiscussionXBlock):
         fragment = self.block.student_view()
         read_only = 'false' if permissions[0] else 'true'
         assert f'data-discussion-id="{self.discussion_id}"' in fragment.content
-        assert 'data-user-create-comment="{}"'.format(json.dumps(permissions[1])) in fragment.content
-        assert 'data-user-create-subcomment="{}"'.format(json.dumps(permissions[2])) in fragment.content
+        assert f'data-user-create-comment="{json.dumps(permissions[1])}"' in fragment.content
+        assert f'data-user-create-subcomment="{json.dumps(permissions[2])}"' in fragment.content
         assert f'data-read-only="{read_only}"' in fragment.content
 
 

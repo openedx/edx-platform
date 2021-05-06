@@ -103,6 +103,7 @@ FIELDS_ALLOWED_IN_AUTH_DENIED_CONTENT = [
     "descendants",
     "authorization_denial_reason",
     "authorization_denial_message",
+    'contains_gated_content',
 ]
 
 

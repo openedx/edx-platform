@@ -10,10 +10,8 @@ These methods should be called from tasks.
 """
 
 import logging
-import random
 from uuid import uuid4
 
-from capa.xqueue_interface import make_hashkey
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
@@ -68,9 +66,13 @@ def _generate_certificate(user, course_key):
     course = modulestore().get_course(course_key, depth=0)
     course_grade = CourseGradeFactory().read(user, course)
     enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+
     # Retain the `verify_uuid` from an existing certificate if possible, this will make it possible for the learner to
     # keep the existing URL to their certificate
-    uuid = getattr(existing_certificate, 'verify_uuid', uuid4().hex)
+    if existing_certificate and existing_certificate.verify_uuid:
+        uuid = existing_certificate.verify_uuid
+    else:
+        uuid = uuid4().hex
 
     cert, created = GeneratedCertificate.objects.update_or_create(
         user=user,

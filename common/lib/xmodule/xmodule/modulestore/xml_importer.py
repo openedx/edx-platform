@@ -21,7 +21,6 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
 
-
 import json
 import logging
 import mimetypes
@@ -38,8 +37,7 @@ from xblock.core import XBlockMixin
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
-import cms.djangoapps.contentstore.errors as UserErrors
-
+from cms.djangoapps.contentstore.exceptions import ErrorReadingFileException, ModuleFailedToImport
 from common.djangoapps.util.monitoring import monitor_import_failure
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
@@ -69,6 +67,7 @@ class LocationMixin(XBlockMixin):
     with old-style :class:`XModule` API. This is a simplified version of
     :class:`XModuleMixin`.
     """
+
     @property
     def location(self):
         """ Get the UsageKey of this block. """
@@ -235,7 +234,6 @@ class ImportManager:
             create_if_not_present=False, raise_on_failure=False,
             static_content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR,
             python_lib_filename='python_lib.zip',
-            status=None
     ):
         self.store = store
         self.user_id = user_id
@@ -260,7 +258,6 @@ class ImportManager:
             xblock_select=store.xblock_select,
             target_course_id=target_id,
         )
-        self.status = status
         self.logger, self.errors = make_error_tracker()
 
     def preflight(self):
@@ -363,12 +360,10 @@ class ImportManager:
             logging.info(f'Course import {course_id}: No {assets_filename} file present.')
             return
         except Exception as exc:  # pylint: disable=W0703
-            monitor_import_failure(course_id, 'Updating', exception=exc)
-            logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
             if self.raise_on_failure:  # lint-amnesty, pylint: disable=no-else-raise
-                if self.status:
-                    self.status.fail(UserErrors.ERROR_WHILE_READING).format(assets_filename)
-                raise
+                monitor_import_failure(course_id, 'Updating', exception=exc)
+                logging.exception(f'Course import {course_id}: Error while parsing {assets_filename}.')
+                raise ErrorReadingFileException(assets_filename)  # pylint: disable=raise-missing-from
             else:
                 return
 
@@ -485,13 +480,7 @@ class ImportManager:
                         log.exception(
                             f'Course import {dest_id}: failed to import module location {child.location}'
                         )
-                        if self.status:
-                            self.status.fail(
-                                UserErrors.FAILED_TO_IMPORT_MODULE.format(
-                                    child.display_name, child.location
-                                )
-                            )
-                        raise
+                        raise ModuleFailedToImport(child.display_name, child.location)  # pylint: disable=raise-missing-from
 
                     depth_first(child)
 
@@ -512,15 +501,11 @@ class ImportManager:
                     runtime=courselike.runtime,
                 )
             except Exception:
-                msg = f'Course import {dest_id}: failed to import module location {leftover}'
-                log.error(msg)
-                if self.status:
-                    self.status.fail(
-                        UserErrors.FAILED_TO_IMPORT_MODULE.format(
-                            leftover.display_name, leftover.location
-                        )
-                    )
-                raise
+                log.exception(
+                    f'Course import {dest_id}: failed to import module location {leftover}'
+                )
+                # pylint: disable=raise-missing-from
+                raise ModuleFailedToImport(leftover.display_name, leftover.location)
 
     def run_imports(self):
         """
@@ -606,10 +591,6 @@ class CourseImportManager(ImportManager):
                     "Skipping import of course with id, %s, "
                     "since it collides with an existing one", dest_id
                 )
-                if self.status:
-                    self.status.fail(
-                        UserErrors.COURSE_ALREADY_EXIST.format(dest_id)
-                    )
                 raise
 
         return dest_id, runtime
@@ -719,8 +700,6 @@ class LibraryImportManager(ImportManager):
                     "Skipping import of Library with id %s, "
                     "since it collides with an existing one", dest_id
                 )
-                if self.status:
-                    self.status.fail(UserErrors.LIBRARY_ALREADY_EXIST)
                 raise
 
         return dest_id, runtime
@@ -785,6 +764,7 @@ def _update_and_import_module(
         """
         Move the module to a new course.
         """
+
         def _convert_ref_fields_to_new_namespace(reference):
             """
             Convert a reference to the new namespace, but only

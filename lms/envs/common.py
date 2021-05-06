@@ -311,7 +311,7 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
     # Settings for course import olx validation
-    'ENABLE_COURSE_OLX_VALIDATION': True,
+    'ENABLE_COURSE_OLX_VALIDATION': False,
 
     # .. toggle_name: FEATURES['DISABLE_HONOR_CERTIFICATES']
     # .. toggle_implementation: DjangoSetting

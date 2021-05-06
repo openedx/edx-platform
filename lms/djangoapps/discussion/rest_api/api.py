@@ -51,6 +51,7 @@ from lms.djangoapps.discussion.rest_api.utils import discussion_open_for_user
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import CommentClientRequestError
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
@@ -61,7 +62,6 @@ from openedx.core.djangoapps.django_comment_common.signals import (
     thread_edited,
     thread_voted
 )
-from openedx.core.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.accounts.views import \
     AccountViewSet  # lint-amnesty, pylint: disable=unused-import
@@ -126,7 +126,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
-        course_discussion_settings = get_course_discussion_settings(course_key)
+        course_discussion_settings = CourseDiscussionSettings.get(course_key)
         if (
                 not context["is_requester_privileged"] and
                 cc_thread["group_id"] and
@@ -590,7 +590,7 @@ def get_thread_list(
         "user_id": str(request.user.id),
         "group_id": (
             None if context["is_requester_privileged"] else
-            get_group_id_for_user(request.user, get_course_discussion_settings(course.id))
+            get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
         ),
         "page": page,
         "per_page": page_size,
@@ -875,7 +875,7 @@ def create_thread(request, thread_data):
 
     context = get_context(course, request)
     _check_initializable_thread_fields(thread_data, context)
-    discussion_settings = get_course_discussion_settings(course_key)
+    discussion_settings = CourseDiscussionSettings.get(course_key)
     if (
             "group_id" not in thread_data and
             is_commentable_divided(course_key, thread_data.get("topic_id"), discussion_settings)

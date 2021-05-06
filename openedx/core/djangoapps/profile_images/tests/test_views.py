@@ -6,7 +6,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
-import datetime
+import datetime  # lint-amnesty, pylint: disable=wrong-import-order
 from pytz import UTC
 
 from django.urls import reverse
