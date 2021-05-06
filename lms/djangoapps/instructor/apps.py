@@ -8,7 +8,6 @@ from django.conf import settings
 from edx_django_utils.plugins import PluginSettings, PluginURLs
 from edx_proctoring.runtime import set_runtime_service
 
-from openedx.core.constants import COURSE_ID_PATTERN
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
 
 
@@ -22,8 +21,8 @@ class InstructorConfig(AppConfig):
         PluginURLs.CONFIG: {
             ProjectType.LMS: {
                 PluginURLs.NAMESPACE: '',
-                PluginURLs.REGEX: f'^courses/{COURSE_ID_PATTERN}/instructor/api/',
-                PluginURLs.RELATIVE_PATH: 'views.api_urls',
+                PluginURLs.REGEX: '',
+                PluginURLs.RELATIVE_PATH: 'urls',
             }
         },
         PluginSettings.CONFIG: {

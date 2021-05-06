@@ -9,10 +9,11 @@ Many of these GETs may become PUTs in the future.
 import csv
 import json
 import logging
+import string
 import random
 import re
-import string
 
+import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
@@ -26,17 +27,18 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from edx_when.api import get_date_for_block
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from submissions import api as sub_api  # installed from the edx-submissions repository
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student import auth
@@ -44,17 +46,17 @@ from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
     DEFAULT_TRANSITION_STATE,
     ENROLLED_TO_ENROLLED,
     ENROLLED_TO_UNENROLLED,
-    UNENROLLED_TO_ALLOWEDTOENROLL,
-    UNENROLLED_TO_ENROLLED,
-    UNENROLLED_TO_UNENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
     EntranceExamConfiguration,
     ManualEnrollmentAudit,
     Registration,
+    UNENROLLED_TO_ALLOWEDTOENROLL,
+    UNENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_UNENROLLED,
     UserProfile,
     get_user_by_username_or_email,
     is_email_retired,
@@ -63,7 +65,7 @@ from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesA
 from common.djangoapps.util.file import (
     FileValidationException,
     course_and_time_based_filename_generator,
-    store_uploaded_file
+    store_uploaded_file,
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 from common.djangoapps.util.views import require_global_staff
@@ -79,7 +81,7 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_name,
-    has_forum_access
+    has_forum_access,
 )
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
@@ -89,13 +91,11 @@ from lms.djangoapps.instructor.enrollment import (
     get_user_email_language,
     send_beta_role_email,
     send_mail_to_student,
-    unenroll_email
+    unenroll_email,
 )
 from lms.djangoapps.instructor.views import INVOICE_KEY
 from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
-from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic
-from lms.djangoapps.instructor_analytics import csvs as instructor_analytics_csvs
-from lms.djangoapps.instructor_analytics import distributions as instructor_analytics_distributions  # lint-amnesty, pylint: disable=unused-import
+from lms.djangoapps.instructor_analytics import basic as instructor_analytics_basic, csvs as instructor_analytics_csvs
 from lms.djangoapps.instructor_task import api as task_api
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
@@ -107,17 +107,14 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
-    Role
+    Role,
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-
-from .. import permissions
 from .tools import (
     dump_module_extensions,
     dump_student_extensions,
@@ -127,8 +124,9 @@ from .tools import (
     parse_datetime,
     require_student_from_identifier,
     set_due_date_extension,
-    strip_if_string
+    strip_if_string,
 )
+from .. import permissions
 
 log = logging.getLogger(__name__)
 
@@ -971,12 +969,144 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+class ProblemResponseReportPostParamsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that describes that POST parameters for the report generation API.
+    """
+    problem_locations = serializers.ListSerializer(
+        child=serializers.CharField(
+            help_text=_(
+                "A usage key location for a section or a problem. "
+                "If the location is a block that contains other blocks, (such as the course, "
+                "section, subsection, or unit blocks) then all blocks under that block will be "
+                "included in the report."
+            ),
+        ),
+        required=True,
+        allow_empty=False,
+        help_text=_(
+            "A list of usage keys for the blocks to include in the report. "
+        )
+    )
+    problem_types_filter = serializers.ListSerializer(
+        child=serializers.CharField(),
+        required=False,
+        allow_empty=True,
+        help_text=_(
+            "A list of problem/block types to generate the report for. "
+            "This field can be omitted if the report should include details of all"
+            "block types. "
+        ),
+    )
+
+
+class ProblemResponsesReportStatusSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that describes the response of the problem response report generation API.
+    """
+    status = serializers.CharField(help_text=_("User-friendly text describing current status of report generation."))
+    task_id = serializers.UUIDField(
+        help_text=_(
+            "A unique id for the report generation task. "
+            "It can be used to query the latest report generation status."
+        )
+    )
+
+
+@view_auth_classes()
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ProblemResponseReportInitiate(DeveloperErrorViewMixin, APIView):
+    """
+    Initiate generation of a CSV file containing all student answers
+    to a given problem.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.path_parameter(
+                'course_id',
+                str,
+                description="ID of the course for which report is to be generate.",
+            ),
+        ],
+        body=ProblemResponseReportPostParamsSerializer,
+        responses={
+            200: ProblemResponsesReportStatusSerializer,
+            400: _(
+                "The provided parameters were invalid. Make sure you've provided at least "
+                "one valid usage key for `problem_locations`."
+            ),
+            401: _("The requesting user is not authenticated."),
+            403: _("The requesting user lacks access to the course."),
+        }
+    )
+    @transaction.non_atomic_requests
+    @method_decorator(require_course_permission(permissions.CAN_RESEARCH))
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing all student answers
+        to a given problem.
+
+        **Example requests**
+
+            POST /api/instructor/v1/reports/{course_id}/generate/problem_responses {
+                "problem_locations": [
+                    "{usage_key1}",
+                    "{usage_key2}",
+                    "{usage_key3}"
+                ]
+            }
+            POST /api/instructor/v1/reports/{course_id}/generate/problem_responses {
+                "problem_locations": ["{usage_key}"],
+                "problem_types_filter": ["problem"]
+            }
+
+        **POST Parameters**
+
+        A POST request can include the following parameters:
+
+        * problem_location: A list of usage keys for the blocks to include in
+          the report. If the location is a block that contains other blocks,
+          (such as the course, section, subsection, or unit blocks) then all
+          blocks under that block will be included in the report.
+        * problem_types_filter: Optional. A comma-separated list of block types
+          to include in the report. If set, only blocks of the specified types
+          will be included in the report.
+
+        To get data on all the poll and survey blocks in a course, you could
+        POST the usage key of the course for `problem_location`, and
+        "poll, survey" as the value for `problem_types_filter`.
+
+
+        **Example Response:**
+        If initiation is successful (or generation task is already running):
+        ```json
+        {
+            "status": "The problem responses report is being created. ...",
+            "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
+        }
+        ```
+
+        Responds with BadRequest if any of the provided problem locations are faulty.
+        """
+        params = ProblemResponseReportPostParamsSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+        problem_locations = params.validated_data.get('problem_locations')
+        problem_types_filter = params.validated_data.get('problem_types_filter')
+        if problem_types_filter:
+            problem_types_filter = ','.join(problem_types_filter)
+        return _get_problem_responses(
+            request,
+            course_id=course_id,
+            problem_locations=problem_locations,
+            problem_types_filter=problem_types_filter,
+        )
+
+
 @transaction.non_atomic_requests
 @require_POST
 @ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
 def get_problem_responses(request, course_id):
     """
     Initiate generation of a CSV file containing all student answers
@@ -1020,24 +1150,38 @@ def get_problem_responses(request, course_id):
 
     Responds with BadRequest if any of the provided problem locations are faulty.
     """
-    course_key = CourseKey.from_string(course_id)
     # A comma-separated list of problem locations
     # The name of the POST parameter is `problem_location` (not pluralised) in
     # order to preserve backwards compatibility with existing third-party
     # scripts.
-    problem_locations = request.POST.get('problem_location', '')
+    problem_locations = request.POST.get('problem_location', '').split(',')
     # A comma-separated list of block types
-    problem_types_filter = request.POST.get('problem_types_filter', '')
+    problem_types_filter = request.POST.get('problem_types_filter')
+    return _get_problem_responses(
+        request,
+        course_id=course_id,
+        problem_locations=problem_locations,
+        problem_types_filter=problem_types_filter,
+    )
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@common_exceptions_400
+def _get_problem_responses(request, *, course_id, problem_locations, problem_types_filter):
+    """
+    Shared code for new DRF and old APIS for problem response report generation.
+    """
+    course_key = CourseKey.from_string(course_id)
     report_type = _('problem responses')
 
     try:
-        for problem_location in problem_locations.split(','):
-            problem_key = UsageKey.from_string(problem_location).map_into_course(course_key)  # lint-amnesty, pylint: disable=unused-variable
+        for problem_location in problem_locations:
+            UsageKey.from_string(problem_location).map_into_course(course_key)
     except InvalidKeyError:
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
     task = task_api.submit_calculate_problem_responses_csv(
-        request, course_key, problem_locations, problem_types_filter,
+        request, course_key, ','.join(problem_locations), problem_types_filter,
     )
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
@@ -1852,10 +1996,139 @@ def list_email_content(request, course_id):
     return JsonResponse(response_payload)
 
 
+class InstructorTaskSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that describes the format of a single instructor task.
+    """
+    status = serializers.CharField(help_text=_("Current status of task."))
+    task_type = serializers.CharField(help_text=_("Identifies the kind of task being performed, e.g. rescoring."))
+    task_id = serializers.CharField(help_text=_("The celery ID for the task."))
+    created = serializers.DateTimeField(help_text=_("The date and time when the task was created."))
+    task_input = serializers.DictField(
+        help_text=_(
+            "The input parameters for the task. The format and content of this "
+            "data will depend on the kind of task being performed. For instance"
+            "it may contain the problem locations for a problem resources task.")
+    )
+    requester = serializers.CharField(help_text=_("The username of the user who initiated this task."))
+    task_state = serializers.CharField(help_text=_("The last knows state of the celery task."))
+    duration_sec = serializers.CharField(help_text=_("Task duration information, if known"))
+    task_message = serializers.CharField(help_text=_("User-friendly task status information, if available."))
+
+
+class InstructorTasksListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer to describe the response of the instructor tasks list API.
+    """
+    tasks = serializers.ListSerializer(
+        child=InstructorTaskSerializer(),
+        help_text=_("List of instructor tasks.")
+    )
+
+
+@view_auth_classes()
+class InstructorTasks(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Lists currently running instructor tasks
+
+    **Parameters**
+       - With no arguments, lists running tasks.
+       - `problem_location_str` lists task history for problem
+       - `problem_location_str` and `unique_student_identifier` lists task
+           history for problem AND student (intersection)
+
+    **Example Requests**:
+
+        GET /courses/{course_id}/instructor/api/v0/tasks
+
+    **Response Values**
+        {
+          "tasks": [
+            {
+              "status": "Incomplete",
+              "task_type": "grade_problems",
+              "task_id": "2519ff31-22d9-4a62-91e2-55495895b355",
+              "created": "2019-01-15T18:00:15.902470+00:00",
+              "task_input": "{}",
+              "duration_sec": "unknown",
+              "task_message": "No status information available",
+              "requester": "staff",
+              "task_state": "PROGRESS"
+            }
+          ]
+        }
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter(
+                'course_id',
+                apidocs.ParameterLocation.PATH,
+                description="ID for the course whose tasks need to be listed.",
+            ),
+            apidocs.string_parameter(
+                'problem_location_str',
+                apidocs.ParameterLocation.QUERY,
+                description="Filter instructor tasks to this problem location.",
+            ),
+            apidocs.string_parameter(
+                'unique_student_identifier',
+                apidocs.ParameterLocation.QUERY,
+                description="Filter tasks to a singe problem and a single student. "
+                            "Must be used in combination with `problem_location_str`.",
+            ),
+        ],
+        responses={
+            200: InstructorTasksListSerializer,
+            401: _("The requesting user is not authenticated."),
+            403: _("The requesting user lacks access to the course."),
+            404: _("The requested course does not exist."),
+        }
+    )
+    def get(self, request, course_id):
+        """
+        List instructor tasks filtered by `course_id`.
+
+        **Use Cases**
+
+        Lists currently running instructor tasks
+
+        **Parameters**
+           - With no arguments, lists running tasks.
+           - `problem_location_str` lists task history for problem
+           - `problem_location_str` and `unique_student_identifier` lists task
+               history for problem AND student (intersection)
+
+        **Example Requests**:
+
+            GET /courses/{course_id}/instructor/api/v0/tasks
+
+        **Response Values**
+        ```json
+            {
+              "tasks": [
+                {
+                  "status": "Incomplete",
+                  "task_type": "grade_problems",
+                  "task_id": "2519ff31-22d9-4a62-91e2-55495895b355",
+                  "created": "2019-01-15T18:00:15.902470+00:00",
+                  "task_input": "{}",
+                  "duration_sec": "unknown",
+                  "task_message": "No status information available",
+                  "requester": "staff",
+                  "task_state": "PROGRESS"
+                }
+              ]
+            }
+        ```
+        """
+        return _list_instructor_tasks(request=request, course_id=course_id)
+
+
 @require_POST
 @ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.SHOW_TASKS)
 def list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
@@ -1866,9 +2139,21 @@ def list_instructor_tasks(request, course_id):
         - `problem_location_str` and `unique_student_identifier` lists task
             history for problem AND student (intersection)
     """
+    return _list_instructor_tasks(request=request, course_id=course_id)
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.SHOW_TASKS)
+def _list_instructor_tasks(request, course_id):
+    """
+    List instructor tasks.
+
+    Internal function with common code for both DRF and and tradition views.
+    """
     course_id = CourseKey.from_string(course_id)
-    problem_location_str = strip_if_string(request.POST.get('problem_location_str', False))
-    student = request.POST.get('unique_student_identifier', None)
+    params = getattr(request, 'query_params', request.POST)
+    problem_location_str = strip_if_string(params.get('problem_location_str', False))
+    student = params.get('unique_student_identifier', None)
     if student is not None:
         student = get_student_from_identifier(student)
 
@@ -1940,10 +2225,85 @@ def list_entrance_exam_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
+class ReportDownloadSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that describes a single report download.
+    """
+    url = serializers.URLField(help_text=_("URL from which report can be downloaded."))
+    name = serializers.CharField(help_text=_("Name of report."))
+    link = serializers.CharField(help_text=_("HTML anchor tag that contains the name and link."))
+
+
+class ReportDownloadsListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """
+    Serializer that describes the response of the report downloads list API.
+    """
+    downloads = serializers.ListSerializer(
+        child=ReportDownloadSerializer(help_text="Report Download"),
+        help_text=_("List of report downloads"),
+    )
+
+
+@view_auth_classes()
+class ReportDownloads(DeveloperErrorViewMixin, APIView):
+    """
+    API view to list report downloads for a course.
+    """
+
+    @apidocs.schema(parameters=[
+        apidocs.string_parameter(
+            'course_id',
+            apidocs.ParameterLocation.PATH,
+            description=_("ID for the course whose reports need to be listed."),
+        ),
+        apidocs.string_parameter(
+            'report_name',
+            apidocs.ParameterLocation.QUERY,
+            description=_(
+                "Filter results to only return details of for the report with the specified name."
+            ),
+        ),
+    ], responses={
+        200: ReportDownloadsListSerializer,
+        401: _("The requesting user is not authenticated."),
+        403: _("The requesting user lacks access to the course."),
+        404: _("The requested course does not exist."),
+    })
+    def get(self, request, course_id):
+        """
+        List report CSV files that are available for download for this course.
+
+        **Use Cases**
+
+        Lists reports available for download
+
+        **Example Requests**:
+
+            GET /api/instructor/v1/reports/{course_id}
+
+        **Response Values**
+        ```json
+        {
+            "downloads": [
+                {
+                    "url": "https://1.mock.url",
+                    "link": "<a href=\"https://1.mock.url\">mock_file_name_1</a>",
+                    "name": "mock_file_name_1"
+                }
+            ]
+        }
+        ```
+
+        The report name will depend on the type of report generated. For example a
+        problem responses report for an entire course might be called:
+
+            edX_DemoX_Demo_Course_student_state_from_block-v1_edX+DemoX+Demo_Course+type@course+block@course_2021-04-30-0918.csv
+        """  # pylint: disable=line-too-long
+        return _list_report_downloads(request=request, course_id=course_id)
+
+
 @require_POST
 @ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
 def list_report_downloads(request, course_id):
     """
     List grade CSV files that are available for download for this course.
@@ -1951,9 +2311,20 @@ def list_report_downloads(request, course_id):
     Takes the following query parameters:
     - (optional) report_name - name of the report
     """
+    return _list_report_downloads(request=request, course_id=course_id)
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.CAN_RESEARCH)
+def _list_report_downloads(request, course_id):
+    """
+    List grade CSV files that are available for download for this course.
+
+    Internal function with common code shared between DRF and functional views.
+    """
     course_id = CourseKey.from_string(course_id)
     report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
-    report_name = request.POST.get("report_name", None)
+    report_name = getattr(request, 'query_params', request.POST).get("report_name", None)
 
     response_payload = {
         'downloads': [
