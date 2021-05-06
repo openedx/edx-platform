@@ -13,13 +13,14 @@ from openedx.adg.lms.webinars.constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, 
 from openedx.adg.lms.webinars.helpers import (
     cancel_all_reminders,
     cancel_reminders_for_given_webinars,
+    get_newly_added_and_removed_team_members,
     get_webinar_description_link,
+    get_webinar_invitees_emails,
     remove_emails_duplicate_in_other_list,
     save_scheduled_reminder_ids,
     send_cancellation_emails_for_given_webinars,
     send_webinar_emails,
     send_webinar_registration_email,
-    update_webinar_team_registrations,
     validate_email_list,
     webinar_emails_for_panelists_co_hosts_and_presenter
 )
@@ -233,8 +234,9 @@ def test_save_scheduled_reminder_ids(template, msg_id_field_name, webinar_regist
             'email': webinar_registration.user.email
         }
     ]
+    webinar_reminders_context = {'webinar_id': webinar_registration.webinar.id}
 
-    save_scheduled_reminder_ids(mandrill_response, template, webinar_registration.webinar.id)
+    save_scheduled_reminder_ids(mandrill_response, template, webinar_reminders_context)
 
     webinar_registration.refresh_from_db()
     assert getattr(webinar_registration, msg_id_field_name) == FAKE_MANDRILL_MSG_ID
@@ -275,24 +277,59 @@ def test_cancel_all_reminders(msg_id, msg_id_field_name, webinar_registration, m
 
 
 @pytest.mark.django_db
-def test_update_webinar_team_registrations(webinar, mocker):
+@pytest.mark.parametrize('invite_all_platform_users', [True, False])
+def test_get_webinar_invitees_emails(invite_all_platform_users, webinar):
     """
-    Tests `schedule_webinar_reminders` is called to schedule reminders for newly added team members and
-    `cancel_all_reminders` is called for the removed team members.
+    Test that `get_webinar_invitees_emails` correctly returns the invitees' emails of a webinar
     """
-    mock_schedule_webinar_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.schedule_webinar_reminders')
-    mock_cancel_all_reminders = mocker.patch('openedx.adg.lms.webinars.helpers.cancel_all_reminders')
+    UserFactory(email='learner@email.com')
 
     mock_webinar_form = Mock()
     mock_webinar_form.instance = webinar
-    users = UserFactory.create_batch(6)
     mock_webinar_form.cleaned_data = {
-        'co_hosts': users[0:2],
-        'presenter': users[2],
-        'panelists': users[3:]
+        'invites_by_email_address': ['guest1@email.com', 'guest2@email.com'],
+        'invite_all_platform_users': invite_all_platform_users
     }
 
-    update_webinar_team_registrations(mock_webinar_form)
+    if invite_all_platform_users:
+        expected_emails = {
+            webinar.presenter.email,
+            webinar.created_by.email,
+            'learner@email.com',
+            'guest1@email.com',
+            'guest2@email.com'
+        }
+    else:
+        expected_emails = {'guest1@email.com', 'guest2@email.com'}
 
-    mock_schedule_webinar_reminders.assert_called_once()
-    mock_cancel_all_reminders.assert_called_once()
+    actual_emails = set(get_webinar_invitees_emails(mock_webinar_form))
+
+    assert expected_emails == actual_emails
+
+
+@pytest.mark.django_db
+def test_get_newly_added_and_removed_team_members(webinar):
+    """
+    Test that the function `get_newly_added_and_removed_team_members` correctly extracts newly added and removed members
+    from a webinar form
+    """
+    mock_webinar_form = Mock()
+
+    users = UserFactory.create_batch(8)
+    webinar.presenter = users[0]
+    webinar.co_hosts.set(users[1:3])
+    webinar.panelists.set(users[3:5])
+
+    mock_webinar_form.cleaned_data = {
+        'presenter': users[5],
+        'co_hosts': [users[1], users[6]],
+        'panelists': [users[3], users[7]]
+    }
+
+    expected_new_members = set(users[5:8])
+    expected_removed_members = {users[0], users[2], users[4]}
+
+    actual_new_members, actual_removed_members = get_newly_added_and_removed_team_members(mock_webinar_form, webinar)
+
+    assert expected_new_members == set(actual_new_members)
+    assert expected_removed_members == set(actual_removed_members)

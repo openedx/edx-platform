@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 @task()
-def task_send_mandrill_email(template, emails, context, send_at=None):
+def task_send_mandrill_email(template, emails, context, send_at=None, save_mandrill_msg_ids=False):
     """
     Sends an email by calling send_mandrill_email, asynchronously
 
@@ -23,12 +23,11 @@ def task_send_mandrill_email(template, emails, context, send_at=None):
         emails (iterable): Email addresses of users
         context (dict): Dictionary containing email content
         send_at (str): When this message should be sent as a UTC timestamp in YYYY-MM-DD HH:MM:SS format.
+        save_mandrill_msg_ids (bool): Whether to process mandrill response and save message ids or not
 
     Returns:
         None
     """
-    from openedx.adg.lms.webinars.helpers import save_scheduled_reminder_ids
-
     log.info(f'Sending an email using template: {template} to accounts: {emails}, from inside task_send_mandrill_email')
 
     template_to_email_adresses_map = defaultdict(list)
@@ -39,9 +38,10 @@ def task_send_mandrill_email(template, emails, context, send_at=None):
     for template_slug, recipient_emails in template_to_email_adresses_map.items():
         response = MandrillClient().send_mandrill_email(template_slug, recipient_emails, context, send_at)
 
-        if (response and
-                template in [MandrillClient.WEBINAR_ONE_WEEK_REMINDER, MandrillClient.WEBINAR_TWO_HOURS_REMINDER]):
-            save_scheduled_reminder_ids(response, template, context['webinar_id'])
+        if response and save_mandrill_msg_ids:
+            from openedx.adg.lms.webinars.helpers import save_scheduled_reminder_ids
+
+            save_scheduled_reminder_ids(response, template, context)
 
 
 @task()

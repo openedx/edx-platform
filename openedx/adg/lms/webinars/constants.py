@@ -19,3 +19,5 @@ WEBINAR_STATUS_DELIVERED = _('Delivered')
 WEBINAR_STATUS_UPCOMING = _('Upcoming')
 
 WEBINARS_TIME_FORMAT = '%B %d, %Y %I:%M %p %Z'
+
+SEND_UPDATE_EMAILS_FIELD = 'send_update_emails'

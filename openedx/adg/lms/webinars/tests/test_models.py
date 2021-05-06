@@ -6,8 +6,10 @@ from unittest.mock import Mock
 
 import pytest
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.webinars.constants import BANNER_MAX_SIZE
-from openedx.adg.lms.webinars.models import Webinar
+from openedx.adg.lms.webinars.models import Webinar, WebinarRegistration
+from openedx.adg.lms.webinars.tests.factories import WebinarRegistrationFactory
 
 
 @pytest.mark.django_db
@@ -98,3 +100,45 @@ def test_upcoming_webinars(webinar, delivered_webinar):  # pylint: disable=unuse
 def test_delivered_webinars(webinar, delivered_webinar):  # pylint: disable=unused-argument
     assert Webinar.objects.delivered_webinars().count() == 1
     assert Webinar.objects.delivered_webinars().first() == delivered_webinar
+
+
+@pytest.mark.django_db
+def test_remove_team_registrations_and_cancel_reminders(webinar, mocker):
+    """
+    Test that the function `remove_team_registrations_and_cancel_reminders` removes team registrations and cancels
+    reminders of removed members of a webinar
+    """
+    mock_cancel_all_reminders = mocker.patch('openedx.adg.lms.webinars.models.cancel_all_reminders')
+
+    user_1 = UserFactory()
+    user_2 = UserFactory()
+    WebinarRegistrationFactory(
+        user=user_1, webinar=webinar, is_registered=False, is_team_member_registration=True
+    )
+    WebinarRegistrationFactory(
+        user=user_2, webinar=webinar, is_registered=False, is_team_member_registration=True
+    )
+
+    removed_members = [user_1, user_2]
+    webinar.remove_team_registrations_and_cancel_reminders(removed_members)
+
+    assert not WebinarRegistration.objects.get(user=user_1).is_team_member_registration
+    assert not WebinarRegistration.objects.get(user=user_2).is_team_member_registration
+
+    mock_cancel_all_reminders.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_get_webinar_update_recipients_emails(webinar):
+    """
+    Tests that the method `get_webinar_update_recipients_emails` correctly returns the update recipients of a webinar
+    """
+    user_1 = UserFactory()
+    user_2 = UserFactory()
+    WebinarRegistrationFactory(user=user_1, webinar=webinar)
+    WebinarRegistrationFactory(user=user_2, webinar=webinar, is_team_member_registration=True, is_registered=False)
+
+    expected_emails = {user_1.email, user_2.email}
+    actual_emails = set(webinar.get_webinar_update_recipients_emails())
+
+    assert expected_emails == actual_emails

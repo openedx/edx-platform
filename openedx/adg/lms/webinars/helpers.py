@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from itertools import chain
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.urls import reverse
@@ -140,6 +141,7 @@ def schedule_webinar_reminders(user_emails, email_context):
         user_emails,
         email_context,
         webinar_start_time - timedelta(hours=2),
+        save_mandrill_msg_ids=True
     )
 
     if (webinar_start_time - timedelta(days=6)) > datetime.now():
@@ -148,17 +150,18 @@ def schedule_webinar_reminders(user_emails, email_context):
             user_emails,
             email_context,
             webinar_start_time - timedelta(days=7),
+            save_mandrill_msg_ids=True
         )
 
 
-def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
+def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_reminders_context):
     """
     Saves mandrill msg ids of the reminders for a webinar registration.
 
     Args:
-        webinar_id (int): Webinar Id
         mandrill_response (list): List containing the response from mandrill
         template_name (str): Mandrill email template slug
+        webinar_reminders_context (dict): Webinar reminders context.
 
     Returns:
         None
@@ -172,7 +175,7 @@ def save_scheduled_reminder_ids(mandrill_response, template_name, webinar_id):
 
     for response in mandrill_response:
         registration = WebinarRegistration.objects.filter(
-            user__email=response['email'], webinar__id=webinar_id
+            user__email=response['email'], webinar__id=webinar_reminders_context['webinar_id']
         ).first()
         setattr(registration, template_name_to_field_map[template_name], response['_id'])
         registration.save()
@@ -217,7 +220,7 @@ def webinar_emails_for_panelists_co_hosts_and_presenter(webinar):
     emails = panelist_emails + co_host_emails
     if webinar.presenter:
         emails.append(webinar.presenter.email)
-    return emails
+    return list(set(emails))
 
 
 def remove_emails_duplicate_in_other_list(email_list, reference_email_list):
@@ -234,37 +237,29 @@ def remove_emails_duplicate_in_other_list(email_list, reference_email_list):
     return [email for email in email_list if email not in reference_email_list]
 
 
-def update_webinar_team_registrations(webinar_form):
+def get_newly_added_and_removed_team_members(webinar_form, old_webinar):
     """
-    Updates webinar team registrations if webinar presenter, cohosts or panelists are updated.
+    Returns a list of newly added and removed co-hosts, panelists and presenter
 
-    Args:
+    Arguments:
         webinar_form (Form): Model form with updated data.
+        old_webinar (Webinar): Old webinar state prior to updation.
 
     Returns:
-        None
+        new_members (list): list of newly added co-hosts, panelists and presenter
+        removed_members (list): list of removed co-hosts, panelists and presenter
     """
-    from openedx.adg.lms.webinars.models import WebinarRegistration
-
-    webinar = webinar_form.instance
     cleaned_data = webinar_form.cleaned_data
-    old_team = webinar.webinar_team()
+
+    old_team = old_webinar.webinar_co_hosts_and_panelists()
+    old_team.add(old_webinar.presenter)
+
     new_team = set(chain(cleaned_data['co_hosts'], cleaned_data['panelists'], {cleaned_data['presenter']}))
 
-    newly_added_members = list(new_team - old_team)
+    new_members = list(new_team - old_team)
     removed_members = list(old_team - new_team)
 
-    if newly_added_members:
-        WebinarRegistration.create_team_registrations(newly_added_members, webinar)
-        schedule_webinar_reminders([user.email for user in newly_added_members], webinar.to_dict())
-
-    if removed_members:
-        WebinarRegistration.remove_team_registrations(removed_members, webinar)
-
-        registrations = WebinarRegistration.objects.filter(
-            webinar=webinar, user__in=removed_members, is_registered=False
-        )
-        cancel_all_reminders(registrations)
+    return new_members, removed_members
 
 
 def cancel_all_reminders(registrations, is_rescheduling=False):
@@ -305,3 +300,22 @@ def cancel_all_reminders(registrations, is_rescheduling=False):
     WebinarRegistration.objects.bulk_update(
         registrations, ['starting_soon_mandrill_reminder_id', 'week_before_mandrill_reminder_id'], batch_size=999
     )
+
+
+def get_webinar_invitees_emails(webinar_form):
+    """
+    Given a webinar form, get emails of all invitees of the webinar
+
+    Arguments:
+        webinar_form (Form): Model form with updated data.
+
+    Returns:
+        list: Webinar invitees' emails
+    """
+    webinar_invitees_emails = webinar_form.cleaned_data.get('invites_by_email_address', [])
+    if webinar_form.cleaned_data.get('invite_all_platform_users'):
+        webinar_invitees_emails += list(
+            User.objects.exclude(email='').values_list('email', flat=True)
+        )
+
+    return webinar_invitees_emails
