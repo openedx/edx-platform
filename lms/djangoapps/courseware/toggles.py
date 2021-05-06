@@ -127,7 +127,7 @@ COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS = CourseWaffleFlag(
 )
 
 
-def special_exams_is_active(course_key: CourseKey) -> bool:
+def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
