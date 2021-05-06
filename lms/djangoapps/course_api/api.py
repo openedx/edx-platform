@@ -338,8 +338,6 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
                 ]
             }
     """
-    queryset = User.objects.filter(is_active=True).only('id')
-
     # if access_roles not given, assign all registered access roles
     if access_roles is None:
         access_roles = list(REGISTERED_ACCESS_ROLES.keys())
@@ -384,6 +382,9 @@ def get_course_members(course_key, include_students=True, access_roles=None, pag
 
     # Paginate queryset and serialize data output
     paginator = Paginator(queryset, per_page)
+    # Since we already know the size of the dataset, we set the paginator count manually
+    # to avoid an additional COUNT query here
+    paginator.count = len(user_ids)
     serialized_data = CourseMemberSerializer(paginator.page(page), many=True).data
 
     return {
