@@ -64,21 +64,26 @@ jobs:
         id: pylint-report
         continue-on-error: true
         run: |
-          pylint --score=y ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
+          pylint ${{ env.GIT_DIFF }} && pylint_status=$?
 
-          body=$(cat report_pylint.txt)
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
+          if [[ ${pylint_status} == 0 ]]; then
+            echo ::set-output name=icon::":heavy_check_mark:"
+            echo ::set-output name=status::success
+          else
+            pylint --score=y ${{ env.GIT_DIFF }} 2>&1 | tee report_pylint.txt
 
-          echo ::set-output name=icon::":x:"
-          [[ $body == *".py:"* || $body == *"***********"* ]] && title="**Please fix following pylint issues:**"
-          [[ ${body:5} == "-----"* ]] && score="Pylint score" && echo ::set-output name=status::success \
-          && echo ::set-output name=icon::":heavy_check_mark:"
+            body=$(cat report_pylint.txt)
+            body="${body//'%'/'%25'}"
+            body="${body//$'\n'/'%0A'}"
+            body="${body//$'\r'/'%0D'}"
+            body="\`\`\` %0A $body %0A \`\`\`"
 
-          echo ::set-output name=score::$score
-          echo ::set-output name=title::$title
-          echo ::set-output name=body::$body
+            title="**Please fix following pylint issues:**"
+            echo ::set-output name=icon::":x:"
+            echo ::set-output name=title::$title
+            echo ::set-output name=body::"$body"
+          fi
+
         if: env.GIT_DIFF
 
       - name: Creating pycodestyle report
@@ -127,9 +132,7 @@ jobs:
             **iSort:** ${{ steps.isort-report.outputs.icon }}
 
             ${{ steps.pylint-report.outputs.title }}
-            ```
-            ${{ steps.pylint-report.outputs.score }}${{ steps.pylint-report.outputs.body }}
-            ```
+            ${{ steps.pylint-report.outputs.body }}
 
             ${{ steps.pycodestyle-report.outputs.title }}
             ${{ steps.pycodestyle-report.outputs.body }}
