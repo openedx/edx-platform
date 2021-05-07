@@ -396,7 +396,7 @@ def _track_certificate_events(request, course, user, user_certificate):
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
-        emit_certificate_event('evidence_visited', user, str(course.id), course, {
+        emit_certificate_event('evidence_visited', user, str(course.id), event_data={
             'certificate_id': user_certificate.verify_uuid,
             'enrollment_mode': user_certificate.mode,
             'social_network': CertificateSocialNetworks.linkedin

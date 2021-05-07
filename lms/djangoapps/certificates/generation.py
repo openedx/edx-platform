@@ -153,7 +153,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         return
 
     if CertificateStatuses.is_passing_status(cert.status):
-        emit_certificate_event('created', student, course_key, course, {
+        emit_certificate_event('created', student, course_key, course_overview, {
             'user_id': student.id,
             'course_id': str(course_key),
             'certificate_id': cert.verify_uuid,
