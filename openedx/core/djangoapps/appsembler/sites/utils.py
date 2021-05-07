@@ -16,9 +16,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.query import Q
 
 from oauth2_provider.models import AccessToken, RefreshToken, Application
+from oauth2_provider.generators import generate_client_id
 
 from django.utils.text import slugify
 
@@ -121,6 +121,7 @@ def get_amc_oauth_app():
 def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
+    JLB: we need to fix this. can't be returning empty string tokens
     """
     app = get_amc_oauth_app()
     tokens = {
@@ -151,6 +152,11 @@ def get_amc_tokens(user):
 def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
+
+    The `generate_client_id` function generates a 40 char hash
+    This is longer than the implementaion in Hawthorn which generated 32 char hashes
+    This function is used because it's there in the toolkit code rather than
+    write a custom hash creation function to generates 32 chars
     """
     app = get_amc_oauth_app()
     one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
@@ -158,7 +164,10 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
     access, _created = AccessToken.objects.get_or_create(
         user=user,
         application=app,
-        defaults={'expires': one_year_ahead}
+        defaults={
+            'expires': one_year_ahead,
+            'token': generate_client_id(),
+        }
     )
 
     access.expires = one_year_ahead
@@ -170,6 +179,9 @@ def reset_amc_tokens(user, access_token=None, refresh_token=None):
         user=user,
         access_token=access,
         application=app,
+        defaults={
+            'token': generate_client_id(),
+        }
     )
 
     if refresh_token:
