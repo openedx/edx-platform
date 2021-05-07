@@ -99,6 +99,12 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
             # 'discussion_link',
             # 'discussion_sort_alpha',
         ]
+        fields_cohorts = [
+            'always_divide_inline_discussions',
+            'divided_course_wide_discussions',
+            'divided_inline_discussions',
+            'division_scheme',
+        ]
 
     def create(self, validated_data):
         """
@@ -110,6 +116,14 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
         """
         Transform the incoming primitive data into a native value
         """
+        if not isinstance(data.get('allow_anonymous', False), bool):
+            raise serializers.ValidationError('Wrong type for allow_anonymous')
+        if not isinstance(data.get('allow_anonymous_to_peers', False), bool):
+            raise serializers.ValidationError('Wrong type for allow_anonymous_to_peers')
+        if not isinstance(data.get('discussion_blackouts', []), list):
+            raise serializers.ValidationError('Wrong type for discussion_blackouts')
+        if not isinstance(data.get('discussion_topics', {}), dict):
+            raise serializers.ValidationError('Wrong type for discussion_topics')
         payload = {
             key: value
             for key, value in data.items()
@@ -151,7 +165,7 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
             if field in self.Meta.fields:
                 setattr(instance, field, value)
                 save = True
-            else:
+            elif field in self.Meta.fields_cohorts:
                 cohort_settings[field] = value
         if cohort_settings:
             discussion_settings = CourseDiscussionSettings.get(instance.id)
