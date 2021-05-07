@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-05-07 09:53+0000\n"
+"POT-Creation-Date: 2021-05-07 14:24+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -5088,8 +5088,9 @@ msgstr "فتح الحساب"
 #. interface (a menu or piece of UI that takes the full focus of the screen)
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html lms/templates/ccx/schedule.html
-#: lms/templates/dashboard.html
+#: lms/templates/wiki/includes/cheatsheet.html
+#: themes/edx-platform/adg/lms/templates/admin/webinars/webinar/submit_line.html
+#: lms/templates/ccx/schedule.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -5469,6 +5470,8 @@ msgstr "تبرَّع"
 #: lms/djangoapps/branding/api.py
 #: openedx/adg/lms/branding_extension/helpers.py lms/templates/footer.html
 #: lms/templates/static_templates/about.html
+#: themes/edx-platform/adg/lms/templates/footer.html
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
 msgid "About"
 msgstr "لمحة عن"
 
@@ -5480,6 +5483,7 @@ msgstr "{platform_name} للأعمال التجارية"
 #: lms/djangoapps/branding/api.py
 #: openedx/adg/lms/branding_extension/helpers.py
 #: lms/templates/static_templates/contact.html
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "معلومات الاتّصال"
 
@@ -6585,6 +6589,7 @@ msgstr "{sign_in_link} أو {register_link}."
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "تسجيل الدخول"
 
@@ -7215,6 +7220,7 @@ msgstr "سنة الميلاد"
 #: openedx/adg/lms/applications/admin.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/signup_modal.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "Gender"
 msgstr "الجنس"
 
@@ -8806,7 +8812,7 @@ msgstr ""
 "الصفحة الرئيسية {end_anchor}."
 
 #: lms/templates/main_django.html cms/templates/base.html
-#: lms/templates/main.html
+#: lms/templates/main.html themes/edx-platform/adg/lms/templates/main.html
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 
@@ -9026,6 +9032,7 @@ msgstr "حذف المقال"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: themes/edx-platform/adg/lms/templates/admin/webinars/webinar/submit_line.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
@@ -9356,6 +9363,7 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "بحث"
@@ -9662,12 +9670,11 @@ msgid "Site URL"
 msgstr ""
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 msgid "Business Line"
 msgstr ""
 
 #: openedx/adg/lms/applications/models.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
 msgid "Organization"
 msgstr "اسم المنظمة"
 
@@ -9680,6 +9687,8 @@ msgid "Resume File"
 msgstr ""
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 msgid "Accepted extensions: .pdf, .doc, .jpg, .png"
 msgstr ""
 
@@ -9696,6 +9705,7 @@ msgid "Open"
 msgstr "Open edX"
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/admin/applications/waitlist_input.html
 msgid "Waitlist"
 msgstr ""
 
@@ -9756,6 +9766,7 @@ msgid "Doctoral Degree"
 msgstr "دكتوراه"
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
 msgid "School / University"
 msgstr ""
 
@@ -9764,6 +9775,7 @@ msgid "Degree Received"
 msgstr "جرى تلقّي الإجابة."
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
 msgid "Area of Study"
 msgstr ""
 
@@ -9776,6 +9788,7 @@ msgid "Current Position"
 msgstr "الموقع الحالي في الفيديو."
 
 #: openedx/adg/lms/applications/models.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
 msgid "Job Responsibilities"
 msgstr ""
 
@@ -9804,6 +9817,7 @@ msgid "Terms"
 msgstr ""
 
 #: openedx/adg/lms/constants.py
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "Are you a Saudi National?"
 msgstr ""
 
@@ -10143,10 +10157,12 @@ msgid "Company"
 msgstr "الشركة"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "Yes"
 msgstr "نعم"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
 msgid "No"
 msgstr "لا"
 
@@ -11837,6 +11853,7 @@ msgstr ""
 #: openedx/core/djangoapps/user_authn/views/login.py
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Register"
 msgstr "التسجيل"
 
@@ -12657,6 +12674,86 @@ msgid ""
 "won’t lose any of your progress."
 msgstr ""
 
+#: themes/edx-platform/adg/lms/templates/admin/applications/accept_input.html
+msgid "Accept"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "APPLICATION REVIEW"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "NOTES"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "Admin Notes "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid ""
+"(For internal use only; these notes will not be shared with the applicant)"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "DECISION"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "Message for Applicant"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "(Optional this message will be included in the decision email)"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+#, python-format
+msgid ""
+"\n"
+"                        The application was waitlisted by %(reviewer)s on %(review_date)s.\n"
+"                    "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "Update Decision"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "Message for Applicant "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "(Optional this message will be included in the update email)"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+#, python-format
+msgid ""
+"\n"
+"                        The application was accepted by %(reviewer)s on %(review_date)s.\n"
+"                    "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/change_form.html
+msgid "Finish & Send"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/admin/applications/check_and_display_note.html
+msgid "The following note was left for the applicant:"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_edit.html
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Save"
+msgstr "حفظ"
+
+#: themes/edx-platform/adg/lms/templates/admin/webinars/webinar/submit_line.html
+msgid "Clone"
+msgstr ""
+
 #: cms/djangoapps/api/v1/serializers/course_runs.py
 msgid "Course team user does not exist"
 msgstr "مستخدم فريق المساق غير موجود"
@@ -13449,6 +13546,7 @@ msgstr "الإعدادات"
 #: lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Loading"
 msgstr "جاري التحميل"
 
@@ -13495,10 +13593,12 @@ msgstr "تشغيل المساق:"
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "المساقات"
 
 #: cms/templates/settings.html lms/templates/courseware/program_marketing.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_instructors.html
 msgid "Instructors"
 msgstr "المُدرسين في المدورة"
 
@@ -13509,6 +13609,7 @@ msgstr "المتطلّبات"
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/module-error.html
+#: themes/edx-platform/adg/lms/templates/course.html
 msgid "Details"
 msgstr "التفاصيل"
 
@@ -13519,11 +13620,6 @@ msgstr "التفاصيل"
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "عرض"
-
-#: cms/templates/maintenance/_announcement_edit.html
-#: lms/templates/problem.html lms/templates/word_cloud.html
-msgid "Save"
-msgstr "حفظ"
 
 #: cms/templates/maintenance/_announcement_index.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -13554,6 +13650,7 @@ msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr "الحساب"
 
@@ -13573,6 +13670,7 @@ msgstr "الاسم"
 
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
 
@@ -13750,6 +13848,7 @@ msgstr "عرض جميع المساقات"
 
 #: lms/templates/dashboard.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
 
@@ -13769,6 +13868,7 @@ msgstr "لست منضماً لأية مساقات بعد."
 #: lms/templates/header/navbar-not-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "Explore courses"
 msgstr "تصفح المساقات"
 
@@ -13943,6 +14043,7 @@ msgid "You should Register before trying to access the Unit"
 msgstr "عليك التسجيل في المنصة قبل أن تستطيع مشاهدة الوحدة."
 
 #: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "Enroll"
 msgstr "سجّل"
@@ -14048,6 +14149,7 @@ msgstr ""
 "أكملت هذه المهمة يمكنك رؤية علامتك على {link_start}progress page{link_end}."
 
 #: lms/templates/courseware/courses.html lms/templates/index.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Search for a course"
 msgstr "البحث عن مساق"
 
@@ -14667,6 +14769,7 @@ msgstr "أحدث نشاط تحميل git لمساق {course_id}"
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Date"
@@ -14727,6 +14830,7 @@ msgstr ""
 "{undo_link_start}إعادة التسجيل{link_end}."
 
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Dashboard for:"
 msgstr "لوحة المعلومات لـ:"
 
@@ -14740,6 +14844,8 @@ msgstr "المزيد من الخيارات"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/header.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "More Options"
 msgstr "المزيد من الخيارات"
 
@@ -16033,6 +16139,7 @@ msgid "Time format two digit hours colon two digit minutes"
 msgstr "صيغة التوقيت خانتان للساعات نقطتان خانتان للدقائق"
 
 #: lms/templates/ccx/schedule.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
 msgid "Time"
 msgstr "الوقت"
 
@@ -16077,6 +16184,8 @@ msgid "time"
 msgstr "الوقت"
 
 #: lms/templates/ccx/schedule.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
 msgid "(Optional)"
 msgstr "(اختياري)"
 
@@ -16436,10 +16545,12 @@ msgid "This content is graded"
 msgstr "جرى تقييم هذا المحتوى"
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "An error has occurred. Please ensure that you are logged in to enroll."
 msgstr "حدث خطأ. الرجاء التأكد من تسجيل دخولك للتسجيل."
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
 
@@ -16449,18 +16560,22 @@ msgstr "أنت مسجّل في هذا المساق"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "View Course"
 msgstr "استعراض المساق "
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "المساق كامل الآن"
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "يجري التسجيل في هذا المساق بموجب دعوة فقط "
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "أُغلِق باب التسجيل"
 
@@ -16469,6 +16584,7 @@ msgid "Enroll Now"
 msgstr "سجل الآن"
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
 msgstr "استعراض صفحة اللمحة في استوديو"
 
@@ -16481,6 +16597,7 @@ msgid "Classes End"
 msgstr "تنتهي الحصص"
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
 msgstr "الجهد المقدَّر"
 
@@ -16494,10 +16611,12 @@ msgstr ""
 "المساق."
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgid "Additional Resources"
 msgstr "مصادر إضافية"
 
 #: lms/templates/courseware/course_about.html
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
 msgstr "تسجيل"
@@ -16560,10 +16679,12 @@ msgid "Show Earlier Course Updates"
 msgstr "عرض تحديثات سابقة للمساق"
 
 #: lms/templates/courseware/courses.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "List of Courses"
 msgstr "لائحة المساقات"
 
 #: lms/templates/courseware/courses.html
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
 msgid "Refine Your Search"
 msgstr "خصِّص بحثك"
 
@@ -18235,14 +18356,18 @@ msgstr "تقدّم بطلب للحصول على دعم مالي"
 #: lms/templates/header/navbar-logo-header.html
 #: lms/templates/navigation/bootstrap/navbar-logo-header.html
 #: lms/templates/navigation/navbar-logo-header.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-logo-header.html
 msgid "{platform_name} Home Page"
 msgstr "الصفحة الرئيسية لمنصّة {platform_name}"
 
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/header.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Options Menu"
 msgstr "قائمة الخيارات"
 
 #: lms/templates/header/header.html lms/templates/navigation/navigation.html
+#: themes/edx-platform/adg/lms/templates/header/header.html
 msgid ""
 "{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
 "strongly recommend using {chrome_link} or {ff_link}."
@@ -18258,6 +18383,7 @@ msgstr "اكتشف الجديد"
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
 msgid "Sysadmin"
 msgstr "المشرف على النظام"
 
@@ -18266,6 +18392,7 @@ msgid "{name} Dashboard"
 msgstr "لوحة المعلومات الخاصة بـ{name}"
 
 #: lms/templates/header/navbar-not-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
 msgstr "روابط تكميلية"
 
@@ -18280,14 +18407,17 @@ msgid "Schools"
 msgstr "المدارس"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
 msgstr "استئناف مساقك الأخير"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "الملف الشخصي"
 
 #: lms/templates/header/user_dropdown.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
 msgid "Order History"
 msgstr "تاريخ الطلب"
 
@@ -20045,10 +20175,12 @@ msgid "Reset Your {platform_name} Password"
 msgstr "إعادة ضبط كلمة المرور الخاصة بك على {platform_name}"
 
 #: lms/templates/registration/password_reset_confirm.html
+#: themes/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "رابط إعادة ضبط كلمة المرور غير صحيح"
 
 #: lms/templates/registration/password_reset_confirm.html
+#: themes/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
 msgid ""
 "This password reset link is invalid. It may have been used already. To reset"
 " your password, go to the {start_link}sign-in{end_link} page and select "
@@ -20158,6 +20290,7 @@ msgid "Please Wait"
 msgstr "يرجى الانتظار"
 
 #: lms/templates/student_account/login_and_register.html
+#: themes/edx-platform/adg/lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
 msgstr "يرجى تسجيل الدخول أو التسجيل"
 
@@ -20636,6 +20769,775 @@ msgstr "أنشئ ملفك الشخصي لتخصيص هويتك على {platform_
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "An error occurred. Try loading the page again."
 msgstr "حدث خطأ. حاول تحميل الصفحة مرة أخرى."
+
+#: themes/edx-platform/adg/lms/static_copies/certificate/certificate.html
+msgid "CERTIFICATE OF ACHIEVEMENT"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static_copies/certificate/certificate.html
+msgid "AWARDED ON"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/static_copies/certificate/certificate.html
+msgid "FOR SUCCESSFULLY COMPLETING THE COURSE"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Join the World’s First Omnipreneurship Academy"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "A meaningful life starts here!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Apply Today"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "About the Academy"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"The Omnipreneurship Academy is a one-of-it’s kind developmental program, "
+"built upon Al-Dabbagh Group’s (ADG) governing ecosystem, Omnipreneurship. It"
+" is a space where you will not only be able to take part in our training "
+"courses and apply for the Omni in a Box program; you will be to make your "
+"dreams a reality, with minimal risk and no investments necessary. This "
+"program will provide you with the training you need to become a successful "
+"business owner and live a life of meaning."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Training that will transform you from a job seeker to a"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "provider..."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "With no financial investment necessary!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Omni in a Box Program"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"Candidates who join this program will have the opportunity to learn how to "
+"operate as omnipreneurs, not just entrepreneurs. What is the difference? "
+"Living the omnipreneurial way ensures that you are building a well-rounded, "
+"value-creating and impactful business, based on the foundational principles "
+"of giving, earning, and sustaining. The principles are interlocking and "
+"dependent upon each other; giving is at the core of Omnipreneurship, and in "
+"order to give effectively, we must earn. In order to do both, we must ensure"
+" that mechanisms are in place to sustain all that we do through the lens of "
+"the 4Ps: People, Planet, Philanthropy and Profit."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"Through our unique program, you will receive guidance on how to best build "
+"your business, along with the precise tools needed to achieve your goals. "
+"What is more is that there is no catch… and no financial investment "
+"necessary from your side. The Omnipreneurship Academy is the first to offer "
+"this one-of-a-kind program."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Benefits of the Program"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"By taking part in this program, you are making a conscious decision to "
+"transform not only your life, but eventually the lives of others. You will "
+"equip yourself with the skills necessary to set up and run a business, "
+"empowering you to bring others on board. Our one-of-a-kind program allows "
+"you to realize your dreams, without taking on any of the risk that comes "
+"with setting up a business."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"When you start off with the Omni in a Box Program, you start off as a job "
+"seeker. When you complete the program, you will become a business owner and "
+"an employer… it doesn’t get much better than that!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Benefits of the program"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Access to World-Class Training"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"The program will support your development with engaging online courses and "
+"on-the-job training. The training is designed to help you become a "
+"successful business owner. You will also be able to take external programs "
+"offered by world-class institutions that are linked to Omnipreneurship."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Post-Program Opportunities and Outcomes"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"Upon successful completion of the program, including on-the-job training, "
+"you will be the owner of a solid business brand, without taking on the "
+"financial risk that comes with that, with a large and sustainable corporate "
+"base to support your growth."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Join Omni in a Box"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Register yourself"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Step 1"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Register for the Academy and begin your Omnipreneurship Journey"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Submit requirements"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Step 2"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"Apply for the Omni in a Box program, submit all requirements, and take the "
+"assessment"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Begin Journey"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Step 3"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"After completing Omnipreneurship 101 and 102 and being accepted into the "
+"program, begin your omnipreneurial journey"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Start Application"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Program Eligibility"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid ""
+"Below are the requirements to become part of the Omni in a Box Program, "
+"allowing you to progress towards becoming a business-owner:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "Currently only open to Saudi nationals"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "You must be between the ages of 21 and 60"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/index.html
+msgid "You must hold a high school diploma or equivalent"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid ""
+"Thank you for your interest in the Omni in a Box program. Unfortunately, you"
+" do not meet some of our key requirements, so you will not be able to move "
+"forward with your application."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "It's not all bad news: you can still enroll in the"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Omnipreneurship Framework Training!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Contact information"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Date of birth"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Day"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Month"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Year"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Add Resume "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid ""
+"Please upload your resume, if you have one. Your resume must include your "
+"education and work experience. This is optional; if you do not have a "
+"resume, you can manually fill out your education and work experience on the "
+"next page."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+msgid "Add Resume"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/contact_info.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "Next"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
+msgid "Select a business"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"Which business line and location would you like to apply to? Read about the "
+"businesses below:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Cover letter "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid ""
+"You can attach or type a cover letter explaining why you are interested in "
+"this program and business. This is optional — your application will still be"
+" considered without a cover letter."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Add Cover Letter"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "Back"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/cover_letter.html
+msgid "Submit & continue"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "Education"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "ADD EDUCATION"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "Work Experience"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "Not applicable; I do not have any work experience."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_experience.html
+msgid "ADD EXPERIENCE"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Date Started"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Date Completed"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/education_form.html
+msgid "Remove Degree"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
+msgid "My Application"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
+msgid "Contact Information"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/header.html
+msgid "My Experience"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Welcome to the Omni in a Box application!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"You can view the application requirements and track your progress on this "
+"page. After you submit a complete application, the Omni in a Box team will "
+"review your application."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"Please Note: In order to be eligible for the program, you must be a Saudi "
+"National between the ages of 21 - 60 and have a high school diploma or GED."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Prerequisite Courses"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "You must get a passing score in the following introductory courses: "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Written Application"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid ""
+"This written application will help us get to know you! Before you start, "
+"make sure you have everything you need to answer questions about your "
+"background and interest in the program. A resume is recommended and a cover "
+"letter is optional."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/hub.html
+msgid "Submit Application"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr "تهانينا!"
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
+msgid "You submitted the Omni in a Box application on {}."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/success.html
+msgid "You will receive a decision by email within two weeks of submission."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Please share some details about your role and work."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/applications/work_experience_form.html
+msgid "Remove Experience"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/common/select_options.html
+msgid "Select"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
+msgid "Our Board of Trustees"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
+msgid "Our Partners"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/our_team/our_team.html
+msgid "OneValley"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "REGISTER"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "You are registered!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "Check your email for the webinar link."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "Cancel registration"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "EVENT DETAILS"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "ABOUT THIS EVENT"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/adg/lms/webinar/description_page.html
+msgid "FEATURED SPEAKERS"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Select course language"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "enroll now"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "{total_enrollments} already enrolled!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "COURSE DETAILS"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Self - Paced"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Instructor - Paced"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Start learning today"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Certificate"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/course_about.html
+msgid "Digital"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "Upcoming Webinars"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/courseware/courses.html
+msgid "There are currently no courses available. Please check back soon!"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "ABOUT"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "LEARN"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/header/navbar-authenticated.html
+msgid "APPLY"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/header/navbar-not-authenticated.html
+msgid "apply"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/header/user_dropdown.html
+msgid "Administration"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/registration/password_reset_confirm.html
+msgid "Reset Password"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "About Us"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"At the Omnipreneurship Academy, you will find Omnipreneurship Training and "
+"the Omni in a Box Program."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Omnipreneurship Training"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"The online courses are open to all. You can register at any time with the "
+"flexibility to choose your own start date."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"This is an exciting and ambitious program to convert 30,000 Saudis from job "
+"seekers to "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "job providers by 2030. It is currently only open to Saudi nationals."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Mission"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"To empower omnipreneurial business owners to effectively manage their own "
+"businesses "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"and live a balanced life of meaning, by providing them with the training and"
+" skills "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"necessary to operate on the principles of Giving, Earning and Sustaining."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Vision"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "To transform 30,000 Saudi job seekers into job providers by 2030."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Values"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Integrity:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"We subscribe to honesty and forthrightness to reinforce our approach to "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "business and our responsibility to the global community at large."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Passion:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"We embrace the work we do with a thoughtful methodology and genuine "
+"commitment."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Respect:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "We conduct our business and underpin all our relationships internally "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "and externally with respect and awareness of cultural sensitivities."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Forward Thinking:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"We espouse a forward-looking ethos and flexibility of practices to stay "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "in line with the rapid-fire evolution of the global landscape."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "Teamwork:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"We believe in the value of collaboration and partnerships with the foremost "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"experts in their respective fields, both in our internal and external "
+"activities."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "The Omnipreneurship Ecosystem"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "The Omnipreneurship ecosystem is an approach to building a life of"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"meaning. It is comprised of  three principles, five values, and ten golden "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"rules that can be applied to every aspect of our  personal and professional "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"lives, whether you operate in the private sector, public, or non-profit "
+"sectors. "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"Omnipreneurship changes your decision-making paradigm and helps you  develop"
+" "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"and maintain both work and life goal plans. A key element of the ecosystem "
+"is "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"the life plan which translates the entire ecosystem into tangible and "
+"practical "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"actions and targets that help Omnipreneurs achieve the larger goal of living"
+" "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "a balanced life of meaning."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "With the Omnipreneurship Training, you will be able to start your "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"Omnipreneurship journey by understanding the ecosystem’s elements, how "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"they interact with each other, and how to use them in your daily life. "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"Then, at the program’s conclusion, you will be able to develop and monitor "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "your very own Omnipreneurship Life Plan."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid "The App"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"The Omnipreneur App helps you achieve an organized approach to living a life"
+" of "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"meaning, in a well-rounded and holistic manner. Download the app to set "
+"goals and "
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/about.html
+msgid ""
+"join a community of those who yearn for a life filled with greater meaning."
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "Looking for help?"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "Please visit our"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "help center"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "Inquiries"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "For any inquiries please contact:"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "Al–Dabbagh Group"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "T +966 12 510 6200"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "F +966 12 5106201"
+msgstr ""
+
+#: themes/edx-platform/adg/lms/templates/static_templates/contact.html
+msgid "P.O Box 1039, Jeddah 21431 Saudi Arabia"
+msgstr ""
 
 #: cms/templates/404.html
 msgid "The page that you were looking for was not found."
@@ -25126,10 +26028,6 @@ msgstr "قم بتسجيلي ..."
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root article"
 msgstr "إنشاء مقال رئيسي"
-
-#: wiki/templates/wiki/article/create_root.html
-msgid "Congratulations!"
-msgstr "تهانينا!"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
