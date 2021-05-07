@@ -3,6 +3,7 @@ Provide django models to back the discussions app
 """
 from __future__ import annotations
 import logging
+from enum import Enum
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -21,18 +22,118 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 log = logging.getLogger(__name__)
 
-
 DEFAULT_PROVIDER_TYPE = 'legacy'
+
+
+class Features(Enum):
+    """
+    Features to be used/mapped in discussion providers
+    """
+    ADVANCED_IN_CONTEXT_DISCUSSION = 'advanced_in_context_discussion'
+    ANONYMOUS_POSTING = 'anonymous_posting'
+    AUTOMATIC_LEARNER_ENROLLMENT = 'automatic_learner_enrollment'
+    BLACKOUT_DISCUSSION_DATES = 'blackout_discussion_dates'
+    COMMUNITY_TA_SUPPORT = 'community_ta_support'
+    COURSE_COHORT_SUPPORT = 'course_cohort_support'
+    DIRECT_MESSAGES_FROM_INSTRUCTORS = 'direct_messages_from_instructors'
+    DISCUSSION_PAGE = 'discussion-page'
+    DISCUSSION_CONTENT_PROMPTS = 'discussion_content_prompts'
+    EMAIL_NOTIFICATIONS = 'email_notifications'
+    EMBEDDED_COURSE_SECTIONS = 'embedded-course-sections'
+    GRADED_DISCUSSIONS = 'graded_discussions'
+    IN_PLATFORM_NOTIFICATIONS = 'in_platform_notifications'
+    INTERNATIONALIZATION_SUPPORT = 'internationalization_support'
+    LTI = 'lti'
+    LTI_ADVANCED_SHARING_MODE = 'lti_advanced_sharing_mode'
+    LTI_BASIC_CONFIGURATION = 'lti_basic_configuration'
+    PRIMARY_DISCUSSION_APP_EXPERIENCE = 'primary_discussion_app_experience'
+    QUESTION_DISCUSSION_SUPPORT = 'question_discussion_support'
+    REPORT_FLAG_CONTENT_TO_MODERATORS = 'report/flag_content_to_moderators'
+    RESEARCH_DATA_EVENTS = 'research_data_events'
+    SIMPLIFIED_IN_CONTEXT_DISCUSSION = 'simplified_in_context_discussion'
+    USER_MENTIONS = 'user_mentions'
+    WCAG_2_1 = 'wcag-2.1'
+    WCAG_2_0_SUPPORT = 'wcag_2_0_support'
+
 PROVIDER_FEATURE_MAP = {
     'legacy': [
-        'discussion-page',
-        'embedded-course-sections',
-        'wcag-2.1',
+        Features.DISCUSSION_PAGE.value,
+        Features.WCAG_2_1.value,
+        Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+        Features.WCAG_2_0_SUPPORT.value,
+        Features.INTERNATIONALIZATION_SUPPORT.value,
+        Features.ANONYMOUS_POSTING.value,
+        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+        Features.QUESTION_DISCUSSION_SUPPORT.value,
+        Features.COMMUNITY_TA_SUPPORT.value,
+        Features.BLACKOUT_DISCUSSION_DATES.value,
+        Features.COURSE_COHORT_SUPPORT.value,
+        Features.RESEARCH_DATA_EVENTS.value,
     ],
     'piazza': [
-        'discussion-page',
-        'lti',
+        Features.DISCUSSION_PAGE.value,
+        Features.LTI.value,
+        Features.WCAG_2_0_SUPPORT.value,
+        Features.ANONYMOUS_POSTING.value,
+        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+        Features.QUESTION_DISCUSSION_SUPPORT.value,
+        Features.COMMUNITY_TA_SUPPORT.value,
+        Features.EMAIL_NOTIFICATIONS.value,
+        Features.BLACKOUT_DISCUSSION_DATES.value,
+        Features.DISCUSSION_CONTENT_PROMPTS.value,
+        Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+        Features.USER_MENTIONS.value,
     ],
+    'edx-next': [
+        Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+        Features.WCAG_2_0_SUPPORT.value,
+        Features.INTERNATIONALIZATION_SUPPORT.value,
+        Features.ANONYMOUS_POSTING.value,
+        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+        Features.QUESTION_DISCUSSION_SUPPORT.value,
+        Features.COMMUNITY_TA_SUPPORT.value,
+        Features.EMAIL_NOTIFICATIONS.value,
+        Features.BLACKOUT_DISCUSSION_DATES.value,
+        Features.SIMPLIFIED_IN_CONTEXT_DISCUSSION.value,
+        Features.ADVANCED_IN_CONTEXT_DISCUSSION.value,
+        Features.COURSE_COHORT_SUPPORT.value,
+        Features.RESEARCH_DATA_EVENTS.value,
+        Features.DISCUSSION_CONTENT_PROMPTS.value,
+        Features.GRADED_DISCUSSIONS.value,
+    ],
+    'yellowdig': [
+        Features.WCAG_2_0_SUPPORT.value,
+        Features.ANONYMOUS_POSTING.value,
+        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+        Features.QUESTION_DISCUSSION_SUPPORT.value,
+        Features.COMMUNITY_TA_SUPPORT.value,
+        Features.EMAIL_NOTIFICATIONS.value,
+        Features.RESEARCH_DATA_EVENTS.value,
+        Features.IN_PLATFORM_NOTIFICATIONS.value,
+        Features.GRADED_DISCUSSIONS.value,
+        Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+        Features.USER_MENTIONS.value,
+    ],
+    'inscribe': [
+        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+        Features.LTI_BASIC_CONFIGURATION.value,
+    ],
+    'discourse': [
+        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+        Features.LTI_BASIC_CONFIGURATION.value,
+        Features.LTI_ADVANCED_SHARING_MODE.value,
+    ],
+    'ed-discuss': [
+        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+        Features.LTI_BASIC_CONFIGURATION.value,
+        Features.WCAG_2_0_SUPPORT.value,
+        Features.INTERNATIONALIZATION_SUPPORT.value,
+        Features.ANONYMOUS_POSTING.value,
+        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+        Features.QUESTION_DISCUSSION_SUPPORT.value,
+        Features.COMMUNITY_TA_SUPPORT.value,
+        Features.EMAIL_NOTIFICATIONS.value,
+    ]
 }
 
 
@@ -223,6 +324,7 @@ class DiscussionsConfiguration(TimeStampedModel):
                 provider_type=DEFAULT_PROVIDER_TYPE,
             )
         return configuration
+
     # pylint: enable=undefined-variable
 
     @property
