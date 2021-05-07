@@ -681,7 +681,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
         if is_testing_environment():
             ace.send(msg)
         else:
-            compose_and_send_adg_update_email_verification(user, use_https, confirm_link)
+            compose_and_send_adg_update_email_verification(new_email, use_https, confirm_link)
     except Exception:
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)

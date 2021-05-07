@@ -5,14 +5,17 @@ from datetime import timedelta
 
 import pytest
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
 from django.utils.timezone import now
 from mock import Mock, call
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
+from openedx.adg.lms.applications.admin import adg_admin_site
 from openedx.adg.lms.webinars.admin import (
     ActiveWebinarStatusFilter,
     CancelledWebinarAdmin,
+    ReadOnlyUserAdmin,
     WebinarAdmin,
     WebinarRegistrationAdmin
 )
@@ -38,11 +41,15 @@ def webinar_admin_fixture():
     return WebinarAdmin(Webinar, site)
 
 
+@pytest.fixture(name='readonly_user_admin')
+def readonly_user_admin_fixture():
+    return ReadOnlyUserAdmin(User, adg_admin_site)
+
+
 @pytest.fixture(name='webinar_registration_admin')
 def webinar_registration_admin_fixture():
     site = AdminSite()
     return WebinarRegistrationAdmin(WebinarRegistration, site)
-
 
 def test_cancelled_webinar_admin_add_permission():
     """
@@ -185,6 +192,41 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
         mock_send_webinar_emails.assert_called_once_with(
             MandrillClient.WEBINAR_CREATED, webinar, []
         )
+
+
+def test_readonly_user_admin_change_permission(readonly_user_admin):
+    """
+    Test that ReadOnlyUserAdmin does not have any change permissions
+    """
+    assert not readonly_user_admin.has_change_permission(Mock())
+
+
+def test_readonly_user_admin_add_permission(readonly_user_admin):
+    """
+    Test that ReadOnlyUserAdmin does not have any add permissions
+    """
+    assert not readonly_user_admin.has_add_permission(Mock())
+
+
+def test_readonly_user_admin_delete_permission(readonly_user_admin):
+    """
+    Test that ReadOnlyUserAdmin does not have any delete permissions
+    """
+    assert not readonly_user_admin.has_delete_permission(Mock())
+
+
+def test_readonly_user_admin_view_permission(readonly_user_admin):
+    """
+    Test that ReadOnlyUserAdmin has view permission as it is essential for ADG admin user field lookups
+    """
+    assert readonly_user_admin.has_view_permission(Mock())
+
+
+def test_readonly_user_admin_get_model_perms(readonly_user_admin):
+    """
+    Test that ReadOnlyUserAdmin does not appear on the adg admin site index page
+    """
+    assert readonly_user_admin.get_model_perms(Mock()) == {}
 
 
 def create_test_webinars_as_per_status(webinar_statues):
