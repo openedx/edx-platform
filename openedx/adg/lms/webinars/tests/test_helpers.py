@@ -9,11 +9,7 @@ from mock import Mock
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
-from openedx.adg.lms.webinars.constants import (
-    ONE_WEEK_REMINDER_ID_FIELD_NAME,
-    STARTING_SOON_REMINDER_ID_FIELD_NAME,
-    WEBINARS_TIME_FORMAT
-)
+from openedx.adg.lms.webinars.constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME
 from openedx.adg.lms.webinars.helpers import (
     cancel_all_reminders,
     cancel_reminders_for_given_webinars,
@@ -56,7 +52,7 @@ def test_send_webinar_emails(mocker, template_slug):
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_start_time': webinar.start_date_time_AST,
         'webinar_link': webinar.meeting_link,
     }
 
@@ -126,7 +122,7 @@ def test_send_cancellation_emails_for_given_webinars(
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_start_time': webinar.start_date_time_AST,
         'webinar_link': webinar.meeting_link,
     }
 
@@ -152,7 +148,7 @@ def test_send_webinar_registration_email(mocker):
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
         'webinar_link': webinar.meeting_link,
-        'webinar_start_time': 'Jan 01, 2020 01:10 PM GMT',
+        'webinar_start_time': 'Wednesday, January 01, 2020 04:10 PM AST',
     })
 
 

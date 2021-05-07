@@ -13,7 +13,7 @@ from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_cancel_mandrill_emails, task_send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
-from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINARS_TIME_FORMAT
+from .constants import ONE_WEEK_REMINDER_ID_FIELD_NAME, STARTING_SOON_REMINDER_ID_FIELD_NAME, WEBINAR_DATE_TIME_FORMAT
 
 
 def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
@@ -33,7 +33,7 @@ def send_webinar_emails(template_slug, webinar, recipient_emails, send_at=None):
         'webinar_id': webinar.id,
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
-        'webinar_start_time': webinar.start_time.strftime(WEBINARS_TIME_FORMAT),
+        'webinar_start_time': webinar.start_date_time_AST,
         'webinar_link': webinar.meeting_link,
     }
 
@@ -118,7 +118,7 @@ def send_webinar_registration_email(webinar, email):
         'webinar_title': webinar.title,
         'webinar_description': webinar.description,
         'webinar_link': webinar.meeting_link,
-        'webinar_start_time': webinar.start_time.strftime('%b %d, %Y %I:%M %p GMT'),
+        'webinar_start_time': webinar.start_date_time_AST
     })
 
 
@@ -133,7 +133,7 @@ def schedule_webinar_reminders(user_emails, email_context):
     Returns:
         None
     """
-    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINARS_TIME_FORMAT)
+    webinar_start_time = datetime.strptime(email_context['webinar_start_time'], WEBINAR_DATE_TIME_FORMAT)
 
     task_send_mandrill_email.delay(
         MandrillClient.WEBINAR_TWO_HOURS_REMINDER,
