@@ -80,7 +80,9 @@ class LogoutView(TemplateView):
 
         # Clear the cookie used by the edx.org marketing site
         delete_logged_in_cookies(response)
-
+        is_visit_count_session_exists = request.session.get('ip-address-and-visit-count', None)
+        if is_visit_count_session_exists:
+            del request.session['ip-address-and-visit-count']
         return response
 
     def _build_logout_url(self, url):

@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_http_methods
+from ipware.ip import get_client_ip
 from edx_django_utils.monitoring import set_custom_attribute
 from ratelimit.decorators import ratelimit
 from rest_framework.views import APIView
@@ -230,7 +231,7 @@ def _authenticate_first_party(request, unauthenticated_user, third_party_auth_re
     )
 
 
-def _handle_failed_authentication(user, authenticated_user):
+def _handle_failed_authentication(request, user, authenticated_user):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
@@ -245,6 +246,8 @@ def _handle_failed_authentication(user, authenticated_user):
         # doesn't exist, and doesn't have a corresponding password
         loggable_id = user.id if user else "<unknown>"
         AUDIT_LOG.warning(f"Login failed - password for user.id: {loggable_id} is invalid")
+
+    max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
 
     if user and LoginFailures.is_feature_enabled():
         blocked_threshold, failure_count = LoginFailures.check_user_reset_password_threshold(user)
@@ -274,7 +277,31 @@ def _handle_failed_authentication(user, authenticated_user):
 
             _generate_locked_out_error_message()
 
-    raise AuthFailedError(_('Email or password is incorrect.'), error_code='incorrect-email-or-password')
+    visit_count = manage_visit_count(request)
+    raise AuthFailedError(
+        _('Email or password is incorrect.'),
+        error_code='incorrect-email-or-password',
+        context={
+            'number_of_visit': visit_count,
+        }
+    )
+
+def manage_visit_count(request):
+    """
+    Set the session to regulate the nos of visits of a user and returns
+    its visit count.
+    """
+    ip_address = get_client_ip(request)[0]
+    is_session_exists = request.session.get('ip-address-and-visit-count', None)
+    visit_count = 0
+    if is_session_exists:
+        visit_count = int(is_session_exists.split('-')[1])
+        if visit_count >= settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED:
+            del request.session['ip-address-and-visit-count']
+            visit_count = 0
+    visit_count = visit_count + 1
+    request.session['ip-address-and-visit-count'] = ip_address + '-{}'.format(visit_count)
+    return visit_count
 
 
 def _handle_successful_authentication_and_login(user, request):
@@ -535,7 +562,7 @@ def login_user(request, api_version='v1'):
                 _enforce_password_policy_compliance(request, possibly_authenticated_user)
 
         if possibly_authenticated_user is None or not possibly_authenticated_user.is_active:
-            _handle_failed_authentication(user, possibly_authenticated_user)
+            _handle_failed_authentication(request, user, possibly_authenticated_user)
 
         _handle_successful_authentication_and_login(possibly_authenticated_user, request)
 
