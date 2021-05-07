@@ -103,7 +103,7 @@ class CreditService:
             course_overview = CourseOverview.get_from_id(course_key)
             result.update({
                 'course_name': course_overview.display_name,
-                'course_end_date': course_overview.end_date,
+                'course_end_date': course_overview.end,
             })
         return result
 
