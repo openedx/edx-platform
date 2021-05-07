@@ -9,7 +9,7 @@ from contextlib import contextmanager
 
 from django.dispatch import Signal
 from markupsafe import escape
-from unittest.mock import Mock, patch
+from mock import Mock, patch
 
 
 @contextmanager
