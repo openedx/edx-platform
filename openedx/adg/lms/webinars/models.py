@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.applications.helpers import validate_file_size
@@ -42,12 +42,12 @@ class Webinar(TimeStampedModel):
     start_time = models.DateTimeField(verbose_name=_('Start Time'), )
     end_time = models.DateTimeField(verbose_name=_('End Time'), )
 
-    title = models.CharField(verbose_name=_('Title'), max_length=255, )
+    title = models.CharField(verbose_name=_('Title'), max_length=100, )
     description = models.TextField(verbose_name=_('Description'), )
     presenter = models.ForeignKey(
         User, verbose_name=_('Presenter'), on_delete=models.CASCADE, related_name='webinar_presenter',
     )
-    meeting_link = models.URLField(default='', verbose_name=_('Meeting Link'), blank=True, )
+    meeting_link = models.URLField(verbose_name=_('Meeting Link'), )
     banner = models.ImageField(
         upload_to='webinar/banners/',
         verbose_name=_('Banner'),
@@ -75,7 +75,6 @@ class Webinar(TimeStampedModel):
         verbose_name=_('Webinar Status'), choices=STATUS_CHOICES, max_length=10, default=UPCOMING,
     )
 
-    is_virtual = models.BooleanField(default=True, verbose_name=_('Virtual Event'), )
     created_by = models.ForeignKey(
         User, verbose_name=_('Created By'), on_delete=models.CASCADE, blank=True, related_name='webinar_created_by',
     )
@@ -118,8 +117,8 @@ class Webinar(TimeStampedModel):
         if self.end_time and self.end_time < now():
             errors['end_time'] = _('End date/time should be in future')
 
-        if self.start_time and self.end_time and self.start_time > self.end_time:
-            errors['start_time'] = _('End date/time must be greater than start date/time')
+        if self.start_time and self.end_time and self.start_time >= self.end_time:
+            errors['end_time'] = _('End date/time must be greater than start date/time')
 
         if self.banner:
             error_message = validate_file_size(self.banner, BANNER_MAX_SIZE)
