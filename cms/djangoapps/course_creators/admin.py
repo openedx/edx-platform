@@ -176,9 +176,9 @@ def send_admin_notification_callback(sender, **kwargs):  # lint-amnesty, pylint:
 
 
 @receiver(m2m_changed, sender=CourseCreator.orgs.through)
-def post_all_organizations_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+def course_creator_organizations_changed_callback(sender, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
-    Callback for addition and removal for orgs field.
+    Callback for addition and removal of orgs field.
     """
     instance = kwargs["instance"]
     action = kwargs["action"]
