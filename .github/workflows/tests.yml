@@ -35,6 +35,7 @@ jobs:
     - name: Install dependencies
       # TODO: Remove tox-pip-version once we upgrade to Koa+, or whenever we have addressed pip 20.3 strict issues.
       run: |
+        sudo apt-get update -y
         sudo apt-get install -y python-dev libxml2-dev libxmlsec1-dev
         pip install tox tox-pip-version
     - name: Run tox
