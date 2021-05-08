@@ -233,8 +233,11 @@ if 'loc_cache' not in CACHES:
         'LOCATION': 'edx_location_mem_cache',
     }
 
-if 'staticfiles' in CACHES:
-    CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
+# Tahoe: RED-1961 Disable the upstream prefix override to refresh cache on every deploy and use the random prefix:
+#        https://github.com/appsembler/configuration/pull/348
+#
+# if 'staticfiles' in CACHES:
+#     CACHES['staticfiles']['KEY_PREFIX'] = EDX_PLATFORM_REVISION
 
 # In order to transition from local disk asset storage to S3 backed asset storage,
 # we need to run asset collection twice, once for local disk and once for S3.
