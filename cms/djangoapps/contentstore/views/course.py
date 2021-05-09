@@ -927,7 +927,7 @@ def _create_or_rerun_course(request):
         return JsonResponse({
             'error': _('User does not have the permission to create courses in this organization '
                        'or course creation is disabled')},
-            status=400
+            status=403
         )
 
 

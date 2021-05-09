@@ -106,7 +106,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
 
     # This functions is overriden to update the m2m query
     def save_related(self, request, form, formsets, change):
-        super(CourseCreatorAdmin, self).save_related(request, form, formsets, change)
+        super().save_related(request, form, formsets, change)
         state = form.instance.state
         if state != CourseCreator.GRANTED:
             form.instance.orgs.clear()
