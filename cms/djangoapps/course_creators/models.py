@@ -51,7 +51,7 @@ class CourseCreator(models.Model):
                                   help_text=_("Organizations under which the user is allowed to create courses"))
     all_organizations = models.BooleanField(default=True,
                                             help_text=_("Grant the user the permission to create courses "
-                                                "in all organizations"))
+                                                        "in all organizations"))
 
     def __str__(self):
         return f"{self.user} | {self.state} [{self.state_changed}]"

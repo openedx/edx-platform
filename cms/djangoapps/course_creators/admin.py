@@ -51,8 +51,10 @@ class CourseCreatorForm(forms.ModelForm):
         is_all_org_role_set = (orgs and all_orgs) or (not orgs and not all_orgs)
         is_state_granted = state == CourseCreator.GRANTED
         if is_all_org_role_set and is_state_granted:
-            raise ValidationError("The role can be granted either to all organizations or to "
-                                    "specific organizations but not both.")
+            raise ValidationError(
+                "The role can be granted either to all organizations or to "
+                "specific organizations but not both."
+            )
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
@@ -189,7 +191,9 @@ def course_creator_organizations_changed_callback(sender, **kwargs):  # lint-amn
     orgs = list(instance.orgs.all().values_list('short_name', flat=True))
     updated_state = instance.state
     is_granted = updated_state == CourseCreator.GRANTED
-    should_update_role = ((action in ["post_add", "post_remove"] and is_granted) or
-        (action == "post_clear" and not is_granted))
+    should_update_role = (
+        (action in ["post_add", "post_remove"] and is_granted) or
+        (action == "post_clear" and not is_granted)
+    )
     if should_update_role:
         update_org_content_creator_role(instance.admin, instance.user, orgs)
