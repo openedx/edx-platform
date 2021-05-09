@@ -20,14 +20,9 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    "\n          Start my exam\n        ": "\n          Start min eksamen\n        ",
-    "\n        If you take this exam without proctoring, you will <strong> no longer be eligible for academic credit. </strong>\n      ": "\n        Dersom du gjennomf\u00f8rer denne eksamenen uten overv\u00e5kning, vil du <strong> ikke lenger ha grunnlag for  formell kompetanse \"academic credit\". </strong>\n      ",
     "\n      Are you sure you want to end your proctored exam?\n    ": "\n      Er du sikker p\u00e5 at du vil avslutte din overv\u00e5kete eksamen?\n    ",
     "\n      Error with proctored exam\n    ": "\n      Feil med overv\u00e5ket eksamen\n    ",
-    "\n      Follow these instructions\n    ": "\n      F\u00f8lg disse instruksjonene\n    ",
     "\n      This exam is proctored\n    ": "\n      Denne eksamenen er overv\u00e5ket\n    ",
-    "\n      Try a proctored exam\n    ": "\n      Fors\u00f8k en overv\u00e5ket eksamen\n    ",
-    "\n      Yes, end my proctored exam\n    ": "\n Ja, avslutt min overv\u00e5kete eksamen\n ",
     "\n    %(exam_name)s is a Timed Exam (%(total_time)s)\n    ": "\n    %(exam_name)s er en eksamen med tidsfrist (%(total_time)s)\n    ",
     " Your Proctoring Session Has Started ": "Din overv\u00e5kede sesjon har startet",
     "%(sel)s of %(cnt)s selected": [
@@ -48,7 +43,6 @@
     "Back to Full List": "Tilbake til hele listen",
     "Block view is unavailable": "Blokkvisning er utilgjengelig",
     "Cancel": "Avbryt",
-    "Cannot Start Proctored Exam": "Kan ikke starte overv\u00e5ket eksamen",
     "Changes to steps that are not selected as part of the assignment will not be saved.": "Endringer i trinn som ikke er valgt som en del av oppgaven, blir ikke lagret.",
     "Choose": "Velg",
     "Choose a Date": "Velg en dato",
@@ -72,7 +66,6 @@
     "December": "Desember",
     "Declined": "Avsl\u00e5tt",
     "Describe ": "Beskriv",
-    "Do you want to upload your file before submitting?": "Vil du laste opp filen din f\u00f8r du sender inn?",
     "Download Software Clicked": "Last ned programvare klikket",
     "Error": "Feil",
     "Error getting the number of ungraded responses": "Det oppstod en feil ved fors\u00f8k p\u00e5 \u00e5 finne antall ikke-rettede svar",
@@ -168,7 +161,6 @@
     "Tomorrow": "I morgen",
     "Total Responses": "Totalt antall svar",
     "Training": "\u00d8ver",
-    "Try this practice exam again": "Gjennomf\u00f8r denne pr\u00f8veeksamenen p\u00e5 nytt",
     "Type into this box to filter down the list of available %s.": "Skriv i dette feltet for \u00e5 filtrere ned listen av tilgjengelige %s.",
     "Unable to load": "Ikke i stand til \u00e5 laste",
     "Unexpected server error.": "Uventet serverfeil.",
@@ -181,7 +173,6 @@
     "Waiting": "Venter",
     "Warning": "Advarsel",
     "Yesterday": "I g\u00e5r",
-    "You can also retry this practice exam": "Du kan ogs\u00e5 fors\u00f8ke denne pr\u00f8veeksamenen p\u00e5 nytt",
     "You have added a criterion. You will need to select an option for the criterion in the Learner Training step. To do this, click the Settings tab.": "Du har lagt til et kriterium. Du m\u00e5 velge et alternativ for kriteriet i \"Learner Training\" trinnet. For \u00e5 gj\u00f8re dette, klikk p\u00e5 Innstillinger-fanen.",
     "You have deleted a criterion. The criterion has been removed from the example responses in the Learner Training step.": "Du har slettet et kriterium. Kriteriet er fjernet fra eksempelresponsene i \"Learner Training\" trinnet.",
     "You have deleted all the options for this criterion. The criterion has been removed from the sample responses in the Learner Training step.": "Du har slettet alle alternativene for dette kriteriet. Kriteriet er fjernet fra eksempelsvarene i \"Learner Training\" trinnet.",
@@ -202,9 +193,6 @@
     "one letter Thursday\u0004T": "T",
     "one letter Tuesday\u0004T": "T",
     "one letter Wednesday\u0004W": "O",
-    "pending": "venter",
-    "satisfactory": "tilfredsstillende",
-    "unsatisfactory": "ikke tilfredsstillende",
     "your course": "ditt kurs"
   };
   for (var key in newcatalog) {

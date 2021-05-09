@@ -1,14 +1,15 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Alexandra Messini <alexandra_messini@yahoo.com>, 2015
-# Angelos Chraniotis <chraniotis@gmail.com>, 2016
+# Angel Chr. <chraniotis@gmail.com>, 2016
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # EEYEM, 2015
+# Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
 # Elisabeth Georgiado <almanean@yahoo.gr>, 2014
 # Giannoulis Thanasis <thanasis@giannoulis.net>, 2015
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016-2017,2019-2020
@@ -20,11 +21,11 @@
 # kafroulitsa <zasimak@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Angelos Chraniotis <chraniotis@gmail.com>, 2016
+# Angel Chr. <chraniotis@gmail.com>, 2016
 # Bill Y <stsu3lu@gmail.com>, 2015
 # Dimitris Agelakis <minoan07@gmail.com>, 2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
@@ -40,9 +41,9 @@
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (https://www.transifex.com/open-edx/teams/6205/el/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Katerina Ligkovanli <kaligova@gmail.com>, 2019
@@ -50,12 +51,13 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
+# Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016-2017,2019-2020
 # kostas kalatzis <koskalat@gmail.com>, 2015
 # Nick Gikopoulos, 2015-2017
@@ -65,7 +67,7 @@
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -80,9 +82,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
-"Last-Translator: Panos Chronis <panosfyra4@yahoo.gr>\n"
+"POT-Creation-Date: 2021-05-06 19:44+0000\n"
+"PO-Revision-Date: 2021-02-28 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -2467,6 +2469,10 @@ msgstr ""
 msgid "Subject"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr ""
+
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Ρυθμίσεις λογαριασμού"
@@ -2496,27 +2502,11 @@ msgid "Financial Aid"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
@@ -2572,18 +2562,6 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -3195,10 +3173,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr ""
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
 msgstr ""
 
@@ -3237,6 +3211,26 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners already appear on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner already appears on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Uploaded file issues. Click on \"+\" to view."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3278,12 +3272,12 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
+msgid "<%- user %> already in exception list."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
+"<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
 
@@ -3354,7 +3348,7 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
 
@@ -3569,10 +3563,8 @@ msgid "Recent Activity"
 msgstr ""
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
-"Δεν βρέθηκαν αποτελέσματα για το \"%(query_string)s\". Παρακαλούμε "
-"επιχειρήστε ξανά την αναζήτησή σας."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -3799,6 +3791,10 @@ msgid "Error getting issued certificates list."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
@@ -3993,10 +3989,6 @@ msgid "Reason field should not be left blank."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr ""
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr ""
 
@@ -4162,7 +4154,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
@@ -4561,7 +4553,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Enter and confirm your new password."
-msgstr ""
+msgstr "Εισάγετε και επιβεβαιώστε το νέο σας κωδικό."
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "New Password"
@@ -4569,11 +4561,11 @@ msgstr "Νέος κωδικός"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Confirm Password"
-msgstr ""
+msgstr "Επιβεβαιώστε τον κωδικό σας"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr ""
+msgstr "Οι κωδικοί δεν συμπίπτουν"
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
@@ -4796,6 +4788,12 @@ msgid ""
 "your spam folders or  {anchorStart}contact {platform_name} "
 "Support{anchorEnd}."
 msgstr ""
+"Για να μπορέσετε να συνδεθείτε, θα πρέπει να ενεργοποιήσετε πρώτα τον "
+"λογαριασμό σας.{line_break} {line_break}Σας έχουμε αποστείλει σύνδεσμο για "
+"την ενεργοποίηση του λογαριασμού σας στο e-mail {strong_start} {email} "
+"{strong_end}.  Εάν δεν λάβετε το e-mail με τον σύνδεσμο, ελέγξτε το φάκελό "
+"σας με τα ανεπιθύμητα μηνύματα ή {anchorStart}επικοινωνήστε με το "
+"{platform_name} Τεχνικό Τμήμα{anchorEnd}. "
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An unexpected error has occurred."
@@ -5339,8 +5337,8 @@ msgstr "Δείτε Λιγότερα"
 #: openedx/features/course_search/static/course_search/js/views/search_results_view.js
 msgid "{total_results} result found for \"{search_term}\""
 msgid_plural "{total_results} results found for \"{search_term}\""
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Βρέθηκε {total_results} αποτέλεσμα για τον όρο \"{search_term}\""
+msgstr[1] " Βρέθηκαν {total_results} αποτελέσματα για τον όρο \"{search_term}\""
 
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Profile Visibility:"
@@ -5766,7 +5764,7 @@ msgid "Please enter non-negative integer."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -6216,7 +6214,7 @@ msgid "Highlights for {display_name}"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
+msgid "Enable Course Highlight Emails"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -8326,11 +8324,11 @@ msgstr "Προέκυψε σφάλμα. Παρακαλούμε επαναφορτ
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Need help signing in?"
-msgstr ""
+msgstr "Χρειάζεστε βοήθεια;"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot my password"
-msgstr ""
+msgstr "Ξεχάσατε τον κωδικό σας;"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Other sign-in issues"
@@ -8346,7 +8344,7 @@ msgstr ""
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Create an account"
-msgstr ""
+msgstr "Δημιουργία νέου λογαριασμού"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
@@ -8471,7 +8469,7 @@ msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Recover my password"
-msgstr ""
+msgstr "Ανάκτηση του κωδικού μου"
 
 #: lms/templates/student_account/register.underscore
 msgid "Already have an {platformName} account?"
@@ -8794,6 +8792,11 @@ msgid ""
 "your inbox for an activation email. After you complete activation you can "
 "return and refresh this page."
 msgstr ""
+"Για να μπορέσετε να εγγραφείτε στα μαθήματα, θα πρέπει προηγουμένως να "
+"ενεργοποιήσετε το λογαριασμό σας. Αναζητήστε στα εισερχόμενα μηνύματά σας, "
+"το e-mail ενεργοποίησης που σας αποστείλαμε. Αφού ολοκληρώσετε την "
+"διαδικασία ενεργοποίησης επιστρέψετε σε αυτή τη σελίδα και ανανεώστε την για"
+" να μπορέσετε να εγγραφείτε στο μάθημα."
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Activate Your Account"
@@ -8995,7 +8998,7 @@ msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Edit Your Name"
-msgstr ""
+msgstr "Επεξεργασία του Ονοματεπώνυμού σας."
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid ""
@@ -9062,7 +9065,7 @@ msgstr[1] ""
 #: openedx/features/course_search/static/course_search/templates/course_search_results.underscore
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
 msgid "Sorry, no results were found."
-msgstr ""
+msgstr "Λυπούμαστε, δεν βρέθηκαν αποτελέσματα"
 
 #: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
 #, python-format
@@ -9464,7 +9467,7 @@ msgid "Copy Component Location"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
+msgid "Course Highlight Emails"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
@@ -9965,12 +9968,6 @@ msgstr ""
 
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
-msgstr ""
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
 msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
