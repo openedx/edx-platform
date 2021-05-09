@@ -165,7 +165,7 @@ def remove_users(caller, role, *users):
     role.remove_users(*users)
 
 
-def update_org_course_role(caller, role, user, *orgs):
+def update_org_role(caller, role, user, *orgs):
     """
     The caller requests updating the Org role for the user. Checks that the caller has
     sufficient authority.

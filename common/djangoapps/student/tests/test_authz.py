@@ -16,7 +16,7 @@ from common.djangoapps.student.auth import (
     has_studio_read_access,
     has_studio_write_access,
     remove_users,
-    update_org_course_role,
+    update_org_role,
     user_has_role
 )
 from common.djangoapps.student.roles import (
@@ -281,19 +281,19 @@ class CourseOrgGroupTest(TestCase):
         self.org = 'mitx'
         self.course_key = CourseLocator(self.org, '101', 'test')
 
-    def test_update_org_course_role_permission_denied(self):
+    def test_update_org_role_permission_denied(self):
         """
-        Verifies PermissionDenied if caller of update_org_course_role is not instructor role.
+        Verifies PermissionDenied if caller of update_org_role is not instructor role.
         """
         with pytest.raises(PermissionDenied):
-            update_org_course_role(self.user, OrgContentCreatorRole(), self.user, [self.org])
+            update_org_role(self.user, OrgContentCreatorRole(), self.user, [self.org])
 
-    def test_update_org_course_role_permission(self):
+    def test_update_org_role_permission(self):
         """
-        Verifies if caller of update_org_course_role is GlobalAdmin.
+        Verifies if caller of update_org_role is GlobalAdmin.
         """
         assert not user_has_role(self.user, OrgContentCreatorRole(self.org))
-        update_org_course_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.org])
+        update_org_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.org])
         assert user_has_role(self.user, OrgContentCreatorRole(self.org))
 
     def test_non_org_usre_write_access(self):
@@ -301,5 +301,5 @@ class CourseOrgGroupTest(TestCase):
         Test that OrgContentCreatorRole has write access
         """
         assert not has_studio_write_access(self.user, self.course_key)
-        update_org_course_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.org])
+        update_org_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.org])
         assert has_studio_write_access(self.user, self.course_key)

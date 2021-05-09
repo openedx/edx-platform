@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from common.djangoapps.student.auth import update_org_course_role
+from common.djangoapps.student.auth import update_org_role
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, OrgContentCreatorRole
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
@@ -209,7 +209,7 @@ class TestCourseListing(ModuleStoreTestCase):
             'short_name': self.source_course_key.org,
             'description': 'Testing Organization Description',
         })
-        update_org_course_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.source_course_key.org])
+        update_org_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.source_course_key.org])
         with modulestore().default_store(store):
             response = self.client.ajax_post(self.course_create_rerun_url, {
                 'org': self.source_course_key.org,
