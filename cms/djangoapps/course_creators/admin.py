@@ -46,16 +46,13 @@ class CourseCreatorForm(forms.ModelForm):
         Validate the 'state', 'orgs' and 'all_orgs' field before saving.
         """
         all_orgs = self.cleaned_data.get("all_organizations")
-        updated_state = self.cleaned_data.get("state")
         orgs = self.cleaned_data.get("orgs").exists()
-        add_role = updated_state == CourseCreator.GRANTED
+        state = self.cleaned_data.get("state")
         is_all_org_role_set = (orgs and all_orgs) or (not orgs and not all_orgs)
-        if not add_role and orgs:
-            raise ValidationError("Organizations cannot be added if the role is not granted.")
-        if is_all_org_role_set:
+        is_state_granted = state == CourseCreator.GRANTED
+        if is_all_org_role_set and is_state_granted:
             raise ValidationError("The role can be granted either to all organizations or to "
                                     "specific organizations but not both.")
-
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
@@ -104,6 +101,13 @@ class CourseCreatorAdmin(admin.ModelAdmin):
         # Store who is making the request.
         obj.admin = request.user
         obj.save()
+
+    # This functions is overriden to update the m2m query
+    def save_related(self, request, form, formsets, change):
+        super(CourseCreatorAdmin, self).save_related(request, form, formsets, change)
+        state = form.instance.state
+        if state != CourseCreator.GRANTED:
+            form.instance.orgs.clear()
 
 
 admin.site.register(CourseCreator, CourseCreatorAdmin)
@@ -184,6 +188,8 @@ def course_creator_organizations_changed_callback(sender, **kwargs):  # lint-amn
     action = kwargs["action"]
     orgs = list(instance.orgs.all().values_list('short_name', flat=True))
     updated_state = instance.state
-    add_role = updated_state == CourseCreator.GRANTED
-    if action in ["post_add", "post_remove"] and add_role:
+    is_granted = updated_state == CourseCreator.GRANTED
+    should_update_role = ((action in ["post_add", "post_remove"] and is_granted) or
+        (action == "post_clear" and not is_granted))
+    if should_update_role:
         update_org_content_creator_role(instance.admin, instance.user, orgs)
