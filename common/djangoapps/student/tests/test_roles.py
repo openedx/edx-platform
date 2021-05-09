@@ -141,24 +141,24 @@ class RolesTestCase(TestCase):
         role.remove_users(self.student)
         assert not role.has_user(self.student)
 
-    def test_update_org_course_role(self):
+    def test_uupdate_org_role(self):
         """
-        Test update_org_course_role
+        Test uupdate_org_role
         """
         role = OrgContentCreatorRole()
-        role.update_org_course_role(self.student, self.orgs)
+        role.update_org_role(self.student, self.orgs)
         # Check both roles got created
         assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) > 0
         assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) > 0
 
         # Check if the org list is updated
-        role.update_org_course_role(self.student, ["Edx"])
+        role.update_org_role(self.student, ["Edx"])
         assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
         assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
         assert len(OrgContentCreatorRole("Edx").users_with_role()) == 1
 
         # Check removing all orgs
-        role.update_org_course_role(self.student, [])
+        role.update_org_role(self.student, [])
         assert len(OrgContentCreatorRole(self.orgs[0]).users_with_role()) == 0
         assert len(OrgContentCreatorRole(self.orgs[1]).users_with_role()) == 0
         assert len(OrgContentCreatorRole("Edx").users_with_role()) == 0

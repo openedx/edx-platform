@@ -176,7 +176,7 @@ def update_org_course_role(caller, role, user, *orgs):
     :param orgs: List of organization names to update the org role
     """
     _check_caller_authority(caller, role)
-    role.update_org_course_role(user, *orgs)
+    role.update_org_role(user, *orgs)
 
 
 def _check_caller_authority(caller, role):
