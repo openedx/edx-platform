@@ -13,7 +13,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('student', '0020_auto_20190227_2019'),
+        ('student', '0001_squashed_0031_auto_20200317_1122'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('program_enrollments', '0001_initial'),
     ]
