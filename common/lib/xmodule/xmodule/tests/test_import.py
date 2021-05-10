@@ -439,7 +439,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
         def check_for_key(key, node, value):
             "recursive check for presence of key"
-            print("Checking {}".format(str(node.location)))
+            print(f"Checking {str(node.location)}")
             assert getattr(node, key) == value
             for c in node.get_children():
                 check_for_key(key, c, value)

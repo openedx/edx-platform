@@ -109,7 +109,7 @@ class InheritingFieldDataTest(unittest.TestCase):
         """
         scope_ids = Mock()
         if usage_id is None:
-            block_id = "_auto{id}".format(id=len(self.all_blocks))
+            block_id = f"_auto{len(self.all_blocks)}"
             usage_id = self.get_usage_id("course", block_id)
         scope_ids.usage_id = usage_id
         block = self.system.construct_xblock_from_class(

@@ -971,7 +971,7 @@ def _import_course_draft(
                 # Skip any OSX quarantine files, prefixed with a '._'.
                 continue
             module_path = os.path.join(rootdir, filename)
-            with open(module_path, 'r') as f:
+            with open(module_path) as f:
                 try:
                     xml = f.read()
 

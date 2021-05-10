@@ -1023,7 +1023,7 @@ class VideoBlock(
             """ Find video transcript - if not found, don't update index """
             try:
                 transcript = get_transcript(self, lang=language, output_format=Transcript.TXT)[0].replace("\n", " ")
-                transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
+                transcript_index_name = f"transcript_{language if language else self.transcript_language}"
                 video_body.update({transcript_index_name: transcript})
             except NotFoundError:
                 pass

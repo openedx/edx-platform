@@ -625,7 +625,7 @@ class ProblemBlock(
                 minimal_init=True,
             )
         except responsetypes.LoncapaProblemError:
-            log.exception("LcpFatalError for block {} while getting max score".format(str(self.location)))
+            log.exception(f"LcpFatalError for block {str(self.location)} while getting max score")
             maximum_score = 0
         else:
             maximum_score = lcp.get_max_score()
@@ -903,7 +903,7 @@ class ProblemBlock(
         })
 
     def handle_fatal_lcp_error(self, error):  # lint-amnesty, pylint: disable=missing-function-docstring
-        log.exception("LcpFatalError Encountered for {block}".format(block=str(self.location)))
+        log.exception(f"LcpFatalError Encountered for {str(self.location)}")
         if error:
             return(
                 HTML('<p>Error formatting HTML for problem:</p><p><pre style="color:red">{msg}</pre></p>').format(
@@ -1633,7 +1633,7 @@ class ProblemBlock(
                     # If the submission wasn't deserializable, raise an error.
                     except(KeyError, ValueError):
                         raise ValueError(  # lint-amnesty, pylint: disable=raise-missing-from
-                            "Invalid submission: {val} for {key}".format(val=data[key], key=key)
+                            f"Invalid submission: {data[key]} for {key}"
                         )
                 else:
                     val = data[key]
@@ -1784,7 +1784,7 @@ class ProblemBlock(
             self.set_score(self.score_from_lcp(self.lcp))
 
             if self.runtime.DEBUG:
-                msg = "Error checking problem: {}".format(str(err))
+                msg = f"Error checking problem: {str(err)}"
                 msg += f'\nTraceback:\n{traceback.format_exc()}'
                 return {'success': msg}
             raise

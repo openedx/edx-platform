@@ -71,7 +71,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = '/courses/{}/'.format(str(source_course_id))
+            generic_courseware_link_base = f'/courses/{str(source_course_id)}/'
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)  # lint-amnesty, pylint: disable=line-too-long
         except Exception as exc:  # pylint: disable=broad-except
             logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))  # lint-amnesty, pylint: disable=line-too-long

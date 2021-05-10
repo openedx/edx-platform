@@ -266,7 +266,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     def create_definition(self, block_type, slug=None):
         assert block_type is not None
         if slug is None:
-            slug = 'autogen_{}_{}'.format(block_type, next(self.autogen_ids))
+            slug = f'autogen_{block_type}_{next(self.autogen_ids)}'
         return self.course_id.make_usage_key(block_type, slug)
 
     def get_definition_id(self, usage_id):

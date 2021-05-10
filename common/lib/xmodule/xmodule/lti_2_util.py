@@ -292,7 +292,7 @@ class LTI20BlockMixin:
         try:
             self.verify_oauth_body_sign(request, content_type=LTI_2_0_JSON_CONTENT_TYPE)
         except (ValueError, LTIError) as err:
-            log.info("[LTI]: v2.0 result service -- OAuth body verification failed:  {}".format(str(err)))
+            log.info(f"[LTI]: v2.0 result service -- OAuth body verification failed:  {str(err)}")
             raise LTIError(str(err))  # lint-amnesty, pylint: disable=raise-missing-from
 
     def parse_lti_2_0_result_json(self, json_str):
@@ -362,7 +362,7 @@ class LTI20BlockMixin:
                 log.info(f"[LTI] {msg}")
                 raise LTIError(msg)
         except (TypeError, ValueError) as err:
-            msg = "Could not convert resultScore to float: {}".format(str(err))
+            msg = f"Could not convert resultScore to float: {str(err)}"
             log.info(f"[LTI] {msg}")
             raise LTIError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 

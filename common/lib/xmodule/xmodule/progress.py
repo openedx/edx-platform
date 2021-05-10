@@ -117,7 +117,7 @@ class Progress:  # pylint: disable=eq-without-hash
         '''
         (a, b) = self.frac()
         display = lambda n: f'{n:.2f}'.rstrip('0').rstrip('.')
-        return "{}/{}".format(display(a), display(b))
+        return f"{display(a)}/{display(b)}"
 
     @staticmethod
     def add_counts(a, b):

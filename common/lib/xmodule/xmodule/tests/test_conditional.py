@@ -279,7 +279,7 @@ class ConditionalBlockXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': '{}/xmodule_handler'.format(str(location)),
+                'ajax_url': f'{str(location)}/xmodule_handler',
                 'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
                 'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
             }

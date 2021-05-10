@@ -112,7 +112,7 @@ class SequenceMixin(SequenceFields):
             except Exception as e:  # pylint: disable=broad-except
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker(u"ERROR: {0}".format(e))
+                    system.error_tracker(f"ERROR: {e}")
                 continue
         return {}, children
 

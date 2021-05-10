@@ -46,11 +46,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         for chapter_index in range(len(self.course.get_children())):
             chapter = self._set_up_block(self.course, chapter_index)
-            setattr(self, 'chapter_{}'.format(chapter_index + 1), chapter)
+            setattr(self, f'chapter_{chapter_index + 1}', chapter)
 
             for sequence_index in range(len(chapter.get_children())):
                 sequence = self._set_up_block(chapter, sequence_index)
-                setattr(self, 'sequence_{}_{}'.format(chapter_index + 1, sequence_index + 1), sequence)
+                setattr(self, f'sequence_{chapter_index + 1}_{sequence_index + 1}', sequence)
 
     @staticmethod
     def _set_up_course_xml():
