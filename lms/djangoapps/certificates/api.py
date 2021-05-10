@@ -9,6 +9,8 @@ certificates models or any other certificates modules.
 
 
 import logging
+from datetime import datetime
+from pytz import UTC
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -44,7 +46,6 @@ from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
@@ -581,6 +582,30 @@ def get_certificate_footer_context():
         data.update({'company_about_url': about})
 
     return data
+
+
+def certificates_viewable_for_course(course):
+    """
+    Returns True if certificates are viewable for any student enrolled in the course, False otherwise.
+    """
+    if course.self_paced:
+        return True
+    if (
+        course.certificates_display_behavior in ('early_with_info', 'early_no_info')
+        or course.certificates_show_before_end
+    ):
+        return True
+    if (
+        course.certificate_available_date
+        and course.certificate_available_date <= datetime.now(UTC)
+    ):
+        return True
+    if (
+        course.certificate_available_date is None
+        and course.has_ended()
+    ):
+        return True
+    return False
 
 
 def get_allowlisted_users(course_key):
