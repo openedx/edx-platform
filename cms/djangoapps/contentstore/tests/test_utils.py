@@ -1,13 +1,14 @@
 """ Tests for utils. """
 import collections
 from datetime import datetime, timedelta
+from unittest import mock
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock, mock, patch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
