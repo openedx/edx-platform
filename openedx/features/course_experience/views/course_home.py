@@ -141,7 +141,6 @@ class CourseHomeFragmentView(EdxFragmentView):
         update_message_fragment = None
         course_sock_fragment = None
         offer_banner_fragment = None
-        course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
         handouts_html = None
@@ -165,10 +164,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
             offer_banner_fragment = get_first_purchase_offer_banner_fragment(
-                request.user,
-                course_overview
-            )
-            course_expiration_fragment = generate_course_expired_fragment(
                 request.user,
                 course_overview
             )
@@ -231,7 +226,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
             'offer_banner_fragment': offer_banner_fragment,
-            'course_expiration_fragment': course_expiration_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
             'course_tools': course_tools,
