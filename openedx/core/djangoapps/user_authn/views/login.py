@@ -234,6 +234,7 @@ def _handle_failed_authentication(user, authenticated_user):
     """
     Handles updating the failed login count, inactive user notifications, and logging failed authentications.
     """
+    failure_count = 0
     if user:
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
@@ -269,12 +270,18 @@ def _handle_failed_authentication(user, authenticated_user):
                     error_code='failed-login-attempt',
                     context={
                         'remaining_attempts': remaining_attempts,
+                        'allowed_failure_attempts': max_failures_allowed,
+                        'failure_count': failure_count,
                     }
                 )
 
             _generate_locked_out_error_message()
 
-    raise AuthFailedError(_('Email or password is incorrect.'), error_code='incorrect-email-or-password')
+    raise AuthFailedError(
+        _('Email or password is incorrect.'),
+        error_code='incorrect-email-or-password',
+        context={'failure_count': failure_count},
+    )
 
 
 def _handle_successful_authentication_and_login(user, request):
@@ -575,9 +582,7 @@ def login_user(request, api_version='v1'):
         if error_code:
             set_custom_attribute('login_error_code', error_code)
 
-        if error_code == 'inactive-user':
-            response_content['email'] = user.email
-
+        response_content['email'] = request.POST.get('email', None)
         response = JsonResponse(response_content, status=400)
         set_custom_attribute('login_user_auth_failed_error', True)
         set_custom_attribute('login_user_response_status', response.status_code)
