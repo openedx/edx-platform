@@ -38,7 +38,7 @@ def test_webinar_registration_view_cancelled_webinar(client, user_client):
     Test webinar registration if webinar is cancelled
     """
     _, client = user_client
-    webinar = WebinarFactory(status=Webinar.CANCELLED)
+    webinar = WebinarFactory(is_cancelled=True)
 
     response = client.post(
         reverse('webinars_api:webinar_registration', kwargs={'pk': webinar.id, 'action': 'register'})
@@ -48,12 +48,11 @@ def test_webinar_registration_view_cancelled_webinar(client, user_client):
 
 
 @pytest.mark.parametrize('action', ['register', 'cancel'])
-def test_webinar_registration_view_register_user_with_no_prior_registration(action, user_client, mocker):
+def test_webinar_registration_view_register_user_with_no_prior_registration(action, user_client, webinar, mocker):
     """
     Test webinar registration and cancellation if webinar was not previously registered by user
     """
     mock_send_registration_email = mocker.patch('openedx.adg.lms.webinars.api_views.send_webinar_registration_email')
-    webinar = WebinarFactory(status=Webinar.UPCOMING)
     user, client = user_client
 
     response = client.post(reverse('webinars_api:webinar_registration', kwargs={'pk': webinar.id, 'action': action}))

@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus
 from django.utils.text import slugify
+from django.utils.timezone import now
 from django.utils.translation import ugettext
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
@@ -268,14 +269,13 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
-    # Add upcoming webinars in context to display them on `learn` page.
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
-            'webinars': Webinar.objects.filter(status=Webinar.UPCOMING).order_by('start_time'),
+            'webinars': Webinar.objects.upcoming_webinars().order_by('start_time'),
         }
     )
 
