@@ -23,8 +23,7 @@ jobs:
 
       - name: Install OS requirements
         run: |
-          sudo apt-get install libxmlsec1-dev pkg-config gettext
-          sudo apt-get update
+          sudo apt-get update --fix-missing && sudo apt-get install libxmlsec1-dev pkg-config gettext
 
       - name: Install pip requirements
         env:

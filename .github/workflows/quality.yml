@@ -48,8 +48,7 @@ jobs:
           PHILU_PAT: ${{ secrets.PHILU_PAT }}
           ADG_XBLOCKS_BRANCH: ${{ github.base_ref }}
         run: |
-          sudo apt-get install libxmlsec1-dev pkg-config
-          sudo apt-get update
+          sudo apt-get update --fix-missing && sudo apt-get install libxmlsec1-dev pkg-config
 
           python3 -m pip install pip==20.0.2
           python3 -m pip install setuptools==50.3.0
