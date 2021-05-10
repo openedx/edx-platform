@@ -121,7 +121,12 @@ def get_amc_oauth_app():
 def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
-    JLB: we need to fix this. can't be returning empty string tokens
+
+    TODO: we need to fix this. Can't be returning empty string tokens
+    But then we need to rework the callers to handle errors. One is the
+    admin iterface, so we have to rewrite some of the form handling there
+    And there's a Django management command, so need to add error handling
+    there. There may be other places
     """
     app = get_amc_oauth_app()
     tokens = {
