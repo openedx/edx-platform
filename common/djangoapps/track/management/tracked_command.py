@@ -46,8 +46,8 @@ class TrackedCommand(BaseCommand):  # lint-amnesty, pylint: disable=abstract-met
 
     def create_parser(self, prog_name, subcommand):  # lint-amnesty, pylint: disable=arguments-differ
         """Wraps create_parser to snag command line info."""
-        self.prog_name = "{} {}".format(prog_name, subcommand)
-        return super(TrackedCommand, self).create_parser(prog_name, subcommand)  # lint-amnesty, pylint: disable=super-with-arguments
+        self.prog_name = f"{prog_name} {subcommand}"
+        return super().create_parser(prog_name, subcommand)  # lint-amnesty, pylint: disable=super-with-arguments
 
     def execute(self, *args, **options):
         """Wraps base execute() to add command line to tracking context."""
@@ -56,4 +56,4 @@ class TrackedCommand(BaseCommand):  # lint-amnesty, pylint: disable=abstract-met
         }
         COMMAND_CONTEXT_NAME = 'edx.mgmt.command'
         with tracker.get_tracker().context(COMMAND_CONTEXT_NAME, context):
-            super(TrackedCommand, self).execute(*args, **options)  # lint-amnesty, pylint: disable=super-with-arguments
+            super().execute(*args, **options)  # lint-amnesty, pylint: disable=super-with-arguments
