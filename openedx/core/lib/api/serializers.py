@@ -69,4 +69,4 @@ class UsageKeyField(serializers.Field):
         try:
             return UsageKey.from_string(data)
         except InvalidKeyError as err:
-            raise serializers.ValidationError("Invalid course key") from err
+            raise serializers.ValidationError("Invalid usage key") from err

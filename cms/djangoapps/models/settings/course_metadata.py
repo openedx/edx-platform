@@ -152,13 +152,13 @@ class CourseMetadata:
         return exclude_list
 
     @classmethod
-    def fetch(cls, descriptor):
+    def fetch(cls, descriptor, filter_fields=None):
         """
         Fetch the key:value editable course details for the given course from
         persistence and return a CourseMetadata model.
         """
         result = {}
-        metadata = cls.fetch_all(descriptor)
+        metadata = cls.fetch_all(descriptor, filter_fields=filter_fields)
         exclude_list_of_fields = cls.get_exclude_list_of_fields(descriptor.id)
 
         for key, value in metadata.items():
@@ -168,13 +168,16 @@ class CourseMetadata:
         return result
 
     @classmethod
-    def fetch_all(cls, descriptor):
+    def fetch_all(cls, descriptor, filter_fields=None):
         """
         Fetches all key:value pairs from persistence and returns a CourseMetadata model.
         """
         result = {}
         for field in descriptor.fields.values():
             if field.scope != Scope.settings:
+                continue
+
+            if filter_fields and field.name not in filter_fields:
                 continue
 
             field_help = _(field.help)  # lint-amnesty, pylint: disable=translation-of-non-string

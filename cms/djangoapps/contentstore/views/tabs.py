@@ -1,22 +1,29 @@
 """
 Views related to course tabs
 """
+from typing import Dict, Iterable, List, Optional
+
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey, UsageKey
-
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.util.json_request import JsonResponse, expect_json
+from rest_framework.exceptions import ValidationError
+from xmodule.course_module import CourseBlock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab
 
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 from ..utils import get_lms_link_for_item
-__all__ = ['tabs_handler']
+
+__all__ = ["tabs_handler", "update_tabs_handler"]
+
+User = get_user_model()
 
 
 @expect_json
@@ -43,40 +50,74 @@ def tabs_handler(request, course_key_string):
 
     course_item = modulestore().get_course(course_key)
 
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if request.method == 'GET':  # lint-amnesty, pylint: disable=no-else-raise
-            raise NotImplementedError('coming soon')
+    if "application/json" in request.META.get("HTTP_ACCEPT", "application/json"):
+        if request.method == "GET":  # lint-amnesty, pylint: disable=no-else-raise
+            raise NotImplementedError("coming soon")
         else:
-            if 'tabs' in request.json:
-                return reorder_tabs_handler(course_item, request)
-            elif 'tab_id_locator' in request.json:
-                return edit_tab_handler(course_item, request)
-            else:
-                raise NotImplementedError('Creating or changing tab content is not supported.')
+            try:
+                update_tabs_handler(course_item, request.json, request.user)
+            except ValidationError as err:
+                return JsonResponseBadRequest(err.detail)
+            return JsonResponse()
 
-    elif request.method == 'GET':  # assume html
+    elif request.method == "GET":  # assume html
         # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
         # present in the same order they are displayed in LMS
 
-        tabs_to_render = []
-        for tab in CourseTabList.iterate_displayable(course_item, user=request.user, inline_collections=False,
-                                                     include_hidden=True):
-            if isinstance(tab, StaticTab):
-                # static tab needs its locator information to render itself as an xmodule
-                static_tab_loc = course_key.make_usage_key('static_tab', tab.url_slug)
-                tab.locator = static_tab_loc
-            tabs_to_render.append(tab)
+        tabs_to_render = list(get_course_tabs(course_item, request.user))
 
-        return render_to_response('edit-tabs.html', {
-            'context_course': course_item,
-            'tabs_to_render': tabs_to_render,
-            'lms_link': get_lms_link_for_item(course_item.location),
-        })
+        return render_to_response(
+            "edit-tabs.html",
+            {
+                "context_course": course_item,
+                "tabs_to_render": tabs_to_render,
+                "lms_link": get_lms_link_for_item(course_item.location),
+            },
+        )
     else:
         return HttpResponseNotFound()
 
 
-def reorder_tabs_handler(course_item, request):
+def get_course_tabs(course_item: CourseBlock, user: User) -> Iterable[CourseTab]:
+    """
+    Yields all the course tabs in a course including hidden tabs.
+
+    Args:
+        course_item (CourseBlock): The course object from which to get the tabs
+        user (User): The user fetching the course tabs.
+
+    Returns:
+        Iterable[CourseTab]: An iterable containing course tab objects from the
+        course
+    """
+
+    for tab in CourseTabList.iterate_displayable(course_item, user=user, inline_collections=False, include_hidden=True):
+        if isinstance(tab, StaticTab):
+            # static tab needs its locator information to render itself as an xmodule
+            static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
+            tab.locator = static_tab_loc
+        yield tab
+
+
+def update_tabs_handler(course_item: CourseBlock, tabs_data: Dict, user: User) -> None:
+    """
+    Helper to handle updates to course tabs based on API data.
+
+    Args:
+        course_item (CourseBlock): Course module whose tabs need to be updated
+        tabs_data (Dict): JSON formatted data for updating or reordering tabs.
+        user (User): The user performing the operation.
+    """
+
+    if "tabs" in tabs_data:
+        reorder_tabs_handler(course_item, tabs_data, user)
+    elif "tab_id_locator" in tabs_data:
+        edit_tab_handler(course_item, tabs_data, user)
+    else:
+        raise NotImplementedError("Creating or changing tab content is not supported.")
+
+
+def reorder_tabs_handler(course_item, tabs_data, user):
     """
     Helper function for handling reorder of tabs request
     """
@@ -85,7 +126,7 @@ def reorder_tabs_handler(course_item, request):
     # The locators are used to identify static tabs since they are xmodules.
     # Although all tabs have tab_ids, newly created static tabs do not know
     # their tab_ids since the xmodule editor uses only locators to identify new objects.
-    requested_tab_id_locators = request.json['tabs']
+    requested_tab_id_locators = tabs_data["tabs"]
 
     # original tab list in original order
     old_tab_list = course_item.tabs
@@ -95,9 +136,7 @@ def reorder_tabs_handler(course_item, request):
     for tab_id_locator in requested_tab_id_locators:
         tab = get_tab_by_tab_id_locator(old_tab_list, tab_id_locator)
         if tab is None:
-            return JsonResponse(
-                {"error": f"Tab with id_locator '{tab_id_locator}' does not exist."}, status=400
-            )
+            raise ValidationError({"error": f"Tab with id_locator '{tab_id_locator}' does not exist."})
         new_tab_list.append(tab)
 
     # the old_tab_list may contain additional tabs that were not rendered in the UI because of
@@ -109,54 +148,50 @@ def reorder_tabs_handler(course_item, request):
     try:
         CourseTabList.validate_tabs(new_tab_list)
     except InvalidTabsException as exception:
-        return JsonResponse(
-            {"error": f"New list of tabs is not valid: {str(exception)}."}, status=400
-        )
+        raise ValidationError({"error": f"New list of tabs is not valid: {str(exception)}."}) from exception
 
     # persist the new order of the tabs
     course_item.tabs = new_tab_list
-    modulestore().update_item(course_item, request.user.id)
-
-    return JsonResponse()
+    modulestore().update_item(course_item, user.id)
 
 
-def edit_tab_handler(course_item, request):
+def edit_tab_handler(course_item: CourseBlock, tabs_data: Dict, user: User):
     """
     Helper function for handling requests to edit settings of a single tab
     """
 
     # Tabs are identified by tab_id or locator
-    tab_id_locator = request.json['tab_id_locator']
+    tab_id_locator = tabs_data["tab_id_locator"]
 
     # Find the given tab in the course
     tab = get_tab_by_tab_id_locator(course_item.tabs, tab_id_locator)
     if tab is None:
-        return JsonResponse(
-            {"error": f"Tab with id_locator '{tab_id_locator}' does not exist."}, status=400
-        )
+        raise ValidationError({"error": f"Tab with id_locator '{tab_id_locator}' does not exist."})
 
-    if 'is_hidden' in request.json:
-        # set the is_hidden attribute on the requested tab
-        tab.is_hidden = request.json['is_hidden']
-        modulestore().update_item(course_item, request.user.id)
+    if "is_hidden" in tabs_data:
+        if tab.is_hideable:
+            # set the is_hidden attribute on the requested tab
+            tab.is_hidden = tabs_data["is_hidden"]
+            modulestore().update_item(course_item, user.id)
+        else:
+            raise ValidationError({"error": f"Tab of type {tab.type} can not be hidden"})
     else:
-        raise NotImplementedError(f'Unsupported request to edit tab: {request.json}')
-
-    return JsonResponse()
+        raise NotImplementedError(f"Unsupported request to edit tab: {tabs_data}")
 
 
-def get_tab_by_tab_id_locator(tab_list, tab_id_locator):
+def get_tab_by_tab_id_locator(tab_list: List[CourseTab], tab_id_locator: Dict[str, str]) -> Optional[CourseTab]:
     """
     Look for a tab with the specified tab_id or locator.  Returns the first matching tab.
     """
-    if 'tab_id' in tab_id_locator:
-        tab = CourseTabList.get_tab_by_id(tab_list, tab_id_locator['tab_id'])
-    elif 'tab_locator' in tab_id_locator:
-        tab = get_tab_by_locator(tab_list, tab_id_locator['tab_locator'])
+    tab = None
+    if "tab_id" in tab_id_locator:
+        tab = CourseTabList.get_tab_by_id(tab_list, tab_id_locator["tab_id"])
+    elif "tab_locator" in tab_id_locator:
+        tab = get_tab_by_locator(tab_list, tab_id_locator["tab_locator"])
     return tab
 
 
-def get_tab_by_locator(tab_list, usage_key_string):
+def get_tab_by_locator(tab_list: List[CourseTab], usage_key_string: str) -> Optional[CourseTab]:
     """
     Look for a tab with the specified locator.  Returns the first matching tab.
     """
