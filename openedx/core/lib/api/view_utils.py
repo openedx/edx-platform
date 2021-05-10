@@ -91,7 +91,7 @@ class DeveloperErrorViewMixin:
             return exc.response
         elif isinstance(exc, APIException):
             return self._make_error_response(exc.status_code, exc.detail)
-        elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):  # lint-amnesty, pylint: disable=consider-merging-isinstance
+        elif isinstance(exc, (Http404, ObjectDoesNotExist)):
             return self._make_error_response(404, str(exc) or "Not found.")
         elif isinstance(exc, ValidationError):
             return self._make_validation_error_response(exc)
