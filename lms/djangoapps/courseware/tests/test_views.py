@@ -54,10 +54,9 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW,
     COURSEWARE_OPTIMIZED_RENDER_XBLOCK,
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
-
+    courseware_mfe_is_advertised,
 )
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.courseware.views.index import show_courseware_mfe_link
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from lms.djangoapps.grades.config.waffle import waffle_switch as grades_waffle_switch
@@ -3360,20 +3359,22 @@ class TestShowCoursewareMFE(TestCase):
         """Test every permutation"""
         old_course_key = CourseKey.from_string("OpenEdX/Old/2020")
         new_course_key = CourseKey.from_string("course-v1:OpenEdX+New+2020")
-        global_staff_user = UserFactory(username="global_staff", is_staff=True)
-        regular_user = UserFactory(username="normal", is_staff=False)
 
         # Old style course keys are never supported and should always return false...
         old_mongo_combos = itertools.product(
-            [regular_user, global_staff_user],  # User (is global staff)
+            [True, False],  # is_global_staff
             [True, False],  # is_course_staff
             [True, False],  # preview_active (COURSEWARE_MICROFRONTEND_COURSE_TEAM_PREVIEW)
             [True, False],  # redirect_active (REDIRECT_TO_COURSEWARE_MICROFRONTEND)
         )
-        for user, is_course_staff, preview_active, redirect_active in old_mongo_combos:
+        for is_global_staff, is_course_staff, preview_active, redirect_active in old_mongo_combos:
             with _set_preview_mfe_flag(preview_active):
                 with _set_mfe_flag(redirect_active):
-                    assert show_courseware_mfe_link(user, is_course_staff, old_course_key) is False
+                    assert not courseware_mfe_is_advertised(
+                        is_global_staff=is_global_staff,
+                        is_course_staff=is_course_staff,
+                        course_key=old_course_key,
+                    )
 
         # We've checked all old-style course keys now, so we can test only the
         # new ones going forward. Now we check combinations of waffle flags and
@@ -3382,9 +3383,9 @@ class TestShowCoursewareMFE(TestCase):
             with _set_mfe_flag(True):
                 # (preview=on, redirect=on)
                 # Global and Course Staff can see the link.
-                assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
-                assert show_courseware_mfe_link(global_staff_user, False, new_course_key)
-                assert show_courseware_mfe_link(regular_user, True, new_course_key)
+                assert courseware_mfe_is_advertised(new_course_key, True, True)
+                assert courseware_mfe_is_advertised(new_course_key, True, False)
+                assert courseware_mfe_is_advertised(new_course_key, False, True)
 
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
@@ -3392,38 +3393,37 @@ class TestShowCoursewareMFE(TestCase):
             with _set_mfe_flag(False):
                 # (preview=on, redirect=off)
                 # Global and Course Staff can see the link.
-                assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
-                assert show_courseware_mfe_link(global_staff_user, False, new_course_key)
-                assert show_courseware_mfe_link(regular_user, True, new_course_key)
+                assert courseware_mfe_is_advertised(new_course_key, True, True)
+                assert courseware_mfe_is_advertised(new_course_key, True, False)
+                assert courseware_mfe_is_advertised(new_course_key, False, True)
 
                 # Regular users don't see the link.
-                assert not show_courseware_mfe_link(regular_user, False, new_course_key)
+                assert not courseware_mfe_is_advertised(new_course_key, False, False)
 
         with _set_preview_mfe_flag(False):
             with _set_mfe_flag(True):
                 # (preview=off, redirect=on)
                 # Global staff see the link anyway
-                assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
-                assert show_courseware_mfe_link(global_staff_user, False, new_course_key)
+                assert courseware_mfe_is_advertised(new_course_key, True, True)
+                assert courseware_mfe_is_advertised(new_course_key, True, False)
 
                 # If redirect is active for their students, course staff see the link even
                 # if preview=off.
-                assert show_courseware_mfe_link(regular_user, True, new_course_key)
+                assert courseware_mfe_is_advertised(new_course_key, False, True)
 
                 # (Regular users would see the link, but they can't see the Legacy
                 #  experience, so it doesn't matter.)
 
             with _set_mfe_flag(False):
                 # (preview=off, redirect=off)
-                # Global staff see the link anyway
-                assert show_courseware_mfe_link(global_staff_user, True, new_course_key)
-                assert show_courseware_mfe_link(global_staff_user, False, new_course_key)
-
-                # Course teams can NOT see the link because both rollout waffle flags are false.
-                assert not show_courseware_mfe_link(regular_user, True, new_course_key)
+                # Global staff  and course teams can NOT see the link
+                # because both rollout waffle flags are false.
+                assert not courseware_mfe_is_advertised(new_course_key, True, True)
+                assert not courseware_mfe_is_advertised(new_course_key, True, False)
+                assert not courseware_mfe_is_advertised(new_course_key, False, True)
 
                 # Regular users don't see the link.
-                assert not show_courseware_mfe_link(regular_user, False, new_course_key)
+                assert not courseware_mfe_is_advertised(new_course_key, False, False)
 
     @override_settings(LEARNING_MICROFRONTEND_URL='https://learningmfe.openedx.org')
     def test_url_generation(self):
