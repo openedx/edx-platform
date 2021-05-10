@@ -59,7 +59,7 @@ class Command(BaseCommand):
             # Create the course
             try:
                 new_course = create_new_course_in_store("split", user, org, num, run, fields)
-                logger.info("Created {}".format(str(new_course.id)))
+                logger.info(f"Created {str(new_course.id)}")
             except DuplicateCourseError:
                 logger.warning("Course already exists for %s, %s, %s", org, num, run)
 

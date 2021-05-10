@@ -154,7 +154,7 @@ class Command(BaseCommand):
             max(len(str(result[col])) for result in results + [headers])
             for col in range(len(results[0]))
         ]
-        id_format = "{{:>{}}} |".format(len(str(len(results))))
+        id_format = f"{{:>{len(str(len(results)))}}} |"
         col_format = "| {{:>{}}} |"
 
         self.stdout.write(id_format.format(""), ending='')
