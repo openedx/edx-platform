@@ -162,7 +162,7 @@ def get_xblock_id_for_anonymous_user(user):
     if current_request and current_request.session:
         # Make sure we have a key for this user:
         if "xblock_id_for_anonymous_user" not in current_request.session:
-            new_id = "anon{}".format(uuid4().hex[:20])
+            new_id = f"anon{uuid4().hex[:20]}"
             current_request.session["xblock_id_for_anonymous_user"] = new_id
         return current_request.session["xblock_id_for_anonymous_user"]
     else:

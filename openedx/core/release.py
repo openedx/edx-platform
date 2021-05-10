@@ -19,7 +19,7 @@ def doc_version():
     if RELEASE_LINE == "master":
         return "latest"
     else:
-        return "open-release-{}.master".format(RELEASE_LINE)
+        return f"open-release-{RELEASE_LINE}.master"
 
 
 def skip_unless_master(func_or_class):

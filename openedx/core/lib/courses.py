@@ -79,7 +79,7 @@ def clean_course_id(model_form, is_required=True):
         raise forms.ValidationError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
     if not modulestore().has_course(course_key):
-        msg = 'Course not found. Entered course id was: "{}".'.format(str(course_key))
+        msg = f'Course not found. Entered course id was: "{str(course_key)}".'
         raise forms.ValidationError(msg)
 
     return course_key
@@ -98,4 +98,4 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found: {}.".format(str(course_key)))
+        raise Http404(f"Course not found: {str(course_key)}.")

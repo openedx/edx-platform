@@ -425,7 +425,7 @@ def verify_course_exists(view_func):
         if not CourseOverview.course_exists(course_key):
             raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
-                developer_message="Requested grade for unknown course {course}".format(course=str(course_key)),
+                developer_message=f"Requested grade for unknown course {str(course_key)}",
                 error_code='course_does_not_exist'
             )
 

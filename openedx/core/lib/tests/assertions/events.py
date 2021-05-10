@@ -223,11 +223,11 @@ def compare_structs(expected, actual, should_strict_compare=None, path=None):
         actual_keys = frozenset(list(actual.keys()))
 
         for key in expected_keys - actual_keys:
-            differences.append('{}: not found in actual'.format(_path_to_string(path + [key])))
+            differences.append(f'{_path_to_string(path + [key])}: not found in actual')
 
         if should_strict_compare is not None and should_strict_compare(path):
             for key in actual_keys - expected_keys:
-                differences.append('{}: only defined in actual'.format(_path_to_string(path + [key])))
+                differences.append(f'{_path_to_string(path + [key])}: only defined in actual')
 
         for key in expected_keys & actual_keys:
             child_differences = compare_structs(expected[key], actual[key], should_strict_compare, path + [key])

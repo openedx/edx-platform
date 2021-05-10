@@ -33,7 +33,7 @@ class TeamsConfig:  # pylint: disable=eq-without-hash
 
         TODO move this code to __str__ after Py3 upgrade.
         """
-        return "Teams configuration for {} team-sets".format(len(self.teamsets))
+        return f"Teams configuration for {len(self.teamsets)} team-sets"
 
     def __str__(self):
         """

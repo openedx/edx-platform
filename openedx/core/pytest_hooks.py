@@ -58,11 +58,11 @@ def pytest_sessionfinish(session):
 
     report = session.config._json_report.report  # noqa pylint: disable=protected-access
 
-    with io.open(create_file_name(dir_path, file_name_postfix, num), "w") as outfile:
+    with open(create_file_name(dir_path, file_name_postfix, num), "w") as outfile:
         json.dump(report, outfile)
 
 
-class DeferPlugin(object):
+class DeferPlugin:
     """Simple plugin to defer pytest-xdist hook functions."""
 
     def pytest_json_modifyreport(self, json_report):
