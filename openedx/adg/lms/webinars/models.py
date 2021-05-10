@@ -9,13 +9,21 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.models import TimeStampedModel
 
 from openedx.adg.lms.applications.helpers import validate_file_size
+from openedx.adg.lms.helpers import convert_date_time_zone_and_format
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
-from .constants import ALLOWED_BANNER_EXTENSIONS, BANNER_MAX_SIZE, WEBINARS_TIME_FORMAT
+from .constants import (
+    ALLOWED_BANNER_EXTENSIONS,
+    BANNER_MAX_SIZE,
+    WEBINAR_DATE_FORMAT,
+    WEBINAR_DATE_TIME_FORMAT,
+    WEBINAR_DEFAULT_TIME_ZONE,
+    WEBINAR_TIME_FORMAT
+)
 from .helpers import cancel_reminders_for_given_webinars, send_cancellation_emails_for_given_webinars
 from .managers import WebinarRegistrationManager
 
@@ -42,12 +50,12 @@ class Webinar(TimeStampedModel):
     start_time = models.DateTimeField(verbose_name=_('Start Time'), )
     end_time = models.DateTimeField(verbose_name=_('End Time'), )
 
-    title = models.CharField(verbose_name=_('Title'), max_length=255, )
+    title = models.CharField(verbose_name=_('Title'), max_length=100, )
     description = models.TextField(verbose_name=_('Description'), )
     presenter = models.ForeignKey(
         User, verbose_name=_('Presenter'), on_delete=models.CASCADE, related_name='webinar_presenter',
     )
-    meeting_link = models.URLField(default='', verbose_name=_('Meeting Link'), blank=True, )
+    meeting_link = models.URLField(verbose_name=_('Meeting Link'), )
     banner = models.ImageField(
         upload_to='webinar/banners/',
         verbose_name=_('Banner'),
@@ -75,7 +83,6 @@ class Webinar(TimeStampedModel):
         verbose_name=_('Webinar Status'), choices=STATUS_CHOICES, max_length=10, default=UPCOMING,
     )
 
-    is_virtual = models.BooleanField(default=True, verbose_name=_('Virtual Event'), )
     created_by = models.ForeignKey(
         User, verbose_name=_('Created By'), on_delete=models.CASCADE, blank=True, related_name='webinar_created_by',
     )
@@ -101,7 +108,7 @@ class Webinar(TimeStampedModel):
             'webinar_id': self.id,
             'webinar_title': self.title,
             'webinar_description': self.description,
-            'webinar_start_time': self.start_time.strftime(WEBINARS_TIME_FORMAT),
+            'webinar_start_time': self.start_date_time_AST,
             'webinar_meeting_link': self.meeting_link,
         }
 
@@ -118,8 +125,8 @@ class Webinar(TimeStampedModel):
         if self.end_time and self.end_time < now():
             errors['end_time'] = _('End date/time should be in future')
 
-        if self.start_time and self.end_time and self.start_time > self.end_time:
-            errors['start_time'] = _('End date/time must be greater than start date/time')
+        if self.start_time and self.end_time and self.start_time >= self.end_time:
+            errors['end_time'] = _('End date/time must be greater than start date/time')
 
         if self.banner:
             error_message = validate_file_size(self.banner, BANNER_MAX_SIZE)
@@ -166,6 +173,33 @@ class Webinar(TimeStampedModel):
 
     def webinar_team(self):
         return set(chain(self.co_hosts.all(), self.panelists.all(), {self.presenter}))
+
+    @property
+    def start_date_time_AST(self):
+        """
+        AST (Arabian standard time UTC+3) is a TimeZone
+        Returns:
+            Formatted AST date time string
+        """
+        return convert_date_time_zone_and_format(self.start_time, WEBINAR_DEFAULT_TIME_ZONE, WEBINAR_DATE_TIME_FORMAT)
+
+    @property
+    def start_date_AST(self):
+        """
+        AST (Arabian standard time UTC+3) is a TimeZone
+        Returns:
+            Formatted AST date  string
+        """
+        return convert_date_time_zone_and_format(self.start_time, WEBINAR_DEFAULT_TIME_ZONE, WEBINAR_DATE_FORMAT)
+
+    @property
+    def start_time_AST(self):
+        """
+        AST (Arabian standard time UTC+3) is a TimeZone
+        Returns:
+            Formatted AST time string
+        """
+        return convert_date_time_zone_and_format(self.start_time, WEBINAR_DEFAULT_TIME_ZONE, WEBINAR_TIME_FORMAT)
 
 
 class CancelledWebinar(Webinar):

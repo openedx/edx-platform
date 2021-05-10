@@ -2731,6 +2731,7 @@ EDXMKTG_USER_INFO_COOKIE_VERSION = 1
 MKTG_URLS = {}
 MKTG_URL_OVERRIDES = {}
 MKTG_URL_LINK_MAP = {
+    'HONOR': 'tos',
     'ABOUT': 'about',
     'CONTACT': 'contact',
     'FAQ': None,

@@ -23,7 +23,7 @@ class WebinarFactory(factory.DjangoModelFactory):
     presenter = factory.SubFactory(UserFactory)
     banner = factory.django.ImageField()
     language = factory.Iterator(['ar', 'en'])
-
+    meeting_link = factory.Faker('url')
     start_time = now() + timedelta(hours=1)
     end_time = now() + timedelta(hours=2)
     created_by = factory.SubFactory(UserFactory)

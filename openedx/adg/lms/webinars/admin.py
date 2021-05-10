@@ -2,6 +2,7 @@
 Registering models for webinars app.
 """
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -149,13 +150,44 @@ class WebinarRegistrationAdmin(admin.ModelAdmin):
     """
 
     list_display = ('webinar', 'user', 'is_registered', 'is_team_member_registration',)
-    search_fields = ('webinar',)
+    search_fields = ('webinar__title', 'user__username')
+    list_filter = ('webinar',)
 
     def has_add_permission(self, request):
         return False
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+class ReadOnlyUserAdmin(UserAdmin):
+    """
+    Readonly User admin to allow search when adding users in fields in ADG Admin site
+    """
+
+    def has_add_permission(self, request):
+        """
+        Do not allow admin to add a new User object
+        """
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """
+        Do not allow admin to change any User object
+        """
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Do not allow admin to delete an existing User object
+        """
+        return False
+
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the User model from admin site index
+        """
+        return {}
 
 
 admin.site.register(Webinar, WebinarAdmin)
@@ -166,3 +198,5 @@ adg_admin_site.register(CancelledWebinar, CancelledWebinarAdmin)
 
 admin.site.register(WebinarRegistration, WebinarRegistrationAdmin)
 adg_admin_site.register(WebinarRegistration, WebinarRegistrationAdmin)
+
+adg_admin_site.register(User, ReadOnlyUserAdmin)
