@@ -14,6 +14,8 @@ from django.contrib.auth import get_user_model
 from django.test.client import RequestFactory
 
 from edx_toggles.toggles.testutils import override_waffle_flag
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory, LinkedInAddToProfileConfigurationFactory
@@ -27,6 +29,8 @@ from lms.djangoapps.courseware.toggles import (
     REDIRECT_TO_COURSEWARE_MICROFRONTEND,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
 )
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
 from lms.djangoapps.verify_student.services import IDVerificationService
 from common.djangoapps.student.models import (
     CourseEnrollment, CourseEnrollmentCelebration
@@ -105,6 +109,14 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
         )
         cls.store.update_item(cls.course, cls.user.id)
         LinkedInAddToProfileConfigurationFactory.create()
+        CourseModeFactory(course_id=cls.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory(
+            course_id=cls.course.id,
+            mode_slug=CourseMode.VERIFIED,
+            expiration_datetime=datetime(3028, 1, 1),
+            min_price=149,
+            sku='ABCD1234',
+        )
 
     @ddt.data(
         (True, None, ACCESS_DENIED),
@@ -285,9 +297,12 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     def test_streak_data_in_response(self):
         """ Test that metadata endpoint returns data for the streak celebration """
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
-        response = self.client.get(self.url, content_type='application/json')
-        celebrations = response.json()['celebrations']
-        assert 'streak_length_to_celebrate' in celebrations
+        with override_experiment_waffle_flag(STREAK_DISCOUNT_EXPERIMENT_FLAG, active=True):
+            with mock.patch('common.djangoapps.student.models.UserCelebration.perform_streak_updates', return_value=3):
+                response = self.client.get(self.url, content_type='application/json')
+                celebrations = response.json()['celebrations']
+                assert celebrations['streak_length_to_celebrate'] == 3
+                assert celebrations['streak_discount_experiment_enabled'] is True
 
     @ddt.data(
         (False, False),
