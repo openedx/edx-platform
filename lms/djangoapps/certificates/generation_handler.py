@@ -34,28 +34,11 @@ log = logging.getLogger(__name__)
 
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='certificates_revamp')
 
-# .. toggle_name: certificates_revamp.use_allowlist
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable the course certificates allowlist (aka v2 of the certificate whitelist)
-#   on a per-course run basis.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-01-27
-# .. toggle_target_removal_date: 2022-01-27
-# .. toggle_tickets: MICROBA-918
-CERTIFICATES_USE_ALLOWLIST = CourseWaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name='use_allowlist',
-    module_name=__name__,
-)
-
-
 # .. toggle_name: certificates_revamp.use_updated
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable the updated regular (non-allowlist) course certificate logic on a
-#   per-course run basis. Note that if this flag is enabled for a course run, certificates_revamp.use_allowlist
-#   should also be enabled for that course run.
+#   per-course run basis.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2021-03-05
 # .. toggle_target_removal_date: 2022-03-05
@@ -72,10 +55,10 @@ def can_generate_certificate_task(user, course_key):
     Determine if we can create a task to generate a certificate for this user in this course run.
 
     This will return True if either:
-    - the course run is using the allowlist and the user is on the allowlist, or
+    - the user is on the allowlist for the course run, or
     - the course run is using v2 course certificates
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
+    if is_on_certificate_allowlist(user, course_key):
         return True
     elif is_using_v2_course_certificates(course_key):
         return True
@@ -91,9 +74,9 @@ def generate_certificate_task(user, course_key, generation_mode=None):
     If the allowlist is enabled for this course run and the user is on the allowlist, the allowlist logic will be used.
     Otherwise, the regular course certificate generation logic will be used.
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-        log.info(f'{course_key} is using allowlist certificates, and the user {user.id} is on its allowlist. Attempt '
-                 f'will be made to generate an allowlist certificate.')
+    if is_on_certificate_allowlist(user, course_key):
+        log.info(f'User {user.id} is on the allowlist for {course_key}. Attempt will be made to generate an allowlist '
+                 f'certificate.')
         return generate_allowlist_certificate_task(user, course_key, generation_mode)
 
     elif is_using_v2_course_certificates(course_key):
@@ -157,12 +140,6 @@ def _can_generate_allowlist_certificate(user, course_key):
     Check if an allowlist certificate can be generated (created if it doesn't already exist, or updated if it does
     exist) for this user, in this course run.
     """
-    if not is_using_certificate_allowlist(course_key):
-        # This course run is not using the allowlist feature
-        log.info(f'{course_key} is not using the certificate allowlist. Allowlist certificate cannot be generated'
-                 f'for {user.id}.')
-        return False
-
     if not is_on_certificate_allowlist(user, course_key):
         log.info(f'{user.id} : {course_key} is not on the certificate allowlist. Allowlist certificate cannot be '
                  f'generated.')
@@ -315,9 +292,6 @@ def _can_set_allowlist_cert_status(user, course_key):
     """
     Determine whether we can set a custom (non-downloadable) cert status for an allowlist certificate
     """
-    if not is_using_certificate_allowlist(course_key):
-        return False
-
     if not is_on_certificate_allowlist(user, course_key):
         return False
 
@@ -359,26 +333,6 @@ def _can_set_cert_status_common(user, course_key):
         return False
 
     return True
-
-
-def is_using_certificate_allowlist_and_is_on_allowlist(user, course_key):
-    """
-    Return True if both:
-    1) the course run is using the allowlist, and
-    2) if the user is on the allowlist for this course run
-    """
-    return is_using_certificate_allowlist(course_key) and is_on_certificate_allowlist(user, course_key)
-
-
-def is_using_certificate_allowlist(course_key):
-    """
-    Check if the course run is using the allowlist, aka v2 of certificate whitelisting
-
-    Currently this returns True for all course runs, as we're enabling the allowlist for everyone.
-    If all goes well, we'll come back and remove this method and the flag entirely in MICROBA-1073.
-    """
-    return True
-#    return CERTIFICATES_USE_ALLOWLIST.is_enabled(course_key)
 
 
 def is_using_v2_course_certificates(course_key):
