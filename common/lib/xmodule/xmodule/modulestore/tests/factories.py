@@ -607,14 +607,14 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
                 stack_counter.total_calls
             ))
             for stack in stack_counter:
-                messages.append("  called {} times:\n\n".format(stack_counter.stack_calls(stack)))
+                messages.append(f"  called {stack_counter.stack_calls(stack)} times:\n\n")
                 messages.append("    " + "    ".join(traceback.format_list(stack)))
                 messages.append("\n\n")
                 if include_arguments:
                     for (args, kwargs), count in stack_counter[stack].items():
                         messages.append(f"      called {count} times with:\n")
                         messages.append(f"      args: {args}\n")
-                        messages.append("      kwargs: {}\n\n".format(dict(kwargs)))
+                        messages.append(f"      kwargs: {dict(kwargs)}\n\n")
 
     # verify that we called the methods within the desired range
     assert minimum_calls <= call_count <= maximum_calls, "".join(messages)

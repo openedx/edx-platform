@@ -90,7 +90,7 @@ class Tagger:
         and also all of the added measurements, bucketed into powers of 2).
         """
         return [
-            '{}:{}'.format(name, round_power_2(size))
+            f'{name}:{round_power_2(size)}'
             for name, size in self.measures
         ] + [
             f'{name}:{value}'
@@ -427,7 +427,7 @@ class MongoConnection:
         with TIMER.timer("get_course_index", key):
             if ignore_case:
                 query = {
-                    key_attr: re.compile('^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
+                    key_attr: re.compile(f'^{re.escape(getattr(key, key_attr))}$', re.IGNORECASE)
                     for key_attr in ('org', 'course', 'run')
                 }
             else:

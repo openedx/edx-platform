@@ -458,7 +458,7 @@ class ContentStore:
         except Exception as exc:  # pylint: disable=broad-except
             # log and continue as thumbnails are generally considered as optional
             logging.exception(
-                "Failed to generate thumbnail for {}. Exception: {}".format(content.location, str(exc))
+                f"Failed to generate thumbnail for {content.location}. Exception: {str(exc)}"
             )
 
         return thumbnail_content, thumbnail_file_location

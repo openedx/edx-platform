@@ -102,7 +102,7 @@ class MixedSplitTestCase(TestCase):
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': '{}: {}, {}'.format(t_n, repr(d), repr(ctx))
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': f'{t_n}: {repr(d)}, {repr(ctx)}'
     modulestore_options = {
         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
         'fs_root': DATA_DIR,
