@@ -23,7 +23,6 @@ from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
-    is_using_certificate_allowlist as _is_using_certificate_allowlist,
     is_using_v2_course_certificates as _is_using_v2_course_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
@@ -587,9 +586,6 @@ def get_allowlisted_users(course_key):
     """
     Return the users who are on the allowlist for this course run
     """
-    if not _is_using_certificate_allowlist(course_key):
-        return User.objects.none()
-
     return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
 
 

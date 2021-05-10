@@ -15,7 +15,7 @@ from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task,
     generate_allowlist_certificate_task,
     generate_certificate_task,
-    is_using_certificate_allowlist_and_is_on_allowlist
+    is_on_certificate_allowlist
 )
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
@@ -60,9 +60,9 @@ def _listen_for_certificate_whitelist_append(sender, instance, **kwargs):  # pyl
     if not auto_certificate_generation_enabled():
         return
 
-    if is_using_certificate_allowlist_and_is_on_allowlist(instance.user, instance.course_id):
-        log.info(f'{instance.course_id} is using allowlist certificates, and the user {instance.user.id} is now on '
-                 f'its allowlist. Attempt will be made to generate an allowlist certificate.')
+    if is_on_certificate_allowlist(instance.user, instance.course_id):
+        log.info(f'User {instance.user.id} is now on the allowlist for course {instance.course_id}. Attempt will be '
+                 f'made to generate an allowlist certificate.')
         return generate_allowlist_certificate_task(instance.user, instance.course_id)
 
     if _fire_ungenerated_certificate_task(instance.user, instance.course_id):
@@ -106,9 +106,9 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
 
     If needed, mark the certificate as notpassing.
     """
-    if is_using_certificate_allowlist_and_is_on_allowlist(user, course_id):
-        log.info('{course_id} is using allowlist certificates, and the user {user_id} is on its allowlist. The '
-                 'failing grade will not affect the certificate.'.format(course_id=course_id, user_id=user.id))
+    if is_on_certificate_allowlist(user, course_id):
+        log.info(f'User {user.id} is on the allowlist for {course_id}. The failing grade will not affect the '
+                 f'certificate.')
         return
 
     cert = GeneratedCertificate.certificate_for_student(user, course_id)
