@@ -117,6 +117,9 @@ urlpatterns = [
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
+    # Agreements API RESTful endpoints
+    url(r'^api/agreements/v1/', include('openedx.core.djangoapps.agreements.urls')),
+
     # Entitlement API RESTful endpoints
     url(
         r'^api/entitlements/',
