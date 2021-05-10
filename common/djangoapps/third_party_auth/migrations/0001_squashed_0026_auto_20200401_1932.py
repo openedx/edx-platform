@@ -14,8 +14,6 @@ from common.djangoapps.third_party_auth import models as third_party_auth_models
 
 class Migration(migrations.Migration):
 
-    replaces = [('third_party_auth', '0001_initial'), ('third_party_auth', '0002_schema__provider_icon_image'), ('third_party_auth', '0003_samlproviderconfig_debug_mode'), ('third_party_auth', '0004_add_visible_field'), ('third_party_auth', '0005_add_site_field'), ('third_party_auth', '0006_samlproviderconfig_automatic_refresh_enabled'), ('third_party_auth', '0007_auto_20170406_0912'), ('third_party_auth', '0008_auto_20170413_1455'), ('third_party_auth', '0009_auto_20170415_1144'), ('third_party_auth', '0010_add_skip_hinted_login_dialog_field'), ('third_party_auth', '0011_auto_20170616_0112'), ('third_party_auth', '0012_auto_20170626_1135'), ('third_party_auth', '0013_sync_learner_profile_data'), ('third_party_auth', '0014_auto_20171222_1233'), ('third_party_auth', '0015_samlproviderconfig_archived'), ('third_party_auth', '0016_auto_20180130_0938'), ('third_party_auth', '0017_remove_icon_class_image_secondary_fields'), ('third_party_auth', '0018_auto_20180327_1631'), ('third_party_auth', '0019_consolidate_slug'), ('third_party_auth', '0020_cleanup_slug_fields'), ('third_party_auth', '0021_sso_id_verification'), ('third_party_auth', '0022_auto_20181012_0307'), ('third_party_auth', '0023_auto_20190418_2033'), ('third_party_auth', '0024_fix_edit_disallowed'), ('third_party_auth', '0025_auto_20200303_1448'), ('third_party_auth', '0026_auto_20200401_1932')]
-
     initial = True
 
     dependencies = [
