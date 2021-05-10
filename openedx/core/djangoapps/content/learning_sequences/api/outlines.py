@@ -6,15 +6,16 @@ __init__.py imports from here, and is a more stable place to import from.
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, FrozenSet, Optional, List, Union
-from django.contrib.auth import get_user_model
-from django.db.models.query import QuerySet
+from typing import Dict, FrozenSet, List, Optional, Union
+
 from django.db import transaction
+from django.db.models.query import QuerySet
+from edx_django_utils.cache import TieredCache
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from opaque_keys import OpaqueKey
-from opaque_keys.edx.locator import LibraryLocator
-from edx_django_utils.cache import TieredCache
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
+from openedx.core import types
 
 from ..data import (
     ContentErrorData,
@@ -25,30 +26,28 @@ from ..data import (
     ExamData,
     UserCourseOutlineData,
     UserCourseOutlineDetailsData,
-    VisibilityData,
-
+    VisibilityData
 )
 from ..models import (
     ContentError,
+    CourseContext,
     CourseSection,
     CourseSectionSequence,
-    CourseContext,
     CourseSequenceExam,
     LearningContext,
     LearningSequence,
     PublishReport,
-    UserPartitionGroup,
+    UserPartitionGroup
 )
 from .permissions import can_see_all_content
 from .processors.content_gating import ContentGatingOutlineProcessor
+from .processors.enrollment import EnrollmentOutlineProcessor
+from .processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 from .processors.milestones import MilestonesOutlineProcessor
 from .processors.schedule import ScheduleOutlineProcessor
 from .processors.special_exams import SpecialExamsOutlineProcessor
 from .processors.visibility import VisibilityOutlineProcessor
-from .processors.enrollment import EnrollmentOutlineProcessor
-from .processors.enrollment_track_partition_groups import EnrollmentTrackPartitionGroupsOutlineProcessor
 
-User = get_user_model()
 log = logging.getLogger(__name__)
 
 # Public API...
@@ -255,7 +254,7 @@ def get_content_errors(course_key: CourseKey) -> List[ContentErrorData]:
 
 @function_trace('learning_sequences.api.get_user_course_outline')
 def get_user_course_outline(course_key: CourseKey,
-                            user: User,
+                            user: types.User,
                             at_time: datetime) -> UserCourseOutlineData:
     """
     Get an outline customized for a particular user at a particular time.
@@ -272,7 +271,7 @@ def get_user_course_outline(course_key: CourseKey,
 
 @function_trace('learning_sequences.api.get_user_course_outline_details')
 def get_user_course_outline_details(course_key: CourseKey,
-                                    user: User,
+                                    user: types.User,
                                     at_time: datetime) -> UserCourseOutlineDetailsData:
     """
     Get an outline with supplementary data like scheduling information.
@@ -299,7 +298,7 @@ def get_user_course_outline_details(course_key: CourseKey,
 
 
 def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnesty, pylint: disable=missing-function-docstring
-                                            user: User,
+                                            user: types.User,
                                             at_time: datetime):
     """
     Helper function that runs the outline processors.
@@ -352,7 +351,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
 
     # Open question: Does it make sense to remove a Section if it has no Sequences in it?
     trimmed_course_outline = full_course_outline.remove(usage_keys_to_remove)
-    accessible_sequences = set(trimmed_course_outline.sequences) - inaccessible_sequences
+    accessible_sequences = frozenset(set(trimmed_course_outline.sequences) - inaccessible_sequences)
 
     user_course_outline = UserCourseOutlineData(
         base_outline=full_course_outline,

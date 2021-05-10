@@ -853,6 +853,10 @@ mpmath==1.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   sympy
+mypy-extensions==0.4.3
+    # via mypy
+mypy==0.812
+    # via -r requirements/edx/development.in
 mysqlclient==2.0.3
     # via -r requirements/edx/testing.txt
 newrelic==6.4.0.157
@@ -1377,6 +1381,10 @@ tqdm==4.61.0
     #   nltk
 transifex-client==0.14.2
     # via -r requirements/edx/testing.txt
+typed-ast==1.4.3
+    # via mypy
+typing-extensions==3.10.0.0
+    # via mypy
 ua-parser==0.10.0
     # via
     #   -r requirements/edx/testing.txt
