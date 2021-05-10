@@ -111,6 +111,9 @@ compile-requirements: ## Re-compile *.in requirements to *.txt
 upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
+check-types: ## run static type-checking tests
+	mypy
+
 # These make targets currently only build LMS images.
 docker_build:
 	docker build . -f Dockerfile --target lms -t openedx/edx-platform
