@@ -68,7 +68,7 @@ class TestRedirectUtils(TestCase):
             'client_id': application.client_id,
             'redirect_url': redirect_url,
         }
-        req = self.request.get('/logout?{}'.format(urlencode(params)), HTTP_HOST=host)
+        req = self.request.get(f'/logout?{urlencode(params)}', HTTP_HOST=host)
         actual_is_safe = self._is_safe_redirect(req, redirect_url)
         assert actual_is_safe == expected_is_safe
 

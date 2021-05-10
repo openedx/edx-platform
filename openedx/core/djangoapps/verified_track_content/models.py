@@ -111,7 +111,7 @@ class VerifiedTrackCohortedCourse(models.Model):
     CACHE_NAMESPACE = "verified_track_content.VerifiedTrackCohortedCourse.cache."
 
     def __str__(self):
-        return "Course: {}, enabled: {}".format(str(self.course_key), self.enabled)
+        return f"Course: {str(self.course_key)}, enabled: {self.enabled}"
 
     @classmethod
     def verified_cohort_name_for_course(cls, course_key):

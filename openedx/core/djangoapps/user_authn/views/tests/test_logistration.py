@@ -217,7 +217,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         with with_comprehensive_theme_context(theme):
             response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
-        expected_url = '/login?{}'.format(self._finish_auth_url_param(params))
+        expected_url = f'/login?{self._finish_auth_url_param(params)}'
         self.assertNotContains(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
@@ -655,7 +655,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         '/account/finish_auth?next=%2Fdashboard'
         """
         return urlencode({
-            'next': '/account/finish_auth?{}'.format(urlencode(params))
+            'next': f'/account/finish_auth?{urlencode(params)}'
         })
 
     def test_english_by_default(self):

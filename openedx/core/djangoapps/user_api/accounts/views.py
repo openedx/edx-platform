@@ -802,7 +802,7 @@ class AccountRetirementStatusView(ViewSet):
         except ValueError:
             return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(f'Missing required parameter: {str(exc)}',
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementStateError as exc:
             return Response(str(exc), status=status.HTTP_400_BAD_REQUEST)
@@ -842,9 +842,9 @@ class AccountRetirementStatusView(ViewSet):
             return Response(serializer.data)
         # This should only occur on the datetime conversion of the start / end dates.
         except ValueError as exc:
-            return Response('Invalid start or end date: {}'.format(str(exc)), status=status.HTTP_400_BAD_REQUEST)
+            return Response(f'Invalid start or end date: {str(exc)}', status=status.HTTP_400_BAD_REQUEST)
         except KeyError as exc:
-            return Response('Missing required parameter: {}'.format(str(exc)),
+            return Response(f'Missing required parameter: {str(exc)}',
                             status=status.HTTP_400_BAD_REQUEST)
         except RetirementState.DoesNotExist:
             return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)

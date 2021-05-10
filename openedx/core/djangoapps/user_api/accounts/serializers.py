@@ -407,7 +407,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             # If we have encountered any validation errors, return them to the user.
             raise errors.AccountValidationError({
                 'social_links': {
-                    "developer_message": "Error when adding new social link: '{}'".format(str(err)),
+                    "developer_message": f"Error when adding new social link: '{str(err)}'",
                     "user_message": str(err)
                 }
             })
