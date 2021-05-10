@@ -1,9 +1,9 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import datetime
 import hashlib
+from unittest import mock
 
 import ddt
-import mock
 import pytz
 from crum import set_current_request
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -98,7 +98,7 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):  # lint-amnesty, pylint:
         enrollments = CourseEnrollment.enrollments_for_user(self.user).order_by(Lower('course_id'))
         hash_elements = [self.user.username]
         hash_elements += [
-            '{course_id}={mode}'.format(course_id=str(enrollment.course_id).lower(), mode=enrollment.mode.lower()) for
+            f'{str(enrollment.course_id).lower()}={enrollment.mode.lower()}' for
             enrollment in enrollments]
         expected = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
         assert CourseEnrollment.generate_enrollment_status_hash(self.user) == expected

@@ -93,11 +93,11 @@ def marketing_link(name):
                 try:
                     return reverse(link_map[name])
                 except NoReverseMatch:
-                    log.debug(u"Cannot find corresponding link for name: %s", name)
+                    log.debug("Cannot find corresponding link for name: %s", name)
                     set_custom_attribute('unresolved_marketing_link', name)
                     return '#'
     else:
-        log.debug(u"Cannot find corresponding link for name: %s", name)
+        log.debug("Cannot find corresponding link for name: %s", name)
         return '#'
 
 
@@ -143,15 +143,12 @@ def marketing_link_context_processor(request):
         settings.MKTG_URLS
     )
 
-    return dict(  # lint-amnesty, pylint: disable=consider-using-dict-comprehension
-        [
-            ("MKTG_URL_" + k, marketing_link(k))
-            for k in (
-                six.viewkeys(settings.MKTG_URL_LINK_MAP) |
-                six.viewkeys(marketing_urls)
-            )
-        ]
-    )
+    return {
+        "MKTG_URL_" + k: marketing_link(k)
+        for k in (
+            settings.MKTG_URL_LINK_MAP.keys() | marketing_urls.keys()
+        )
+    }
 
 
 def render_to_string(template_name, dictionary, namespace='main', request=None):

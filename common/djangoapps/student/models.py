@@ -421,7 +421,7 @@ def get_potentially_retired_user_by_username(username):
 
     # We should have, at most, a retired username and an active one with a username
     # differing only by case. If there are more we need to disambiguate them by hand.
-    raise Exception('Expected 1 or 2 Users, received {}'.format(str(potential_users)))
+    raise Exception(f'Expected 1 or 2 Users, received {str(potential_users)}')
 
 
 def get_potentially_retired_user_by_username_and_hash(username, hashed_username):
@@ -898,7 +898,7 @@ class Registration(models.Model):
         db_table = "auth_registration"
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    activation_key = models.CharField((u'activation key'), max_length=32, unique=True, db_index=True)
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
     activation_timestamp = models.DateTimeField(default=None, null=True, blank=True)
 
     def register(self, user):
@@ -913,7 +913,7 @@ class Registration(models.Model):
         self.activation_timestamp = datetime.utcnow()
         self.save()
         USER_ACCOUNT_ACTIVATED.send_robust(self.__class__, user=self.user)
-        log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
+        log.info('User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
@@ -1807,7 +1807,7 @@ class CourseEnrollment(models.Model):
             enrollments = [(str(e[0]).lower(), e[1].lower()) for e in enrollments]
             enrollments = sorted(enrollments, key=lambda e: e[0])
             hash_elements = [user.username]
-            hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
+            hash_elements += [f'{e[0]}={e[1]}' for e in enrollments]
             status_hash = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
 
             # The hash is cached indefinitely. It will be invalidated when the user enrolls/unenrolls.

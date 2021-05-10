@@ -27,7 +27,7 @@ KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
 UNKNOWN_SOURCE = '<unknown source>'
 
 
-class Template(object):
+class Template:
     """
     This bridges the gap between a Mako template and a Django template. It can
     be rendered like it is a Django template because the arguments are transformed
