@@ -83,7 +83,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
         username = request.user.username if request.user.username else None
         course = course_detail(request, request.user.username, course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key_string)
-        user_is_enrolled = bool(enrollment)
+        user_is_enrolled = bool(enrollment and enrollment.is_active)
 
         courseware_meta = CoursewareMeta(course_key, request, request.user.username)
         can_load_courseware = courseware_meta.is_microfrontend_enabled_for_user()
