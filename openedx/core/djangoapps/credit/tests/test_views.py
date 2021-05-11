@@ -686,7 +686,7 @@ class CreditEligibilityViewTests(AuthMixin, UserMixin, ReadOnlyMixin, TestCase):
 
     def test_get_with_invalid_course_key(self):
         """ Verify the endpoint returns HTTP status 400 if the provided course_key is not an actual CourseKey. """
-        url = '{}?username=edx&course_key=a'.format(reverse(self.view_name))
+        url = f'{reverse(self.view_name)}?username=edx&course_key=a'
         response = self.client.get(url)
         assert response.status_code == 400
         self.assertDictEqual(response.data, {'detail': '[a] is not a valid course key.'})

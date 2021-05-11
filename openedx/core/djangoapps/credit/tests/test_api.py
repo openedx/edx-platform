@@ -198,7 +198,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         """ Mock GET requests to the ecommerce course API endpoint. """
         httpretty.reset()
         httpretty.register_uri(
-            httpretty.GET, '{}/courses/{}/?include_products=1'.format(TEST_API_URL, str(course_key)),
+            httpretty.GET, f'{TEST_API_URL}/courses/{str(course_key)}/?include_products=1',
             status=status,
             body=json.dumps(body), content_type='application/json',
         )
