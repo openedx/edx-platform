@@ -16,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
-from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
+from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
     create_thread,
@@ -43,7 +43,7 @@ from lms.djangoapps.discussion.rest_api.serializers import (
     DiscussionRolesSerializer,
     DiscussionSettingsSerializer
 )
-from lms.djangoapps.discussion.views import get_divided_discussions
+from lms.djangoapps.discussion.views import get_divided_discussions  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import Role

@@ -15,7 +15,6 @@
 
 import logging
 
-import six
 from django.conf import settings
 from django.http import HttpResponse  # lint-amnesty, pylint: disable=unused-import
 from django.template import engines

@@ -13,7 +13,7 @@ signals.)
 
 import logging
 import shlex
-import sys
+import sys  # lint-amnesty, pylint: disable=unused-import
 
 from datetime import datetime, timedelta
 import dateutil.parser

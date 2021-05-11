@@ -68,7 +68,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         group_objects = {}
 
-        f = open(options['log_name'], "a+")
+        f = open(options['log_name'], "a+")  # lint-amnesty, pylint: disable=consider-using-with
 
         # Create groups
         for group in dict(groups):

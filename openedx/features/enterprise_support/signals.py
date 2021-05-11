@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser  # lint-amnesty, pylint: disable=unused-import
 from integrated_channels.integrated_channel.tasks import (
     transmit_single_learner_data,
     transmit_single_subsection_learner_data

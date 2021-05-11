@@ -7,7 +7,7 @@ because the Studio course outline may need these utilities.
 from enum import Enum
 from typing import Optional
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest

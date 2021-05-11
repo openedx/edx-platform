@@ -3218,8 +3218,7 @@ class UserCelebration(TimeStampedModel):
         if last_day_of_streak != self.last_day_of_streak:
             self.last_day_of_streak = last_day_of_streak
             self.streak_length = streak_length
-            if self.longest_ever_streak < streak_length:
-                self.longest_ever_streak = streak_length
+            self.longest_ever_streak = max(self.longest_ever_streak, streak_length)
 
             self.save()
 

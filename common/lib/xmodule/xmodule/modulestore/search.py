@@ -6,7 +6,7 @@ from logging import getLogger
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import MASQUERADE_SETTINGS_KEY
-from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.student.roles import GlobalStaff  # lint-amnesty, pylint: disable=unused-import
 from .exceptions import ItemNotFoundError, NoPathToItem
 
 LOGGER = getLogger(__name__)

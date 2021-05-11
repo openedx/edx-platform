@@ -274,7 +274,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             call_command('email_opt_in_list', *args)
 
     def test_file_already_exists(self):
-        temp_file = tempfile.NamedTemporaryFile(delete=True)
+        temp_file = tempfile.NamedTemporaryFile(delete=True)  # lint-amnesty, pylint: disable=consider-using-with
 
         def _cleanup():
             temp_file.close()

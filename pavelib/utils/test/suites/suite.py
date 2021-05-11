@@ -99,7 +99,7 @@ class TestSuite:
         process = None
 
         try:
-            process = subprocess.Popen(cmd, **kwargs)
+            process = subprocess.Popen(cmd, **kwargs)  # lint-amnesty, pylint: disable=consider-using-with
             return self.is_success(process.wait())
         except KeyboardInterrupt:
             kill_process(process)

@@ -324,7 +324,7 @@ class ItemFactory(XModuleFactory):
         return parent.location
 
     @classmethod
-    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def _create(cls, target_class, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements, unused-argument
         """
         Uses ``**kwargs``:
 

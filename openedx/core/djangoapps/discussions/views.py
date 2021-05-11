@@ -126,7 +126,7 @@ class LegacySettingsSerializer(serializers.BaseSerializer):
             raise serializers.ValidationError('Wrong type for discussion_topics')
         payload = {
             key: value
-            for key, value in data.items()
+            for key, value in data.items()  # lint-amnesty, pylint: disable=unnecessary-comprehension
         }
         return payload
 

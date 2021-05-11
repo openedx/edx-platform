@@ -2,7 +2,7 @@
 Views that handle course updates.
 """
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string

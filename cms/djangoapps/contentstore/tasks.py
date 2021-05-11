@@ -336,7 +336,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_module.url_name
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
+    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
     try:
@@ -595,7 +595,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     # try-finally block for proper clean up after receiving file.
     try:
-        tar_file = tarfile.open(temp_filepath)
+        tar_file = tarfile.open(temp_filepath)  # lint-amnesty, pylint: disable=consider-using-with
         try:
             safetar_extractall(tar_file, (course_dir + '/'))
         except SuspiciousOperation as exc:

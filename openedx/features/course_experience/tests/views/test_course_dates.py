@@ -5,7 +5,7 @@ Tests for course dates fragment.
 
 from datetime import datetime, timedelta
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import UserFactory

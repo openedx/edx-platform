@@ -24,7 +24,7 @@ import inspect
 import warnings
 from importlib import import_module
 
-import six
+import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 
 from common.djangoapps.track.backends import BaseBackend

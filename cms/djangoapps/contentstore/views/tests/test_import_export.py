@@ -720,7 +720,7 @@ class ExportTestCase(CourseTestCase):
             resp_content += item
 
         buff = BytesIO(resp_content)
-        return tarfile.open(fileobj=buff)
+        return tarfile.open(fileobj=buff)  # lint-amnesty, pylint: disable=consider-using-with
 
     def _verify_export_succeeded(self, resp):
         """ Export success helper method. """

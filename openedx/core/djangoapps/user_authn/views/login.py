@@ -44,7 +44,7 @@ from openedx.core.djangoapps.user_authn.views.utils import (
 from openedx.core.djangoapps.user_authn.toggles import is_require_third_party_auth_enabled
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.api.view_utils import require_post_params
+from openedx.core.lib.api.view_utils import require_post_params  # lint-amnesty, pylint: disable=unused-import
 from openedx.features.enterprise_support.api import activate_learner_enterprise, get_enterprise_learner_data_from_api
 from common.djangoapps.student.helpers import get_next_url_for_login_page, get_redirect_url_with_host
 from common.djangoapps.student.models import LoginFailures, AllowedAuthUser, UserProfile

@@ -28,7 +28,7 @@ class TestPaverQualityViolations(unittest.TestCase):
     """
     def setUp(self):
         super().setUp()
-        self.f = tempfile.NamedTemporaryFile(delete=False)
+        self.f = tempfile.NamedTemporaryFile(delete=False)  # lint-amnesty, pylint: disable=consider-using-with
         self.f.close()
         self.addCleanup(os.remove, self.f.name)
 
@@ -102,7 +102,7 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         super().setUp()
 
         # Temporary file infrastructure
-        self.f = tempfile.NamedTemporaryFile(delete=False)
+        self.f = tempfile.NamedTemporaryFile(delete=False)  # lint-amnesty, pylint: disable=consider-using-with
         self.f.close()
 
         # Cleanup various mocks and tempfiles
@@ -241,7 +241,7 @@ class TestPrepareReportDir(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_dir = tempfile.mkdtemp()
-        self.test_file = tempfile.NamedTemporaryFile(delete=False, dir=self.test_dir)
+        self.test_file = tempfile.NamedTemporaryFile(delete=False, dir=self.test_dir)  # lint-amnesty, pylint: disable=consider-using-with
         self.addCleanup(os.removedirs, self.test_dir)
 
     def test_report_dir_with_files(self):

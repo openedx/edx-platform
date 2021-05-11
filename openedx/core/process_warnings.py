@@ -4,7 +4,7 @@ Script to process pytest warnings output by pytest-json-report plugin and output
 """
 
 import argparse
-import io
+import io  # lint-amnesty, pylint: disable=unused-import
 import itertools
 import json
 import os
