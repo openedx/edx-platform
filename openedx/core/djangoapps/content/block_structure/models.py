@@ -247,7 +247,7 @@ class BlockStructureModel(TimeStampedModel):
         Returns a string representation of this model.
         """
         return ', '.join(
-            '{}: {}'.format(field_name, str(getattr(self, field_name)))
+            f'{field_name}: {str(getattr(self, field_name))}'
             for field_name in self.UNIQUENESS_FIELDS
         )
 
