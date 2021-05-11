@@ -26,6 +26,7 @@ from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
+    is_on_certificate_allowlist as _is_on_certificate_allowlist,
     is_using_v2_course_certificates as _is_using_v2_course_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
@@ -675,7 +676,7 @@ def is_on_allowlist(user, course_key):
     Determines if a learner has an active allowlist entry for a given course-run.
     """
     log.info(f"Checking if student {user.id} is on the allowlist in course {course_key}")
-    return CertificateWhitelist.objects.filter(user=user, course_id=course_key, whitelist=True).exists()
+    return _is_on_certificate_allowlist(user, course_key)
 
 
 def can_be_added_to_allowlist(user, course_key):

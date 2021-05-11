@@ -2,11 +2,10 @@
 Extremely basic tests for the cert_whitelist command
 """
 import pytest
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import call_command
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from lms.djangoapps.certificates.models import CertificateWhitelist
+from lms.djangoapps.certificates.api import is_on_allowlist
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -59,19 +58,16 @@ class CertAllowlistManagementCommandTests(ModuleStoreTestCase):
             "-c",
             f"{self.course_run_key}")
 
-        allowlist_entry_1 = CertificateWhitelist.objects.get(user_id=self.user.id, course_id=self.course_run_key)
-        assert allowlist_entry_1.user_id == self.user.id
-        assert allowlist_entry_1.course_id == self.course_run_key
+        assert is_on_allowlist(self.user, self.course_run_key)
 
-        allowlist_entry_2 = CertificateWhitelist.objects.get(user_id=self.user2.id, course_id=self.course_run_key)
-        assert allowlist_entry_2.user_id == self.user2.id
-        assert allowlist_entry_2.course_id == self.course_run_key
+        assert is_on_allowlist(self.user2, self.course_run_key)
 
     def test_allowlist_removal(self):
         """
         Verify an allowlist entry can be removed using the management command.
         """
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        assert is_on_allowlist(self.user, self.course_run_key)
 
         call_command(
             "cert_whitelist",
@@ -80,9 +76,7 @@ class CertAllowlistManagementCommandTests(ModuleStoreTestCase):
             "-c",
             f"{self.course_run_key}")
 
-        with pytest.raises(ObjectDoesNotExist) as error:
-            CertificateWhitelist.objects.get(user=self.user, course_id=self.course_run_key)
-        assert str(error.value) == "CertificateWhitelist matching query does not exist."
+        assert not is_on_allowlist(self.user, self.course_run_key)
 
     def test_bad_user_account(self):
         """
@@ -90,6 +84,4 @@ class CertAllowlistManagementCommandTests(ModuleStoreTestCase):
         """
         call_command("cert_whitelist", "--add", f"gumby,{self.user.username}", "-c", f"{self.course_run_key}")
 
-        allowlist_entry_1 = CertificateWhitelist.objects.get(user_id=self.user.id, course_id=self.course_run_key)
-        assert allowlist_entry_1.user_id == self.user.id
-        assert allowlist_entry_1.course_id == self.course_run_key
+        assert is_on_allowlist(self.user, self.course_run_key)
