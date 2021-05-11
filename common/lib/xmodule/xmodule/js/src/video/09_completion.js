@@ -86,6 +86,13 @@
                     self.handleTimeUpdate(currentTime);
                 });
 
+                /** Event handler to receive youtube metadata (if we even are a youtube link),
+                 *  and mark complete, if youtube will insist on hosting the video itself.
+                 */
+                this.state.el.on('metadata_received', function() {
+                    self.checkMetadata();
+                });
+
                 /** Event handler to clean up resources when the video player
                  *  is destroyed.
                  */
@@ -123,6 +130,21 @@
 
                 if (currentTime > this.completeAfterTime) {
                     this.markCompletion(currentTime);
+                }
+            },
+
+            /** Handler to call when youtube metadata is received */
+            checkMetadata: function() {
+                var metadata = this.state.metadata[this.state.youtubeId()];
+
+                // https://developers.google.com/youtube/v3/docs/videos#contentDetails.contentRating.ytRating
+                if (metadata && metadata.contentRating && metadata.contentRating.ytRating === 'ytAgeRestricted') {
+                    // Age-restricted videos won't play in embedded players. Instead, they ask you to watch it on
+                    // youtube itself. Which means we can't notice if they complete it. Rather than leaving an
+                    // incompletable video in the course, let's just mark it complete right now.
+                    if (!this.isComplete) {
+                        this.markCompletion();
+                    }
                 }
             },
 

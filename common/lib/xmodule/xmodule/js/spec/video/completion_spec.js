@@ -67,5 +67,20 @@
             state.el.trigger('ended');
             expect(state.completionHandler.markCompletion).toHaveBeenCalled();
         });
+
+        it('calls the completion api if the video is age restricted', function() {
+            spyOn(state, 'youtubeId').and.returnValue('fakeYouTubeID');
+            spyOn(state.completionHandler, 'markCompletion').and.callThrough();
+            state.metadata = {fakeYouTubeID: {contentRating: {}}};
+
+            // Check metadata once with no content rating and it should not be marked complete
+            state.el.trigger('metadata_received');
+            expect(state.completionHandler.markCompletion).not.toHaveBeenCalled();
+
+            // But with age restricted rating, it will be completed immediately
+            state.metadata.fakeYouTubeID.contentRating.ytRating = 'ytAgeRestricted';
+            state.el.trigger('metadata_received');
+            expect(state.completionHandler.markCompletion).toHaveBeenCalled();
+        });
     });
 }).call(this);
