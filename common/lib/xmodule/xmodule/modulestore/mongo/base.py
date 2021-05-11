@@ -1139,7 +1139,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             course_query = location.to_deprecated_son('_id.')
             for key in course_query.keys():
                 if isinstance(course_query[key], str):
-                    course_query[key] = re.compile(fr"(?i)^{course_query[key]}$")
+                    course_query[key] = re.compile(r"(?i)^{}$".format(course_query[key]))
         else:
             course_query = {'_id': location.to_deprecated_son()}
         course = self.collection.find_one(course_query, projection={'_id': True})
@@ -1346,7 +1346,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if block_type == 'course':
                 block_id = course_key.run
             else:
-                block_id = f'{block_type}_{uuid4().hex[:5]}'
+                block_id = '{}_{}'.format(block_type, uuid4().hex[:5])
 
         if runtime is None:
             services = {}
@@ -1411,7 +1411,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if block_type == 'course':
                 block_id = course_key.run
             else:
-                block_id = f'{block_type}_{uuid4().hex[:5]}'
+                block_id = '{}_{}'.format(block_type, uuid4().hex[:5])
 
         runtime = kwargs.pop('runtime', None)
         xblock = self.create_xblock(runtime, course_key, block_type, block_id, **kwargs)
@@ -1670,7 +1670,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 if len(non_orphan_parents) > 1:  # lint-amnesty, pylint: disable=no-else-raise
                     # should never have multiple PUBLISHED parents
                     raise ReferentialIntegrityError(
-                        f"{len(parents)} parents claim {location}"
+                        "{} parents claim {}".format(len(parents), location)
                     )
                 else:
                     return cache_and_return(non_orphan_parents[0].replace(run=location.course_key.run))
