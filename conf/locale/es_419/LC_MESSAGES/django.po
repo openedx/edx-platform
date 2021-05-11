@@ -7966,7 +7966,7 @@ msgstr "Descarga de Datos"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
-msgstr "Analíticas"
+msgstr "Analítica"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Open Responses"
@@ -19025,7 +19025,7 @@ msgid ""
 "For analytics about your course, go to "
 "{link_start}{analytics_dashboard_name}{link_end}."
 msgstr ""
-"Para ver información analítica de su curso, visite {link_start} "
+"Para visualizar el comportamiento de su curso, visite el nuevo {link_start} "
 "{analytics_dashboard_name} {link_end}."
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
