@@ -9,11 +9,9 @@ from unittest.mock import patch
 import ddt
 from django.conf import settings
 from edx_proctoring.api import get_all_exams_for_course, get_review_policy_by_exam_id
-from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
-from cms.djangoapps.contentstore.config.waffle import ENABLE_ASYNC_REGISTER_EXAMS
 from common.djangoapps.student.tests.factories import UserFactory
 from common.lib.xmodule.xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -102,9 +100,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             is_onboarding_exam=is_onboarding_exam,
         )
 
-        with patch('cms.djangoapps.contentstore.tasks.update_special_exams_and_publish') as mock_task:
-            listen_for_course_publish(self, self.course.id)
-            mock_task.delay.assert_not_called()
+        listen_for_course_publish(self, self.course.id)
 
         self._verify_exam_data(sequence, True)
 
@@ -319,7 +315,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         exams = get_all_exams_for_course(str(self.course.id))
         assert exams[0]['due_date'] is not None
 
-    @override_waffle_flag(ENABLE_ASYNC_REGISTER_EXAMS, active=True)
     def test_async_waffle_flag_publishes(self):
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         sequence = ItemFactory.create(
@@ -341,7 +336,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(len(exams), 1)
         self._verify_exam_data(sequence, True)
 
-    @override_waffle_flag(ENABLE_ASYNC_REGISTER_EXAMS, active=True)
     def test_async_waffle_flag_task(self):
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         ItemFactory.create(

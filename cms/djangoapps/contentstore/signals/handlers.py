@@ -14,17 +14,14 @@ from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer
 )
-from cms.djangoapps.contentstore.proctoring import register_special_exams
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.module_utils import yield_dynamic_descriptor_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
-from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore.django import SignalHandler, modulestore
 
 from .signals import GRADING_POLICY_CHANGED
-from ..config.waffle import ENABLE_ASYNC_REGISTER_EXAMS
 
 log = logging.getLogger(__name__)
 
@@ -52,34 +49,25 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     registering proctored exams, building up credit requirements, and performing
     search indexing
     """
-    is_enabled = ENABLE_ASYNC_REGISTER_EXAMS.is_enabled(course_key)
-    if is_enabled:
-        from cms.djangoapps.contentstore.tasks import update_special_exams_and_publish
-        course_key_str = str(course_key)
-        update_special_exams_and_publish.delay(course_key_str)
-    else:
-        # first is to registered exams, the credit subsystem will assume that
-        # all proctored exams have already been registered, so we have to do that first
-        try:
-            register_special_exams(course_key)
-        # pylint: disable=broad-except
-        except Exception as exception:
-            log.exception(exception)
-
-        # then call into the credit subsystem (in /openedx/djangoapps/credit)
-        # to perform any 'on_publish' workflow
-        on_course_publish(course_key)
-
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
-    from cms.djangoapps.contentstore.tasks import update_outline_from_modulestore_task, update_search_index
+    from cms.djangoapps.contentstore.tasks import (
+        update_outline_from_modulestore_task,
+        update_search_index,
+        update_special_exams_and_publish
+    )
+
+    # register special exams asynchronously
+    course_key_str = str(course_key)
+    update_special_exams_and_publish.delay(course_key_str)
+
     if key_supports_outlines(course_key):
         # Push the course outline to learning_sequences asynchronously.
-        update_outline_from_modulestore_task.delay(str(course_key))
+        update_outline_from_modulestore_task.delay(course_key_str)
 
     # Finally call into the course search subsystem
     # to kick off an indexing action
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        update_search_index.delay(str(course_key), datetime.now(UTC).isoformat())
+        update_search_index.delay(course_key_str, datetime.now(UTC).isoformat())
 
 
 @receiver(SignalHandler.library_updated)
