@@ -131,7 +131,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             expected_messages.append('mkdir_p ' + repr(TEST_THEME_DIR / 'lms/static/css'))
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    f'rm -rf {str(TEST_THEME_DIR)}/lms/static/css/*.css'
                 )
             expected_messages.append("libsass lms/static/sass")
             expected_messages.append(
@@ -148,10 +148,10 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             )
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/lms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    f'rm -rf {str(TEST_THEME_DIR)}/lms/static/css/*.css'
                 )
             expected_messages.append(
-                'libsass {test_theme_dir}/lms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
+                f'libsass {str(TEST_THEME_DIR)}/lms/static/sass'
             )
             if force:
                 expected_messages.append('rm -rf lms/static/css/*.css')
@@ -171,7 +171,7 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             expected_messages.append('mkdir_p ' + repr(TEST_THEME_DIR / 'cms/static/css'))
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    f'rm -rf {str(TEST_THEME_DIR)}/cms/static/css/*.css'
                 )
             expected_messages.append('libsass cms/static/sass')
             expected_messages.append(
@@ -182,10 +182,10 @@ class TestPaverThemeAssetTasks(PaverTestCase):
             )
             if force:
                 expected_messages.append(
-                    'rm -rf {test_theme_dir}/cms/static/css/*.css'.format(test_theme_dir=str(TEST_THEME_DIR))
+                    f'rm -rf {str(TEST_THEME_DIR)}/cms/static/css/*.css'
                 )
             expected_messages.append(
-                'libsass {test_theme_dir}/cms/static/sass'.format(test_theme_dir=str(TEST_THEME_DIR))
+                f'libsass {str(TEST_THEME_DIR)}/cms/static/sass'
             )
             if force:
                 expected_messages.append('rm -rf cms/static/css/*.css')

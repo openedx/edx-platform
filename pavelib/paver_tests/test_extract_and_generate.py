@@ -109,7 +109,7 @@ class TestGenerate(TestCase):
         pof = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
         match = pattern.findall(pof.header)
-        assert len(match) == 3, ('Found {} (should be 3) merge comments in the header for {}'.format(len(match), path))
+        assert len(match) == 3, (f'Found {len(match)} (should be 3) merge comments in the header for {path}')
 
 
 def random_name(size=6):

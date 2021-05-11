@@ -77,7 +77,7 @@ def main(log_file, test_suite, fast, verbose):
 
     test_list_with_failures, pytest_command = _find_fewest_tests_with_failures(failing_test_list, 'ALL')
     if test_list_with_failures:
-        print('Found failures running {} tests.'.format(len(test_list_with_failures)))
+        print(f'Found failures running {len(test_list_with_failures)} tests.')
         print(f'Use: {pytest_command}')
         return
 
@@ -102,7 +102,7 @@ def _strip_console_for_tests_with_failure(log_file, test_suite):
     worker_test_dict = {}
     test_base_included = {}
     failing_worker_num = None
-    with open(log_file, 'r') as console_file:
+    with open(log_file) as console_file:
         for line in console_file:
             regex_search = re.search(fr'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)', line)
             if regex_search:
@@ -159,7 +159,7 @@ def _create_and_check_test_files_for_failures(test_list, test_type):
 
     Returns the pytest command to run if failures are found.
     """
-    print("Testing {}, includes {} test(s)...".format(test_type, len(test_list)))
+    print(f"Testing {test_type}, includes {len(test_list)} test(s)...")
     global test_suite_option
     output_file_name = "{}_failing_test_list_{}_{}.txt".format(
         OUTPUT_FOLDER_NAME, test_suite_option, test_type, len(test_list)

@@ -30,7 +30,7 @@ import click
 )
 def main(log_file, test_suite):
     worker_test_dict = {}
-    with open(log_file, 'r') as console_file:
+    with open(log_file) as console_file:
         for line in console_file:
             regex_search = re.search(fr'\[gw(\d+)] (PASSED|FAILED|SKIPPED|ERROR) (\S+)', line)
             if regex_search:

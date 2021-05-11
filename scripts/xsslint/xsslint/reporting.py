@@ -289,7 +289,7 @@ class SummaryResults:
             print("", file=out)
             for rule_id in sorted(self.totals_by_rule.keys()):
                 padding = " " * (max_rule_id_len - len(rule_id))
-                print("{}: {}{} violations".format(rule_id, padding, self.totals_by_rule[rule_id]), file=out)
+                print(f"{rule_id}: {padding}{self.totals_by_rule[rule_id]} violations", file=out)
             print("", file=out)
 
         # matches output of eslint for simplicity
