@@ -10,13 +10,13 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-def emit_certificate_event(event_name, user, course_id, course=None, event_data=None):
+def emit_certificate_event(event_name, user, course_id, course_overview=None, event_data=None):
     """
     Emits certificate event.
 
@@ -24,10 +24,12 @@ def emit_certificate_event(event_name, user, course_id, course=None, event_data=
     https://github.com/edx/edx-documentation/blob/master/en_us/data/source/internal_data_formats/tracking_logs/student_event_types.rst # pylint: disable=line-too-long
     """
     event_name = '.'.join(['edx', 'certificate', event_name])
-    if course is None:
-        course = modulestore().get_course(course_id, depth=0)
+
+    if not course_overview:
+        course_overview = get_course_overview(course_id)
+
     context = {
-        'org_id': course.org,
+        'org_id': course_overview.org,
         'course_id': str(course_id)
     }
 
