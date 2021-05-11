@@ -2,10 +2,12 @@
 Django storage backends for Open edX.
 """
 
+import beeline
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
+from django.core.cache import caches
 from django.utils.deconstruct import deconstructible
 from django.utils.lru_cache import lru_cache
 from pipeline.storage import NonPackagingMixin
@@ -62,7 +64,31 @@ class ProductionStorage(ProductionMixin, StaticFilesStorage):
 
 
 class ProductionS3Storage(ProductionMixin, S3Boto3Storage):  # pylint: disable=abstract-method
-    pass
+
+    @beeline.traced('ProductionS3Storage.url')
+    def url(self, name, force=False):
+        """
+        Return the non-hashed URL in DEBUG mode with cache support.
+
+        Tahoe: RED-1961 This method is created for Tahoe to address mysteriously missing cache.
+        """
+        beeline.add_context_field('ProductionS3Storage.file_name', name)
+        beeline.add_context_field('ProductionS3Storage.force', force)
+
+        static_files_cache = caches['staticfiles']
+        cache_entry_name = 'ProductionS3Storage.staticfiles_cache.{}'.format(name)
+        beeline.add_context_field('ProductionS3Storage.staticfiles_cache', cache_entry_name)
+
+        url = static_files_cache.get(cache_entry_name)
+        if not url:
+            beeline.add_context_field('ProductionS3Storage.cached', False)
+            url = super().url(name, force)
+            static_files_cache.set(cache_entry_name, url)
+        else:
+            beeline.add_context_field('ProductionS3Storage.cached', True)
+
+        beeline.add_context_field('ProductionS3Storage.hashed_url', url)
+        return url
 
 
 class DevelopmentStorage(
