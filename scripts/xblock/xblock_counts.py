@@ -383,4 +383,4 @@ if __name__ == "__main__":
     if len(course_data) > 0:
         write_block_summary_report(course_data)
         write_course_block_detail_report(course_data)
-    print('Start time: {} Total run time: {}'.format(str(start_time), str(datetime.now() - start_time)))
+    print(f'Start time: {str(start_time)} Total run time: {str(datetime.now() - start_time)}')

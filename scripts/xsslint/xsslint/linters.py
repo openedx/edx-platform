@@ -53,7 +53,7 @@ class BaseLinter:
             A string containing the files contents.
 
         """
-        with open(file_full_path, 'r') as input_file:
+        with open(file_full_path) as input_file:
             file_contents = input_file.read()
             return file_contents
 
