@@ -511,26 +511,36 @@ def activate_account(request, key):
     # If not, the templates wouldn't be needed for cms, but we still need a way to activate for cms tests.
     monitoring_utils.set_custom_attribute('student_activate_account', 'lms')
     activation_message_type = None
+
+    invalid_message = HTML(_(
+        '{html_start}Your account could not be activated{html_end}'
+        'Something went wrong, please <a href="{support_url}">contact support</a> to resolve this issue.'
+    )).format(
+        support_url=configuration_helpers.get_value(
+            'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
+        ) or settings.SUPPORT_SITE_LINK,
+        html_start=HTML('<p class="message-title">'),
+        html_end=HTML('</p>'),
+    )
+
     try:
         registration = Registration.objects.get(activation_key=key)
     except (Registration.DoesNotExist, Registration.MultipleObjectsReturned):
         activation_message_type = 'error'
         messages.error(
             request,
-            HTML(_(
-                '{html_start}Your account could not be activated{html_end}'
-                'Something went wrong, please <a href="{support_url}">contact support</a> to resolve this issue.'
-            )).format(
-                support_url=configuration_helpers.get_value(
-                    'ACTIVATION_EMAIL_SUPPORT_LINK', settings.ACTIVATION_EMAIL_SUPPORT_LINK
-                ) or settings.SUPPORT_SITE_LINK,
-                html_start=HTML('<p class="message-title">'),
-                html_end=HTML('</p>'),
-            ),
+            invalid_message,
             extra_tags='account-activation aa-icon'
         )
     else:
-        if registration.user.is_active:
+        if request.user.is_authenticated and request.user.id != registration.user.id:
+            activation_message_type = 'error'
+            messages.error(
+                request,
+                invalid_message,
+                extra_tags='account-activation aa-icon'
+            )
+        elif registration.user.is_active:
             activation_message_type = 'info'
             messages.info(
                 request,
