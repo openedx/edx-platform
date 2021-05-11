@@ -3,25 +3,21 @@ Signal handlers for course goals.
 """
 
 
-from django.db import models
+from django.db.models.signals import post_save
 from django.dispatch import receiver
+from eventtracking import tracker
 
-from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import CourseEnrollment
-
-from .api import add_course_goal, remove_course_goal
-from .models import GOAL_KEY_CHOICES
+from common.djangoapps.track import segment
+from lms.djangoapps.course_goals.models import CourseGoal
 
 
-@receiver(models.signals.post_save, sender=CourseEnrollment, dispatch_uid="update_course_goal_on_enroll_change")
-def update_course_goal_on_enroll_change(sender, instance, **kwargs):  # pylint: disable=unused-argument
-    """
-    Updates goals as follows on enrollment changes:
-    1) Set the course goal to 'certify' when the user enrolls as a verified user.
-    2) Remove the course goal when the user's enrollment is no longer active.
-    """
-    course_id = str(instance.course_id)
-    if not instance.is_active:
-        remove_course_goal(instance.user, course_id)
-    elif instance.mode == CourseMode.VERIFIED:
-        add_course_goal(instance.user, course_id, GOAL_KEY_CHOICES.certify)
+@receiver(post_save, sender=CourseGoal, dispatch_uid="emit_course_goals_event")
+def emit_course_goal_event(sender, instance, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    """Emit events for both tracking logs and for Segment."""
+    name = 'edx.course.goal.added' if kwargs.get('created', False) else 'edx.course.goal.updated'
+    properties = {
+        'courserun_key': str(instance.course_key),
+        'goal_key': instance.goal_key,
+    }
+    tracker.emit(name, properties)
+    segment.track(instance.user.id, name, properties)
