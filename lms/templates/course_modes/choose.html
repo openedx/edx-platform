@@ -77,10 +77,6 @@ from openedx.core.djangolib.markup import HTML, Text
                         </h3>
                     </header>
 
-                    % if offer_banner_fragment:
-                        ${HTML(offer_banner_fragment.content)}
-                    % endif
-
                     <form class="form-register-choose" method="post" name="enrollment_mode_form" id="enrollment_mode_form">
                         <%
                         b_tag_kwargs = {'b_start': HTML('<b>'), 'b_end': HTML('</b>')}

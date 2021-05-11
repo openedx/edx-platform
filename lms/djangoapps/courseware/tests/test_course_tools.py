@@ -15,7 +15,6 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
