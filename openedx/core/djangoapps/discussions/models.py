@@ -2,6 +2,7 @@
 Provide django models to back the discussions app
 """
 from __future__ import annotations
+
 import logging
 from enum import Enum
 
@@ -10,12 +11,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 from jsonfield import JSONField
+from lti_consumer.models import LtiConfiguration
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
-
-from lti_consumer.models import LtiConfiguration
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -52,8 +52,8 @@ class Features(Enum):
     RESEARCH_DATA_EVENTS = 'research_data_events'
     SIMPLIFIED_IN_CONTEXT_DISCUSSION = 'simplified_in_context_discussion'
     USER_MENTIONS = 'user_mentions'
-    WCAG_2_1 = 'wcag-2.1'
-    WCAG_2_0_SUPPORT = 'wcag_2_0_support'
+    WCAG_2_1 = 'wcag_2.1'
+    WCAG_2_0_SUPPORT = 'wcag_2.0_support'
 
 PROVIDER_FEATURE_MAP = {
     'legacy': [

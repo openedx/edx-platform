@@ -3,17 +3,16 @@ Handle view-logic for the djangoapp
 """
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from rest_framework import serializers
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import serializers
 
 from common.djangoapps.student.roles import CourseStaffRole
-
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+
 from .models import DiscussionsConfiguration
 from .serializers import DiscussionsConfigurationSerializer
 
@@ -59,7 +58,6 @@ class DiscussionsConfigurationView(APIView):
         course_key = _validate_course_key(course_key_string)
         configuration = DiscussionsConfiguration.get(course_key)
         serializer = DiscussionsConfigurationSerializer(configuration)
-        # breakpoint()
         return Response(serializer.data)
 
     def post(self, request, course_key_string: str, **_kwargs) -> Response:

@@ -2,15 +2,15 @@
 Serializers for Discussion views.
 """
 
-from rest_framework import serializers
 from lti_consumer.models import LtiConfiguration
+from rest_framework import serializers
 
-from openedx.core.lib.courses import get_course_by_id
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from lms.djangoapps.discussion.rest_api.serializers import DiscussionSettingsSerializer
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
-from .models import DiscussionsConfiguration, DEFAULT_PROVIDER_TYPE, Features, PROVIDER_FEATURE_MAP
+from .models import DEFAULT_PROVIDER_TYPE, PROVIDER_FEATURE_MAP, DiscussionsConfiguration, Features
 
 
 class LtiSerializer(serializers.ModelSerializer):
