@@ -38,7 +38,7 @@ def test_webinar_description_view_valid_pk(mock_select_template, user_client):
     Test webinar description with valid pk
     """
     _, client = user_client
-    webinar = WebinarFactory(status=Webinar.CANCELLED)
+    webinar = WebinarFactory(is_cancelled=False)
 
     client.get(reverse('webinar_event', kwargs={'pk': webinar.id}))
 

@@ -8,7 +8,6 @@ import pytest
 
 from openedx.adg.lms.webinars.constants import BANNER_MAX_SIZE
 from openedx.adg.lms.webinars.models import Webinar
-from openedx.adg.lms.webinars.tests.factories import WebinarFactory
 
 
 @pytest.mark.django_db
@@ -73,19 +72,29 @@ def test_delete_single_webinar(mocker, webinar):
     """
     mocker.patch('openedx.adg.lms.webinars.models.send_cancellation_emails_for_given_webinars')
     webinar.delete()
-    assert webinar.status == Webinar.CANCELLED
+    assert webinar.is_cancelled
 
 
 @pytest.mark.django_db
-def test_delete_multiple_webinars(mocker):
+def test_delete_multiple_webinars(mocker, webinar, delivered_webinar):
     """
     Test deleting a queryset of webinars to check if the WebinarQuerySet.delete() method works as expected
     """
     mocker.patch('openedx.adg.lms.webinars.models.send_cancellation_emails_for_given_webinars')
-    test_webinar1 = WebinarFactory(status=Webinar.DELIVERED)
-    test_webinar2 = WebinarFactory(status=Webinar.UPCOMING)
 
-    Webinar.objects.filter(id__in=[test_webinar1.id, test_webinar2.id]).delete()
+    Webinar.objects.filter(id__in=[delivered_webinar.id, webinar.id]).delete()
 
-    assert Webinar.objects.filter(id=test_webinar1.id).first().status == Webinar.CANCELLED
-    assert Webinar.objects.filter(id=test_webinar2.id).first().status == Webinar.CANCELLED
+    assert Webinar.objects.filter(id=delivered_webinar.id).first().is_cancelled
+    assert Webinar.objects.filter(id=webinar.id).first().is_cancelled
+
+
+@pytest.mark.django_db
+def test_upcoming_webinars(webinar, delivered_webinar):  # pylint: disable=unused-argument
+    assert Webinar.objects.upcoming_webinars().count() == 1
+    assert Webinar.objects.upcoming_webinars().first() == webinar
+
+
+@pytest.mark.django_db
+def test_delivered_webinars(webinar, delivered_webinar):  # pylint: disable=unused-argument
+    assert Webinar.objects.delivered_webinars().count() == 1
+    assert Webinar.objects.delivered_webinars().first() == delivered_webinar

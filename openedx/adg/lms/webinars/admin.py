@@ -4,12 +4,12 @@ Registering models for webinars app.
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.lms.applications.admin import adg_admin_site
 
+from .constants import WEBINAR_STATUS_CANCELLED, WEBINAR_STATUS_DELIVERED, WEBINAR_STATUS_UPCOMING
 from .forms import WebinarForm
 from .helpers import (
     remove_emails_duplicate_in_other_list,
@@ -31,16 +31,16 @@ class ActiveWebinarStatusFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            (Webinar.UPCOMING, _('Upcoming')),
-            (Webinar.DELIVERED, _('Delivered')),
+            (Webinar.UPCOMING, WEBINAR_STATUS_UPCOMING),
+            (Webinar.DELIVERED, WEBINAR_STATUS_DELIVERED),
         )
 
     def queryset(self, request, queryset):
         if self.value() == Webinar.UPCOMING:
-            return queryset.filter(status=Webinar.UPCOMING)
+            return queryset.upcoming_webinars()
 
         if self.value() == Webinar.DELIVERED:
-            return queryset.filter(status=Webinar.DELIVERED)
+            return queryset.delivered_webinars()
 
 
 class WebinarAdminBase(admin.ModelAdmin):
@@ -48,8 +48,25 @@ class WebinarAdminBase(admin.ModelAdmin):
     Base Model admin for webinars i.e Cancelled Webinars and Non-Cancelled Webinars
     """
 
+    def webinar_status(self, webinar):
+        """
+        Method field to show webinar status.
+
+        Args:
+            webinar (Webinar): Current webinar object
+
+        Returns:
+            string: Webinar status either `Upcoming` or `Delivered`
+        """
+        if webinar.is_cancelled:
+            return WEBINAR_STATUS_CANCELLED
+        elif not webinar.id or webinar.is_upcoming_webinar:
+            return WEBINAR_STATUS_UPCOMING
+        return WEBINAR_STATUS_DELIVERED
+
     save_as = True
-    list_display = ('title', 'start_time', 'presenter', 'status',)
+    exclude = ('is_cancelled',)
+    list_display = ('title', 'start_time', 'presenter', 'webinar_status',)
     raw_id_fields = ('presenter', 'co_hosts', 'panelists')
     search_fields = ('title',)
     filter_horizontal = ('co_hosts', 'panelists',)
@@ -61,7 +78,7 @@ class WebinarAdmin(WebinarAdminBase):
     """
 
     list_filter = ('start_time', 'language', ActiveWebinarStatusFilter)
-    readonly_fields = ('created_by', 'modified_by', 'status',)
+    readonly_fields = ('created_by', 'modified_by', 'webinar_status',)
 
     form = WebinarForm
 
@@ -120,7 +137,7 @@ class WebinarAdmin(WebinarAdminBase):
 
     def get_queryset(self, request):
         qs = super(WebinarAdmin, self).get_queryset(request)
-        return qs.filter(~Q(status=Webinar.CANCELLED))
+        return qs.filter(is_cancelled=False)
 
 
 class CancelledWebinarAdmin(WebinarAdminBase):
@@ -128,11 +145,13 @@ class CancelledWebinarAdmin(WebinarAdminBase):
     Model admin for cancelled webinar
     """
 
+    readonly_fields = ('webinar_status',)
+
     save_as = False
 
     def get_queryset(self, request):
         qs = super(CancelledWebinarAdmin, self).get_queryset(request)
-        return qs.filter(status=Webinar.CANCELLED)
+        return qs.filter(is_cancelled=True)
 
     def has_delete_permission(self, request, obj=None):
         return False

@@ -30,16 +30,32 @@ from .managers import WebinarRegistrationManager
 
 class WebinarQuerySet(models.QuerySet):
     """
-    Custom QuerySet that does not allow Webinars to be deleted from the database, instead marks the status of the
-    deleted Webinars as `Cancelled`
+    Class contains custom querySet methods for webinars
     """
 
     def delete(self):
-        cancelled_upcoming_webinars = self.filter(
-            status=Webinar.UPCOMING).select_related('presenter').prefetch_related('co_hosts', 'panelists')
+        """
+        Overriding delete method so that it does not allow Webinars to be deleted from the database,
+        instead marks the status of the deleted Webinars as `Cancelled`
+        """
+        cancelled_upcoming_webinars = self.upcoming_webinars().select_related('presenter').prefetch_related(
+            'co_hosts', 'panelists'
+        )
         send_cancellation_emails_for_given_webinars(cancelled_upcoming_webinars)
         cancel_reminders_for_given_webinars(cancelled_upcoming_webinars)
-        self.update(status=Webinar.CANCELLED)
+        self.update(is_cancelled=True)
+
+    def upcoming_webinars(self):
+        """
+        Filter queryset to display upcoming webinars
+        """
+        return self.filter(is_cancelled=False, end_time__gte=now())
+
+    def delivered_webinars(self):
+        """
+        Filter queryset to display delivered webinars
+        """
+        return self.filter(is_cancelled=False, end_time__lt=now())
 
 
 class Webinar(TimeStampedModel):
@@ -63,7 +79,7 @@ class Webinar(TimeStampedModel):
         help_text=_('Accepted extensions: .png, .jpg, .jpeg, .svg'),
     )
 
-    language = models.CharField(verbose_name=_('Language'), choices=settings.LANGUAGES, max_length=2,)
+    language = models.CharField(verbose_name=_('Language'), choices=settings.LANGUAGES, max_length=2, )
 
     co_hosts = models.ManyToManyField(User, verbose_name=_('Co-Hosts'), blank=True, related_name='webinar_co_hosts', )
     panelists = models.ManyToManyField(
@@ -74,15 +90,7 @@ class Webinar(TimeStampedModel):
     DELIVERED = 'delivered'
     CANCELLED = 'cancelled'
 
-    STATUS_CHOICES = (
-        (UPCOMING, _('Upcoming')),
-        (DELIVERED, _('Delivered')),
-        (CANCELLED, _('Cancelled'))
-    )
-    status = models.CharField(
-        verbose_name=_('Webinar Status'), choices=STATUS_CHOICES, max_length=10, default=UPCOMING,
-    )
-
+    is_cancelled = models.BooleanField(default=False, verbose_name=_('Is Event Cancelled'), )
     created_by = models.ForeignKey(
         User, verbose_name=_('Created By'), on_delete=models.CASCADE, blank=True, related_name='webinar_created_by',
     )
@@ -102,6 +110,10 @@ class Webinar(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    @property
+    def is_upcoming_webinar(self):
+        return self.end_time > now() and not self.is_cancelled
 
     def to_dict(self):
         return {
@@ -137,10 +149,10 @@ class Webinar(TimeStampedModel):
             raise ValidationError(errors)
 
     def delete(self, *args, **kwargs):  # pylint: disable=arguments-differ, unused-argument
-        if self.status == Webinar.UPCOMING:
+        if self.is_upcoming_webinar:
             send_cancellation_emails_for_given_webinars([self])
             cancel_reminders_for_given_webinars([self])
-        self.status = self.CANCELLED
+        self.is_cancelled = True
         self.save()
 
     @classmethod
@@ -223,7 +235,7 @@ class WebinarRegistration(TimeStampedModel):
         User, verbose_name=_('Registered User'), on_delete=models.CASCADE, related_name='webinar_registrations',
     )
 
-    is_registered = models.BooleanField(default=False, verbose_name=_('Registered'),)
+    is_registered = models.BooleanField(default=False, verbose_name=_('Registered'), )
     is_team_member_registration = models.BooleanField(
         default=False, verbose_name=_('Is Presenter, Co-Host, or Panelist'),
     )

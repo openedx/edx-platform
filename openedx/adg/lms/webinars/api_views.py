@@ -39,7 +39,7 @@ class WebinarRegistrationView(APIView):
         if not webinar:
             return HttpResponseServerError(_('Webinar not found'))
 
-        if webinar.status == Webinar.CANCELLED:
+        if webinar.is_cancelled:
             return HttpResponseServerError(_('Webinar has been cancelled'))
 
         is_registering = action == 'register'
