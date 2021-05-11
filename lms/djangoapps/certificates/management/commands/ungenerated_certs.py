@@ -14,7 +14,6 @@ from pytz import UTC
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
-from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
 User = get_user_model()
@@ -91,9 +90,6 @@ class Command(BaseCommand):
         ended_courses = [course]
 
         for course_key in ended_courses:
-            # prefetch all chapters/sequentials by saying depth=2
-            course = modulestore().get_course(course_key, depth=2)
-
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_key
             )
@@ -133,7 +129,6 @@ class Command(BaseCommand):
                         generate_user_certificates(
                             student,
                             course_key,
-                            course=course,
                             insecure=options['insecure']
                         )
 

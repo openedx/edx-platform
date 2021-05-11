@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
 LOGGER = logging.getLogger(__name__)
 
@@ -92,10 +92,9 @@ class Command(BaseCommand):
         course_cache = {}
         resubmit_count = 0
         for user, course_key in resubmit_list:
-            course = self._load_course_with_cache(course_key, course_cache)
-
-            if course is not None:
-                generate_user_certificates(user, course_key, course=course)
+            course_overview = self._load_course_overview_with_cache(course_key, course_cache)
+            if course_overview:
+                generate_user_certificates(user, course_key)
                 resubmit_count += 1
                 LOGGER.info(
                     (
@@ -113,11 +112,11 @@ class Command(BaseCommand):
 
         LOGGER.info("Finished resubmitting %s certificate tasks", resubmit_count)
 
-    def _load_course_with_cache(self, course_key, course_cache):
-        """Retrieve the course, then cache it to avoid Mongo queries. """
-        course = (
+    def _load_course_overview_with_cache(self, course_key, course_cache):
+        """Retrieve the course-overview for the given course-key and store it."""
+        course_overview = (
             course_cache[course_key] if course_key in course_cache
-            else modulestore().get_course(course_key, depth=0)
+            else get_course_overview(course_key)
         )
-        course_cache[course_key] = course
-        return course
+        course_cache[course_key] = course_overview
+        return course_overview

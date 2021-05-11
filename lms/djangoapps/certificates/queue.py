@@ -27,7 +27,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
 LOGGER = logging.getLogger(__name__)
 
@@ -253,12 +253,6 @@ class XQueueCertInterface:
             )
             return None
 
-        # The caller can optionally pass a course in to avoid
-        # re-fetching it from Mongo. If they have not provided one,
-        # get it from the modulestore.
-        if course is None:
-            course = modulestore().get_course(course_id, depth=0)
-
         profile = UserProfile.objects.get(user=student)
         profile_name = profile.name
 
@@ -267,7 +261,7 @@ class XQueueCertInterface:
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        course_grade = CourseGradeFactory().read(student, course)
+        course_grade = CourseGradeFactory().read(student, course_key=course_id)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = IDVerificationService.user_is_verified(student)
@@ -400,14 +394,15 @@ class XQueueCertInterface:
             return cert
 
         # Finally, generate the certificate and send it off.
-        return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf)
+        return self._generate_cert(cert, student, grade_contents, template_pdf, generate_pdf)
 
-    def _generate_cert(self, cert, course, student, grade_contents, template_pdf, generate_pdf):
+    def _generate_cert(self, cert, student, grade_contents, template_pdf, generate_pdf):
         """
         Generate a certificate for the student. If `generate_pdf` is True,
         sends a request to XQueue.
         """
-        course_id = str(course.id)
+        course_id = str(cert.course_id)
+        course_overview = get_course_overview(course_id)
 
         key = make_hashkey(random.random())
         cert.key = key
@@ -415,7 +410,7 @@ class XQueueCertInterface:
             'action': 'create',
             'username': student.username,
             'course_id': course_id,
-            'course_name': course.display_name or course_id,
+            'course_name': course_overview.display_name or course_id,
             'name': cert.name,
             'grade': grade_contents,
             'template_pdf': template_pdf,
