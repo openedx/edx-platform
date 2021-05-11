@@ -51,6 +51,7 @@ def webinar_registration_admin_fixture():
     site = AdminSite()
     return WebinarRegistrationAdmin(WebinarRegistration, site)
 
+
 def test_cancelled_webinar_admin_add_permission():
     """
     Test if CancelledWebinarAdmin does not have add permission
