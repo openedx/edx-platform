@@ -17,7 +17,14 @@ class CourseCardModel extends Backbone.Model {
   }
 
   getCourseRun(course) {
-    const enrolledCourseRun = course.course_runs.find(run => run.is_enrolled);
+    // A learner might have have enrolled in a course multiple times,
+    // so we want to get the enrollment with a certificate if it exists
+    // otherwise any enrolled run.
+    let enrolledCourseRun = course.course_runs.find(run => run.is_enrolled && run.certificate_url);
+    if (!enrolledCourseRun) {
+      enrolledCourseRun = course.course_runs.find(run => run.is_enrolled);
+    }
+
     const openEnrollmentCourseRuns = this.getEnrollableCourseRuns();
     let desiredCourseRun;
 
