@@ -33,7 +33,6 @@ from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_bann
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
-from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
@@ -140,7 +139,6 @@ class CourseHomeFragmentView(EdxFragmentView):
         outline_fragment = None
         update_message_fragment = None
         course_sock_fragment = None
-        offer_banner_fragment = None
         course_expiration_fragment = None
         has_visited_course = None
         resume_course_url = None
@@ -164,10 +162,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             )
             has_visited_course, resume_course_url = self._get_resume_course_info(request, course_id)
             handouts_html = self._get_course_handouts(request, course)
-            offer_banner_fragment = get_first_purchase_offer_banner_fragment(
-                request.user,
-                course_overview
-            )
             course_expiration_fragment = generate_course_expired_fragment(
                 request.user,
                 course_overview
@@ -230,7 +224,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'outline_fragment': outline_fragment,
             'handouts_html': handouts_html,
             'course_home_message_fragment': course_home_message_fragment,
-            'offer_banner_fragment': offer_banner_fragment,
             'course_expiration_fragment': course_expiration_fragment,
             'has_visited_course': has_visited_course,
             'resume_course_url': resume_course_url,
