@@ -35,7 +35,7 @@ function generateUniqueId(wordCloudId, counter) {
 * @param {jQuery} el DOM element where the word cloud will be processed and created.
 */
 export default class WordCloudMain {
-  constructor(el) {
+  constructor(el, runtime) {
     this.wordCloudEl = $(el).find('.word_cloud');
 
     // Get the URL to which we will post the users words.
@@ -51,7 +51,7 @@ export default class WordCloudMain {
     // Retriveing response from the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
-      `${this.ajax_url}/get_state`,
+      runtime.handleUrl(el, 'get_state'),
       null,
       (response) => {
         if (response.status !== 'success') {
@@ -93,7 +93,7 @@ export default class WordCloudMain {
     // Send the data to the server as an AJAX request. Attach a callback that will
     // be fired on server's response.
     $.postWithPrefix(
-      `${this.ajax_url}/submit`, $.param(data),
+      runtime.handleUrl(el, 'submit'), $.param(data),
       (response) => {
         if (response.status !== 'success') {
           return;

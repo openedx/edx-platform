@@ -13,6 +13,7 @@ import logging
 from pkg_resources import resource_string
 
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_module import EditingMixin
 from xmodule.raw_module import EmptyDataRawMixin
@@ -136,7 +137,16 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     studio_js_module_name = "MetadataOnlyEditingDescriptor"
     mako_template = "widgets/metadata-only-edit.html"
 
-    def get_state(self):
+    @property
+    def ajax_url(self):
+        return self.runtime.handler_url(self)
+
+    @XBlock.json_handler
+    def get_state(self, _data, _suffix=''):
+        """ Returns the state of the word cloud submission."""
+        self._get_state()
+
+    def _get_state(self):
         """Return success json answer for client."""
         if self.submitted:
             total_count = sum(self.all_words.values())
@@ -219,6 +229,47 @@ class WordCloudBlock(  # pylint: disable=abstract-method
             )[:amount]
         )
 
+    @XBlock.json_handler
+    def submit(self, data, _suffix=''):
+        """ Submits data to the word cloud shared by the entire course. """
+        self._submit(data)
+
+    def _submit(self, data):
+        if self.submitted:
+            return json.dumps({
+                'status': 'fail',
+                'error': 'You have already posted your data.'
+            })
+
+        # Student words from client.
+        # FIXME: we must use raw JSON, not a post data (multipart/form-data)
+        raw_student_words = data.getall('student_words[]')
+        student_words = [word for word in map(self.good_word, raw_student_words) if word]
+
+        self.student_words = student_words
+
+        # FIXME: fix this, when xblock will support mutable types.
+        # Now we use this hack.
+        # speed issues
+        temp_all_words = self.all_words
+
+        self.submitted = True
+
+        # Save in all_words.
+        for word in self.student_words:
+            temp_all_words[word] = temp_all_words.get(word, 0) + 1
+
+        # Update top_words.
+        self.top_words = self.top_dict(
+            temp_all_words,
+            self.num_top_words
+        )
+
+        # Save all_words in database.
+        self.all_words = temp_all_words
+
+        return self._get_state()
+
     def handle_ajax(self, dispatch, data):
         """Ajax handler.
 
@@ -230,42 +281,9 @@ class WordCloudBlock(  # pylint: disable=abstract-method
             json string
         """
         if dispatch == 'submit':
-            if self.submitted:
-                return json.dumps({
-                    'status': 'fail',
-                    'error': 'You have already posted your data.'
-                })
-
-            # Student words from client.
-            # FIXME: we must use raw JSON, not a post data (multipart/form-data)
-            raw_student_words = data.getall('student_words[]')
-            student_words = [word for word in map(self.good_word, raw_student_words) if word]
-
-            self.student_words = student_words
-
-            # FIXME: fix this, when xblock will support mutable types.
-            # Now we use this hack.
-            # speed issues
-            temp_all_words = self.all_words
-
-            self.submitted = True
-
-            # Save in all_words.
-            for word in self.student_words:
-                temp_all_words[word] = temp_all_words.get(word, 0) + 1
-
-            # Update top_words.
-            self.top_words = self.top_dict(
-                temp_all_words,
-                self.num_top_words
-            )
-
-            # Save all_words in database.
-            self.all_words = temp_all_words
-
-            return self.get_state()
+            self._submit(data)
         elif dispatch == 'get_state':
-            return self.get_state()
+            return self._get_state()
         else:
             return json.dumps({
                 'status': 'fail',
