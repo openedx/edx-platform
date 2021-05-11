@@ -160,44 +160,6 @@ def generate_course_expired_message(user, course):
         return HTML(upgrade_message).format(
             expiration_date=strftime_localized_html(expiration_date, 'SHORT_DATE')
         )
-    else:
-        expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
-                               '{line_break}You lose all access to this course, including your progress, on '
-                               '{expiration_date}.')
-        upgrade_deadline_message = _('{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
-                                     'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
-                                     'retain access past {expiration_date}{span_close}{a_close}')
-        full_message = expiration_message
-        if upgrade_deadline and upgrade_url:
-            full_message += upgrade_deadline_message
-            using_upgrade_messaging = True
-        else:
-            using_upgrade_messaging = False
-
-        formatted_expiration_date = strftime_localized_html(expiration_date, 'SHORT_DATE')
-        if using_upgrade_messaging:
-            formatted_upgrade_deadline = strftime_localized_html(upgrade_deadline, 'SHORT_DATE')
-
-            return HTML(full_message).format(
-                a_open=HTML('<a id="FBE_banner" href="{upgrade_link}">').format(upgrade_link=upgrade_url),
-                sronly_span_open=HTML('<span class="sr-only">'),
-                span_close=HTML('</span>'),
-                a_close=HTML('</a>'),
-                expiration_date=HTML(formatted_expiration_date),
-                strong_open=HTML('<strong>'),
-                strong_close=HTML('</strong>'),
-                line_break=HTML('<br>'),
-                upgrade_deadline=HTML(formatted_upgrade_deadline)
-            )
-
-        else:
-            return HTML(full_message).format(
-                span_close=HTML('</span>'),
-                expiration_date=HTML(formatted_expiration_date),
-                strong_open=HTML('<strong>'),
-                strong_close=HTML('</strong>'),
-                line_break=HTML('<br>'),
-            )
 
 
 def generate_course_expired_fragment(user, course):
