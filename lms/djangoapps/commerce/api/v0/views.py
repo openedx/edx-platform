@@ -150,7 +150,7 @@ class BasketsView(APIView):
                 )
             log.info(msg)
             self._enroll(course_key, user, default_enrollment_mode.slug)
-            mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR
+            mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR  # lint-amnesty, pylint: disable=unused-variable
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
         else:

@@ -2777,7 +2777,7 @@ class CodeResponse(LoncapaResponse):
         # matches
         if oldcmap.is_right_queuekey(self.answer_id, queuekey):
             # Sanity check on returned points
-            if points < 0:
+            if points < 0:  # lint-amnesty, pylint: disable=consider-using-max-builtin
                 points = 0
             # Queuestate is consumed
             oldcmap.set(

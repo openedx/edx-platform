@@ -475,7 +475,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         programs = data[:3]
         assert meter.engaged_programs == programs
 
-    def test_simulate_progress(self, mock_get_programs):
+    def test_simulate_progress(self, mock_get_programs):  # lint-amnesty, pylint: disable=too-many-statements
         """Simulate the entirety of a user's progress through a program."""
         today = datetime.datetime.now(utc)
         two_days_ago = today - datetime.timedelta(days=2)

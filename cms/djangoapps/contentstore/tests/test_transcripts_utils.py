@@ -812,7 +812,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         """
         Create srt file.
         """
-        srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
+        srt_file = tempfile.NamedTemporaryFile(suffix=".srt")  # lint-amnesty, pylint: disable=consider-using-with
         srt_file.content_type = transcripts_utils.Transcript.SRT
         srt_file.write(content)
         srt_file.seek(0)

@@ -14,7 +14,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 from openedx.core.djangoapps.courseware_api.views import CoursewareMeta
 
-from common.djangoapps.student.models import CourseEnrollment, UserCelebration
+from common.djangoapps.student.models import CourseEnrollment, UserCelebration  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_home_api.course_metadata.v1.serializers import CourseHomeMetadataSerializer
 from lms.djangoapps.courseware.access import has_access

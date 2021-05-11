@@ -2,7 +2,7 @@
 Course API Views
 """
 
-import json
+import json  # lint-amnesty, pylint: disable=unused-import
 
 from completion.exceptions import UnavailableCompletionData
 from completion.utilities import get_key_to_last_completed_block

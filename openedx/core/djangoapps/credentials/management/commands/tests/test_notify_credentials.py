@@ -8,7 +8,7 @@ from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings  # lint-amnesty, pylint: disable=unused-import
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory

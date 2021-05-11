@@ -49,7 +49,7 @@ def _create_srt_file(content=None):
     """
     content = content or SRT_content
 
-    srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
+    srt_file = tempfile.NamedTemporaryFile(suffix=".srt")  # lint-amnesty, pylint: disable=consider-using-with
     srt_file.content_type = 'application/x-subrip; charset=utf-8'
     srt_file.write(content.encode('utf-8'))
     srt_file.seek(0)
@@ -93,7 +93,7 @@ def _create_file(content=''):
     """
     Create temporary subs_somevalue.srt.sjson file.
     """
-    sjson_file = tempfile.NamedTemporaryFile(prefix="subs_", suffix=".srt.sjson")
+    sjson_file = tempfile.NamedTemporaryFile(prefix="subs_", suffix=".srt.sjson")  # lint-amnesty, pylint: disable=consider-using-with
     sjson_file.content_type = 'application/json'
     sjson_file.write(textwrap.dedent(content).encode('utf-8'))
     sjson_file.seek(0)

@@ -31,10 +31,10 @@ class Progress:  # pylint: disable=eq-without-hash
                 isinstance(b, numbers.Number)):
             raise TypeError(f'a and b must be numbers.  Passed {a}/{b}')
 
-        if a > b:
+        if a > b:  # lint-amnesty, pylint: disable=consider-using-min-builtin
             a = b
 
-        if a < 0:
+        if a < 0:  # lint-amnesty, pylint: disable=consider-using-max-builtin
             a = 0
 
         if b <= 0:

@@ -1423,7 +1423,7 @@ class MockDefaultStorage:
 
     def open(self, file_name):
         """Mock out DefaultStorage.open with standard python open"""
-        return open(file_name)  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+        return open(file_name)  # lint-amnesty, pylint: disable=bad-option-value, open-builtin  # lint-amnesty, pylint: disable=consider-using-with
 
 
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
