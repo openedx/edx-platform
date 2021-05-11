@@ -2895,9 +2895,6 @@ INSTALLED_APPS = [
 
     'openedx.core.djangoapps.user_api',
 
-    # Shopping cart
-    'lms.djangoapps.shoppingcart',
-
     # Different Course Modes
     'common.djangoapps.course_modes.apps.CourseModesConfig',
 
