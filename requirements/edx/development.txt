@@ -26,7 +26,7 @@ aniso8601==9.0.1          # via -r requirements/edx/testing.txt, edx-tincan-py35
 apipkg==1.5               # via -r requirements/edx/testing.txt, execnet
 appdirs==1.4.4            # via -r requirements/edx/testing.txt, fs, virtualenv
 astroid==2.5.6            # via -r requirements/edx/testing.txt, pylint, pylint-celery
-attrs==21.1.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
+attrs==21.2.0             # via -r requirements/edx/testing.txt, edx-ace, jsonschema, pytest
 babel==2.9.1              # via -r requirements/edx/testing.txt, enmerkar, enmerkar-underscore, sphinx
 beautifulsoup4==4.9.3     # via -r requirements/edx/testing.txt, pynliner
 billiard==3.6.4.0         # via -r requirements/edx/testing.txt, celery
@@ -137,7 +137,7 @@ enmerkar==0.7.1           # via -r requirements/edx/testing.txt, enmerkar-unders
 event-tracking==1.0.4     # via -r requirements/edx/testing.txt, edx-event-routing-backends, edx-proctoring, edx-search
 execnet==1.8.0            # via -r requirements/edx/testing.txt, pytest-xdist
 factory-boy==3.2.0        # via -r requirements/edx/testing.txt
-faker==8.1.2              # via -r requirements/edx/testing.txt, factory-boy
+faker==8.1.3              # via -r requirements/edx/testing.txt, factory-boy
 filelock==3.0.12          # via -r requirements/edx/testing.txt, tox, virtualenv
 freezegun==0.3.12         # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt
 fs-s3fs==0.1.8            # via -r requirements/edx/testing.txt, django-pyfs
@@ -182,7 +182,7 @@ mailsnake==1.6.4          # via -r requirements/edx/testing.txt
 mako==1.1.4               # via -r requirements/edx/testing.txt, acid-xblock, lti-consumer-xblock, xblock-google-drive, xblock-utils
 markdown==3.3.4           # via -r requirements/edx/testing.txt, django-wiki, staff-graded-xblock, xblock-poll
 markey==0.8               # via -r requirements/edx/testing.txt, enmerkar-underscore
-markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, mako, xblock
+markupsafe==1.1.1         # via -r requirements/edx/testing.txt, chem, jinja2, mako, sphinx, xblock
 maxminddb==1.5.4          # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, geoip2
 mccabe==0.6.1             # via -r requirements/edx/testing.txt, pylint
 mistune==0.8.4            # via m2r
@@ -195,7 +195,7 @@ mysqlclient==2.0.3        # via -r requirements/edx/testing.txt
 newrelic==6.2.0.156       # via -r requirements/edx/testing.txt, edx-django-utils
 nltk==3.6.2               # via -r requirements/edx/testing.txt, chem
 nodeenv==1.6.0            # via -r requirements/edx/testing.txt
-numpy==1.20.2             # via -r requirements/edx/testing.txt, chem, openedx-calc, scipy
+numpy==1.20.3             # via -r requirements/edx/testing.txt, chem, openedx-calc, scipy
 oauthlib==3.0.1           # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, django-oauth-toolkit, lti-consumer-xblock, requests-oauthlib, social-auth-core
 openedx-calc==2.0.1       # via -r requirements/edx/testing.txt
 ora2==3.4.1               # via -r requirements/edx/testing.txt
@@ -237,7 +237,7 @@ pytest-django==4.2.0      # via -r requirements/edx/testing.txt
 pytest-forked==1.3.0      # via -r requirements/edx/testing.txt, pytest-xdist
 pytest-json-report==1.2.4  # via -r requirements/edx/testing.txt
 pytest-metadata==1.8.0    # via -r requirements/edx/testing.txt, pytest-json-report
-pytest-randomly==3.7.0    # via -r requirements/edx/testing.txt
+pytest-randomly==3.8.0    # via -r requirements/edx/testing.txt
 pytest-xdist[psutil]==2.2.1  # via -r requirements/edx/testing.txt
 pytest==6.2.4             # via -r requirements/edx/testing.txt, pylint-pytest, pytest-attrib, pytest-cov, pytest-django, pytest-forked, pytest-json-report, pytest-metadata, pytest-randomly, pytest-xdist
 python-dateutil==2.4.0    # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, analytics-python, botocore, edx-ace, edx-drf-extensions, edx-enterprise, edx-event-routing-backends, edx-proctoring, faker, freezegun, icalendar, olxcleaner, ora2, xblock
@@ -260,7 +260,7 @@ requests==2.25.1          # via -r requirements/edx/testing.txt, analytics-pytho
 rest-condition==1.0.3     # via -r requirements/edx/testing.txt, edx-drf-extensions
 ruamel.yaml.clib==0.2.2   # via -r requirements/edx/testing.txt, ruamel.yaml
 ruamel.yaml==0.17.4       # via -r requirements/edx/testing.txt, drf-yasg
-rules==2.2                # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
+rules==3.0                # via -r requirements/edx/testing.txt, edx-enterprise, edx-proctoring
 s3transfer==0.1.13        # via -r requirements/edx/testing.txt, boto3
 sailthru-client==2.2.3    # via -r requirements/edx/testing.txt, edx-ace
 scipy==1.6.3              # via -r requirements/edx/testing.txt, chem, openedx-calc
@@ -278,7 +278,7 @@ social-auth-core==3.4.0   # via -c requirements/edx/../constraints.txt, -r requi
 sorl-thumbnail==12.7.0    # via -r requirements/edx/testing.txt, django-wiki
 sortedcontainers==2.3.0   # via -r requirements/edx/testing.txt
 soupsieve==2.2.1          # via -r requirements/edx/testing.txt, beautifulsoup4
-sphinx==3.5.4             # via edx-sphinx-theme, sphinxcontrib-httpdomain
+sphinx==4.0.1             # via edx-sphinx-theme, sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
@@ -311,7 +311,7 @@ vine==1.3.0               # via -r requirements/edx/testing.txt, amqp, celery
 virtualenv==20.4.6        # via -r requirements/edx/testing.txt, tox
 voluptuous==0.12.1        # via -r requirements/edx/testing.txt, ora2
 vulture==2.3              # via -r requirements/edx/development.in
-watchdog==2.1.0           # via -r requirements/edx/testing.txt
+watchdog==2.1.1           # via -r requirements/edx/testing.txt
 web-fragments==1.0.0      # via -r requirements/edx/testing.txt, crowdsourcehinter-xblock, edx-sga, staff-graded-xblock, xblock, xblock-utils
 webencodings==0.5.1       # via -r requirements/edx/testing.txt, bleach, html5lib
 webob==1.8.7              # via -r requirements/edx/testing.txt, xblock, xmodule
