@@ -242,3 +242,28 @@ class TestActivateAccount(TestCase):
         # Open account activation page with an invalid activation link, the query param should contain error
         response = self.client.get(reverse('activate', args=[uuid4().hex]))
         assert response.url == (login_page_url + 'error')
+
+    def test_authenticated_user_cannot_activate_another_account(self):
+        """
+        Verify that if a user is authenticated and tries to activate another account,
+        error message is shown.
+        """
+        # create a new user and registration link
+        second_user = UserFactory.create(
+            username='jack-2', email='jack-2@fake.edx.org', password='test-password', is_active=False,
+        )
+
+        registration = Registration()
+        registration.register(second_user)
+        registration.save()
+
+        # Login first user
+        self.login()
+        # Try activating second user's account
+        response = self.client.get(reverse('activate', args=[registration.activation_key]), follow=True)
+        self.assertContains(response, 'Your account could not be activated')
+
+        # verify that both users have their is_active state set to False
+        self._assert_user_active_state(expected_active_state=False)
+        second_user.refresh_from_db()
+        assert second_user.is_active is False
