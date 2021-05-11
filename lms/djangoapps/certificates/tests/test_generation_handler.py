@@ -17,8 +17,7 @@ from lms.djangoapps.certificates.generation_handler import (
     generate_allowlist_certificate_task,
     generate_certificate_task,
     generate_regular_certificate_task,
-    is_using_certificate_allowlist,
-    is_using_certificate_allowlist_and_is_on_allowlist,
+    is_on_certificate_allowlist,
     is_using_v2_course_certificates,
     _set_allowlist_cert_status,
     _set_v2_cert_status
@@ -66,21 +65,15 @@ class AllowlistTests(ModuleStoreTestCase):
         # Whitelist user
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
 
-    def test_is_using_allowlist_true(self):
+    def test_is_on_allowlist(self):
         """
-        Test the allowlist flag
+        Test the presence of the user on the allowlist
         """
-        assert is_using_certificate_allowlist(self.course_run_key)
+        assert is_on_certificate_allowlist(self.user, self.course_run_key)
 
-    def test_is_using_allowlist_and_is_on_list(self):
+    def test_is_on_allowlist_false(self):
         """
-        Test the allowlist flag and the presence of the user on the list
-        """
-        assert is_using_certificate_allowlist_and_is_on_allowlist(self.user, self.course_run_key)
-
-    def test_is_using_allowlist_and_is_on_list_true(self):
-        """
-        Test the allowlist flag and the presence of the user on the list when the user is not on the list
+        Test the absence of the user on the allowlist
         """
         u = UserFactory()
         CourseEnrollmentFactory(
@@ -90,7 +83,7 @@ class AllowlistTests(ModuleStoreTestCase):
             mode="verified",
         )
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=u, whitelist=False)
-        assert not is_using_certificate_allowlist_and_is_on_allowlist(u, self.course_run_key)
+        assert not is_on_certificate_allowlist(u, self.course_run_key)
 
     @ddt.data(
         (CertificateStatuses.deleted, True),

@@ -236,7 +236,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
         # Assert Newly created bookmark.
-        assert response.data['id'] == ('{},{}'.format(self.user.username, str(self.vertical_2.location)))
+        assert response.data['id'] == (f'{self.user.username},{str(self.vertical_2.location)}')
         assert response.data['course_id'] == self.course_id
         assert response.data['usage_id'] == str(self.vertical_2.location)
         assert response.data['created'] is not None
@@ -334,7 +334,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     def test_listed_event_for_different_page_size_values(self, mock_tracker, page_size, expected_bookmarks_count,
                                                          expected_page_size, expected_page_number):
         """ Test that edx.course.bookmark.listed event values are as expected for different page size values """
-        query_parameters = 'course_id={}&page_size={}'.format(quote(self.course_id), page_size)
+        query_parameters = f'course_id={quote(self.course_id)}&page_size={page_size}'
 
         self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
 
@@ -468,7 +468,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
         """
         Test that delete bookmark returns 204 status code with success.
         """
-        query_parameters = 'course_id={}'.format(quote(self.course_id))
+        query_parameters = f'course_id={quote(self.course_id)}'
         response = self.send_get(client=self.client, url=reverse('bookmarks'), query_parameters=query_parameters)
         bookmarks_data = response.data['results']
         assert len(bookmarks_data) == 4

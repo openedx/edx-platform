@@ -35,13 +35,16 @@ from common.djangoapps.student.models import (
     username_exists_or_retired
 )
 from common.djangoapps.util.password_policy_validators import normalize_password
-from lms.djangoapps.certificates.api import get_certificate_url, has_html_certificates_enabled
+from lms.djangoapps.certificates.api import (
+    certificates_viewable_for_course,
+    get_certificate_url,
+    has_html_certificates_enabled
+)
 from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
@@ -366,7 +369,7 @@ def _get_redirect_to(request_host, request_headers, request_params, request_is_h
             redirect_to = None
         elif mime_type:
             log.warning(
-                "Redirect to url path with specified filed type '%(mime_type)s' not allowed: '%(redirect_to)s'",
+                "Redirect to url path with specified file type '%(mime_type)s' not allowed: '%(redirect_to)s'",
                 {"redirect_to": redirect_to, "mime_type": mime_type}
             )
             redirect_to = None
@@ -396,7 +399,7 @@ def create_or_set_user_attribute_created_on_site(user, site):
     Create or Set UserAttribute indicating the site the user account was created on.
     User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
     traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
-    code which comsumes this attribute should assume a 'created_on_site' which doesn't exist
+    code which consumes this attribute should assume a 'created_on_site' which doesn't exist
     belongs to the default site.
     """
     if site and site.id != settings.SITE_ID:
@@ -696,7 +699,7 @@ def get_resume_urls_for_enrollments(user, enrollments):
         enrollments (list): a list of user enrollments
 
     Returns:
-        resume_course_urls (OrderedDict): an OrderdDict of urls
+        resume_course_urls (OrderedDict): an OrderedDict of urls
             key: CourseKey
             value: url to the last completed block
                 if the value is '', then the user has not completed any blocks in the course run

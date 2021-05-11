@@ -14,7 +14,6 @@ from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pyli
 from django.db.models import signals
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from edx_when.api import set_dates_for_course
-from mock import patch  # lint-amnesty, pylint: disable=reimported
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from edx_toggles.toggles.testutils import override_waffle_flag

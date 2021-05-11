@@ -48,9 +48,9 @@ class TestLoginHelper(TestCase):
          "Redirect to non html content 'image/*' detected from 'test/agent' after login page: '" + static_url +
          "dummy.png" + "'"),
         (logging.WARNING, "WARNING", "test.png", "text/html", None,
-         "Redirect to url path with specified filed type 'image/png' not allowed: 'test.png'"),
+         "Redirect to url path with specified file type 'image/png' not allowed: 'test.png'"),
         (logging.WARNING, "WARNING", static_url + "dummy.png", "text/html", None,
-         "Redirect to url path with specified filed type 'image/png' not allowed: '" + static_url + "dummy.png" + "'"),
+         "Redirect to url path with specified file type 'image/png' not allowed: '" + static_url + "dummy.png" + "'"),
     )
     @ddt.unpack
     def test_next_failures(self, log_level, log_name, unsafe_url, http_accept, user_agent, expected_log):

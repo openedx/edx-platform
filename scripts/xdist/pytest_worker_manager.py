@@ -100,7 +100,7 @@ class PytestWorkerManager():
                         not_running.append(instance_info['InstanceId'])
 
             if len(not_running) > 0:
-                logger.info("Still waiting on {} workers to spin up".format(len(not_running)))
+                logger.info(f"Still waiting on {len(not_running)} workers to spin up")
                 time.sleep(5)
             else:
                 logger.info("Finished spinning up workers")

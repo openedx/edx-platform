@@ -199,7 +199,8 @@
                     register: function(data) {
                         var model = new RegisterModel({}, {
                             method: data.method,
-                            url: data.submit_url
+                            url: data.submit_url,
+                            nextUrl: this.nextUrl
                         });
 
                         this.subview.register = new RegisterView({

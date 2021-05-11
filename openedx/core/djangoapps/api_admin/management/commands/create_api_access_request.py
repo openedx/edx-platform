@@ -144,7 +144,7 @@ class Command(BaseCommand):
         try:
             _, created = ApiAccessConfig.objects.get_or_create(enabled=True)
         except Exception as e:
-            msg = 'Unable to create ApiAccessConfig. Exception is {}: {}'.format(type(e).__name__, e)
+            msg = f'Unable to create ApiAccessConfig. Exception is {type(e).__name__}: {e}'
             raise CommandError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
         if created:

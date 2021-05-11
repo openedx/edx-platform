@@ -26,7 +26,7 @@ class SendActivationEmailTestCase(TestCase):
         registration = Registration()
         registration.register(self.student)
 
-        self.msg = compose_activation_email("http://www.example.com", self.student, registration)
+        self.msg = compose_activation_email(self.student, registration)
 
     def test_ComposeEmail(self):
         """

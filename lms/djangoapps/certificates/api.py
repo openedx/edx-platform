@@ -9,6 +9,8 @@ certificates models or any other certificates modules.
 
 
 import logging
+from datetime import datetime
+from pytz import UTC
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,7 +25,6 @@ from lms.djangoapps.certificates.generation_handler import (
     can_generate_certificate_task as _can_generate_certificate_task,
     generate_certificate_task as _generate_certificate_task,
     generate_user_certificates as _generate_user_certificates,
-    is_using_certificate_allowlist as _is_using_certificate_allowlist,
     is_using_v2_course_certificates as _is_using_v2_course_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
@@ -44,7 +45,6 @@ from lms.djangoapps.certificates.utils import (
     get_certificate_url as _get_certificate_url,
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
-from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger("edx.certificate")
@@ -583,13 +583,34 @@ def get_certificate_footer_context():
     return data
 
 
+def certificates_viewable_for_course(course):
+    """
+    Returns True if certificates are viewable for any student enrolled in the course, False otherwise.
+    """
+    if course.self_paced:
+        return True
+    if (
+        course.certificates_display_behavior in ('early_with_info', 'early_no_info')
+        or course.certificates_show_before_end
+    ):
+        return True
+    if (
+        course.certificate_available_date
+        and course.certificate_available_date <= datetime.now(UTC)
+    ):
+        return True
+    if (
+        course.certificate_available_date is None
+        and course.has_ended()
+    ):
+        return True
+    return False
+
+
 def get_allowlisted_users(course_key):
     """
     Return the users who are on the allowlist for this course run
     """
-    if not _is_using_certificate_allowlist(course_key):
-        return User.objects.none()
-
     return User.objects.filter(certificatewhitelist__course_id=course_key, certificatewhitelist__whitelist=True)
 
 

@@ -70,7 +70,7 @@ class EmbargoedCourse(models.Model):
         not_em = "Not "
         if self.embargoed:
             not_em = ""
-        return "Course '{}' is {}Embargoed".format(str(self.course_id), not_em)
+        return f"Course '{str(self.course_id)}' is {not_em}Embargoed"
 
 
 @python_2_unicode_compatible
