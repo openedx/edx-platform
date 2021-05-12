@@ -40,10 +40,13 @@ from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateStatuses,
-    CertificateWhitelist
+    CertificateStatuses
 )
-from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateAllowlistFactory,
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory
+)
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
@@ -1622,10 +1625,9 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assert_invalidate_certificate(generated_certificate)
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
-    def test_page_with_whitelisted_certificate_with_html_view(self):
+    def test_page_with_allowlisted_certificate_with_html_view(self):
         """
-        Verify that for white listed user the view certificate is
-        appearing on dashboard
+        Verify that view certificate appears for an allowlisted user
         """
         generated_certificate = self.generate_certificate(
             "http://www.example.com/certificate.pdf", "honor"
@@ -1647,10 +1649,9 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.course.cert_html_view_enabled = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
-        CertificateWhitelist.objects.create(
+        CertificateAllowlistFactory.create(
             user=self.user,
-            course_id=self.course.id,
-            whitelist=True
+            course_id=self.course.id
         )
 
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_create:

@@ -19,7 +19,8 @@ from six.moves import zip_longest
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
-from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -358,8 +359,8 @@ class _ProblemGradeReportContext:
 
 class _CertificateBulkContext:
     def __init__(self, context, users):
-        certificate_whitelist = CertificateWhitelist.objects.filter(course_id=context.course_id, whitelist=True)
-        self.whitelisted_user_ids = [entry.user_id for entry in certificate_whitelist]
+        certificate_allowlist = certs_api.get_allowlist(context.course_id)
+        self.allowlisted_user_ids = [entry['user_id'] for entry in certificate_allowlist]
         self.certificates_by_user = {
             certificate.user.id: certificate
             for certificate in
@@ -661,12 +662,12 @@ class CourseGradeReport:
         """
         Returns the course certification information for the given user.
         """
-        is_whitelisted = user.id in bulk_certs.whitelisted_user_ids
+        is_allowlisted = user.id in bulk_certs.allowlisted_user_ids
         certificate_info = certificate_info_for_user(
             user,
             context.course_id,
             course_grade.letter_grade,
-            is_whitelisted,
+            is_allowlisted,
             bulk_certs.certificates_by_user.get(user.id),
         )
         return certificate_info

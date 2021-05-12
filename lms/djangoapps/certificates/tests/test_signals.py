@@ -90,8 +90,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                 with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
                     CertificateAllowlistFactory(
                         user=self.user,
-                        course_id=self.ip_course.id,
-                        whitelist=True
+                        course_id=self.ip_course.id
                     )
                     mock_generate_certificate_apply_async.assert_not_called()
                     mock_generate_allowlist_task.assert_called_with(self.user, self.ip_course.id)
@@ -111,8 +110,7 @@ class AllowlistGeneratedCertificatesTest(ModuleStoreTestCase):
                 with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=False):
                     CertificateAllowlistFactory(
                         user=self.user,
-                        course_id=self.ip_course.id,
-                        whitelist=True
+                        course_id=self.ip_course.id
                     )
                     mock_generate_certificate_apply_async.assert_not_called()
                     mock_generate_allowlist_task.assert_not_called()
