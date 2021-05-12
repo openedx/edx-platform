@@ -310,10 +310,11 @@ def post_course_certificate(client, username, certificate, visible_date):
         ]
     })
 
-
+# pylint: disable=W0613
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def update_credentials_course_certificate_configuration_available_date(
+    self,
     course_key,
     certificate_available_date=None
 ):
