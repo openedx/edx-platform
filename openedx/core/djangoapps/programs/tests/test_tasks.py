@@ -922,23 +922,38 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
 @mock.patch(TASKS_MODULE + '.get_credentials_api_client')
 class UpdateCredentialsCourseCertificateConfigurationAvailableDateTestCase(TestCase):
+    """
+    Tests for the update_credentials_course_certificate_configuration_available_date
+    function
+    """
     def setUp(self):
-        self.course = CourseOverviewFactory.create(certificate_available_date=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'))
+        super().setUp()
+        self.course = CourseOverviewFactory.create(
+            certificate_available_date=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        )
         CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
         CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
         self.available_date = self.course.certificate_available_date
         self.course_id = self.course.id
         self.credentials_worker = UserFactory(username='test-service-username')
 
+    # pylint: disable=W0613
     def test_update_course_cert_available_date(self, mock_client):
         with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
-            tasks.update_credentials_course_certificate_configuration_available_date(self.course_id, self.available_date)
+            tasks.update_credentials_course_certificate_configuration_available_date(
+                self.course_id,
+                self.available_date
+            )
             update_posted.assert_called_once()
 
+    # pylint: disable=W0613
     def test_course_with_two_paid_modes(self, mock_client):
         CourseModeFactory.create(course_id=self.course.id, mode_slug='professional')
         with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
-            tasks.update_credentials_course_certificate_configuration_available_date(self.course_id, self.available_date)
+            tasks.update_credentials_course_certificate_configuration_available_date(
+                self.course_id,
+                self.available_date
+            )
             update_posted.assert_not_called()
 
 
