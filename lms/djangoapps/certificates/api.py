@@ -424,8 +424,8 @@ def example_certificates_status(course_key):
     return ExampleCertificateSet.latest_status(course_key)
 
 
-def has_html_certificates_enabled(course):
-    return _has_html_certificates_enabled(course)
+def has_html_certificates_enabled(course_overview):
+    return _has_html_certificates_enabled(course_overview)
 
 
 def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificate=None):
