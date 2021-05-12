@@ -5,13 +5,11 @@ import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from unittest.mock import patch
-import pytest
 
 import ddt
 import pytz
 from config_models.models import cache
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -58,7 +56,6 @@ from lms.djangoapps.certificates.api import (
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateStatuses,
-    CertificateWhitelist,
     ExampleCertificate,
     GeneratedCertificate,
     certificate_status_for_student
@@ -908,13 +905,11 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
         Test for removing an allowlist entry for a user in a given course-run.
         """
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        assert is_on_allowlist(self.user, self.course_run_key)
 
         result = remove_allowlist_entry(self.user, self.course_run_key)
         assert result
-
-        with pytest.raises(ObjectDoesNotExist) as error:
-            CertificateWhitelist.objects.get(user=self.user, course_id=self.course_run_key)
-        assert str(error.value) == "CertificateWhitelist matching query does not exist."
+        assert not is_on_allowlist(self.user, self.course_run_key)
 
     def test_remove_allowlist_entry_with_certificate(self):
         """
@@ -927,16 +922,14 @@ class CertificateAllowlistTests(ModuleStoreTestCase):
             status=CertificateStatuses.downloadable,
             mode='verified'
         )
+        assert is_on_allowlist(self.user, self.course_run_key)
 
         result = remove_allowlist_entry(self.user, self.course_run_key)
         assert result
 
         certificate = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_run_key)
         assert certificate.status == CertificateStatuses.unavailable
-
-        with pytest.raises(ObjectDoesNotExist) as error:
-            CertificateWhitelist.objects.get(user=self.user, course_id=self.course_run_key)
-        assert str(error.value) == "CertificateWhitelist matching query does not exist."
+        assert not is_on_allowlist(self.user, self.course_run_key)
 
     def test_remove_allowlist_entry_entry_dne(self):
         """
