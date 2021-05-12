@@ -8,9 +8,9 @@ import logging
 from datetime import datetime, timedelta
 from unittest import mock
 
-import pytest
 import ddt
 import httpretty
+import pytest
 import pytz
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
@@ -19,6 +19,8 @@ from edx_rest_api_client import exceptions
 from edx_rest_api_client.client import EdxRestApiClient
 from waffle.testutils import override_switch
 
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.certificates.config import waffle
@@ -28,7 +30,6 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFa
 from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import UserFactory
 
 log = logging.getLogger(__name__)
 
@@ -915,3 +916,80 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
         assert mock_exception.called
         assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
         assert not mock_revoke_program_certificate.called
+
+
+@skip_unless_lms
+@override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
+@mock.patch(TASKS_MODULE + '.get_credentials_api_client')
+class UpdateCredentialsCourseCertificateConfigurationAvailableDateTestCase(TestCase):
+    """
+    Tests for the update_credentials_course_certificate_configuration_available_date
+    function
+    """
+    def setUp(self):
+        super().setUp()
+        self.course = CourseOverviewFactory.create(
+            certificate_available_date=datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        )
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
+        self.available_date = self.course.certificate_available_date
+        self.course_id = self.course.id
+        self.credentials_worker = UserFactory(username='test-service-username')
+
+    # pylint: disable=W0613
+    def test_update_course_cert_available_date(self, mock_client):
+        with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
+            tasks.update_credentials_course_certificate_configuration_available_date(
+                self.course_id,
+                self.available_date
+            )
+            update_posted.assert_called_once()
+
+    # pylint: disable=W0613
+    def test_course_with_two_paid_modes(self, mock_client):
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='professional')
+        with mock.patch(TASKS_MODULE + '.post_course_certificate_configuration') as update_posted:
+            tasks.update_credentials_course_certificate_configuration_available_date(
+                self.course_id,
+                self.available_date
+            )
+            update_posted.assert_not_called()
+
+
+@skip_unless_lms
+class PostCourseCertificateConfigurationTestCase(TestCase):
+    """
+    Test the post_course_certificate_configuration function
+    """
+
+    def setUp(self):  # lint-amnesty, pylint: disable=super-method-not-called
+        self.certificate = {
+            'mode': 'verified',
+            'course_id': 'testCourse',
+        }
+
+    @httpretty.activate
+    def test_post_course_certificate_configuration(self):
+        """
+        Ensure the correct API call gets made
+        """
+        test_client = EdxRestApiClient('http://test-server', jwt='test-token')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            'http://test-server/course_certificates/',
+        )
+
+        available_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        tasks.post_course_certificate_configuration(test_client, self.certificate, available_date)
+
+        expected_body = {
+            "course_id": 'testCourse',
+            "certificate_type": 'verified',
+            "certificate_available_date": available_date,
+            "is_active": True
+        }
+        last_request_body = httpretty.last_request().body.decode('utf-8')
+        assert json.loads(last_request_body) == expected_body
