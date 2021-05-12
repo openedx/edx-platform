@@ -209,7 +209,8 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.course = CourseFactory.create(
             modulestore=store,
             start=datetime(2015, 3, 1, tzinfo=UTC),
-            display_name="Search Index Test Course"
+            display_name="Search Index Test Course",
+            display_coursenumber="S101",
         )
 
         self.chapter = ItemFactory.create(
@@ -472,6 +473,20 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["short_description"], short_description)
 
+    def _test_display_coursenumber(self, store):
+        """ Test that course number property in course object reflects updated value in the course_info index"""
+        course_number = "CS301"
+        self.course.display_coursenumber = course_number
+        self.update_item(store, self.course)
+        self.reindex_course(store)
+        response = self.searcher.search(
+            doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,
+            field_dictionary={"course": six.text_type(self.course.id)}
+        )
+        self.assertEqual(response["total"], 1)
+        print(response["results"][0]["data"])
+        self.assertEqual(response["results"][0]["data"]["display_coursenumber"], course_number)
+
     def _test_course_about_mode_index(self, store):
         """ Test that informational properties in the course modes store end up in the course_info index """
         honour_mode = CourseModeFactory(
@@ -588,6 +603,10 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     @ddt.data(*WORKS_WITH_STORES)
     def test_course_about_store_index(self, store_type):
         self._perform_test_using_store(store_type, self._test_course_about_store_index)
+
+    @ddt.data(*WORKS_WITH_STORES)
+    def test_display_coursenumber(self, store_type):
+        self._perform_test_using_store(store_type, self._test_display_coursenumber)
 
     @ddt.data(*WORKS_WITH_STORES)
     def test_course_about_mode_index(self, store_type):
