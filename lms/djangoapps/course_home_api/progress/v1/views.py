@@ -95,8 +95,7 @@ class ProgressTabView(RetrieveAPIView):
     **Returns**
 
         * 200 on success with above fields.
-        * 302 if the user is not enrolled.
-        * 401 if the user is not authenticated.
+        * 401 if the user is not authenticated or not enrolled.
         * 404 if the course is not available or cannot be seen.
     """
 
@@ -119,19 +118,23 @@ class ProgressTabView(RetrieveAPIView):
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
         monitoring_utils.set_custom_attribute('user_id', request.user.id)
         monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
+        is_staff = bool(has_access(request.user, 'staff', course_key))
 
         _, request.user = setup_masquerade(
             request,
             course_key,
-            staff_access=has_access(request.user, 'staff', course_key),
+            staff_access=is_staff,
             reset_masquerade_data=True
         )
 
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 
         course_overview = CourseOverview.get_from_id(course_key)
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
         enrollment_mode = getattr(enrollment, 'mode', None)
+
+        if not (enrollment and enrollment.is_active) and not is_staff:
+            return Response('User not enrolled.', status=401)
 
         # The block structure is used for both the course_grade and has_scheduled content fields
         # So it is called upfront and reused for optimization purposes
@@ -185,7 +188,7 @@ class ProgressTabView(RetrieveAPIView):
             'verification_data': verification_data,
         }
         context = self.get_serializer_context()
-        context['staff_access'] = bool(has_access(request.user, 'staff', course))
+        context['staff_access'] = is_staff
         context['course_key'] = course_key
         # course_overview and enrollment will be used by VerifiedModeSerializerMixin
         context['course_overview'] = course_overview

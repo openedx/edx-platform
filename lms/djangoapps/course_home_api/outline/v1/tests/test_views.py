@@ -78,7 +78,12 @@ class OutlineTabTestViews(BaseCourseHomeTests):
 
     @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
     @override_waffle_flag(COURSE_HOME_MICROFRONTEND_OUTLINE_TAB, active=True)
-    def test_get_authenticated_user_not_enrolled(self):
+    @ddt.data(True, False)
+    def test_get_authenticated_user_not_enrolled(self, has_previously_enrolled):
+        if has_previously_enrolled:
+            # Create an enrollment, then unenroll to set is_active to False
+            CourseEnrollment.enroll(self.user, self.course.id)
+            CourseEnrollment.unenroll(self.user, self.course.id)
         response = self.client.get(self.url)
         assert response.status_code == 200
 

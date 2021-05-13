@@ -46,6 +46,16 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         # 'Course', 'Wiki', 'Progress' tabs
         assert len(response.data.get('tabs', [])) == 4
 
+    @ddt.data(True, False)
+    def test_get_authenticated_not_enrolled(self, has_previously_enrolled):
+        if has_previously_enrolled:
+            # Create an enrollment, then unenroll to set is_active to False
+            CourseEnrollment.enroll(self.user, self.course.id)
+            CourseEnrollment.unenroll(self.user, self.course.id)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['is_enrolled'] is False
+
     def test_get_authenticated_staff_user(self):
         self.client.logout()
         self.client.login(username=self.staff_user.username, password='bar')
