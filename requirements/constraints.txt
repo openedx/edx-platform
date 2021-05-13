@@ -117,5 +117,9 @@ diff-cover==4.0.0
 python-slugify<5.0.0
 
 
-# latest version causing conflicts in make upgrade PR.
-click==7.1.2
+# Temporary package constraints added on May 12th, 2021 to deal with some requirement upgrade issues. We will
+# re-evaluate these constraints later.
+Sphinx<4.0
+jinja2<3.0
+MarkupSafe<2.0
+click<8.0
