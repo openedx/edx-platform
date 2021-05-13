@@ -4,8 +4,14 @@
 #
 #    make upgrade
 #
-click==7.1.2              # via pip-tools
-pip-tools==5.5.0          # via -c requirements/edx/../constraints.txt, -r requirements/edx/pip-tools.in
+click==7.1.2
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   pip-tools
+pip-tools==5.5.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/pip-tools.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
