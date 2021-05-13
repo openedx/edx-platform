@@ -73,7 +73,7 @@ pipeline {
         }
         stage('Run Tests') {
             parallel {
-                stage("commonlib pylint") {
+                stage("common pylint") {
                     // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
                     agent { label "js-worker" }
                     environment {
@@ -150,37 +150,6 @@ pipeline {
                             }
                         }
                     }
-                }
-            }
-        }
-        stage('Diff quality') {
-            when {
-                // Only run diff quality on PR builds
-                 expression { env.ghprbTargetBranch != null }
-            }
-            environment {
-                TARGET_BRANCH = "origin/${ghprbTargetBranch}"
-            }
-            steps {
-                sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: "${ghprbActualCommit}"]],
-                        doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption',
-                        honorRefspec: true, noTags: true, shallow: false], [$class: 'WipeWorkspace']], submoduleCfg: [],
-                        userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                        refspec: "+refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch} +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*",
-                        url: "git@github.com:edx/${REPO_NAME}.git"]]]
-                    unstash 'quality-1-reports'
-                    unstash 'quality-2-reports'
-                    unstash 'quality-3-reports'
-                    unstash 'quality-4-reports'
-                    sh "./scripts/jenkins-quality-diff.sh"
-                }
-            }
-            post {
-                always {
-                    qualityTestCleanup()
-                    publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'reports/diff_quality',
-                        reportFiles: 'diff_quality_pylint.html, diff_quality_eslint.html', reportName: 'Diff Quality Report', reportTitles: ''])
                 }
             }
         }
