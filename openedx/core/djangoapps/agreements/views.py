@@ -1,4 +1,6 @@
-"""Views served by the agreements app. """
+"""
+Views served by the Agreements app
+"""
 
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import status
@@ -10,9 +12,12 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseStaffRole
-
-from .api import get_integrity_signature
-from .toggles import is_integrity_signature_enabled
+from openedx.core.djangoapps.agreements.api import (
+    create_integrity_signature,
+    get_integrity_signature,
+)
+from openedx.core.djangoapps.agreements.serializers import IntegritySignatureSerializer
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
 
 
 def is_user_course_or_global_staff(user, course_id):
@@ -26,7 +31,7 @@ def is_user_course_or_global_staff(user, course_id):
 
 class AuthenticatedAPIView(APIView):
     """
-        Authenticated API View.
+    Authenticated API View.
     """
     authentication_classes = (SessionAuthentication, JwtAuthentication)
     permission_classes = (IsAuthenticated,)
@@ -44,6 +49,10 @@ class IntegritySignatureView(AuthenticatedAPIView):
         ** Scenarios **
         ?username=xyz
         returns an existing signed integrity agreement for the given user and course
+
+    HTTP POST
+        * If an integrity signature does not exist for the user + course, creates one and
+          returns it. If one does exist, returns the existing signature.
     """
 
     def get(self, request, course_id):
@@ -85,12 +94,30 @@ class IntegritySignatureView(AuthenticatedAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        created_at = str(signature.created)
+        serializer = IntegritySignatureSerializer(signature)
+        return Response(serializer.data)
 
-        data = {
-            'username': username,
-            'course_id': course_id,
-            'created_at': created_at,
-        }
+    def post(self, request, course_id):
+        """
+        Create an integrity signature for the requesting user and course. If a signature
+        already exists, returns the existing signature instead of creating a new one.
 
-        return Response(data)
+        /api/agreements/v1/integrity_signature/{course_id}
+
+        Example response:
+            {
+                username: "janedoe",
+                course_id: "org.2/course_2/Run_2",
+                created_at: "2021-04-23T18:25:43.511Z"
+            }
+        """
+        # check that waffle flag is enabled
+        if not is_integrity_signature_enabled():
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        username = request.user.username
+        signature = create_integrity_signature(username, course_id)
+        serializer = IntegritySignatureSerializer(signature)
+        return Response(serializer.data)

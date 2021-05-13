@@ -1,19 +1,25 @@
 """
 Tests for agreements views
 """
+
+from datetime import datetime, timedelta
+
+from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from freezegun import freeze_time
 
 from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 from common.djangoapps.student.roles import CourseStaffRole
+from openedx.core.djangoapps.agreements.api import (
+    create_integrity_signature,
+    get_integrity_signatures_for_course,
+)
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from ..api import create_integrity_signature
-from ..toggles import ENABLE_INTEGRITY_SIGNATURE
 
 
 @skip_unless_lms
@@ -155,6 +161,57 @@ class IntegritySignatureViewTests(APITestCase, ModuleStoreTestCase):
     def test_404_for_no_waffle_flag(self):
         self._create_signature(self.user.username, self.course_id)
         response = self.client.get(
+            reverse(
+                'integrity_signature',
+                kwargs={'course_id': self.course_id},
+            )
+        )
+        self._assert_response(response, status.HTTP_404_NOT_FOUND)
+
+    def test_post_integrity_signature(self):
+        response = self.client.post(
+            reverse('integrity_signature', kwargs={'course_id': self.course_id})
+        )
+        self._assert_response(response, status.HTTP_200_OK, self.user, self.course_id)
+
+        # Check that the course has a signature created
+        signatures = get_integrity_signatures_for_course(self.course_id)
+        self.assertEqual(len(signatures), 1)
+        self.assertEqual(signatures[0].user.username, self.USERNAME)
+
+    def test_post_duplicate_integrity_signature(self):
+        # Create a signature
+        original_response = self.client.post(
+            reverse(
+                'integrity_signature',
+                kwargs={'course_id': self.course_id},
+            )
+            + '?username={}'.format(self.other_user.username)
+        )
+
+        # Attempt to create a new signature in the future
+        with freeze_time(datetime.now() + timedelta(days=1)):
+            new_response = self.client.post(
+                reverse(
+                    'integrity_signature',
+                    kwargs={'course_id': self.course_id},
+                )
+            )
+
+            # The created_at field in the response should equal the original time created
+            self.assertEqual(
+                original_response.data['created_at'],
+                new_response.data['created_at'],
+            )
+
+            # The course should not have a second signature
+            signatures = get_integrity_signatures_for_course(self.course_id)
+            self.assertEqual(len(signatures), 1)
+            self.assertEqual(signatures[0].user.username, self.USERNAME)
+
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, active=False)
+    def test_post_integrity_signature_no_waffle_flag(self):
+        response = self.client.post(
             reverse(
                 'integrity_signature',
                 kwargs={'course_id': self.course_id},
