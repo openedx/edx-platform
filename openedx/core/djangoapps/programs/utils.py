@@ -206,7 +206,7 @@ class ProgramProgressMeter:
         ]
 
         if runs_with_required_mode:
-            not_failed_runs = [run for run in runs_with_required_mode if run not in self.failed_course_runs]
+            not_failed_runs = [run for run in runs_with_required_mode if run['key'] not in self.failed_course_runs]
             if not_failed_runs:
                 return True
 
@@ -417,7 +417,7 @@ class ProgramProgressMeter:
         Determine which course runs have been failed by the user.
 
         Returns:
-            list of dicts, each a course run ID
+            list of strings, each a course run ID
         """
         return [run['course_run_id'] for run in self.course_runs_with_state['failed']]
 
@@ -442,9 +442,13 @@ class ProgramProgressMeter:
                 'type': self._certificate_mode_translation(certificate['type']),
             }
 
+            try:
+                may_certify = CourseOverview.get_from_id(course_key).may_certify()
+            except CourseOverview.DoesNotExist:
+                may_certify = True
             if (
                 certificate_api.is_passing_status(certificate['status'])
-                and CourseOverview.get_from_id(course_key).may_certify()
+                and may_certify
             ):
                 completed_runs.append(course_data)
             else:
