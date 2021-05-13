@@ -14049,7 +14049,7 @@ msgstr "Ver en Studio"
 
 #: lms/templates/preview_menu.html
 msgid "View in Insights"
-msgstr ""
+msgstr "Ver Analítica"
 
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} attempt"
