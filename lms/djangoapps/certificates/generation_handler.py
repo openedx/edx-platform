@@ -412,8 +412,7 @@ def _is_cert_downloadable(user, course_key):
     return True
 
 
-def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
     """
     It will add the add-cert request into the xqueue.
 
@@ -431,8 +430,6 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         course_key (CourseKey)
 
     Keyword Arguments:
-        course (Course): Optionally provide the course object; if not provided
-            it will be loaded.
         insecure - (Boolean)
         generation_mode - who has requested certificate generation. Its value should `batch`
         in case of django command and `self` if student initiated the request.
@@ -461,7 +458,6 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     cert = xqueue.add_cert(
         student,
         course_key,
-        course=course,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
@@ -484,8 +480,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     return cert.status
 
 
-def regenerate_user_certificates(student, course_key, course=None,
-                                 forced_grade=None, template_file=None, insecure=False):
+def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
     """
     Add the regen-cert request into the xqueue.
 
@@ -500,8 +495,6 @@ def regenerate_user_certificates(student, course_key, course=None,
         course_key (CourseKey)
 
     Keyword Arguments:
-        course (Course): Optionally provide the course object; if not provided
-            it will be loaded.
         grade_value - The grade string, such as "Distinction"
         template_file - The template file used to render this certificate
         insecure - (Boolean)
@@ -523,7 +516,6 @@ def regenerate_user_certificates(student, course_key, course=None,
     xqueue.regen_cert(
         student,
         course_key,
-        course=course,
         forced_grade=forced_grade,
         template_file=template_file,
         generate_pdf=generate_pdf

@@ -98,8 +98,7 @@ def _generate_certificate(user, course_key):
     return cert
 
 
-def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
     """
     It will add the add-cert request into the xqueue.
 
@@ -117,8 +116,6 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         course_key (CourseKey)
 
     Keyword Arguments:
-        course (Course): Optionally provide the course object; if not provided
-            it will be loaded.
         insecure - (Boolean)
         generation_mode - who has requested certificate generation. Its value should `batch`
         in case of django command and `self` if student initiated the request.
@@ -140,7 +137,6 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
     cert = xqueue.add_cert(
         student,
         course_key,
-        course=course,
         generate_pdf=generate_pdf,
         forced_grade=forced_grade
     )
