@@ -37,7 +37,7 @@ BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler._is_beta_te
 CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_course'
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._has_passing_grade'
-WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled_from_course_overview'
+WEB_CERTS_METHOD = 'lms.djangoapps.certificates.generation_handler.has_html_certificates_enabled'
 
 
 @mock.patch(ID_VERIFIED_METHOD, mock.Mock(return_value=True))

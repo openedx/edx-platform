@@ -11,7 +11,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger(__name__)
 
@@ -51,33 +50,20 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None, user_certificat
     """
     url = ''
 
-    course = _course_from_key(course_id)
-    if not course:
+    course_overview = _course_from_key(course_id)
+    if not course_overview:
         return url
 
-    if has_html_certificates_enabled(course):
+    if has_html_certificates_enabled(course_overview):
         url = _certificate_html_url(uuid)
     else:
         url = _certificate_download_url(user_id, course_id, user_certificate=user_certificate)
     return url
 
 
-def has_html_certificates_enabled(course):
+def has_html_certificates_enabled(course_overview):
     """
-    Returns True if HTML certificates are enabled
-    """
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
-        return False
-    return course.cert_html_view_enabled
-
-
-def has_html_certificates_enabled_from_course_overview(course_overview):
-    """
-    Returns True if HTML certificates are enabled
-
-    This is a companion function to the `has_html_certificates_enabled` function. We are in the process of refactoring
-    and removing the `Certificates` apps dependence on `modulestore`. These functions will be consolidated at a later
-    date. Progress is being tracked in MICROBA-1178.
+    Returns True if HTML certificates are enabled in a course run.
     """
     if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
         return False
@@ -120,7 +106,7 @@ def _course_from_key(course_key):
     """
     Returns the course overview
     """
-    return CourseOverview.get_from_id(_safe_course_key(course_key))
+    return get_course_overview(_safe_course_key(course_key))
 
 
 def _safe_course_key(course_key):

@@ -15,7 +15,7 @@ from uuid import uuid4
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
-from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled_from_course_overview
+from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level_from_course_key
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
@@ -135,7 +135,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         xqueue.use_https = False
 
     course_overview = get_course_overview(course_key)
-    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
+    generate_pdf = not has_html_certificates_enabled(course_overview)
 
     cert = xqueue.add_cert(
         student,

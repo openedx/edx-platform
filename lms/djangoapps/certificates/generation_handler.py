@@ -22,7 +22,7 @@ from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS, generate_certificate
 from lms.djangoapps.certificates.utils import (
     emit_certificate_event,
-    has_html_certificates_enabled_from_course_overview
+    has_html_certificates_enabled
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor.access import list_with_level_from_course_key
@@ -216,7 +216,7 @@ def _can_generate_certificate_common(user, course_key):
         return False
 
     course_overview = get_course_overview(course_key)
-    if not has_html_certificates_enabled_from_course_overview(course_overview):
+    if not has_html_certificates_enabled(course_overview):
         log.info(f'{course_key} does not have HTML certificates enabled. Certificate cannot be generated for '
                  f'{user.id}.')
         return False
@@ -329,7 +329,7 @@ def _can_set_cert_status_common(user, course_key):
         return False
 
     course_overview = get_course_overview(course_key)
-    if not has_html_certificates_enabled_from_course_overview(course_overview):
+    if not has_html_certificates_enabled(course_overview):
         return False
 
     return True
@@ -456,7 +456,7 @@ def generate_user_certificates(student, course_key, course=None, insecure=False,
         xqueue.use_https = False
 
     course_overview = get_course_overview(course_key)
-    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
+    generate_pdf = not has_html_certificates_enabled(course_overview)
 
     cert = xqueue.add_cert(
         student,
@@ -516,7 +516,7 @@ def regenerate_user_certificates(student, course_key, course=None,
         xqueue.use_https = False
 
     course_overview = get_course_overview(course_key)
-    generate_pdf = not has_html_certificates_enabled_from_course_overview(course_overview)
+    generate_pdf = not has_html_certificates_enabled(course_overview)
     log.info(f"Started regenerating certificates for user {student.id} in course {course_key} with generate_pdf "
              f"status: {generate_pdf}.")
 
