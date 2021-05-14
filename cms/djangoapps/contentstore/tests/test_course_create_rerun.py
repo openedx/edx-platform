@@ -200,7 +200,7 @@ class TestCourseListing(ModuleStoreTestCase):
 
     @override_settings(FEATURES={'ENABLE_CREATOR_GROUP': True})
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_course_creation_when_user_in_org(self, store):
+    def test_course_creation_when_user_in_org_with_staff_role(self, store):
         """
         Tests course creation with restriction and user not regitered in CourseAccessRole.
         """

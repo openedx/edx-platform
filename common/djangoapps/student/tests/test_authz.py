@@ -296,7 +296,7 @@ class CourseOrgGroupTest(TestCase):
         update_org_role(self.global_admin, OrgContentCreatorRole(), self.user, [self.org])
         assert user_has_role(self.user, OrgContentCreatorRole(self.org))
 
-    def test_non_org_usre_write_access(self):
+    def test_non_org_user_write_access(self):
         """
         Test that OrgContentCreatorRole has write access
         """
