@@ -2,7 +2,7 @@
 /* eslint-disable */
 (function() {
   this.Conditional = (function() {
-    function Conditional(element, callerElId) {
+    function Conditional(element, runtime, callerElId) {
       var dependencies;
       this.el = $(element).find('.conditional-wrapper');
       this.callerElId = callerElId;
