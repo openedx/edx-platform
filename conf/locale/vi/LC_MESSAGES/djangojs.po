@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -23,7 +23,7 @@
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # Nguyen Don Binh <donbinhvn@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014-2015
-# Nguyen Lam <lamnguyen.cis@gmail.com>, 2020
+# Lam Nguyen <lamnguyen.cis@gmail.com>, 2020
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2015
 # Nhan Nguyen <constfang@yahoo.com>, 2015
 # Nhung Tran <nhungtth@hachium.com>, 2020
@@ -35,7 +35,7 @@
 # Vu Bach, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -63,9 +63,9 @@
 # truong tran <tranminhtruong88@yahoo.com.vn>, 2017
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Tan Phat Trang <phattt2901@gmail.com>, 2019
@@ -75,7 +75,7 @@
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -92,7 +92,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -112,9 +112,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
-"Last-Translator: Hoà Lê Thanh <hoa.lethanh@gmail.com>\n"
+"POT-Creation-Date: 2021-05-16 20:43+0000\n"
+"PO-Revision-Date: 2021-02-28 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
@@ -2490,6 +2490,10 @@ msgstr "Không cụ thể cho một khóa học"
 msgid "Subject"
 msgstr "Chủ đề"
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr ""
+
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Thiết lập tài khoản"
@@ -2519,27 +2523,11 @@ msgid "Financial Aid"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2597,18 +2585,6 @@ msgstr ""
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
 msgstr "Nhập một số chi tiết cho yêu cầu hỗ trợ của bạn."
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
-msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -3236,10 +3212,6 @@ msgstr ""
 " Vui lòng điền tên đăng nhập/email sau đó nhấn nút \"Huỷ bỏ Chứng chỉ\"."
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr "Đã tải lên các sự cố về tệp. Nhấp vào \"+\" để xem."
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
 msgstr "đã thêm học viên vào danh sách không hợp lệ"
 
@@ -3295,6 +3267,26 @@ msgstr ""
 " học viên không ghi danh tham gia khóa học và không thêm vào danh sách không"
 " hợp lệ"
 
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners already appear on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner already appears on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr "Đã tải lên các sự cố về tệp. Nhấp vào \"+\" để xem."
+
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "Certificate of <%= user %> has already been invalidated. Please check your "
@@ -3342,16 +3334,14 @@ msgstr ""
 "trang và thử lại"
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
-msgstr "<%= user %> đã trong danh sách không hợp lệ."
+msgid "<%- user %> already in exception list."
+msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
+"<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
-"<%= user %> đã được thêm vào danh sách không hợp lệ. Bấm vào Tạo Chứng chỉ "
-"không hợp lệ bên dưới để gửi chứng chỉ."
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
@@ -3418,11 +3408,9 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
-"Thời hạn hoàn trả của khóa học này đã được qua, vì vậy bạn sẽ không nhận "
-"được tiền hoàn lại."
 
 #: lms/static/js/dashboard/legacy.js
 #: lms/static/js/learner_dashboard/views/unenroll_view.js
@@ -3644,10 +3632,8 @@ msgid "Recent Activity"
 msgstr "Hoạt động gần đây"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
-"Không có kết quả nào cho \"%(query_string)s\". Hãy thử tìm kiếm với từ khoá "
-"khác."
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -3882,6 +3868,10 @@ msgid "Error getting issued certificates list."
 msgstr "lỗi khi nhận danh sách chứng chỉ đã phát hành."
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr "Đã có lỗi xảy ra khi phát kết quả thi. Xin vui lòng thử lại lần nữa."
@@ -4087,10 +4077,6 @@ msgid "Reason field should not be left blank."
 msgstr "Vui lòng điền vào mục Lý do."
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr "trường vai trò không được để trống."
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Lỗi khi ghi danh/hủy ghi danh thành viên."
 
@@ -4274,7 +4260,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
@@ -5939,8 +5925,8 @@ msgid "Please enter non-negative integer."
 msgstr "Vui lòng nhập số nguyên không âm"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
-msgstr "Không thể cho hơn <%= types %> bài tập so với quy định."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6416,7 +6402,7 @@ msgid "Highlights for {display_name}"
 msgstr "Làm nổi bật {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
+msgid "Enable Course Highlight Emails"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -9736,7 +9722,7 @@ msgid "Copy Component Location"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
+msgid "Course Highlight Emails"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
@@ -10262,12 +10248,6 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "Xoá nhóm"
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""

@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -11,7 +11,7 @@
 # sandra bonillo <sandraboni13@gmail.com>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -20,23 +20,23 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (https://www.transifex.com/open-edx/teams/6205/ca/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Juanjo Bote <juanjo.botev@ub.edu>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -47,9 +47,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-15 20:43+0000\n"
-"PO-Revision-Date: 2020-10-04 20:44+0000\n"
-"Last-Translator: Elies Martos Robles <eliesmr4@gmail.com>\n"
+"POT-Creation-Date: 2021-05-11 19:55+0000\n"
+"PO-Revision-Date: 2021-02-28 20:45+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -2381,6 +2381,10 @@ msgstr ""
 msgid "Subject"
 msgstr ""
 
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr ""
+
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Configuració del compte"
@@ -2410,27 +2414,11 @@ msgid "Financial Aid"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2485,18 +2473,6 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Enter some details for your support request."
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
 msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
@@ -3095,10 +3071,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr ""
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
 msgstr ""
 
@@ -3137,6 +3109,26 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is not enrolled in course and not added to the exception list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners already appear on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner already appears on the certificate invalidation list"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Uploaded file issues. Click on \"+\" to view."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
@@ -3178,12 +3170,12 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
+msgid "<%- user %> already in exception list."
 msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
+"<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
 
@@ -3251,7 +3243,7 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
 
@@ -3463,7 +3455,7 @@ msgid "Recent Activity"
 msgstr ""
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
 
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -3687,6 +3679,10 @@ msgid "Error getting issued certificates list."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
@@ -3882,10 +3878,6 @@ msgid "Reason field should not be left blank."
 msgstr ""
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr ""
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "Error donant d'alta/baixa usuaris."
 
@@ -4061,7 +4053,7 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
@@ -5609,9 +5601,8 @@ msgid "Please enter non-negative integer."
 msgstr "Si us plau, entra un nombre enter no negatiu."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
-"No es poden deixar caure més <%= types %> assignacions que s'assignen."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6081,8 +6072,8 @@ msgid "Highlights for {display_name}"
 msgstr "Destacats per a {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
-msgstr "Activa els correus electrònics de resum setmanals"
+msgid "Enable Course Highlight Emails"
+msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -9492,8 +9483,8 @@ msgid "Copy Component Location"
 msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
-msgstr "Correus electrònics destacats setmanals"
+msgid "Course Highlight Emails"
+msgstr ""
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -10023,14 +10014,6 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "suprimeix el grup"
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
-"Actualment aquesta funció està en proves. Els equips de cursos poden entrar "
-"a destacar, però els alumnes no rebran missatges de correu electrònic."
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
