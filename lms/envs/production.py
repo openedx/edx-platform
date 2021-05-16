@@ -114,6 +114,10 @@ CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
 ###################################### CELERY  ################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = ENV_TOKENS.get('CELERYBEAT_SCHEDULER', CELERYBEAT_SCHEDULER)
+
 # Don't use a connection pool, since connections are dropped by ELB.
 BROKER_POOL_LIMIT = 0
 BROKER_CONNECTION_TIMEOUT = 1

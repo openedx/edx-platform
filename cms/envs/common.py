@@ -1273,6 +1273,10 @@ WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
 
 ################################# CELERY ######################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = 'celery.beat:PersistentScheduler'
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
