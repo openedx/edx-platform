@@ -2593,6 +2593,10 @@ DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
+# Celery beat configuration
+
+CELERYBEAT_SCHEDULER = 'celery.beat:PersistentScheduler'
+
 # Message configuration
 
 CELERY_TASK_SERIALIZER = 'json'
