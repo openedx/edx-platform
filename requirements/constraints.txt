@@ -13,7 +13,7 @@
 -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
 
 # latest version breaks the tests.
-django<2.3
+django<2.2.21
 
 # celery 5.0 has dropped python3.5 support.
 celery<5.0
