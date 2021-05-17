@@ -126,3 +126,5 @@ jinja2<3.0
 MarkupSafe<2.0
 click<8.0
 
+# greate version has breaking changes and requires some migration steps.
+django-webpack-loader==0.7.0
