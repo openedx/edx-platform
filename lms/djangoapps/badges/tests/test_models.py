@@ -32,7 +32,7 @@ def get_image(name):
     """
     Get one of the test images from the test data directory.
     """
-    return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png', mode='rb'))  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
+    return ImageFile(open(TEST_DATA_DIR / 'badges' / name + '.png', mode='rb'))  # lint-amnesty, pylint: disable=bad-option-value, open-builtin
 
 
 @override_settings(MEDIA_ROOT=TEST_DATA_ROOT)
