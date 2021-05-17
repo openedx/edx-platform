@@ -33,7 +33,7 @@ ROLES = {
 }
 
 
-def list_with_level(course, level):
+def list_with_level(course_id, level):
     """
     List users who have 'level' access.
 
@@ -41,23 +41,7 @@ def list_with_level(course, level):
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
-    return ROLES[level](course.id).users_with_role()
-
-
-def list_with_level_from_course_key(course_key, level):
-    """
-    List users who have 'level' access.
-
-    The 'level' value can be 'instructor', 'staff', or 'beta' for standard courses.
-
-    It is possible for other levels to be defined specific to the course. If there is no group for that level we return
-    an empty list.
-
-    This is a companion function to the `list_with_level` function. We are in the process of refactoring and removing
-    the `Certificates` apps dependence on `modulestore`. These functions will be consolidated at a later date. Progress
-    is being tracked in MICROBA-1178.
-    """
-    return ROLES[level](course_key).users_with_role()
+    return ROLES[level](course_id).users_with_role()
 
 
 def allow_access(course, user, level, send_email=True):

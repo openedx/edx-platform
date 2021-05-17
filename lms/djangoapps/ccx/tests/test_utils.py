@@ -87,15 +87,15 @@ class TestStaffOnCCX(CcxTestCase):
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
 
         # assert that staff and instructors of master course has staff and instructor roles on ccx
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
 
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) == len(list_staff_ccx_course)
             assert list_staff_master_course[0].email == list_staff_ccx_course[0].email
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) == len(list_instructor_master_course)
             assert list_instructor_ccx_course[0].email == list_instructor_master_course[0].email
 
@@ -136,15 +136,15 @@ class TestStaffOnCCX(CcxTestCase):
 
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name, send_email=False)
 
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
 
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) == len(list_staff_ccx_course)
             assert list_staff_master_course[0].email == list_staff_ccx_course[0].email
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) == len(list_instructor_master_course)
             assert list_instructor_ccx_course[0].email == list_instructor_master_course[0].email
 
@@ -152,10 +152,10 @@ class TestStaffOnCCX(CcxTestCase):
             remove_master_course_staff_from_ccx(
                 self.course, self.ccx_locator, self.ccx.display_name, send_email=False
             )
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) != len(list_staff_ccx_course)
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) != len(list_instructor_master_course)
 
             for user in list_staff_master_course:
@@ -178,15 +178,15 @@ class TestStaffOnCCX(CcxTestCase):
         assert len(outbox) == 0
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name, send_email=False)
 
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
 
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) == len(list_staff_ccx_course)
             assert list_staff_master_course[0].email == list_staff_ccx_course[0].email
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) == len(list_instructor_master_course)
             assert list_instructor_ccx_course[0].email == list_instructor_master_course[0].email
 
@@ -196,10 +196,10 @@ class TestStaffOnCCX(CcxTestCase):
             )
             assert len(outbox) == (len(list_staff_master_course) + len(list_instructor_master_course))
 
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) != len(list_staff_ccx_course)
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) != len(list_instructor_master_course)
 
             for user in list_staff_master_course:
@@ -212,10 +212,10 @@ class TestStaffOnCCX(CcxTestCase):
         assert len(outbox) == (len(list_staff_master_course) + len(list_instructor_master_course))
 
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
             assert len(list_staff_master_course) != len(list_staff_ccx_course)
 
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
             assert len(list_instructor_ccx_course) != len(list_instructor_master_course)
 
             for user in list_staff_master_course:
@@ -238,8 +238,8 @@ class TestStaffOnCCX(CcxTestCase):
         outbox = self.get_outbox()
         # create a unique display name
         display_name = f'custom_display_{uuid.uuid4()}'
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
         assert len(outbox) == 0
         # give access to the course staff/instructor
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, display_name)
@@ -263,8 +263,8 @@ class TestStaffOnCCX(CcxTestCase):
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name, send_email=False)
         # create a unique display name
         display_name = f'custom_display_{uuid.uuid4()}'
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
         assert len(outbox) == 0
         # give access to the course staff/instructor
         remove_master_course_staff_from_ccx(self.course, self.ccx_locator, display_name)
@@ -284,16 +284,16 @@ class TestStaffOnCCX(CcxTestCase):
         instructor = self.make_instructor()
         assert CourseInstructorRole(self.course.id).has_user(instructor)
         outbox = self.get_outbox()
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
         assert len(outbox) == 0
 
         # run the assignment the first time
         add_master_course_staff_to_ccx(self.course, self.ccx_locator, self.ccx.display_name)
         assert len(outbox) == (len(list_staff_master_course) + len(list_instructor_master_course))
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
         assert len(list_staff_master_course) == len(list_staff_ccx_course)
         for user in list_staff_master_course:
             assert user in list_staff_ccx_course
@@ -307,8 +307,8 @@ class TestStaffOnCCX(CcxTestCase):
         assert len(outbox) == (len(list_staff_master_course) + len(list_instructor_master_course))
         # there are no duplicated staffs
         with ccx_course(self.ccx_locator) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
         assert len(list_staff_master_course) == len(list_staff_ccx_course)
         for user in list_staff_master_course:
             assert user in list_staff_ccx_course
