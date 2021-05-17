@@ -106,7 +106,7 @@ class XQueueCertInterface:
         self.whitelist = CertificateWhitelist.objects.all()
         self.use_https = True
 
-    def regen_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):
+    def regen_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
         """(Re-)Make certificate for a particular student in a particular course
 
         Arguments:
@@ -152,7 +152,6 @@ class XQueueCertInterface:
         return self.add_cert(
             student,
             course_id,
-            course=course,
             forced_grade=forced_grade,
             template_file=template_file,
             generate_pdf=generate_pdf
@@ -175,7 +174,7 @@ class XQueueCertInterface:
         raise NotImplementedError
 
     # pylint: disable=too-many-statements
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, generate_pdf=True):  # lint-amnesty, pylint: disable=unused-argument
+    def add_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
         """
         Request a new certificate for a student.
 

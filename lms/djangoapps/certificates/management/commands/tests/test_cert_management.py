@@ -188,7 +188,6 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             key,
         )
         regen_cert_call_kwargs = xqueue.return_value.regen_cert.call_args.kwargs
-        assert regen_cert_call_kwargs.pop('course').location == self.course.location
         assert regen_cert_call_kwargs == {
             'forced_grade': None,
             'template_file': None,

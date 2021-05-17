@@ -103,7 +103,8 @@ class Command(BaseCommand):
 
             # Add the certificate request to the queue
             regenerate_user_certificates(
-                student, course_id, course=course,
+                student,
+                course_id,
                 forced_grade=options['grade_value'],
                 template_file=options['template_file'],
                 insecure=options['insecure']
