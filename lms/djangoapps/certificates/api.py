@@ -198,15 +198,11 @@ def get_recently_modified_certificates(course_keys=None, start_date=None, end_da
     return GeneratedCertificate.objects.filter(**cert_filter_args).order_by('modified_date')
 
 
-# lint-amnesty, pylint: disable=unused-argument
-def generate_user_certificates(student, course_key, course=None, insecure=False, generation_mode='batch',
-                               forced_grade=None):
+def generate_user_certificates(student, course_key, insecure=False, generation_mode='batch', forced_grade=None):
     return _generate_user_certificates(student, course_key, insecure, generation_mode, forced_grade)
 
 
-# lint-amnesty, pylint: disable=unused-argument
-def regenerate_user_certificates(student, course_key, course=None,
-                                 forced_grade=None, template_file=None, insecure=False):
+def regenerate_user_certificates(student, course_key, forced_grade=None, template_file=None, insecure=False):
     return _regenerate_user_certificates(student, course_key, forced_grade, template_file, insecure)
 
 

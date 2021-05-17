@@ -21,7 +21,6 @@ from lms.djangoapps.certificates.api import (
     is_using_v2_course_certificates,
 )
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from xmodule.modulestore.django import modulestore
 
 from .runner import TaskProgress
 
@@ -79,7 +78,6 @@ def generate_students_certificates(
     current_step = {'step': 'Generating Certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    course = modulestore().get_course(course_id, depth=0)
     # Generate certificate for each student
     for student in students_require_certs:
         task_progress.attempted += 1
@@ -89,11 +87,7 @@ def generate_students_certificates(
             generate_certificate_task(student, course_id)
         else:
             log.info(f'Attempt will be made to generate a certificate for user {student.id} in {course_id}.')
-            generate_user_certificates(
-                student,
-                course_id,
-                course=course
-            )
+            generate_user_certificates(student, course_id)
     return task_progress.update_task_state(extra_meta=current_step)
 
 
