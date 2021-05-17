@@ -170,6 +170,7 @@ class AccountViewSet(ViewSet):
             values.
 
             * id: numerical lms user id in db
+            * activation_key: auto-genrated activation key when signed up via email
             * bio: null or textual representation of user biographical
               information ("about me").
             * country: An ISO 3166 country code or null.

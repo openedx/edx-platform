@@ -123,6 +123,11 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
         except ObjectDoesNotExist:
             account_recovery = None
 
+        try:
+            activation_key = user.registration.activation_key
+        except ObjectDoesNotExist:
+            activation_key = None
+
         accomplishments_shared = badges_enabled()
         data = {
             "username": user.username,
@@ -138,6 +143,7 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "date_joined": user.date_joined.replace(microsecond=0),
             "last_login": user.last_login,
             "is_active": user.is_active,
+            "activation_key": activation_key,
             "bio": None,
             "country": None,
             "state": None,

@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
-from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory, RegistrationFactory
 
 from .. import ALL_USERS_VISIBILITY, CUSTOM_VISIBILITY, PRIVATE_VISIBILITY
 
@@ -125,6 +125,12 @@ class UserAPITestCase(APITestCase):
         legacy_profile.language_proficiencies.create(code=TEST_LANGUAGE_PROFICIENCY_CODE)
         legacy_profile.phone_number = "+18005555555"
         legacy_profile.save()
+
+    def create_user_registration(self, user):
+        """
+        Helper method that creates a registration object for the specified user
+        """
+        RegistrationFactory(user=user)
 
     def _verify_profile_image_data(self, data, has_profile_image):
         """
@@ -275,7 +281,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        assert 27 == len(data)
+        assert 28 == len(data)
 
         # public fields (3)
         expected_account_privacy = (
@@ -298,7 +304,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         assert data['accomplishments_shared'] is not None
         assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
 
-        # additional admin fields (11)
+        # additional admin fields (12)
         assert self.user.email == data['email']
         assert self.user.id == data['id']
         assert data['extended_profile'] is not None
@@ -340,6 +346,24 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
         assert 404 == response.status_code
+
+    @ddt.data(
+        ("client", "user"),
+    )
+    @ddt.unpack
+    def test_regsitration_activation_key(self, api_client, user):
+        """
+        Test that registration activation key has a value.
+
+        UserFactory does not auto-generate registration object for the test users.
+        It is created only for users that signup via email/API.  Therefore, activation key has to be tested manually.
+        """
+        self.create_user_registration(self.user)
+
+        client = self.login_client(api_client, user)
+        response = self.send_get(client)
+
+        assert response.data["activation_key"] is not None
 
     @ddt.data(
         ("client", "user"),
@@ -389,7 +413,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(25):
             response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response, account_privacy=ALL_USERS_VISIBILITY)
 
@@ -404,7 +428,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.create_mock_profile(self.user)
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(25):
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
@@ -530,7 +554,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             with self.assertNumQueries(queries):
                 response = self.send_get(self.client)
             data = response.data
-            assert 27 == len(data)
+            assert 28 == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -553,12 +577,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
             assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(22)
+        verify_get_own_information(23)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(14)
+        verify_get_own_information(15)
 
     def test_get_account_empty_string(self):
         """
@@ -573,7 +597,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(22):
+        with self.assertNumQueries(23):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None
@@ -929,7 +953,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client)
         if has_full_access:
             data = response.data
-            assert 27 == len(data)
+            assert 28 == len(data)
             assert self.user.username == data['username']
             assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
             assert self.user.email == data['email']
