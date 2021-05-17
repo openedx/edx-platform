@@ -390,19 +390,6 @@ class TestPhotoVerification(TestVerificationBase, MockS3BotoMixin, ModuleStoreTe
 
         assert verification.expiration_datetime == (verification.created_at + timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR']))
 
-    def test_deprecated_expiry_date(self):
-        """
-        Test `expiration_datetime` returns `expiry_date` if it is not null.
-        """
-        user = UserFactory.create()
-        with freeze_time(now()):
-            verification = SoftwareSecurePhotoVerification(user=user)
-            # First, assert that expiration_date is set correctly
-            assert verification.expiration_datetime == (now() + timedelta(days=FAKE_SETTINGS['DAYS_GOOD_FOR']))
-            verification.expiry_date = now() + timedelta(days=10)
-            # Then, assert that expiration_datetime favors expiry_date's value if set
-            assert verification.expiration_datetime == (now() + timedelta(days=10))
-
     def test_get_verification_from_receipt(self):
         result = SoftwareSecurePhotoVerification.get_verification_from_receipt('')
         assert result is None
