@@ -382,11 +382,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         with mock_passing_grade():
             # Generate certificate for user and check that user has a audit passing certificate.
-            cert_status = certs_api.generate_user_certificates(
-                student=self.user,
-                course_key=self.course.id,
-                course=self.course,
-            )
+            cert_status = certs_api.generate_user_certificates(student=self.user, course_key=self.course.id)
 
             # Check that certificate status is 'audit_passing'.
             assert cert_status == CertificateStatuses.audit_passing

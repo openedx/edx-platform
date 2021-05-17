@@ -1915,7 +1915,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 'Beta Tester.'
             )
 
-            generate_user_certificates(self.beta_tester, self.course.id, self.course)
+            generate_user_certificates(self.beta_tester, self.course.id)
             capture.check_present(('lms.djangoapps.certificates.generation_handler', 'INFO', message))
 
     def test_missing_params(self):
