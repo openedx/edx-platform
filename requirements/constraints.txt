@@ -118,3 +118,13 @@ diff-cover==4.0.0
 # transifex-client==0.14.2(latest) requires python-slugify<5.0.0 for Python 2.0 support.
 # This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
 python-slugify<5.0.0
+
+
+# Temporary package constraints to deal with some requirement upgrade issues.
+Sphinx<4.0
+jinja2<3.0
+MarkupSafe<2.0
+click<8.0
+
+# greater version has breaking changes and requires some migration steps.
+django-webpack-loader==0.7.0
