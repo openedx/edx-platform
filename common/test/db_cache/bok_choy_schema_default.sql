@@ -9,6 +9,21 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `agreements_integritysignature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `agreements_integritysignature` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `course_key` varchar(255) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `agreements_integritysignature_user_id_course_key_80bb4165_uniq` (`user_id`,`course_key`),
+  KEY `agreements_integritysignature_course_key_0536c1fa` (`course_key`),
+  CONSTRAINT `agreements_integritysignature_user_id_a4d26f65_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `announcements_announcement`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -431,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3040 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3048 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1859,6 +1874,27 @@ CREATE TABLE `course_goals_coursegoal` (
   CONSTRAINT `course_goals_coursegoal_user_id_0a07e3db_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `course_goals_historicalcoursegoal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_goals_historicalcoursegoal` (
+  `id` int(11) NOT NULL,
+  `course_key` varchar(255) NOT NULL,
+  `goal_key` varchar(100) NOT NULL,
+  `history_id` int(11) NOT NULL AUTO_INCREMENT,
+  `history_date` datetime(6) NOT NULL,
+  `history_change_reason` varchar(100) DEFAULT NULL,
+  `history_type` varchar(1) NOT NULL,
+  `history_user_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`history_id`),
+  KEY `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` (`history_user_id`),
+  KEY `course_goals_historicalcoursegoal_id_ae96ee01` (`id`),
+  KEY `course_goals_historicalcoursegoal_course_key_a8e29f00` (`course_key`),
+  KEY `course_goals_historicalcoursegoal_user_id_3aef8b4b` (`user_id`),
+  CONSTRAINT `course_goals_histori_history_user_id_b20abbc7_fk_auth_user` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `course_groups_cohortmembership`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -2988,7 +3024,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=861 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=863 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2999,7 +3035,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=863 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=867 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3355,38 +3391,6 @@ CREATE TABLE `edxval_videotranscript` (
   KEY `edxval_videotranscript_language_code_d78ce3d1` (`language_code`),
   KEY `edxval_videotranscript_file_format_3adddaf7` (`file_format`),
   CONSTRAINT `edxval_videotranscript_video_id_6ffdfb56_fk_edxval_video_id` FOREIGN KEY (`video_id`) REFERENCES `edxval_video` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `email_marketing_emailmarketingconfiguration`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `email_marketing_emailmarketingconfiguration` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `change_date` datetime(6) NOT NULL,
-  `enabled` tinyint(1) NOT NULL,
-  `sailthru_key` varchar(32) NOT NULL,
-  `sailthru_secret` varchar(32) NOT NULL,
-  `sailthru_new_user_list` varchar(48) NOT NULL,
-  `sailthru_retry_interval` int(11) NOT NULL,
-  `sailthru_max_retries` int(11) NOT NULL,
-  `changed_by_id` int(11) DEFAULT NULL,
-  `sailthru_abandoned_cart_delay` int(11) NOT NULL,
-  `sailthru_abandoned_cart_template` varchar(20) NOT NULL,
-  `sailthru_content_cache_age` int(11) NOT NULL,
-  `sailthru_enroll_cost` int(11) NOT NULL,
-  `sailthru_enroll_template` varchar(20) NOT NULL,
-  `sailthru_get_tags_from_sailthru` tinyint(1) NOT NULL,
-  `sailthru_purchase_template` varchar(20) NOT NULL,
-  `sailthru_upgrade_template` varchar(20) NOT NULL,
-  `sailthru_lms_url_override` varchar(80) NOT NULL,
-  `welcome_email_send_delay` int(11) NOT NULL,
-  `user_registration_cookie_timeout_delay` double NOT NULL,
-  `sailthru_welcome_template` varchar(20) NOT NULL,
-  `sailthru_verification_failed_template` varchar(20) NOT NULL,
-  `sailthru_verification_passed_template` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `email_marketing_emai_changed_by_id_15ce753b_fk_auth_user` (`changed_by_id`),
-  CONSTRAINT `email_marketing_emai_changed_by_id_15ce753b_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `embargo_country`;
@@ -5820,6 +5824,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempt` (
   `user_id` int(11) NOT NULL,
   `is_status_acknowledged` tinyint(1) NOT NULL,
   `time_remaining_seconds` int(11) DEFAULT NULL,
+  `is_resumable` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `proctoring_proctored_proctored_exam_id_0732c688_fk_proctorin` (`proctored_exam_id`),
   KEY `proctoring_proctoredexamstudentattempt_attempt_code_b10ad854` (`attempt_code`),
@@ -5869,6 +5874,7 @@ CREATE TABLE `proctoring_proctoredexamstudentattempthistory` (
   `last_poll_ipaddr` varchar(32) DEFAULT NULL,
   `proctored_exam_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `is_resumable` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `proctoring_proctored_proctored_exam_id_72c6f4ab_fk_proctorin` (`proctored_exam_id`),
   KEY `proctoring_proctored_user_id_52fb8674_fk_auth_user` (`user_id`),
