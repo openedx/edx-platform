@@ -126,5 +126,3 @@ jinja2<3.0
 MarkupSafe<2.0
 click<8.0
 
-# greater version is failing the quality build with too many args errors.
-edx-ora2==3.5.0
