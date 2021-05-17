@@ -97,6 +97,8 @@ notification_prefs_urls = [
 
 
 urlpatterns = [
+    url(r'^users-and-groups/?$', util_views.users_and_groups),
+
     url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
     url(r'', include('common.djangoapps.student.urls')),

@@ -223,3 +223,34 @@ def expose_header(header, response):
     exposedHeaders += f', {header}' if exposedHeaders else header
     response['Access-Control-Expose-Headers'] = exposedHeaders
     return response
+
+
+def users_and_groups(_request):
+    """
+    @@TODO temporary
+    """
+    from django.contrib.auth.models import Group, User
+    from django.http import JsonResponse
+    groups = (
+        {
+            "name": group.name,
+            "permissions": sorted(str(p) for p in group.permissions.all()),
+        }
+        for group in Group.objects.all()
+    )
+    users = (
+        {
+            "username": user.username,
+            "email": user.email,
+            "staff": user.is_staff,
+            "superuser": user.is_superuser,
+            "groups": sorted(g.name for g in user.groups.all()),
+
+        }
+        for user in User.objects.all()
+    )
+    result = {
+        "django_users": sorted(users, key=lambda u: u["username"]),
+        "django_groups": sorted(groups, key=lambda u: u["name"]),
+    }
+    return JsonResponse(result, json_dumps_params={'indent': 4})
