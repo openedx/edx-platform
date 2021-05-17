@@ -72,10 +72,7 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration,
 )
-from lms.djangoapps.courseware.toggles import (
-    streak_celebration_is_active,
-    COURSEWARE_PROCTORING_IMPROVEMENTS,
-)
+from lms.djangoapps.courseware.toggles import streak_celebration_is_active
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
@@ -1423,11 +1420,10 @@ class CourseEnrollment(models.Model):
                 self.send_signal(EnrollStatusChange.unenroll)
 
         if mode_changed:
-            if COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(self.course_id):
-                # If mode changed to one that requires proctoring, send proctoring requirements email
-                if should_send_proctoring_requirements_email(self.user.username, self.course_id):
-                    email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
-                    send_proctoring_requirements_email(context=email_context)
+            # If mode changed to one that requires proctoring, send proctoring requirements email
+            if should_send_proctoring_requirements_email(self.user.username, self.course_id):
+                email_context = generate_proctoring_requirements_email_context(self.user, self.course_id)
+                send_proctoring_requirements_email(context=email_context)
 
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting

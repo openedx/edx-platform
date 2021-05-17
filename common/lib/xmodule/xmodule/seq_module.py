@@ -22,7 +22,6 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Boolean, Integer, List, Scope, String
 
 from edx_toggles.toggles import LegacyWaffleFlag
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
@@ -892,8 +891,7 @@ class SequenceBlock(
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
-                'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'experimental_proctoring_features': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_id),
+                'grace_period': self.graceperiod  # lint-amnesty, pylint: disable=no-member
             }
 
             # inject the user's credit requirements and fulfillments

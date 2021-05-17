@@ -85,20 +85,6 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_streak_celebration', __name__
 )
 
-# .. toggle_name: courseware.proctoring_improvements
-# .. toggle_implementation: CourseWaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to toggle various enhancements to the proctoring experience, including but
-#   not limited to the display of learner facing proctoring information on the course outline, changes to the
-#   Proctortrack onboarding flow, changes to IDV (identity verification) requirements, etc.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-10-07
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: MST-432
-COURSEWARE_PROCTORING_IMPROVEMENTS = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'proctoring_improvements', __name__
-)
-
 # .. toggle_name: courseware.optimized_render_xblock
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False

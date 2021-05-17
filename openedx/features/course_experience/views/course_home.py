@@ -25,7 +25,6 @@ from lms.djangoapps.course_goals.api import (
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
 from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_upgrade_deadline_link
 from lms.djangoapps.courseware.views.views import CourseTabView
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
@@ -247,7 +246,6 @@ class CourseHomeFragmentView(EdxFragmentView):
             'upgrade_url': upgrade_url,
             'has_discount': has_discount,
             'show_search': show_search,
-            'show_proctoring_info_panel': COURSEWARE_PROCTORING_IMPROVEMENTS.is_enabled(course_key),
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)
