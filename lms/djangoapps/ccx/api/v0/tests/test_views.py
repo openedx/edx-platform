@@ -661,12 +661,12 @@ class CcxListTest(CcxRestApiTest):
         assert len(outbox) == 1
         assert self.coach.email in outbox[0].recipients()
 
-        list_staff_master_course = list_with_level(self.course, 'staff')
-        list_instructor_master_course = list_with_level(self.course, 'instructor')
+        list_staff_master_course = list_with_level(self.course.id, 'staff')
+        list_instructor_master_course = list_with_level(self.course.id, 'instructor')
         course_key = CourseKey.from_string(resp.data.get('ccx_course_id'))
         with ccx_course_cm(course_key) as course_ccx:
-            list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
+            list_staff_ccx_course = list_with_level(course_ccx.id, 'staff')
+            list_instructor_ccx_course = list_with_level(course_ccx.id, 'instructor')
 
         # The "Coach" in the parent course becomes "Staff" on the CCX, so the CCX should have 1 "Staff"
         # user more than the parent course

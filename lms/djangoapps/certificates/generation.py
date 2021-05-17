@@ -17,7 +17,7 @@ from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCer
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level_from_course_key
+from lms.djangoapps.instructor.access import list_with_level
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 
 log = logging.getLogger(__name__)
@@ -122,7 +122,7 @@ def generate_user_certificates(student, course_key, insecure=False, generation_m
         forced_grade - a string indicating to replace grade parameter. if present grading
                        will be skipped.
     """
-    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
+    beta_testers_queryset = list_with_level(course_key, 'beta')
     if beta_testers_queryset.filter(username=student.username):
         log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key}. User is a Beta Tester.")
         return

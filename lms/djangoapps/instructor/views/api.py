@@ -963,7 +963,7 @@ def list_course_role_members(request, course_id):
     response_payload = {
         'course_id': str(course_id),
         rolename: list(map(extract_user_info, list_with_level(
-            course, rolename
+            course.id, rolename
         ))),
     }
     return JsonResponse(response_payload)

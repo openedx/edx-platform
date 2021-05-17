@@ -25,7 +25,7 @@ from lms.djangoapps.certificates.utils import (
     has_html_certificates_enabled
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
-from lms.djangoapps.instructor.access import list_with_level_from_course_key
+from lms.djangoapps.instructor.access import list_with_level
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
@@ -371,7 +371,7 @@ def _is_beta_tester(user, course_key):
     """
     Check if the user is a beta tester in this course run
     """
-    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
+    beta_testers_queryset = list_with_level(course_key, 'beta')
     return beta_testers_queryset.filter(username=user.username).exists()
 
 
@@ -443,7 +443,7 @@ def generate_user_certificates(student, course_key, insecure=False, generation_m
                  f'{student.id}.')
         return generate_certificate_task(student, course_key)
 
-    beta_testers_queryset = list_with_level_from_course_key(course_key, 'beta')
+    beta_testers_queryset = list_with_level(course_key, 'beta')
     if beta_testers_queryset.filter(username=student.username):
         log.info(f"Canceling Certificate Generation task for user {student.id} : {course_key}. User is a Beta Tester.")
         return
