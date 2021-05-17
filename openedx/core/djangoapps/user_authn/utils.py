@@ -75,20 +75,25 @@ def is_registration_api_v1(request):
 def generate_username_suggestions(username):
     """ Generate 3 available username suggestions """
     max_length = USERNAME_MAX_LENGTH
-    short_username = username[:max_length - 4] if max_length is not None else username
+    short_username = username[:max_length - 6] if max_length is not None else username
+    short_username = short_username.replace('_', '').replace('-', '')
 
     username_suggestions = []
-    int_ranges = {
-        1: {'min': 0, 'max': 9},
-        2: {'min': 10, 'max': 99},
-        3: {'min': 100, 'max': 999},
-    }
-    while len(username_suggestions) < 3:
-        int_length = len(username_suggestions) + 1
-        int_range = int_ranges[int_length]
-        random_int = random.randint(int_range['min'], int_range['max'])
-        username = f'{short_username}_{random_int}'
-        if not username_exists_or_retired(username):
-            username_suggestions.append(username)
+    int_ranges = [
+        {'min': 0, 'max': 9},
+        {'min': 10, 'max': 99},
+        {'min': 100, 'max': 999},
+        {'min': 1000, 'max': 99999},
+    ]
+    for int_range in int_ranges:
+        for _ in range(10):
+            random_int = random.randint(int_range['min'], int_range['max'])
+            suggestion = f'{short_username}_{random_int}'
+            if not username_exists_or_retired(suggestion):
+                username_suggestions.append(suggestion)
+                break
+
+        if len(username_suggestions) == 3:
+            break
 
     return username_suggestions
