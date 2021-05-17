@@ -3,7 +3,6 @@ Views for the course home page.
 """
 
 
-import six  # lint-amnesty, pylint: disable=unused-import
 from django.conf import settings
 from django.template.context_processors import csrf
 from django.template.loader import render_to_string
@@ -31,26 +30,25 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
+from openedx.features.course_experience import (
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
+    LATEST_UPDATE_FLAG,
+    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
+)
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
+from openedx.features.course_experience.utils import get_course_outline_block_tree, get_resume_block, get_start_block
+from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
+from openedx.features.course_experience.views.course_home_messages import CourseHomeMessageFragmentView
+from openedx.features.course_experience.views.course_outline import CourseOutlineFragmentView
+from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
+from openedx.features.course_experience.views.latest_update import LatestUpdateFragmentView
+from openedx.features.course_experience.views.welcome_message import WelcomeMessageFragmentView
 from openedx.features.discounts.utils import get_first_purchase_offer_banner_fragment
 from openedx.features.discounts.utils import format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
-
-from .. import (
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    LATEST_UPDATE_FLAG,
-    SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-)
-from ..utils import get_course_outline_block_tree, get_resume_block, get_start_block
-from .course_dates import CourseDatesFragmentView
-from .course_home_messages import CourseHomeMessageFragmentView
-from .course_outline import CourseOutlineFragmentView
-from .course_sock import CourseSockFragmentView
-from .latest_update import LatestUpdateFragmentView
-from .welcome_message import WelcomeMessageFragmentView
 
 EMPTY_HANDOUTS_HTML = '<ol></ol>'
 
