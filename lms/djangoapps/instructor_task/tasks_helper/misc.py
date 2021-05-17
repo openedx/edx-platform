@@ -448,7 +448,7 @@ def upload_ora2_submission_files(
             'Failed to download and compress submissions attachments.',
             'Error while downloading and compressing submissions attachments',
         ):
-            compressed = OraDownloadData.create_zip_with_attachments(zip_file, course_id, submission_files_data)
+            compressed = OraDownloadData.create_zip_with_attachments(zip_file, submission_files_data)
 
         if compressed is None:
             return UPDATE_STATUS_FAILED

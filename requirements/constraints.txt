@@ -129,6 +129,3 @@ click<8.0
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
 
-# greater version was failing in quality. Too many positional arguments for classmethod call.
-edx-ora2==3.5.0
-
