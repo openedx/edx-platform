@@ -18,7 +18,7 @@ click==7.1.2
     #   code-annotations
 code-annotations==1.1.1
     # via -r requirements/edx/doc.in
-django==2.2.20
+django==2.2.23
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
