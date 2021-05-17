@@ -71,17 +71,17 @@ class BlockCompletionTransformer(BlockStructureTransformer):
             block_structure.override_xblock_field(block_key, self.COMPLETE, True)
             if str(block_key) == str(latest_complete_block_key):
                 block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
+        elif block_structure.get_xblock_field(block_key, 'completion_mode') == CompletionMode.AGGREGATOR:
+            children = block_structure.get_children(block_key)
+            all_children_complete = all(block_structure.get_xblock_field(child_key, self.COMPLETE)
+                                        for child_key in children
+                                        if not self._is_block_excluded(block_structure, child_key))
 
-        children = block_structure.get_children(block_key)
-        all_children_complete = all(block_structure.get_xblock_field(child_key, self.COMPLETE)
-                                    for child_key in children
-                                    if not self._is_block_excluded(block_structure, child_key))
+            if all_children_complete:
+                block_structure.override_xblock_field(block_key, self.COMPLETE, True)
 
-        if children and all_children_complete:
-            block_structure.override_xblock_field(block_key, self.COMPLETE, True)
-
-        if any(block_structure.get_xblock_field(child_key, self.RESUME_BLOCK) for child_key in children):
-            block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
+            if any(block_structure.get_xblock_field(child_key, self.RESUME_BLOCK) for child_key in children):
+                block_structure.override_xblock_field(block_key, self.RESUME_BLOCK, True)
 
     def transform(self, usage_info, block_structure):
         """

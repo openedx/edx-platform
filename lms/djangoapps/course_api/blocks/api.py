@@ -88,6 +88,13 @@ def get_blocks(
             HiddenContentTransformer()
         ]
 
+    # Note: A change to the BlockCompletionTransformer (https://github.com/edx/edx-platform/pull/27622/)
+    # will be introducing a bug if hide_access_denials is True.  I'm accepting this risk because in
+    # the AccessDeniedMessageFilterTransformer, there is note about deleting it and I believe it is
+    # technically deprecated functionality. The only use case where hide_access_denials is True
+    # (outside of explicitly setting the temporary waffle flag) is in lms/djangoapps/course_api/blocks/urls.py
+    # for a v1 api that I also believe should have been deprecated and removed. When this code is removed,
+    # please also remove this comment. Thanks!
     if hide_access_denials:
         transformers += [AccessDeniedMessageFilterTransformer()]
 

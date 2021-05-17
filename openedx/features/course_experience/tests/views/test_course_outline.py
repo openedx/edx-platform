@@ -462,6 +462,9 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
             vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
             vertical3 = ItemFactory.create(category='vertical', parent_location=sequential3.location)
             vertical4 = ItemFactory.create(category='vertical', parent_location=sequential4.location)
+            problem = ItemFactory.create(category='problem', parent_location=vertical.location)
+            problem2 = ItemFactory.create(category='problem', parent_location=vertical2.location)
+            problem3 = ItemFactory.create(category='problem', parent_location=vertical3.location)
         course.children = [chapter, chapter2]
         chapter.children = [sequential, sequential2]
         chapter2.children = [sequential3, sequential4]
@@ -469,6 +472,9 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         sequential2.children = [vertical2]
         sequential3.children = [vertical3]
         sequential4.children = [vertical4]
+        vertical.children = [problem]
+        vertical2.children = [problem2]
+        vertical3.children = [problem3]
         if hasattr(cls, 'user'):
             CourseEnrollment.enroll(cls.user, course.id)
         return course
@@ -545,8 +551,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.client.get(course_home_url(course))
         content = pq(response.content)
 
-        # Subsection should be checked
-        assert len(content('.fa-check')) == 1
+        # Subsection should be checked. Subsection 4 is also checked because it contains a vertical with no content
+        assert len(content('.fa-check')) == 2
 
     def test_start_course(self):
         """
@@ -561,8 +567,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
 
-        vertical = course.children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name)
+        problem = course.children[0].children[0].children[0].children[0]
+        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem.url_name)
 
     @override_settings(LMS_BASE='test_url:9999')
     def test_resume_course_with_completion_api(self):
@@ -573,33 +579,33 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
         # Course tree
         course = self.course
-        vertical1 = course.children[0].children[0].children[0]
-        vertical2 = course.children[0].children[1].children[0]
+        problem1 = course.children[0].children[0].children[0].children[0]
+        problem2 = course.children[0].children[1].children[0].children[0]
 
-        self.complete_sequential(self.course, vertical1)
+        self.complete_sequential(self.course, problem1)
         # Test for 'resume' link
         response = self.visit_course_home(course, resume_count=1)
 
-        # Test for 'resume' link URL - should be vertical 1
+        # Test for 'resume' link URL - should be problem 1
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/vertical/' + vertical1.url_name)
+        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem1.url_name)
 
-        self.complete_sequential(self.course, vertical2)
+        self.complete_sequential(self.course, problem2)
         # Test for 'resume' link
         response = self.visit_course_home(course, resume_count=1)
 
-        # Test for 'resume' link URL - should be vertical 2
+        # Test for 'resume' link URL - should be problem 2
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name)
+        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem2.url_name)
 
         # visit sequential 1, make sure 'Resume Course' URL is robust against 'Last Visited'
         # (even though I visited seq1/vert1, 'Resume Course' still points to seq2/vert2)
         self.visit_sequential(course, course.children[0], course.children[0].children[0])
 
-        # Test for 'resume' link URL - should be vertical 2 (last completed block, NOT last visited)
+        # Test for 'resume' link URL - should be problem 2 (last completed block, NOT last visited)
         response = self.visit_course_home(course, resume_count=1)
         content = pq(response.content)
-        assert content('.action-resume-course').attr('href').endswith('/vertical/' + vertical2.url_name)
+        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem2.url_name)
 
     def test_resume_course_deleted_sequential(self):
         """
@@ -662,8 +668,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         CourseEnrollment.get_enrollment(self.user, course.id).delete()
         response = self.visit_course_home(course, start_count=1, resume_count=0)
         content = pq(response.content)
-        vertical = course.children[0].children[0].children[0]
-        assert content('.action-resume-course').attr('href').endswith('/vertical/' + vertical.url_name)
+        problem = course.children[0].children[0].children[0].children[0]
+        assert content('.action-resume-course').attr('href').endswith('/problem/' + problem.url_name)
 
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
     def test_course_outline_auto_open(self):
