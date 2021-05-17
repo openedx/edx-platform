@@ -287,6 +287,7 @@ django-waffle==2.1.0
     #   edx-toggles
 django-webpack-loader==0.7.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-proctoring
 django==2.2.20
