@@ -114,6 +114,7 @@ chem==1.2.0
     # via -r requirements/edx/base.in
 click==7.1.2
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/../edx-sandbox/shared.txt
     #   code-annotations
@@ -456,7 +457,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.8.9
+edx-proctoring==3.9.1
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
