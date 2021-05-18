@@ -114,6 +114,7 @@ chem==1.2.0
     # via -r requirements/edx/base.in
 click==7.1.2
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/../edx-sandbox/shared.txt
     #   code-annotations
@@ -390,7 +391,7 @@ edx-analytics-data-api-client==0.17.0
     # via -r requirements/edx/base.in
 edx-api-doc-tools==1.4.0
     # via -r requirements/edx/base.in
-edx-bulk-grades==0.8.9
+edx-bulk-grades==0.8.10
     # via
     #   -r requirements/edx/base.in
     #   staff-graded-xblock

@@ -8,6 +8,7 @@ cffi==1.14.5
     # via cryptography
 click==7.1.2
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx-sandbox/../constraints.txt
     #   nltk
 cryptography==3.2.1
