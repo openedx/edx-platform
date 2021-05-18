@@ -508,14 +508,12 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
     USERNAME = 'frank-underwood'
     PASSWORD = 'ṕáśśẃőŕd'
     EMAIL = 'frank+underwood@example.com'
-    ID = -1
 
     def test_create_account(self):
         # Create a new account, which should have empty account settings by default.
         self.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
-        self.ID = user.id
         request = RequestFactory().get("/api/user/v1/accounts/")
         request.user = user
         account_settings = get_account_settings(request)[0]
@@ -530,8 +528,9 @@ class AccountSettingsOnCreationTest(CreateAccountMixin, TestCase):
         assert account_settings == {
             'username': self.USERNAME,
             'email': self.EMAIL,
-            'id': self.ID,
+            'id': user.id,
             'name': self.USERNAME,
+            'activation_key': user.registration.activation_key,
             'gender': None, 'goals': '',
             'is_active': False,
             'level_of_education': None,
