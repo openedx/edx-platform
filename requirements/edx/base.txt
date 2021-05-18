@@ -24,7 +24,9 @@
     # via -r requirements/edx/github.in
 -e common/lib/safe_lxml
     # via -r requirements/edx/local.in
--e common/lib/sandbox-packages
+-e common/lib/sandbox-packages/loncapa
+    # via -r requirements/edx/local.in
+-e common/lib/sandbox-packages/verifiers
     # via -r requirements/edx/local.in
 -e common/lib/symmath
     # via -r requirements/edx/local.in

@@ -2,7 +2,8 @@
 -e .
 -e common/lib/capa
 -e common/lib/safe_lxml
--e common/lib/sandbox-packages
+-e common/lib/sandbox-packages/loncapa
+-e common/lib/sandbox-packages/verifiers
 -e common/lib/symmath
 -e common/lib/xmodule
 
