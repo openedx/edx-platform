@@ -7,12 +7,18 @@ import uuid
 from unittest import mock
 
 import ddt
+from completion.models import BlockCompletion
+from completion.test_utils import CompletionWaffleTestMixin
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch
-from edx_toggles.toggles.testutils import override_waffle_flag
+from django.urls import NoReverseMatch, reverse
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
@@ -34,11 +40,16 @@ from openedx.features.enterprise_support.utils import (
     get_enterprise_slug_login_url,
     get_provider_login_url,
     handle_enterprise_cookies_for_logistration,
+    is_course_accessed,
     is_enterprise_learner,
     update_account_settings_context_for_enterprise,
     update_logistration_context_for_enterprise,
     update_third_party_auth_context_for_enterprise
 )
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+TEST_PASSWORD = 'test'
 
 
 @ddt.ddt
@@ -515,3 +526,128 @@ class TestEnterpriseUtils(TestCase):
             redirect_url=redirect_url,
         )
         assert not mock_next_login_url.called
+
+
+@override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
+@skip_unless_lms
+class TestCourseAccessed(SharedModuleStoreTestCase, CompletionWaffleTestMixin):
+    """
+    Test the course accessed functionality.
+
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Creates a test course that can be used for non-destructive tests
+        """
+        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.course = cls.create_test_course()
+
+    @classmethod
+    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
+        """Set up and enroll our fake user in the course."""
+        cls.user = UserFactory(password=TEST_PASSWORD)
+        CourseEnrollment.enroll(cls.user, cls.course.id)
+        cls.site = Site.objects.get_current()
+
+    @classmethod
+    def create_test_course(cls):
+        """
+        Creates a test course.
+        """
+        course = CourseFactory.create()
+        with cls.store.bulk_operations(course.id):
+            chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+            chapter2 = ItemFactory.create(category='chapter', parent_location=course.location)
+            sequential = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential2 = ItemFactory.create(category='sequential', parent_location=chapter.location)
+            sequential3 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
+            sequential4 = ItemFactory.create(category='sequential', parent_location=chapter2.location)
+            vertical = ItemFactory.create(category='vertical', parent_location=sequential.location)
+            vertical2 = ItemFactory.create(category='vertical', parent_location=sequential2.location)
+            vertical3 = ItemFactory.create(category='vertical', parent_location=sequential3.location)
+            vertical4 = ItemFactory.create(category='vertical', parent_location=sequential4.location)
+        course.children = [chapter, chapter2]
+        chapter.children = [sequential, sequential2]
+        chapter2.children = [sequential3, sequential4]
+        sequential.children = [vertical]
+        sequential2.children = [vertical2]
+        sequential3.children = [vertical3]
+        sequential4.children = [vertical4]
+        if hasattr(cls, 'user'):
+            CourseEnrollment.enroll(cls.user, course.id)
+        return course
+
+    def setUp(self):
+        """
+        Set up for the tests.
+        """
+        super().setUp()
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+
+    @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
+    def complete_sequential(self, course, sequential):
+        """
+        Completes provided sequential.
+        """
+        course_key = CourseKey.from_string(str(course.id))
+        # Fake a visit to sequence2/vertical2
+        block_key = UsageKey.from_string(str(sequential.location))
+        if block_key.course_key.run is None:
+            # Old mongo keys must be annotated with course run info before calling submit_completion:
+            block_key = block_key.replace(course_key=course_key)
+        completion = 1.0
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            block_key=block_key,
+            completion=completion
+        )
+
+    def course_home_url(self, course):
+        """
+        Returns the URL for the course's home page.
+
+        Arguments:
+            course (CourseBlock): The course being tested.
+        """
+        return self.course_home_url_from_string(str(course.id))
+
+    def course_home_url_from_string(self, course_key_string):
+        """
+        Returns the URL for the course's home page.
+
+        Arguments:
+            course_key_string (String): The course key as string.
+        """
+        return reverse(
+            'openedx.course_experience.course_home',
+            kwargs={
+                'course_id': course_key_string,
+            }
+        )
+
+    def test_course_accessed_for_visit_course_home(self):
+        """
+        Test that a visit to course home does not fall under course access
+        """
+        response = self.client.get(self.course_home_url(self.course))
+        assert response.status_code == 200
+        course_accessed = is_course_accessed(self.user, str(self.course.id))
+        self.assertFalse(course_accessed)
+
+    @override_settings(LMS_BASE='test_url:9999')
+    def test_course_accessed_with_completion_api(self):
+        """
+        Tests the course accessed function with completion API functionality
+        """
+        self.override_waffle_switch(True)
+
+        # Course tree
+        course = self.course
+        vertical1 = course.children[0].children[0].children[0]
+
+        self.complete_sequential(self.course, vertical1)
+        course_accessed = is_course_accessed(self.user, str(self.course.id))
+        self.assertTrue(course_accessed)
