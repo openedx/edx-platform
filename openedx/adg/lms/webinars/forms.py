@@ -19,8 +19,10 @@ class WebinarForm(forms.ModelForm):
         label=_('Add guests by email address'),
         help_text=_('Add comma separated emails e.g. example1@domain.com,example2@domain.com')
     )
-    send_update_emails_to_registrants = forms.BooleanField(
-        required=False, label=_('Send update email to all the users who have registered')
+    send_update_emails = forms.BooleanField(
+        required=False, label=_(
+            'Send update email to registered users and to existing co-hosts, panelists, and presenter'
+        )
     )
     invite_all_platform_users = forms.BooleanField(required=False, label=_('Invite all Omnipreneurship Academy users'))
 

@@ -24,7 +24,11 @@ from .constants import (
     WEBINAR_DEFAULT_TIME_ZONE,
     WEBINAR_TIME_FORMAT
 )
-from .helpers import cancel_reminders_for_given_webinars, send_cancellation_emails_for_given_webinars
+from .helpers import (
+    cancel_all_reminders,
+    cancel_reminders_for_given_webinars,
+    send_cancellation_emails_for_given_webinars
+)
 from .managers import WebinarRegistrationManager
 
 
@@ -183,8 +187,30 @@ class Webinar(TimeStampedModel):
         if old_values and old_values.get('start_time') != self.start_time:
             task_reschedule_webinar_reminders.delay(self.to_dict())
 
-    def webinar_team(self):
-        return set(chain(self.co_hosts.all(), self.panelists.all(), {self.presenter}))
+    def webinar_co_hosts_and_panelists(self):
+        """
+        Returns:
+            set: All co-hosts and panelists of the webinar
+        """
+        return set(chain(self.co_hosts.all(), self.panelists.all()))
+
+    def create_team_registrations(self, team_members, **kwargs):
+        """
+        Create or update webinar team registrations.
+
+        Args:
+            team_members (list): List of users for which team registrations will be added.
+            **kwargs (dict): Dictionary of values to be set for the registrations.
+
+        Returns:
+            None
+        """
+        for member in team_members:
+            self.registrations.update_or_create(  # pylint: disable=no-member
+                user=member, defaults={
+                    'is_team_member_registration': True, **kwargs
+                }
+            )
 
     @property
     def start_date_time_AST(self):
@@ -212,6 +238,35 @@ class Webinar(TimeStampedModel):
             Formatted AST time string
         """
         return convert_date_time_zone_and_format(self.start_time, WEBINAR_DEFAULT_TIME_ZONE, WEBINAR_TIME_FORMAT)
+
+    def remove_team_registrations_and_cancel_reminders(self, removed_members):
+        """
+        Given a list of team members of the webinar, remove their team registrations and cancel all reminder emails.
+
+        Arguments:
+            removed_members (list): List of team members whose registrations are to be removed and reminders cancelled
+
+        Returns:
+            None
+        """
+        registrations_to_remove = self.registrations.filter(user__in=removed_members)
+        registrations_to_remove.update(is_team_member_registration=False)
+
+        cancel_all_reminders(registrations_to_remove)
+
+    def get_webinar_update_recipients_emails(self):
+        """
+        Get emails of all update recipients of a given webinar. Update recipients correspond to registered users or
+        webinar team members (presenter/co-hosts/panelists).
+
+        Returns:
+            list: A list of emails that correspond to webinar update recipients
+        """
+        return list(
+            self.registrations.webinar_team_and_active_user_registrations().values_list(  # pylint: disable=no-member
+                'user__email', flat=True
+            )
+        )
 
 
 class CancelledWebinar(Webinar):
@@ -255,43 +310,3 @@ class WebinarRegistration(TimeStampedModel):
 
     def __str__(self):
         return f'User {self.user}, Webinar {self.webinar}'
-
-    @classmethod
-    def create_team_registrations(cls, team_members, webinar, **kwargs):
-        """
-        Create or update webinar team registrations.
-
-        Args:
-            team_members (list): List of users for which team registrations will be added.
-            webinar (Webinar): Webinar for which registrations will be added.
-            is_webinar_team (bool): Are registrations for webinar team members.
-            **kwargs (dict): Dictionary of values to be set for the registrations.
-
-        Returns:
-            None
-        """
-        for member in team_members:
-            WebinarRegistration.objects.update_or_create(
-                webinar=webinar, user=member, defaults={
-                    'is_team_member_registration': True,
-                    **kwargs
-                }
-            )
-
-    @classmethod
-    def remove_team_registrations(cls, team_members, webinar):
-        """
-        Marks `is_team_member_registration=False` for the given members.
-
-        Args:
-            team_members (list): List of team members for which `is_team_member_registration` will be marked as False.
-            webinar (Webinar): Webinar for which registrations will be updated.
-
-        Returns:
-            None
-        """
-        cls.objects.filter(
-            webinar=webinar, user__in=team_members
-        ).update(
-            is_team_member_registration=False
-        )

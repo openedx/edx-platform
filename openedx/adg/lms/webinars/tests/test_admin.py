@@ -20,6 +20,7 @@ from openedx.adg.lms.webinars.admin import (
     WebinarRegistrationAdmin
 )
 from openedx.adg.lms.webinars.constants import (
+    SEND_UPDATE_EMAILS_FIELD,
     WEBINAR_STATUS_CANCELLED,
     WEBINAR_STATUS_DELIVERED,
     WEBINAR_STATUS_UPCOMING
@@ -165,7 +166,7 @@ def test_send_update_emails_to_registrants_in_webinar_update(webinar_admin_insta
     Test that 'send_update_emails_to_registrants' is in fields when modifying webinar.
     """
     fields = WebinarAdmin.get_fields(webinar_admin_instance, request, WebinarFactory())
-    assert 'send_update_emails_to_registrants' in fields
+    assert SEND_UPDATE_EMAILS_FIELD in fields
 
 
 @pytest.mark.django_db
@@ -177,6 +178,9 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
     mock_send_webinar_emails = mocker.patch('openedx.adg.lms.webinars.admin.send_webinar_emails')
     mock_form_class = mocker.patch('openedx.adg.lms.webinars.forms.WebinarForm')
 
+    mock_get_webinar_invitees_emails = mocker.patch('openedx.adg.lms.webinars.admin.get_webinar_invitees_emails')
+    mock_get_webinar_invitees_emails.return_value = ['test@email.com']
+
     request.method = 'POST'
     mock_form_class.instance = webinar
 
@@ -186,12 +190,13 @@ def test_save_related_send_emails(request, webinar_admin_instance, webinar, mock
         WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
         mock_send_webinar_emails.assert_has_calls([
             call(MandrillClient.WEBINAR_UPDATED, webinar, [user.email]),
-            call(MandrillClient.WEBINAR_CREATED, webinar, [])
+            call(MandrillClient.WEBINAR_CREATED, webinar, ['test@email.com'])
         ])
     else:
         WebinarAdmin.save_related(webinar_admin_instance, request, mock_form_class, [], update)
+        expected_invitee_emails = list({'test@email.com', webinar.presenter.email})
         mock_send_webinar_emails.assert_called_once_with(
-            MandrillClient.WEBINAR_CREATED, webinar, []
+            MandrillClient.WEBINAR_CREATED, webinar, expected_invitee_emails
         )
 
 
@@ -241,3 +246,18 @@ def create_test_webinars_as_per_status(webinar_statues):
             WebinarFactory(end_time=now() - timedelta(hours=1))
         else:
             WebinarFactory(is_cancelled=True)
+
+
+@pytest.mark.django_db
+def test_save_model(webinar_admin_instance, request, webinar):
+    """
+    Test that the extended `save_model` method stores webinar object prior to updation in `old_webinar` instance
+    variable of the model admin and later also persists the updated webinar state in db.
+    """
+    old_webinar_title = webinar.title
+
+    webinar.title = 'Updated Title'
+    webinar_admin_instance.save_model(request, webinar, Mock(), True)
+
+    assert webinar_admin_instance.old_webinar.title == old_webinar_title
+    assert Webinar.objects.get(id=webinar.id).title == 'Updated Title'
