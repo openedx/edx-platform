@@ -10,6 +10,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import InvalidPage
 from django.http import Http404
+from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
@@ -317,119 +318,34 @@ class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
     def setUpClass(cls):
         super(TestGetCourseMembers, cls).setUpClass()
         cls.course = cls.create_course()
-        cls.course2 = cls.create_course(course='course2')
         cls.honor = cls.create_user('honor', is_staff=False)
         cls.staff = cls.create_user('staff', is_staff=True)
         cls.instructor = cls.create_user('instructor', is_staff=True)
 
-        # attach users with cls.course
+        # Attach users with cls.course
         cls.create_enrollment(user=cls.honor, course_id=cls.course.id)
+        cls.create_enrollment(user=cls.instructor, course_id=cls.course.id)
         cls.create_courseaccessrole(user=cls.staff, course_id=cls.course.id, role='staff')
         cls.create_courseaccessrole(user=cls.instructor, course_id=cls.course.id, role='instructor')
-
-        # attach users with cls.course2
-        cls.create_enrollment(user=cls.honor, course_id=cls.course2.id)
-        cls.create_courseaccessrole(user=cls.staff, course_id=cls.course2.id, role='staff')
-        cls.create_courseaccessrole(user=cls.instructor, course_id=cls.course2.id, role='instructor')
 
     def test_get_course_members(self):
         """
         Test all different possible filtering
         """
-        # by default it should return all type of users
-        members = get_course_members(self.course.id)
-        assert members['count'] == 3
-        assert members['num_pages'] == 1
-        assert members['current_page'] == 1
+        with self.assertNumQueries(3):
+            members = get_course_members(self.course.id)
 
-        # exclude students
-        members = get_course_members(self.course.id, include_students=False)
-        assert members['count'] == 2
-
-        # get only staff
-        members = get_course_members(self.course.id, include_students=False, access_roles=['staff'])
-        assert members['count'] == 1
-        assert members['result'][0]['username'] == 'staff'
-
-        # get only instructor
-        members = get_course_members(self.course.id, include_students=False, access_roles=['instructor'])
-        assert members['count'] == 1
-        assert members['result'][0]['username'] == 'instructor'
-
-        # get only students
-        members = get_course_members(self.course.id, include_students=True, access_roles=[])
-        assert members['count'] == 1
-        assert members['result'][0]['username'] == 'honor'
-
-    def test_enrollments(self):
-        """
-        Test CourseEnrollment data.
-        """
-        members = get_course_members(
-            self.course.id,
-            include_students=True,
-            access_roles=[]
+        self.assertEqual(len(members), 3)
+        self.assertEqual(
+            members[self.honor.id]['roles'],
+            ['student']
         )
-        assert len(members['result'][0]['enrollments']) == 1
-        assert members['result'][0]['enrollments'][0]['mode'] == 'audit'
 
-    def test_accessroles(self):
+    @override_settings(COURSE_MEMBER_API_ENROLLMENT_LIMIT=1)
+    def test_course_members_fails_overlimit(self):
         """
-        Test CourseAccessRole data.
+        Check if trying to retrieve more than settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT
+        fails.
         """
-        members = get_course_members(
-            self.course.id,
-            include_students=False,
-            access_roles=['staff'],
-        )
-        assert len(members['result'][0]['course_access_roles']) == 1
-
-    def test_user_and_profile_information(self):
-        """
-        Test if user and profile related information present in output
-        """
-        members = get_course_members(
-            self.course.id,
-            include_students=False,
-            access_roles=['staff'],
-        )
-        assert 'id' in members['result'][0]
-        assert 'username' in members['result'][0]
-        assert 'email' in members['result'][0]
-        assert 'profile' in members['result'][0]
-        assert 'name' in members['result'][0]['profile']
-        assert 'profile_image' in members['result'][0]['profile']
-
-    def test_pagination(self):
-        """
-        Test get_course_members pagination
-        """
-        # there are 3 users in self.course
-        members = get_course_members(self.course.id, per_page=1)
-        assert members['num_pages'] == 3
-        assert members['count'] == 3
-        assert members['current_page'] == 1
-
-        # check next page
-        members = get_course_members(self.course.id, page=2, per_page=1)
-        assert members['num_pages'] == 3
-        assert members['count'] == 3
-        assert members['current_page'] == 2
-
-        # check if exceptions throws as expected
-        with self.assertRaises(InvalidPage):
-            get_course_members(self.course.id, page=4, per_page=1)
-
-    def test_number_of_queries(self):
-        """
-        Tests if number of queries matches expectation.
-        """
-        # a total of 6 queries should be executed
-        # 1. select course access
-        # 2. select course enrollments
-        # 3. retrieve users using ids
-        # 4. prefetch user profiles
-        # 5. prefetch course access
-        # 6. prefetch course enrollments
-        with self.assertNumQueries(6):
+        with self.assertRaises(Exception):
             get_course_members(self.course.id)

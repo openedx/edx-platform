@@ -4,6 +4,7 @@ Course API
 import logging
 
 import search
+from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
@@ -17,7 +18,6 @@ from rest_framework.exceptions import PermissionDenied
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, REGISTERED_ACCESS_ROLES
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.course_api.serializers import CourseMemberSerializer
 from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_courses,
@@ -271,125 +271,88 @@ def get_course_run_url(request, course_id):
     return request.build_absolute_uri(course_run_url)
 
 
-def get_course_members(course_key, include_students=True, access_roles=None, page=1, per_page=20):
+def get_course_members(course_key):
     """
-    Returns a dict containing User information that filters all users related to a course.
-    For example - Students, Teachers, Staffs etc.
+    Returns a dict containing all users with access to a course.
 
-    User information includes -
-        - User info - id, email, username
-        - Profile info - name, picture etc
-        - CourseEnrollment - mode, only the course enrollments associated with the given course
-        - CourseAccessRole - role, only the course access roles associated with the given course
+    User information includes:
+        - User info: id, email, username, name
+        - Enrollment mode
+        - Role list
 
     Examples:
-        - Get all members:
+        - Get all course members:
             get_course_members(course_key)
-        - Get only students excluding staffs:
-            get_course_members(course_key, include_students=True, access_roles=[])
-        - Get only staffs excluding students:
-            get_course_members(course_key, include_students=False, access_roles=None)
-        - Get only instructors:
-            get_course_members(course_key, include_students=False, access_roles=['instructor'])
-        - Get instructors & students:
-            get_course_members(course_key, include_students=True, access_roles=['instructor'])
-        - Paginating
-            get_course_members(course_key, page=2)
-        - Paginating with custom limit
-            get_course_members(course_key, per_page=50)
 
     Arguments:
-        course_key (CourseKey): the CourseKey for the course
-        include_students: whether or not to include students,
-        access_roles:
-            accepts an array of string course access roles.
-            If None provided, it includes all roles.
-        page (int): the page number for pagination
-        per_page (int): how many results to include per page
+        course_key (CourseKey): CourseKey to retrieve student data.
 
     Returns:
-        dict: A dictionary with paginated result with following format -
+        dict: A dictionary with the following format:
             {
-                'count': total number of user instances matching specified filter,
-                'num_pages': total number of pages,
-                'current_page': current page number,
-                'result': [
-                    {
-                        'id': user id,
-                        'email': user's email,
-                        'username': user's username,
-                        'profile': {
-                            'name': user's name,
-                            'profile_image': user's profile image,
-                            .... other profile information
-                        },
-                        'enrollments': [
-                            {
-                                'mode': enrollment mode
-                            }
-                        ],
-                        'course_access_roles': [
-                            {
-                                'role': user's role in course
-                            }
-                        ]
-                    },
-                    ... more users
-                ]
+                "user_id": {
+                    "id": 12,
+                    "username": "jonh5000",
+                    "email": "jonh@example.com",
+                    "name": "Jonh Doe",
+                    "enrollment_mode": "verified",
+                    "roles": [
+                        "student",
+                        "instructor",
+                        "staff",
+                    ]
+                }
             }
     """
-    # if access_roles not given, assign all registered access roles
-    if access_roles is None:
-        access_roles = list(REGISTERED_ACCESS_ROLES.keys())
+    def get_user_info(user, enrollment_mode=None):
+        """
+        Utility function to extract user information from model.
+        """
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "name": user.profile.name,
+            "enrollment_mode": enrollment_mode,
+        }
 
-    course_access_roles = CourseAccessRole.objects.filter(
-        course_id=course_key,
-        role__in=access_roles
-    ).only('user_id')
-    staff_ids = [role.user_id for role in course_access_roles]
-
-    enrolled_ids = []
-    if include_students:
-        enrollments = CourseEnrollment.objects.filter(
-            course_id=course_key,
-            is_active=True
-        ).only('user_id')
-        enrolled_ids = [enrollment.user_id for enrollment in enrollments]
-
-    # Evaluate the queryset and build a list of IDS
-    user_ids = set(enrolled_ids + staff_ids)
-
-    # Filter users by unique user ID
-    queryset = User.objects.filter(pk__in=list(user_ids)).order_by('id')
-
-    # Prefetch UserProfile, CourseAccessRole and CourseEnrollment
-    # to avoid JOINs in a potentially large dataset.
-    queryset = queryset.prefetch_related(
-        'profile'
-    ).prefetch_related(
-        # Prefetch CourseAccessRole items related to the course and given roles
-        Prefetch(
-            'courseaccessrole_set',
-            CourseAccessRole.objects.filter(course_id=course_key, role__in=access_roles)
+    # Raise error if trying to retrieve user list from a course with more than
+    # settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT active enrollments. The fastest way
+    # to do this is to query for the 1st item after `COURSE_MEMBER_API_ENROLLMENT_LIMIT`.
+    over_limit = CourseEnrollment.get_active_enrollments_in_course(
+        course_key
+    )[settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT:][:1]
+    if over_limit.exists():
+        raise Exception(
+            f"Can't retrieve course members for courses with more than"
+            f"{settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT} active enrollments"
         )
-    ).prefetch_related(
-        # Prefetch CourseEnrollment items related to the course
-        Prefetch(
-            'courseenrollment_set',
-            CourseEnrollment.objects.filter(course_id=course_key)
-        )
-    )
 
-    # Paginate queryset and serialize data output
-    paginator = Paginator(queryset, per_page)
-    # Since we already know the size of the dataset, we set the paginator count manually
-    # to avoid an additional COUNT query here
-    paginator.count = len(user_ids)
-    serialized_data = CourseMemberSerializer(paginator.page(page), many=True).data
+    # Python dicts where we're going to manually combine the data from the two querysets
+    user_roles = defaultdict(list)
+    user_info = {}
 
-    return {
-        'count': paginator.count,
-        'num_pages': paginator.num_pages,
-        'current_page': page,
-        'result': serialized_data,
-    }
+    # Retrieve all active enrollments in course and prefetch user information
+    enrollments = CourseEnrollment.get_active_enrollments_in_course(
+        course_key
+    )[:settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT]
+
+    # Retrieve all course access roles and prefetch user information
+    access_roles = CourseAccessRole.access_roles_in_course(course_key)
+
+    # Evaluates querysets and parses data from the two querysets
+    # into `user_info` and `user_roles` dictionaries.
+    for enrollment in enrollments:
+        user_roles[enrollment.user_id].append('student')
+        user_info[enrollment.user_id] = get_user_info(enrollment.user, enrollment.mode)
+
+    for access_role in access_roles:
+        user_roles[access_role.user_id].append(access_role.role)
+        if access_role.user_id not in user_info:
+            user_info[access_role.user_id] = get_user_info(enrollment.user)
+
+    # Merge user role information with `user_info`
+    for user in user_info:
+        user_info[user]['roles'] = user_roles.get(user, [])
+
+    return user_info

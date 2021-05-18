@@ -2193,6 +2193,20 @@ class CourseEnrollment(models.Model):
         """
         cache[(user_id, course_key)] = enrollment_state
 
+    @classmethod
+    def get_active_enrollments_in_course(cls, course_key):
+        """
+        Retrieves active CourseEnrollments for a given course and
+        prefetches user information.
+        """
+        return cls.objects.filter(
+            course_id=course_key,
+            is_active=True,
+        ).select_related(
+            'user',
+            'user__profile',
+        )
+
 
 @python_2_unicode_compatible
 class FBEEnrollmentExclusion(models.Model):
@@ -2401,6 +2415,18 @@ class CourseAccessRole(models.Model):
         that role is primary, followed by org, course, and then user
         """
         return (self.role, self.org, self.course_id, self.user_id)
+
+    @classmethod
+    def access_roles_in_course(cls, course_key):
+        """
+        Returns all users that have a course access role in a given course.
+        """
+        return cls.objects.filter(
+            course_id=course_key,
+        ).select_related(
+            'user',
+            'user__profile'
+        )
 
     def __eq__(self, other):
         """
