@@ -14,6 +14,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via
+    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
 code-annotations==1.1.1
