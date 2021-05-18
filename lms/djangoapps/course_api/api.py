@@ -7,8 +7,6 @@ import search
 from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.core.paginator import Paginator
-from django.db.models import Prefetch
 from django.urls import reverse
 from edx_django_utils.monitoring import function_trace
 from edx_when.api import get_dates_for_course

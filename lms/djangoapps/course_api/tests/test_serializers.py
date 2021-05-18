@@ -8,7 +8,6 @@ from unittest import TestCase
 
 import ddt
 from opaque_keys.edx.locator import CourseLocator
-from django.contrib.auth import get_user_model
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
