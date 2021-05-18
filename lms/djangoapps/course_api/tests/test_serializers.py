@@ -19,11 +19,7 @@ from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
-from ..serializers import (
-    CourseDetailSerializer,
-    CourseKeySerializer,
-    CourseSerializer,
-)
+from ..serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 

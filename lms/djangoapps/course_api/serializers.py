@@ -6,7 +6,6 @@ Course API Serializers.  Representing course catalog data
 import urllib
 
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 from edx_django_utils import monitoring as monitoring_utils
 from rest_framework import serializers
 
@@ -14,8 +13,6 @@ from openedx.core.djangoapps.content.course_overviews.models import \
     CourseOverview  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
-from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
-from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method

@@ -8,7 +8,6 @@ from unittest import mock
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
-from django.core.paginator import InvalidPage
 from django.http import Http404
 from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
