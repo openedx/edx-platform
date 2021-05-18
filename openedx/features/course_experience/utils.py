@@ -1,6 +1,8 @@
 """
 Common utilities for the course experience, including course outline.
 """
+from django.conf import settings
+
 from completion.models import BlockCompletion
 
 from lms.djangoapps.course_api.blocks.api import get_blocks
@@ -135,16 +137,11 @@ def get_course_outline_block_tree(request, course_id):
         'poll',
         'word_cloud',
         'lti',
-        'lti_consumer',
-        # Appsembler completable blocks installed to Tahoe
-        # TODO: this really should be dynamic
-        'done',
-        'freetextresponse',
-        'openassessment',
-        'problem-builder',
-        'edx_sga',
-        'ubcpi'
+        'lti_consumer'
     ]
+    # Appsembler: DEPRECATED starting with Lilac
+    addl_block_types = getattr(settings, "TAHOE_COURSE_OUTLINE_COMPLETABLE_BLOCK_TYPES", [])
+    block_types_filter.extend(addl_block_types)
     all_blocks = get_blocks(
         request,
         course_usage_key,
