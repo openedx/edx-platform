@@ -15,7 +15,6 @@ from django.test import TransactionTestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.html import escape
-from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from common.djangoapps.student.email_helpers import generate_proctoring_requirements_email_context
@@ -30,7 +29,6 @@ from common.djangoapps.student.views import (
 )
 from common.djangoapps.third_party_auth.views import inactive_user_view
 from common.djangoapps.util.testing import EventTestMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_PROCTORING_IMPROVEMENTS
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -215,7 +213,6 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
 
 
 @ddt.ddt
-@override_waffle_flag(COURSEWARE_PROCTORING_IMPROVEMENTS, active=True)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @override_settings(ACCOUNT_MICROFRONTEND_URL='http://account-mfe')
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
