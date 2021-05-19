@@ -79,14 +79,7 @@ def get_enrollments_for_site(site):
     return CourseEnrollment.objects.filter(course_id__in=course_keys)
 
 
-@beeline.traced(name="api.sites.get_user_ids_for_site")
-def get_user_ids_for_site(site):
-    orgs = Organization.objects.filter(sites__in=[site])
-    mappings = UserOrganizationMapping.objects.filter(organization__in=orgs)
-    return mappings.values_list('user_id', flat=True)
-
-
 @beeline.traced(name="api.sites.get_users_for_site")
 def get_users_for_site(site):
-    user_ids = get_user_ids_for_site(site)
-    return get_user_model().objects.filter(id__in=user_ids)
+    org = Organization.objects.filter(sites__in=[site]).first()
+    return org.users.all()
