@@ -13539,7 +13539,7 @@ msgstr "Panel de control"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "results successfully populated,"
-msgstr "resultados populados exitosamente,"
+msgstr "resultados obtenidos exitosamente,"
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Click to load all enrolled courses"
@@ -17210,13 +17210,13 @@ msgstr "Programas relacionados"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
-msgstr "Verificación no esta completa"
+msgstr "La Verificación no esta completa"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
-msgstr[0] "You only have {days} day left to verify for this course."
-msgstr[1] "Tú solo tienes {days} días para verificar este curso."
+msgstr[0] "Solo queda un dia para verificarse en este curso."
+msgstr[1] "Quedan {days} días para verificarse en este curso."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
@@ -17224,7 +17224,7 @@ msgstr "Casi llegamos!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You still need to verify for this course."
-msgstr "Tú todavía necesitas verificarte para este curso"
+msgstr "Todavía necesitas verificarte en este curso"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verify Now"
@@ -17232,15 +17232,15 @@ msgstr "Verificar ahora"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have submitted your verification information."
-msgstr "Tú has enviado tu información de verificación."
+msgstr "Has enviado tu información de verificación."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
 "complete (usually within 5-7 days)."
 msgstr ""
-"Recibirás un mensaje en su panel de control cuando el proceso de "
-"verificación esté completado (usualmente entre 5-7 días)."
+"Recibirás un mensaje en tu página de inicio cuando el proceso de "
+"verificación sea completado (usualmente entre 5-7 días)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
@@ -17252,8 +17252,8 @@ msgid ""
 "on your dashboard when the verification process is complete (usually within "
 "5-7 days)."
 msgstr ""
-"Ha enviado su información de verificación de identidad. Recibirá un mensaje "
-"en su Panel de usuario cuando el proceso de verificación esté completado "
+"Has enviado tu información de verificación de identidad. Recibirás un mensaje "
+"en su Página de inicio cuando el proceso de verificación sea completado "
 "(usualmente entre 5-7 días)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -17262,7 +17262,7 @@ msgstr "Tú te has verificado tu ID con edX"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
-msgstr "Tu estado de verificación está válido hasta {date}."
+msgstr "Tu estado de verificación es válido hasta el {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
