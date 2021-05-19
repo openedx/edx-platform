@@ -37,6 +37,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
 
+from cms.djangoapps.contentstore.permissions import EDIT_ACTIVE_CERTIFICATE
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_studio_write_access
@@ -492,7 +493,7 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
             active_certificates = CertificateManager.get_certificates(course, only_active=True)
             if int(certificate_id) in [int(certificate["id"]) for certificate in active_certificates]:
                 # Only global staff (PMs) are able to edit active certificate configuration
-                if not GlobalStaff().has_user(request.user):
+                if not request.user.has_perm(EDIT_ACTIVE_CERTIFICATE):
                     raise PermissionDenied()
         try:
             new_certificate = CertificateManager.deserialize_certificate(course, request.body)
