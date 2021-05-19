@@ -5,6 +5,7 @@ from django.urls import path
 
 from .views import (
     ApplicationHubView,
+    ApplicationIntroductionView,
     ApplicationSuccessView,
     ContactInformationView,
     CoverLetterView,
@@ -13,6 +14,7 @@ from .views import (
 
 urlpatterns = [
     path('', ApplicationHubView.as_view(), name='application_hub'),
+    path('introduction', ApplicationIntroductionView.as_view(), name='application_introduction'),
     path('contact', ContactInformationView.as_view(), name='application_contact'),
     path('education_experience', EducationAndExperienceView.as_view(), name='application_education_experience'),
     path('cover_letter', CoverLetterView.as_view(), name='application_cover_letter'),
