@@ -13,7 +13,7 @@
   padding: $baseline;
 
   footer.primary {
-    @extend %t-copy-sub2;
+    @extend %t-copy-sub2 !optional;
 
     @include clearfix();
 
