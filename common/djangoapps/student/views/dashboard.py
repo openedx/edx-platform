@@ -706,6 +706,12 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         if enrollment.is_paid_course()
     )
 
+    # Checks if a course enrollment redeemed using a voucher is refundable
+    enrolled_courses_voucher_refundable = frozenset(
+        enrollment.course_id for enrollment in course_enrollments
+        if enrollment.is_order_voucher_refundable()
+    )
+
     # If there are *any* denied reverifications that have not been toggled off,
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
@@ -775,6 +781,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'logout_url': reverse('logout'),
         'platform_name': platform_name,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
+        'enrolled_courses_voucher_refundable': enrolled_courses_voucher_refundable,
         'provider_states': [],
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,

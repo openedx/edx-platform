@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
+<%page args="course_overview, enrollment, entitlement, entitlement_session, course_card_index, is_unfulfilled_entitlement, is_fulfilled_entitlement, entitlement_available_sessions, entitlement_expiration_date, entitlement_expired_at, show_courseware_link, cert_status, can_refund_entitlement, can_unenroll, credit_status, show_email_settings, course_mode_info, is_paid_course, is_course_voucher_refundable, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard, show_consent_link, enterprise_customer_name, resume_button_url, partner_managed_enrollment" expression_filter="h"/>
 
 <%!
 import datetime
@@ -266,6 +266,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                                     data-dashboard-index="${dashboard_index}"
                                     data-course-refund-url="${course_refund_url}"
                                     data-course-is-paid-course="${is_paid_course}"
+                                    data-is-course-voucher-refundable="${is_course_voucher_refundable}"
                                     data-course-cert-name-long="${cert_name_long}"
                                     data-course-enrollment-mode="${enrollment.mode}">
                                     ${_('Unenroll')}
