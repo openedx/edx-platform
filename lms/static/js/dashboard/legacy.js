@@ -84,7 +84,7 @@
              return properties;
          }
 
-         function setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
+         function setDialogAttributes(isPaidCourse, certNameLong,
                                         courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
              var diagAttr = {};
 
@@ -99,9 +99,6 @@
              } else if (enrollmentMode !== 'verified') {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from {courseName} ' +
                                                    '({courseNumber})?');
-             } else if (showRefundOption && !isCourseVoucherRefundable) {
-                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '{certNameLong}  track of {courseName}  ({courseNumber})?');
              } else if (showRefundOption) {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
                                                    '{certNameLong}  track of {courseName}  ({courseNumber})?');
@@ -137,7 +134,6 @@
          });
          $('.action-unenroll').click(function(event) {
              var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True',
-                 isCourseVoucherRefundable = $(event.target).data('is-course-voucher-refundable') === 'True',
                  certNameLong = $(event.target).data('course-cert-name-long'),
                  enrollmentMode = $(event.target).data('course-enrollment-mode'),
                  courseNumber = $(event.target).data('course-number'),
@@ -153,7 +149,7 @@
              });
              request.success(function(data, textStatus, xhr) {
                  if (xhr.status === 200) {
-                     dialogMessageAttr = setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
+                     dialogMessageAttr = setDialogAttributes(isPaidCourse, certNameLong,
                                     courseNumber, courseName, enrollmentMode, data.course_refundable_status, courseKey);
 
                      $('#track-info').empty();
