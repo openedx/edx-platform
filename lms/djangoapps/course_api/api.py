@@ -2,9 +2,9 @@
 Course API
 """
 import logging
+from collections import defaultdict
 
 import search
-from collections import defaultdict
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
@@ -26,6 +26,7 @@ from openedx.core.lib.api.view_utils import LazySequence
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from .exceptions import OverEnrollmentLimitException
 from .permissions import can_view_courses_for_username
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -321,9 +322,10 @@ def get_course_members(course_key):
         course_key
     )[settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT:][:1]
     if over_limit.exists():
-        raise Exception(
-            f"Can't retrieve course members for courses with more than"
-            f"{settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT} active enrollments"
+        raise OverEnrollmentLimitException(
+            f"Can't retrieve course members for courses with more than "
+            f"{settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT} active enrollments. "
+            f"This value is retrieved from `settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT`."
         )
 
     # Python dicts where we're going to manually combine the data from the two querysets
@@ -347,10 +349,10 @@ def get_course_members(course_key):
     for access_role in access_roles:
         user_roles[access_role.user_id].append(access_role.role)
         if access_role.user_id not in user_info:
-            user_info[access_role.user_id] = get_user_info(enrollment.user)
+            user_info[access_role.user_id] = get_user_info(access_role.user)
 
     # Merge user role information with `user_info`
-    for user in user_info:
-        user_info[user]['roles'] = user_roles.get(user, [])
+    for user_id in user_info:
+        user_info[user_id]['roles'] = user_roles[user_id]
 
     return user_info
