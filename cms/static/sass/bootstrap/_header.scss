@@ -74,8 +74,8 @@
   // basic layout - nav items
   nav {
     > ol > .nav-item {
-      @extend %t-action3;
-      @extend %t-strong;
+      @extend %t-action3 !optional;
+      @extend %t-strong !optional;
 
       display: inline-block;
       vertical-align: middle;
@@ -163,8 +163,8 @@
     }
 
     .course-title {
-      @extend %t-action2;
-      @extend %t-strong;
+      @extend %t-action2 !optional;
+      @extend %t-strong !optional;
 
       display: block;
       width: 100%;
@@ -422,8 +422,8 @@
     }
 
     .nav-item {
-      @extend %t-action3;
-      @extend %t-regular;
+      @extend %t-action3 !optional;
+      @extend %t-regular !optional;
 
       display: block;
       margin: 0 0 ($baseline/4) 0;
