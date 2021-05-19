@@ -73,12 +73,6 @@ def get_enrollments_for_site(site):
     return CourseEnrollment.objects.filter(course_id__in=course_keys)
 
 
-def get_user_ids_for_site(site):
-    orgs = Organization.objects.filter(sites__in=[site])
-    mappings = UserOrganizationMapping.objects.filter(organization__in=orgs)
-    return mappings.values_list('user_id', flat=True)
-
-
 def get_users_for_site(site):
     org = Organization.objects.filter(sites__in=[site]).first()
     return org.users.all()
