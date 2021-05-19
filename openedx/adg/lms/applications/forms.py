@@ -5,7 +5,7 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from common.djangoapps.student.models import UserProfile
 from openedx.adg.lms.applications.constants import (
@@ -14,9 +14,10 @@ from openedx.adg.lms.applications.constants import (
     MAXIMUM_AGE_LIMIT,
     MINIMUM_AGE_LIMIT
 )
-from openedx.adg.lms.applications.models import UserApplication
+from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 
+from .constants import COURSE_GROUP_PREREQ_VALIDATION_ERROR
 from .helpers import validate_file_size
 
 
@@ -189,3 +190,29 @@ class UserApplicationCoverLetterForm(forms.ModelForm):
             instance.cover_letter_file.delete()
 
         instance.save()
+
+
+class MultilingualCourseGroupForm(forms.ModelForm):
+    """
+    Form for MultilingualCourseGroup
+    """
+
+    class Meta:
+        model = MultilingualCourseGroup
+        fields = '__all__'
+
+    def clean(self):
+        """
+        Add validations for when course group prerequisites are added
+        """
+        super().clean()
+
+        is_program_prerequisite = self.cleaned_data['is_program_prerequisite']
+        business_line_prerequisite = self.cleaned_data['business_line_prerequisite']
+        is_common_business_line_prerequisite = self.cleaned_data['is_common_business_line_prerequisite']
+
+        if is_common_business_line_prerequisite and is_program_prerequisite:
+            self.add_error('is_program_prerequisite', COURSE_GROUP_PREREQ_VALIDATION_ERROR)
+
+        if business_line_prerequisite and (is_program_prerequisite or is_common_business_line_prerequisite):
+            self.add_error('business_line_prerequisite', COURSE_GROUP_PREREQ_VALIDATION_ERROR)

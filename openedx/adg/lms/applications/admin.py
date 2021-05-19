@@ -8,7 +8,7 @@ from django.contrib.admin import AdminSite
 from django.core.exceptions import ValidationError
 from django.forms import BaseInlineFormSet
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
@@ -48,7 +48,7 @@ from .constants import (
     STATUS_PARAM,
     WAITLISTED_APPLICATIONS_TITLE
 )
-from .forms import UserApplicationAdminForm
+from .forms import MultilingualCourseGroupForm, UserApplicationAdminForm
 from .helpers import (
     get_duration,
     get_embedded_view_html,
@@ -186,8 +186,56 @@ class MultilingualCourseAdmin(admin.TabularInline):
 
 @admin.register(MultilingualCourseGroup)
 class MultilingualCourseGroupAdmin(admin.ModelAdmin):
+    """
+    Admin class for MultilingualCourseGroup
+    """
+
+    fieldsets = (
+        (None, {
+            'fields': ('name',),
+        }),
+        ('Prerequisite', {
+            'fields': ('is_program_prerequisite', 'is_common_business_line_prerequisite', 'business_line_prerequisite'),
+            'description': _('Choose one of the following options to set this Course Group as a prerequisite'),
+        }),
+    )
+
+    list_display = (
+        'name',
+        'is_program_prerequisite',
+        'is_business_line_prerequisite',
+        'is_common_business_line_prerequisite',
+        'multilingual_course_count',
+        'open_multilingual_courses_count'
+    )
+
     inlines = (MultilingualCourseAdmin,)
-    list_display = ('name', 'is_prerequisite', 'multilingual_course_count', 'open_multilingual_courses_count')
+    form = MultilingualCourseGroupForm
+
+    def is_business_line_prerequisite(self, obj):
+        return obj.is_business_line_prerequisite
+    is_business_line_prerequisite.boolean = True
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        """
+        Extend the `get_form` method of `MultilingualCourseGroupAdmin` to remove the widgets that allow the option to
+        add, change and remove Business Lines from the MultilingualCourseGroup admin model page.
+
+        Arguments:
+            request (WSGIRequest): HTTP request for the `MultilingualCourseGroupAdmin` page
+            obj (MultilingualCourseGroup): `MultilingualCourseGroup` object
+            change (bool): Type of form
+
+        Returns:
+            MultilingualCourseGroupForm: `MultilingualCourseGroupForm` with updated permissions regarding related
+            field widgets
+        """
+        form = super(MultilingualCourseGroupAdmin, self).get_form(request, obj, **kwargs)
+        field = form.base_fields['business_line_prerequisite']
+        field.widget.can_add_related = False
+        field.widget.can_change_related = False
+        field.widget.can_delete_related = False
+        return form
 
 
 @admin.register(BusinessLine)

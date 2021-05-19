@@ -350,8 +350,27 @@ class MultilingualCourseGroup(models.Model):
     Model for multilingual course groups
     """
 
-    name = models.CharField(verbose_name=_('Course group name'), max_length=255,)
-    is_prerequisite = models.BooleanField(default=False, verbose_name=_('Is Prerequisite Course Group'),)
+    name = models.CharField(verbose_name=_('Course group name'), max_length=255, )
+
+    is_program_prerequisite = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Prerequisite for the Program'),
+    )
+    is_common_business_line_prerequisite = models.BooleanField(
+        default=False,
+        verbose_name=_('Is Common Prerequisite for all Business Lines')
+    )
+    business_line_prerequisite = models.ForeignKey(
+        BusinessLine,
+        default=None,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='prerequisite_courses',
+        related_query_name="prerequisite_course",
+        verbose_name=_('Is Prerequisite for Business Line'),
+        help_text=_('Select the Business Line that this Course Group is a prerequisite for')
+    )
 
     objects = MultilingualCourseGroupManager()
 
@@ -360,6 +379,10 @@ class MultilingualCourseGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_business_line_prerequisite(self):
+        return bool(self.business_line_prerequisite)
 
     def multilingual_course_count(self):
         return self.multilingual_courses.count()

@@ -10,9 +10,14 @@ from dateutil.relativedelta import relativedelta
 from django.core.files import File
 
 from openedx.adg.lms.applications.admin import UserApplicationADGAdmin
-from openedx.adg.lms.applications.constants import APPLICATION_REVIEW_ERROR_MSG, FILE_MAX_SIZE
+from openedx.adg.lms.applications.constants import (
+    APPLICATION_REVIEW_ERROR_MSG,
+    COURSE_GROUP_PREREQ_VALIDATION_ERROR,
+    FILE_MAX_SIZE
+)
 from openedx.adg.lms.applications.forms import (
     ExtendedUserProfileForm,
+    MultilingualCourseGroupForm,
     UserApplicationCoverLetterForm,
     UserApplicationForm
 )
@@ -228,3 +233,41 @@ def test_user_application_cover_letter_form_file_size(size, expected, mock_cover
     form = UserApplicationCoverLetterForm(data=data_dict, files=file_dict)
 
     assert form.is_valid() == expected
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_program_prereq, is_common_for_all_prereq, is_business_line_prereq, is_valid, errors',
+    [
+        (False, False, False, True, {}),
+        (True, False, False, True, {}),
+        (False, True, False, True, {}),
+        (False, False, True, True, {}),
+        (True, False, True, False, {'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
+        (True, True, False, False, {'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
+        (False, True, True, False, {'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
+        (
+            True, True, True, False,
+            {
+                'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR],
+                'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]
+            }
+        )
+    ]
+)
+def test_multilingual_course_group_form_validations(
+    is_program_prereq, is_common_for_all_prereq, is_business_line_prereq, is_valid, errors
+):
+    """
+    Test if the prerequisite related validations are working correctly for MultilingualCourseGroupForm
+    """
+    form_data = {
+        'name': 'test',
+        'is_program_prerequisite': is_program_prereq,
+        'is_common_business_line_prerequisite': is_common_for_all_prereq,
+        'business_line_prerequisite': BusinessLineFactory().id if is_business_line_prereq else None
+    }
+
+    form = MultilingualCourseGroupForm(data=form_data)
+    assert form.errors == errors
+    assert form.is_valid() is is_valid

@@ -94,7 +94,7 @@ def multilingual_course_group_data():
         'multilingual_courses-1-multilingual_course_group': '',
         'multilingual_courses-1-course': '',
         'name': 'Test',
-        'is_prerequisite': 'on',
+        'is_program_prerequisite': 'on',
     }
 
 

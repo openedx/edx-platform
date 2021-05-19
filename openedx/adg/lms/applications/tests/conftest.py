@@ -4,16 +4,18 @@ File containing common fixtures used across different test modules
 from datetime import date, timedelta
 
 import pytest
+from django.contrib import admin
 
 from common.djangoapps.student.tests.factories import GroupFactory, UserFactory
 from openedx.adg.lms.applications.admin import (
     EducationInline,
+    MultilingualCourseGroupAdmin,
     UserApplicationADGAdmin,
     WorkExperienceInline,
     adg_admin_site
 )
 from openedx.adg.lms.applications.constants import ADG_ADMIN_GROUP_NAME
-from openedx.adg.lms.applications.models import UserApplication
+from openedx.adg.lms.applications.models import MultilingualCourseGroup, UserApplication
 from openedx.adg.lms.applications.tests.factories import MultilingualCourseGroupFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
@@ -39,6 +41,11 @@ def user_application():
 @pytest.fixture
 def user_application_adg_admin_instance():
     return UserApplicationADGAdmin(UserApplication, adg_admin_site)
+
+
+@pytest.fixture
+def multilingual_course_group_admin_instance():
+    return MultilingualCourseGroupAdmin(MultilingualCourseGroup, admin.site)
 
 
 @pytest.fixture
