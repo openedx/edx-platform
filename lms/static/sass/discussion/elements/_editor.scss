@@ -120,7 +120,7 @@
 }
 
 .wmd-prompt-dialog {
-  @extend .modal;
+  @extend .modal !optional;
 
   background: $forum-color-background;
   padding: $baseline;

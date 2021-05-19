@@ -70,8 +70,8 @@
     list-style: none;
 
     .cta-show-sock {
-      @extend %ui-btn-pill;
-      @extend %t-action4;
+      @extend %ui-btn-pill !optional;
+      @extend %t-action4 !optional;
 
       background: theme-color("light");
       padding: ($baseline/2) $baseline;
@@ -145,7 +145,7 @@
             display: block;
 
             .icon {
-              @extend %t-icon4;
+              @extend %t-icon4 !optional;
 
               vertical-align: middle;
               margin-right: $baseline/4;
