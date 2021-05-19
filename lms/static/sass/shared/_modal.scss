@@ -10,7 +10,7 @@
 }
 
 .modal {
-  @extend %ui-depth1;
+  @extend %ui-depth1 !optional;
 
   display: none;
   position: absolute;
@@ -89,7 +89,7 @@
       }
 
       hr {
-        @extend %faded-hr-divider-light;
+        @extend %faded-hr-divider-light !optional;
 
         border: none;
         margin: 0;
@@ -97,7 +97,7 @@
         z-index: 2;
 
         &::after {
-          @extend %faded-hr-divider;
+          @extend %faded-hr-divider !optional;
 
           bottom: 0;
           content: "";
@@ -352,7 +352,7 @@
   // general reset
   .list-input,
   .list-actions {
-    @extend %ui-no-list;
+    @extend %ui-no-list !optional;
   }
 
   .settings-language-select .select {
@@ -367,7 +367,7 @@
     padding: 0 ($baseline*2) $baseline ($baseline*2);
 
     .list-actions-item {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub1 !optional;
 
       color: $body-color;
       text-align: center;
@@ -379,4 +379,3 @@
     }
   }
 }
-
