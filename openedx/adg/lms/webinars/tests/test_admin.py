@@ -261,3 +261,10 @@ def test_save_model(webinar_admin_instance, request, webinar):
 
     assert webinar_admin_instance.old_webinar.title == old_webinar_title
     assert Webinar.objects.get(id=webinar.id).title == 'Updated Title'
+
+
+def test_registration_webinar_admin_delete_permission():
+    """
+    Test that admins do not have permission to delete webinar registrations
+    """
+    assert not WebinarRegistrationAdmin.has_delete_permission('self', Mock())
