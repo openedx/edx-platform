@@ -80,5 +80,5 @@ def get_user_ids_for_site(site):
 
 
 def get_users_for_site(site):
-    user_ids = get_user_ids_for_site(site)
-    return get_user_model().objects.filter(id__in=user_ids)
+    org = Organization.objects.filter(sites__in=[site]).first()
+    return org.users.all()
