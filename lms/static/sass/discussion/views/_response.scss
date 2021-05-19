@@ -49,7 +49,7 @@
 
     // CASE: larger username for responses
     .username {
-      @extend %t-weight5;
+      @extend %t-weight5 !optional;
 
       font-size: $forum-base-font-size;
     }
