@@ -272,12 +272,24 @@ def get_course_run_url(request, course_id):
 
 def get_course_members(course_key):
     """
-    Returns a dict containing all users with access to a course.
+    Returns a dict containing all users with access to a course through CourseEnrollment
+    and CourseAccessRole models.
 
-    User information includes:
-        - User info: id, email, username, name
-        - Enrollment mode
-        - Role list
+    User information includes id, email, username, name, enrollment mode and role list.
+
+    This API is limited and will only work for courses with less than a configurable number
+    of active enrollments (managed through `settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT`,
+    and the default value is 1000). More than that and the method will raise a
+    `OverEnrollmentLimitException` exception.
+
+    This method works by querying the `CourseEnrollment` and `CourseAccessRole` models,
+    prefetching user information and *then joining results in Python using dictionaries*.
+    This approach was choosen to avoid database heavy queries (such as DISTINCT and COUNT) in
+    the `CourseEnrollment` table, which would take too long to complete in a request lifecycle.
+
+    The main concern with this approach is the dataset size and resource usage since this method
+    returns all enrollments without pagination. We're using a conservative number on the
+    `COURSE_MEMBER_API_ENROLLMENT_LIMIT` setting to avoid any issues.
 
     Examples:
         - Get all course members:
