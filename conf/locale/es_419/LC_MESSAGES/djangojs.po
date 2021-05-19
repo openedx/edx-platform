@@ -9187,7 +9187,7 @@ msgstr "Ayuda a la investigación académica brindando más información"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
-msgstr "Felicitaciones! Ya se encuentra verificado en %(platformName)s!"
+msgstr "¡Felicitaciones! ¡Ya se encuentra verificado en %(platformName)s!"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "You are now enrolled as a verified student for:"
@@ -9199,7 +9199,7 @@ msgstr "Lista de cursos que te has inscrito como estudiante verificado"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
-msgstr "Explora tus cursos!"
+msgstr "¡Explora tus cursos!"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
@@ -9217,10 +9217,10 @@ msgid ""
 "certificates. Verification is good for one year. After one year, you must "
 "submit photos for verification again."
 msgstr ""
-"Gracias por enviar sus fotos. Las revisaremos pronto. Ahora puede "
-"registrarse para cualquier curso de %(platformName)s que ofrezca Certficados"
+"Gracias por enviar tus fotos. Las revisaremos pronto. Ahora puedes "
+"registrarte para cualquier curso de %(platformName)s que ofrezca Certficados"
 " Verificados. La verificación es válida por un año. Después de este periodo,"
-" deberá volver a enviar fotografías para una nueva verificación."
+" deberás volver a enviar fotografías para una nueva verificación."
 
 #: lms/templates/verify_student/error.underscore
 msgid "Error:"
@@ -9248,7 +9248,7 @@ msgstr "Identificación fotográfica."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "You need a valid ID that contains your full name and photo."
-msgstr "Necesita un ID válida que contenga su nombre completo y foto."
+msgstr "Necesita un documento de indentidad válido que contenga su nombre completo y foto."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9294,7 +9294,7 @@ msgstr "Preguntas frecuentes"
 #: lms/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Why does %(platformName)s need my photo?"
-msgstr "Por qué %(platformName)s necesita mi foto ?"
+msgstr "¿Por qué %(platformName)s necesita mi foto ?"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
@@ -9321,7 +9321,7 @@ msgid ""
 msgstr ""
 "Ciframos su foto de forma segura y la enviamos a nuestro servicio de "
 "autorización para su revisión. Su foto e información no se guardan ni son "
-"visibles en ningún lugar de  %(platformName)s después de que se complete el "
+"visibles en ningún lugar de %(platformName)s después de que se complete el "
 "proceso de verificación."
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -9348,7 +9348,7 @@ msgstr ""
 "ayuda, pero puede tomar un par de intentos de envío para obtener la posición"
 " correcta de la cámara. El posicionamiento óptimo de la cámara varía con "
 "cada computadora, pero generalmente la mejor posición para la doma de la "
-"cabeza es de aproximadamente 12-18 pulgadas (30-45 centímetros) de la "
+"cabeza es de aproximadamente 30-45 centímetros (12-18 pulgadas) de la "
 "cámara, con la cabeza centrada en relación con la pantalla de la "
 "computadora."
 
@@ -9428,7 +9428,7 @@ msgstr "Asegurese que su documento está bien iluminado"
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the Take Photo button {icon} to capture your ID"
 msgstr ""
-"Una vez en posición, use el botón Tomar foto {icon} para captura su ID"
+"Una vez en posición, use el botón Tomar foto {icon} para captura su documento de identidad"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -9459,7 +9459,7 @@ msgstr ""
 "ayuda, pero puede tomar un par de intentos de envío para obtener la posición"
 " correcta de la cámara. El posicionamiento óptimo de la cámara varía con "
 "cada computadora, pero en general, la mejor posición para una foto de una "
-"tarjeta de identificación es de 8 a 12 pulgadas (20-30 centímetros) de la "
+"tarjeta de identificación es de 20-30 centímetros (8 a 12 pulgadas) de la "
 "cámara, con la tarjeta de identificación centrada en relación con la cámara."
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -9532,7 +9532,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
-msgstr "Gracias por regresar a verificar tu ID en: {courseName}"
+msgstr "Gracias por regresar a verificar tu identidad en: {courseName}"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
@@ -9603,7 +9603,7 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
-msgstr "Por qué activar?"
+msgstr "¿Por qué activar?"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
