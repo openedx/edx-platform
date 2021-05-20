@@ -5,7 +5,9 @@
 @import 'lms/theme/variables';
 
 // Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// @import 'bootstrap/scss/bootstrap';
+@import "~@edx/paragon-new/scss/core/core";
+@import "~@edx/brand-edx.org/paragon/overrides";
 
 // LMS variables
 @import '../variables';

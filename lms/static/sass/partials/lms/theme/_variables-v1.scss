@@ -65,6 +65,7 @@ $gray-d2:   shade($gray, 40%) !default;
 $gray-d3:   shade($gray, 60%) !default;
 $gray-d4:   shade($gray, 80%) !default;
 
+$pink: rgb(183, 37, 103) !default; // #b72567;
 $pink-l1: tint($pink, 20%) !default;
 $pink-l2: tint($pink, 40%) !default;
 $pink-l3: tint($pink, 60%) !default;

@@ -14,4 +14,5 @@ $primary: $red;
 $font-family-sans-serif: cursive;
 
 // Initialize the Open edX Bootstrap theme
-@import 'edx-bootstrap/sass/open-edx/theme';
+@import "~@edx/brand-openedx/paragon/fonts";
+@import "~@edx/brand-openedx/paragon/variables";

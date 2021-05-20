@@ -11,6 +11,7 @@ import traceback
 from datetime import datetime
 from functools import wraps
 from threading import Timer
+import logging
 
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
@@ -24,6 +25,8 @@ from .utils.cmd import cmd, django_cmd
 from .utils.envs import Env
 from .utils.process import run_background_process
 from .utils.timer import timed
+
+logger = logging.getLogger(__name__)
 
 # setup baseline paths
 
@@ -529,6 +532,12 @@ def _compile_sass(system, theme, debug, force, timing_info):
         source_comments = False
         output_style = 'compressed'
 
+    def remove_tilda_importer(existing_path):
+        if (existing_path.startswith('~')):
+            new_path = existing_path.replace('~', path('node_modules/'))
+            return [(new_path,)]
+        return None
+
     for dirs in sass_dirs:
         start = datetime.now()
         css_dir = dirs['css_destination_dir']
@@ -560,6 +569,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
                 include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
                 source_comments=source_comments,
                 output_style=output_style,
+                importers=[(0, remove_tilda_importer)]
             )
 
         # For Sass files without explicit RTL versions, generate

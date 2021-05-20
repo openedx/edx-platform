@@ -7,9 +7,11 @@
 // It should mirror main-ltr w/ the exception of bi-app references.
 
 @import '../sass/vendor/bi-app/bi-app-rtl';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
+// @import 'bootstrap/scss/functions';
+// @import 'bootstrap/scss/variables';
+// @import 'bootstrap/scss/mixins';
+@import "~@edx/paragon-new/scss/core/core";
+@import "~@edx/brand-edx.org/paragon/overrides";
 
 // Load the shared build
 @import 'build';
