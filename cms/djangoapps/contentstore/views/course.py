@@ -14,7 +14,6 @@ from collections import defaultdict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
-from cms.djangoapps.contentstore.permissions import REINDEX_COURSE, RERUN_COURSE
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -33,6 +32,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 
+from cms.djangoapps.contentstore.permissions import REINDEX_COURSE, RERUN_COURSE
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
