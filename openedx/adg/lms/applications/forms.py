@@ -211,8 +211,5 @@ class MultilingualCourseGroupForm(forms.ModelForm):
         business_line_prerequisite = self.cleaned_data['business_line_prerequisite']
         is_common_business_line_prerequisite = self.cleaned_data['is_common_business_line_prerequisite']
 
-        if is_common_business_line_prerequisite and is_program_prerequisite:
+        if is_program_prerequisite + is_common_business_line_prerequisite + bool(business_line_prerequisite) > 1:
             self.add_error('is_program_prerequisite', COURSE_GROUP_PREREQ_VALIDATION_ERROR)
-
-        if business_line_prerequisite and (is_program_prerequisite or is_common_business_line_prerequisite):
-            self.add_error('business_line_prerequisite', COURSE_GROUP_PREREQ_VALIDATION_ERROR)

@@ -243,16 +243,10 @@ def test_user_application_cover_letter_form_file_size(size, expected, mock_cover
         (True, False, False, True, {}),
         (False, True, False, True, {}),
         (False, False, True, True, {}),
-        (True, False, True, False, {'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
+        (True, False, True, False, {'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
         (True, True, False, False, {'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
-        (False, True, True, False, {'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
-        (
-            True, True, True, False,
-            {
-                'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR],
-                'business_line_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]
-            }
-        )
+        (False, True, True, False, {'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]}),
+        (True, True, True, False, {'is_program_prerequisite': [COURSE_GROUP_PREREQ_VALIDATION_ERROR]})
     ]
 )
 def test_multilingual_course_group_form_validations(
