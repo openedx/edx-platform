@@ -11,7 +11,7 @@
   padding-bottom: $baseline/2;
   border-bottom: 1px solid theme-color("primary");
   box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
-  background: theme-color("inverse");
+  background: $white;
   line-height: 1.5;
 
   @include media-breakpoint-up(lg) {
@@ -166,26 +166,26 @@
         a.sign-in-btn,
         .nav-item a.shopping-cart {
           background-color: theme-color("primary");
-          color: theme-color("inverse");
-          border: 1px solid theme-color("inverse");
+          color: $white;
+          border: 1px solid $white;
           font-weight: $font-weight-normal;
           padding: $baseline/4 $baseline;
 
           &:hover {
-            background-color: theme-color("inverse");
+            background-color: $white;
             color: theme-color("primary");
             border-color: theme-color("primary");
           }
         }
 
         a.register-btn {
-          background: theme-color("inverse");
+          background: $white;
           color: theme-color("primary");
           font-weight: $font-weight-normal;
 
           &:hover {
             background-color: theme-color("primary");
-            color: theme-color("inverse");
+            color: $white;
           }
         }
 
@@ -207,7 +207,7 @@
         .dropdown-user-menu {
           border: 1px solid theme-color("secondary");
           position: absolute;
-          background-color: theme-color("inverse");
+          background-color: $white;
           color: theme-color("secondary");
 
           @include right(30px);

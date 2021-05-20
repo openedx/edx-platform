@@ -106,7 +106,7 @@
   text-align: center;
 
   &.shown {
-    background-color: theme-color("inverse");
+    background-color: $white;
     color: theme-color("primary");
   }
 }

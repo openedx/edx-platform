@@ -2,5 +2,5 @@ body {
   @include padding-left($baseline);
   @include padding-right($baseline);
 
-  background: theme-color("inverse");
+  background: $white;
 }

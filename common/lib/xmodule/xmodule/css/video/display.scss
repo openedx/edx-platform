@@ -157,7 +157,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       }
 
       .btn-play::after {
-        background: theme-color("inverse");
+        background: $white;
       }
     }
 

@@ -37,7 +37,7 @@ $proctoring-banner-text-size: 14px;
         display: inline-block;
         margin-bottom: 0;
         vertical-align: middle;
-        color: theme-color("inverse");
+        color: $white;
       }
 
       .action-preview-select {
@@ -119,17 +119,17 @@ $proctoring-banner-text-size: 14px;
         color: theme-color("light");
 
         b {
-          color: theme-color("inverse");
+          color: $white;
         }
 
         .exam-button-turn-in-exam {
           background-color: transparent;
-          border: 1px solid theme-color("inverse");
-          color: theme-color("inverse");
+          border: 1px solid $white;
+          color: $white;
 
           &:hover {
-            border: 1px solid theme-color("inverse");
-            background-color: theme-color("inverse");
+            border: 1px solid $white;
+            background-color: $white;
             color: theme-color("brand");
           }
         }
@@ -166,7 +166,7 @@ $proctoring-banner-text-size: 14px;
 
     &.critical {
       border-left-color: theme-color("danger");
-      color: theme-color("inverse");
+      color: $white;
     }
 
     .exam-button-turn-in-exam {

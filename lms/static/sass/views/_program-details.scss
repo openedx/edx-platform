@@ -377,7 +377,7 @@ $btn-color-primary: $primary-dark;
 
         &:hover {
           color: $btn-color-primary;
-          background-color: theme-color("inverse");
+          background-color: $white;
         }
 
         /* IE11 CSS styles */

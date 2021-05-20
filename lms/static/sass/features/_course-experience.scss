@@ -126,7 +126,7 @@
           border-color: theme-color("purchase");
 
           &:hover {
-            color: theme-color("inverse");
+            color: $white;
             background-color: theme-color("purchase");
           }
         }

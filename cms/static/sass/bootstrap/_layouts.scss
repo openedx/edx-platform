@@ -268,7 +268,7 @@
 // layout - primary content
 .content-primary {
   border: 1px solid theme-color("dark");
-  background-color: theme-color("inverse");
+  background-color: $white;
   padding: $baseline ($baseline*1.5);
   margin-right: $baseline;
 

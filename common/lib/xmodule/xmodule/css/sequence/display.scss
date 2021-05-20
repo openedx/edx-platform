@@ -217,7 +217,7 @@ $seq-nav-height: 50px;
   height: 100%;
   text-shadow: none; // overrides default button text-shadow
   background: none;  // overrides default button gradient
-  background-color: theme-color("inverse");
+  background-color: $white;
   border-color: $seq-nav-border-color;
   box-shadow: none;
   font-size: inherit;
@@ -318,12 +318,12 @@ $seq-nav-height: 50px;
     background-color: theme-color("primary");
 
     .icon {
-      color: theme-color("inverse");
+      color: $white;
     }
 
     @include media-breakpoint-up(sm) {
       border-bottom: 3px solid $seq-nav-link-color;
-      background-color: theme-color("inverse");
+      background-color: $white;
 
       .icon {
         color: $seq-nav-icon-color;

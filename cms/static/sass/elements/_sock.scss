@@ -46,7 +46,7 @@
 
       &:hover {
         background: theme-color("primary");
-        color: theme-color("inverse");
+        color: $white;
       }
     }
   }

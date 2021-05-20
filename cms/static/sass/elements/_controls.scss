@@ -71,7 +71,7 @@
 
   background: theme-color("primary");
   border-color: theme-color("primary");
-  color: theme-color("inverse");
+  color: $white;
 
   &:hover,
   &:active {
@@ -98,7 +98,7 @@
 
   background: $uxpl-green-base;
   border-color: $uxpl-green-base;
-  color: theme-color("inverse");
+  color: $white;
 
   &:hover,
   &:active {
@@ -109,7 +109,7 @@
   &.current,
   &.active {
     background: $uxpl-green-dark-hover-active;
-    color: theme-color("inverse");
+    color: $white;
     border-color: $uxpl-green-dark-hover-active;
 
     &:hover,

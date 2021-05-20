@@ -285,14 +285,14 @@
   border-radius: ($baseline/4);
   border: 1px solid theme-color("primary");
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: theme-color("inverse");
+  background-color: $white;
   color: theme-color("primary");
 
   &:hover,
   &:focus {
     border: 1px solid $uxpl-blue-hover-active;
     background-color: $uxpl-blue-hover-active;
-    color: theme-color("inverse");
+    color: $white;
   }
 
   &.is-disabled,
@@ -333,7 +333,7 @@
   &:hover,
   &:focus {
     background-color: theme-color("primary");
-    color: theme-color("inverse");
+    color: $white;
   }
 }
 

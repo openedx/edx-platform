@@ -271,7 +271,7 @@ $pink: rgb(183, 37, 103) !default; // #b72567;
         .action-icon {
           border: 1px solid theme-color("dark");
           background-color: theme-color("dark");
-          color: theme-color("inverse");
+          color: $white;
         }
 
         .action-label {

@@ -103,7 +103,7 @@ $font-bold: 700 !default;
 // ----------------------------
 
 $gray: $gray-600 !default;
-$lms-container-background-color: theme-color("inverse") !default;
+$lms-container-background-color: $white !default;
 $lms-preview-menu-color: $gray-400 !default;
 $success-color-hover: darken($success, 15%) !default;
 $lms-hero-color: #005e90 !default;

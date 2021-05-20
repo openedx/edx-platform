@@ -1485,7 +1485,7 @@ p.course-block {
   opacity: 0.5;
   background: #808080;
   border: 0;
-  color: theme-color("inverse");
+  color: $white;
   box-shadow: none;
 
   &.archived {
@@ -1669,13 +1669,13 @@ a.fade-cover {
     margin-top: 10px;
     margin-left: 2.5%;
     margin-right: 2.5%;
-    color: theme-color("inverse");
+    color: $white;
   }
 
   .survey_button:visited,
   .survey_button:hover,
   .survey_button:focus {
-    color: theme-color("inverse");
+    color: $white;
     text-decoration: none;
   }
 }
