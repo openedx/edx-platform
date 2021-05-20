@@ -956,6 +956,10 @@
         margin: 0;
       }
 
+      &.course-status-processing {
+        color: #0d7d4d;
+      }
+
       .credit-action {
         .credit-btn {
           @extend %btn-pl-yellow-base;
