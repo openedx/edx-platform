@@ -26,6 +26,7 @@ from functools import partial
 from celery import task
 from django.conf import settings
 from django.utils.translation import ugettext_noop
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask

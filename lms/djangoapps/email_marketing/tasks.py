@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.cache import cache
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from .models import EmailMarketingConfiguration
 

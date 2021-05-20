@@ -16,7 +16,7 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_custom_attribute
+from edx_django_utils.monitoring import set_custom_attribute, set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 

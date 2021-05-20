@@ -11,6 +11,7 @@ from celery import Task, task
 from celery.states import FAILURE
 from django.conf import settings
 from django.core.mail import EmailMessage
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
