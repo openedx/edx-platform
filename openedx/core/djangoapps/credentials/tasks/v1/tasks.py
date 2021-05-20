@@ -8,6 +8,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 

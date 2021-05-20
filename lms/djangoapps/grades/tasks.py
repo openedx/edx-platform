@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
+from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key, set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api

@@ -22,6 +22,7 @@ from django.core.files import File
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.models import OrganizationCourse
