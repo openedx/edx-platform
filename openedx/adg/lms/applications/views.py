@@ -422,3 +422,12 @@ class ApplicationIntroductionView(RedirectToLoginOrRelevantPageMixin, TemplateVi
 
     login_url = reverse_lazy('register_user')
     template_name = 'adg/lms/applications/introduction.html'
+
+    def is_precondition_satisfied(self):
+        """
+        Checks if a user has visited the application hub page i.e ApplicationHub object for current user exists or not
+
+        Returns:
+            bool: True if user has visited the hub page else False
+        """
+        return not ApplicationHub.objects.filter(user=self.request.user).exists()
