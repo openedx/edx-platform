@@ -70,6 +70,7 @@ class CertificateDataSerializer(serializers.Serializer):
     cert_status = serializers.CharField()
     cert_web_view_url = serializers.CharField()
     download_url = serializers.CharField()
+    certificate_available_date = serializers.DateTimeField()
 
 
 class VerificationDataSerializer(serializers.Serializer):

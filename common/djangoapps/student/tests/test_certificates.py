@@ -123,12 +123,12 @@ class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
 
     def _check_message(self, certificate_available_date):  # lint-amnesty, pylint: disable=missing-function-docstring
         response = self.client.get(reverse('dashboard'))
-
+        test_message = 'Your grade and certificate will be ready after'
         if certificate_available_date is None:
-            self.assertNotContains(response, "Your certificate will be available on")
+            self.assertNotContains(response, test_message)
             self.assertNotContains(response, "View Test_Certificate")
         elif datetime.datetime.now(UTC) < certificate_available_date:
-            self.assertContains(response, "Your certificate will be available on")
+            self.assertContains(response, test_message)
             self.assertNotContains(response, "View Test_Certificate")
         else:
             self._check_can_download_certificate()
