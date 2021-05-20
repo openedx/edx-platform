@@ -14,6 +14,7 @@ from collections import defaultdict
 
 import django.utils
 from ccx_keys.locator import CCXLocator
+from cms.djangoapps.contentstore.permissions import REINDEX_COURSE, RERUN_COURSE
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -305,7 +306,7 @@ def course_rerun_handler(request, course_key_string):
         html: return html page with form to rerun a course for the given course id
     """
     # Only global staff (PMs) are able to rerun courses during the soft launch
-    if not GlobalStaff().has_user(request.user):
+    if not request.user.has_perm(RERUN_COURSE):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
@@ -331,7 +332,7 @@ def course_search_index_handler(request, course_key_string):
         json: return status of indexing task
     """
     # Only global staff (PMs) are able to index courses
-    if not GlobalStaff().has_user(request.user):
+    if not request.user.has_perm(REINDEX_COURSE):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     content_type = request.META.get('CONTENT_TYPE', None)
