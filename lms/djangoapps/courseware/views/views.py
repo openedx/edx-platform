@@ -149,7 +149,7 @@ log = logging.getLogger("edx.courseware")
 REQUIREMENTS_DISPLAY_MODES = CourseMode.CREDIT_MODES + [CourseMode.VERIFIED]
 
 CertData = namedtuple(
-    "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url"]
+    "CertData", ["cert_status", "title", "msg", "download_url", "cert_web_view_url", "certificate_available_date"]
 )
 EARNED_BUT_NOT_AVAILABLE_CERT_STATUS = 'earned_but_not_available'
 
@@ -158,7 +158,8 @@ AUDIT_PASSING_CERT_DATA = CertData(
     _('Your enrollment: Audit track'),
     _('You are enrolled in the audit track for this course. The audit track does not include a certificate.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 HONOR_PASSING_CERT_DATA = CertData(
@@ -166,7 +167,8 @@ HONOR_PASSING_CERT_DATA = CertData(
     _('Your enrollment: Honor track'),
     _('You are enrolled in the honor track for this course. The honor track does not include a certificate.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 INELIGIBLE_PASSING_CERT_DATA = {
@@ -182,7 +184,8 @@ GENERATING_CERT_DATA = CertData(
         "to it will appear here and on your Dashboard when it is ready."
     ),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 INVALID_CERT_DATA = CertData(
@@ -190,7 +193,8 @@ INVALID_CERT_DATA = CertData(
     _('Your certificate has been invalidated'),
     _('Please contact your course team if you have any questions.'),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 REQUESTING_CERT_DATA = CertData(
@@ -198,7 +202,8 @@ REQUESTING_CERT_DATA = CertData(
     _('Congratulations, you qualified for a certificate!'),
     _("You've earned a certificate for this course."),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
 UNVERIFIED_CERT_DATA = CertData(
@@ -209,16 +214,20 @@ UNVERIFIED_CERT_DATA = CertData(
         'verified identity.'
     ).format(platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)),
     download_url=None,
-    cert_web_view_url=None
+    cert_web_view_url=None,
+    certificate_available_date=None
 )
 
-EARNED_BUT_NOT_AVAILABLE_CERT_DATA = CertData(
-    EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
-    _('Your certificate will be available soon!'),
-    _('After this course officially ends, you will receive an email notification with your certificate.'),
-    download_url=None,
-    cert_web_view_url=None
-)
+
+def _earned_but_not_available_cert_data(cert_downloadable_status):
+    return CertData(
+        EARNED_BUT_NOT_AVAILABLE_CERT_STATUS,
+        _('Your certificate will be available soon!'),
+        _('After this course officially ends, you will receive an email notification with your certificate.'),
+        download_url=None,
+        cert_web_view_url=None,
+        certificate_available_date=cert_downloadable_status.get('certificate_available_date')
+    )
 
 
 def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
@@ -227,7 +236,8 @@ def _downloadable_cert_data(download_url=None, cert_web_view_url=None):
         _('Your certificate is available'),
         _("You've earned a certificate for this course."),
         download_url=download_url,
-        cert_web_view_url=cert_web_view_url
+        cert_web_view_url=cert_web_view_url,
+        certificate_available_date=None
     )
 
 
@@ -1239,7 +1249,7 @@ def _certificate_message(student, course, enrollment_mode):  # lint-amnesty, pyl
     cert_downloadable_status = certs_api.certificate_downloadable_status(student, course.id)
 
     if cert_downloadable_status.get('earned_but_not_available'):
-        return EARNED_BUT_NOT_AVAILABLE_CERT_DATA
+        return _earned_but_not_available_cert_data(cert_downloadable_status)
 
     if cert_downloadable_status['is_generating']:
         return GENERATING_CERT_DATA

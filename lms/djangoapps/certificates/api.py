@@ -267,6 +267,7 @@ def certificate_downloadable_status(student, course_key):
         course_overview.certificate_available_date
     ):
         response_data['earned_but_not_available'] = True
+        response_data['certificate_available_date'] = course_overview.certificate_available_date
 
     may_view_certificate = course_overview.may_certify()
     if current_status['status'] == CertificateStatuses.downloadable and may_view_certificate:
