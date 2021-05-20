@@ -9,7 +9,7 @@ from django.utils.translation import get_language
 
 class SubmittedApplicationsManager(Manager):
     """
-    Manager which returns all user applications whose written applications have been submitted successfully.
+    Manager which returns all written user applications which have been submitted successfully.
     """
 
     def get_queryset(self):

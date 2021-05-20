@@ -205,7 +205,7 @@ def test_post_logged_in_user_with_required_objectives_completed_to_application_h
     Test the case where an authenticated user, with all the required objectives completed, hits the url.
     """
     user.application_hub.set_is_prerequisite_courses_passed()
-    user.application_hub.set_is_written_application_completed()
+    user.application_hub.submit_written_application_for_current_date()
 
     response = logged_in_client.post(reverse('application_hub'))
     assert mock_send_mail.called
@@ -221,7 +221,7 @@ def test_post_already_submitted_application_to_application_hub_view(user, logged
     Test the case where a user with already submitted application hits the url again.
     """
     user.application_hub.set_is_prerequisite_courses_passed()
-    user.application_hub.set_is_written_application_completed()
+    user.application_hub.submit_written_application_for_current_date()
     user.application_hub.submit_application_for_current_date()
 
     response = logged_in_client.post(reverse('application_hub'))
@@ -342,7 +342,7 @@ def test_get_already_submitted_application_to_contact_information_view(get_reque
     Test the case where a user with already submitted application hits the url again.
     """
     request = get_request_for_contact_information_view
-    request.user.application_hub.set_is_written_application_completed()
+    request.user.application_hub.submit_written_application_for_current_date()
     response = ContactInformationView.as_view()(request)
     assert response.get('Location') == reverse('application_hub')
 
@@ -353,7 +353,7 @@ def test_post_already_submitted_application_to_contact_information_view(post_req
     Test the case where a user with already submitted application hits the url again.
     """
     request = post_request_for_contact_information_view
-    request.user.application_hub.set_is_written_application_completed()
+    request.user.application_hub.submit_written_application_for_current_date()
     response = ContactInformationView.as_view()(request)
     assert response.status_code == HTTP_400_BAD_REQUEST
 
@@ -456,7 +456,7 @@ def test_response_for_user_with_complete_written_application_cover_letter_view(
     """
     request = cover_letter_view_get_request if is_get_request else cover_letter_view_post_request
 
-    request.user.application_hub.set_is_written_application_completed()
+    request.user.application_hub.submit_written_application_for_current_date()
 
     response = CoverLetterView.as_view()(request)
 

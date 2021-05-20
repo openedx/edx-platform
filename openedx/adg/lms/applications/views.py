@@ -410,6 +410,6 @@ class CoverLetterView(RedirectToLoginOrRelevantPageMixin, View):
             return redirect('application_education_experience')
         else:
             application_hub = request.user.application_hub
-            application_hub.set_is_written_application_completed()
+            application_hub.submit_written_application_for_current_date()
 
             return redirect('application_hub')
