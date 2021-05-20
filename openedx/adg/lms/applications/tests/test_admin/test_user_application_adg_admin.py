@@ -44,7 +44,7 @@ from openedx.adg.lms.applications.constants import (
     WAITLISTED_APPLICATIONS_TITLE,
     CourseScore
 )
-from openedx.adg.lms.applications.models import UserApplication, ApplicationHub
+from openedx.adg.lms.applications.models import ApplicationHub, UserApplication
 from openedx.adg.lms.applications.tests.constants import (
     ADMIN_TYPE_ADG_ADMIN,
     ADMIN_TYPE_SUPER_ADMIN,
