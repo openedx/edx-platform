@@ -117,6 +117,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     verification_status = serializers.CharField()
     linkedin_add_to_profile_url = serializers.URLField()
     is_mfe_special_exams_enabled = serializers.BooleanField()
+    user_needs_integrity_signature = serializers.BooleanField()
 
     def __init__(self, *args, **kwargs):
         """

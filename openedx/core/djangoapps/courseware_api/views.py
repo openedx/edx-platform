@@ -43,11 +43,13 @@ from lms.djangoapps.courseware.toggles import (
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
+from openedx.core.djangoapps.agreements.api import get_integrity_signature
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
-from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
-from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -293,6 +295,22 @@ class CoursewareMeta:
             )
 
     @property
+    def user_needs_integrity_signature(self):
+        """
+        Boolean describing whether the user needs to sign the integrity agreement for a course.
+        """
+        if (
+            not self.is_staff
+            and self.enrollment_object
+            and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
+            and is_integrity_signature_enabled()
+        ):
+            signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
+            if not signature:
+                return True
+        return False
+
+    @property
     def related_programs(self):
         """
         Returns related program data if the effective_user is enrolled.
@@ -405,6 +423,7 @@ class CoursewareInformation(RetrieveAPIView):
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
+        * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
 
     **Parameters:**
 

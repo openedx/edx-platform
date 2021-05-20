@@ -37,6 +37,8 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
+from openedx.core.djangoapps.agreements.api import create_integrity_signature
+from openedx.core.djangoapps.agreements.toggles import ENABLE_INTEGRITY_SIGNATURE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
@@ -320,6 +322,36 @@ class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
                 courseware_data = response.json()
                 assert 'is_mfe_special_exams_enabled' in courseware_data
                 assert courseware_data['is_mfe_special_exams_enabled'] == (is_globaly_enabled and is_waffle_enabled)
+
+    @ddt.data(
+        (None, False, False, False),
+        ('verified', False, False, True),
+        ('masters', False, False, True),
+        ('audit', False, False, False),
+        ('verified', False, True, False),
+        ('masters', False, True, False),
+        ('verified', True, False, False),
+    )
+    @ddt.unpack
+    @override_waffle_flag(ENABLE_INTEGRITY_SIGNATURE, True)
+    def test_user_needs_integrity_signature(
+        self, enrollment_mode, is_staff, has_integrity_signature, needs_integrity_signature,
+    ):
+        """
+        Test that the correct value is returned if the user needs to sign the integrity agreement for the course.
+        """
+        if is_staff:
+            self.user.is_staff = True
+            self.user.save()
+        if enrollment_mode:
+            CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
+        if has_integrity_signature:
+            create_integrity_signature(self.user.username, str(self.course.id))
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        courseware_data = response.json()
+        assert 'user_needs_integrity_signature' in courseware_data
+        assert courseware_data['user_needs_integrity_signature'] == needs_integrity_signature
 
 
 class SequenceApiTestViews(BaseCoursewareTests):
