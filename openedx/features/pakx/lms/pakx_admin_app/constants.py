@@ -1,0 +1,1 @@
+GROUP_TRAINING_MANAGERS = "Training Manager"
