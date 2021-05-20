@@ -13,4 +13,4 @@ So until we find another solution, this template will continue to live here.
 
 
 .. _the way that Django's app_directories loader works: https://docs.djangoproject.com/en/2.2/ref/templates/api/#django.template.loaders.app_directories.Loader
-.. _template defined in the library: https://github.com/jazzband/django-oauth-toolkit/blob/master/oauth2_provider/templates/oauth2_provider/authorize.html
+.. _template defined in the django-oauth-toolkit: https://github.com/jazzband/django-oauth-toolkit/blob/master/oauth2_provider/templates/oauth2_provider/authorize.html
