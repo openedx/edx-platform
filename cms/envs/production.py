@@ -209,7 +209,7 @@ if 'loc_cache' not in CACHES:
         'LOCATION': 'edx_location_mem_cache',
     }
 
-# ensure that the CMS has a different staticfiles cache prefix than the lms
+# Tahoe: RED-1961 ensure that the CMS has a different staticfiles cache prefix than the lms
 if 'staticfiles' in CACHES and 'KEY_PREFIX' in CACHES['staticfiles']:
     CACHES['staticfiles']['KEY_PREFIX'] = CACHES['staticfiles']['KEY_PREFIX'] + "_cms"
 
