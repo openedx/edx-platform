@@ -9,7 +9,7 @@ is_user_active = rules.is_authenticated & rules.is_active
 # Is the user global staff?
 is_global_staff = is_user_active & rules.is_staff
 
-EDIT_ACTIVE_CERTIFICATE = 'contentstore.edit_active_certificate' 
+EDIT_ACTIVE_CERTIFICATE = 'contentstore.edit_active_certificate'
 DELETE_ACTIVE_CERTIFICATE = 'contentstore.delete_active_certificate'
 REINDEX_COURSE = 'contentstore.reindex_course'
 RERUN_COURSE = 'contentstore.rerun_course'
