@@ -368,6 +368,9 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         extra_context = get_extra_context_for_application_review_page(application)
         extra_context['note'] = note
 
+        application_hub = ApplicationHub.objects.get(user=application.user)
+        extra_context['is_prerequisite_courses_passed'] = application_hub.is_prerequisite_courses_passed
+
         return super(UserApplicationADGAdmin, self).changeform_view(
             request, object_id, extra_context=extra_context
         )

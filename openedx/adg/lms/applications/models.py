@@ -51,6 +51,7 @@ class ApplicationHub(TimeStampedModel):
         Mark written_application objective as complete i.e set is_written_application_completed to True.
         """
         self.is_written_application_completed = True
+        self.submission_date = date.today()
         self.save()
 
     def are_application_pre_reqs_completed(self):
