@@ -369,7 +369,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         extra_context['note'] = note
 
         application_hub = ApplicationHub.objects.get(user=application.user)
-        extra_context['is_prerequisite_courses_passed'] = application_hub.is_prerequisite_courses_passed
+        disable_admin_evaluation = '' if application_hub.is_prerequisite_courses_passed else 'disabled'
+        extra_context['disable_admin_evaluation'] = disable_admin_evaluation
 
         return super(UserApplicationADGAdmin, self).changeform_view(
             request, object_id, extra_context=extra_context
