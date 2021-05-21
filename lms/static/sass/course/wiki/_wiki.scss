@@ -15,11 +15,12 @@
   @include clearfix();
 
   .breadcrumbs-header {
-    height: 33px;
-    padding: 24px 0 26px;
+    min-height: 33px;
+    padding: 12px 0;
     border-bottom: 1px solid $gray-l3;
     border-radius: 3px 3px 0 0;
     background-color: $sidebar-color;
+    display: flex;
   }
 
 
@@ -30,8 +31,10 @@
   // -----------------
 
   .breadcrumb {
+    flex-grow: 1;
     list-style: none;
-    padding-left: 0;
+    padding: 0;
+    background: none;
     margin: 0 0 0 ($baseline*2);
 
     li {
