@@ -16,7 +16,6 @@ chem==1.2.0
     # via -r requirements/edx-sandbox/py35.in
 click==7.1.2
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/shared.txt
     #   nltk
@@ -43,7 +42,6 @@ lxml==4.5.0
     #   -r requirements/edx-sandbox/shared.txt
 markupsafe==1.1.1
     # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx-sandbox/../constraints.txt
     #   chem
 matplotlib==2.2.4
