@@ -19,7 +19,13 @@ from openedx.adg.lms.applications.models import (
 from openedx.core.lib.grade_utils import round_away_from_zero
 
 from .constants import USERNAME
-from .factories import ApplicationHubFactory, BusinessLineFactory, MultilingualCourseFactory, UserApplicationFactory
+from .factories import (
+    ApplicationHubFactory,
+    BusinessLineFactory,
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory,
+    UserApplicationFactory
+)
 
 
 @pytest.mark.django_db
@@ -403,3 +409,17 @@ def test_is_user_business_line_admin(business_line_names, expected_result):
     test_user = UserFactory(groups=business_lines)
 
     assert BusinessLine.is_user_business_line_admin(test_user) == expected_result
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('business_line, expected_result', [(True, True), (False, False)])
+def test_multilingual_course_group_is_business_line_prerequisite_property(business_line, expected_result):
+    """
+    Test if `is_business_line_prerequisite` property works correctly
+    """
+    multilingual_course_group = MultilingualCourseGroupFactory(is_program_prerequisite=False)
+
+    if business_line:
+        multilingual_course_group.business_line_prerequisite = BusinessLineFactory()
+
+    assert multilingual_course_group.is_business_line_prerequisite == expected_result

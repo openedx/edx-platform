@@ -27,7 +27,7 @@ class MultilingualCourseGroupManager(Manager):
         """
         Get non-empty prerequisite course groups
         """
-        return self.get_queryset().filter(is_prerequisite=True, multilingual_courses__isnull=False).distinct()
+        return self.get_queryset().filter(is_program_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
     def get_courses(self, user, is_prereq=False):
         """
