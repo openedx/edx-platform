@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2021-05-17 14:32+0000\n"
+"POT-Creation-Date: 2021-05-19 12:52+0000\n"
 "PO-Revision-Date: 2020-10-27 19:12+0000\n"
 "Last-Translator: Rana Waqar <rana.waqar@arbisoft.com>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/philanthropy-u/teams/113553/ar/)\n"
@@ -9465,6 +9465,12 @@ msgid ""
 msgstr ""
 
 #: openedx/adg/lms/applications/admin.py
+msgid ""
+"Choose one of the following options to set this Course Group as a "
+"prerequisite"
+msgstr ""
+
+#: openedx/adg/lms/applications/admin.py
 msgid "Al-Dabbagh"
 msgstr ""
 
@@ -9560,6 +9566,12 @@ msgstr "أفضّل عدم الإفصاح"
 
 #: openedx/adg/lms/applications/constants.py
 msgid "Please make a decision before submitting."
+msgstr ""
+
+#: openedx/adg/lms/applications/constants.py
+msgid ""
+"A Course Group can either be a prerequisite for the program, a specific "
+"business line or common for all business lines"
 msgstr ""
 
 #: openedx/adg/lms/applications/forms.py
@@ -9784,8 +9796,20 @@ msgid "Course group name"
 msgstr "متصفّح كروم للمساق"
 
 #: openedx/adg/lms/applications/models.py
-msgid "Is Prerequisite Course Group"
+msgid "Is Prerequisite for the Program"
 msgstr "مساقات أساسية"
+
+#: openedx/adg/lms/applications/models.py
+msgid "Is Common Prerequisite for all Business Lines"
+msgstr ""
+
+#: openedx/adg/lms/applications/models.py
+msgid "Is Prerequisite for Business Line"
+msgstr "مساقات أساسية"
+
+#: openedx/adg/lms/applications/models.py
+msgid "Select the Business Line that this Course Group is a prerequisite for"
+msgstr "مفتاح المساق الأساسي إذا كان لهذا المساق مساق أساسي."
 
 #: openedx/adg/lms/applications/models.py
 msgid "Multilingual version of a course"
