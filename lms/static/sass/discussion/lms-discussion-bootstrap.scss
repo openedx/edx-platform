@@ -10,7 +10,6 @@ $static-path: '../..';
 // Bootstrap
 // @import 'bootstrap/scss/bootstrap';
 @import "~@edx/paragon-new/scss/core/core";
-@import "~@edx/brand/paragon/overrides";
 
 // Legacy support
 @import '../bootstrap/legacy';
