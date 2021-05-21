@@ -9,4 +9,3 @@ class OverEnrollmentLimitException(Exception):
     course has more enrollments than the limit specified on
     `settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT`.
     """
-    pass
