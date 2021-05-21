@@ -1,10 +1,8 @@
 // ----------------------------------------
 // LMS edx.org Footer: Shared Build Compile
 @import 'lms/theme/variables';
-@import 'bootstrap/variables';
-// @import 'bootstrap/scss/variables';
-// @import 'bootstrap/scss/mixins/breakpoints';
-
+@import './bootstrap/variables';
+// Paragon SCSS framework
 @import "~@edx/paragon-new/scss/core/core";
 @import '../variables';
 @import 'lms/theme/variables-v1';

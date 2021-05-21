@@ -2,10 +2,9 @@
 // ====================
 @import '../base/grid-settings';
 @import 'neat/neat'; // lib - Neat
+
+// Paragon SCSS framework
 @import "~@edx/paragon-new/scss/core/core";
-// @import 'bootstrap/scss/functions';
-// @import 'bootstrap/scss/variables';
-// @import 'bootstrap/scss/mixins/breakpoints';
 
 $edx-footer-link-color: $primary;
 $edx-footer-bg-color: rgb(252, 252, 252);
