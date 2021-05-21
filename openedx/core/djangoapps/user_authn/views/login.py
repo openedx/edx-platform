@@ -118,21 +118,16 @@ def _get_user_by_email_or_username(request):
     """
     Finds a user object in the database based on the given request, ignores all fields except for email and username.
     """
-    if not (
-        'email' in request.POST or 'username' in request.POST
-    ) or 'password' not in request.POST:
+    if 'email_or_username' not in request.POST or 'password' not in request.POST:
         raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
 
-    email = request.POST.get('email', None)
-    username = request.POST.get('username', None)
-
+    email_or_username = request.POST.get('email_or_username', None)
     try:
         return USER_MODEL.objects.get(
-            Q(username=username) | Q(email=email)
+            Q(username=email_or_username) | Q(email=email_or_username)
         )
     except USER_MODEL.DoesNotExist:
-        username_or_email = email or username
-        digest = hashlib.shake_128(username_or_email.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
+        digest = hashlib.shake_128(email_or_username.encode('utf-8')).hexdigest(16)  # pylint: disable=too-many-function-args
         AUDIT_LOG.warning(f"Login failed - Unknown user username/email {digest}")
 
 
