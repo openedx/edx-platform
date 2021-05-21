@@ -2,6 +2,7 @@
 Course API custom exceptions
 """
 
+
 class OverEnrollmentLimitException(Exception):
     """
     Exception used by `get_course_members` to signal when a

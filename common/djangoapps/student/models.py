@@ -2419,7 +2419,7 @@ class CourseAccessRole(models.Model):
     @classmethod
     def access_roles_in_course(cls, course_key):
         """
-        Returns all users that have a course access role in a given course.
+        Returns all CourseAccessRole for a given course and prefetches user information.
         """
         return cls.objects.filter(
             course_id=course_key,
