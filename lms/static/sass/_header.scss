@@ -361,7 +361,7 @@
         text-decoration: none;
         outline: none;
         display: block;
-        background-color: theme-color('inverse');
+        background-color: $white;
         border-radius: 0;
         width: 100%;
         padding: $baseline*0.6 $baseline;
@@ -372,7 +372,7 @@
         &:hover,
         &:focus {
           background-color: $gray-600;
-          color: theme-color('inverse');
+          color: $white;
         }
 
         &::after {
