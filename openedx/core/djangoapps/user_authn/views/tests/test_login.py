@@ -1053,7 +1053,7 @@ class LoginSessionViewTest(ApiTestCase):
     def test_login_with_username(self):
         UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         data = {
-            "username": self.USERNAME,
+            "email_or_username": self.USERNAME,
             "password": self.PASSWORD,
         }
         self.url = reverse("user_api_login_session", kwargs={'api_version': 'v2'})
