@@ -27,7 +27,7 @@ markupsafe==1.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   jinja2
-more-itertools==8.7.0
+more-itertools==8.8.0
     # via zipp
 pluggy==0.13.1
     # via diff-cover
