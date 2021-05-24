@@ -43,7 +43,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
 from django_countries.fields import CountryField
-from edx_django_utils.cache import RequestCache
+from edx_django_utils.cache import RequestCache, TieredCache, get_cache_key
 from edx_django_utils import monitoring
 from edx_rest_api_client.exceptions import SlumberBaseException
 from eventtracking import tracker
@@ -1890,8 +1890,7 @@ class CourseEnrollment(models.Model):
     def refund_cutoff_date(self):
         """ Calculate and return the refund window end date. """
         # NOTE: This is here to avoid circular references
-        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
-
+        from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
         date_placed = self.get_order_attribute_value('date_placed')
 
         if not date_placed:
@@ -1899,20 +1898,67 @@ class CourseEnrollment(models.Model):
             if not order_number:
                 return None
 
+            date_placed = self.get_order_attribute_from_ecommerce('date_placed')
+            if not date_placed:
+                return None
+
+            # also save the attribute so that we don't need to call ecommerce again.
+            username = self.user.username
+            enrollment_attributes = get_enrollment_attributes(username, str(self.course_id))
+            enrollment_attributes.append(
+                {
+                    "namespace": "order",
+                    "name": "date_placed",
+                    "value": date_placed,
+                }
+            )
+            set_enrollment_attributes(username, str(self.course_id), enrollment_attributes)
+
+        refund_window_start_date = max(
+            datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
+            self.course_overview.start.replace(tzinfo=None)
+        )
+
+        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+
+    def is_order_voucher_refundable(self):
+        """ Checks if the coupon batch expiration date has passed to determine whether order voucher is refundable. """
+        from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
+        vouchers = self.get_order_attribute_from_ecommerce('vouchers')
+        if not vouchers:
+            return False
+        voucher_end_datetime_str = vouchers[0]['end_datetime']
+        voucher_expiration_date = datetime.strptime(voucher_end_datetime_str, ECOMMERCE_DATE_FORMAT).replace(tzinfo=UTC)
+        return datetime.now(UTC) < voucher_expiration_date
+
+    def get_order_attribute_from_ecommerce(self, attribute_name):
+        """
+        Fetches the order details from ecommerce to return the value of the attribute passed as argument.
+
+        Arguments:
+            attribute_name (str): The name of the attribute that you want to fetch from response e:g 'number' or
+            'vouchers', etc.
+
+        Returns:
+            (str | array | None): Returns the attribute value if it exists, returns None if the order doesn't exist or
+            attribute doesn't exist in the response.
+        """
+
+        # NOTE: This is here to avoid circular references
+        from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+        order_number = self.get_order_attribute_value('order_number')
+        if not order_number:
+            return None
+
+        # check if response is already cached
+        cache_key = get_cache_key(user_id=self.user.id, order_number=order_number)
+        cached_response = TieredCache.get_cached_response(cache_key)
+        if cached_response.is_found:
+            order = cached_response.value
+        else:
             try:
+                # response is not cached, so make a call to ecommerce to fetch order details
                 order = ecommerce_api_client(self.user).orders(order_number).get()
-                date_placed = order['date_placed']
-                # also save the attribute so that we don't need to call ecommerce again.
-                username = self.user.username
-                enrollment_attributes = get_enrollment_attributes(username, str(self.course_id))
-                enrollment_attributes.append(
-                    {
-                        "namespace": "order",
-                        "name": "date_placed",
-                        "value": date_placed,
-                    }
-                )
-                set_enrollment_attributes(username, str(self.course_id), enrollment_attributes)
             except HttpClientError:
                 log.warning(
                     "Encountered HttpClientError while getting order details from ecommerce. "
@@ -1931,12 +1977,12 @@ class CourseEnrollment(models.Model):
                     "Order={number} and user {user}".format(number=order_number, user=self.user.id))
                 return None
 
-        refund_window_start_date = max(
-            datetime.strptime(date_placed, ECOMMERCE_DATE_FORMAT),
-            self.course_overview.start.replace(tzinfo=None)
-        )
-
-        return refund_window_start_date.replace(tzinfo=UTC) + EnrollmentRefundConfiguration.current().refund_window
+            cache_time_out = getattr(settings, 'ECOMMERCE_ORDERS_API_CACHE_TIMEOUT', 3600)
+            TieredCache.set_all_tiers(cache_key, order, cache_time_out)
+        try:
+            return order[attribute_name]
+        except KeyError:
+            return None
 
     def get_order_attribute_value(self, attr_name):
         """ Get and return course enrollment order attribute's value."""
