@@ -18,15 +18,15 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from django.core.management.base import BaseCommand
 
 
-
 class Command(BaseCommand):
     """
     A command to populate the available_date field in the CourseCertificate model for every
     course run inside of the LMS.
     """
+
     def handle(self, *args, **options):
         backfill_date_for_all_course_runs.delay()
-            
+
 
 @shared_task(base=LoggedTask, ignore_result=True)
 @set_code_owner_attribute
