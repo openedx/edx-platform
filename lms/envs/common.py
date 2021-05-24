@@ -609,7 +609,17 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7315
     'LICENSING': False,
 
-    # Certificates Web/HTML Views
+    # .. toggle_name: FEATURES['CERTIFICATES_HTML_VIEW']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to True to enable course certificates on your instance of Open edX.
+    # .. toggle_warnings: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
+    #   described here:
+    #   https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2015-03-13
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/7113
     'CERTIFICATES_HTML_VIEW': False,
 
     # .. toggle_name: FEATURES['CUSTOM_CERTIFICATE_TEMPLATES_ENABLED']
