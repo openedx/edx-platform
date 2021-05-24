@@ -26,6 +26,9 @@ PyJWT[crypto]<2.0.0
 # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
 social-auth-core<4.0.0
 
+# We do not support version django-config-models<1.0.0
+django-config-models>=1.0.0
+
 # The CORS_ORIGIN_WHITELIST changes in a backwards incompatible way in 3.0.0, needs matching configuration repo changes
 django-cors-headers<3.0.0
 
@@ -34,7 +37,6 @@ django-countries==5.5
 
 # django-storages version 1.9 drops support for boto storage backend.
 django-storages<1.9
-
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better

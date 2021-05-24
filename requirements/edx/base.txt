@@ -170,6 +170,7 @@ django-classy-tags==2.0.0
     # via django-sekizai
 django-config-models==2.1.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-event-routing-backends
