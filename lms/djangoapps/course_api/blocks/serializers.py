@@ -77,11 +77,9 @@ SUPPORTED_FIELDS = [
         VisibilityTransformer,
         requested_field_name='visible_to_staff_only',
     ),
-    SupportedFieldType(
-        BlockCompletionTransformer.COMPLETION,
-        BlockCompletionTransformer,
-        'completion'
-    ),
+    SupportedFieldType(BlockCompletionTransformer.COMPLETION, BlockCompletionTransformer),
+    SupportedFieldType(BlockCompletionTransformer.COMPLETE),
+    SupportedFieldType(BlockCompletionTransformer.RESUME_BLOCK),
 
     *[SupportedFieldType(field_name) for field_name in ExtraFieldsTransformer.get_requested_extra_fields()],
 ]
