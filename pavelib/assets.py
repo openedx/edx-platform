@@ -533,7 +533,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
         output_style = 'compressed'
 
     def remove_tilda_importer(existing_path):
-        if (existing_path.startswith('~')):
+        if existing_path.startswith('~'):
             new_path = existing_path.replace('~', path('node_modules/'))
             return [(new_path,)]
         return None
