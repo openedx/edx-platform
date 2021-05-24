@@ -490,6 +490,10 @@
         </div>
         <% } %>
     </div>
+    <div class="alert alert-warning forum-warning-message" role="alert" >
+        <i class="fa fa-exclamation-triangle mt-1" aria-hidden="true"></i>
+        <span class="ml-2"> <%- gettext("We do not recommend sharing personal information in your post.") %> </span>
+    </div>
     <div>
         <button type="submit" class="btn btn-primary submit"><%- gettext('Submit') %></button>
         <button type="button" class="btn btn-outline-primary cancel"><%- gettext('Cancel') %></button>
