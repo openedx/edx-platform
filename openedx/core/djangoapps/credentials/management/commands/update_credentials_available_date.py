@@ -37,7 +37,7 @@ def backfill_date_for_all_course_runs():
     Pulls a list of every single course run and then sends a cert_date_changed signal. Every 10 courses,
     it will sleep for a time, to create a delay as to not kill credentials/LMS.
     """
-    course_run_list = CourseOverview.objects.exclude(self_paced=True, certificate_available_date=None)
+    course_run_list = CourseOverview.objects.exclude(self_paced=True).exclude(certificate_available_date=None)
     for index, course_run in enumerate(course_run_list):
         COURSE_CERT_DATE_CHANGE.send_robust(
             sender=None,
