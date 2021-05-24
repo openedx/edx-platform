@@ -10,12 +10,14 @@ that flow.
 """
 
 import time
+
 from celery.app import shared_task
 from celery_utils.logged_task import LoggedTask
-from edx_django_utils.monitoring.internal.code_owner.utils import set_code_owner_attribute
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from django.core.management.base import BaseCommand
+from edx_django_utils.monitoring.internal.code_owner.utils import set_code_owner_attribute
+
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 
 
 class Command(BaseCommand):
