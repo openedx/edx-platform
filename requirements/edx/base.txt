@@ -119,7 +119,7 @@ click==7.1.2
     #   code-annotations
     #   nltk
     #   user-util
-code-annotations==1.1.1
+code-annotations==1.1.2
     # via
     #   edx-enterprise
     #   edx-toggles
@@ -141,7 +141,7 @@ cryptography==3.2.1
     #   edx-enterprise
     #   pyjwt
     #   social-auth-core
-cssutils==2.2.0
+cssutils==2.3.0
     # via pynliner
 ddt==1.4.2
     # via
@@ -277,7 +277,7 @@ django-storages==1.8
     #   edxval
 django-user-tasks==1.3.2
     # via -r requirements/edx/base.in
-django-waffle==2.1.0
+django-waffle==2.2.0
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
@@ -295,7 +295,6 @@ django==2.2.20
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
-    #   code-annotations
     #   django-appconf
     #   django-classy-tags
     #   django-config-models
@@ -458,7 +457,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.10.0
+edx-proctoring==3.10.1
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -679,7 +678,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.5.1
+ora2==3.5.2
     # via -r requirements/edx/base.in
 packaging==20.9
     # via

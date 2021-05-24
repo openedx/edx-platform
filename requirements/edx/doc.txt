@@ -16,13 +16,8 @@ click==7.1.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-code-annotations==1.1.1
+code-annotations==1.1.2
     # via -r requirements/edx/doc.in
-django==2.2.20
-    # via
-    #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
-    #   -c requirements/edx/../constraints.txt
-    #   code-annotations
 docutils==0.16
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
@@ -59,9 +54,7 @@ python-slugify==4.0.1
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
 pytz==2021.1
-    # via
-    #   babel
-    #   django
+    # via babel
 pyyaml==5.4.1
     # via code-annotations
 requests==2.25.1
@@ -83,16 +76,14 @@ sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
-sqlparse==0.4.1
-    # via django
 stevedore==1.32.0
     # via
     #   -c requirements/edx/../constraints.txt
