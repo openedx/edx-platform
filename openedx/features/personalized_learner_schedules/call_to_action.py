@@ -39,7 +39,7 @@ class PersonalizedLearnerScheduleCallToAction:
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
         # Not showing in the missed_gated_content case because those learners are not eligible
         # to shift due dates.
-        if not missed_deadlines or missed_gated_content:
+        if missed_gated_content:
             return []
 
         # Some checks to disable PLS calls to action until these environments (mobile and MFE) support them natively
@@ -53,7 +53,7 @@ class PersonalizedLearnerScheduleCallToAction:
             if self._is_block_shiftable(xblock, category):
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
 
-        elif category == self.VERTICAL_BANNER and not completed:
+        elif category == self.VERTICAL_BANNER and not completed and missed_deadlines:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
             if any(self._is_block_shiftable(item, category) for item in xblock.get_display_items()):
