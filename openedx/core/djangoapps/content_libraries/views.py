@@ -21,6 +21,7 @@ from django.contrib.auth.models import Group
 from django.http import HttpResponseBadRequest
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -611,6 +612,27 @@ class LibraryBlockView(APIView):
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
         api.delete_library_block(key)
         return Response({})
+
+
+@view_auth_classes()
+class LibraryBlockLtiUrlView(APIView):
+    """
+    Views to generate LTI URL for existing XBlocks in a content library.
+
+    Returns 404 in case the block not found by the given key.
+    """
+    @convert_exceptions
+    def get(self, request, usage_key_str):
+        """
+        Get the LTI launch URL for the XBlock.
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
+
+        # Get the block to validate its existence
+        api.get_library_block(key)
+        lti_login_url = f"{reverse('content_libraries:lti-launch')}?id={key}"
+        return Response({"lti_url": lti_login_url})
 
 
 @view_auth_classes()

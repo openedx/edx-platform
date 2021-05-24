@@ -38,6 +38,8 @@ urlpatterns = [
         url(r'^blocks/(?P<usage_key_str>[^/]+)/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
             url(r'^$', views.LibraryBlockView.as_view()),
+            # Get the LTI URL of a specific XBlock
+            url(r'^lti/$', views.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
             url(r'^olx/$', views.LibraryBlockOlxView.as_view()),
             # CRUD for static asset files associated with a block in the library:
