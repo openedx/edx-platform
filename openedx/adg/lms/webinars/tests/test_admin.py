@@ -268,3 +268,16 @@ def test_registration_webinar_admin_delete_permission():
     Test that admins do not have permission to delete webinar registrations
     """
     assert not WebinarRegistrationAdmin.has_delete_permission('self', Mock())
+
+
+@pytest.mark.django_db
+def test_get_deleted_objects_webinar_admin(webinar_admin_instance, request, webinar):
+    """
+    Test that get_deleted_objects for webinar admin returns an empty set of permissions
+    """
+    request.user = UserFactory()
+    # pylint: disable=unused-variable
+    deleted_objects, model_count, perms_needed, protected = webinar_admin_instance.get_deleted_objects(
+        [webinar], request
+    )
+    assert perms_needed == set()

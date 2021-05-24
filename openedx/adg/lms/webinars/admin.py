@@ -187,6 +187,26 @@ class WebinarAdmin(WebinarAdminBase):
         qs = super(WebinarAdmin, self).get_queryset(request)
         return qs.filter(is_cancelled=False)
 
+    def get_deleted_objects(self, objs, request):
+        """
+        Overriding this method to prevent delete permissions error on related objects when a webinar is
+        deleted (cancelled) from admin site.
+
+        We have overridden the delete method of Webinar model to mark a webinar as cancelled, instead of deleting it.
+        Once the webinar is deleted (cancelled) from admin site, the delete view gets a list of related objects by
+        calling get_deleted_objects method and checks for admin’s delete permission of those related objects, which
+        includes webinar registrations. Since webinar registration’s delete permission is revoked from the admin site,
+        the admin delete view show a permission error and does not allow to proceed with the cancellation of the
+        webinar. To bypass the permission error, we are overriding this method.
+
+        Note: deleting (cancelling) a webinar does not delete its corresponding webinar registrations, we only need the
+        permission so that the webinar can be cancelled successfully
+        """
+        # pylint: disable=unused-variable
+        deleted_objects, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+
+        return deleted_objects, model_count, set(), protected
+
 
 class CancelledWebinarAdmin(WebinarAdminBase):
     """
