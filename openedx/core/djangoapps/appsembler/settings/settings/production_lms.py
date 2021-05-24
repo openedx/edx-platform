@@ -47,6 +47,7 @@ def plugin_settings(settings):
             'oauth',
             'status',
             '/heartbeat',
+            '/courses/yt_video_metadata',
             '/accounts/manage_user_standing',
             '/accounts/disable_account_ajax',
         ]
