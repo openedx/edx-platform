@@ -330,7 +330,8 @@ def update_credentials_course_certificate_configuration_available_date(
             available to the user. If not provided, it will be none.
     """
     LOGGER.info(
-        f"Running task update_credentials_course_certificate_configuration_available_date for course {course_key}"
+        f"Running task update_credentials_course_certificate_configuration_available_date for course {course_key} \
+        with certificate_available_date {certificate_available_date}"
     )
     course_key = str(course_key)
     course_modes = CourseMode.objects.filter(course_id=course_key)
