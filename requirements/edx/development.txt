@@ -548,7 +548,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.10.1
+edx-proctoring==3.10.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
