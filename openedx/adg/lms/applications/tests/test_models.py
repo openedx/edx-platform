@@ -192,14 +192,14 @@ def test_work_experience_string_representation(work_experience):
 @pytest.mark.django_db
 def test_submitted_applications_manager():
     """
-    Test that the SubmittedApplicationsManager returns only submitted applications.
+    Test that the SubmittedApplicationsManager returns only submitted written applications.
     """
     user_application_1 = UserApplicationFactory()
     user_application_2 = UserApplicationFactory()
 
     application_hub_1 = ApplicationHubFactory()
     application_hub_1.user = user_application_1.user
-    application_hub_1.is_application_submitted = True
+    application_hub_1.is_written_application_completed = True
     application_hub_1.save()
 
     application_hub_2 = ApplicationHubFactory()

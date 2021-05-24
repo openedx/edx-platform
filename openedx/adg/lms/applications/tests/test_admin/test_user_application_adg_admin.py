@@ -44,7 +44,7 @@ from openedx.adg.lms.applications.constants import (
     WAITLISTED_APPLICATIONS_TITLE,
     CourseScore
 )
-from openedx.adg.lms.applications.models import UserApplication
+from openedx.adg.lms.applications.models import ApplicationHub, UserApplication
 from openedx.adg.lms.applications.tests.constants import (
     ADMIN_TYPE_ADG_ADMIN,
     ADMIN_TYPE_SUPER_ADMIN,
@@ -180,7 +180,8 @@ def test_changeform_view(
     request,
     user_application,
     user_application_adg_admin_instance,
-    request_method
+    request_method,
+    mocker
 ):
     """
     Test the overridden changeform_view.
@@ -192,6 +193,8 @@ def test_changeform_view(
         Test that if a POST request is made with an internal note but without status, the application should not be
         saved and the right context should be rendered for the application review page.
     """
+    mocker.patch.object(ApplicationHub.objects, 'get')
+
     application_id = user_application.id
 
     expected_context = {'test_key': 'test_value'}

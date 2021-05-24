@@ -9,12 +9,12 @@ from django.utils.translation import get_language
 
 class SubmittedApplicationsManager(Manager):
     """
-    Manager which returns all user applications which have been submitted successfully.
+    Manager which returns all written user applications which have been submitted successfully.
     """
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            user__application_hub__is_application_submitted=True
+            user__application_hub__is_written_application_completed=True
         )
 
 
