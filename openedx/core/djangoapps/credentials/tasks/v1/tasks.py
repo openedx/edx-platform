@@ -13,18 +13,20 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_django_utils.monitoring import set_code_owner_attribute
-from opaque_keys.edx.keys import CourseKey
 from MySQLdb import OperationalError
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
-from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_grades
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_grades
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabled_for_org
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
-from openedx.core.djangoapps.programs.signals import handle_course_cert_changed, handle_course_cert_awarded
+from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 logger = get_task_logger(__name__)
@@ -360,3 +362,21 @@ def is_course_run_in_a_program(course_run_key):
                     if str_key == course_run['key']:
                         return True
     return False
+
+
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
+def backfill_date_for_all_course_runs():
+    """
+    Pulls a list of every single course run and then sends a cert_date_changed signal. Every 10 courses,
+    it will sleep for a time, to create a delay as to not kill credentials/LMS.
+    """
+    course_run_list = CourseOverview.objects.exclude(self_paced=True).exclude(certificate_available_date=None)
+    for index, course_run in enumerate(course_run_list):
+        COURSE_CERT_DATE_CHANGE.send_robust(
+            sender=None,
+            course_key=str(course_run.id),
+            available_date=course_run.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        )
+        if index % 10 == 0:
+            time.sleep(3)
