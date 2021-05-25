@@ -6,7 +6,6 @@ import math
 import time
 
 from celery import shared_task
-from celery.app import shared_task
 from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger
 from celery_utils.logged_task import LoggedTask
