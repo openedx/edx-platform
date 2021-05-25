@@ -647,7 +647,7 @@ def remove_allowlist_entry(user, course_key):
         certificate = get_certificate_for_user(user.username, course_key, False)
         if certificate:
             log.info(f"Invalidating certificate for student {user.id} in course {course_key} before allowlist removal.")
-            certificate.invalidate()
+            certificate.invalidate(source='allowlist_removal')
 
         log.info(f"Removing student {user.id} from the allowlist in course {course_key}.")
         allowlist_entry.delete()

@@ -358,24 +358,66 @@ class GeneratedCertificate(models.Model):
             user=self.user
         )
 
-    def invalidate(self):
+    def invalidate(self, source=None):
         """
-        Invalidate Generated Certificate by marking it 'unavailable'. This will prevent the learner from being able to
-        access their certificate in the associated Course. In addition, we remove any errors and grade information
-        associated with the certificate record.
+        Invalidate Generated Certificate by marking it 'unavailable'. For additional information see the
+        `_revoke_certificate()` function.
+
+        Args:
+            source (String) - source requesting invalidation of the certificate for tracking purposes
+        """
+        log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
+        self._revoke_certificate(CertificateStatuses.unavailable, source=source)
+
+    def mark_notpassing(self, grade, source=None):
+        """
+        Invalidates a Generated Certificate by marking it as 'notpassing'. For additional information see the
+        `_revoke_certificate()` function.
+
+        Args:
+            grade (float) - snapshot of the learner's current grade as a decimal
+            source (String) - source requesting invalidation of the certificate for tracking purposes
+        """
+        log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
+        self._revoke_certificate(CertificateStatuses.notpassing, grade=grade, source=source)
+
+    def mark_unverified(self, source=None):
+        """
+        Invalidates a Generated Certificate by marking it as 'unverified'. For additional information see the
+        `_revoke_certificate()` function.
+
+        Args:
+            source (String) - source requesting invalidation of the certificate for tracking purposes
+        """
+        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id}')
+        self._revoke_certificate(CertificateStatuses.unverified, source=source)
+
+    def _revoke_certificate(self, status, grade=None, source=None):
+        """
+        Revokes a course certificate from a learner, updating the certificate's status as specified by the value of the
+        `status` argument. This will prevent the learner from being able to access their certiticate in the associated
+        course run.
 
         We remove the `download_uuid` and the `download_url` as well, but this is only important to PDF certificates.
 
         Invalidating a certificate fires the `COURSE_CERT_REVOKED` signal. This kicks off a task to determine if there
-        are any program certificates that need to be revoked from the learner.
+        are any program certificates that also need to be revoked from the learner.
+
+        If the certificate had a status of `downloadable` before being revoked then we will also emit an
+        `edx.certificate.revoked` event for tracking purposes.
+
+        Args:
+            status (CertificateStatus) - certificate status to set for the `GeneratedCertificate` record
+            grade (float) - snapshot of the learner's current grade as a decimal
+            source (String) - source requesting invalidation of the certificate for tracking purposes
         """
-        log.info(f'Marking certificate as unavailable for {self.user.id} : {self.course_id}')
+        previous_certificate_status = self.status
 
         self.error_reason = ''
         self.download_uuid = ''
         self.download_url = ''
-        self.grade = ''
-        self.status = CertificateStatuses.unavailable
+        self.grade = grade or ''
+        self.status = status
         self.save()
 
         COURSE_CERT_REVOKED.send_robust(
@@ -386,49 +428,18 @@ class GeneratedCertificate(models.Model):
             status=self.status,
         )
 
-    def mark_notpassing(self, grade):
-        """
-        Invalidates a Generated Certificate by marking it as 'notpassing'. For additional information, please see the
-        comments of the `invalidate` function above as they also apply here.
-        """
-        log.info(f'Marking certificate as notpassing for {self.user.id} : {self.course_id}')
+        if previous_certificate_status == CertificateStatuses.downloadable:
+            # imported here to avoid a circular import issue
+            from lms.djangoapps.certificates.utils import emit_certificate_event
 
-        self.error_reason = ''
-        self.download_uuid = ''
-        self.download_url = ''
-        self.grade = grade
-        self.status = CertificateStatuses.notpassing
-        self.save()
-
-        COURSE_CERT_REVOKED.send_robust(
-            sender=self.__class__,
-            user=self.user,
-            course_key=self.course_id,
-            mode=self.mode,
-            status=self.status,
-        )
-
-    def mark_unverified(self):
-        """
-        Invalidates a Generated Certificate by marking it as 'unverified'. For additional information, please see the
-        comments of the `invalidate` function above as they also apply here.
-        """
-        log.info(f'Marking certificate as unverified for {self.user.id} : {self.course_id}')
-
-        self.error_reason = ''
-        self.download_uuid = ''
-        self.download_url = ''
-        self.grade = ''
-        self.status = CertificateStatuses.unverified
-        self.save()
-
-        COURSE_CERT_REVOKED.send_robust(
-            sender=self.__class__,
-            user=self.user,
-            course_key=self.course_id,
-            mode=self.mode,
-            status=self.status,
-        )
+            event_data = {
+                'user_id': self.user.id,
+                'course_id': str(self.course_id),
+                'certificate_id': self.verify_uuid,
+                'enrollment_mode': self.mode,
+                'source': source or '',
+            }
+            emit_certificate_event('revoked', self.user, str(self.course_id), event_data=event_data)
 
     def is_valid(self):
         """

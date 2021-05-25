@@ -67,6 +67,7 @@ from lms.djangoapps.certificates.tests.factories import (
     CertificateInvalidationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
@@ -252,6 +253,9 @@ class CertificateIsInvalid(WebCertificateTestMixin, ModuleStoreTestCase):
             org='edx',
             number='verified',
             display_name='Verified Course'
+        )
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id
         )
         self.global_staff = GlobalStaffFactory()
         self.request_factory = RequestFactory()
