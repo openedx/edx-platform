@@ -6,9 +6,7 @@ API function for retrieving course blocks data
 import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.access_denied_filter import AccessDeniedMessageFilterTransformer
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
-from lms.djangoapps.course_blocks.transformers.hide_empty import HideEmptyTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.effort_estimation.api import EffortEstimationTransformer
 
 from .serializers import BlockDictSerializer, BlockSerializer
@@ -97,10 +95,6 @@ def get_blocks(
     # please also remove this comment. Thanks!
     if hide_access_denials:
         transformers += [AccessDeniedMessageFilterTransformer()]
-
-    # TODO: Remove this after REVE-52 lands and old-mobile-app traffic falls to < 5% of mobile traffic
-    if is_request_from_mobile_app(request):
-        transformers += [HideEmptyTransformer()]
 
     if include_effort_estimation:
         transformers += [EffortEstimationTransformer()]
