@@ -219,15 +219,29 @@ class EligibleAvailableCertificateManager(EligibleCertificateManager):
 
 class GeneratedCertificate(models.Model):
     """
-    Base model for generated certificates
+    Base model for generated course certificates
 
     .. pii: PII can exist in the generated certificate linked to in this model. Certificate data is currently retained.
     .. pii_types: name, username
     .. pii_retirement: retained
 
-    The grade stored in this model is set at the same time as the status. This GeneratedCertificate grade is *not*
-    updated whenever the user's course grade changes and so it should not be considered the source of truth. It is
-    suggested that the PersistentCourseGrade be used instead of the GeneratedCertificate grade.
+    course_id       - Course run key
+    created_date    - Date and time the certificate was created
+    distinction     - Indicates whether the user passed the course with distinction. Currently unused.
+    download_url    - URL where the PDF version of the certificate, if any, can be found
+    download_uuid   - UUID associated with a PDF certificate
+    error_reason    - Reason a PDF certificate could not be created
+    grade           - User's grade in this course run. This grade is set at the same time as the status. This
+                    GeneratedCertificate grade is *not* updated whenever the user's course grade changes and so it
+                    should not be considered the source of truth. It is suggested that the PersistentCourseGrade be
+                    used instead of the GeneratedCertificate grade.
+    key             - Certificate identifier, used for PDF certificates
+    mode            - Course run mode (ex. verified)
+    modified_date   - Date and time the certificate was last modified
+    name            - User's name
+    status          - Certificate status value; see the CertificateStatuses model
+    user            - User associated with the certificate
+    verify_uuid     - Unique identifier for the certificate
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
@@ -347,7 +361,7 @@ class GeneratedCertificate(models.Model):
     def invalidate(self):
         """
         Invalidate Generated Certificate by marking it 'unavailable'. This will prevent the learner from being able to
-        access their certiticate in the associated Course. In addition, we remove any errors and grade information
+        access their certificate in the associated Course. In addition, we remove any errors and grade information
         associated with the certificate record.
 
         We remove the `download_uuid` and the `download_url` as well, but this is only important to PDF certificates.
