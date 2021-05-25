@@ -51,7 +51,7 @@
   }
 
   .inner-wrapper {
-    @extend %ui-depth1;
+    @extend %ui-depth1 !optional;
 
     background: $modal-content-bg;
     border-radius: 0;
@@ -69,7 +69,7 @@
     }
 
     header {
-      @extend %ui-depth1;
+      @extend %ui-depth1 !optional;
 
       margin-bottom: ($baseline*1.5);
       overflow: hidden;
