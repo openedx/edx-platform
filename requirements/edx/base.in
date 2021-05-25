@@ -44,7 +44,7 @@ Django                              # Web application framework
 django-appconf
 django-celery-results               # Only used for the CacheBackend for celery results
 django-cookies-samesite             # Middleware which allows SameSite=None flag for session and csrf cookies in Django<3.0.5
-django-config-models>=1.0.0         # Configuration models for Django allowing config management with auditing
+django-config-models                # Configuration models for Django allowing config management with auditing
 django-cors-headers                 # Used to allow to configure CORS headers for cross-domain requests
 django-countries                    # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
