@@ -16,7 +16,7 @@ idna==3.4
     # via requests
 lazy==1.5
     # via -r requirements/edx/paver.in
-libsass==0.20.1
+libsass==0.21.0
     # via -r requirements/edx/paver.in
 markupsafe==2.1.1
     # via -r requirements/edx/paver.in
