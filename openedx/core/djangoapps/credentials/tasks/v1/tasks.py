@@ -14,7 +14,6 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_django_utils.monitoring import set_code_owner_attribute
-from edx_django_utils.monitoring.internal.code_owner.utils import set_code_owner_attribute
 from MySQLdb import OperationalError
 from opaque_keys.edx.keys import CourseKey
 
