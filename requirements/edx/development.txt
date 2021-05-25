@@ -1451,7 +1451,7 @@ wrapt==1.11.2
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   astroid
-git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.4#egg=xblock-drag-and-drop-v2==2.3.4
+git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.5#egg=xblock-drag-and-drop-v2==2.3.5
     # via -r requirements/edx/testing.txt
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
     # via -r requirements/edx/testing.txt
