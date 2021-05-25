@@ -23,7 +23,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
-from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.auth import user_has_role
