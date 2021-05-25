@@ -6,6 +6,7 @@ Module for the Storage of BlockStructure objects.
 
 from logging import getLogger
 
+import six
 from django.utils.encoding import python_2_unicode_compatible
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
