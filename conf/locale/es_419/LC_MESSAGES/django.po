@@ -5479,7 +5479,7 @@ msgstr "Gracias por usar el sitio!"
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team"
-msgstr "El equpo de %(platform_name)s"
+msgstr "El equipo de %(platform_name)s"
 
 #: common/templates/student/edx_ace/accountrecovery/email/subject.txt
 #, python-format
@@ -9225,7 +9225,7 @@ msgstr "Error"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
-msgstr ""
+msgstr "Verificación de identidad aprobada"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
@@ -9240,7 +9240,7 @@ msgstr "Hola %(full_name)s,"
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid "Your %(platform_name)s ID verification photos have been approved."
-msgstr ""
+msgstr "Tu verificación de identidad para la plafaforma %(platform_name)s fue aprobada."
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -9249,11 +9249,13 @@ msgid ""
 "Your approval status remains valid for one year, and it will expire "
 "%(expiry_date)s."
 msgstr ""
+"Tu verificación es válida durante un año. Expirará el "
+"%(expiry_date)s."
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 msgid "Enjoy your studies,"
-msgstr ""
+msgstr "Disfrute su curso,"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -9263,7 +9265,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 #, python-format
 msgid "The %(platform_name)s Team "
-msgstr "El %(platform_name)s equipo"
+msgstr "El equipo de %(platform_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9275,17 +9277,17 @@ msgstr "Hola %(full_name)s, "
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s ID verification was approved!"
-msgstr ""
+msgstr "¡Tu verificación de identidad para %(platform_name)s fue aprobada!"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 msgid "Expired ID Verification"
-msgstr "verificación de ID caducada"
+msgstr "Verificación de identidad caducada"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "Your %(platform_name)s ID verification has expired. "
-msgstr "Tu %(platform_name)s verificación de ID ha expirado "
+msgstr "Tu verificación de Identidad en %(platform_name)s ha expirado "
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9307,7 +9309,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 msgid "You can also do this from your dashboard."
-msgstr "También puedes hacer esto desde tu panel principal."
+msgstr "También puedes hacer esto desde tu página de inicio."
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
@@ -9334,11 +9336,11 @@ msgstr "Gracias."
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
-msgstr "Tu %(platform_name)s verificación ha expirado"
+msgstr "Tu verificación en %(platform_name)s ha expirado"
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 msgid "ID Verification Submitted"
-msgstr ""
+msgstr "Verificación de Identidad enviada"
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
@@ -9346,28 +9348,29 @@ msgstr ""
 msgid ""
 "Thank you for submitting your photos for identity verification with "
 "%(platform_name)s. "
-msgstr ""
+msgstr "Gracias por enviar tus fotos para verificiar tu identidad con "
+"%(platform_name)s. "
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
 "We have received your photos and they will be reviewed within 5-7 days."
-msgstr ""
+msgstr "Hemos recibido tus fotos y serán revisadas dentro de los póximos 5 a 7 dias."
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 #, python-format
 msgid "You may check the status on your dashboard: %(dashboard_link)s "
-msgstr ""
+msgstr "Puedes revisar el estado de tu verificación en tu página de inicio: %(dashboard_link)s "
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid "Best regards,"
-msgstr ""
+msgstr "Cordialmente,"
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/subject.txt
 msgid "Thank you for submitting your photos!"
-msgstr ""
+msgstr "¡Gracias por enviar tus fotos!"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
