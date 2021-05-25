@@ -106,7 +106,7 @@ sympy==1.6.2
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py35.in
     #   symmath
-tqdm==4.60.0
+tqdm==4.61.0
     # via
     #   -r requirements/edx-sandbox/shared.txt
     #   nltk
