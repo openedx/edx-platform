@@ -733,7 +733,7 @@ lazy==1.4
     #   bok-choy
     #   lti-consumer-xblock
     #   ora2
-libsass==0.20.1
+libsass==0.21.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
