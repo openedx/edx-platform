@@ -2,7 +2,6 @@
 Serializers for applications app
 """
 from rest_framework import serializers
-from django.utils.translation import ugettext as _
 
 from .helpers import check_validations_for_current_record, check_validations_for_past_record
 from .models import Education, WorkExperience
@@ -23,20 +22,11 @@ class EducationSerializer(serializers.ModelSerializer):
         Returns:
             dict: Returns updated education attributes after validation or raises validation exceptions
         """
-        attrs, errors = self._check_area_of_study_validations(attrs)
-
+        attrs = self._check_area_of_study_validations(attrs)
         if attrs.get('is_in_progress'):
-            errors.update(
-                check_validations_for_current_record(
-                    attrs, '{key} isn\'t applicable for degree in progress'
-                )
-            )
+            errors = check_validations_for_current_record(attrs, '{key} isn\'t applicable for degree in progress')
         else:
-            errors.update(
-                check_validations_for_past_record(
-                    attrs, '{key} is required for past degree'
-                )
-            )
+            errors = check_validations_for_past_record(attrs, '{key} is required for past degree')
         if errors:
             raise serializers.ValidationError(errors)
 
@@ -44,9 +34,8 @@ class EducationSerializer(serializers.ModelSerializer):
 
     def _check_area_of_study_validations(self, attrs):
         """
-        Validate area of study by checking if `area_of_study` is provided for all degrees except for
-        `high school diploma` and if it isn't raising exception. For `high school diploma` if value of `area_of_study`
-        is provided replace it with empty string`''`.
+        Validate area of study by checking if `area_of_study` is provided for `high school diploma` and
+        replace it with empty string `''`.
 
         Arguments:
             attrs (dict): Dictionary containing education attributes
@@ -54,12 +43,9 @@ class EducationSerializer(serializers.ModelSerializer):
         Returns:
             dicts: Returns updated education attributes and errors if any in dictionary
         """
-        errors = {}
         if attrs.get('degree') == Education.HIGH_SCHOOL_DIPLOMA:
             attrs['area_of_study'] = ''
-        elif not attrs.get('area_of_study'):
-            errors['area_of_study'] = _('Area of study is required for all degrees above High School Diploma')
-        return attrs, errors
+        return attrs
 
     class Meta:
         model = Education

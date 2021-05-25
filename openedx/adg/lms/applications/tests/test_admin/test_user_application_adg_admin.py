@@ -17,16 +17,14 @@ from openedx.adg.lms.applications.constants import (
     ALL_APPLICATIONS_TITLE,
     APPLICANT_INFO,
     APPLYING_TO,
-    COVER_LETTER_FILE,
-    COVER_LETTER_FILE_DISPLAY,
-    COVER_LETTER_ONLY,
-    COVER_LETTER_TEXT,
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
     EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
+    INTEREST,
+    INTEREST_IN_BUSINESS,
     IS_SAUDI_NATIONAL,
     LINKED_IN_PROFILE,
     LINKED_IN_PROFILE_HTML_FORMAT,
@@ -35,10 +33,6 @@ from openedx.adg.lms.applications.constants import (
     ORGANIZATION,
     PHONE_NUMBER,
     PREREQUISITES,
-    RESUME,
-    RESUME_AND_COVER_LETTER,
-    RESUME_DISPLAY,
-    RESUME_ONLY,
     SCORES,
     STATUS_PARAM,
     WAITLISTED_APPLICATIONS_TITLE,
@@ -49,14 +43,11 @@ from openedx.adg.lms.applications.tests.constants import (
     ADMIN_TYPE_ADG_ADMIN,
     ADMIN_TYPE_SUPER_ADMIN,
     ALL_FIELDSETS,
-    FIELDSETS_WITHOUT_RESUME_OR_COVER_LETTER,
     FORMSET,
     LINKED_IN_URL,
     NOTE,
-    TEST_COVER_LETTER_FILE,
-    TEST_COVER_LETTER_TEXT,
+    TEST_INTEREST_IN_BUSINESS,
     TEST_MESSAGE_FOR_APPLICANT,
-    TEST_RESUME,
     TITLE_BUSINESS_LINE_1,
     TITLE_BUSINESS_LINE_2
 )
@@ -415,31 +406,6 @@ def test_applying_to(user_application):
 
 
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.get_embedded_view_html')
-def test_resume_display(mock_get_embedded_view_html, user_application):
-    """
-    Test that `resume_display` field method gets HTML for embedded view of resume file uploaded by applicant.
-    """
-    user_application.resume = 'Test Resume File'
-    UserApplicationADGAdmin.resume_display('self', user_application)
-
-    mock_get_embedded_view_html.assert_called_once_with(user_application.resume)
-
-
-@pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.get_embedded_view_html')
-def test_cover_letter_file_display(mock_get_embedded_view_html, user_application):
-    """
-    Test that `cover_letter_file_display` field method gets HTML for embedded view of cover letter file uploaded by
-    applicant.
-    """
-    user_application.cover_letter_file = 'Test Cover Letter File'
-    UserApplicationADGAdmin.cover_letter_file_display('self', user_application)
-
-    mock_get_embedded_view_html.assert_called_once_with(user_application.cover_letter_file)
-
-
-@pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.admin.UserApplication.prereq_course_scores', new_callable=mock.PropertyMock)
 def test_prerequisites(mock_prereq_course_scores, user_application):
     """
@@ -456,52 +422,37 @@ def test_prerequisites(mock_prereq_course_scores, user_application):
     assert expected_result == actual_result
 
 
-@pytest.mark.parametrize('resume, cover_letter_file, cover_letter_text, expected_fieldsets', [
-    (TEST_RESUME, None, None, ALL_FIELDSETS),
-    (None, TEST_COVER_LETTER_FILE, None, ALL_FIELDSETS),
-    (None, None, TEST_COVER_LETTER_TEXT, ALL_FIELDSETS),
-    (None, None, None, FIELDSETS_WITHOUT_RESUME_OR_COVER_LETTER)
-], ids=['with_resume', 'with_cover_letter_file', 'with_cover_letter_text', 'with_neither_resume_nor_cover_letter']
-)
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_scores')
-@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_resume_cover_letter')
+@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_fieldset_for_interest')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_applicant_info_fieldset')
 @mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_preliminary_info_fieldset')
 def test_get_fieldsets(
     mock_get_preliminary_info_fieldset,
     mock_get_applicant_info_fieldset,
-    mock_get_fieldset_for_resume_cover_letter,
+    mock_get_fieldset_for_interest,
     mock_get_fieldset_for_scores,
     request,
     user_application,
-    user_application_adg_admin_instance,
-    resume,
-    cover_letter_file,
-    cover_letter_text,
-    expected_fieldsets
+    user_application_adg_admin_instance
 ):
     """
-    Test that the `get_fieldsets` method gets the fieldsets for: preliminary info, applicant info, conditionally resume
-    and cover letter, and scores of applicant.
+    Test that the `get_fieldsets` method gets the fieldsets for: preliminary info, applicant info,
+    interest, and scores of applicant.
 
-    If either resume or cover letter in any form is provided with the application, a fieldset for resume/cover letter
-    should be returned. Otherwise, it should be omitted.
     """
     mock_get_preliminary_info_fieldset.return_value = ALL_FIELDSETS[0]
     mock_get_applicant_info_fieldset.return_value = ALL_FIELDSETS[1]
-    mock_get_fieldset_for_resume_cover_letter.return_value = ALL_FIELDSETS[2]
+    mock_get_fieldset_for_interest.return_value = ALL_FIELDSETS[2]
     mock_get_fieldset_for_scores.return_value = ALL_FIELDSETS[3]
 
-    user_application.resume = resume
-    user_application.cover_letter_file = cover_letter_file
-    user_application.cover_letter = cover_letter_text
+    user_application.interest_in_business = TEST_INTEREST_IN_BUSINESS
 
     actual_fieldsets = UserApplicationADGAdmin.get_fieldsets(
         user_application_adg_admin_instance, request, user_application
     )
 
-    assert expected_fieldsets == actual_fieldsets
+    assert actual_fieldsets == ALL_FIELDSETS
 
 
 @pytest.mark.parametrize('linkedin_url, expected_fields', [
@@ -549,87 +500,18 @@ def test_get_applicant_info_fieldset(user_application, organization):
     assert expected_fieldset == actual_fieldset
 
 
-@pytest.mark.parametrize('resume, cover_letter_file, cover_letter_text, expected_fieldset_title, expected_fields', [
-    (TEST_RESUME, TEST_COVER_LETTER_FILE, None, RESUME_AND_COVER_LETTER, [RESUME, COVER_LETTER_FILE]),
-    (TEST_RESUME, False, TEST_COVER_LETTER_TEXT, RESUME_AND_COVER_LETTER, [RESUME]),
-    (TEST_RESUME, False, False, RESUME_ONLY, [RESUME]),
-    (False, TEST_COVER_LETTER_FILE, False, COVER_LETTER_ONLY, [COVER_LETTER_FILE]),
-    (False, False, TEST_COVER_LETTER_TEXT, COVER_LETTER_ONLY, [])
-], ids=[
-    'with_resume_and_cover_letter_file',
-    'with_resume_and_cover_letter_text',
-    'with_resume_only',
-    'with_cover_letter_file_only',
-    'with_cover_letter_text_only'
-])
 @pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.UserApplicationADGAdmin._get_resume_cover_letter_display_fields')
-def test_get_fieldset_for_resume_cover_letter(
-    mock__get_resume_cover_letter_display_fields,
-    user_application,
-    user_application_adg_admin_instance,
-    resume,
-    cover_letter_file,
-    cover_letter_text,
-    expected_fieldset_title,
-    expected_fields
-):
+def test_get_fieldset_for_interest(user_application, user_application_adg_admin_instance):
     """
-    Test that the `_get_fieldset_for_resume_cover_letter` method returns the correct fieldset.
-
-    Correct fieldsets should be returned for all types of user applications, i.e. applications with both resume and
-    cover letter, only resume, and only cover letter (in any format - file or text).
+    Test that the `_get_fieldset_for_interest` method returns the correct fieldset.
     """
-    user_application.resume = resume
-    user_application.cover_letter_file = cover_letter_file
-    user_application.cover_letter = cover_letter_text
+    user_application.interest_in_business = TEST_INTEREST_IN_BUSINESS
 
-    test_display_field = ['display_field']
-    mock__get_resume_cover_letter_display_fields.return_value = test_display_field
-    expected_fields.extend(test_display_field)
+    actual_fieldset = UserApplicationADGAdmin._get_fieldset_for_interest(user_application_adg_admin_instance)
 
-    expected_fieldset = (expected_fieldset_title, {'fields': tuple(expected_fields)})
-    actual_fieldset = UserApplicationADGAdmin._get_fieldset_for_resume_cover_letter(
-        user_application_adg_admin_instance, user_application
-    )
+    expected_fieldset = (INTEREST, {'fields': (INTEREST_IN_BUSINESS,)})
 
-    assert expected_fieldset == actual_fieldset
-
-
-@pytest.mark.parametrize(
-    'resume, cover_letter_file, cover_letter_text, is_displayable_on_browser, expected_fields', [
-        (TEST_RESUME, TEST_COVER_LETTER_FILE, None, True, [RESUME_DISPLAY, COVER_LETTER_FILE_DISPLAY]),
-        (TEST_RESUME, TEST_COVER_LETTER_FILE, None, False, []),
-        (None, None, TEST_COVER_LETTER_TEXT, None, [COVER_LETTER_TEXT])
-    ], ids=[
-        'with_displayable_resume_and_cover_letter_file',
-        'with_undisplayable_resume_and_cover_letter_file',
-        'with_cover_letter_text'
-    ]
-)
-@pytest.mark.django_db
-@mock.patch('openedx.adg.lms.applications.admin.is_displayable_on_browser')
-def test_get_resume_cover_letter_display_fields(
-    mock_is_displayable_on_browser,
-    user_application,
-    resume,
-    cover_letter_file,
-    cover_letter_text,
-    is_displayable_on_browser,
-    expected_fields
-):
-    """
-    Test that the `_get_resume_cover_letter_display_fields` method correctly returns the list of display fields
-    depending upon the data provided in the application.
-    """
-    user_application.resume = resume
-    user_application.cover_letter_file = cover_letter_file
-    user_application.cover_letter = cover_letter_text
-    mock_is_displayable_on_browser.return_value = is_displayable_on_browser
-
-    actual_fields = UserApplicationADGAdmin._get_resume_cover_letter_display_fields('self', user_application)
-
-    assert expected_fields == actual_fields
+    assert actual_fieldset == expected_fieldset
 
 
 def test_get_fieldset_for_scores():
@@ -657,23 +539,7 @@ def _mock_get_formsets_with_inlines_dependencies(mocker, education_inline, work_
 
 
 @pytest.mark.django_db
-def test_get_formsets_with_inlines_with_resume(user_application, user_application_adg_admin_instance):
-    """
-    Test that the overridden generator function `get_formsets_with_inlines` yields no formsets in case of a user
-    application with attached resume
-    """
-    user_application.resume = TEST_RESUME
-
-    actual_formsets = UserApplicationADGAdmin.get_formsets_with_inlines(
-        user_application_adg_admin_instance, 'request', user_application
-    )
-
-    with pytest.raises(StopIteration):
-        next(actual_formsets)
-
-
-@pytest.mark.django_db
-def test_get_formsets_with_inlines_no_resume_no_experience(
+def test_get_formsets_with_inlines_no_experience(
     user_application,
     user_application_adg_admin_instance,
     education_inline,
@@ -681,8 +547,8 @@ def test_get_formsets_with_inlines_no_resume_no_experience(
     mocker
 ):
     """
-    Test that the overridden generator function `get_formsets_with_inlines` yields formset for only education in case of
-    no work experience.
+    Test that the overridden generator function `get_formsets_with_inlines` yields formset for
+    only education in case of no work experience.
     """
     _mock_get_formsets_with_inlines_dependencies(mocker, education_inline, work_experience_inline)
 
@@ -696,7 +562,7 @@ def test_get_formsets_with_inlines_no_resume_no_experience(
 
 
 @pytest.mark.django_db
-def test_get_formsets_with_inlines_no_resume_with_experience(
+def test_get_formsets_with_inlines_with_experience(
     user_application,
     user_application_adg_admin_instance,
     education_inline,

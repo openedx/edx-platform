@@ -22,16 +22,14 @@ from .constants import (
     ALL_APPLICATIONS_TITLE,
     APPLICANT_INFO,
     APPLYING_TO,
-    COVER_LETTER_FILE,
-    COVER_LETTER_FILE_DISPLAY,
-    COVER_LETTER_ONLY,
-    COVER_LETTER_TEXT,
     DATE_OF_BIRTH,
     DAY_MONTH_YEAR_FORMAT,
     EMAIL,
     EMAIL_ADDRESS_HTML_FORMAT,
     GENDER,
     GENDER_MAP,
+    INTEREST,
+    INTEREST_IN_BUSINESS,
     IS_SAUDI_NATIONAL,
     LINKED_IN_PROFILE,
     LINKED_IN_PROFILE_HTML_FORMAT,
@@ -40,21 +38,12 @@ from .constants import (
     ORGANIZATION,
     PHONE_NUMBER,
     PREREQUISITES,
-    RESUME,
-    RESUME_AND_COVER_LETTER,
-    RESUME_DISPLAY,
-    RESUME_ONLY,
     SCORES,
     STATUS_PARAM,
     WAITLISTED_APPLICATIONS_TITLE
 )
 from .forms import MultilingualCourseGroupForm, UserApplicationAdminForm
-from .helpers import (
-    get_duration,
-    get_embedded_view_html,
-    get_extra_context_for_application_review_page,
-    is_displayable_on_browser
-)
+from .helpers import get_duration, get_extra_context_for_application_review_page
 from .models import (
     ApplicationHub,
     BusinessLine,
@@ -214,6 +203,7 @@ class MultilingualCourseGroupAdmin(admin.ModelAdmin):
 
     def is_business_line_prerequisite(self, obj):
         return obj.is_business_line_prerequisite
+
     is_business_line_prerequisite.boolean = True
 
     def get_form(self, request, obj=None, change=False, **kwargs):
@@ -286,6 +276,7 @@ class EducationInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_in_progress)
+
     dates.short_description = _('Dates')
 
 
@@ -301,10 +292,12 @@ class WorkExperienceInline(ApplicationReviewInline):
 
     def dates(self, obj):
         return get_duration(obj, obj.is_current_position)
+
     dates.short_description = _('Dates')
 
     def responsibilities(self, obj):
         return obj.job_responsibilities
+
     responsibilities.short_description = _('Responsibilities')
 
 
@@ -325,12 +318,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         DATE_OF_BIRTH,
         ORGANIZATION,
         APPLYING_TO,
-        RESUME,
-        COVER_LETTER_FILE,
-        COVER_LETTER_FILE_DISPLAY,
-        RESUME_DISPLAY,
-        COVER_LETTER_TEXT,
-        PREREQUISITES
+        PREREQUISITES,
+        INTEREST_IN_BUSINESS
     )
 
     inlines = [
@@ -338,7 +327,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
     ]
 
     list_display = ('applicant_name', 'date_received', 'status')
-    list_filter = ('status', )
+    list_filter = ('status',)
     list_per_page = 10
 
     def get_queryset(self, request):
@@ -357,10 +346,12 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def applicant_name(self, obj):
         return obj.user.profile.name
+
     applicant_name.short_description = _('Applicant Name')
 
     def date_received(self, obj):
         return obj.user.application_hub.submission_date.strftime(MONTH_DAY_YEAR_FORMAT)
+
     date_received.short_description = _('Date Received (MM/DD/YYYY)')
 
     def changelist_view(self, request, extra_context=None):
@@ -462,6 +453,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
     def email(self, obj):
         return format_html(EMAIL_ADDRESS_HTML_FORMAT, email_address=obj.user.email)
+
     email.short_description = _('Email')
 
     def location(self, obj):
@@ -480,39 +472,38 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             location += ', {country}'.format(country=user_profile.country)
 
         return location
+
     location.short_description = _('Location')
 
     def linked_in_profile(self, obj):
         return format_html(LINKED_IN_PROFILE_HTML_FORMAT, url=obj.linkedin_url)
+
     linked_in_profile.short_description = _('LinkedIn Profile')
 
     def is_saudi_national(self, obj):
         return obj.user.extended_profile.is_saudi_national
+
     is_saudi_national.short_description = SAUDI_NATIONAL_PROMPT
 
     def gender(self, obj):
         return GENDER_MAP[obj.user.profile.gender]
+
     gender.short_description = _('Gender')
 
     def phone_number(self, obj):
         return obj.user.profile.phone_number
+
     phone_number.short_description = _('Phone Number')
 
     def date_of_birth(self, obj):
         return obj.user.extended_profile.birth_date.strftime(DAY_MONTH_YEAR_FORMAT)
+
     date_of_birth.short_description = _('Date of Birth')
 
     def applying_to(self, obj):
         return obj.business_line
+
     applying_to.short_description = _('Applying to')
-
-    def resume_display(self, obj):
-        return get_embedded_view_html(obj.resume)
-    resume_display.short_description = _('Resume')
-
-    def cover_letter_file_display(self, obj):
-        return get_embedded_view_html(obj.cover_letter_file)
-    cover_letter_file_display.short_description = _('Cover Letter')
 
     def prerequisites(self, obj):
         """
@@ -535,6 +526,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
             )
 
         return format_html(final_html)
+
     prerequisites.short_description = _('Prerequisites')
 
     def get_fieldsets(self, request, obj=None):
@@ -558,9 +550,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         applicant_info_fieldset = self._get_applicant_info_fieldset(obj)
         fieldsets.append(applicant_info_fieldset)
 
-        if obj.cover_letter_or_resume:
-            fieldset_for_resume_cover_letter = self._get_fieldset_for_resume_cover_letter(obj)
-            fieldsets.append(fieldset_for_resume_cover_letter)
+        fieldset_for_interest = self._get_fieldset_for_interest()
+        fieldsets.append(fieldset_for_interest)
 
         fieldset_for_scores = self._get_fieldset_for_scores()
         fieldsets.append(fieldset_for_scores)
@@ -609,69 +600,15 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
 
         return fieldset
 
-    def _get_fieldset_for_resume_cover_letter(self, application):
+    def _get_fieldset_for_interest(self):
         """
-        Prepare and return fieldset for resume and cover letter provided with application.
-
-        Arguments:
-            application (UserApplication): Application under review
+        Prepare and return fieldset for the interest in business field provided with application.
 
         Returns:
-            tuple: Fieldset containing both fieldset title and a child tuple for fields.
-
-                Title for fieldset varies based on the provided data. If the applicant has provided:
-
-                    both cover letter and resume, title returned is 'RESUME & COVER LETTER',
-                    resume only, title returned is 'RESUME'
-                    cover letter only, either as an attachment or in text, title returned is 'COVER LETTER'
-
-                Fields returned as part of the fieldset also vary depending on the data that the applicant has provided.
+            tuple: Fieldset containing both fieldset title and a child tuple for `interest in business` field
         """
-        resume_cover_letter_file_fields = []
-
-        if application.cover_letter_and_resume:
-            fieldset_title = RESUME_AND_COVER_LETTER
-            resume_cover_letter_file_fields.append(RESUME)
-            if application.cover_letter_file:
-                resume_cover_letter_file_fields.append(COVER_LETTER_FILE)
-        elif application.resume:
-            fieldset_title = RESUME_ONLY
-            resume_cover_letter_file_fields.append(RESUME)
-        else:
-            fieldset_title = COVER_LETTER_ONLY
-            if application.cover_letter_file:
-                resume_cover_letter_file_fields.append(COVER_LETTER_FILE)
-
-        resume_cover_letter_display_fields = self._get_resume_cover_letter_display_fields(application)
-
-        resume_cover_letter_fields = resume_cover_letter_file_fields + resume_cover_letter_display_fields
-        fieldset = (fieldset_title, {'fields': tuple(resume_cover_letter_fields)})
-
+        fieldset = (INTEREST, {'fields': (INTEREST_IN_BUSINESS,)})
         return fieldset
-
-    def _get_resume_cover_letter_display_fields(self, application):
-        """
-        Get display fields, if applicable, for resume and/or cover letter
-
-        Arguments:
-            application (UserApplication): Application under review
-
-        Returns:
-            list: Display fields
-        """
-        resume_cover_letter_display_fields = []
-
-        if application.resume:
-            if is_displayable_on_browser(application.resume):
-                resume_cover_letter_display_fields.append(RESUME_DISPLAY)
-
-        if application.cover_letter_file:
-            if is_displayable_on_browser(application.cover_letter_file):
-                resume_cover_letter_display_fields.append(COVER_LETTER_FILE_DISPLAY)
-        elif application.cover_letter:
-            resume_cover_letter_display_fields.append(COVER_LETTER_TEXT)
-
-        return resume_cover_letter_display_fields
 
     def _get_fieldset_for_scores(self):
         """
@@ -680,7 +617,7 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Returns:
             tuple: Fieldset
         """
-        fieldset = (SCORES, {'fields': (PREREQUISITES, )})
+        fieldset = (SCORES, {'fields': (PREREQUISITES,)})
 
         return fieldset
 
@@ -688,9 +625,8 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         """
         Override method `get_formsets_with_inlines` of ModelAdmin.
 
-        Override is needed to ensure that if the applicant has attached a resume, the education and work experience
-        inlines should not be rendered. If resume is not attached with application, EducationInline should be rendered
-        while WorkExperienceInline should be optionally rendered depending on whether the user has entered any.
+        Override is needed to ensure that the EducationInline should be rendered while WorkExperienceInline
+        should be optionally rendered depending on whether the user has entered any.
 
         Arguments:
             request (WSGIRequest): HTTP request accessing application review page
@@ -699,8 +635,6 @@ class UserApplicationADGAdmin(admin.ModelAdmin):
         Returns:
             Formsets with inlines
         """
-        if obj.resume:
-            return
 
         for inline in self.get_inline_instances(request, obj):
             if isinstance(inline, WorkExperienceInline) and obj.has_no_work_experience:

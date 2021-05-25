@@ -1,6 +1,9 @@
 """
 Constants related to applications.
 """
+
+# TODO: Convert all these constants into a dictionary
+
 from collections import namedtuple
 from datetime import datetime
 
@@ -10,17 +13,15 @@ MINIMUM_YEAR_OPTION = 1900
 MAXIMUM_YEAR_OPTION = datetime.today().year
 LOGO_IMAGE_MAX_SIZE = 200 * 1024
 ALLOWED_LOGO_EXTENSIONS = ('png', 'jpg', 'svg')
-MAXIMUM_AGE_LIMIT = 60
-MINIMUM_AGE_LIMIT = 21
+MAXIMUM_AGE_LIMIT = 65
+MINIMUM_AGE_LIMIT = 18
 FILE_MAX_SIZE = 4 * 1024 * 1024
 
 # Fieldset titles for application review admin page
 
 APPLICANT_INFO = _('APPLICANT INFORMATION')
 
-RESUME_AND_COVER_LETTER = _('RESUME & COVER LETTER')
-RESUME_ONLY = _('RESUME')
-COVER_LETTER_ONLY = _('COVER LETTER')
+INTEREST = _('INTEREST IN BUSINESS LINE')
 
 SCORES = _('SCORES')
 
@@ -35,11 +36,7 @@ PHONE_NUMBER = 'phone_number'
 DATE_OF_BIRTH = 'date_of_birth'
 ORGANIZATION = 'organization'
 APPLYING_TO = 'applying_to'
-RESUME = 'resume'
-COVER_LETTER_FILE = 'cover_letter_file'
-COVER_LETTER_FILE_DISPLAY = 'cover_letter_file_display'
-RESUME_DISPLAY = 'resume_display'
-COVER_LETTER_TEXT = 'cover_letter'
+INTEREST_IN_BUSINESS = 'interest_in_business'
 PREREQUISITES = 'prerequisites'
 
 # Application listing page titles
@@ -55,8 +52,8 @@ EMAIL_ADDRESS_HTML_FORMAT = '<a href="mailto:{email_address}">{email_address}</a
 LINKED_IN_PROFILE_HTML_FORMAT = '<a href={url}>{url}</a>'
 
 GENDER_MAP = {
-    'm': _('Man'),
-    'f': _('Woman'),
+    'm': _('Male'),
+    'f': _('Female'),
     'o': _('Prefer not to answer')
 }
 
@@ -67,11 +64,11 @@ CourseScore = namedtuple('CourseScore', 'course_name course_percentage')
 
 APPLICATION_REVIEW_ERROR_MSG = _('Please make a decision before submitting.')
 
-HTML_FOR_EMBEDDED_FILE_VIEW = '<iframe src="{path_to_file}" style="width:889px; height:393px;"></iframe>'
-
 ADG_ADMIN_GROUP_NAME = 'ADG Admins'
 
 COURSE_GROUP_PREREQ_VALIDATION_ERROR = _(
     'A Course Group can either be a prerequisite for the program, a specific business line or common for all business '
     'lines'
 )
+
+MAX_NUMBER_OF_WORDS_ALLOWED_IN_TEXT_INPUT = 200

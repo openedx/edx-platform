@@ -149,21 +149,14 @@ class UserApplication(TimeStampedModel):
 
     organization = models.CharField(verbose_name=_('Organization'), max_length=255, blank=True, )
     linkedin_url = models.URLField(verbose_name=_('LinkedIn URL'), max_length=255, blank=True, )
-    resume = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/resume/', verbose_name=_('Resume File'),
-        validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
-        help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
+    interest_in_business = models.TextField(
+        blank=True, verbose_name=_('Why are you interested in this business line?'),
     )
-    cover_letter_file = models.FileField(
-        max_length=500, blank=True, null=True, upload_to='files/cover_letter/', verbose_name=_('Cover Letter File'),
-        validators=[FileExtensionValidator(['pdf', 'doc', 'jpg', 'png'])],
-        help_text=_('Accepted extensions: .pdf, .doc, .jpg, .png'),
-    )
-    cover_letter = models.TextField(blank=True, verbose_name=_('Cover Letter'), )
     is_work_experience_not_applicable = models.BooleanField(
         verbose_name=_('Work Experience Not Applicable'),
         default=False
     )
+    background_question = models.TextField(blank=True, verbose_name=_('Background Question'))
 
     OPEN = 'open'
     WAITLIST = 'waitlist'
@@ -192,18 +185,6 @@ class UserApplication(TimeStampedModel):
 
     def __str__(self):
         return '{}'.format(self.user.profile.name)  # pylint: disable=E1101
-
-    @property
-    def cover_letter_provided(self):
-        return self.cover_letter or self.cover_letter_file
-
-    @property
-    def cover_letter_and_resume(self):
-        return self.cover_letter_provided and self.resume
-
-    @property
-    def cover_letter_or_resume(self):
-        return self.cover_letter_provided or self.resume
 
     @property
     def prereq_course_scores(self):
@@ -262,16 +243,7 @@ class UserApplication(TimeStampedModel):
         """
         Check user completed the education and experience step in user application
         """
-        return self.is_education_completed and self.is_work_experience_completed
-
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        if self.pk:
-            current = UserApplication.objects.get(pk=self.pk)
-            if current.resume != self.resume:
-                current.resume.delete(save=False)
-            if current.cover_letter_file != self.cover_letter_file:
-                current.cover_letter_file.delete(save=False)
-        super(UserApplication, self).save(*args, **kwargs)
+        return self.is_education_completed and self.is_work_experience_completed and self.background_question
 
 
 class UserStartAndEndDates(TimeStampedModel):
