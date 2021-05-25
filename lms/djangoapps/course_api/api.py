@@ -315,7 +315,7 @@ def get_course_members(course_key):
                 }
             }
     """
-    def get_user_info(user, enrollment_mode=None):
+    def make_user_info_dict(user, enrollment_mode=None):
         """
         Utility function to extract user information from model.
         """
@@ -335,9 +335,9 @@ def get_course_members(course_key):
     )[settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT:][:1]
     if over_limit.exists():
         raise OverEnrollmentLimitException(
-            f"Can't retrieve course members for courses with more than "
+            f"Can't retrieve course members for {course_key} since it has more than "
             f"{settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT} active enrollments. "
-            f"This value is retrieved from `settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT`."
+            f"This limit is stored on `settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT`."
         )
 
     # Python dicts where we're going to manually combine the data from the two querysets
@@ -345,9 +345,7 @@ def get_course_members(course_key):
     user_info = {}
 
     # Retrieve all active enrollments in course and prefetch user information
-    enrollments = CourseEnrollment.get_active_enrollments_in_course(
-        course_key
-    )[:settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT]
+    enrollments = CourseEnrollment.get_active_enrollments_in_course(course_key)
 
     # Retrieve all course access roles and prefetch user information
     access_roles = CourseAccessRole.access_roles_in_course(course_key)
@@ -356,12 +354,12 @@ def get_course_members(course_key):
     # into `user_info` and `user_roles` dictionaries.
     for enrollment in enrollments:
         user_roles[enrollment.user_id].append('student')
-        user_info[enrollment.user_id] = get_user_info(enrollment.user, enrollment.mode)
+        user_info[enrollment.user_id] = make_user_info_dict(enrollment.user, enrollment.mode)
 
     for access_role in access_roles:
         user_roles[access_role.user_id].append(access_role.role)
         if access_role.user_id not in user_info:
-            user_info[access_role.user_id] = get_user_info(access_role.user)
+            user_info[access_role.user_id] = make_user_info_dict(access_role.user)
 
     # Merge user role information with `user_info`
     for user_id in user_info:
