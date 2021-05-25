@@ -7,6 +7,7 @@ import os
 from datetime import datetime
 
 import six
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.utils.translation import ugettext as _
@@ -90,16 +91,30 @@ def store_uploaded_file(
 
 def course_filename_prefix_generator(course_id, separator='_'):
     """
-    Generates a course-identifying unicode string for use in a file
-    name.
+    Generates a course-identifying unicode string for use in a file name.
 
     Args:
         course_id (object): A course identification object.
+        separator (str): The character or chain of characters used for separating course details in
+            the filename.
     Returns:
-        str: A unicode string which can safely be inserted into a
-            filename.
+        str: A unicode string which can safely be inserted into a filename.
     """
-    return get_valid_filename(six.text_type(separator).join([course_id.org, course_id.course, course_id.run]))
+    filename = six.text_type(separator).join([
+        course_id.org,
+        course_id.course,
+        course_id.run
+    ])
+
+    enable_course_filename_ccx_suffix = settings.FEATURES.get(
+        'ENABLE_COURSE_FILENAME_CCX_SUFFIX',
+        False
+    )
+
+    if enable_course_filename_ccx_suffix and getattr(course_id, 'ccx', None):
+        filename = six.text_type(separator).join([filename, 'ccx', course_id.ccx])
+
+    return get_valid_filename(filename)
 
 
 def course_and_time_based_filename_generator(course_id, base_name):
