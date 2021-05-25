@@ -8,24 +8,21 @@ consist primarily of authentication, request validation, and serialization.
 import json
 import logging
 
-from course_modes.models import CourseMode
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ObjectDoesNotExist,
     ValidationError
 )
-from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.jwt.authentication import \
-    JwtAuthentication  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_rest_framework_extensions.auth.session.authentication import \
-    SessionAuthenticationAllowInactiveUser  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys import InvalidKeyError  # lint-amnesty, pylint: disable=wrong-import-order
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
+from django.utils.decorators import method_decorator
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from rest_framework import permissions, status  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.generics import ListAPIView  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.response import Response  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.throttling import UserRateThrottle  # lint-amnesty, pylint: disable=wrong-import-order
-from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-import-order
+from rest_framework import permissions, status
+from rest_framework.generics import ListAPIView
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
 from six import text_type
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -35,7 +32,6 @@ from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangofromcourseware.models import BaseStudentModuleHistory, StudentModule
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
