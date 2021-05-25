@@ -134,7 +134,7 @@
 
     header {
       @extend .clearfix;
-      @extend h1.top-header;
+      @extend %h1-top-header;
 
       margin-bottom: lh();
 
