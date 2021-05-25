@@ -340,7 +340,6 @@ FEATURES = {
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
 
-    'ENABLE_INSTRUCTOR_ANALYTICS': False,
     'PREVIEW_LMS_BASE': "preview.localhost:18000",
     'ENABLE_GRADE_DOWNLOADS': True,
     'ENABLE_MKTG_SITE': False,
