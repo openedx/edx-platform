@@ -63,9 +63,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
     </header>
     <div class="page-content">
         <div class="page-content-main">
-            % if offer_banner_fragment:
-                ${HTML(offer_banner_fragment.content)}
-            % endif
             % if course_expiration_fragment:
                 ${HTML(course_expiration_fragment.content)}
             % endif
@@ -194,7 +191,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
 
   var personalizedLearnerSchedulesLink = $(".personalized_learner_schedules_button");
   var fbeLink = $("#FBE_banner");
-  var welcomeLink = $("#welcome");
   var sockLink = $("#sock");
   var upgradeDateLink = $("#course_home_dates");
   var GreenUpgradeLink = $("#green_upgrade");
@@ -211,12 +207,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
       pageName: "course_home",
       linkType: "link",
       linkCategory: "FBE_banner"
-    });
-
-    TrackECommerceEvents.trackUpsellClick(welcomeLink, 'course_home_welcome', {
-      pageName: "course_home",
-      linkType: "link",
-      linkCategory: "welcome"
     });
 
     TrackECommerceEvents.trackUpsellClick(sockLink, 'course_home_sock', {
