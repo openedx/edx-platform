@@ -26,7 +26,6 @@ from openedx.core.djangoapps.credentials.helpers import is_learner_records_enabl
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials_api_client
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 logger = get_task_logger(__name__)
@@ -368,15 +367,40 @@ def is_course_run_in_a_program(course_run_key):
 @set_code_owner_attribute
 def backfill_date_for_all_course_runs():
     """
-    Pulls a list of every single course run and then sends a cert_date_changed signal. Every 10 courses,
-    it will sleep for a time, to create a delay as to not kill credentials/LMS.
+    This task will update the course certificate configuration's certificate_available_date
+    in credentials for all course runs. This is different from the "visable_date" attribute.
+    This date will always either be the available date that is set in studio for a given course, or it will be None.
+    This will exclude any course runs that do not have a certificate_available_date or are self paced.
     """
     course_run_list = CourseOverview.objects.exclude(self_paced=True).exclude(certificate_available_date=None)
     for index, course_run in enumerate(course_run_list):
-        COURSE_CERT_DATE_CHANGE.send_robust(
-            sender=None,
-            course_key=str(course_run.id),
-            available_date=course_run.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        logger.info(
+            f"updating certificate_available_date for course {course_run.id} "
+            f"with date {course_run.certificate_available_date}"
         )
+        course_key = str(course_run.id)
+        course_modes = CourseMode.objects.filter(course_id=course_key)
+        # There should only ever be one certificate relevant mode per course run
+        modes = [mode.slug for mode in course_modes if mode.slug in CourseMode.CERTIFICATE_RELEVANT_MODES]
+        if len(modes) != 1:
+            logger.exception(
+                f'Either course {course_key} has no certificate mode or multiple modes. Task failed.'
+            )
+        # if there is only one relevant mode, post to credentials
+        else:
+            try:
+                credentials_client = get_credentials_api_client(
+                    User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
+                )
+                credentials_client.course_certificates.post({
+                    "course_id": course_key,
+                    "certificate_type": modes[0],
+                    "certificate_available_date": course_run.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    "is_active": True,
+                })
+                logger.info(f"certificate_available_date updated for course {course_key}")
+            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable,W0703
+                error_msg = f"Failed to send certificate_available_date for course {course_key}."
+                logger.exception(error_msg)
         if index % 10 == 0:
             time.sleep(3)
