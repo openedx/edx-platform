@@ -85,6 +85,24 @@ COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION = CourseWaffleFl
     WAFFLE_FLAG_NAMESPACE, 'mfe_progress_milestones_streak_celebration', __name__
 )
 
+# .. toggle_name: courseware.streak_celebration_testing
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: End to end testing features around the streak celebration
+# .. is complex, since it requires waiting 3 days to hit the streak.
+# .. The purpose of this flag is to allow developers to test streak related features
+# .. end to end in production without having to wait 3 days to do so for each test case.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2021-05-16
+# .. toggle_target_removal_date: None
+# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL and
+#   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES and
+#   COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION
+# .. toggle_tickets: AA-759
+STREAK_CELEBRATION_TESTING_FLAG = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'streak_celebration_testing', __name__
+)
+
 # .. toggle_name: courseware.optimized_render_xblock
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False

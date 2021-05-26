@@ -72,7 +72,7 @@ from lms.djangoapps.courseware.models import (
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration,
 )
-from lms.djangoapps.courseware.toggles import streak_celebration_is_active
+from lms.djangoapps.courseware.toggles import streak_celebration_is_active, STREAK_CELEBRATION_TESTING_FLAG
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import (
@@ -3282,6 +3282,13 @@ class UserCelebration(TimeStampedModel):
             return the length of the streak the user should celebrate.
             Also update the streak data that is stored in the database."""
         # importing here to avoid a circular import
+
+        # Override streak logic to show streak for testing purposes
+        # Temporary flag for AA-759 to simplify testing so that waiting
+        # 3 days is not necessary to see a streak modal
+        if STREAK_CELEBRATION_TESTING_FLAG.is_enabled():
+            return 3
+
         from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
         if not user or user.is_anonymous:
             return None
