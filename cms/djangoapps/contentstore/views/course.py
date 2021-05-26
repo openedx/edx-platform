@@ -32,7 +32,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 
-from cms.djangoapps.contentstore.permissions import REINDEX_COURSE, RERUN_COURSE
+from cms.djangoapps.contentstore.permissions import CREATE_COURSE, REINDEX_COURSE, RERUN_COURSE
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -850,7 +850,7 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not auth.user_has_role(request.user, CourseCreatorRole()):
+    if not request.user.has_perm(CREATE_COURSE):
         raise PermissionDenied()
 
     try:
