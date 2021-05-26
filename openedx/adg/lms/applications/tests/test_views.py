@@ -13,6 +13,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.adg.lms.applications.views import (
     ApplicationHubView,
+    ApplicationIntroductionView,
     ApplicationSuccessView,
     ContactInformationView,
     CoverLetterView,
@@ -83,13 +84,56 @@ def logged_in_client_fixture(user):
     return client
 
 
+# ------- Application Introduction View tests below -------
+
+
+@pytest.mark.django_db
+def test_get_redirects_without_login_for_application_introduction_view():
+    """
+    Test the case where an unauthenticated user is redirected to login page or not.
+    """
+    application_introduction_url = reverse('application_introduction')
+    response = Client().get(application_introduction_url)
+    assert f'/register?next={application_introduction_url}' == response.url
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('application_hub, status_code, expected_output', [
+    (True, 302, reverse('application_hub')),
+    (False, 200, None)
+])
+def test_application_introduction_view_for_logged_in_user(
+    application_hub, status_code, expected_output, request_factory, mocker
+):
+    """
+    Test that Application Introduction view is only accessible to users that have no ApplicationHub object i.e have not
+    clicked the `Start Application` button on Application Introduction page
+    """
+    mocker.patch('openedx.adg.lms.applications.views.render')
+
+    test_user = UserFactory()
+    request = request_factory.get(reverse('application_introduction'))
+    request.user = test_user
+
+    if application_hub:
+        ApplicationHubFactory(user=test_user)
+
+    response = ApplicationIntroductionView.as_view()(request)
+    assert response.get('Location') == expected_output
+    assert response.status_code == status_code
+
+
+# ------- Application Hub View tests below -------
+
+
 @pytest.mark.django_db
 def test_get_redirects_without_login_for_application_hub_view():
     """
     Test the case where an unauthenticated user is redirected to login page or not.
     """
-    response = Client().get(reverse('application_hub'))
-    assert '/login?next=/application/' in response.url
+    application_hub_url = reverse('application_hub')
+    response = Client().get(application_hub_url)
+    assert f'/login?next={application_hub_url}' == response.url
 
 
 @pytest.mark.django_db
@@ -97,8 +141,9 @@ def test_post_user_redirects_without_login_for_application_hub_view():
     """
     Test the case where an unauthenticated user is redirected to login page or not.
     """
-    response = Client().post(reverse('application_hub'))
-    assert '/login?next=/application/' in response.url
+    application_hub_url = reverse('application_hub')
+    response = Client().post(application_hub_url)
+    assert f'/login?next={application_hub_url}' == response.url
 
 
 @pytest.mark.django_db
@@ -258,8 +303,9 @@ def test_get_unauthenticated_user_redirects_for_application_success_view():
     """
     Test the case where an unauthenticated user is redirected to login page or not.
     """
-    response = Client().get(reverse('application_success'))
-    assert '/login?next=/application/success' in response.url
+    application_success_url = reverse('application_success')
+    response = Client().get(application_success_url)
+    assert f'/login?next={application_success_url}' in response.url
 
 
 @pytest.mark.django_db
@@ -323,8 +369,9 @@ def test_get_redirects_without_login_for_contact_information_view():
     """
     Test the case where an unauthenticated user is redirected to login page or not.
     """
-    response = Client().get(reverse('application_contact'))
-    assert '/register?next=/application/contact' in response.url
+    application_contact_url = reverse('application_contact')
+    response = Client().get(application_contact_url)
+    assert f'/register?next={application_contact_url}' == response.url
 
 
 @pytest.mark.django_db
@@ -332,8 +379,9 @@ def test_post_user_redirects_without_login_for_contact_information_view():
     """
     Test the case where an unauthenticated user is redirected to login page or not.
     """
-    response = Client().post(reverse('application_contact'))
-    assert '/register?next=/application/contact' in response.url
+    application_contact_url = reverse('application_contact')
+    response = Client().post(application_contact_url)
+    assert f'/register?next={application_contact_url}' == response.url
 
 
 @pytest.mark.django_db
