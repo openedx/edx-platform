@@ -12,88 +12,12 @@ from django.test import RequestFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
-from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool, VerifiedUpgradeTool
+from lms.djangoapps.courseware.course_tools import FinancialAssistanceTool
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-
-class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.now = datetime.datetime.now(pytz.UTC)
-
-        cls.course = CourseFactory.create(
-            org='edX',
-            number='test',
-            display_name='Test Course',
-            self_paced=True,
-            start=cls.now - datetime.timedelta(days=30),
-        )
-        cls.course_overview = CourseOverview.get_from_id(cls.course.id)
-
-    def setUp(self):
-        super().setUp()
-
-        self.course_verified_mode = CourseModeFactory(
-            course_id=self.course.id,
-            mode_slug=CourseMode.VERIFIED,
-            expiration_datetime=self.now + datetime.timedelta(days=30),
-        )
-
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
-
-        self.request = RequestFactory().request()
-        crum.set_current_request(self.request)
-        self.addCleanup(crum.set_current_request, None)
-        self.enrollment = CourseEnrollmentFactory(
-            course_id=self.course.id,
-            mode=CourseMode.AUDIT,
-            course=self.course_overview,
-        )
-        self.request.user = self.enrollment.user
-
-    def test_tool_visible(self):
-        assert VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_no_enrollment_exists(self):
-        self.enrollment.delete()
-
-        request = RequestFactory().request()
-        request.user = UserFactory()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_using_deadline_from_course_mode(self):
-        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=False)
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_enrollment_is_inactive(self):
-        self.enrollment.is_active = False
-        self.enrollment.save()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_already_verified(self):
-        self.enrollment.mode = CourseMode.VERIFIED
-        self.enrollment.save()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_no_verified_track(self):
-        self.course_verified_mode.delete()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_course_deadline_has_passed(self):
-        self.course_verified_mode.expiration_datetime = self.now - datetime.timedelta(days=1)
-        self.course_verified_mode.save()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
-
-    def test_not_visible_when_course_mode_has_no_deadline(self):
-        self.course_verified_mode.expiration_datetime = None
-        self.course_verified_mode.save()
-        assert not VerifiedUpgradeTool().is_enabled(self.request, self.course.id)
 
 
 class FinancialAssistanceToolTest(SharedModuleStoreTestCase):

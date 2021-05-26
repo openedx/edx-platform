@@ -198,7 +198,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
   var sockLink = $("#sock");
   var upgradeDateLink = $("#course_home_dates");
   var GreenUpgradeLink = $("#green_upgrade");
-  var courseToolsUpgradeLink = $(document.querySelectorAll("[data-analytics-id='edx.tool.verified_upgrade']"));
   var GreenUpgradeLink = $("#green_upgrade");
   var certificateUpsellLink = $("#certificate_upsell");
 
@@ -236,12 +235,6 @@ from openedx.features.course_experience.course_tools import HttpMethod
       pageName: "course_home",
       linkType: "button",
       linkCategory: "green_upgrade"
-    });
-
-    TrackECommerceEvents.trackUpsellClick(courseToolsUpgradeLink, 'course_home_course_tools', {
-      pageName: "course_home",
-      linkType: "link",
-      linkCategory: "(none)"
     });
 
     TrackECommerceEvents.trackUpsellClick(certificateUpsellLink, 'course_home_certificate', {

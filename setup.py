@@ -42,7 +42,6 @@ setup(
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
             "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
             "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
-            "verified_upgrade = lms.djangoapps.courseware.course_tools:VerifiedUpgradeTool",
             "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
         ],
         "openedx.user_partition_scheme": [
