@@ -7,15 +7,11 @@ from datetime import datetime
 import pytz
 from django.utils.translation import get_language
 from django.utils.translation import ugettext as _
-from edx_django_utils.cache import RequestCache
-from web_fragments.fragment import Fragment
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
-from common.djangoapps.util.date_utils import strftime_localized_html
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.markup import HTML
 from openedx.features.discounts.applicability import (
     REV1008_EXPERIMENT_ID,
     can_receive_discount,
@@ -32,9 +28,7 @@ def offer_banner_wrapper(user, block, view, frag, context):  # pylint: disable=W
     if block.category != 'vertical':
         return frag
 
-    offer_banner_fragment = get_first_purchase_offer_banner_fragment_from_key(
-        user, block.course_id
-    )
+    offer_banner_fragment = None
 
     if not offer_banner_fragment:
         return frag
@@ -155,75 +149,3 @@ def format_strikeout_price(user, course):
         return HTML("<span class='price'>{}</span>").format(original_price), False
     else:
         return _format_discounted_price(original_price, discounted_price), True
-
-
-def generate_offer_html(user, course):
-    """
-    Create the actual HTML object with the offer text in it.
-
-    Returns a openedx.core.djangolib.markup.HTML object, or None if the user
-    should not be shown an offer message.
-    """
-    data = generate_offer_data(user, course)
-    if not data:
-        return None
-
-    # Translator: xgettext:no-python-format
-    offer_message = _('{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% '
-                      '[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at checkout! '
-                      '{a_open}Upgrade Now{a_close}{div_close}')
-
-    message_html = HTML(offer_message).format(
-        a_open=HTML('<a id="welcome" href="{upgrade_link}">').format(upgrade_link=data['upgrade_url']),
-        a_close=HTML('</a>'),
-        b_open=HTML('<b>'),
-        code=Text(data['code']),
-        b_close=HTML('</b>'),
-        br=HTML('<br>'),
-        banner_open=HTML(
-            '<div class="first-purchase-offer-banner" role="note">'
-            '<span class="first-purchase-offer-banner-bold"><b>'
-        ),
-        discount_expiration_date=strftime_localized_html(data['expiration_date'], 'SHORT_DATE'),
-        percentage=data['percentage'],
-        span_close=HTML('</b></span>'),
-        div_close=HTML('</div>'),
-        strikeout_price=_format_discounted_price(data['original_price'], data['discounted_price']),
-    )
-    return message_html
-
-
-def get_first_purchase_offer_banner_fragment(user, course):
-    """
-    Return an HTML Fragment with First Purcahse Discount message,
-    which has the discount_expiration_date, price,
-    discount percentage and a link to upgrade.
-    """
-    offer_html = generate_offer_html(user, course)
-    if offer_html is None:
-        return None
-    return Fragment(offer_html)
-
-
-def get_first_purchase_offer_banner_fragment_from_key(user, course_key):
-    """
-    Like `get_first_purchase_offer_banner_fragment`, but using a CourseKey
-    instead of a CourseOverview and using request-level caching.
-
-    Either returns WebFragment to inject XBlock content into, or None if we
-    shouldn't show a first purchase offer message for this user.
-    """
-    request_cache = RequestCache('get_first_purchase_offer_banner_fragment_from_key')
-    cache_key = f'html:{user.id},{course_key}'
-    cache_response = request_cache.get_cached_response(cache_key)
-    if cache_response.is_found:
-        cached_html = cache_response.value
-        if cached_html is None:
-            return None
-        return Fragment(cached_html)
-
-    course = CourseOverview.get_from_id(course_key)
-    offer_html = generate_offer_html(user, course)
-    request_cache.set(cache_key, offer_html)
-
-    return Fragment(offer_html)

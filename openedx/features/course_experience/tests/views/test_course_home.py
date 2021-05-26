@@ -25,13 +25,10 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import OrgInstructorFactory
 from common.djangoapps.student.tests.factories import OrgStaffFactory
 from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.util.date_utils import strftime_localized_html
-from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, get_course_goal
 from lms.djangoapps.courseware.tests.helpers import get_expiration_banner_text
-from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.django_comment_common.models import (
@@ -53,8 +50,6 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.tests import BaseCourseUpdatesTestCase
 from openedx.features.course_experience.tests.views.helpers import add_course_mode, remove_course_mode
-from openedx.features.discounts.applicability import get_discount_expiration_date
-from openedx.features.discounts.utils import REV1008_EXPERIMENT_ID, format_strikeout_price
 from common.djangoapps.student.models import CourseEnrollment, FBEEnrollmentExclusion
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import strftime_localized
@@ -204,7 +199,7 @@ class TestCourseHomePage(CourseHomePageTestCase):  # lint-amnesty, pylint: disab
 
         # Fetch the view and verify the query counts
         # TODO: decrease query count as part of REVO-28
-        with self.assertNumQueries(79, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(72, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -388,50 +383,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             params=expected_params.urlencode()
         )
         self.assertRedirects(response, expected_url)
-
-    @mock.patch('openedx.features.discounts.utils.discount_percentage')
-    @mock.patch('openedx.features.discounts.utils.can_receive_discount')
-    @ddt.data(
-        [True, 15],
-        [True, 13],
-        [True, 0],
-        [False, 15])
-    @ddt.unpack
-    def test_first_purchase_offer_banner_display(self,
-                                                 applicability,
-                                                 percentage,
-                                                 can_receive_discount_mock,
-                                                 discount_percentage_mock):
-        """
-        Ensure first purchase offer banner displays correctly
-        """
-        can_receive_discount_mock.return_value = applicability
-        discount_percentage_mock.return_value = percentage
-        user = self.create_user_for_course(self.course, CourseUserType.ENROLLED)
-        now_time = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M:%S%z")
-        ExperimentData.objects.create(
-            user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(self.course.id), value=now_time
-        )
-        self.client.login(username=user.username, password=self.TEST_PASSWORD)
-        url = course_home_url(self.course)
-        response = self.client.get(url)
-        expiration_date = strftime_localized_html(get_discount_expiration_date(user, self.course), 'SHORT_DATE')
-        upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
-        bannerText = '''<div class="first-purchase-offer-banner" role="note">
-             <span class="first-purchase-offer-banner-bold"><b>
-             Upgrade by {discount_expiration_date} and save {percentage}% [{strikeout_price}]</b></span>
-             <br>Use code <b>EDXWELCOME</b> at checkout! <a id="welcome" href="{upgrade_link}">Upgrade Now</a>
-             </div>'''.format(
-            discount_expiration_date=expiration_date,
-            percentage=percentage,
-            strikeout_price=HTML(format_strikeout_price(user, self.course)[0]),
-            upgrade_link=upgrade_link
-        )
-
-        if applicability:
-            self.assertContains(response, bannerText, html=True)
-        else:
-            self.assertNotContains(response, bannerText, html=True)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_course_does_not_expire_for_verified_user(self):
