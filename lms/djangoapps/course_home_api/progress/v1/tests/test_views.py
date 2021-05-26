@@ -16,9 +16,11 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from lms.djangoapps.course_home_api.models import DisableProgressPageStackedConfig
 from lms.djangoapps.course_home_api.toggles import COURSE_HOME_MICROFRONTEND, COURSE_HOME_MICROFRONTEND_PROGRESS_TAB
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from lms.djangoapps.verify_student.models import ManualVerification
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_date_signals.utils import MIN_DURATION
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -155,3 +157,17 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         assert response.data['verified_mode'] == {'access_expiration_date': (enrollment.created + MIN_DURATION),
                                                   'currency': 'USD', 'currency_symbol': '$', 'price': 149,
                                                   'sku': 'ABCD1234', 'upgrade_url': '/dashboard'}
+
+    @override_experiment_waffle_flag(COURSE_HOME_MICROFRONTEND, active=True)
+    @override_waffle_flag(COURSE_HOME_MICROFRONTEND_PROGRESS_TAB, active=True)
+    def test_page_respects_stacked_config(self):
+        CourseEnrollment.enroll(self.user, self.course.id)
+        course_overview = CourseOverview.get_from_id(self.course.id)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        DisableProgressPageStackedConfig.objects.create(disabled=True, course=course_overview)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 404
