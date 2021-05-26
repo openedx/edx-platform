@@ -14,6 +14,9 @@ from student.models import Registration
 from student.tasks import send_activation_email
 from student.views.management import compose_activation_email
 
+from openedx.core.djangoapps.appsembler.api.tests.factories import OrganizationFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+
 
 class SendActivationEmailTestCase(TestCase):
     """
@@ -22,6 +25,11 @@ class SendActivationEmailTestCase(TestCase):
     def setUp(self):
         """ Setup components used by each test."""
         super(SendActivationEmailTestCase, self).setUp()
+
+        # Tahoe: Added multi-site support
+        self.site = SiteFactory()
+        self.org = OrganizationFactory(sites=[self.site])
+
         self.student = UserFactory()
 
         registration = Registration()
@@ -49,7 +57,8 @@ class SendActivationEmailTestCase(TestCase):
         from_address = 'task_testing@example.com'
         email_max_attempts = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
 
-        send_activation_email.delay(str(self.msg), from_address=from_address)
+        send_activation_email.delay(str(self.msg),
+                                    site_id=self.site.pk, from_address=from_address)
 
         # Asserts sending email retry logging.
         for attempt in range(email_max_attempts):
@@ -78,7 +87,8 @@ class SendActivationEmailTestCase(TestCase):
         """
         from_address = 'task_testing@example.com'
 
-        send_activation_email.delay(str(self.msg), from_address=from_address)
+        send_activation_email.delay(str(self.msg),
+                                    site_id=self.site.pk, from_address=from_address)
 
         # Asserts that the error was logged
         mock_log.exception.assert_called_with(

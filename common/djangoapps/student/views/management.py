@@ -212,7 +212,11 @@ def compose_and_send_activation_email(user, profile, user_registration=None):
     root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     msg = compose_activation_email(root_url, user, user_registration, route_enabled, profile.name)
 
-    send_activation_email.delay(str(msg))
+    from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
+        configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    )
+    site = get_current_site()
+    send_activation_email.delay(str(msg), site_id=site.pk, from_address=from_address)
 
 
 @login_required
