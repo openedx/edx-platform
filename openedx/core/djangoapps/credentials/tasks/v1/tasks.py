@@ -399,7 +399,7 @@ def backfill_date_for_all_course_runs():
                     "is_active": True,
                 })
                 logger.info(f"certificate_available_date updated for course {course_key}")
-            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable
+            except Exception as exc:  # lint-amnesty, pylint: disable=unused-variable,W0703
                 error_msg = f"Failed to send certificate_available_date for course {course_key}."
                 logger.exception(error_msg)
         if index % 10 == 0:
