@@ -533,7 +533,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.txt
-edx-proctoring==3.11.1
+edx-proctoring==3.11.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -573,7 +573,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.txt
-elasticsearch==7.12.1
+elasticsearch==7.13.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-search
@@ -815,7 +815,7 @@ mpmath==1.2.1
     #   sympy
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==6.2.0.156
+newrelic==6.4.0.157
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -841,7 +841,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.5.2
+ora2==3.5.3
     # via -r requirements/edx/base.txt
 packaging==20.9
     # via
