@@ -265,7 +265,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
             request.session[session_key] = True
 
             # Temporary event for AA-759 experiment
-            if course_key and self._experiment_name == 'AA-759':
+            if course_key and self._experiment_name == 'discount_experiment_AA759':
                 modes_dict = CourseMode.modes_for_course_dict(course_id=course_key, include_expired=False)
                 verified_mode = modes_dict.get('verified', None)
                 if verified_mode:

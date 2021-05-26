@@ -74,7 +74,7 @@ UPSELL_TRACKING_FLAG = LegacyWaffleFlag(
 )
 # TODO END: Clean up as part of REV-1205 (End)
 
-# .. toggle_name: streak_celebration.AA-759
+# .. toggle_name: streak_celebration.discount_experiment_AA759
 # .. toggle_implementation: ExperimentWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This experiment flag enables an engagement discount incentive message.
