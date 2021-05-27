@@ -140,7 +140,7 @@ class XQueueCertInterface:
                 )
                 return None
 
-            certificate.invalidate()
+            certificate.invalidate(source='certificate_regeneration')
 
             LOGGER.info(
                 f"The certificate status for student {student.id} in course '{course_id} has been changed to "

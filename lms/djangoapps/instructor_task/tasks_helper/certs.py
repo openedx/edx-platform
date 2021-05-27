@@ -157,4 +157,4 @@ def _invalidate_generated_certificates(course_id, enrolled_students, certificate
                          f'for course {course_id}')
             else:
                 log.info(f'About to invalidate certificate for user {c.user.id} in course {course_id}')
-                c.invalidate()
+                c.invalidate(source='bulk_certificate_regeneration')

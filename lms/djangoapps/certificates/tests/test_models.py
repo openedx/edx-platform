@@ -301,6 +301,9 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.course = CourseFactory()
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id
+        )
         self.user = UserFactory()
         self.course_id = self.course.id  # pylint: disable=no-member
         self.certificate = GeneratedCertificateFactory.create(
@@ -358,7 +361,18 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         self.course = CourseOverviewFactory()
         self.course_key = self.course.id
 
-    def test_invalidate(self):
+    def _assert_event_data(self, mocked_function_call, expected_event_data):
+        """Utility function that verifies the mocked function was called with the expected arguments."""
+
+        mocked_function_call.assert_called_with(
+            'revoked',
+            self.user,
+            str(self.course_key),
+            event_data=expected_event_data
+        )
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_invalidate(self, mock_emit_certificate_event):
         """
         Test the invalidate method
         """
@@ -367,12 +381,24 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course_key
         )
-        cert.invalidate()
+        source = 'invalidated_test'
+        cert.invalidate(source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
         assert cert.status == CertificateStatuses.unavailable
 
-    def test_notpassing(self):
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_notpassing(self, mock_emit_certificate_event):
         """
         Test the notpassing method
         """
@@ -382,13 +408,25 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
             course_id=self.course_key
         )
         grade = '.3'
-        cert.mark_notpassing(grade)
+        source = "notpassing_test"
+        cert.mark_notpassing(grade, source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
         assert cert.status == CertificateStatuses.notpassing
         assert cert.grade == grade
 
-    def test_unverified(self):
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+    @patch('lms.djangoapps.certificates.utils.emit_certificate_event')
+    def test_unverified(self, mock_emit_certificate_event):
         """
         Test the unverified method
         """
@@ -397,7 +435,18 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
             user=self.user,
             course_id=self.course_key
         )
-        cert.mark_unverified()
+        source = "unverified_test"
+        cert.mark_unverified(source=source)
 
         cert = GeneratedCertificate.objects.get(user=self.user, course_id=self.course_key)
         assert cert.status == CertificateStatuses.unverified
+
+        expected_event_data = {
+            'user_id': self.user.id,
+            'course_id': str(self.course_key),
+            'certificate_id': cert.verify_uuid,
+            'enrollment_mode': cert.mode,
+            'source': source,
+        }
+
+        self._assert_event_data(mock_emit_certificate_event, expected_event_data)

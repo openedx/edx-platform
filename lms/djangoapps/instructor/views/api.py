@@ -3332,7 +3332,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
     )
 
     # Invalidate the certificate
-    generated_certificate.invalidate()
+    generated_certificate.invalidate(source='certificate_invalidation_list')
 
     return {
         'id': certificate_invalidation.id,

@@ -7,6 +7,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -20,6 +21,9 @@ class CertificateServiceTests(ModuleStoreTestCase):
         super().setUp()
         self.service = CertificateService()
         self.course = CourseFactory()
+        self.course_overview = CourseOverviewFactory.create(
+            id=self.course.id
+        )
         self.user = UserFactory()
         self.user_id = self.user.id
         self.course_id = self.course.id  # pylint: disable=no-member

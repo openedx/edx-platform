@@ -258,7 +258,7 @@ def _set_v2_cert_status(user, course_key):
         if cert is None:
             cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
         if cert.status != CertificateStatuses.notpassing:
-            cert.mark_notpassing(course_grade.percent)
+            cert.mark_notpassing(course_grade.percent, source='certificate_generation')
         return CertificateStatuses.notpassing
 
     return None
@@ -275,14 +275,14 @@ def _get_cert_status_common(user, course_key, cert):
         if cert is None:
             cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
         if cert.status != CertificateStatuses.unavailable:
-            cert.invalidate()
+            cert.invalidate(source='certificate_generation')
         return CertificateStatuses.unavailable
 
     if not IDVerificationService.user_is_verified(user):
         if cert is None:
             cert = GeneratedCertificate.objects.create(user=user, course_id=course_key)
         if cert.status != CertificateStatuses.unverified:
-            cert.mark_unverified()
+            cert.mark_unverified(source='certificate_generation')
         return CertificateStatuses.unverified
 
     return None
