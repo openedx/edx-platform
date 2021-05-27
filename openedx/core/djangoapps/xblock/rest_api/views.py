@@ -29,7 +29,9 @@ from ..utils import validate_secure_token_for_xblock_handler
 
 User = get_user_model()
 
-not_found_invalid_exception = NotFound("Invalid XBlock key")
+
+class InvalidNotFound(NotFound):
+    default_detail = "Invalid XBlock key"
 
 
 @api_view(['GET'])
@@ -45,7 +47,7 @@ def block_metadata(request, usage_key_str):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise not_found_invalid_exception from e
+        raise InvalidNotFound from e
 
     block = load_block(usage_key, request.user)
     includes = request.GET.get("include", "").split(",")
@@ -67,7 +69,7 @@ def render_block_view(request, usage_key_str, view_name):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise not_found_invalid_exception from e
+        raise InvalidNotFound from e
 
     block = load_block(usage_key, request.user)
     fragment = _render_block_view(block, view_name, request.user)
@@ -88,7 +90,7 @@ def get_handler_url(request, usage_key_str, handler_name):
     try:
         usage_key = UsageKey.from_string(usage_key_str)
     except InvalidKeyError as e:
-        raise not_found_invalid_exception from e
+        raise InvalidNotFound from e
 
     handler_url = _get_handler_url(usage_key, handler_name, request.user)
     return Response({"handler_url": handler_url})

@@ -22,7 +22,6 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_XBLOCK_HANDLER,
 )
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
-from openedx.core.djangoapps.xblock.rest_api.views import not_found_invalid_exception
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -783,9 +782,9 @@ class ContentLibraryXBlockValidationTest(APITestCase):
     """Tests only focused on service validation, no Blockstore needed."""
 
     @ddt.data(
-        (URL_BLOCK_METADATA_URL, dict(block_key='lb:somethi:invalidkey:1')),
-        (URL_BLOCK_RENDER_VIEW, dict(block_key='lb:something:invalidkey:1', view_name='random')),
-        (URL_BLOCK_GET_HANDLER_URL, dict(block_key='lb:something:invalidkey:1', handler_name='random')),
+        (URL_BLOCK_METADATA_URL, dict(block_key='totally_invalid_key')),
+        (URL_BLOCK_RENDER_VIEW, dict(block_key='totally_invalid_key', view_name='random')),
+        (URL_BLOCK_GET_HANDLER_URL, dict(block_key='totally_invalid_key', handler_name='random')),
     )
     @ddt.unpack
     def test_invalid_key(self, endpoint, endpoint_parameters):
@@ -793,14 +792,14 @@ class ContentLibraryXBlockValidationTest(APITestCase):
         response = self.client.get(
             endpoint.format(**endpoint_parameters),
         )
-        self.assertEqual(response.status_code, not_found_invalid_exception.status_code)
-        self.assertEqual(response.json(), {'detail': not_found_invalid_exception.detail})
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {'detail': "Invalid XBlock key"})
 
     def test_xblock_handler_invalid_key(self):
         """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""
         client = Client()
         response = client.get(URL_BLOCK_XBLOCK_HANDLER.format(**dict(
-            block_key='lb:something:invalidkey:1',
+            block_key='totally_invalid_key',
             handler_name='random',
             user_id='random',
             secure_token='random',
