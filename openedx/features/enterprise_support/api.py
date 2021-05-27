@@ -830,7 +830,10 @@ def get_enterprise_learner_portal_enabled_message(enterprise_customer):
     if not enterprise_customer.get('enable_learner_portal', False):
         return None
 
-    learner_portal_url = f"{settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL}/{enterprise_customer['slug']}?utm_source=lms_dashboard_banner"
+    learner_portal_url = "{base_url}/{slug}?utm_source=lms_dashboard_banner".format(
+        base_url=settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+        slug=enterprise_customer['slug']
+    )
 
     return Text(_(
         "You have access to the {bold_start}{enterprise_name}{bold_end} dashboard. "

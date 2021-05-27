@@ -836,8 +836,9 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     @override_settings(ENTERPRISE_LEARNER_PORTAL_BASE_URL='http://localhost')
     def test_enterprise_learner_portal_message_customer_exists(self, enable_learner_portal):
         """
-        When an enterprise customer exists with learner portal enabled, then ``get_enterprise_learner_portal_enabled_message()``
-        should return an appropriate message for that customer.
+        When an enterprise customer exists with learner portal enabled, then
+        ``get_enterprise_learner_portal_enabled_message()`` should return an appropriate message
+        for that customer.
         """
         mock_enterprise_customer = {
             'uuid': 'some-uuid',
@@ -855,7 +856,8 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     def test_enterprise_learner_portal_message_no_customer(self):
         """
-        When an enterprise customer does not exists, then ``get_enterprise_learner_portal_enabled_message()`` should return None.
+        When an enterprise customer does not exists, then
+        ``get_enterprise_learner_portal_enabled_message()`` should return None.
         """
         actual_result = get_enterprise_learner_portal_enabled_message(None)
         assert actual_result is None
