@@ -52,7 +52,7 @@ stevedore==1.32.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-urllib3==1.26.4
+urllib3==1.26.5
     # via requests
 watchdog==2.1.2
     # via -r requirements/edx/paver.in

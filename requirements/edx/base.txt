@@ -679,7 +679,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.5.3
+ora2==3.5.4
     # via -r requirements/edx/base.in
 packaging==20.9
     # via
@@ -1002,7 +1002,7 @@ uritemplate==3.0.1
     # via
     #   coreapi
     #   drf-yasg
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch

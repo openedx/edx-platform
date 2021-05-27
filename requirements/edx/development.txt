@@ -613,7 +613,7 @@ execnet==1.8.0
     #   pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.txt
-faker==8.2.1
+faker==8.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -678,7 +678,7 @@ idna==2.10
     #   requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.0.1
+importlib-metadata==4.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   inflect
@@ -881,7 +881,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
-ora2==3.5.3
+ora2==3.5.4
     # via -r requirements/edx/testing.txt
 packaging==20.9
     # via
@@ -1218,7 +1218,7 @@ simplejson==3.17.2
     #   sailthru-client
     #   super-csv
     #   xblock-utils
-singledispatch==3.6.1
+singledispatch==3.6.2
     # via -r requirements/edx/testing.txt
 six==1.16.0
     # via
@@ -1392,7 +1392,7 @@ uritemplate==3.0.1
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-urllib3==1.26.4
+urllib3==1.26.5
     # via
     #   -r requirements/edx/testing.txt
     #   elasticsearch
