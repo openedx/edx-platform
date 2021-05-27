@@ -65,6 +65,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml, import_libr
 
 from .exceptions import CourseImportException
 from .outlines import update_outline_from_modulestore
+from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
@@ -668,7 +669,34 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
 @shared_task
 @set_code_owner_attribute
-def update_outline_from_modulestore_task(course_key_str):
+def update_all_outlines_from_modulestore_task():
+    """
+    Celery task that creates multiple celery tasks - one per learning_sequence course outline
+    to regenerate. The list of course keys to regenerate comes from the proxy model itself.
+    """
+    course_key_list = [str(course_key) for course_key in CourseOutlineRegenerate.get_course_outline_ids()]
+    for course_key_str in course_key_list:
+        try:
+            course_key = CourseKey.from_string(course_key_str)
+            if not key_supports_outlines(course_key):
+                LOGGER.warning(
+                    (
+                        "update_multiple_outlines_from_modulestore_task called for course key"
+                        " %s, which does not support learning_sequence outlines."
+                    ),
+                    course_key_str
+                )
+                return
+
+            update_outline_from_modulestore_task.delay(course_key_str)
+        except Exception:  # pylint: disable=broad-except
+            # Swallow the exception to continue the loop through course keys - but log it.
+            LOGGER.exception("Could not create course outline for course %s", course_key_str)
+
+
+@shared_task
+@set_code_owner_attribute
+def update_outline_from_modulestore_task(course_key_str: str):
     """
     Celery task that creates a learning_sequence course outline.
     """
@@ -685,7 +713,7 @@ def update_outline_from_modulestore_task(course_key_str):
             return
 
         update_outline_from_modulestore(course_key)
-    except Exception:  # pylint disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         LOGGER.exception("Could not create course outline for course %s", course_key_str)
         raise  # Re-raise so that errors are noted in reporting.
 
