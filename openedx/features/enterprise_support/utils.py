@@ -495,6 +495,6 @@ def is_course_accessed(user, course_id):
         (bool): True if course has been accessed by the enterprise learner.
     """
     request = _create_placeholder_request(user)
-    course_outline_root_block = get_course_outline_block_tree_accessed(request, course_id, user)
+    course_outline_root_block = get_course_outline_block_tree(request, course_id, user)
     resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
     return bool(resume_block)
