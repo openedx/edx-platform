@@ -798,7 +798,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
 
     # Include enterprise learner portal metadata and messaging
     enterprise_learner_portal_context = get_enterprise_learner_portal_context(request)
-    log.info(enterprise_learner_portal_context)
     context.update(enterprise_learner_portal_context)
 
     context_from_plugins = get_plugins_view_context(
