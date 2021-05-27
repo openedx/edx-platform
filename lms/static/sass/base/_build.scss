@@ -5,10 +5,7 @@
 
 // Core Bootstrap functions, variables and mixins
 @import 'bootstrap/variables';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/mixins';
-@import 'bootstrap/scss/utilities';
+@import '@edx/paragon-new/scss/core/core';
 
 
 // Bootstrap components
