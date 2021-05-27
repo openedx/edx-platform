@@ -787,13 +787,12 @@ def get_enterprise_learner_data_from_db(user):
 
 
 @enterprise_is_enabled()
-def get_enterprise_learner_portal_enabled_message(request):
+def enterprise_customer_from_session_or_learner_data(request):
     """
-    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
+    Returns an Enterprise Customer for the authenticated user.
 
-    Note: request.session[ENTERPRISE_CUSTOMER_KEY_NAME] will be used in case the user is linked to
-        multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
-        will be used. If that doesn't exist return None.
+    Retrieves customer from session by default. If _CACHE_MISS, retrieve customer using
+    learner data from the DB and add customer data to the session.
 
     Args:
         request: request made to the LMS dashboard
@@ -812,31 +811,73 @@ def get_enterprise_learner_portal_enabled_message(request):
         add_enterprise_customer_to_session(request, enterprise_customer)
         if enterprise_customer:
             cache_enterprise(enterprise_customer)
+    return enterprise_customer
 
+
+@enterprise_is_enabled()
+def get_enterprise_learner_portal_enabled_message(enterprise_customer):
+    """
+    Returns message to be displayed in dashboard if the user is linked to an Enterprise with the Learner Portal enabled.
+    Note: request.session[ENTERPRISE_CUSTOMER_KEY_NAME] will be used in case the user is linked to
+        multiple Enterprises. Otherwise, it won't exist and the Enterprise Learner data
+        will be used. If that doesn't exist return None.
+    Args:
+        enterprise_customer: EnterpriseCustomer object
+    """
     if not enterprise_customer:
         return None
 
-    if enterprise_customer.get('enable_learner_portal', False):
-        learner_portal_url = settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL + '/' + enterprise_customer['slug']
-        return Text(_(
-            "Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a custom dashboard for learning. "
-            "{link_start}Click here {screen_reader_start}for your {enterprise_customer_name} dashboard,"
-            "{screen_reader_end}{link_end} to continue in that experience."
-        )).format(
-            enterprise_customer_name=enterprise_customer['name'],
-            link_start=HTML("<a href='{learner_portal_url}'>").format(
-                learner_portal_url=learner_portal_url,
-            ),
-            link_end=HTML("</a>"),
-            bold_start=HTML("<b>"),
-            bold_end=HTML("</b>"),
-            screen_reader_start=HTML("<span class='sr-only'>"),
-            screen_reader_end=HTML("</span>"),
-        )
-    else:
+    if not enterprise_customer.get('enable_learner_portal', False):
         return None
 
+    learner_portal_url = "{base_url}/{slug}?utm_source=lms_dashboard_banner".format(
+        base_url=settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+        slug=enterprise_customer['slug']
+    )
 
+    return Text(_(
+        "You have access to the {bold_start}{enterprise_name}{bold_end} dashboard. "
+        "To access the courses available to you through {enterprise_name}, "
+        "{link_start}visit the {enterprise_name} dashboard{link_end}."
+    )).format(
+        enterprise_name=enterprise_customer['name'],
+        bold_start=HTML("<b>"),
+        bold_end=HTML("</b>"),
+        link_start=HTML(f"<a href='{learner_portal_url}'>"),
+        link_end=HTML("</a>"),
+    )
+
+
+@enterprise_is_enabled(otherwise={})
+def get_enterprise_learner_portal_context(request):
+    """
+    Determines a selected enterprise customer from session or learner data from the DB.
+
+    Arguments:
+        request: A request object.
+
+    Returns:
+        dict: A dictionary representing the necessary metadata and messaging about an Enterprise Learner Portal,
+            used in the dashboard.html template.
+    """
+    context = {}
+    enterprise_customer = enterprise_customer_from_session_or_learner_data(request)
+    if not enterprise_customer:
+        return context
+
+    enterprise_learner_portal_enabled_message = get_enterprise_learner_portal_enabled_message(enterprise_customer)
+    context.update({
+        'enterprise_customer_name': enterprise_customer.get('name'),
+        'enterprise_customer_slug': enterprise_customer.get('slug'),
+        'enterprise_customer_learner_portal_enabled': enterprise_customer.get('enable_learner_portal', False),
+        'enterprise_customer_uuid': enterprise_customer.get('uuid'),
+        'enterprise_learner_portal_base_url': settings.ENTERPRISE_LEARNER_PORTAL_BASE_URL,
+        'enterprise_learner_portal_enabled_message': enterprise_learner_portal_enabled_message,
+    })
+    return context
+
+
+@enterprise_is_enabled()
 def get_consent_notification_data(enterprise_customer):
     """
     Returns the consent notification data from DataSharingConsentPage modal
