@@ -14,10 +14,14 @@ from django.http import HttpRequest
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext as _
 from edx_django_utils.cache import TieredCache, get_cache_key
+from openedx.core.lib.cache_utils import request_cached
 from edx_toggles.toggles import LegacyWaffleFlag
 from enterprise.api.v1.serializers import EnterpriseCustomerBrandingConfigurationSerializer
 from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
 from social_django.models import UserSocialAuth
+from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.course_api.blocks.api import get_blocks
+from xmodule.modulestore.django import modulestore
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.student.helpers import get_next_url_for_login_page
@@ -483,6 +487,52 @@ def _create_placeholder_request(user):
     return request
 
 
+@request_cached()
+def get_course_outline_block_tree_accessed(request, course_id, user=None, allow_start_dates_in_future=False):  # lint-amnesty, pylint: disable=too-many-statements
+    """
+    Returns the root block of the course outline, with children as blocks.
+
+    allow_start_dates_in_future (bool): When True, will allow blocks to be
+            returned that can bypass the StartDateTransformer's filter to show
+            blocks with start dates in the future.
+    """
+
+    assert user is None or user.is_authenticated
+
+    course_key = CourseKey.from_string(course_id)
+    course_usage_key = modulestore().make_course_usage_key(course_key)
+
+    all_blocks = get_blocks(
+        request,
+        course_usage_key,
+        user=user,
+        nav_depth=3,
+        requested_fields=[
+            'children',
+            'contains_gated_content',
+            'display_name',
+            'due',
+            'effort_activities',
+            'effort_time',
+            'format',
+            'graded',
+            'has_score',
+            'show_gated_sections',
+            'special_exam_info',
+            'start',
+            'type',
+            'weight',
+            'completion',
+            'complete',
+            'resume_block',
+        ],
+        allow_start_dates_in_future=allow_start_dates_in_future,
+    )
+
+    course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
+    return course_outline_root_block
+
+
 def is_course_accessed(user, course_id):
     """
     Check if the learner accessed the course.
@@ -495,6 +545,6 @@ def is_course_accessed(user, course_id):
         (bool): True if course has been accessed by the enterprise learner.
     """
     request = _create_placeholder_request(user)
-    course_outline_root_block = get_course_outline_block_tree(request, course_id, user)
+    course_outline_root_block = get_course_outline_block_tree_accessed(request, course_id, user)
     resume_block = get_resume_block(course_outline_root_block) if course_outline_root_block else None
     return bool(resume_block)
