@@ -137,6 +137,9 @@ def award_program_certificates(self, username):  # lint-amnesty, pylint: disable
     change - for example, to backpopulate missing program credentials for a
     student.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Args:
         username (str): The username of the student
 
@@ -364,6 +367,9 @@ def award_course_certificate(self, username, course_run_key, certificate_availab
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Arguments:
         username (str): The user to award the Credentials course cert to
         course_run_key (str): The course run key to award the certificate for
@@ -524,6 +530,9 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
     specified user's certificate should be revoked in one or more programs, and
     use the credentials service to revoke the said certificates if so.
 
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
+
     Args:
         username (str): The username of the student
         course_key (str): The course identifier
@@ -673,6 +682,9 @@ def update_certificate_visible_date_on_course_update(self, course_key, certifica
     It will get all users within the course that have a certificate and call
     the credentials API to update all these certificates visible_date value
     to keep certificates in sync on both sides.
+
+    If this function is moved, make sure to update it's entry in
+    EXPLICIT_QUEUES in the settings files so it runs in the correct queue.
 
     Arguments:
         course_key (str): The course identifier
