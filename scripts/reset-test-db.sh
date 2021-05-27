@@ -98,7 +98,7 @@ rebuild_cache_for_db() {
 
 for db in "${database_order[@]}"; do
     if ! [[ $USE_EXISTING_DB ]]; then
-        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root
+        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root -p root
 
         # Clear out the test database
         #
