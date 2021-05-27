@@ -2866,6 +2866,9 @@ INSTALLED_APPS = [
     'lms.djangoapps.bulk_email',
     'lms.djangoapps.branding',
 
+    # Course home api
+    'lms.djangoapps.course_home_api',
+
     # New (Blockstore-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
 
