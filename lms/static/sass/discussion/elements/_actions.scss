@@ -162,7 +162,7 @@
       }
 
       .action-icon {
-        @include border-radius(0, $forum-border-radius, $forum-border-radius, 0);
+        @include border-radius(0 $forum-border-radius $forum-border-radius 0);
       }
     }
 
