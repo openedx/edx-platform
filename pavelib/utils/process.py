@@ -18,7 +18,7 @@ def kill_process(proc):
     Kill the process `proc` created with `subprocess`.
     """
     p1_group = psutil.Process(proc.pid)
-    child_pids = p1_group.get_children(recursive=True)  # lint-amnesty, pylint: disable=no-member
+    child_pids = p1_group.children(recursive=True)
 
     for child_pid in child_pids:
         os.kill(child_pid.pid, signal.SIGKILL)
@@ -110,7 +110,7 @@ def run_background_process(cmd, out_log=None, err_log=None, cwd=None):
         killed properly.
         """
         p1_group = psutil.Process(proc.pid)
-        child_pids = p1_group.get_children(recursive=True)  # lint-amnesty, pylint: disable=no-member
+        child_pids = p1_group.children(recursive=True)
 
         for child_pid in child_pids:
             os.kill(child_pid.pid, signal.SIGINT)
