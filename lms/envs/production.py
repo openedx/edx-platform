@@ -1030,13 +1030,13 @@ EXPLICIT_QUEUES = {
         'queue': POLICY_CHANGE_GRADES_ROUTING_KEY},
     'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v3': {
         'queue': RECALCULATE_GRADES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.award_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.revoke_program_certificates': {
+    'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.update_certificate_visible_date_on_course_update': {
+    'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
-    'openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate': {
+    'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.coursegraph.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
