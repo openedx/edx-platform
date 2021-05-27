@@ -730,8 +730,8 @@ def validate_course_olx(courselike_key, course_dir, status):
     if bypass_olx_failure_enabled():
         return olx_is_valid
 
-    status.fail(UserErrors.OLX_VALIDATION_FAILED)
     monitor_import_failure(courselike_key, status.state, message=validation_failed_mesg)
+    status.fail(UserErrors.OLX_VALIDATION_FAILED)
     return False
 
 
