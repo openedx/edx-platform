@@ -210,11 +210,13 @@ class ActivationEmailTests(EmailTemplateTagMixin, CacheIsolationTestCase):
         inactive_user = UserFactory(is_active=False)
         Registration().register(inactive_user)
         request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
-        request.site = Mock()
+        request.site = Mock(pk=settings.SITE_ID)
         request.user = inactive_user
         with patch('edxmako.request_context.get_current_request', return_value=request):
             with patch('third_party_auth.pipeline.running', return_value=False):
-                inactive_user_view(request)
+                with patch('student.views.management.get_current_site', return_value=request.site):
+                    # Tahoe: Added support for multi-tenant email branding
+                    inactive_user_view(request)
                 self.assertEqual(email.called, True, msg='method should have been called')
 
 
