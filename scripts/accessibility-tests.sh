@@ -16,7 +16,7 @@ set -e
 ###############################################################################
 
 echo "Setting up for accessibility tests..."
-source scripts/jenkins-common.sh
+#source scripts/jenkins-common.sh
 
 # if specified tox environment is supported, prepend paver commands
 # with tox env invocation

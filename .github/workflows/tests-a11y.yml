@@ -1,0 +1,60 @@
+name: Platform a11y Tests
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: a11y Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.8' ]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: '5.7'
+        mysql database: 'edxapp'
+        mysql user: 'edxapp001'
+        mysql password: 'password'
+        mysql root password: 'password'
+
+    - name: Install Required Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxmlsec1-dev memcached
+        sudo apt-get install -y python3-mysqldb python3-mysqldb
+        sudo systemctl start mongod
+        sudo service memcached start
+#        sudo service mysql restart
+
+    - name: Install pip
+      run: |
+        pip install setuptools wheel
+        pip install -r requirements/edx/development.txt
+
+    - name: Install Python Dependencies
+      run: pip install -r requirements/edx/development.txt
+    - uses: browser-actions/setup-geckodriver@latest
+
+    - name: Run Tests
+      env:
+        TEST_SUITE: a11y
+      run: ./scripts/accessibility-tests.sh
