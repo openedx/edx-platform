@@ -1638,6 +1638,8 @@ a.fade-cover {
 
 #unenroll-modal {
   margin-top: -60px;
+  height: auto;
+  width: 480px;
 
   .modal-form-error {
     background: tint($red, 95%);
