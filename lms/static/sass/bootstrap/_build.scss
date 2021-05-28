@@ -4,8 +4,8 @@
 // LMS theme
 @import 'lms/theme/variables';
 
-// Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// Paragon SASS Framework
+@import '@edx/paragon-new/scss/core/core';
 
 // LMS variables
 @import '../variables';
