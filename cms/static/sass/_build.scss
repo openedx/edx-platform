@@ -3,8 +3,8 @@
 // Studio theme
 @import 'cms/theme/variables';
 
-// Legacy variables file
-@import './bootstrap/variables';
-
 // Paragon SASS framework
 @import 'paragon';
+
+// Legacy variables file
+@import './bootstrap/variables';
