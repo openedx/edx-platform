@@ -9247,10 +9247,10 @@ msgstr "Tu verificación de identidad para la plafaforma %(platform_name)s fue a
 #, python-format
 msgid ""
 "Your approval status remains valid for one year, and it will expire "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 msgstr ""
 "Tu verificación es válida durante un año. Expirará el "
-"%(expiration_datetime)s."
+"%(expiry_date)s."
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -9321,7 +9321,8 @@ msgstr "Volver a enviar la verificación: %(lms_verification_link)s"
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
 #, python-format
 msgid "ID verification FAQ : %(help_center_link)s "
-msgstr "Preguntas frecuentes sobre la verificación de ID: %(help_center_link)s"
+msgstr ""
+"Preguntas frecuentes sobre la verificación de ID: %(help_center_link)s"
 
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
