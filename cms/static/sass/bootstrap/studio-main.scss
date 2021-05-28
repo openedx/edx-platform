@@ -5,8 +5,8 @@
 // Studio theme variables
 @import 'cms/theme/variables';
 
-// Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// Paragon SASS framework
+@import '@edx/paragon-new/scss/core/core';
 
 // Legacy support
 @import 'legacy';
