@@ -43,7 +43,6 @@ def ensure_clean_package_lock():
     """
     Ensure no untracked changes have been made in the current git context.
     """
-    sh("git diff")
     sh("""
       git diff --name-only --exit-code package-lock.json ||
       (echo \"Dirty package-lock.json, run 'npm install' and commit the generated changes\" && exit 1)
