@@ -7,11 +7,20 @@ from unittest.mock import patch
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.test.client import Client
 from django.test.utils import override_settings
 from organizations.models import Organization
+from rest_framework.test import APITestCase
 
 from openedx.core.djangoapps.content_libraries.libraries_index import LibraryBlockIndexer, ContentLibraryIndexer
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest, elasticsearch_test
+from openedx.core.djangoapps.content_libraries.tests.base import (
+    ContentLibrariesRestApiTest,
+    elasticsearch_test,
+    URL_BLOCK_METADATA_URL,
+    URL_BLOCK_RENDER_VIEW,
+    URL_BLOCK_GET_HANDLER_URL,
+    URL_BLOCK_XBLOCK_HANDLER,
+)
 from openedx.core.djangoapps.content_libraries.constants import VIDEO, COMPLEX, PROBLEM, CC_4_BY, ALL_RIGHTS_RESERVED
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -766,3 +775,42 @@ class ContentLibrariesTest(ContentLibrariesRestApiTest):
             assert types[0]['block_type'] == library_type
         else:
             assert len(types) > 1
+
+
+@ddt.ddt
+class ContentLibraryXBlockValidationTest(APITestCase):
+    """Tests only focused on service validation, no Blockstore needed."""
+
+    @ddt.data(
+        (URL_BLOCK_METADATA_URL, dict(block_key='totally_invalid_key')),
+        (URL_BLOCK_RENDER_VIEW, dict(block_key='totally_invalid_key', view_name='random')),
+        (URL_BLOCK_GET_HANDLER_URL, dict(block_key='totally_invalid_key', handler_name='random')),
+    )
+    @ddt.unpack
+    def test_invalid_key(self, endpoint, endpoint_parameters):
+        """Test all xblock related endpoints, when the key is invalid, return 404."""
+        response = self.client.get(
+            endpoint.format(**endpoint_parameters),
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {'detail': "Invalid XBlock key"})
+
+    def test_xblock_handler_invalid_key(self):
+        """This endpoint is tested separately from the previous ones as it's not a DRF endpoint."""
+        client = Client()
+        response = client.get(URL_BLOCK_XBLOCK_HANDLER.format(**dict(
+            block_key='totally_invalid_key',
+            handler_name='random',
+            user_id='random',
+            secure_token='random',
+        )))
+        self.assertEqual(response.status_code, 404)
+
+    def test_not_found_fails_correctly(self):
+        """Test fails with 404 when xblock key is valid but not found."""
+        valid_not_found_key = 'lb:valid:key:video:1'
+        response = self.client.get(URL_BLOCK_METADATA_URL.format(block_key=valid_not_found_key))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {
+            'detail': f"XBlock {valid_not_found_key} does not exist, or you don't have permission to view it.",
+        })
