@@ -122,12 +122,12 @@
         flex-grow: 1;
 
         &:not(.dismissible):first-of-type {
-          color: theme-color("purchase");
-          border-color: theme-color("purchase");
+          color: theme-color("success");
+          border-color: theme-color("success");
 
           &:hover {
             color: theme-color("inverse");
-            background-color: theme-color("purchase");
+            background-color: theme-color("success");
           }
         }
 
@@ -142,7 +142,6 @@
           font-size: font-size(small);
           color: $link-color;
           text-decoration: underline;
-
           cursor: pointer;
 
           &:hover {
