@@ -3101,13 +3101,6 @@ INSTALLED_APPS = [
     # Bulk User Retirement
     'lms.djangoapps.bulk_user_retirement',
 
-    # management of user-triggered async tasks (course import/export, etc.)
-    # This is only used by Studio, but is being added here because the
-    # app-permissions script that assigns users to Django admin roles only runs
-    # in the LMS process at the moment, so anything that has Django admin access
-    # permissions needs to be listed as an LMS app or the script will fail.
-    'user_tasks',
-
     # Agreements
     'openedx.core.djangoapps.agreements'
 ]
