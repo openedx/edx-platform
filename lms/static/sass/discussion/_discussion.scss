@@ -159,7 +159,7 @@ section.discussion-pagination {
           font-size: $forum-base-font-size;
           font-weight: 700;
           line-height: 32px;
-          color: theme-color("gray-dark");
+          color: $gray-700;
           text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
       }
