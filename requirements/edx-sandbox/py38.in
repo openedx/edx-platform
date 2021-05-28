@@ -8,10 +8,10 @@ nltk                                # Natural language processing; used by the c
 # dependencies copied from py35.in
 chem                                # A helper library for chemistry calculations
 matplotlib                          # 2D plotting library
-networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
+networkx                            # Utilities for creating, manipulating, and studying network graphs
 numpy                               # Numeric array processing utilities; used by scipy
-openedx-calc<2.0.0
-pyparsing==2.2.0                    # Python Parsing module
+openedx-calc
+pyparsing                           # Python Parsing module
 random2                             # Implementation of random module that works identically under Python 2 and 3
 scipy                               # Math, science, and engineering library
 sympy                               # Symbolic math library
