@@ -6,7 +6,7 @@
 @import 'cms/theme/variables';
 
 // Paragon SASS framework
-@import '@edx/paragon-new/scss/core/core';
+@import '../paragon';
 
 // Legacy support
 @import 'legacy';
