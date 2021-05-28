@@ -10,7 +10,7 @@ diff-cover==4.0.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/coverage.in
-importlib-metadata==4.2.0
+importlib-metadata==4.3.0
     # via inflect
 inflect==3.0.2
     # via
