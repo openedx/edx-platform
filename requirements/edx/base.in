@@ -10,7 +10,6 @@
 
 -c ../constraints.txt
 
--r ../edx-sandbox/shared.txt  # Dependencies which are also used by code sandboxes
 -r github.in              # Forks and other dependencies not yet on PyPI
 -r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
@@ -164,3 +163,6 @@ xblock-utils                        # Provides utilities used by the Discussion 
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
 
+cryptography                        # Implementations of assorted cryptography algorithms
+lxml                                # XML parser
+nltk                                # Natural language processing; used by the chem package
