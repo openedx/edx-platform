@@ -292,7 +292,7 @@
   &:focus {
     border: 1px solid $uxpl-blue-hover-active;
     background-color: $uxpl-blue-hover-active;
-    color: theme-color("inverse");
+    color: theme-color("inverse") !important;
   }
 
   &.is-disabled,
