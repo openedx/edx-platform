@@ -1,0 +1,14 @@
+// Paragon SASS framework plus variables that LMS expects.
+@import '@edx/paragon-new/scss/core/core';
+
+// Fill in variable gaps
+
+$inverse: $white !default;
+$pink: pink !default;
+
+$theme-colors: map-merge(
+  (
+    "inverse":    $inverse,
+  ),
+  $theme-colors
+);

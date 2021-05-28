@@ -6,7 +6,4 @@ $text-width-readability-max: 1080px;
 $audit-mode-color: rgb(74, 74, 74) !default;
 $honor-mode-color: theme-color("primary") !default;
 $verified-mode-color: theme-color("success") !default;
-$professional-certificate-color: #9a1f60 !default;
-
-// $pink existed in Bootstrap, but does not exist in Paragon
-$pink: pink !default;
+$professional-certificate-color: #9a1f60 !default;$pink: pink !default;

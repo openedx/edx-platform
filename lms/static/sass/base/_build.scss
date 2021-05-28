@@ -7,7 +7,7 @@
 @import 'bootstrap/variables';
 
 // Paragon SASS Framework
-@import '@edx/paragon-new/scss/core/core';
+@import '../paragon';
 
 // LMS-specific variables
 @import '../variables';

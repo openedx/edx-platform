@@ -8,7 +8,7 @@ $static-path: '../..';
 @import 'lms/theme/variables';
 
 // Paragon SASS Framework
-@import '@edx/paragon-new/scss/core/core';
+@import '../paragon';
 
 // Legacy support
 @import '../bootstrap/legacy';
