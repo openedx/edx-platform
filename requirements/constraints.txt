@@ -50,6 +50,8 @@ pip-tools<6.0
 
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
+# matplotlib>=3.4.0 requires python-dateutil>=2.7
+matplotlib<3.4.0
 
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
