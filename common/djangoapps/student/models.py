@@ -1399,6 +1399,7 @@ class CourseEnrollment(models.Model):
         """
         try:
             context = contexts.course_context_from_course_id(self.course_id)
+
             if enterprise_uuid is not None:
                 context["enterprise_uuid"] = enterprise_uuid
             assert isinstance(self.course_id, CourseKey)
