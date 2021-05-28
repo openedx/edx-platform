@@ -73,3 +73,6 @@ git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-rate
 
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.4#egg=xblock-drag-and-drop-v2==2.3.4
+
+# adding for sandbox testing.
+git+https://github.com/edx/django-user-tasks@d5fb5d8fa88597948b73533435b585459e7dafeb#egg=django-user-tasks==2.0.1

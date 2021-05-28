@@ -66,7 +66,6 @@ django-simple-history
 django-splash
 django-statici18n
 django-storages
-django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
