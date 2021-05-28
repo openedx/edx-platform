@@ -66,6 +66,7 @@ class ProgressTabView(RetrieveAPIView):
             display_name: (str) a str of what the name of the Chapter is for displaying on the site
             subsections: List of serialized Subsections, each has the following fields:
                 assignment_type: (str) the format, if any, of the Subsection (Homework, Exam, etc)
+                block_key: (str) the key of the given subsection block
                 display_name: (str) a str of what the name of the Subsection is for displaying on the site
                 has_graded_assignment: (bool) whether or not the Subsection is a graded assignment
                 num_points_earned: (int) the amount of points the user has earned for the given subsection
