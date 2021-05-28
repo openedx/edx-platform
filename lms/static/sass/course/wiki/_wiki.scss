@@ -15,7 +15,8 @@
   @include clearfix();
 
   .breadcrumbs-header {
-    height: 33px;
+    @include clearfix();
+
     padding: 24px 0 26px;
     border-bottom: 1px solid $gray-l3;
     border-radius: 3px 3px 0 0;
@@ -31,8 +32,9 @@
 
   .breadcrumb {
     list-style: none;
-    padding-left: 0;
+    padding: 0;
     margin: 0 0 0 ($baseline*2);
+    background: none;
 
     li {
       float: left;
@@ -279,6 +281,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    flex-direction: column;
 
     li {
       &.active {
