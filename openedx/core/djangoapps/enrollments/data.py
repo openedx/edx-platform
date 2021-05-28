@@ -116,7 +116,7 @@ def get_user_enrollments(course_key):
     ).order_by('created')
 
 
-def create_course_enrollment(username, course_id, mode, is_active):
+def create_course_enrollment(username, course_id, mode, is_active, enterprise_uuid=None):
     """Create a new course enrollment for the given user.
 
     Creates a new course enrollment for the specified user username.
@@ -126,6 +126,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
         course_id (str): The course to create the course enrollment for.
         mode (str): (Optional) The mode for the new enrollment.
         is_active (boolean): (Optional) Determines if the enrollment is active.
+        enterprise_uuid (str): Add course enterprise uuid
 
     Returns:
         A serializable dictionary representing the new course enrollment.
@@ -147,7 +148,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
         raise UserNotFoundError(msg)
 
     try:
-        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
+        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True, enterprise_uuid=enterprise_uuid)
         return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
         raise CourseNotFoundError(text_type(err))
