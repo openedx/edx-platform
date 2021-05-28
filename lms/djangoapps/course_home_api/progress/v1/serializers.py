@@ -95,6 +95,7 @@ class ProgressTabSerializer(VerifiedModeSerializerMixin):
     """
     Serializer for progress tab
     """
+    username = serializers.CharField()
     certificate_data = CertificateDataSerializer()
     completion_summary = serializers.DictField()
     course_grade = CourseGradeSerializer()

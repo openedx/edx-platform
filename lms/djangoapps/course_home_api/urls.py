@@ -59,7 +59,14 @@ urlpatterns += [
 # Progress Tab URLs
 urlpatterns += [
     re_path(
-        fr'v1/progress/{settings.COURSE_KEY_PATTERN}',
+        fr'v1/progress/{settings.COURSE_KEY_PATTERN}$',
+        ProgressTabView.as_view(),
+        name='course-home-progress-tab'
+    ),
+]
+urlpatterns += [
+    re_path(
+        fr'v1/progress/{settings.COURSE_KEY_PATTERN}/(?P<student_id>[^/]*)/$',
         ProgressTabView.as_view(),
         name='course-home-progress-tab'
     ),
