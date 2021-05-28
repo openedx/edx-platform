@@ -131,5 +131,3 @@ click<8.0
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
 
-# greater version requires testing. Will remove this constraint after testing.
-django-user-tasks==1.3.2

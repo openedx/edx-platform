@@ -351,10 +351,8 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-user-tasks==1.3.2
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+django-user-tasks==2.0.2
+    # via -r requirements/edx/testing.txt
 django-waffle==2.2.0
     # via
     #   -r requirements/edx/testing.txt
