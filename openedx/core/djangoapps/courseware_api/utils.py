@@ -11,6 +11,7 @@ from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_experiment_coupon
 
+
 def get_celebrations_dict(user, enrollment, course, browser_timezone):
     """
     Returns a dict of celebrations that should be performed.
