@@ -489,7 +489,7 @@ edx-celeryutils==1.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   super-csv
-edx-completion==4.0.3
+edx-completion==4.0.4
     # via -r requirements/edx/testing.txt
 edx-django-release-util==1.0.0
     # via -r requirements/edx/testing.txt
@@ -549,7 +549,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.11.3
+edx-proctoring==3.11.4
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -613,7 +613,7 @@ execnet==1.8.0
     #   pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.txt
-faker==8.3.0
+faker==8.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -678,7 +678,7 @@ idna==2.10
     #   requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.2.0
+importlib-metadata==4.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   inflect
@@ -885,7 +885,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
-ora2==3.5.4
+ora2==3.5.5
     # via -r requirements/edx/testing.txt
 packaging==20.9
     # via
@@ -1454,7 +1454,7 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.3.4#egg=xblock-d
     # via -r requirements/edx/testing.txt
 git+https://github.com/open-craft/xblock-poll@922cd36fb1c3cfe00b4ce03b19a13185d136447d#egg=xblock-poll==1.10.2
     # via -r requirements/edx/testing.txt
-xblock-utils==2.1.2
+xblock-utils==2.1.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-sga
