@@ -169,9 +169,8 @@ coverage==5.5
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.txt
-cryptography==3.2.1
+cryptography==3.4.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-fernet-fields
     #   edx-enterprise
@@ -686,9 +685,8 @@ jinja2-pluralize==0.3.0
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
-jinja2==2.11.3
+jinja2==3.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   code-annotations
@@ -777,9 +775,8 @@ markey==0.8
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   chem
@@ -1171,7 +1168,6 @@ six==1.16.0
     #   chem
     #   codejail
     #   crowdsourcehinter-xblock
-    #   cryptography
     #   django-countries
     #   edx-ace
     #   edx-bulk-grades
@@ -1200,7 +1196,6 @@ six==1.16.0
     #   singledispatch
     #   social-auth-app-django
     #   social-auth-core
-    #   stevedore
     #   tox
     #   transifex-client
     #   virtualenv
@@ -1235,9 +1230,8 @@ sqlparse==0.4.1
     #   django
 staff-graded-xblock==1.5.1
     # via -r requirements/edx/base.txt
-stevedore==1.32.0
+stevedore==3.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   edx-ace

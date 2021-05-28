@@ -13,11 +13,15 @@
 
 
 -c ../constraints.txt
+-c py35-constraints.txt
 
--r shared.txt                       # Dependencies in common with LMS and Studio
+
 chem                                # A helper library for chemistry calculations
+cryptography                        # Implementations of assorted cryptography algorithms
+lxml                                # XML parser
 matplotlib==2.2.4                   # 2D plotting library
 networkx==2.2                       # Utilities for creating, manipulating, and studying network graphs
+nltk                                # Natural language processing; used by the chem package
 numpy==1.16.5                       # Numeric array processing utilities; used by scipy
 openedx-calc<2.0.0
 pyparsing==2.2.0                    # Python Parsing module
