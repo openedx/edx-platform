@@ -212,7 +212,6 @@
 
                 .wrapper-course-actions {
                   margin-top: $baseline;
-
                   flex-grow: 1;
                   flex-shrink: 0;
                 }
@@ -243,6 +242,7 @@
 
             @include media-breakpoint-down(xs) {
               margin-bottom: $baseline;
+
               @include padding-left($baseline/2);
 
               .wrapper-course-info-actions {
@@ -251,7 +251,7 @@
 
                 .wrapper-course-info-row {
                   .wrapper-course-actions {
-                    margin-top: 0px;
+                    margin-top: 0;
                   }
                 }
               }
@@ -455,6 +455,7 @@
             @extend %btn-pl-white-base;
 
             @include float(right);
+
             margin-top: $baseline;
 
             &.archived {
@@ -662,7 +663,7 @@
   .messages-list {
     margin: 0;
     padding: 0;
-    background-color: theme-color("lightest");
+    background-color: $light-300;
   }
 
   .message {
@@ -776,7 +777,7 @@
       padding-left: $baseline;
       padding-top: $baseline;
       padding-bottom: $baseline;
-      background-color: #F2F0EF;
+      background-color: #f2f0ef;
 
       .wrapper-tip {
         @include clearfix();
@@ -803,7 +804,7 @@
       .wrapper-extended {
         display: flex;
         flex-flow: column wrap;
-        color: #00262B;
+        color: #00262b;
 
         .wrapper-icon-message {
           width: 100%;
@@ -828,7 +829,7 @@
           }
 
           a.verified-info {
-            color: #00262B;
+            color: #00262b;
             text-decoration: underline;
           }
         }
