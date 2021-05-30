@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -22,13 +22,14 @@
 # kluo <kevluo@stanford.edu>, 2017
 # Lam Nguyen <lamnguyen.comsci@gmail.com>, 2020
 # Le Minh Tri <trilm@hihexa.com>, 2020
+# Linh Nguyen Nhat <nl98hk@gmail.com>, 2021
 # Minh Trang Dao <minhtrang@kaist.ac.kr>, 2015
 # Minh Tue Vo <mvo@edx.org>, 2014-2015
 # Minh Tue Vo <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
-# Nguyen Lam <lamnguyen.cis@gmail.com>, 2020
+# Lam Nguyen <lamnguyen.cis@gmail.com>, 2020
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2014
 # Nhan Nguyen <constfang@yahoo.com>, 2015
@@ -47,7 +48,7 @@
 # Vu Bach, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -64,7 +65,7 @@
 # Minh Tue Vo <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
-# Nguyen Lam <lamnguyen.cis@gmail.com>, 2020
+# Lam Nguyen <lamnguyen.cis@gmail.com>, 2020
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2014
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
@@ -72,7 +73,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -107,7 +108,7 @@
 # Nguyen D. Man <mannd@live.com>, 2013
 # Nguyen Don Binh <donbinhvn@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
-# Nguyen Lam <lamnguyen.cis@gmail.com>, 2020
+# Lam Nguyen <lamnguyen.cis@gmail.com>, 2020
 # Nguyen Nhat Quang <technicalmanager@gmail.com>, 2016
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2014
 # Nguyen Tan Kim <kimnt93@gmail.com>, 2018
@@ -125,7 +126,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -161,7 +162,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
@@ -184,9 +185,9 @@
 # Tuan Nguyen <manhtuanbn12@gmail.com>, 2018
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX community translations have been downloaded from Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
@@ -196,7 +197,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:43+0000\n"
+"POT-Creation-Date: 2021-05-30 20:43+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
 "Language-Team: Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)\n"
@@ -454,7 +455,6 @@ msgid "Account recovery"
 msgstr ""
 
 #: lms/templates/provider_login.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Password"
 msgstr "Mật khẩu"
@@ -480,7 +480,7 @@ msgstr ""
 
 #: common/djangoapps/student/admin.py
 #, python-brace-format
-msgid "Email doesn't have {domain_name} domain name."
+msgid "Email doesn't have {allowed_site_email_domain} domain name."
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -1603,12 +1603,12 @@ msgid "Question {}"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Incorrect"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct"
 msgstr ""
 
@@ -2008,7 +2008,7 @@ msgid "XML data for the annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -2027,223 +2027,223 @@ msgstr ""
 msgid "Annotation"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Blank Advanced Problem"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Date that this problem is due by"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Results"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show whether a learner's answer to the problem is correct. "
 "Configured on the subsection."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Always"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Never"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/courseware/dates.html
-#: lms/templates/vert_module.html
+#: common/lib/xmodule/xmodule/capa_module.py
+#: lms/templates/courseware/dates.html
 msgid "Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Answer"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to show the answer to the problem. A default value can be set "
 "in Advanced Settings."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answered"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted or Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Closed"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Finished"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct or Past Due"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After Some Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "After All Attempts or Correct"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Attempted"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Answer: Number of Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Number of times the student must attempt to answer the question before the "
 "Show Answer button appears."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether to force the save button to appear on the page"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Show Reset Button"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Determines whether a 'Reset' button is shown so the user may reset their "
 "answer. A default value can be set in Advanced Settings."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "On Reset"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Per Student"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "XML data for the problem"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the correctness of current student answers"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary for maintaining the state of inputtypes"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student responses"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Dictionary with the current student score"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether or not the answers have been saved since last submit"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Whether the student has answered the problem"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Random seed for this student"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Last submission time"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Timer Between Attempts"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Seconds a student must wait between submissions for a problem with multiple "
 "attempts."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Problem Weight"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Defines the number of points each problem is worth. If the value is not set,"
 " each response field in the problem is worth one point."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Markdown source of this module"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Source code for LaTeX and Word problems. This feature is not well-supported."
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
 "Service. This key is granted for exclusive use by this course for the "
@@ -2251,164 +2251,6 @@ msgid ""
 "notify MathWorks immediately if you believe the key is exposed or "
 "compromised. To obtain a key for your course, or to report an issue, please "
 "contact moocsupport@mathworks.com"
-msgstr ""
-
-#: cms/templates/index.html cms/templates/videos_index_pagination.html
-#: lms/templates/dashboard/_entitlement_reason_survey.html
-#: lms/templates/dashboard/_reason_survey.html
-#: lms/templates/manage_user_standing.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: lms/templates/widgets/footer-language-selector.html
-#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
-#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "Gửi"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Submitting"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Warning: The problem has been reset to its initial state!"
-msgstr ""
-
-#. Translators: Following this message, there will be a bulleted list of
-#. items.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid ""
-"The problem's state was corrupted by an invalid submission. The submission "
-"consisted of:"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "If this error persists, please contact the course staff."
-msgstr ""
-
-#. Translators: {previous_hints} is the HTML of hints that have already been
-#. generated, {hint_number_prefix}
-#. is a header for this hint, and {hint_text} is the text of the hint itself.
-#. This string is being passed to translation only for possible reordering of
-#. the placeholders.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
-msgstr ""
-
-#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
-#. hints.
-#. This text is shown in bold before the accompanying hint text.
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Hint ({hint_num} of {hints_count}): "
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers were previously saved. Click '{button_name}' to grade them."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Incorrect ({progress} point)"
-msgid_plural "Incorrect ({progress} points)"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Correct ({progress} point)"
-msgid_plural "Correct ({progress} points)"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "Partially correct ({progress} point)"
-msgid_plural "Partially correct ({progress} points)"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Partially Correct"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Answer submitted."
-msgstr ""
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem is closed."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be submitted again."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "You must wait at least {wait} seconds between submissions."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"You must wait at least {wait_secs} between submissions. {remaining_secs} "
-"remaining."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_hour} hour"
-msgid_plural "{num_hour} hours"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_minute} minute"
-msgid_plural "{num_minute} minutes"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid "{num_second} second"
-msgid_plural "{num_second} seconds"
-msgstr[0] ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem needs to be reset prior to save."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Your answers have been saved."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
-msgid ""
-"Your answers have been saved but not graded. Click '{button_name}' to grade "
-"them."
-msgstr ""
-
-#. Translators: 'closed' means the problem's due date has passed. You may no
-#. longer attempt to solve the problem.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You cannot select Reset for a problem that is closed."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "You must submit an answer before you can select Reset."
-msgstr ""
-
-#. Translators: 'rescoring' refers to the act of re-submitting a student's
-#. solution so it can get a new score.
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem's definition does not support rescoring."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be answered before it can be graded again."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
@@ -2433,6 +2275,164 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid "Correct Answer"
+msgstr ""
+
+#: cms/templates/index.html cms/templates/videos_index_pagination.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
+#: lms/templates/dashboard/_reason_survey.html
+#: lms/templates/manage_user_standing.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: lms/templates/widgets/footer-language-selector.html
+#: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
+#: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "Gửi"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Submitting"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr ""
+
+#. Translators: Following this message, there will be a bulleted list of
+#. items.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "If this error persists, please contact the course staff."
+msgstr ""
+
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{previous_hints}{list_start_tag}{strong_text}{hint_text}</li>"
+msgstr ""
+
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
+#. hints.
+#. This text is shown in bold before the accompanying hint text.
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Hint ({hint_num} of {hints_count}): "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Partially Correct"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer submitted."
+msgstr ""
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be reset before it can be submitted again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_hour} hour"
+msgid_plural "{num_hour} hours"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_minute} minute"
+msgid_plural "{num_minute} minutes"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid "{num_second} second"
+msgid_plural "{num_second} seconds"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem needs to be reset prior to save."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Your answers have been saved."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+#, python-brace-format
+msgid ""
+"Your answers have been saved but not graded. Click '{button_name}' to grade "
+"them."
+msgstr ""
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You cannot select Reset for a problem that is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "You must submit an answer before you can select Reset."
+msgstr ""
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem's definition does not support rescoring."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Problem must be answered before it can be graded again."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
@@ -2499,13 +2499,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-#, python-brace-format
-msgid ""
-"The selected proctoring provider, {proctoring_provider}, is not a valid "
-"provider. Please select from one of {available_providers}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2592,8 +2585,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter the name of the course as it should appear in the edX.org course list."
+msgid "Enter the name of the course as it should appear in the course list."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2690,8 +2682,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, the course appears in the list of new courses "
-"on edx.org, and a New! badge temporarily appears next to the course image."
+"Enter true or false. If true, the course appears in the list of new courses,"
+" and a New! badge temporarily appears next to the course image."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3051,7 +3043,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter true or false. If true, edX users can view the course wiki even if "
+"Enter true or false. If true, students can view the course wiki even if "
 "they're not enrolled in the course."
 msgstr ""
 
@@ -3360,6 +3352,13 @@ msgstr ""
 #: common/lib/xmodule/xmodule/graders.py
 #, python-brace-format
 msgid "{short_label} Avg"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/hidden_module.py
+#, python-brace-format
+msgid ""
+"ERROR: \"{block_type}\" is an unknown component type. This component will be"
+" hidden in LMS."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -4523,7 +4522,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Account Activation"
+msgid "Account activation"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -4536,7 +4535,7 @@ msgid ""
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
-msgid "Activate Your Account"
+msgid "Activate your account"
 msgstr ""
 
 #: common/templates/student/edx_ace/accountactivation/email/body.html
@@ -4684,6 +4683,136 @@ msgstr ""
 "Chúng tôi giữ một danh sách của e-mail cũ, vì vậy nếu yêu cầu này là không "
 "chủ ý, chúng tôi có thể điều tra."
 
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctoring requirements for %(course_name)s\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Hello %(full_name)s,\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You are enrolled in %(course_name)s at %(platform_name)s. This course contains proctored exams.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Proctored exams are timed exams that you take while proctoring software monitors your computer's desktop, webcam video, and audio. Your course uses %(proctoring_provider)s software for proctoring.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Carefully review the system requirements as well as the steps to take a proctored exam in order to ensure that you are prepared.\n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                Proctoring Instructions and Requirements\n"
+"            "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                    Before taking a graded proctored exam, you must have approved ID verification photos. \n"
+"                "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+msgid ""
+"\n"
+"                        You can submit ID verification photos here.\n"
+"                    "
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "Cảm ơn,"
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.html
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
+#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team "
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"You are enrolled in %(course_name)s at %(platform_name)s. This course "
+"contains proctored exams."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Proctored exams are timed exams that you take while proctoring software "
+"monitors your computer's desktop, webcam video, and audio. Your course uses "
+"%(proctoring_provider)s software for proctoring."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+msgid ""
+"Carefully review the system requirements as well as the steps to take a "
+"proctored exam in order to ensure that you are prepared."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"To view proctoring instructions and requirements, please visit: "
+"%(proctoring_requirements_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"Before taking a graded proctored exam, you must have approved ID "
+"verification photos. You can submit ID verification photos here: "
+"%(id_verification_url)s"
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/body.txt
+#, python-format
+msgid ""
+"This email was automatically sent from %(platform_name)s to %(full_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/proctoringrequirements/email/subject.txt
+#, python-format
+msgid "Proctoring requirements for %(course_name)s"
+msgstr ""
+
 #: common/templates/student/edx_ace/recoveryemailcreate/email/body.html
 msgid "Create Recovery Email"
 msgstr ""
@@ -4793,8 +4922,8 @@ msgstr ""
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
 msgid ""
-"© {org_name}.  All rights reserved except where noted.  edX, Open edX and "
-"their respective logos are registered trademarks of edX Inc."
+"\\u00A9 {org_name}.  All rights reserved except where noted.  edX, Open edX "
+"and their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
@@ -5082,11 +5211,16 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 #, python-brace-format
-msgid "User {username} is not enrolled in the course {course_key}"
+msgid "User {user_id} is not enrolled in the course {course_key}"
 msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "An unexpected error occurred while regenerating certificates."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/support.py
+#, python-brace-format
+msgid "User {username} is not enrolled in the course {course_key}"
 msgstr ""
 
 #. Translators:  This text describes the 'Honor' course certificate type.
@@ -5121,11 +5255,6 @@ msgstr ""
 msgid ""
 "An {cert_type} certificate demonstrates a high level of achievement in a "
 "program of study, and includes verification of the student's identity."
-msgstr ""
-
-#: lms/djangoapps/certificates/views/webview.py
-#, python-brace-format
-msgid "{month} {day}, {year}"
 msgstr ""
 
 #. Translators:  This text represents the verification of the certificate
@@ -5261,7 +5390,7 @@ msgstr ""
 msgid "Contact {platform_name}"
 msgstr ""
 
-#. Translators:  This text appears near the top of the certficate and
+#. Translators:  This text appears near the top of the certificate and
 #. describes the guarantee provided by edX
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -5387,6 +5516,30 @@ msgstr ""
 msgid "Not sure yet"
 msgstr ""
 
+#: lms/djangoapps/course_home_api/admin.py
+msgid ""
+"These define the context to disable the frontend-app-learning progress "
+"page.If no values are set, then the configuration applies globally. If a "
+"single value is set, then the configuration applies to all courses within "
+"that context. At most one value can be set at a time.<br>If multiple "
+"contexts apply to a course (for example, if configuration is specified for "
+"the course specifically, and for the org that the course is in, then the "
+"more specific context overrides the more general context."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/admin.py openedx/features/discounts/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Disabled only if the org that it is in is Disabled."
+msgstr ""
+
+#: lms/djangoapps/course_home_api/models.py
+#: openedx/features/discounts/models.py
+msgid "Disabled"
+msgstr ""
+
 #: lms/djangoapps/course_home_api/outline/v1/serializers.py
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 #, python-brace-format
@@ -5482,10 +5635,6 @@ msgstr ""
 msgid "Please view your course in the existing experience"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Upgrade to Verified"
-msgstr "Nâng cấp lên trạng thái Đã xác thực"
-
 #: lms/djangoapps/courseware/course_tools.py
 msgid "Financial Assistance"
 msgstr ""
@@ -5540,7 +5689,7 @@ msgid "Enrollment Date"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course Starts"
+msgid "Course starts"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5558,16 +5707,19 @@ msgid "Course starts in {time_remaining_string} at {course_start_time}."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Course End"
+msgid "Course ends"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
-"To earn a certificate, you must complete all requirements before this date."
+"This course will be archived, which means you can review the course content "
+"but can no longer participate in graded assignments or earn a certificate."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "After this date, course content will be archived."
+msgid ""
+"After the course ends, the course content will be archived and no longer "
+"active."
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5873,6 +6025,11 @@ msgid "You must be enrolled in the course to see course content."
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
+#: lms/djangoapps/instructor/views/api.py
+msgid "User does not exist."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
 msgstr ""
 
@@ -5952,179 +6109,6 @@ msgid ""
 "financial information) for edX marketing purposes."
 msgstr ""
 
-#: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
-msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with"
-" GIT_REPO_DIR"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid ""
-"Non usable git url provided. Expecting something like: "
-"git@github.com:edx/edx4edx_lite.git"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to get git log"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "git clone or pull failed!"
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to run import command."
-msgstr ""
-
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The underlying module store does not support import."
-msgstr ""
-
-#. Translators: This is an error message when they ask for a
-#. particular version of a git repository and that version isn't
-#. available from the remote source they specified
-#: lms/djangoapps/dashboard/git_import.py
-msgid "The specified remote branch is not available."
-msgstr ""
-
-#. Translators: Error message shown when they have asked for a git
-#. repository branch, a specific version within a repository, that
-#. doesn't exist, or there is a problem changing to it.
-#: lms/djangoapps/dashboard/git_import.py
-msgid "Unable to switch to specified branch. Please check your branch name."
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid ""
-"Import the specified git repository and optional branch into the modulestore"
-" and optionally specified directory."
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide username"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Must provide full name"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Password must be supplied"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "email address required (not username)"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Oops, failed to create user {user}, {error}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "User {user} created successfully!"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with email address {email_addr}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Cannot find user with username {username} - {error}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
-msgid "Deleted user {username}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Statistic"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Value"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Site statistics"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Total number of users"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Create User Results"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Delete User Results"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "The git repo location should end with '.git', and be a valid url"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Added Course"
-msgstr ""
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#: lms/templates/support/feature_based_enrollments.html
-msgid "Course Name"
-msgstr "Tên khóa học"
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Directory/ID"
-msgstr ""
-
-#. Translators: "Git Commit" is a computer command; see
-#. http://gitref.org/basic/#commit
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Git Commit"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Change"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Last Editor"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Information about all courses"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "course_id"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# enrolled"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "# staff"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "instructors"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Enrollment information for all courses"
-msgstr ""
-
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
 msgstr ""
@@ -6151,8 +6135,8 @@ msgid "Good"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
-#, python-format
-msgid "%(comment_username)s replied to"
+#, python-format, python-brace-format
+msgid "%(comment_username)s replied to {start_tag}%(thread_title)s{end_tag}:"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/edx_ace/responsenotification/email/body.html
@@ -6194,89 +6178,6 @@ msgstr ""
 msgid "Notes"
 msgstr "Ghi chú"
 
-#: lms/djangoapps/email_marketing/models.py
-msgid "API key for accessing Sailthru. "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "API secret for accessing Sailthru. "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru list name to add new users to. "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru connection retry interval (secs)."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru maximum retries."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on welcome send."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Sailthru minutes to wait before sending abandoned cart message. Deprecated."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on enrolling for audit. "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on passed ID verification."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on failed ID verification."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on upgrading a course. Deprecated "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Use the Sailthru content API to fetch course tags."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Number of seconds to cache course content retrieved from Sailthru."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid "Cost in cents to report to Sailthru for enrolls."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Optional lms url scheme + host used to construct urls for content library, "
-"e.g. https://courses.edx.org."
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"Number of seconds to delay the sending of User Welcome email after user has "
-"been created"
-msgstr ""
-
-#: lms/djangoapps/email_marketing/models.py
-msgid ""
-"The number of seconds to delay/timeout wait to get cookie values from "
-"sailthru."
-msgstr ""
-
 #: lms/djangoapps/grades/rest_api/v1/gradebook_views.py
 msgid ""
 "Cannot override subsection grade: subsection is not available for target "
@@ -6304,10 +6205,6 @@ msgstr ""
 msgid ""
 "The {report_type} report is being created. To view the status of the report,"
 " see Pending Tasks below."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "User does not exist."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6359,6 +6256,48 @@ msgid ""
 "Error '{error}' while sending email to new user (user email={email}). "
 "Without the email student would not be able to login. Please contact support"
 " for further information."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A usage key location for a section or a problem. If the location is a block "
+"that contains other blocks, (such as the course, section, subsection, or "
+"unit blocks) then all blocks under that block will be included in the "
+"report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "A list of usage keys for the blocks to include in the report. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A list of problem/block types to generate the report for. This field can be "
+"omitted if the report should include details of allblock types. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly text describing current status of report generation."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A unique id for the report generation task. It can be used to query the "
+"latest report generation status."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The provided parameters were invalid. Make sure you've provided at least one"
+" valid usage key for `problem_locations`."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user is not authenticated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requesting user lacks access to the course."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6451,6 +6390,10 @@ msgid "Date Joined"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "External User Key"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
 msgstr ""
 
@@ -6490,6 +6433,10 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "proctored exam results"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Anonymized User IDs"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6554,8 +6501,85 @@ msgid "Cannot rescore with all_students and unique_student_identifier."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Current status of task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Identifies the kind of task being performed, e.g. rescoring."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The celery ID for the task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The date and time when the task was created."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"The input parameters for the task. The format and content of this data will "
+"depend on the kind of task being performed. For instanceit may contain the "
+"problem locations for a problem resources task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The username of the user who initiated this task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The last knows state of the celery task."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Task duration information, if known"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "User-friendly task status information, if available."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of instructor tasks."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The requested course does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "URL from which report can be downloaded."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Name of report."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "HTML anchor tag that contains the name and link."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "List of report downloads"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ID for the course whose reports need to be listed."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Filter results to only return details of for the report with the specified "
+"name."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "ORA data"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "ORA summary"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6622,14 +6646,28 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
+msgid ""
+"Student {user} is not enrolled in this course. Please check your spelling "
+"and retry."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"Student {user} is already on the certificate invalidation list and cannot be"
+" added to the certificate exception list."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Student (username/email={user}) already in certificate exception list."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
-"Certificate exception (user={user}) does not exist in certificate white "
-"list. Please refresh the page and try again."
+"Error occurred removing the allowlist entry for student {student}. Please "
+"refresh the page and try again"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6651,12 +6689,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
-msgid ""
-"{user} is not enrolled in this course. Please check your spelling and retry."
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "Invalid data, generate_for must be \"new\" or \"all\"."
 msgstr ""
 
@@ -6672,6 +6704,14 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid "user \"{username}\" in row# {row}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid ""
+"The student {student} appears on the Certificate Exception list in course "
+"{course}. Please remove them from the Certificate Exception list before "
+"attempting to invalidate their certificate."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6834,7 +6874,7 @@ msgstr ""
 msgid "An extended due date must be later than the original due date."
 msgstr ""
 
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Full Name"
@@ -6957,6 +6997,14 @@ msgstr ""
 msgid "cohorted"
 msgstr ""
 
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#. An example of such a message is: "Progress: {action} {succeeded} of
+#. {attempted} so far"
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "generate_anonymized_id"
+msgstr ""
+
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "compressed"
 msgstr ""
@@ -6998,28 +7046,32 @@ msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {attempted} and {succeeded} are counts.
+#. {attempted} and {succeeded} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {student} is a student identifier.
+#. {student} is a student identifier.  # lint-amnesty, pylint: disable=line-
+#. too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
@@ -7062,7 +7114,8 @@ msgid "Problem successfully {action} for {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
@@ -7089,14 +7142,16 @@ msgid "Message successfully {action} for {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
-#. {succeeded} and {attempted} are counts.
+#. {succeeded} and {attempted} are counts.  # lint-amnesty, pylint:
+#. disable=line-too-long
 #: lms/djangoapps/instructor_task/views.py
 #, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
@@ -7464,10 +7519,6 @@ msgid "Missing required parameter face_image"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Invalid course key"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
 msgid "No profile found for user"
 msgstr ""
 
@@ -7477,7 +7528,16 @@ msgid "Name must be at least {min_length} character long."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
+msgid "Image data is in an unsupported format."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
 msgid "Image data is not valid."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID verification was approved!"
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
@@ -7893,7 +7953,6 @@ msgid "Allow"
 msgstr ""
 
 #: lms/templates/ccx/schedule.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
 msgstr "Lỗi"
 
@@ -7920,23 +7979,14 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
 #, python-format
 msgid ""
-"Your approval status remains valid for one year, and it will expire "
+"Your approval status remains valid for two years, and it will expire "
 "%(expiration_datetime)s."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "Enjoy your studies,"
-msgstr ""
-
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationexpiry/email/body.txt
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
-#: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
-#, python-format
-msgid "The %(platform_name)s Team "
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.txt
@@ -7991,13 +8041,6 @@ msgstr ""
 msgid "ID verification FAQ : %(help_center_link)s "
 msgstr ""
 
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/passed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Cảm ơn,"
-
 #: lms/templates/verify_student/edx_ace/verificationexpiry/email/subject.txt
 #, python-format
 msgid "Your %(platform_name)s Verification has Expired"
@@ -8018,7 +8061,7 @@ msgstr ""
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.txt
 msgid ""
-"We have received your photos and they will be reviewed within 5-7 days."
+"We have received your photos and they will be reviewed within 3-5 days."
 msgstr ""
 
 #: lms/templates/verify_student/edx_ace/verificationsubmitted/email/body.html
@@ -8755,8 +8798,16 @@ msgstr ""
 msgid "Configuration may not be specified at more than one level at once."
 msgstr ""
 
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Error Status"
+msgstr ""
+
+#: openedx/core/djangoapps/content/learning_sequences/admin.py
+msgid "Courses with Errors"
+msgstr ""
+
 #: openedx/core/djangoapps/content/learning_sequences/apps.py
-msgid "Learning Sequences"
+msgid "Learning Sequences and Outlines"
 msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/api.py
@@ -9034,6 +9085,53 @@ msgstr ""
 msgid "This is a test error"
 msgstr ""
 
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to allow, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Allow List"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+#, python-brace-format
+msgid "Comma-separated list of providers to deny, eg: {choices}"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Deny List"
+msgstr ""
+
+#. Translators: A key specifying a course, library, program,
+#. website, or some other collection of content where learning
+#. happens.
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Learning Context Key"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"If disabled, the discussions in the associated learning context/course will "
+"be disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The LTI configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The plugin configuration data for this context/provider."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "Discussion provider"
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid "The discussion tool/provider's id"
+msgstr ""
+
 #: openedx/core/djangoapps/django_comment_common/models.py
 msgid "Administrator"
 msgstr ""
@@ -9218,7 +9316,6 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/support/feature_based_enrollments.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Course ID"
 msgstr "Course ID"
 
@@ -9456,6 +9553,7 @@ msgid "You are eligible to upgrade in these courses:"
 msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/upgradereminder/email/body.html
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Example of a verified certificate"
 msgstr ""
 
@@ -9515,6 +9613,10 @@ msgid "\"{email}\" is not a valid email address."
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "Enter a valid email address"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {email_address} belongs to an existing account. Try again with"
@@ -9522,10 +9624,18 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this email address is already registered"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
 msgid ""
 "It looks like {username} belongs to an existing account. Try again with a "
 "different username."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/__init__.py
+msgid "It looks like this username is already taken"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -9772,9 +9882,9 @@ msgstr ""
 msgid "Your Account Has Been Queued For Deletion"
 msgstr ""
 
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Đặt lại mật khẩu"
+#: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
+msgid "Password reset"
+msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -9798,7 +9908,7 @@ msgid "If you did not request this change, you can ignore this email."
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.html
-msgid "Change my Password"
+msgid "Reset my password"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordreset/email/body.txt
@@ -9811,7 +9921,7 @@ msgid "Password reset on %(platform_name)s"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
-msgid "Password Reset Success"
+msgid "Password reset success"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
@@ -9881,13 +9991,6 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"To protect your account, it’s been temporarily locked. Try again in {locked_out_period} minutes.\n"
-"To be on the safe side, you can reset your password {link_start}here{link_end} before you try again.\n"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
@@ -9898,14 +10001,6 @@ msgid ""
 "sign-in attempts before your account is temporarily "
 "locked.{li_end}{li_start}If you've forgotten your password, click "
 "{link_start}here{link_end} to reset.{li_end}"
-msgstr ""
-
-#: openedx/core/djangoapps/user_authn/views/login.py
-#, python-brace-format
-msgid ""
-"Email or password is incorrect.\n"
-"You have {remaining_attempts} more sign-in attempts before your account is temporarily locked.\n"
-"If you{quote}ve forgotten your password, click {link_start}here{link_end} to reset.\n"
 msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
@@ -10208,7 +10303,8 @@ msgid "This content is only accessible to enrolled learners. "
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
-msgid "The about me field must be at most {} characters long."
+#, python-brace-format
+msgid "The about me field must be at most {BIO_MAX_LENGTH} characters long."
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -10416,10 +10512,6 @@ msgid "'course_key' is required."
 msgstr ""
 
 #: openedx/features/course_experience/api/v1/views.py
-msgid "Only 'course_key' is expected."
-msgstr ""
-
-#: openedx/features/course_experience/api/v1/views.py
 msgid "View all dates"
 msgstr ""
 
@@ -10495,14 +10587,6 @@ msgstr ""
 
 #: openedx/features/discounts/admin.py
 msgid ""
-"If any of these values is left empty or \"Unknown\", then their value at "
-"runtime will be retrieved from the next most specific context that applies. "
-"For example, if \"Disabled\" is left as \"Unknown\" in the course context, "
-"then that course will be Disabled only if the org that it is in is Disabled."
-msgstr ""
-
-#: openedx/features/discounts/admin.py
-msgid ""
 "These define the context to configure the percentage for the first purchase "
 "discount.If multiple contexts apply to a course (for example, if "
 "configuration is specified for the course specifically, and for the org that"
@@ -10510,23 +10594,11 @@ msgid ""
 " context."
 msgstr ""
 
-#: openedx/features/discounts/models.py
-msgid "Disabled"
-msgstr ""
-
 #: openedx/features/discounts/utils.py
 #, python-brace-format
 msgid ""
 "{s_sr}Original price: {s_op}{original_price}{e_p}, discount price: "
 "{e_sr}{formatted_discount_price}"
-msgstr ""
-
-#: openedx/features/discounts/utils.py
-#, no-python-format, python-brace-format
-msgid ""
-"{banner_open} Upgrade by {discount_expiration_date} and save {percentage}% "
-"[{strikeout_price}]{span_close}{br}Use code {b_open}{code}{b_close} at "
-"checkout! {a_open}Upgrade Now{a_close}{div_close}"
 msgstr ""
 
 #: openedx/features/enterprise_support/admin/forms.py
@@ -10549,9 +10621,9 @@ msgstr ""
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid ""
-"Your organization {bold_start}{enterprise_customer_name}{bold_end} uses a "
-"custom dashboard for learning. {link_start}Click here{link_end} to continue "
-"in that experience."
+"You have access to the {bold_start}{enterprise_name}{bold_end} dashboard. To"
+" access the courses available to you through {enterprise_name}, "
+"{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
@@ -10608,6 +10680,26 @@ msgid ""
 "To participate in this assignment, the suggested schedule for your course "
 "needs updating. Don’t worry, we’ll shift all the due dates for you and you "
 "won’t lose any of your progress."
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "Try again ({attempts} attempt remaining)"
+msgid_plural "Try again ({attempts} attempts remaining)"
+msgstr[0] ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of {max_attempts} attempts for this problem."
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+msgid "Try again (unlimited attempts)"
+msgstr ""
+
+#: openedx/features/personalized_learner_schedules/call_to_action.py
+#, python-brace-format
+msgid "You have used {attempts} of unlimited attempts for this problem."
 msgstr ""
 
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
@@ -10677,6 +10769,69 @@ msgstr "Đã xảy ra lỗi lập chỉ mục chung"
 #: cms/djangoapps/contentstore/courseware_index.py
 msgid "(Unnamed)"
 msgstr "(Chưa có tên)"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import because a course with this id: {} already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied. You do not have write access to this course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Error while reading {}. Check file for XML errors."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Failed to import module: {} at location: {}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Could not find the {0} file in the package."
+msgstr "Không tìm thấy tệp {0} trong gói."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Uploaded Tar file not found. Try again."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "We only support uploading a .tar.gz file."
+msgstr "Chúng tôi chỉ hỗ trợ tải lên tập tin .tar.gz"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Aborting import since a library with this id already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Course olx validation failed. Please check your email."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Permission denied"
+msgstr "Quyền bị từ chối"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unknown error while importing course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "An Unknown error occurred during the unpacking step."
+msgstr ""
+
+#: cms/djangoapps/contentstore/errors.py
+#, python-brace-format
+msgid "Unknown User ID: {0}"
+msgstr "Không biết ID người dùng: {0}"
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "Unsafe tar file. Aborting import."
+msgstr "Tệp tar không an toàn. Hủy nhập vào."
+
+#: cms/djangoapps/contentstore/errors.py
+msgid "User permission denied."
+msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 #, python-brace-format
@@ -10748,33 +10903,6 @@ msgid ""
 msgstr ""
 "Lấy khoá học và xuất vào kho git\n"
 ". Thư mục của khóa học phải là một kho git. Cách sử dụng: git_export <course_loc> <git_url>"
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Unknown User ID: {0}"
-msgstr "Không biết ID người dùng: {0}"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Permission denied"
-msgstr "Quyền bị từ chối"
-
-#: cms/djangoapps/contentstore/tasks.py
-#: cms/djangoapps/contentstore/views/import_export.py
-msgid "We only support uploading a .tar.gz file."
-msgstr "Chúng tôi chỉ hỗ trợ tải lên tập tin .tar.gz"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Tar file not found"
-msgstr "Không tìm thấy tệp tar"
-
-#: cms/djangoapps/contentstore/tasks.py
-msgid "Unsafe tar file. Aborting import."
-msgstr "Tệp tar không an toàn. Hủy nhập vào."
-
-#: cms/djangoapps/contentstore/tasks.py
-#, python-brace-format
-msgid "Could not find the {0} file in the package."
-msgstr "Không tìm thấy tệp {0} trong gói."
 
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
@@ -10879,8 +11007,16 @@ msgid "HTML"
 msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Open Response"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Trống "
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Blank Open Response Assessment"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Course has been successfully reindexed."
@@ -10978,8 +11114,12 @@ msgid "Subsection"
 msgstr "Phần nhỏ"
 
 #: cms/djangoapps/contentstore/views/import_export.py
-msgid "File upload corrupted. Please try again"
-msgstr "Tập tin tải lên bị hỏng. Vui lòng thử lại"
+msgid "Some chunks missed during file upload. Please try again"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/import_export.py
+msgid "File upload failed. Please try again"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 #, python-brace-format
@@ -11091,6 +11231,11 @@ msgstr ""
 "Đã có một thư viện được xác định với cùng một tổ chức và mã thư viện. Xin "
 "vui lòng thay đổi mã thư viện của bạn để nó là duy nhất trong tổ chức của "
 "bạn."
+
+#: cms/djangoapps/contentstore/views/library.py
+#, python-brace-format
+msgid "'{organization_key}' is not a valid organization identifier."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/preview.py
 #, python-brace-format
@@ -11434,6 +11579,11 @@ msgid "Loading"
 msgstr "Đang tải"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Course Name"
+msgstr "Tên khóa học"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Mã khóa học"
@@ -11474,8 +11624,6 @@ msgstr "Chạy khóa học"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Courses"
 msgstr "Các khóa học"
@@ -11510,16 +11658,6 @@ msgstr "Xem "
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
 msgstr "Lưu"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "previous"
-msgstr "trước"
-
-#: cms/templates/maintenance/_announcement_index.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "next"
-msgstr "sau"
 
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html
@@ -12013,6 +12151,10 @@ msgstr "Đăng nhập qua tài khoản ngoài thất bại"
 #: lms/templates/footer.html
 msgid "organization logo"
 msgstr ""
+
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "Đặt lại mật khẩu"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -12560,8 +12702,12 @@ msgid "Submission History Viewer"
 msgstr "Trình Xem Lịch Sử Gửi Bài"
 
 #: lms/templates/staff_problem_info.html
-msgid "User:"
-msgstr "Người dùng: "
+msgid "Learner's {platform_name} email address or username:"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+msgid "Enter the learner email address or username"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "View History"
@@ -12588,120 +12734,6 @@ msgstr "Trang trước"
 #: lms/templates/staticbook.html
 msgid "Next page"
 msgstr "Trang sau"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Sysadmin Dashboard"
-msgstr "Sysadmin Dashboard"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Users"
-msgstr "Người dùng"
-
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Staffing and Enrollment"
-msgstr "Staffing and Enrollment"
-
-#. Translators: refers to http://git-scm.com/docs/git-log
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Logs"
-msgstr "Git Logs"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Note: Sysadmin panel will be deprecated in the next release."
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "User Management"
-msgstr "Quản lý người dùng"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Email or username"
-msgstr "Email hoặc Tên đăng nhập"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete user"
-msgstr "Xóa người dùng"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Create user"
-msgstr "Tạo người dùng"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid ""
-"Go to each individual course's Instructor dashboard to manage course "
-"enrollment."
-msgstr ""
-"Go to each individual course's Instructor dashboard to manage course "
-"enrollment."
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Administer Courses"
-msgstr "Administer Courses"
-
-#. Translators: Repo is short for git repository or source of
-#. courseware; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Location"
-msgstr "Repo Location"
-
-#. Translators: Repo is short for git repository (http://git-scm.com/about) or
-#. source of
-#. courseware and branch is a specific version within that repository
-#: lms/templates/sysadmin_dashboard.html
-msgid "Repo Branch (optional)"
-msgstr "Repo Branch (optional)"
-
-#. Translators: GitHub is a popular website for hosting code
-#: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from GitHub"
-msgstr "Tải khóa học mới từ GitHub"
-
-#. Translators: 'dir' is short for 'directory'
-#: lms/templates/sysadmin_dashboard.html
-msgid "Course ID or dir"
-msgstr "Course ID or dir"
-
-#: lms/templates/sysadmin_dashboard.html
-msgid "Delete course from site"
-msgstr "Delete course from site"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Page {current_page} of {total_pages}"
-msgstr "Trang {current_page} trên {total_pages}"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for {course_id}"
-msgstr "Recent git load activity for {course_id}"
-
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Date"
-msgstr "Ngày"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Git Action"
-msgstr "Git Action"
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded."
-msgstr "No git import logs have been recorded."
-
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "No git import logs have been recorded for this course."
-msgstr "No git import logs have been recorded for this course."
-
-#: lms/templates/text-me-the-app.html
-msgid "Text Me The App"
-msgstr "Nhắn tin cho tôi Ứng dụng"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -12793,6 +12825,10 @@ msgstr "{subsection_format} hạn chót {{date}}"
 
 #: lms/templates/vert_module.html
 msgid "Due {date}"
+msgstr ""
+
+#: lms/templates/vert_module.html
+msgid "Past due"
 msgstr ""
 
 #: lms/templates/video.html
@@ -13935,6 +13971,11 @@ msgstr "Lưu chính sách chấm điểm"
 msgid "Date format four digit year dash two digit month dash two digit day"
 msgstr "Định dạng ngày tháng theo dạng yyyy-mm-dd, ví dụ: 2015-10-30."
 
+#: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Date"
+msgstr "Ngày"
+
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
 #: lms/templates/ccx/schedule.html
@@ -14965,6 +15006,7 @@ msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
 msgid "The {platform_name} Team"
 msgstr "Đội ngũ {platform_name}"
 
@@ -14977,8 +15019,8 @@ msgstr ""
 "{platform_name}{link_end}."
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Your certificate will be available on or before {date}"
-msgstr "Chứng chỉ của bạn sẽ có vào hoặc trước ngày {date}"
+msgid "Your grade and certificate will be ready after {date}."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -15150,10 +15192,6 @@ msgid "You can change sessions until {entitlement_expiration_date}."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "View Archived Course"
-msgstr "Xem khóa học cũ"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr ""
 
@@ -15193,6 +15231,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
 msgid "Email Settings"
 msgstr "Thiết lập Email"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "View Archived Course"
+msgstr "Xem khóa học cũ"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
@@ -15265,21 +15307,15 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Pursue a {cert_name_long} to highlight the knowledge and skills you gain in "
-"this course."
+"{start_bold}Get the most out of your course!{end_bold} Upgrade to get full "
+"access to the course material, unlock both graded and non-graded "
+"assignments, and earn a {link_start}verified certificate{link_end} to "
+"showcase on your resume."
 msgstr ""
-"Theo đuổi một {cert_name_long} để nêu bật kiến thức và kĩ năng đạt được từ "
-"khoá học này."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"It's official. It's easily shareable. It's a proven motivator to complete "
-"the course. {line_break}{link_start}Learn more about the verified "
-"{cert_name_long}{link_end}."
+msgid "Upgrade"
 msgstr ""
-"Nó là chính thức. Nó dễ dàng chia sẻ. Đó là động lực đã được chứng minh để "
-"hoàn thành khóa học. {line_break}{link_start}Tìm hiểu thêm về "
-"{cert_name_long}{link_end} đã được xác minh."
 
 #. Translators: provider_name is the name of a credit provider or university
 #. (e.g. State University)
@@ -15372,22 +15408,20 @@ msgid "View Consent"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Approved"
-msgstr "Trạng thái Xác minh Hiện tại: Được chấp thuận"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX verification has been approved. Your verification is effective for "
-"one year after submission."
+msgid "Current ID Verification Status: Approved"
 msgstr ""
-"Xác minh edX của bạn đã được phê duyệt. Xác minh của bạn có hiệu lực trong "
-"một năm sau khi nộp."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your photo verification expires on {verification_expiry}. Please be aware "
-"photo verification can take up to three days once initiated and you will not"
-" be able to earn a certificate or take a proctored exam until approved."
+"Your edX ID verification has been approved. Your ID verification is "
+"effective for two years after submission."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your photo ID verification expires on {verification_expiry}. Please be aware"
+" photo verification can take up to three days once initiated and you will "
+"not be able to earn a certificate or take a proctored exam until approved."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -15395,48 +15429,40 @@ msgid "Resubmit Verification"
 msgstr "Gửi lại thông tin xác thực"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Pending"
-msgstr "Trạng thái Xác minh Hiện tại: Đang chờ xử lý"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX ID verification is pending. Your verification information has been "
-"submitted and will be reviewed shortly."
+msgid "Current ID Verification Status: Pending"
 msgstr ""
-"Xác minh ID edX của bạn đang chờ xử lý. Thông tin xác minh của bạn đã được "
-"gửi và sẽ sớm được xem xét."
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Denied"
-msgstr "Trạng thái Xác minh Hiện tại: Đã bị từ chối"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification submission was not accepted. To receive a verified "
+"Your edX ID verification is pending. Your ID verification information has "
+"been submitted and will be reviewed shortly."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current ID Verification Status: Denied"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your ID verification submission was not accepted. To receive a verified "
 "certificate, you must submit a new photo of yourself and your government-"
 "issued photo ID before the verification deadline for your course."
 msgstr ""
-"Việc gửi xác minh của bạn không được chấp nhận. Để nhận được chứng chỉ xác "
-"nhận, bạn phải gửi một ảnh mới của mình và ảnh CMT do chính phủ ban hành "
-"trước thời hạn xác minh cho khóa học của bạn."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Your verification was denied for the following reasons:"
-msgstr "Xác minh của bạn đã bị từ chối vì những lý do sau:"
+msgid "Your ID verification was denied for the following reasons:"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Current Verification Status: Expired"
-msgstr "Trạng thái Xác minh Hiện tại: Hết hạn"
+msgid "Current ID Verification Status: Expired"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your verification has expired. To receive a verified certificate, you must "
-"submit a new photo of yourself and your government-issued photo ID before "
-"the verification deadline for your course."
+"Your ID verification has expired. To receive a verified certificate, you "
+"must submit a new photo of yourself and your government-issued photo ID "
+"before the verification deadline for your course."
 msgstr ""
-"Xác minh của bạn đã hết hạn. Để nhận được chứng chỉ xác nhận, bạn phải gửi "
-"một ảnh mới của mình và ảnh CMT do chính phủ ban hành trước thời hạn xác "
-"minh cho khóa học của bạn."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -15921,7 +15947,6 @@ msgid "ID Verification FAQ: {faq_url}"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
@@ -15940,17 +15965,17 @@ msgid "Your order number is: {order_number}"
 msgstr "Số hoá đơn của bạn là: {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Hi {full_name}"
+msgid "Hello {full_name},"
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
+msgid "Your {platform_name} ID verification photos have been approved."
 msgstr ""
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid ""
-"Your verification is effective for one year. It will expire on "
-"{expiration_datetime}"
+"Your approval status remains valid for two years, and it will expire "
+"{expiration_datetime}."
 msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
@@ -16180,13 +16205,6 @@ msgstr ""
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Discover New"
 msgstr ""
-
-#. Translators: This is short for "System administration".
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-msgid "Sysadmin"
-msgstr "Sysadmin"
 
 #: lms/templates/header/navbar-logo-header.html
 msgid "{name} Dashboard"
@@ -16475,15 +16493,6 @@ msgstr "Số phần:"
 msgid "Grade Cutoffs:"
 msgstr "Grade Cutoffs:"
 
-#. Translators: git is a version-control system; see http://git-scm.com/about
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid ""
-"View detailed Git import logs for this course {link_start}by clicking "
-"here{link_end}."
-msgstr ""
-"Xem logs nhập Git chi tiết cho khoá học này bằng cách nhấp vào link "
-"{link_start} {link_end}"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
 msgstr "Lưu ý về khoá học"
@@ -16505,12 +16514,10 @@ msgid "Grading Configuration"
 msgstr "Kết Cấu Điểm"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Click to download a CSV of anonymized student IDs:"
-msgstr "Click to download a CSV of anonymized student IDs:"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Get Student Anonymized IDs CSV"
-msgstr "Nhận được ID CSV học viên ẩn danh ID CSV"
+msgid ""
+"The CSV of anonymized student IDs download has been relocated to the Reports"
+" section below."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Reports"
@@ -16556,6 +16563,14 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
 msgstr "Tải file CSV của học viên có khả năng ghi danh"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Click to download a CSV of anonymized student IDs:"
+msgstr "Click to download a CSV of anonymized student IDs:"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Get Student Anonymized IDs CSV"
+msgstr "Nhận được ID CSV học viên ẩn danh ID CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -16639,6 +16654,10 @@ msgstr "Tạo báo cảo điểm cho vấn đề"
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
 msgstr "Tạo báo cáo dữ liệu ORA"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Generate ORA Summary Report"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -16964,10 +16983,6 @@ msgid ""
 msgstr ""
 "Bạn sẽ không nhận được thông báo trong trường hợp email bị sai, vì vậy hãy "
 "kiểm tra chính tả cẩn thận. "
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Role of the users being enrolled."
-msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -17385,6 +17400,10 @@ msgid "Allowance Section"
 msgstr "Phần Phụ cấp"
 
 #: lms/templates/instructor/instructor_dashboard_2/special_exams.html
+msgid "Student Onboarding Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/special_exams.html
 msgid "Student Special Exam Attempts"
 msgstr "Số lần thử Kỳ thi Đặc biệt dành cho Sinh viên"
 
@@ -17704,22 +17723,6 @@ msgstr ""
 msgid "My Courses"
 msgstr "Các khóa học "
 
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Get the {platform_name} Mobile App!"
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "We'll send you a one time SMS with a link to download the app."
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Mobile phone number"
-msgstr ""
-
-#: lms/templates/learner_dashboard/text-me-fragment.html
-msgid "Send me a text with the link"
-msgstr ""
-
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Thay đổi ngôn ngữ"
@@ -17974,6 +17977,14 @@ msgstr ""
 msgid ""
 "The page that you were looking for was not found. Go back to the "
 "{link_start}homepage{link_end} ."
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Too Many Requests"
+msgstr ""
+
+#: lms/templates/static_templates/429.html
+msgid "Your request has been rate-limited. Please try again later."
 msgstr ""
 
 #: lms/templates/static_templates/about.html
@@ -18355,6 +18366,12 @@ msgstr "Chỉnh sửa mục tiêu khóa học của bạn:"
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Pursue a verified certificate"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+msgid ""
+"Sample verified certificate with your name, the course title, the logo of "
+"the institution and the signatures of the instructors for this course."
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
@@ -19586,6 +19603,10 @@ msgstr "Trang"
 #: cms/templates/edit-tabs.html
 msgid "New Page"
 msgstr "Trang Mới"
+
+#: cms/templates/edit-tabs.html
+msgid "View new Pages and Resources Experience"
+msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -22210,6 +22231,18 @@ msgstr ""
 "Đăng nhập để xem chi tiết nhiệm vụ của bạn hoặc tải về bất kỳ tập tin nào "
 "được tạo ra."
 
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Here are some validations we found with your course content."
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Errors: "
+msgstr ""
+
+#: cms/templates/emails/user_task_complete_email.txt
+msgid "Warnings: "
+msgstr ""
+
 #: cms/templates/emails/user_task_complete_email_subject.txt
 msgid "{platform_name} {studio_name}: Task Status Update"
 msgstr "{platform_name} {studio_name}: Cập nhật Trạng thái Tác vụ"
@@ -22232,6 +22265,14 @@ msgstr ""
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "Create New"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "previous"
+msgstr ""
+
+#: cms/templates/maintenance/_announcement_index.html
+msgid "next"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html

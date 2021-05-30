@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2020 EdX
+# Copyright (C) 2021 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2020 edX
+# Copyright (C) 2021 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2020.
+# EdX Team <info@edx.org>, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-11-22 20:52+0000\n"
-"PO-Revision-Date: 2020-11-22 20:52:49.830515\n"
+"POT-Creation-Date: 2021-05-30 20:51+0000\n"
+"PO-Revision-Date: 2021-05-30 20:51:13.883404\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2640,6 +2640,10 @@ msgid "Subject"
 msgstr "Süßjéçt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+msgid "Select a category"
+msgstr "Séléçt ä çätégörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2669,28 +2673,12 @@ msgid "Financial Aid"
 msgstr "Fïnänçïäl Àïd Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Masters"
-msgstr "Mästérs Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroMasters"
-msgstr "MïçröMästérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "MicroBachelors"
-msgstr "MïçröBäçhélörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Photo Verification"
 msgstr "Phötö Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "Proctoring"
 msgstr "Pröçtörïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-msgid "Security"
-msgstr "Séçürïtý Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: cms/templates/js/asset-library.underscore
@@ -2764,28 +2752,6 @@ msgid "Enter some details for your support request."
 msgstr ""
 "Éntér sömé détäïls för ýöür süppört réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid ""
-"Due to the recent increase in interest in online education and edX, we are "
-"currently experiencing an unusually high volume of support requests. We "
-"appreciate your patience as we work to review each request. Please check the"
-" "
-msgstr ""
-"Düé tö thé réçént ïnçréäsé ïn ïntérést ïn önlïné édüçätïön änd édX, wé äré "
-"çürréntlý éxpérïénçïng än ünüsüällý hïgh völümé öf süppört réqüésts. Wé "
-"äppréçïäté ýöür pätïénçé äs wé wörk tö révïéw éäçh réqüést. Pléäsé çhéçk thé"
-"  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
-
-#: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
-msgid " as many questions may have already been answered."
-msgstr ""
-" äs mäný qüéstïöns mäý hävé älréädý ßéén änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 #: lms/djangoapps/support/static/support/jsx/success.jsx
@@ -3424,18 +3390,17 @@ msgstr "Héädïng Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/ajax-error.js
 msgid ""
-"You have been logged out of your edX account. Click Okay to log in again "
-"now. Click Cancel to stay on this page (you must log in again to save your "
-"work)."
+"You have been logged out of your account. Click Okay to log in again now. "
+"Click Cancel to stay on this page (you must log in again to save your work)."
 msgstr ""
-"Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt. Çlïçk Ökäý tö lög ïn ägäïn "
-"nöw. Çlïçk Çänçél tö stäý ön thïs pägé (ýöü müst lög ïn ägäïn tö sävé ýöür "
-"wörk). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
+"Ýöü hävé ßéén löggéd öüt öf ýöür äççöünt. Çlïçk Ökäý tö lög ïn ägäïn nöw. "
+"Çlïçk Çänçél tö stäý ön thïs pägé (ýöü müst lög ïn ägäïn tö sävé ýöür wörk)."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
@@ -3518,12 +3483,6 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт ł#"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
-msgid "Uploaded file issues. Click on \"+\" to view."
-msgstr ""
-"Ûplöädéd fïlé ïssüés. Çlïçk ön \"+\" tö vïéw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are successfully added to exception list"
 msgstr ""
 " léärnérs äré süççéssfüllý äddéd tö éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -3584,6 +3543,36 @@ msgstr ""
 " léärnér ïs nöt énrölléd ïn çöürsé änd nöt äddéd tö thé éxçéptïön lïst "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners already appear on the certificate invalidation list"
+msgstr ""
+" léärnérs älréädý äppéär ön thé çértïfïçäté ïnvälïdätïön lïst Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner already appears on the certificate invalidation list"
+msgstr ""
+" léärnér älréädý äppéärs ön thé çértïfïçäté ïnvälïdätïön lïst Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learners encountered unknown errors"
+msgstr ""
+" léärnérs énçöüntéréd ünknöwn érrörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid " learner encountered an unknown error"
+msgstr ""
+" léärnér énçöüntéréd än ünknöwn érrör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: lms/static/js/certificates/views/certificate_bulk_whitelist.js
+msgid "Uploaded file issues. Click on \"+\" to view."
+msgstr ""
+"Ûplöädéd fïlé ïssüés. Çlïçk ön \"+\" tö vïéw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "Certificate of <%= user %> has already been invalidated. Please check your "
@@ -3637,16 +3626,16 @@ msgstr ""
 "änd trý ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
-msgid "<%= user %> already in exception list."
+msgid "<%- user %> already in exception list."
 msgstr ""
-"<%= user %> älréädý ïn éxçéptïön lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+"<%- user %> älréädý ïn éxçéptïön lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
-"<%= user %> has been successfully added to the exception list. Click "
+"<%- user %> has been successfully added to the exception list. Click "
 "Generate Exception Certificate below to send the certificate."
 msgstr ""
-"<%= user %> häs ßéén süççéssfüllý äddéd tö thé éxçéptïön lïst. Çlïçk "
+"<%- user %> häs ßéén süççéssfüllý äddéd tö thé éxçéptïön lïst. Çlïçk "
 "Généräté Éxçéptïön Çértïfïçäté ßélöw tö sénd thé çértïfïçäté. Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/js/course_survey.js
@@ -3734,10 +3723,10 @@ msgstr ""
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
-"The refund deadline for this course has passed,so you will not receive a "
+"The refund deadline for this course has passed, so you will not receive a "
 "refund."
 msgstr ""
-"Thé réfünd déädlïné för thïs çöürsé häs pässéd,sö ýöü wïll nöt réçéïvé ä "
+"Thé réfünd déädlïné för thïs çöürsé häs pässéd, sö ýöü wïll nöt réçéïvé ä "
 "réfünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/static/js/dashboard/legacy.js
@@ -4008,10 +3997,10 @@ msgid "Recent Activity"
 msgstr "Réçént Àçtïvïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
+msgid "No results found for \"{query_string}\". Please try searching again."
 msgstr ""
-"Nö résülts föünd för \"%(query_string)s\". Pléäsé trý séärçhïng ägäïn. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Nö résülts föünd för \"{query_string}\". Pléäsé trý séärçhïng ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: openedx/features/course_search/static/course_search/templates/dashboard_search_results.underscore
@@ -4319,6 +4308,12 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/data_download.js
+msgid "Error generating anonymous IDs. Please try again."
+msgstr ""
+"Érrör générätïng änönýmöüs ÌDs. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download_2.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
@@ -4571,12 +4566,6 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: lms/static/js/instructor_dashboard/membership.js
-msgid "Role field should not be left unselected."
-msgstr ""
-"Rölé fïéld shöüld nöt ßé léft ünséléçtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr ""
 "Érrör énröllïng/ünénröllïng üsérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
@@ -4799,11 +4788,11 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
-"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+"Error resetting problem attempts for problem '<%- problem_id %>' and student"
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"Érrör réséttïng prößlém ättémpts för prößlém '<%= problem_id %>' änd stüdént"
+"Érrör réséttïng prößlém ättémpts för prößlém '<%- problem_id %>' änd stüdént"
 " '<%- student_id %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré"
 " çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
 "єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
@@ -5175,6 +5164,18 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid ""
+"To access the courses available to you through {enterpriseName}, visit the "
+"{enterpriseName} dashboard."
+msgstr ""
+"Tö äççéss thé çöürsés äväïläßlé tö ýöü thröügh {enterpriseName}, vïsït thé "
+"{enterpriseName} däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "Go to dashboard"
+msgstr "Gö tö däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/learner_dashboard/models/course_card_model.js
 msgid "(Self-paced) Starts {start}"
@@ -6790,9 +6791,9 @@ msgstr ""
 "Pléäsé éntér nön-négätïvé ïntégér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%= types %> assignments than are assigned."
+msgid "Cannot drop more <%- types %> assignments than are assigned."
 msgstr ""
-"Çännöt dröp möré <%= types %> ässïgnménts thän äré ässïgnéd. Ⱡ'σяєм ιρѕυм "
+"Çännöt dröp möré <%- types %> ässïgnménts thän äré ässïgnéd. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -7360,8 +7361,8 @@ msgid "Highlights for {display_name}"
 msgstr "Hïghlïghts för {display_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-msgid "Enable Weekly Highlight Emails"
-msgstr "Énäßlé Wééklý Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Enable Course Highlight Emails"
+msgstr "Énäßlé Çöürsé Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -11196,8 +11197,8 @@ msgid "Copy Component Location"
 msgstr "Çöpý Çömpönént Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/course-highlights-enable.underscore
-msgid "Weekly Highlight Emails"
-msgstr "Wééklý Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+msgid "Course Highlight Emails"
+msgstr "Çöürsé Hïghlïght Émäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: cms/templates/js/course-highlights-enable.underscore
 msgid "Enabled"
@@ -11775,14 +11776,6 @@ msgstr ""
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "délété gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/js/highlights-editor.underscore
-msgid ""
-"This feature is currently in testing. Course teams can enter highlights, but"
-" learners will not receive email messages."
-msgstr ""
-"Thïs féätüré ïs çürréntlý ïn téstïng. Çöürsé téäms çän éntér hïghlïghts, ßüt"
-" léärnérs wïll nöt réçéïvé émäïl méssägés. Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/js/highlights-editor.underscore
 msgid ""
