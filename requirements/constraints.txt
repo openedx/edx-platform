@@ -82,3 +82,6 @@ django-webpack-loader==0.7.0
 # edx-proctoring==3.11.4 (latest) requires PyJWT<2.0.0
 PyJWT[crypto]<2.0.0
 social-auth-core<4.0.0  # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
+
+# celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
+click<8.0.0
