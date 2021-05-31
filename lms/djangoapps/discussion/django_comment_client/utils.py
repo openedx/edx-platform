@@ -20,6 +20,7 @@ from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from lms.djangoapps.discussion.django_comment_client.permissions import (
+    CAN_REPORT,
     check_permissions_by_view,
     get_team,
     has_permission
@@ -604,7 +605,7 @@ def get_ability(course_id, content, user):
             course_id,
             content,
             "flag_abuse_for_thread" if content['type'] == 'thread' else "flag_abuse_for_comment"
-        ) or GlobalStaff().has_user(user))
+        ) or user.has_perm(CAN_REPORT))
     }
 
 # TODO: RENAME

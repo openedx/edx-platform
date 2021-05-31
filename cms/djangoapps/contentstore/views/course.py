@@ -32,7 +32,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 
-from cms.djangoapps.contentstore.permissions import CREATE_COURSE, REINDEX_COURSE, RERUN_COURSE
+from cms.djangoapps.contentstore.permissions import ACCESS_COURSE, EDIT_COURSE, REINDEX_COURSE, RERUN_COURSE, OPTIMIZE_COURSE_LIST, RERUN_CREATOR_STATUS
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -517,7 +517,7 @@ def course_listing(request):
     List all courses and libraries available to the logged in user
     """
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and \
+    optimization_enabled = request.user.has_perm(OPTIMIZE_COURSE_LIST) and \
         LegacyWaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled('enable_global_staff_optimization')
 
     org = request.GET.get('org', '') if optimization_enabled else None
@@ -565,7 +565,7 @@ def course_listing(request):
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
-        'rerun_creator_status': GlobalStaff().has_user(user),
+        'rerun_creator_status': user.has_perm(RERUN_CREATOR_STATUS),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'optimization_enabled': optimization_enabled,
@@ -592,7 +592,7 @@ def library_listing(request):
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'archived_courses': True,
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'rerun_creator_status': GlobalStaff().has_user(request.user),
+        'rerun_creator_status': request.user.has_perm(RERUN_CREATOR_STATUS),
         'split_studio_home': split_library_view_on_dashboard(),
         'active_tab': 'libraries'
     }
@@ -674,7 +674,7 @@ def course_index(request, course_key):
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
-            if GlobalStaff().has_user(request.user):
+            if request.user.has_perm(REINDEX_COURSE):
                 reindex_link = f"/course/{str(course_key)}/search_reindex"
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
@@ -747,7 +747,7 @@ def get_courses_accessible_to_user(request, org=None):
             returned), an empty string will result in no courses, and otherwise only courses with the
             specified org will be returned. The default value is None.
     """
-    if GlobalStaff().has_user(request.user):
+    if request.user.has_perm(ACCESS_COURSE):
         # user has global access so no need to get courses from django groups
         courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
     else:
@@ -850,7 +850,7 @@ def _create_or_rerun_course(request):
     Returns the destination course_key and overriding fields for the new course.
     Raises DuplicateCourseError and InvalidKeyError
     """
-    if not request.user.has_perm(CREATE_COURSE):
+    if not auth.user_has_role(request.user, CourseCreatorRole()):
         raise PermissionDenied()
 
     try:
@@ -1131,7 +1131,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             )
 
             about_page_editable = not publisher_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
+            enrollment_end_editable = request.user.has_perm(EDIT_COURSE) or not publisher_enabled
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',

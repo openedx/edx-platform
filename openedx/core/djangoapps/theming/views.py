@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from web_fragments.fragment import Fragment
 
+from openedx.core.djangoapps.theming.permissions import PREVIEW_THEME
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference,
@@ -40,7 +41,7 @@ def user_can_preview_themes(user):
         return True
 
     # Otherwise, only global staff can preview themes
-    return GlobalStaff().has_user(user)
+    return user.has_perm(PREVIEW_THEME)
 
 
 def get_user_preview_site_theme(request):

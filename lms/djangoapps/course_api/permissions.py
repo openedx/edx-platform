@@ -2,9 +2,11 @@
 Course API Authorization functions
 """
 
-
+from bridgekeeper import perms, rules
 from common.djangoapps.student.roles import GlobalStaff
 
+is_user_active = rules.is_authenticated & rules.is_active
+is_global_staff = is_user_active & rules.is_staff
 
 def can_view_courses_for_username(requesting_user, target_username):
     """
@@ -34,3 +36,7 @@ def can_view_courses_for_username(requesting_user, target_username):
     else:
         staff = GlobalStaff()
         return staff.has_user(requesting_user)
+
+PREVIEW_COURSE_KEY = 'course_api.preview_course_key'
+
+perms[PREVIEW_COURSE_KEY] = is_global_staff

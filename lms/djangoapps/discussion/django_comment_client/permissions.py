@@ -5,6 +5,7 @@ Module for checking permissions with the comment_client backend
 
 import logging
 
+from bridgekeeper import perms, rules
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from opaque_keys.edx.keys import CourseKey
 
@@ -16,6 +17,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.lib.cache_utils import request_cached
 
+
+is_user_active = rules.is_authenticated & rules.is_active
+is_global_staff = is_user_active & rules.is_staff
 
 def has_permission(user, permission, course_id=None):  # lint-amnesty, pylint: disable=missing-function-docstring
     assert isinstance(course_id, (type(None), CourseKey))
@@ -200,3 +204,6 @@ def check_permissions_by_view(user, course_id, content, name, group_id=None, con
     assert isinstance(course_id, CourseKey)
     p = VIEW_PERMISSIONS.get(name)
     return _check_conditions_permissions(user, p, course_id, content, group_id, content_user_group)
+
+CAN_REPORT = 'discussion.can_report'
+perms[CAN_REPORT] = is_global_staff

@@ -25,7 +25,7 @@ from openedx.core.lib.api.view_utils import LazySequence
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .permissions import can_view_courses_for_username
+from .permissions import can_view_courses_for_username, PREVIEW_COURSE_KEY
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -173,7 +173,7 @@ def list_course_keys(request, username, role):
     all_course_keys = CourseOverview.get_all_course_keys()
 
     # Global staff have access to all courses. Filter courses for non-global staff.
-    if GlobalStaff().has_user(user):
+    if user.has_perm(PREVIEW_COURSE_KEY):
         return all_course_keys
 
     if role == 'staff':

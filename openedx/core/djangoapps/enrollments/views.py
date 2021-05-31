@@ -24,6 +24,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.forms import CourseEnrollmentsApiListForm
 from openedx.core.djangoapps.enrollments.paginators import CourseEnrollmentsApiListPagination
+from openedx.core.djangoapps.enrollments.permissions import VIEW_ENROLLMENT_DATA, CREATE_ENROLLMENT, DEACTIVATE_ENROLLMENT
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentsApiListSerializer
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
@@ -649,7 +650,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username)
                 }
             )
-        if username == request.user.username or GlobalStaff().has_user(request.user) or \
+        if username == request.user.username or request.user.has_perm(VIEW_ENROLLMENT_DATA) or \
                 self.has_api_key_permissions(request):
             return Response(enrollment_data)
         filtered_data = []
@@ -695,13 +696,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         if not username:
             username = request.user.username
         if username != request.user.username and not has_api_key_permissions \
-                and not GlobalStaff().has_user(request.user):
+                and not request.user.has_perm(VIEW_ENROLLMENT_DATA):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if mode not in (CourseMode.AUDIT, CourseMode.HONOR, None) and not has_api_key_permissions \
-                and not GlobalStaff().has_user(request.user):
+                and not request.user.has_perm(CREATE_ENROLLMENT):
             return Response(
                 status=status.HTTP_403_FORBIDDEN,
                 data={
@@ -766,7 +767,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     for attr in enrollment_attributes
                 ]
                 missing_attrs = set(REQUIRED_ATTRIBUTES.get(mode, [])) - set(actual_attrs)
-            if (GlobalStaff().has_user(request.user) or has_api_key_permissions) and (mode_changed or active_changed):
+            if (request.user.has_perm(DEACTIVATE_ENROLLMENT) or has_api_key_permissions) and (mode_changed or active_changed):
                 if mode_changed and active_changed and not is_active:
                     # if the requester wanted to deactivate but specified the wrong mode, fail
                     # the request (on the assumption that the requester had outdated information
