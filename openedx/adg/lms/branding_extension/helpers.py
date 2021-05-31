@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from common.djangoapps.edxmako.shortcuts import marketing_link
+from openedx.adg.lms.branding_extension.constants import TARGET_BLANK, TARGET_SELF
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -21,18 +22,20 @@ def get_footer_navigation_links():
         List, which contains dictionaries of url
     """
     links = [
-        (marketing_link('ABOUT'), _('About')),
-        (reverse('our_team'), _('Our Team')),
-        (marketing_link('TOS'), _('Terms')),
-        (marketing_link('CONTACT'), _('Contact')),
+        (marketing_link('ABOUT'), _('About'), TARGET_SELF),
+        (reverse('our_team'), _('Our Team'), TARGET_SELF),
+        (marketing_link('CONTACT'), _('Contact'), TARGET_SELF),
+        (settings.SUPPORT_LINK, _('Support'), TARGET_BLANK),
+        (marketing_link('TOS'), _('Terms'), TARGET_SELF),
     ]
 
     return [
         {
             'url': link_url,
             'title': link_title,
+            'target': target,
         }
-        for link_url, link_title in links
+        for link_url, link_title, target in links
     ]
 
 
