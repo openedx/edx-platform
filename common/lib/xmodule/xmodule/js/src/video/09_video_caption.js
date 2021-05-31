@@ -598,6 +598,7 @@
                             self.state.el.find('.lang').hide();
                             self.state.el.find('.transcript-control').hide();
                             self.subtitlesEl.hide();
+                            self.hideClosedCaptions();
                         }
                     }
                 });
