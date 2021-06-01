@@ -1,43 +1,47 @@
+
+
+import codecs
+import glob
 import hashlib
+import io
 import itertools
 import json
 import logging
 import os
 import re
 import sys
-import glob
-
 from collections import defaultdict
-from cStringIO import StringIO
-from fs.osfs import OSFS
-from importlib import import_module
-from lxml import etree
-from path import Path as path
 from contextlib import contextmanager
+from importlib import import_module
+
+import six
+from django.utils.encoding import python_2_unicode_compatible
+from fs.osfs import OSFS
 from lazy import lazy
+from lxml import etree
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from path import Path as path
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+from xblock.runtime import DictKeyValueStore
 
 from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import make_error_tracker, exc_info_to_str
+from xmodule.errortracker import exc_info_to_str, make_error_tracker
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import (
-    XMLParsingSystem, policy_key,
-    OpaqueKeyReader, AsideKeyGenerator, DEPRECATION_VSCOMPAT_EVENT
-)
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT, ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase, LIBRARY_ROOT, COURSE_ROOT
 from xmodule.tabs import CourseTabList
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import CourseLocator, LibraryLocator, BlockUsageLocator
-
-from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore
-from xblock.fields import ScopeIds
-
-import dogstats_wrapper as dog_stats_api
+from xmodule.x_module import (
+    DEPRECATION_VSCOMPAT_EVENT,
+    AsideKeyGenerator,
+    OpaqueKeyReader,
+    XMLParsingSystem,
+    policy_key
+)
 
 from .exceptions import ItemNotFoundError
-from .inheritance import compute_inherited_metadata, inheriting_field_data, InheritanceKeyValueStore
-
+from .inheritance import InheritanceKeyValueStore, compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -45,21 +49,6 @@ edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
 etree.set_default_parser(edx_xml_parser)
 
 log = logging.getLogger(__name__)
-
-
-# VS[compat]
-# TODO (cpennington): Remove this once all fall 2012 courses have been imported
-# into the cms from xml
-def clean_out_mako_templating(xml_string):
-    orig_xml = xml_string
-    xml_string = xml_string.replace('%include', 'include')
-    xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
-    if orig_xml != xml_string:
-        dog_stats_api.increment(
-            DEPRECATION_VSCOMPAT_EVENT,
-            tags=["location:xml_clean_out_mako_templating"]
-        )
-    return xml_string
 
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
@@ -125,20 +114,12 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 def fallback_name(orig_name=None):
                     """Return the fallback name for this module.  This is a function instead of a variable
                     because we want it to be lazy."""
-                    dog_stats_api.increment(
-                        DEPRECATION_VSCOMPAT_EVENT,
-                        tags=(
-                            "location:import_system_fallback_name",
-                            u"name:{}".format(orig_name),
-                        )
-                    )
-
                     if looks_like_fallback(orig_name):
                         # We're about to re-hash, in case something changed, so get rid of the tag_ and hash
                         orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
-                    xml_bytes = xml.encode('utf8')
+                    xml_bytes = xml if isinstance(xml, bytes) else xml.encode('utf-8')
                     return tag + orig_name + "_" + hashlib.sha1(xml_bytes).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
@@ -182,10 +163,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 xml_data.set('url_name', url_name)
 
             try:
-                # VS[compat]
-                # TODO (cpennington): Remove this once all fall 2012 courses
-                # have been imported into the cms from xml
-                xml = clean_out_mako_templating(xml)
                 xml_data = etree.fromstring(xml)
 
                 make_name_unique(xml_data)
@@ -205,14 +182,14 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 msg = "Error loading from xml. %s"
                 log.warning(
                     msg,
-                    unicode(err)[:200],
+                    six.text_type(err)[:200],
                     # Normally, we don't want lots of exception traces in our logs from common
                     # content problems.  But if you're debugging the xml loading code itself,
                     # uncomment the next line.
                     # exc_info=True
                 )
 
-                msg = msg % (unicode(err)[:200])
+                msg = msg % (six.text_type(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
@@ -292,7 +269,7 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     def create_definition(self, block_type, slug=None):
         assert block_type is not None
         if slug is None:
-            slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
+            slug = 'autogen_{}_{}'.format(block_type, next(self.autogen_ids))
         return self.course_id.make_usage_key(block_type, slug)
 
     def get_definition_id(self, usage_id):
@@ -326,6 +303,7 @@ class CourseImportLocationManager(CourseLocationManager):
         self.target_course_id = target_course_id
 
 
+@python_2_unicode_compatible
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
@@ -402,7 +380,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_descriptor = self.load_course(course_dir, course_ids, errorlog.tracker, target_course_id)
         except Exception as exc:  # pylint: disable=broad-except
             msg = "ERROR: Failed to load courselike '{0}': {1}".format(
-                course_dir.encode("utf-8"), unicode(exc)
+                course_dir.encode("utf-8"), six.text_type(exc)
             )
             log.exception(msg)
             errorlog.tracker(msg)
@@ -419,11 +397,11 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = self.id_from_descriptor(course_descriptor)
             self._course_errors[course_id] = errorlog
 
-    def __unicode__(self):
+    def __str__(self):
         '''
         String representation - for debugging
         '''
-        return '<%s data_dir=%r, %d courselikes, %d modules>' % (
+        return '<%s data_dir=%r, %d courselikes, %d modules>' % (  # xss-lint: disable=python-interpolate-html
             self.__class__.__name__, self.data_dir, len(self.courses), len(self.modules)
         )
 
@@ -461,12 +439,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.debug('========> Starting courselike import from %s', course_dir)
         with open(self.data_dir / course_dir / self.parent_xml) as course_file:
-
-            # VS[compat]
-            # TODO (cpennington): Remove this once all fall 2012 courses have
-            # been imported into the cms from xml
-            course_file = StringIO(clean_out_mako_templating(course_file.read()))
-
             course_data = etree.parse(course_file, parser=edx_xml_parser).getroot()
 
             org = course_data.get('org')
@@ -506,32 +478,12 @@ class XMLModuleStore(ModuleStoreReadBase):
 
                 # VS[compat]: remove once courses use the policy dirs.
                 if policy == {}:
-
-                    dog_stats_api.increment(
-                        DEPRECATION_VSCOMPAT_EVENT,
-                        tags=(
-                            "location:xml_load_course_policy_dir",
-                            u"course:{}".format(course),
-                        )
-                    )
-
                     old_policy_path = self.data_dir / course_dir / 'policies' / '{0}.json'.format(url_name)
                     policy = self.load_policy(old_policy_path, tracker)
             else:
                 policy = {}
                 # VS[compat] : 'name' is deprecated, but support it for now...
                 if course_data.get('name'):
-
-                    dog_stats_api.increment(
-                        DEPRECATION_VSCOMPAT_EVENT,
-                        tags=(
-                            "location:xml_load_course_course_data_name",
-                            u"course:{}".format(course_data.get('course')),
-                            u"org:{}".format(course_data.get('org')),
-                            u"name:{}".format(course_data.get('name')),
-                        )
-                    )
-
                     url_name = BlockUsageLocator.clean(course_data.get('name'))
                     tracker("'name' is deprecated for module xml.  Please use "
                             "display_name and url_name.")
@@ -675,7 +627,7 @@ class XMLModuleStore(ModuleStoreReadBase):
             if filepath.endswith('~'):  # skip *~ files
                 continue
 
-            with open(filepath) as f:
+            with io.open(filepath) as f:
                 try:
                     if filepath.find('.json') != -1:
                         # json file with json data content
@@ -686,7 +638,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                             try:
                                 # get and update data field in xblock runtime
                                 module = system.load_item(loc)
-                                for key, value in data_content.iteritems():
+                                for key, value in six.iteritems(data_content):
                                     setattr(module, key, value)
                                 module.save()
                             except ItemNotFoundError:
@@ -697,7 +649,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                         slug = os.path.splitext(os.path.basename(filepath))[0]
                         loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
                         # html file with html data content
-                        html = f.read().decode('utf-8')
+                        html = f.read()
                         try:
                             module = system.load_item(loc)
                             module.data = html
@@ -719,14 +671,6 @@ class XMLModuleStore(ModuleStoreReadBase):
                         # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                         # from the course policy
                         if category == "static_tab":
-                            dog_stats_api.increment(
-                                DEPRECATION_VSCOMPAT_EVENT,
-                                tags=(
-                                    "location:xml_load_extra_content_static_tab",
-                                    u"course_dir:{}".format(course_dir),
-                                )
-                            )
-
                             tab = CourseTabList.get_tab_by_slug(tab_list=course_descriptor.tabs, url_slug=slug)
                             if tab:
                                 module.display_name = tab.name
@@ -737,8 +681,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                         self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception as exc:  # pylint: disable=broad-except
                     logging.exception("Failed to load %s. Skipping... \
-                            Exception: %s", filepath, unicode(exc))
-                    system.error_tracker("ERROR: " + unicode(exc))
+                            Exception: %s", filepath, six.text_type(exc))
+                    system.error_tracker("ERROR: " + six.text_type(exc))
 
     def has_item(self, usage_key):
         """
@@ -812,7 +756,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 for fields in [settings, content, qualifiers]
             )
 
-        for mod_loc, module in self.modules[course_id].iteritems():
+        for mod_loc, module in six.iteritems(self.modules[course_id]):
             if _block_matches_all(mod_loc, module):
                 items.append(module)
 
@@ -839,7 +783,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
         """
-        return self.courses.values()
+        return list(self.courses.values())
 
     def get_course_summaries(self, **kwargs):
         """
@@ -898,7 +842,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         return {'xml': True}
 
     @contextmanager
-    def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
+    def branch_setting(self, branch_setting, course_id=None):
         """
         A context manager for temporarily setting the branch value for the store to the given branch_setting.
         """

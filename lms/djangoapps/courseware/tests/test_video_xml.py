@@ -14,11 +14,10 @@ You can then use the CourseFactory and XModuleItemFactory as defined in
 common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
-from nose.plugins.attrib import attr
 
-from xmodule.tests import LogicTest
-from xmodule.video_module import VideoDescriptor
 
+from django.test import TestCase
+from xmodule.video_module import VideoBlock
 
 SOURCE_XML = """
     <video show_captions="true"
@@ -26,7 +25,7 @@ SOURCE_XML = """
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
     download_video="true"
-    start_time="01:00:03" end_time="01:00:10"
+    start_time="3603.0" end_time="3610.0"
     >
         <source src="example.mp4"/>
         <source src="example.webm"/>
@@ -35,11 +34,8 @@ SOURCE_XML = """
 """
 
 
-@attr(shard=1)
-class VideoModuleLogicTest(LogicTest):
-    """Tests for logic of Video Xmodule."""
-
-    descriptor_class = VideoDescriptor
+class VideoBlockLogicTest(TestCase):
+    """Tests for logic of VideoBlock."""
 
     raw_field_data = {
         'data': '<video />'
@@ -48,7 +44,7 @@ class VideoModuleLogicTest(LogicTest):
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': 'ZwkTiUPN0mg',
                                   '1.25': 'rsq9auxASqI',
@@ -60,7 +56,7 @@ class VideoModuleLogicTest(LogicTest):
         empty string.
         """
         youtube_str = '0.75:jNCf2gIqpeE'
-        output = VideoDescriptor._parse_youtube(youtube_str)
+        output = VideoBlock._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': '',
                                   '1.25': '',
@@ -73,8 +69,8 @@ class VideoModuleLogicTest(LogicTest):
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
         self.assertEqual(
-            VideoDescriptor._parse_youtube(youtube_str),
-            VideoDescriptor._parse_youtube(youtube_str_hack)
+            VideoBlock._parse_youtube(youtube_str),
+            VideoBlock._parse_youtube(youtube_str_hack)
         )
 
     def test_parse_youtube_empty(self):
@@ -82,7 +78,7 @@ class VideoModuleLogicTest(LogicTest):
         Some courses have empty youtube attributes, so we should handle
         that well.
         """
-        self.assertEqual(VideoDescriptor._parse_youtube(''),
+        self.assertEqual(VideoBlock._parse_youtube(''),
                          {'0.75': '',
                           '1.00': '',
                           '1.25': '',

@@ -1,6 +1,7 @@
 """
 Test cases for image processing functions in the profile image package.
 """
+
 from contextlib import closing
 from itertools import product
 import os
@@ -11,7 +12,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 import ddt
 import mock
-from nose.plugins.attrib import attr
 import piexif
 from PIL import Image
 from six import text_type
@@ -29,7 +29,6 @@ from ..images import (
 from .helpers import make_image_file, make_uploaded_file
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class TestValidateUploadedImage(TestCase):
@@ -125,7 +124,6 @@ class TestValidateUploadedImage(TestCase):
             self.assertEqual(text_type(ctx.exception), file_upload_bad_mimetype)
 
 
-@attr(shard=2)
 @ddt.ddt
 @skip_unless_lms
 class TestGenerateProfileImages(TestCase):
@@ -223,12 +221,12 @@ class TestGenerateProfileImages(TestCase):
                 yield name, image
 
 
-@attr(shard=2)
 @skip_unless_lms
 class TestRemoveProfileImages(TestCase):
     """
     Test remove_profile_images
     """
+
     def test_remove(self):
         """
         Ensure that the outcome of calling the function is that the named images
@@ -246,5 +244,5 @@ class TestRemoveProfileImages(TestCase):
         ):
             remove_profile_images(requested_sizes)
             deleted_names = [v[0][0] for v in mock_storage.delete.call_args_list]
-            self.assertEqual(requested_sizes.values(), deleted_names)
+            self.assertEqual(list(requested_sizes.values()), deleted_names)
             mock_storage.save.reset_mock()

@@ -3,20 +3,20 @@ Command to recalculate grades for all subsections with problem submissions
 in the specified time range.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
 from datetime import datetime
 
+import six
 from django.core.management.base import BaseCommand, CommandError
 from pytz import utc
+from submissions.models import Submission
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from student.models import user_by_anonymous_id
-from submissions.models import Submission
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 from util.date_utils import to_timestamp
 
@@ -62,14 +62,17 @@ class Command(BaseCommand):
         set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
         kwargs = {'modified__range': (modified_start, modified_end), 'module_type': 'problem'}
         for record in StudentModule.objects.filter(**kwargs):
+            if not record.course_id.is_course:
+                # This is not a course, so we don't store subsection grades for it.
+                continue
             task_args = {
                 "user_id": record.student_id,
-                "course_id": unicode(record.course_id),
-                "usage_id": unicode(record.module_state_key),
+                "course_id": six.text_type(record.course_id),
+                "usage_id": six.text_type(record.module_state_key),
                 "only_if_higher": False,
                 "expected_modified_time": to_timestamp(record.modified),
                 "score_deleted": False,
-                "event_transaction_id": unicode(event_transaction_id),
+                "event_transaction_id": six.text_type(event_transaction_id),
                 "event_transaction_type": PROBLEM_SUBMITTED_EVENT_TYPE,
                 "score_db_table": ScoreDatabaseTableEnum.courseware_student_module,
             }
@@ -77,15 +80,18 @@ class Command(BaseCommand):
 
         kwargs = {'created_at__range': (modified_start, modified_end)}
         for record in Submission.objects.filter(**kwargs):
+            if not record.student_item.course_id.is_course:
+                # This is not a course, so ignore it
+                continue
             task_args = {
                 "user_id": user_by_anonymous_id(record.student_item.student_id).id,
                 "anonymous_user_id": record.student_item.student_id,
-                "course_id": unicode(record.student_item.course_id),
-                "usage_id": unicode(record.student_item.item_id),
+                "course_id": six.text_type(record.student_item.course_id),
+                "usage_id": six.text_type(record.student_item.item_id),
                 "only_if_higher": False,
                 "expected_modified_time": to_timestamp(record.created_at),
                 "score_deleted": False,
-                "event_transaction_id": unicode(event_transaction_id),
+                "event_transaction_id": six.text_type(event_transaction_id),
                 "event_transaction_type": PROBLEM_SUBMITTED_EVENT_TYPE,
                 "score_db_table": ScoreDatabaseTableEnum.submissions,
             }

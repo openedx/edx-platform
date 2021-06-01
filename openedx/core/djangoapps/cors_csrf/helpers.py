@@ -1,7 +1,9 @@
 """Helper methods for CORS and CSRF checks. """
+
+
 import contextlib
 import logging
-import urlparse
+import six.moves.urllib.parse  # pylint: disable=import-error
 
 from django.conf import settings
 
@@ -24,7 +26,7 @@ def is_cross_domain_request_allowed(request):
 
     """
     referer = request.META.get('HTTP_REFERER')
-    referer_parts = urlparse.urlparse(referer) if referer else None
+    referer_parts = six.moves.urllib.parse.urlparse(referer) if referer else None
     referer_hostname = referer_parts.hostname if referer_parts is not None else None
 
     # Use CORS_ALLOW_INSECURE *only* for development and testing environments;

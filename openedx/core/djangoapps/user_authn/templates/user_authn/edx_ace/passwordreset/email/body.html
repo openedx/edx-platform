@@ -1,0 +1,60 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% trans "Password Reset" as tmsg %}{{ tmsg | force_escape }}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}You're receiving this e-mail because you requested a password reset for your user account at {{ platform_name }}.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            {% if failed %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% filter force_escape %}
+                    {% blocktrans %}However, there is currently no user account associated with your email address: {{ email_address }}.{% endblocktrans %}
+                    {% endfilter %}
+                    <br />
+                </p>
+
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you did not request this change, you can ignore this email." as tmsg %}{{ tmsg | force_escape }}
+                    <br />
+                </p>
+            {% else %}
+                <p style="color: rgba(0,0,0,.75);">
+                    {% trans "If you didn't request this change, you can disregard this email - we have not yet reset your password." as tmsg %}{{ tmsg | force_escape }}
+                    <br />
+                </p>
+                {# xss-lint: disable=django-trans-missing-escape #}
+                {% trans "Change my Password" as course_cta_text %}
+
+                {# email client support for style sheets is pretty spotty, so we have to inline all of these styles #}
+                <a href="{{ reset_link }}" style="
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    -webkit-border-radius: 4px;
+                    -moz-border-radius: 4px;
+                    background-color: #005686;
+                    border-top: 12px solid #005686;
+                    border-bottom: 12px solid #005686;
+                    border-right: 50px solid #005686;
+                    border-left: 50px solid #005686;
+                    display: inline-block;
+                ">
+                    {# old email clients require the use of the font tag :( #}
+                    <font color="#ffffff"><b>{{ course_cta_text }}</b></font>
+                </a>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endblock %}

@@ -133,13 +133,22 @@
             },
 
             goHome: function() {
-                var url = DiscussionUtil.urlFor('notifications_status', window.user.get('id'));
                 HtmlUtils.append(this.$('.forum-content').empty(), HtmlUtils.template(discussionHomeTemplate)({}));
                 this.$('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
-                    .remove();
+                  .remove();
+                this.setupForumDigestSettings(window.user.get('id'));
+            },
+            setupForumDigestSettings: function(userId) {
+                if (window.ENABLE_FORUM_DAILY_DIGEST === false) {
+                    return;
+                }
                 this.$('input.email-setting').bind('click', this.discussionThreadListView.updateEmailNotifications);
+                this.getUserNotificationSettings(userId);
+            },
+
+            getUserNotificationSettings: function(userId) {
                 DiscussionUtil.safeAjax({
-                    url: url,
+                    url: DiscussionUtil.urlFor('notifications_status', userId),
                     type: 'GET',
                     success: function(response) {
                         $('input.email-setting').prop('checked', response.status);

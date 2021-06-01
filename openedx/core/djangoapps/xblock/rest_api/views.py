@@ -1,0 +1,138 @@
+"""
+Views that implement a RESTful API for interacting with XBlocks.
+
+Note that these views are only for interacting with existing blocks. Other
+Studio APIs cover use cases like adding/deleting/editing blocks.
+"""
+
+
+from django.contrib.auth import get_user_model
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import permissions
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.exceptions import PermissionDenied, AuthenticationFailed
+from rest_framework.response import Response
+from xblock.django.request import DjangoWebobRequest, webob_to_django_response
+
+from opaque_keys.edx.keys import UsageKey
+from openedx.core.lib.api.view_utils import view_auth_classes
+from ..api import (
+    get_block_metadata,
+    get_handler_url as _get_handler_url,
+    load_block,
+    render_block_view as _render_block_view,
+)
+from ..utils import validate_secure_token_for_xblock_handler
+
+User = get_user_model()
+
+
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+@permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
+def block_metadata(request, usage_key_str):
+    """
+    Get metadata about the specified block.
+
+    Accepts an "include" query parameter which must be a comma separated list of keys to include. Valid keys are
+    "index_dictionary" and "student_view_data".
+    """
+    usage_key = UsageKey.from_string(usage_key_str)
+    block = load_block(usage_key, request.user)
+    includes = request.GET.get("include", "").split(",")
+    metadata_dict = get_block_metadata(block, includes=includes)
+    if 'children' in metadata_dict:
+        metadata_dict['children'] = [str(key) for key in metadata_dict['children']]
+    if 'editable_children' in metadata_dict:
+        metadata_dict['editable_children'] = [str(key) for key in metadata_dict['editable_children']]
+    return Response(metadata_dict)
+
+
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+@permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
+def render_block_view(request, usage_key_str, view_name):
+    """
+    Get the HTML, JS, and CSS needed to render the given XBlock.
+    """
+    usage_key = UsageKey.from_string(usage_key_str)
+    block = load_block(usage_key, request.user)
+    fragment = _render_block_view(block, view_name, request.user)
+    response_data = get_block_metadata(block)
+    response_data.update(fragment.to_dict())
+    return Response(response_data)
+
+
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+def get_handler_url(request, usage_key_str, handler_name):
+    """
+    Get an absolute URL which can be used (without any authentication) to call
+    the given XBlock handler.
+
+    The URL will expire but is guaranteed to be valid for a minimum of 2 days.
+    """
+    usage_key = UsageKey.from_string(usage_key_str)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user)
+    return Response({"handler_url": handler_url})
+
+
+# We cannot use DRF for this endpoint because its Request object is incompatible
+# with the API expected by XBlock handlers.
+# See https://github.com/edx/edx-platform/pull/19253
+# and https://github.com/edx/XBlock/pull/383 for context.
+@csrf_exempt
+@xframe_options_exempt
+def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix):
+    """
+    Run an XBlock's handler and return the result
+
+    This endpoint has a unique authentication scheme that involves a temporary
+    auth token included in the URL (see below). As a result it can be exempt
+    from CSRF, session auth, and JWT/OAuth.
+    """
+    usage_key = UsageKey.from_string(usage_key_str)
+
+    # To support sandboxed XBlocks, custom frontends, and other use cases, we
+    # authenticate requests using a secure token in the URL. see
+    # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
+    # for details and rationale.
+    if not validate_secure_token_for_xblock_handler(user_id, usage_key_str, secure_token):
+        raise PermissionDenied("Invalid/expired auth token.")
+    if request.user.is_authenticated:
+        # The user authenticated twice, e.g. with session auth and the token.
+        # This can happen if not running the XBlock in a sandboxed iframe.
+        # Just make sure the session auth matches the token:
+        if request.user.id != int(user_id):
+            raise AuthenticationFailed("Authentication conflict.")
+        user = request.user
+    elif user_id.isdigit():
+        # This is a normal (integer) user ID for a registered user.
+        # This is the "normal" way this view gets used, with a sandboxed iframe.
+        user = User.objects.get(pk=int(user_id))
+    elif user_id.startswith("anon"):
+        # This is a non-registered (anonymous) user:
+        assert request.user.is_anonymous
+        assert not hasattr(request.user, 'xblock_id_for_anonymous_user')
+        user = request.user  # An AnonymousUser
+        # Since this particular view usually gets called from a sandboxed iframe
+        # we won't have access to the LMS session data for this user (the iframe
+        # has a new, empty session). So we need to save the identifier for this
+        # anonymous user (from the URL) on the user object, so that the runtime
+        # can get it (instead of generating a new one and saving it into this
+        # new empty session)
+        # See djangoapps.xblock.utils.get_xblock_id_for_anonymous_user()
+        user.xblock_id_for_anonymous_user = user_id
+    else:
+        raise AuthenticationFailed("Invalid user ID format.")
+
+    request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
+    block = load_block(usage_key, user)
+    # Run the handler, and save any resulting XBlock field value changes:
+    response_webob = block.handle(handler_name, request_webob, suffix)
+    response = webob_to_django_response(response_webob)
+    # We need to set Access-Control-Allow-Origin: * to allow sandboxed XBlocks
+    # to call these handlers:
+    response['Access-Control-Allow-Origin'] = '*'
+    return response

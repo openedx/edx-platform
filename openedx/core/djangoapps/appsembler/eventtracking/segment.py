@@ -4,9 +4,12 @@ Custom event processors and other functionality for the Segment backend.
 
 from django.conf import settings
 
-from openedx.core.djangoapps.site_configuration import helpers
-
-from . import exceptions, utils
+from openedx.core.djangoapps.appsembler.eventtracking.utils import (
+    get_site_config_for_event
+)
+from openedx.core.djangoapps.appsembler.eventtracking.exceptions import (
+    EventProcessingError
+)
 
 
 class SegmentTopLevelPropertiesProcessor(object):
@@ -67,13 +70,13 @@ class SegmentTopLevelPropertiesProcessor(object):
         Process only if processor is enabled for Site.
         """
         try:
-            siteconfig = utils.get_site_config_for_event(event['data'])
+            siteconfig = get_site_config_for_event(event['data'])
             if not siteconfig.get_value(
                 'COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL',
                 settings.COPY_SEGMENT_EVENT_PROPERTIES_TO_TOP_LEVEL
             ):
                 return event
-        except (AttributeError, exceptions.EventProcessingError):
+        except (AttributeError, EventProcessingError):
             return event
 
         try:

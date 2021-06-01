@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
-from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
-from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights, course_has_highlights
-from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
+import datetime
+
+import mock
+
+from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
+from openedx.core.djangoapps.schedules.content_highlights import (
+    course_has_highlights, get_week_highlights, get_next_section_highlights,
+)
+from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import skip_unless_lms
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 
 
 @skip_unless_lms
@@ -129,3 +135,25 @@ class TestContentHighlights(ModuleStoreTestCase):
         self.assertTrue(course_has_highlights(self.course_key))
         with self.assertRaises(CourseUpdateDoesNotExist):
             get_week_highlights(self.user, self.course_key, week_num=1)
+
+    @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
+    @mock.patch('openedx.core.djangoapps.course_date_signals.utils.get_expected_duration')
+    def test_get_next_section_highlights(self, mock_duration):
+        mock_duration.return_value = datetime.timedelta(days=2)
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+        today = datetime.datetime.utcnow()
+        tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        with self.store.bulk_operations(self.course_key):
+            self._create_chapter(  # Week 1
+                highlights=[u'a', u'b', u'á'],
+            )
+            self._create_chapter(  # Week 2
+                highlights=[u'skipped a week'],
+            )
+
+        self.assertEqual(
+            get_next_section_highlights(self.user, self.course_key, yesterday, today.date()),
+            ([u'skipped a week'], 2),
+        )
+        with self.assertRaises(CourseUpdateDoesNotExist):
+            get_next_section_highlights(self.user, self.course_key, yesterday, tomorrow.date())

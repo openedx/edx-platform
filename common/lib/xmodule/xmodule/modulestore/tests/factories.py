@@ -2,30 +2,30 @@
 Factories for use in tests of XBlocks.
 """
 
+
 import datetime
 import functools
-import pymongo.message
-import pytz
 import threading
 import traceback
 from collections import defaultdict
 from contextlib import contextmanager
 from uuid import uuid4
 
-from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
+import pymongo.message
+import pytz
+import six
+from factory import Factory, Sequence, lazy_attribute, lazy_attribute_sequence
 from factory.errors import CyclicDefinitionError
 from mock import patch
-from nose.tools import assert_less_equal, assert_greater_equal
-import dogstats_wrapper as dog_stats_api
-
-from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from xblock.core import XBlock
-from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+
+from xmodule.course_module import Textbook
+from xmodule.modulestore import ModuleStoreEnum, prefer_xmodules
+from xmodule.modulestore.tests.sample_courses import TOY_BLOCK_INFO_TREE, default_block_info_tree
 from xmodule.tabs import CourseTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
-from xmodule.course_module import Textbook
 
 
 class Dummy(object):
@@ -150,6 +150,7 @@ class SampleCourseFactory(CourseFactory):
         block_info_tree = kwargs.pop('block_info_tree', default_block_info_tree)
         store = kwargs.get('modulestore')
         user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
             course = super(SampleCourseFactory, cls)._create(target_class, **kwargs)
 
@@ -196,7 +197,7 @@ class ToyCourseFactory(SampleCourseFactory):
             'graded': True,
             'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
             'graceperiod': datetime.timedelta(days=2, seconds=21599),
-            'start': datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            'start': datetime.datetime(2015, 7, 17, 12, tzinfo=pytz.utc),
             'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
             'pdf_textbooks': [
                 {
@@ -283,9 +284,14 @@ class ItemFactory(XModuleFactory):
     category = 'chapter'
     parent = None
 
+    descriptive_tag = None
+
     @lazy_attribute_sequence
     def display_name(self, n):
-        return "{} {}".format(self.category, n)
+        if self.descriptive_tag:
+            return "{} {} - {}".format(self.category, n, self.descriptive_tag)
+        else:
+            return "{} {}".format(self.category, n)
 
     @lazy_attribute
     def location(self):
@@ -354,6 +360,10 @@ class ItemFactory(XModuleFactory):
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         publish_item = kwargs.pop('publish_item', True)
 
+        # Remove the descriptive_tag, it's just for generating display_name,
+        # and doesn't need to be passed into the object constructor
+        kwargs.pop('descriptive_tag')
+
         assert isinstance(location, UsageKey)
         assert location != parent_location
 
@@ -361,6 +371,9 @@ class ItemFactory(XModuleFactory):
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
         parent = kwargs.pop('parent', None) or store.get_item(parent_location)
+
+        if isinstance(data, (bytes, bytearray)):  # data appears as bytes and
+            data = data.decode('utf-8')
 
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
 
@@ -370,7 +383,7 @@ class ItemFactory(XModuleFactory):
                 template = clz.get_template(template_id)
                 assert template is not None
                 metadata.update(template.get('metadata', {}))
-                if not isinstance(data, basestring):
+                if not isinstance(data, six.string_types):
                     data.update(template.get('data'))
 
             # replace the display name with an optional parameter passed in from the caller
@@ -392,14 +405,6 @@ class ItemFactory(XModuleFactory):
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=(
-                        "location:itemfactory_create_static_tab",
-                        u"block:{}".format(location.block_type),
-                    )
-                )
-
                 course = store.get_course(location.course_key)
                 course.tabs.append(
                     CourseTab.load('static_tab', name='Static Tab', url_slug=location.block_id)
@@ -470,7 +475,7 @@ class StackTraceCounter(object):
         """
         # pylint: disable=broad-except
 
-        stack = traceback.extract_stack()[:-2]
+        stack = [tuple(item) for item in traceback.extract_stack()[:-2]]
 
         if self._top_of_stack in stack:
             stack = stack[stack.index(self._top_of_stack):]
@@ -482,7 +487,6 @@ class StackTraceCounter(object):
                     safe_args.append(repr(arg))
                 except Exception as exc:
                     safe_args.append('<un-repr-able value: {}'.format(exc))
-
             safe_kwargs = {}
             for key, kwarg in kwargs.items():
                 try:
@@ -514,7 +518,7 @@ class StackTraceCounter(object):
         """
         Iterate over all unique captured stacks.
         """
-        return iter(sorted(self._stacks.keys(), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
+        return iter(sorted(list(self._stacks.keys()), key=lambda stack: (self.stack_calls(stack), stack), reverse=True))
 
     def __getitem__(self, stack):
         """
@@ -538,7 +542,6 @@ class StackTraceCounter(object):
         """
         stacks = StackTraceCounter(stack_depth, include_arguments)
 
-        # pylint: disable=missing-docstring
         @functools.wraps(func)
         def capture(*args, **kwargs):
             stacks.capture_stack(args, kwargs)
@@ -593,13 +596,13 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
                         messages.append("      args: {}\n".format(args))
                         messages.append("      kwargs: {}\n\n".format(dict(kwargs)))
 
-        print "".join(messages)
+        print("".join(messages))
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-    assert_greater_equal(call_count, minimum_calls)
+    assert call_count >= minimum_calls, call_count
 
     # now verify the number of actual calls is less than (or equal to) the expected maximum
-    assert_less_equal(call_count, maximum_calls)
+    assert call_count <= maximum_calls, call_count
 
 
 def mongo_uses_error_check(store):
@@ -614,7 +617,7 @@ def mongo_uses_error_check(store):
 @contextmanager
 def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None, min_sends=None):
     """
-    Instruments the given store to count the number of calls to find (incl find_one) and the number
+    Instruments the given store to count the number of calls to find (incl find_one and count_documents) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
     end of the with statement, it compares the counts to the bounds provided in the arguments.
 
@@ -625,7 +628,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
     """
     with check_sum_of_calls(
         pymongo.collection.Collection,
-        ['find'],
+        ['find', 'count_documents'],
         max_finds,
         min_finds,
     ):
@@ -633,7 +636,7 @@ def check_mongo_calls_range(max_finds=float("inf"), min_finds=0, max_sends=None,
             with check_sum_of_calls(
                 pymongo.collection.Collection,
                 # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'bulk_write', '_delete'],
+                ['insert_one', 'replace_one', 'update_one', 'bulk_write', '_delete'],
                 max_sends if max_sends is not None else float("inf"),
                 min_sends if min_sends is not None else 0,
             ):

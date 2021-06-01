@@ -1,6 +1,8 @@
 """
 Utility methods useful for Studio page tests.
 """
+
+
 from bok_choy.javascript import js_defined
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
@@ -23,8 +25,8 @@ def press_the_notification_button(page, name):
     # the "Save" button at the UI level.
     # Instead, we use JavaScript to reliably click
     # the button.
-    btn_css = 'div#page-notification button.action-%s' % name.lower()
-    page.browser.execute_script("$('{}').focus().click()".format(btn_css))
+    btn_css = u'div#page-notification button.action-%s' % name.lower()
+    page.browser.execute_script(u"$('{}').focus().click()".format(btn_css))
     page.wait_for_ajax()
 
 
@@ -59,8 +61,8 @@ def add_advanced_component(page, menu_index, name):
     page.wait_for_element_visibility('.new-component-advanced', 'Advanced component menu is visible')
 
     # Now click on the component to add it.
-    component_css = 'button[data-category={}]'.format(name)
-    page.wait_for_element_visibility(component_css, 'Advanced component {} is visible'.format(name))
+    component_css = u'button[data-category={}]'.format(name)
+    page.wait_for_element_visibility(component_css, u'Advanced component {} is visible'.format(name))
 
     # Adding some components, e.g. the Discussion component, will make an ajax call
     # but we should be OK because the click_css method is written to handle that.
@@ -76,11 +78,11 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
     specific_type is required for some types and should be something like
     "Blank Common Problem".
     """
-    btn = page.q(css='.add-xblock-component .add-xblock-component-button[data-type={}]'.format(item_type))
+    btn = page.q(css=u'.add-xblock-component .add-xblock-component-button[data-type={}]'.format(item_type))
     multiple_templates = btn.filter(lambda el: 'multiple-templates' in el.get_attribute('class')).present
     btn.click()
     if multiple_templates:
-        sub_template_menu_div_selector = '.new-component-{}'.format(item_type)
+        sub_template_menu_div_selector = u'.new-component-{}'.format(item_type)
         page.wait_for_element_visibility(sub_template_menu_div_selector, 'Wait for the templates sub-menu to appear')
         page.wait_for_element_invisibility(
             '.add-xblock-component .new-component',
@@ -96,11 +98,11 @@ def add_component(page, item_type, specific_type, is_advanced_problem=False):
             # Wait for the advanced tab to be active
             css = '.problem-type-tabs li.ui-tabs-active a'
             page.wait_for(
-                lambda: len(page.q(css=css).filter(text='Advanced').execute()) > 0,
+                lambda: len(page.q(css=css).filter(text=u'Advanced').execute()) > 0,
                 'Waiting for the Advanced problem tab to be active'
             )
 
-        all_options = page.q(css='.new-component-{} ul.new-component-template li button span'.format(item_type))
+        all_options = page.q(css=u'.new-component-{} ul.new-component-template li button span'.format(item_type))
         chosen_option = all_options.filter(text=specific_type).first
         chosen_option.click()
     sync_on_notification(page)
@@ -134,13 +136,13 @@ def add_html_component(page, menu_index, boilerplate=None):
     page.wait_for_element_visibility('.new-component-html', 'HTML component menu is visible')
 
     # Now click on the component to add it.
-    component_css = 'button[data-category=html]'
+    component_css = u'button[data-category=html]'
     if boilerplate:
-        component_css += '[data-boilerplate={}]'.format(boilerplate)
+        component_css += u'[data-boilerplate={}]'.format(boilerplate)
     else:
-        component_css += ':not([data-boilerplate])'
+        component_css += u':not([data-boilerplate])'
 
-    page.wait_for_element_visibility(component_css, 'HTML component {} is visible'.format(boilerplate))
+    page.wait_for_element_visibility(component_css, u'HTML component {} is visible'.format(boilerplate))
 
     # Adding some components will make an ajax call but we should be OK because
     # the click_css method is written to handle that.
@@ -149,7 +151,7 @@ def add_html_component(page, menu_index, boilerplate=None):
 
 @js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):
-    script = """
+    script = u"""
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
     CodeMirror.signal(cm, "focus", cm);
     cm.setValue(arguments[0]);
@@ -161,9 +163,9 @@ def type_in_codemirror(page, index, text, find_prefix="$"):
 @js_defined('window.jQuery')
 def get_codemirror_value(page, index=0, find_prefix="$"):
     return page.browser.execute_script(
-        """
-        return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
-        """.format(index=index, find_prefix=find_prefix)
+        u"return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();".format(
+            index=index, find_prefix=find_prefix
+        )
     )
 
 
@@ -173,7 +175,7 @@ def get_input_value(page, css_selector):
     """
     page.wait_for_element_presence(
         css_selector,
-        'Elements matching "{}" selector are present'.format(css_selector)
+        u'Elements matching "{}" selector are present'.format(css_selector)
     )
     return page.q(css=css_selector).attrs('value')[0]
 
@@ -230,14 +232,14 @@ def verify_ordering(test_class, page, expected_orderings):
     blocks_checked = set()
     for expected_ordering in expected_orderings:
         for xblock in xblocks:
-            parent = expected_ordering.keys()[0]
+            parent = list(expected_ordering.keys())[0]
             if xblock.name == parent:
                 blocks_checked.add(parent)
                 children = xblock.children
                 expected_length = len(expected_ordering.get(parent))
                 test_class.assertEqual(
                     expected_length, len(children),
-                    "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
+                    u"Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
                 for idx, expected in enumerate(expected_ordering.get(parent)):
                     test_class.assertEqual(expected, children[idx].name)
                     blocks_checked.add(expected)

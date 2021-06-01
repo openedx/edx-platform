@@ -2,10 +2,12 @@
 """
 End-to-end tests for LibraryContent block in LMS
 """
+
+
 import textwrap
 
 import ddt
-from nose.plugins.attrib import attr
+import six
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.library import LibraryFixture
@@ -23,7 +25,6 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=10)
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -31,6 +32,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
     STAFF_USERNAME = "STAFF_TESTER"
     STAFF_EMAIL = "staff101@example.com"
+    shard = 10
 
     def populate_library_fixture(self, library_fixture):
         """
@@ -53,7 +55,7 @@ class LibraryContentTestBase(UniqueCourseTest):
             self.course_info['run']
         )
 
-        self.library_fixture = LibraryFixture('test_org', self.unique_id, 'Test Library {}'.format(self.unique_id))
+        self.library_fixture = LibraryFixture('test_org', self.unique_id, u'Test Library {}'.format(self.unique_id))
         self.populate_library_fixture(self.library_fixture)
 
         self.library_fixture.install()
@@ -67,7 +69,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         )
 
         library_content_metadata = {
-            'source_library_id': unicode(self.library_key),
+            'source_library_id': six.text_type(self.library_key),
             'mode': 'random',
             'max_count': 1,
         }
@@ -100,8 +102,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
-        unit_page.publish_action.click()
-        unit_page.wait_for_ajax()
+        unit_page.publish()
         self.assertIn("Published and Live", unit_page.publish_title)
 
     @property
@@ -147,11 +148,12 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr(shard=10)
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
     """
+    shard = 10
+
     def populate_library_fixture(self, library_fixture):
         """
         Populates library fixture with XBlock Fixtures
@@ -200,11 +202,12 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr(shard=10)
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    shard = 10
+
     def setUp(self):
         """ SetUp method """
         self._create_search_index()
@@ -217,11 +220,11 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
     def _get_problem_choice_group_text(self, name, items):
         """ Generates Choice Group CAPA problem XML """
         items_text = "\n".join([
-            "<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
+            u"<choice correct='{correct}'>{item}</choice>".format(correct=correct, item=item)
             for item, correct in items
         ])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <multiplechoiceresponse>
@@ -233,7 +236,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         """ Generates Select Option CAPA problem XML """
         items_text = ",".join(["'{0}'".format(item) for item in items])
 
-        return textwrap.dedent("""
+        return textwrap.dedent(u"""
         <problem>
             <p>{name}</p>
             <optionresponse>
@@ -279,45 +282,3 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self._goto_library_block_page()
         return self.library_content_page.children_headers
-
-    def test_problem_type_selector(self):
-        """
-        Scenario: Ensure setting "Any Type" for Problem Type does not filter out Problems
-        Given I have a library with two "Select Option" and two "Choice Group" problems, and a course containing
-               LibraryContent XBlock configured to draw XBlocks from that library
-        When I set library content xblock Problem Type to "Any Type" and Count to 3 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 3 xblocks from the library of any type
-        When I set library content xblock Problem Type to "Choice Group" and Count to 1 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 1 xblock from the library of "Choice Group" type
-        When I set library content xblock Problem Type to "Select Option" and Count to 2 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 2 xblock from the library of "Select Option" type
-        When I set library content xblock Problem Type to "Matlab" and Count to 2 and publish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see 0 xblocks from the library
-        """
-        children_headers = self._set_library_content_settings(count=3, capa_type="Any Type")
-        self.assertEqual(len(children_headers), 3)
-        self.assertLessEqual(children_headers, self._problem_headers)
-
-        # Choice group test
-        children_headers = self._set_library_content_settings(count=1, capa_type="Multiple Choice")
-        self.assertEqual(len(children_headers), 1)
-        self.assertLessEqual(
-            children_headers,
-            set(["Problem Choice Group 1", "Problem Choice Group 2"])
-        )
-
-        # Choice group test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Dropdown")
-        self.assertEqual(len(children_headers), 2)
-        self.assertEqual(
-            children_headers,
-            set(["Problem Select 1", "Problem Select 2"])
-        )
-
-        # Missing problem type test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Custom Evaluated Script")
-        self.assertEqual(children_headers, set())

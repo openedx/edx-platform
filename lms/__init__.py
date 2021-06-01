@@ -2,7 +2,7 @@
 Celery needs to be loaded when the cms modules are so that task
 registration and discovery can work correctly.
 """
-from __future__ import absolute_import
+
 
 # We monkey patch Kombu's entrypoints listing because scanning through this
 # accounts for the majority of LMS/Studio startup time for tests, and we don't

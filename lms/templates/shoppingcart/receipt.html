@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
 
 <%inherit file="shopping_cart_flow.html" />
@@ -7,6 +8,7 @@ from django.utils.translation import ungettext
 from django.urls import reverse
 from markupsafe import escape
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="billing_details_highlight">
@@ -34,29 +36,31 @@ from openedx.core.lib.courses import course_image_url
           <% dashboard_url = reverse('dashboard') %>
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
           <span class="mt-7">
-            ${_(u"You have successfully been enrolled for {course_names}. "
-                u"The following receipt has been emailed to {receipient_emails}").format(
-                  course_names=u"<b>{course_names}</b>".format(
-                    course_names=escape(appended_course_names)
-                  ),
-                  receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+            ${Text(_(
+                u"You have successfully been enrolled for {course_names}. "
+                u"The following receipt has been emailed to {receipient_emails}"
+            )).format(
+                course_names=HTML(u"<b>{course_names}</b>").format(
+                    course_names=appended_course_names
+                ),
+                receipient_emails=HTML(u"<strong>{receipient_emails}</strong>").format(
                     receipient_emails=appended_recipient_emails
-                  ),
+                ),
             )}
           </span>
         % elif order_type == 'business':
-          ${ungettext(
-            "You have successfully purchased <b>{number} course registration code</b> for {course_names}.",
-            "You have successfully purchased <b>{number} course registration codes</b> for {course_names}.",
+          ${HTML(ungettext(
+            u"You have successfully purchased <b>{number} course registration code</b> for {course_names}.",
+            u"You have successfully purchased <b>{number} course registration codes</b> for {course_names}.",
             total_registration_codes
-          ).format(
+          )).format(
             number=total_registration_codes,
-            course_names=u"<b>{course_names}</b>".format(
+            course_names=HTML(u"<b>{course_names}</b>").format(
               course_names=escape(appended_course_names)
             )
           )}
-          ${_("The following receipt has been emailed to {receipient_emails}").format(
-            receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+          ${Text(_(u"The following receipt has been emailed to {receipient_emails}")).format(
+            receipient_emails=HTML(u"<strong>{receipient_emails}</strong>").format(
               receipient_emails=appended_recipient_emails,
             )
           )}
@@ -286,20 +290,20 @@ from openedx.core.lib.courses import course_image_url
     % endif
 
     % for item, course in shoppingcart_items:
-      % if loop.index > 0 :
+      % if loop.index > 0:
         <hr>
       %endif
       <div class="user-data">
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} Image"/>
+                 alt="${course.display_number_with_default} ${course.display_name_with_default} Image"/>
           </div>
           <div class="data-input">
 
             <h3 class="course-title-info" id="course-title">
               <span class="course-registration-title">${_('Registration for:')}</span>
-              <span class="course-display-name">${ course.display_name | h }</span>
+              <span class="course-display-name">${course.display_name}</span>
             </h3>
             <hr>
             <div class="three-col">
@@ -352,7 +356,7 @@ from openedx.core.lib.courses import course_image_url
         % if any_refunds:
           <span>
           ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
-            ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
+            ${HTML(_("Note: items with strikethough like <del>this</del> have been refunded."))}
           </span>
         % endif
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>

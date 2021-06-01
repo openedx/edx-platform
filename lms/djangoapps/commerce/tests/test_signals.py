@@ -2,11 +2,10 @@
 """
 Tests for signal handling in commerce djangoapp.
 """
-from __future__ import unicode_literals
+
 
 import base64
 import json
-from urlparse import urljoin
 
 import ddt
 import httpretty
@@ -17,14 +16,16 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
+from six.moves.urllib.parse import urljoin
 
 from course_modes.models import CourseMode
 from student.signals import REFUND_ORDER
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+
+from ..models import CommerceConfiguration
+from ..utils import _generate_refund_notification_body, _send_refund_notification, create_zendesk_ticket
 from . import JSON
 from .mocks import mock_create_refund, mock_process_refund
-from ..models import CommerceConfiguration
-from ..utils import create_zendesk_ticket, _generate_refund_notification_body, _send_refund_notification
 
 ZENDESK_URL = 'http://zendesk.example.com/'
 ZENDESK_USER = 'test@example.com'
@@ -37,7 +38,6 @@ class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the REFUND_ORDER signal.
     """
-    shard = 4
 
     def setUp(self):
         super(TestRefundSignal, self).setUp()
@@ -184,7 +184,7 @@ class TestRefundSignal(TestCase):
                 self.assertFalse(mock_send_notification.called)
 
                 last_request = httpretty.last_request()
-                self.assertDictEqual(json.loads(last_request.body), {'action': 'approve_payment_only'})
+                self.assertDictEqual(json.loads(last_request.body.decode('utf8')), {'action': 'approve_payment_only'})
 
     @mock.patch('lms.djangoapps.commerce.utils._send_refund_notification')
     def test_notification_no_refund(self, mock_send_notification):
@@ -305,8 +305,9 @@ class TestRefundSignal(TestCase):
         # Verify the headers
         expected = {
             'content-type': JSON,
-            'Authorization': 'Basic ' + base64.b64encode(
-                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY))
+            'Authorization': 'Basic {}'.format(base64.b64encode(
+                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY).encode('utf8')).decode('utf8')
+            )
         }
         self.assertDictContainsSubset(expected, last_request.headers)
 
@@ -322,4 +323,4 @@ class TestRefundSignal(TestCase):
                 'tags': ['LMS'] + tags
             }
         }
-        self.assertDictEqual(json.loads(last_request.body), expected)
+        self.assertDictEqual(json.loads(last_request.body.decode('utf8')), expected)

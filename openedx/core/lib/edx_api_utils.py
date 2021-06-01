@@ -1,5 +1,5 @@
 """Helper functions to get data from APIs"""
-from __future__ import unicode_literals
+
 
 import logging
 
@@ -55,22 +55,28 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
         cached = cache.get(cache_key)
         if cached:
-            return zunpickle(cached)
+            try:
+                cached_response = zunpickle(cached)
+            except Exception:  # pylint: disable=broad-except
+                # Data is corrupt in some way.
+                log.warning("Data for cache is corrupt for cache key %s", cache_key)
+                cache.delete(cache_key)
+            else:
+                if fields:
+                    cached_response = get_fields(fields, cached_response)
+
+                return cached_response
 
     try:
         endpoint = getattr(api, resource)
         querystring = querystring if querystring else {}
         response = endpoint(resource_id).get(**querystring)
 
-        if resource_id is not None:
-            if fields:
-                results = get_fields(fields, response)
-            else:
-                results = response
-        elif traverse_pagination:
+        if resource_id is None and traverse_pagination:
             results = _traverse_pagination(response, endpoint, querystring, no_data)
         else:
             results = response
+
     except:  # pylint: disable=bare-except
         log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
         return no_data
@@ -81,6 +87,9 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         if long_term_cache:
             cache_ttl = api_config.long_term_cache_ttl
         cache.set(cache_key, zdata, cache_ttl)
+
+    if fields:
+        results = get_fields(fields, results)
 
     return results
 

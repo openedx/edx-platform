@@ -2,12 +2,14 @@
 Internationalization tasks
 """
 
+
 import re
 import subprocess
 import sys
 
 from path import Path as path
 from paver.easy import cmdopts, needs, sh, task
+from six.moves import input
 
 from .utils.cmd import django_cmd
 from .utils.envs import Env
@@ -38,7 +40,7 @@ def i18n_extract(options):
     cmd = "i18n_tool extract"
 
     if verbose:
-        cmd += " -vv"
+        cmd += " -v"
 
     sh(cmd)
 
@@ -75,20 +77,27 @@ def i18n_generate_strict():
 
 @task
 @needs("pavelib.i18n.i18n_extract")
-@cmdopts([
-    ("settings=", "s", "The settings to use (defaults to devstack)"),
-])
 @timed
-def i18n_dummy(options):
+def i18n_dummy():
     """
     Simulate international translation by generating dummy strings
     corresponding to source strings.
     """
-    settings = options.get('settings', DEFAULT_SETTINGS)
-
     sh("i18n_tool dummy")
     # Need to then compile the new dummy strings
     sh("i18n_tool generate")
+
+
+@task
+@needs(
+    "pavelib.prereqs.install_prereqs",
+)
+@timed
+def i18n_compilejs(options):
+    """
+    Generating djangojs.js files using django-statici18n
+    """
+    settings = 'devstack_docker'
 
     # Generate static i18n JS files.
     for system in ['lms', 'cms']:
@@ -130,9 +139,9 @@ def i18n_validate_transifex_config():
     if not config.isfile or config.getsize == 0:
         msg = colorize(
             'red',
-            "Cannot connect to Transifex, config file is missing"
-            " or empty: {config} \nSee "
-            "http://help.transifex.com/features/client/#transifexrc \n".format(
+            u"Cannot connect to Transifex, config file is missing"
+            u" or empty: {config} \nSee "
+            u"http://help.transifex.com/features/client/#transifexrc \n".format(
                 config=config,
             )
         )
@@ -169,11 +178,11 @@ def i18n_rtl():
     """
     sh("i18n_tool transifex rtl")
 
-    print "Now generating langugage files..."
+    print("Now generating langugage files...")
 
     sh("i18n_tool generate --rtl")
 
-    print "Committing translations..."
+    print("Committing translations...")
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -187,11 +196,11 @@ def i18n_ltr():
     """
     sh("i18n_tool transifex ltr")
 
-    print "Now generating langugage files..."
+    print("Now generating langugage files...")
 
     sh("i18n_tool generate --ltr")
 
-    print "Committing translations..."
+    print("Committing translations...")
     sh('git clean -fdX conf/locale')
     sh('git add conf/locale')
     sh('git commit --amend')
@@ -218,10 +227,10 @@ def i18n_robot_pull_edx():
     # TODO: Validate the recently pulled translations, and give a bail option
     sh('git clean -fdX conf/locale/rtl')
     sh('git clean -fdX conf/locale/eo')
-    print "\n\nValidating translations with `i18n_tool validate`..."
+    print("\n\nValidating translations with `i18n_tool validate`...")
     sh("i18n_tool validate")
 
-    con = raw_input("Continue with committing these translations (y/n)? ")
+    con = input("Continue with committing these translations (y/n)? ")
 
     if con.lower() == 'y':
         sh('git add conf/locale')
@@ -245,6 +254,7 @@ def i18n_clean():
 
 @task
 @needs(
+    "pavelib.i18n.i18n_clean",
     "pavelib.i18n.i18n_extract",
     "pavelib.i18n.i18n_transifex_push",
 )
@@ -287,6 +297,38 @@ def i18n_release_pull():
 @needs(
     "pavelib.i18n.i18n_clean",
 )
+def tahoe_i18n_transifex_release_pull(require_reviewed=False):
+    """
+    Pull Tahoe release translation files: adapted from `i18n.transifex.pull`.
+
+    Adapted from the edX repo edx/i18n-tools package, this helper allows to pull either reviewed or unreviewed
+    entries. This taks should be removed when https://github.com/edx/i18n-tools/issues/96 is resolved.
+    """
+    # Keeping imports locally for an easy revert.
+    from i18n import config
+    from i18n.execute import execute
+    from i18n.transifex import clean_translated_locales
+
+    i18n_configs = config.Configuration()  # Read the `locale/config.yaml`
+    resources = find_release_resources()
+
+    for locale in i18n_configs.translated_locales:
+        cmd = u'tx pull --force --mode={mode} --minimum-perc=3 -l {locale}'.format(
+            locale=locale,
+            mode='reviewed' if require_reviewed else 'onlytranslated'
+        )
+        if resources:
+            for resource in resources:
+                execute(cmd + ' -r {resource}'.format(resource=resource))
+        else:
+            execute(cmd)
+    clean_translated_locales(i18n_configs)
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_clean",
+)
 @cmdopts([
     ("settings=", "s", "The settings to use (defaults to devstack)"),
 ])
@@ -303,10 +345,7 @@ def i18n_robot_pull(options):
     sh('git clean -fdX conf/locale/eo')
     print("\n\nValidating translations with `i18n_tool validate`...")
 
-    sh("pip install edx-i18n-tools==0.4.6")  # Hack: Fix an issue with the i18n tools
-
-    resources = find_release_resources()
-    sh("i18n_tool transifex pull " + " ".join(resources))
+    tahoe_i18n_transifex_release_pull()
 
     sh("i18n_tool validate")
     sh("i18n_tool generate")
@@ -315,9 +354,7 @@ def i18n_robot_pull(options):
     for system in ['lms', 'cms']:
         sh(django_cmd(system, settings, 'compilejsi18n'))
 
-    sh("pip install edx-i18n-tools==0.4.5")  # Hack: Get back the original version so Studio can keep working
-
-    con = raw_input("Continue with committing these translations (y/n)? ")
+    con = input("Continue with committing these translations (y/n)? ")
     if con.lower() == 'y':
         sh('git add conf/locale')
         sh('git add cms/static/js/i18n')

@@ -3,12 +3,12 @@ This module defines tests for courseware.access that are specific to group
 access control rules.
 """
 
+
 import ddt
-from nose.plugins.attrib import attr
 from stevedore.extension import Extension, ExtensionManager
 
-import courseware.access as access
-from courseware.tests.factories import StaffFactory, UserFactory
+import lms.djangoapps.courseware.access as access
+from lms.djangoapps.courseware.tests.factories import StaffFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -44,19 +44,19 @@ def resolve_attrs(test_method):
     replaces them with the resolved values of those attributes in the method
     call.
     """
-    def _wrapper(self, *args):  # pylint: disable=missing-docstring
+    def _wrapper(self, *args):
         new_args = [getattr(self, arg) for arg in args]
         return test_method(self, *new_args)
     return _wrapper
 
 
-@attr(shard=7)
 @ddt.ddt
 class GroupAccessTestCase(ModuleStoreTestCase):
     """
     Tests to ensure that has_access() correctly enforces the visibility
     restrictions specified in the `group_access` field of XBlocks.
     """
+
     def set_user_group(self, user, partition, group):
         """
         Internal DRY / shorthand.

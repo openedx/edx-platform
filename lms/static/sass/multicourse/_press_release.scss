@@ -1,5 +1,5 @@
 .pressrelease {
-  background: rgb(250,250,250);
+  background: rgb(250, 250, 250);
 
   .container {
     padding: ($baseline*3) 0 ($baseline*6);
@@ -34,11 +34,9 @@
     }
 
     > article {
-      border: 1px solid rgb(220,220,220);
+      border: 1px solid rgb(220, 220, 220);
       border-radius: 10px;
-
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       box-shadow: 0 2px 16px 0 $shadow-l1;
       margin: 0 auto;
       padding: 80px 80px 40px;

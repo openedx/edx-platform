@@ -1,11 +1,15 @@
 """Tests for zendesk_proxy views."""
-import json
+
+
 from copy import deepcopy
+import json
 
 import ddt
 from django.urls import reverse
 from django.test.utils import override_settings
 from mock import MagicMock, patch
+import six
+from six.moves import range
 
 from openedx.core.djangoapps.zendesk_proxy.v0.views import ZENDESK_REQUESTS_PER_HOUR
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -43,14 +47,30 @@ class ZendeskProxyTestCase(ApiTestCase):
             self.assertHttpCreated(response)
             (mock_args, mock_kwargs) = mock_post.call_args
             self.assertEqual(mock_args, ('https://www.superrealurlsthataredefinitelynotfake.com/api/v2/tickets.json',))
+            six.assertCountEqual(self, mock_kwargs.keys(), ['headers', 'data'])
             self.assertEqual(
-                mock_kwargs,
+                mock_kwargs['headers'],
                 {
-                    'headers': {
-                        'content-type': 'application/json',
-                        'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
+                    'content-type': 'application/json',
+                    'Authorization': 'Bearer abcdefghijklmnopqrstuvwxyz1234567890'
+                }
+            )
+            self.assertEqual(
+                json.loads(mock_kwargs['data']),
+                {
+                    'ticket': {
+                        'comment': {
+                            'body': "Help! I'm trapped in a unit test factory and I can't get out!",
+                            'uploads': None,
+                        },
+                        'custom_fields': None,
+                        'requester': {
+                            'email': 'JohnQStudent@example.com',
+                            'name': 'John Q. Student',
+                        },
+                        'subject': 'Python Unit Test Help Request',
+                        'tags': ['python_unit_test'],
                     },
-                    'data': '{"ticket": {"comment": {"body": "Help! I\'m trapped in a unit test factory and I can\'t get out!", "uploads": null}, "tags": ["python_unit_test"], "subject": "Python Unit Test Help Request", "custom_fields": null, "requester": {"name": "John Q. Student", "email": "JohnQStudent@example.com"}}}'  # pylint: disable=line-too-long
                 }
             )
 

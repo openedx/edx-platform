@@ -74,7 +74,9 @@
     float: left;
     padding: ($baseline*0.5) 0;
 
-    .product-info, .product-name, .price {
+    .product-info,
+    .product-name,
+    .price {
       @extend %t-ultrastrong;
 
       color: $m-blue-d3;

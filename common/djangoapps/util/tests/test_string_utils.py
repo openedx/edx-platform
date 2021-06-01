@@ -2,6 +2,7 @@
 Tests for string_utils.py
 """
 
+
 from django.test import TestCase
 
 from util.string_utils import str_to_bool

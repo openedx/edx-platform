@@ -1,5 +1,5 @@
 /* global
-    Discussion, DiscussionThreadShowView, DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionThreadView,
+    _, Discussion, DiscussionThreadShowView, DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionThreadView,
     DiscussionUtil, Thread, DiscussionContentView, ThreadResponseShowView
 */
 (function() {

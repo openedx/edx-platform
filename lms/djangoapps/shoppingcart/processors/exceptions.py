@@ -1,3 +1,8 @@
+"""
+Payment processing exceptions
+"""
+
+
 from shoppingcart.exceptions import PaymentException
 
 

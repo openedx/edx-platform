@@ -2,6 +2,8 @@
 Course Advanced Settings page
 """
 
+
+import six
 from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.studio.course_page import CoursePage
@@ -51,6 +53,23 @@ class AdvancedSettingsPage(CoursePage):
         """
         return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
 
+    def is_deprecated_setting_visible(self):
+        """
+            Returns true if deprecated settings are visible
+        """
+        return self.q(css=DEPRECATED_SETTINGS_SELECTOR).visible
+
+    def toggle_deprecated_settings(self):
+        """
+        Show deprecated Settings
+        """
+        button_text = self.deprecated_settings_button_text
+        self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+        if button_text == 'Show Deprecated Settings':
+            self.wait_for_element_presence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are present')
+        else:
+            self.wait_for_element_absence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are not present')
+
     def wait_for_modal_load(self):
         """
         Wait for validation response from the server, and make sure that
@@ -69,13 +88,21 @@ class AdvancedSettingsPage(CoursePage):
         self.browser.refresh()
         self.wait_for_page()
 
+    @property
+    def confirmation_message(self):
+        """
+            Returns the text of confirmation message which appears after saving the settings
+        """
+        self.wait_for_element_visibility(CONFIRMATION_MESSAGE_SELECTOR, 'Confirmation message is visible')
+        return self.q(css=CONFIRMATION_MESSAGE_SELECTOR).text[0]
+
     def coordinates_for_scrolling(self, coordinates_for):
         """
         Get the x and y coordinates of elements
         """
         cordinates_dict = self.browser.find_element_by_css_selector(coordinates_for)
         location = cordinates_dict.location
-        for key, val in location.iteritems():
+        for key, val in six.iteritems(location):
             if key == 'x':
                 x_axis = val
             elif key == 'y':
@@ -120,6 +147,9 @@ class AdvancedSettingsPage(CoursePage):
         return self.q(css=ERROR_ITEM_CONTENT_SELECTOR).text
 
     def _get_index_of(self, expected_key):
+        """
+        Returns the index of expected key
+        """
         for i, element in enumerate(self.q(css=KEY_CSS)):
             # Sometimes get stale reference if I hold on to the array of elements
             key = self.q(css=KEY_CSS).nth(i).text[0]
@@ -147,7 +177,7 @@ class AdvancedSettingsPage(CoursePage):
         """
         Make multiple settings changes and save them.
         """
-        for key, value in key_value_map.iteritems():
+        for key, value in six.iteritems(key_value_map):
             index = self._get_index_of(key)
             type_in_codemirror(self, index, value)
 
@@ -225,13 +255,11 @@ class AdvancedSettingsPage(CoursePage):
             'mobile_available',
             'rerandomize',
             'remote_gradebook',
-            'annotation_token_secret',
             'showanswer',
             'show_calculator',
             'show_reset_button',
             'static_asset_path',
             'teams_configuration',
-            'annotation_storage_url',
             'social_sharing_url',
             'video_bumper',
             'enable_proctored_exams',
@@ -240,7 +268,6 @@ class AdvancedSettingsPage(CoursePage):
             'enable_subsection_gating',
             'learning_info',
             'instructor_info',
-            'create_zendesk_tickets',
             'ccx_connector',
             'enable_ccx',
         ]

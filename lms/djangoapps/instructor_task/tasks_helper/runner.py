@@ -1,3 +1,8 @@
+"""
+Instrutor Task runner
+"""
+
+
 import json
 import logging
 from time import time
@@ -5,7 +10,6 @@ from time import time
 from celery import current_task
 from django.db import reset_queries
 
-import dogstats_wrapper as dog_stats_api
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from util.db import outer_atomic
 
@@ -28,6 +32,19 @@ class TaskProgress(object):
         self.failed = 0
         self.preassigned = 0
 
+    @property
+    def state(self):
+        return {
+            'action_name': self.action_name,
+            'attempted': self.attempted,
+            'succeeded': self.succeeded,
+            'skipped': self.skipped,
+            'failed': self.failed,
+            'total': self.total,
+            'preassigned': self.preassigned,
+            'duration_ms': int((time() - self.start_time) * 1000),
+        }
+
     def update_task_state(self, extra_meta=None):
         """
         Update the current celery task's state to the progress state
@@ -41,16 +58,7 @@ class TaskProgress(object):
         Returns:
             dict: The current task's progress dict
         """
-        progress_dict = {
-            'action_name': self.action_name,
-            'attempted': self.attempted,
-            'succeeded': self.succeeded,
-            'skipped': self.skipped,
-            'failed': self.failed,
-            'total': self.total,
-            'preassigned': self.preassigned,
-            'duration_ms': int((time() - self.start_time) * 1000),
-        }
+        progress_dict = self.state
         if extra_meta is not None:
             progress_dict.update(extra_meta)
         _get_current_task().update_state(state=PROGRESS, meta=progress_dict)
@@ -109,8 +117,7 @@ def run_main_task(entry_id, task_fcn, action_name):
         raise ValueError(message)
 
     # Now do the work
-    with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
-        task_progress = task_fcn(entry_id, course_id, task_input, action_name)
+    task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
     # Release any queries that the connection has been hanging onto
     reset_queries()

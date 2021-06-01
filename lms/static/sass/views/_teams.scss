@@ -179,7 +179,8 @@
     // STATE: hover, active, and focus
     &:hover,
     &:active,
-    &:focus {
+    &:focus,
+    &:focus-within {
       box-shadow: 0 0 5px 1px $m-blue-t1;
 
       .card-description {
@@ -353,7 +354,24 @@
     }
   }
 
-  .team-profile {
+  .team-management {
+    padding: 1%;
+
+    h3,
+    p,
+    .action,
+    .team-management-section,
+    input {
+      margin-bottom: 2%;
+    }
+
+    #upload-team-csv {
+      display: block;
+    }
+  }
+
+  .team-profile,
+  .team-management {
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
@@ -527,6 +545,11 @@
 
   .action-primary {
     @extend %btn-primary-blue;
+
+    &:focus {
+      border: inherit;
+      box-shadow: none;
+    }
 
     display: inline-block;
     text-shadow: none;
@@ -720,6 +743,11 @@
       .u-field-description-message {
         color: $error-color !important;
       }
+    }
+
+    .teams-paging-header .listing-sort-select.input-select,
+    .topics-paging-header .listing-sort-select.input-select {
+      border: 1px solid $gray-l2;
     }
 
     .create-team.wrapper-msg {

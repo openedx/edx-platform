@@ -1,6 +1,8 @@
 """
 CourseSettingsEncoder
 """
+
+
 import datetime
 import json
 from json.encoder import JSONEncoder

@@ -50,8 +50,7 @@
 
           input {
             &[type="text"] {
-              @include box-sizing(border-box);
-
+              box-sizing: border-box;
               margin: lh(0.5) 0;
               width: 100%;
             }
@@ -160,8 +159,8 @@
 
       > a {
         @include button(simple, $button-color);
-        @include box-sizing(border-box);
 
+        box-sizing: border-box;
         border-radius: 3px;
         font: normal 15px/1.6rem $font-family-sans-serif;
         letter-spacing: 0;
@@ -278,8 +277,8 @@
 
         .hd {
           @include border-right(1px dashed #ddd);
-          @include box-sizing(border-box);
 
+          box-sizing: border-box;
           display: table-cell;
           letter-spacing: 0;
           margin: 0;

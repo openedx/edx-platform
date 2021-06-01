@@ -1,19 +1,20 @@
 """Tools for helping with testing capa."""
 
+
 import gettext
-from path import Path
+import io
 import os
 import os.path
+import xml.sax.saxutils as saxutils
 
 import fs.osfs
 import six
+from mako.lookup import TemplateLookup
+from mock import MagicMock, Mock
+from path import Path
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
-from mock import Mock, MagicMock
-from mako.lookup import TemplateLookup
-
-import xml.sax.saxutils as saxutils
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -115,6 +116,6 @@ def load_fixture(relpath):
     in the same directory as the test file.
     """
     abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
-    with open(abspath) as fixture_file:
+    with io.open(abspath, encoding="utf-8") as fixture_file:
         contents = fixture_file.read()
-    return contents.decode('utf8')
+        return contents

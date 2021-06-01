@@ -1,6 +1,8 @@
 // home-header-pop-up animation
 //************************************************************************//
 
+/* stylelint-disable */
+
 .animation-home-header-pop-up {
   @include animation(home-header-pop-up 1.15s ease-in-out);
   @include animation-fill-mode(both);

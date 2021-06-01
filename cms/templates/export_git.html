@@ -3,6 +3,8 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%!
+  import six
+
   from django.urls import reverse
   from django.utils.translation import ugettext as _
 %>
@@ -39,7 +41,7 @@
         % else:
         <ul class="list-actions">
           <li class="item-action">
-            <a class="action action-export-git action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=unicode(context_course.id)))}?action=push">
+            <a class="action action-export-git action-primary" href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(context_course.id)))}?action=push">
               <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
               <span class="copy">${_("Export to Git")}</span>
             </a>

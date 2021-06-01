@@ -18,20 +18,26 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <div class="footer-language-selector">
-    <label for="footer-language-select">
-        <span class="icon fa fa-globe" aria-hidden="true"></span>
-        <span class="sr">${_("Choose Language")}</span>
-    </label>
-    <select id="footer-language-select" name="language" onchange="footerLanguageSelector.handleSelection(this)">
-        % for language in sorted(released_languages(), key=lambda x: x.code):
-            <% language_name = Locale.parse(language.code.replace('_', '-'), sep='-').language_name %>
-            % if language.code == LANGUAGE_CODE:
-                <option value="${language.code}" selected="selected">${language_name}</option>
-            % else:
-                <option value="${language.code}">${language_name}</option>
-            % endif
-        % endfor
-    </select>
+    <div role="group" aria-label="Change page language">
+        <label for="footer-language-select">
+            <span class="icon fa fa-globe" aria-hidden="true"></span>
+            <span class="sr">${_("Choose Language")}</span>
+        </label>
+        <select id="footer-language-select" name="language">
+            % for language in sorted(released_languages(), key=lambda x: x.code):
+                <% language_name = Locale.parse(language.code.replace('_', '-'), sep='-').language_name %>
+                % if language.code == LANGUAGE_CODE:
+                    <option value="${language.code}" selected="selected">${language_name}</option>
+                % else:
+                    <option value="${language.code}">${language_name}</option>
+                % endif
+            % endfor
+        </select>
+        <button id="footer-language-button" type="button" class="btn-edged-blue select-lang-button"
+                onclick="footerLanguageSelector.langSelection()">
+            ${_('Submit')}
+        </button>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -48,8 +54,10 @@
         ## preference to the user's profile. This effect may be delayed on pages that do not use the LMS language
         ## selection middleware.
         ##
-        handleSelection: function($select) {
-            this.setLanguageCookie($select.value, this.refreshPage);
+        langSelection: function() {
+            var footer = document.getElementById('footer-language-select');
+            var lang = footer.options[footer.selectedIndex].value;
+            this.setLanguageCookie(lang, this.refreshPage);
         },
 
         setLanguageCookie: function(value, callback) {

@@ -1,6 +1,8 @@
 """
 API for for getting information about the user's shopping cart.
 """
+
+
 from django.urls import reverse
 
 from shoppingcart.models import OrderItem
@@ -23,9 +25,6 @@ def order_history(user, **kwargs):
     for order_item in purchased_order_items:
         # Avoid repeated entries for the same order id.
         if order_item.order.id not in [item['order_id'] for item in order_history_list]:
-            # If we are in a Microsite, then include the orders having courses attributed (by ORG) to that Microsite.
-            # Conversely, if we are not in a Microsite, then include the orders having courses
-            # not attributed (by ORG) to any Microsite.
             order_item_course_id = getattr(order_item, 'course_id', None)
             if order_item_course_id:
                 if (course_org_filter and order_item_course_id.org in course_org_filter) or \

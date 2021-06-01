@@ -2,6 +2,8 @@
 Tests for keyword_substitution.py
 """
 
+
+import six
 from ddt import ddt, file_data
 from mock import patch
 
@@ -39,15 +41,15 @@ class KeywordSubTest(ModuleStoreTestCase):
         }
 
     @file_data('fixtures/test_keyword_coursename_sub.json')
-    def test_course_name_sub(self, test_info):
+    def test_course_name_sub(self, test_string, expected):
         """ Tests subbing course name in various scenarios """
         course_name = self.course.display_name
         result = Ks.substitute_keywords_with_data(
-            test_info['test_string'], self.context,
+            test_string, self.context,
         )
 
         self.assertIn(course_name, result)
-        self.assertEqual(result, test_info['expected'])
+        self.assertEqual(result, expected)
 
     def test_anonymous_id_sub(self):
         """
@@ -83,7 +85,7 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     def test_should_not_sub(self):
         """
@@ -94,18 +96,18 @@ class KeywordSubTest(ModuleStoreTestCase):
             test_string, self.context,
         )
 
-        self.assertEquals(test_string, result)
+        self.assertEqual(test_string, result)
 
     @file_data('fixtures/test_keywordsub_multiple_tags.json')
-    def test_sub_multiple_tags(self, test_info):
+    def test_sub_multiple_tags(self, test_string, expected):
         """ Test that subbing works with multiple subtags """
         anon_id = '123456789'
 
         with patch('util.keyword_substitution.anonymous_id_from_user_id', lambda user_id: anon_id):
             result = Ks.substitute_keywords_with_data(
-                test_info['test_string'], self.context,
+                test_string, self.context,
             )
-            self.assertEqual(result, test_info['expected'])
+            self.assertEqual(result, expected)
 
     def test_subbing_no_userid_or_courseid(self):
         """
@@ -114,13 +116,13 @@ class KeywordSubTest(ModuleStoreTestCase):
         test_string = 'This string should not be subbed here %%USER_ID%%'
 
         no_course_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'course_title'
+            (key, value) for key, value in six.iteritems(self.context) if key != 'course_title'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_course_context)
         self.assertEqual(test_string, result)
 
         no_user_id_context = dict(
-            (key, value) for key, value in self.context.iteritems() if key != 'user_id'
+            (key, value) for key, value in six.iteritems(self.context) if key != 'user_id'
         )
         result = Ks.substitute_keywords_with_data(test_string, no_user_id_context)
         self.assertEqual(test_string, result)

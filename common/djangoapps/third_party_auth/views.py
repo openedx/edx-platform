@@ -1,17 +1,23 @@
 """
 Extra views required for SSO
 """
-from django.conf import settings
-from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
-from django.shortcuts import redirect, render
-from django.views.decorators.csrf import csrf_exempt
-from social_django.utils import load_strategy, load_backend, psa
-from social_django.views import complete
-from social_core.utils import setting_name
 
+
+from django.conf import settings
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseNotFound, HttpResponseServerError
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import View
+from social_core.utils import setting_name
+from social_django.utils import load_backend, load_strategy, psa
+from social_django.views import complete
+
+import third_party_auth
+from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
 from student.views import compose_and_send_activation_email
+from third_party_auth import pipeline, provider
 
 from .models import SAMLConfiguration, SAMLProviderConfig
 
@@ -27,12 +33,27 @@ def inactive_user_view(request):
     The reason this view exists is that if we don't define this as the
     SOCIAL_AUTH_INACTIVE_USER_URL, inactive users will get sent to LOGIN_ERROR_URL, which we
     don't want.
+
+    If the third_party_provider.skip_email_verification is set then the user is activated
+    and verification email is not sent
     """
     # 'next' may be set to '/account/finish_auth/.../' if this user needs to be auto-enrolled
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message
     # about activating their account.
-    profile = UserProfile.objects.get(user=request.user)
-    compose_and_send_activation_email(request.user, profile)
+    user = request.user
+    profile = UserProfile.objects.get(user=user)
+    activated = user.is_active
+    # If the user is registering via 3rd party auth, track which provider they use
+    if third_party_auth.is_enabled() and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        if third_party_provider.skip_email_verification and not activated:
+            user.is_active = True
+            user.save()
+            activated = True
+    if not activated:
+        compose_and_send_activation_email(user, profile)
+
     return redirect(request.GET.get('next', 'dashboard'))
 
 
@@ -93,3 +114,41 @@ def post_to_custom_auth_form(request):
         'hmac': pipeline_data['hmac'],
     }
     return render(request, 'third_party_auth/post_custom_auth_entry.html', data)
+
+
+class IdPRedirectView(View):
+    """
+    Redirect to an IdP's login page if the IdP exists; otherwise, return a 404.
+
+    Example usage:
+
+        GET auth/idp_redirect/saml-default
+
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Return either a redirect to the login page of an identity provider that
+        corresponds to the provider_slug keyword argument or a 404 if the
+        provider_slug does not correspond to an identity provider.
+
+        Args:
+            request (HttpRequest)
+
+        Keyword Args:
+            provider_slug (str): a slug corresponding to a configured identity provider
+
+        Returns:
+            HttpResponse: 302 to a provider's login url if the provider_slug kwarg matches an identity provider
+            HttpResponse: 404 if the provider_slug kwarg does not match an identity provider
+        """
+        # this gets the url to redirect to after login/registration/third_party_auth
+        # it also handles checking the safety of the redirect url (next query parameter)
+        # it checks against settings.LOGIN_REDIRECT_WHITELIST, so be sure to add the url
+        # to this setting
+        next_destination_url = get_next_url_for_login_page(request)
+
+        try:
+            url = pipeline.get_login_url(kwargs['provider_slug'], pipeline.AUTH_ENTRY_LOGIN, next_destination_url)
+            return redirect(url)
+        except ValueError:
+            return HttpResponseNotFound()

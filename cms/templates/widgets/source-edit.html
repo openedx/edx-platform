@@ -1,7 +1,9 @@
+<%page expression_filter="h"/>
 <%
   import hashlib
+  from openedx.core.djangolib.js_utils import js_escaped_string
   from six import text_type
-  hlskey = hashlib.md5(text_type(module.location)).hexdigest()
+  hlskey = hashlib.md5(text_type(module.location).encode('utf-8')).hexdigest()
 %>
 
   <section id="hls-modal-${hlskey}" class="upload-modal modal" style="overflow:scroll; background:#ddd; padding: 10px 0;box-shadow: 0 0 5px 0 #555;" >
@@ -13,7 +15,7 @@
 
     <form id="hls-form" enctype="multipart/form-data">
       <section class="source-edit">
-          <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${editable_metadata_fields['source_code']['value']|h}</textarea>
+          <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${editable_metadata_fields['source_code']['value']}</textarea>
       </section>
       <div class="submit">
         <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
@@ -30,8 +32,8 @@
 
   <script type = "text/javascript">
 require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
-  hlstrig = $('#hls-trig-${hlskey}');
-  hlsmodal = $('#hls-modal-${hlskey}');
+  hlstrig = $('#hls-trig-${hlskey  | n, js_escaped_string}');
+  hlsmodal = $('#hls-modal-${hlskey  | n, js_escaped_string}');
 
   hlstrig.leanModal({
       top: 0,
@@ -44,27 +46,26 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
       mode: 'stex'
   }));
 
-  $('#hls-trig-${hlskey}').click(function() {
+  hlstrig.click(function() {
 
-      ## cannot do this with css or it gets overwritten
+      // cannot do this with css or it gets overwritten
       var editorH = $( window ).height() - 100;
       var editorW = $( window ).innerWidth() - 70;
       hlsmodal.attr('style', function(i,s) { return s + 'margin: 2% 0 0 10% !important; left:10%; height:' + editorH + 'px;'});
 
-      ## setup file input
-      ## need to insert this only after hls triggered, because otherwise it
-      ## causes other <form> elements to become multipart/form-data,
-      ## thus breaking multiple-choice input forms, for example.
-      $('#hls-finput').html('<input type="file" name="hlsfile" id="hlsfile" />');
-
-      var el = $('#hls-modal-${hlskey}');
-      setup_autoupload(el);
-      slow_refresh_hls(el);
+      // setup file input
+      // need to insert this only after hls triggered, because otherwise it
+      // causes other <form> elements to become multipart/form-data,
+      // thus breaking multiple-choice input forms, for example.
+      edx.HtmlUtils.setHtml($('#hls-finput'),edx.HtmlUtils.HTML('<input type="file" name="hlsfile" id="hlsfile" />'));
+      // var el = $('#hls-modal-${hlskey  | n, js_escaped_string}');
+      setup_autoupload(hlsmodal);
+      slow_refresh_hls(hlsmodal);
   });
 
   // file upload button
   hlsmodal.find('.hls-upload').click(function() {
-      $('#hls-modal-${hlskey}').find('#hlsfile').trigger('click');
+      hlsmodal.find('#hlsfile').trigger('click');
   });
 
   // auto-upload after file is chosen
@@ -105,9 +106,8 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
 
   // compile & save button
   hlsmodal.find('.hls-compile').click(function() {
-      var el = $('#hls-modal-${hlskey}');
-      compile_hls(el);
-      $(el).css('display', 'none')
+      compile_hls(hlsmodal);
+      $(hlsmodal).css('display', 'none')
   });
 
   // connect to server using POST (requires cross-domain-access)
@@ -144,25 +144,6 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
               alert('Error: cannot connect to latex2edx server');
           }
       });
-  }
-
-  function process_return_${hlskey}(datadict) {
-      // datadict is json of array with "xml" and "message"
-      // if "xml" value is '' then the conversion failed
-      var xml = datadict.xml;
-      if (xml.length == 0) {
-          alert('Conversion failed!  error:' + datadict.message);
-      } else {
-          set_raw_edit_box(xml, '${hlskey}');
-          save_hls($('#hls-modal-${hlskey}'));
-      }
-  }
-
-
-  function set_raw_edit_box(data, key) {
-      // get the codemirror editor for the raw-edit-box
-      // it's a CodeMirror-wrap class element
-      $('#hls-modal-' + key).closest('.xblock-studio_view').find('.CodeMirror-wrap')[0].CodeMirror.setValue(data);
   }
 
   // save button

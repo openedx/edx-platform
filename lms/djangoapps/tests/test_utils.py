@@ -1,17 +1,18 @@
 """
 Unit Tests for Utils Class
 """
+
+
 from unittest import TestCase
 
 import ddt
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from lms.djangoapps.utils import _get_key
-from opaque_keys.edx.keys import CourseKey, UsageKey
 
 
 @ddt.ddt
 class UtilsTests(TestCase):
-    shard = 4
 
     @ddt.data(
         ['edX/DemoX/Demo_Course', CourseKey.from_string('edX/DemoX/Demo_Course'), CourseKey],

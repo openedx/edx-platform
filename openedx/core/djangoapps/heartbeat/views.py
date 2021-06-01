@@ -1,14 +1,20 @@
 """
 Views for verifying the health (heartbeat) of the app.
 """
-from dogapi import dog_stats_api
+
+
+import logging
+import six
+
 from util.json_request import JsonResponse
 
 from .runchecks import runchecks
 
 
-@dog_stats_api.timed('edxapp.heartbeat')
-def heartbeat(request):  # pylint: disable=unused-argument
+log = logging.getLogger(__name__)
+
+
+def heartbeat(request):
     """
     Simple view that a loadbalancer can check to verify that the app is up. Returns a json doc
     of service id: status or message. If the status for any service is anything other than True,
@@ -24,6 +30,9 @@ def heartbeat(request):  # pylint: disable=unused-argument
                 status_code = 503  # 503 on any failure
     except Exception as e:
         status_code = 503
-        check_results = {'error': unicode(e)}
+        check_results = {'error': six.text_type(e)}
+
+    if status_code == 503:
+        log.error(u'Heartbeat check failed (%s): %s', status_code, check_results)
 
     return JsonResponse(check_results, status=status_code)

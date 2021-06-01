@@ -1,0 +1,41 @@
+.content-paywall {
+  margin-top: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  border: lightgrey 1px solid;
+  padding: 15px 20px;
+
+  h3 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .fa-lock {
+    color: black;
+    margin-right: 10px;
+    font-size: 24px;
+    margin-left: 5px;
+  }
+
+  .certDIV_1 {
+    color: rgb(25, 125, 29);
+    height: 20px;
+    width: 300px;
+    font: normal normal 600 normal 14px / 20px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  .certA_1 {
+    text-decoration: underline !important;
+    color: rgb(0, 117, 180);
+    font: normal normal 400 normal 16px / 25.6px 'Open Sans';
+  }
+
+  .certSPAN_1 {
+    padding: 10px 0;
+  }
+
+  img {
+    height: 60px;
+  }
+}

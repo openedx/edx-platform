@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 from django.db import migrations, models
 
@@ -16,13 +16,13 @@ class Migration(migrations.Migration):
             name='Target',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('target_type', models.CharField(max_length=64, choices=[(b'myself', b'Myself'), (b'staff', b'Staff and instructors'), (b'learners', b'All students'), (b'cohort', b'Specific cohort')])),
+                ('target_type', models.CharField(max_length=64, choices=[(u'myself', u'Myself'), (u'staff', u'Staff and instructors'), (u'learners', u'All students'), (u'cohort', u'Specific cohort')])),
             ],
         ),
         migrations.AlterField(
             model_name='courseemail',
             name='to_option',
-            field=models.CharField(max_length=64, choices=[(b'deprecated', b'deprecated')]),
+            field=models.CharField(max_length=64, choices=[(u'deprecated', u'deprecated')]),
         ),
         migrations.CreateModel(
             name='CohortTarget',

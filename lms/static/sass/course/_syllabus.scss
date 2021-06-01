@@ -3,7 +3,7 @@ div.syllabus {
   text-align: center;
 
   h1 {
-    @extend .top-header
+    @extend .top-header;
   }
 
   .notes {
@@ -33,7 +33,10 @@ div.syllabus {
       font-size: 1em !important;
       line-height: auto;
 
-      &.day, &.due, &.slides, &.assignment {
+      &.day,
+      &.due,
+      &.slides,
+      &.assignment {
         white-space: nowrap !important;
       }
 

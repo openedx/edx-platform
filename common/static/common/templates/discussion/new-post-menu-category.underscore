@@ -1,3 +1,0 @@
-<optgroup label="<%- text %>">
-    <%= edx.HtmlUtils.ensureHtml(entries) %>
-</optgroup>

@@ -4,10 +4,6 @@ Apache WSGI file for LMS
 This module contains the WSGI application used for Apache deployment.
 It exposes a module-level variable named ``application``.
 """
-from __future__ import absolute_import
-
-from openedx.core.lib.logsettings import log_python_warnings
-log_python_warnings()
 
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs

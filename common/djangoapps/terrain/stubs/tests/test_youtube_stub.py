@@ -2,8 +2,11 @@
 Unit test for stub YouTube implementation.
 """
 
+
 import unittest
+
 import requests
+
 from ..youtube import StubYouTubeService
 
 
@@ -18,7 +21,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
 
     def test_unused_url(self):
         response = requests.get(self.url + 'unused_url')
-        self.assertEqual("Unused url", response.content)
+        self.assertEqual(b"Unused url", response.content)
 
     @unittest.skip('Failing intermittently due to inconsistent responses from YT. See TE-871')
     def test_video_url(self):
@@ -28,7 +31,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
 
         # YouTube metadata for video `OEoXaMPEzfM` states that duration is 116.
         self.assertEqual(
-            'callback_func({"data": {"duration": 116, "message": "I\'m youtube.", "id": "OEoXaMPEzfM"}})',
+            b'callback_func({"data": {"duration": 116, "message": "I\'m youtube.", "id": "OEoXaMPEzfM"}})',
             response.content
         )
 
@@ -42,7 +45,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
                 '<?xml version="1.0" encoding="utf-8" ?>',
                 '<transcript><text start="1.0" dur="1.0">',
                 'Equal transcripts</text></transcript>'
-            ]), response.content
+            ]).encode('utf-8'), response.content
         )
 
     def test_transcript_url_not_equal(self):
@@ -56,7 +59,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
                 '<transcript><text start="1.1" dur="5.5">',
                 'Transcripts sample, different that on server',
                 '</text></transcript>'
-            ]), response.content
+            ]).encode('utf-8'), response.content
         )
 
     def test_transcript_not_found(self):

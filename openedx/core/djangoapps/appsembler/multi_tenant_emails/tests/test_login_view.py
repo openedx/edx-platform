@@ -14,23 +14,17 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from .test_utils import with_organization_context, create_org_user
+from ...settings.helpers import get_tahoe_multitenant_auth_backends
 
 
 @skip_unless_lms
-@override_settings(
-    AUTHENTICATION_BACKENDS=(
-        # Match the Appsembler configuration in appsembler.settings..aws_common
-        'organizations.backends.DefaultSiteBackend',
-        'organizations.backends.SiteMemberBackend',
-        'organizations.backends.OrganizationMemberBackend',
-    )
-)
+@override_settings(AUTHENTICATION_BACKENDS=get_tahoe_multitenant_auth_backends(settings))
 @skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
 class MultiTenantLoginTest(CacheIsolationTestCase):
     """
-    Test student.views.login_user() view.
+    Test user_authn's login_user() view.
 
-    This is similar to student.tests.test_login.LoginTest focuses on our multi-tenant tests including but not
+    This is similar to user_authn's LoginTest focuses on our multi-tenant tests including but not
     limited to `APPSEMBLER_MULTI_TENANT_EMAILS` i.e. these tests test
     the `organizations.backends.OrganizationMemberBackend` backend we rely on for Tahoe security.
     """
@@ -48,17 +42,7 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         self.client = Client()
         cache.clear()
         # Store the login url
-        self.url = reverse('login')
-
-    def test_auth_backends(self):
-        """
-        Ensure the correct authentication backends are enabled for this test case.
-        """
-        assert settings.AUTHENTICATION_BACKENDS == (
-            'organizations.backends.DefaultSiteBackend',
-            'organizations.backends.SiteMemberBackend',
-            'organizations.backends.OrganizationMemberBackend',
-        )
+        self.url = reverse('login_api')
 
     def create_user(self, org, email=EMAIL, password=PASSWORD):
         """
@@ -107,7 +91,7 @@ class MultiTenantLoginTest(CacheIsolationTestCase):
         """
         with with_organization_context(self.RED) as org:
             self.create_user(org)
-            nonexistent_email = u'not_a_user@edx.org'
+            nonexistent_email = 'not_a_user@edx.org'
             response = self.client.post(self.url, {'email': nonexistent_email, 'password': self.PASSWORD})
             assert not response.json()['success'], response.content
             assert response.json()['value'], 'Email or password is incorrect'

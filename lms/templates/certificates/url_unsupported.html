@@ -1,0 +1,18 @@
+<%page expression_filter="h"/>
+<%inherit file="accomplishment-base.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="wrapper-content status status-invalid">
+    <div class="wrapper-content-grid">
+        <main class="content content-main">
+            <section class="">
+                <h2 class="title">${_("URL Not Supported")}</h2>
+                <div class="copy">
+                    <p>${_("This link is no longer valid. But don’t worry—this Verified Certificate is still valid and available to share. If this is your certificate, please visit your dashboard to get a new shareable link. If you're viewing someone else's certificate, please contact them to get an updated link.")}</p>
+                </div>
+            </section>
+        </main>
+        <aside role="complementary" class="content-secondary about" aria-label="${_('About {platform_name} Certificates').format(platform_name=platform_name)}">
+        </aside>
+    </div>
+</div>

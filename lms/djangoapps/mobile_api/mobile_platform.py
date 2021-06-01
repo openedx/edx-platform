@@ -1,16 +1,19 @@
 """
 Platform related Operations for Mobile APP
 """
+
+
 import abc
 import re
 
+import six
 
-class MobilePlatform:
+
+class MobilePlatform(six.with_metaclass(abc.ABCMeta)):
     """
     MobilePlatform class creates an instance of platform based on user agent and supports platform
     related operations.
     """
-    __metaclass__ = abc.ABCMeta
     version = None
 
     def __init__(self, version):
@@ -53,16 +56,16 @@ class MobilePlatform:
 
 class IOS(MobilePlatform):
     """ iOS platform """
-    USER_AGENT_REGEX = (r'\((?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?); OS Version [0-9.]+ '
+    USER_AGENT_REGEX = (r'\((?P<version>[0-9]+.[0-9]+.[0-9]+(\.[0-9a-zA-Z]*)?); OS Version [0-9.]+ '
                         r'\(Build [0-9a-zA-Z]*\)\)')
-    NAME = "iOS"
+    NAME = u"iOS"
 
 
 class Android(MobilePlatform):
     """ Android platform """
     USER_AGENT_REGEX = (r'Dalvik/[.0-9]+ \(Linux; U; Android [.0-9]+; (.*) Build/[0-9a-zA-Z]*\) '
-                        r'(.*)/(?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?)')
-    NAME = "Android"
+                        r'(.*)/(?P<version>[0-9]+.[0-9]+.[0-9]+(\.[0-9a-zA-Z]*)?)')
+    NAME = u"Android"
 
 
 # a list of all supported mobile platforms

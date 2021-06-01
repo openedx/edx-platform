@@ -24,6 +24,11 @@ from openedx.core.djangolib.markup import HTML, Text
             <tr>
                 <th scope="row">${_("Professional")}</th><td>${modes['professional'] + modes['no-id-professional']}</td>
             </tr>
+            %if modes['masters'] > 0:
+                <tr>
+                    <th scope="row">${_("Master's")}</th><td>${modes['masters']}</td>
+                </tr>
+            %endif
             <tr style="color:green;border-top:1px solid #000">
                 <th scope="row" style="padding-top:10px;">
                     <strong>${_("Total")}</strong>

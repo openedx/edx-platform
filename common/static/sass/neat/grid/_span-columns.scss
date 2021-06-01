@@ -10,7 +10,7 @@
 
   $display-table: is-display-table($container-display-table, $display);
 
-  @if $display-table  {
+  @if $display-table {
     display: table-cell;
     width: percentage($columns / $container-columns);
   }
@@ -23,7 +23,7 @@
     }
 
     @if $display == collapse {
-      @warn "The 'collapse' argument will be deprecated. Use 'block-collapse' instead."
+      @warn "The 'collapse' argument will be deprecated. Use 'block-collapse' instead.";
     }
 
     @if $display == collapse or $display == block-collapse {
@@ -32,7 +32,6 @@
       &:last-child {
         width: flex-grid($columns, $container-columns);
       }
-
     }
 
     @else {

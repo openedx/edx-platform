@@ -13,31 +13,39 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
 
 from .common import *
 import os
-from path import Path as path
 from uuid import uuid4
-from util.db import NoOpMigrationModules
+
+from django.utils.translation import ugettext_lazy
+from path import Path as path
+
 from openedx.core.lib.derived import derive_settings
+from util.db import NoOpMigrationModules
 
 # import settings from LMS for consistent behavior with CMS
-# pylint: disable=unused-import
 from lms.envs.test import (
-    WIKI_ENABLED,
-    PLATFORM_NAME,
-    SITE_NAME,
+    COMPREHENSIVE_THEME_DIRS,
     DEFAULT_FILE_STORAGE,
+    ECOMMERCE_API_URL,
+    ENABLE_COMPREHENSIVE_THEMING,
+    JWT_AUTH,
     MEDIA_ROOT,
     MEDIA_URL,
-    COMPREHENSIVE_THEME_DIRS,
-    JWT_AUTH,
+    PLATFORM_DESCRIPTION,
+    PLATFORM_NAME,
     REGISTRATION_EXTRA_FIELDS,
+    GRADES_DOWNLOAD,
+    SITE_NAME,
+    WIKI_ENABLED
 )
+
+
+# Include a non-ascii character in STUDIO_NAME and STUDIO_SHORT_NAME to uncover possible
+# UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
+STUDIO_NAME = ugettext_lazy(u"Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸")
+STUDIO_SHORT_NAME = ugettext_lazy(u"𝓢𝓽𝓾𝓭𝓲𝓸")
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.
 ALLOWED_HOSTS = [
@@ -82,6 +90,8 @@ STATICFILES_DIRS += [
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 
+BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE'] = True
+
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -90,10 +100,10 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'collection': 'test_modulestore{0}'.format(THIS_UUID),
+        'collection': 'test_modulestore',
     },
 )
 
@@ -101,7 +111,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'test_xcontent',
+        'db': 'test_xcontent_{}'.format(THIS_UUID),
         'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
@@ -121,15 +131,9 @@ DATABASES = {
     },
 }
 
-if os.environ.get('DISABLE_MIGRATIONS'):
-    # Create tables directly from apps' models. This can be removed once we upgrade
-    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
-    MIGRATION_MODULES = NoOpMigrationModules()
-
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = "http://{}".format(LMS_BASE)
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
-
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -168,6 +172,12 @@ CACHES = {
     },
 }
 
+############################### BLOCKSTORE #####################################
+# Blockstore tests
+RUN_BLOCKSTORE_TESTS = os.environ.get('EDXAPP_RUN_BLOCKSTORE_TESTS', 'no').lower() in ('true', 'yes', '1')
+BLOCKSTORE_API_URL = os.environ.get('EDXAPP_BLOCKSTORE_API_URL', "http://edx.devstack.blockstore-test:18251/api/v1/")
+BLOCKSTORE_API_AUTH_TOKEN = os.environ.get('EDXAPP_BLOCKSTORE_API_AUTH_TOKEN', 'edxapp-test-key')
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
@@ -179,7 +189,6 @@ CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = False
 
 # These ports are carefully chosen so that if the browser needs to
 # access them, they will be available through the SauceLabs SSH tunnel
-LETTUCE_SERVER_PORT = 8003
 XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
@@ -196,76 +205,12 @@ PASSWORD_HASHERS = [
 # No segment key
 CMS_SEGMENT_KEY = None
 
+FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
+
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
-
-# set up some testing for microsites
-FEATURES['USE_MICROSITES'] = True
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
-MICROSITE_CONFIGURATION = {
-    "test_site": {
-        "domain_prefix": "test-site",
-        "university": "test_site",
-        "platform_name": "Test Site",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "TestSiteX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Site Overlay Text.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
-        "urls": {
-            'ABOUT': 'test-site/about',
-            'PRIVACY': 'test-site/privacy',
-            'TOS_AND_HONOR': 'test-site/tos-and-honor',
-        },
-    },
-    "site_with_logistration": {
-        "domain_prefix": "logistration",
-        "university": "logistration",
-        "platform_name": "Test logistration",
-        "logo_image_url": "test_site/images/header-logo.png",
-        "email_from_address": "test_site@edx.org",
-        "payment_support_email": "test_site@edx.org",
-        "ENABLE_MKTG_SITE": False,
-        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
-        "SITE_NAME": "test_site.localhost",
-        "course_org_filter": "LogistrationX",
-        "course_about_show_social_links": False,
-        "css_overrides_file": "test_site/css/test_site.css",
-        "show_partners": False,
-        "show_homepage_promo_video": False,
-        "course_index_overlay_text": "Logistration.",
-        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
-        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
-        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
-        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
-        "ENABLE_SHOPPING_CART": True,
-        "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_logistration.localhost",
-    },
-    "default": {
-        "university": "default_university",
-        "domain_prefix": "www",
-    }
-}
-MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
-MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
 TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
@@ -339,9 +284,17 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 
 ####################### Plugin Settings ##########################
 
+# pylint: disable=wrong-import-position
 from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.TEST)
 
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+############### Settings for edx-rbac  ###############
+SYSTEM_WIDE_ROLE_CLASSES = os.environ.get("SYSTEM_WIDE_ROLE_CLASSES", [])
+
+DEFAULT_MOBILE_AVAILABLE = True
+
+PROCTORING_SETTINGS = {}

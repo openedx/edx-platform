@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "welcome" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.urls import reverse
+  from django.conf import settings
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -161,10 +161,10 @@
 
     <ul class="list-actions">
       <li class="action-item">
-        <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up & Start Making Your {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
+        <a href="${settings.FRONTEND_REGISTER_URL}?next=${current_url}" class="action action-primary">${_("Sign Up & Start Making Your {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
       </li>
       <li class="action-item">
-        <a href="${reverse('login')}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+        <a href="${settings.LOGIN_URL}?next=${current_url}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
       </li>
     </ul>
   </section>

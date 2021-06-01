@@ -1,31 +1,64 @@
 """
 Third party auth API related permissions
 """
-from rest_framework import permissions
 
-from third_party_auth.models import ProviderApiPermissions
+import logging
+
+from edx_rest_framework_extensions.auth.jwt.decoder import decode_jwt_filters
+from edx_rest_framework_extensions.permissions import (
+    IsStaff,
+    IsSuperuser,
+    JwtHasScope,
+    JwtRestrictedApplication,
+    NotJwtRestrictedApplication
+)
+from rest_condition import C
+from rest_framework.permissions import BasePermission
+
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+
+log = logging.getLogger(__name__)
 
 
-class ThirdPartyAuthProviderApiPermission(permissions.BasePermission):
+class JwtHasTpaProviderFilterForRequestedProvider(BasePermission):
     """
-    Allow someone to access the view if they have valid OAuth client credential.
+    Ensures the JWT used to authenticate contains the appropriate tpa_provider
+    filter for the provider_id requested in the view.
     """
-    def __init__(self, provider_id):
-        """ Initialize the class with a provider_id """
-        self.provider_id = provider_id
+    message = 'JWT missing required tpa_provider filter.'
 
     def has_permission(self, request, view):
         """
-        Check if the OAuth client associated with auth token in current request has permission to access
-        the information for provider
+        Ensure that the provider_id kwarg provided to the view exists exists
+        in the tpa_provider filters in the JWT used to authenticate.
         """
-        if not request.auth or not self.provider_id:
-            # doesn't have access token or no provider_id specified
+        provider_id = view.kwargs.get('provider_id')
+        if not provider_id:
+            log.warning("Permission JwtHasTpaProviderFilterForRequestedProvider requires a view with provider_id.")
             return False
 
-        try:
-            ProviderApiPermissions.objects.get(client__pk=request.auth.client_id, provider_id=self.provider_id)
-        except ProviderApiPermissions.DoesNotExist:
-            return False
+        jwt_filters = decode_jwt_filters(request.auth)
+        for filter_type, filter_value in jwt_filters:
+            if filter_type == 'tpa_provider' and filter_value == provider_id:
+                return True
 
-        return True
+        log.warning(
+            "Permission JwtHasTpaProviderFilterForRequestedProvider: required filter tpa_provider:%s was not found.",
+            provider_id,
+        )
+        return False
+
+
+# TODO: Remove ApiKeyHeaderPermission. Check deprecated_api_key_header custom metric for active usage.
+_NOT_JWT_RESTRICTED_TPA_PERMISSIONS = (
+    C(NotJwtRestrictedApplication) &
+    (C(IsSuperuser) | ApiKeyHeaderPermission | C(IsStaff))
+)
+_JWT_RESTRICTED_TPA_PERMISSIONS = (
+    C(JwtRestrictedApplication) &
+    JwtHasScope &
+    JwtHasTpaProviderFilterForRequestedProvider
+)
+TPA_PERMISSIONS = (
+    (_NOT_JWT_RESTRICTED_TPA_PERMISSIONS | _JWT_RESTRICTED_TPA_PERMISSIONS)
+)

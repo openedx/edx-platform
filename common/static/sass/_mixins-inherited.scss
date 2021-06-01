@@ -173,12 +173,14 @@
   background-color: $uxpl-green-base;
   color: $white;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $uxpl-green-hover-active;
     color: $white;
   }
 
-  &.disabled, &.is-disabled {
+  &.disabled,
+  &.is-disabled {
     border: 1px solid $green-l3 !important;
     background: $green-l3 !important;
     color: $white !important;
@@ -195,12 +197,15 @@
   background-color: theme-color("primary");
   color: $white;
 
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     background-color: $uxpl-blue-hover-active;
     color: $white;
   }
 
-  &.disabled, &.is-disabled {
+  &.disabled,
+  &.is-disabled {
     box-shadow: none;
     border: 1px solid $blue-l3 !important;
     background: $blue-l3 !important;
@@ -217,12 +222,15 @@
   background-color: $red;
   color: $white;
 
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     background-color: $red-s1;
     color: $white;
   }
 
-  &.disabled, &.is-disabled {
+  &.disabled,
+  &.is-disabled {
     box-shadow: none;
     border: 1px solid $red-l3 !important;
     background: $red-l3 !important;
@@ -239,12 +247,15 @@
   background-color: $pink;
   color: $white;
 
-  &:hover, &:focus, &:active {
+  &:hover,
+  &:focus,
+  &:active {
     background-color: $pink-s1;
     color: $white;
   }
 
-  &.disabled, &.is-disabled {
+  &.disabled,
+  &.is-disabled {
     box-shadow: none;
     border: 1px solid $pink-l3 !important;
     background: $pink-l3 !important;
@@ -262,12 +273,14 @@
   background-color: $orange;
   color: $gray-d2;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $orange-s2;
     color: $gray-d2;
   }
 
-  &.disabled, &.is-disabled {
+  &.disabled,
+  &.is-disabled {
     border: 1px solid $orange-l3 !important;
     background: $orange-l2 !important;
     color: $gray-l1 !important;
@@ -286,7 +299,8 @@
   color: rgb(92, 103, 122);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: rgb(222, 236, 247);
     color: rgb(92, 103, 122);
   }
@@ -318,7 +332,8 @@
   background-color: $gray-d2;
   color: $gray-l3;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background-color: $gray-d3;
     color: $white;
   }

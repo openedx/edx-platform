@@ -3,15 +3,15 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 
 from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
+
 %>
 <%def name="course_name()">
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
-
+<%include file="/dates_banner.html" />
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
@@ -36,20 +36,27 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course, request.user):
+% if edx_notes_enabled:
 <%static:css group='style-student-notes'/>
 % endif
 
-<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
-<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}" async></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}" async></script>
 
-<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="preload" type="text/css">
   ${HTML(fragment.head_html())}
+
+% if is_learning_mfe:
+  ## If this chromeless view is in an iframe in the learning microfrontend app
+  ## then add a base tag in the head (of the iframe document) to force links
+  ## in this iframe to navigate the parent window.
+  <base target="_parent">
+%endif
 </%block>
 
 <%block name="js_extra">
-  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}" async></script>
 
   <%static:js group='courseware'/>
 
@@ -73,16 +80,19 @@ ${HTML(fragment.foot_html())}
     % else:
       data-enable-completion-on-view-service="false" \
     % endif
+    style="display: block; width: auto; margin: 0;"
   >
       <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
       </main>
   </section>
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course, request.user):
+% if not is_learning_mfe:
+
+  % if course.show_calculator or edx_notes_enabled:
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course, request.user):
+      % if edx_notes_enabled:
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 
@@ -91,4 +101,66 @@ ${HTML(fragment.foot_html())}
         <%include file="/calculator/toggle_calculator.html" />
       % endif
     </nav>
+  % endif
+% else:
+  % if edx_notes_enabled:
+    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+  % endif
+% endif
+
+% if is_learning_mfe:
+<script type="text/javascript">
+  (function() {
+    // If this view is rendered in an iframe within the learning microfrontend app
+    // it will report the height of its contents to the parent window when the
+    // document loads, window resizes, or DOM mutates.
+    if (window !== window.parent) {
+      document.body.className += ' view-in-mfe';
+      var lastHeight = window.offsetHeight;
+      var lastWidth = window.offsetWidth;
+      var contentElement = document.getElementById('content');
+
+      function dispatchResizeMessage(event) {
+        // Note: event is actually an Array of MutationRecord objects
+        // when fired from the MutationObserver
+        var eventType = event.type || 'mutate';
+        var newHeight = contentElement.offsetHeight;
+        var newWidth = contentElement.offsetWidth;
+
+        if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
+          return;
+        }
+
+        window.parent.postMessage({
+            type: 'plugin.resize',
+            payload: {
+              width: newWidth,
+              height: newHeight,
+            }
+          }, document.referrer
+        );
+
+        lastHeight = newHeight;
+        lastWidth = newWidth;
+
+        // Within the learning microfrontend the iframe resizes to match the
+        // height of this document and it should never scroll. It does scroll
+        // ocassionally when javascript is used to focus elements on the page
+        // before the parent iframe has been resized to match the content
+        // height. This window.scrollTo is an attempt to keep the content at the
+        // top of the page. See TNL-7094
+        window.scrollTo(0, 0);
+      }
+
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(dispatchResizeMessage);
+
+      // Start observing the target node for configured mutations
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+
+      window.addEventListener('load', dispatchResizeMessage);
+      window.addEventListener('resize', dispatchResizeMessage);
+    }
+  }());
+</script>
 % endif

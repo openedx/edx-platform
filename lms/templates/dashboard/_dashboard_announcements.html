@@ -1,0 +1,7 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<div id="announcements" role="alert" aria-label="Announcements" tabindex="-1"></div>
+
+<%static:webpack entry="AnnouncementsView">
+  new AnnouncementsView();
+</%static:webpack>

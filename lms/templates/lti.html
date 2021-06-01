@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%!
 import json
 from django.utils.translation import ugettext as _
@@ -33,7 +34,7 @@ from django.utils.translation import ugettext as _
             % if description:
                 <div class="lti-description">${description}</div>
             % endif
-            <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
+            <p class="lti-link external"><a target="_blank" class="link_lti_new_window" rel="noopener" href="${form_url}">
                 ${button_text or _('View resource in a new window')}
                  <span class="icon fa fa-external-link" aria-hidden="true"></span>
             </a></p>
@@ -61,7 +62,7 @@ from django.utils.translation import ugettext as _
     <h4 class="hd hd-4 problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
     <div class="problem-feedback">
         ## sanitized with bleach in view
-        ${comment}
+        ${comment | n, decode.utf8}
     </div>
 % endif
 

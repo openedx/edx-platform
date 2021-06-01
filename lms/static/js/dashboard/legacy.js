@@ -86,29 +86,26 @@
 
          function setDialogAttributes(isPaidCourse, certNameLong,
                                         courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
-             // This flag is added for REV-19 experiment
-             var auditRefundableCourses = (window.experimentVariables || {}).auditRefundableCourses,
-                 courseInExperiment = auditRefundableCourses ? auditRefundableCourses.indexOf(courseKey) > -1 : false,
-                 diagAttr = {};
+             var diagAttr = {};
 
-             if (isPaidCourse || courseInExperiment) {
+             if (isPaidCourse) {
                  if (showRefundOption) {
                      diagAttr['data-refund-info'] = gettext('You will be refunded the amount you paid.');
                  } else {
                      diagAttr['data-refund-info'] = gettext('You will not be refunded the amount you paid.');
                  }
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the purchased course ' +
-                                                   '%(courseName)s (%(courseNumber)s)?');
+                                                   '{courseName} ({courseNumber})?');
              } else if (enrollmentMode !== 'verified') {
-                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from %(courseName)s ' +
-                                                   '(%(courseNumber)s)?');
+                 diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from {courseName} ' +
+                                                   '({courseNumber})?');
              } else if (showRefundOption) {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '%(certNameLong)s  track of %(courseName)s  (%(courseNumber)s)?');
+                                                   '{certNameLong}  track of {courseName}  ({courseNumber})?');
                  diagAttr['data-refund-info'] = gettext('You will be refunded the amount you paid.');
              } else {
                  diagAttr['data-track-info'] = gettext('Are you sure you want to unenroll from the verified ' +
-                                                   '%(certNameLong)s track of %(courseName)s (%(courseNumber)s)?');
+                                                   '{certNameLong} track of {courseName} ({courseNumber})?');
                  diagAttr['data-refund-info'] = gettext('The refund deadline for this course has passed,' +
                      'so you will not receive a refund.');
              }
@@ -158,11 +155,26 @@
                      $('#track-info').empty();
                      $('#refund-info').empty();
 
-                     $('#track-info').html(interpolate(dialogMessageAttr['data-track-info'], {
-                         courseNumber: ['<span id="unenroll_course_number">', courseNumber, '</span>'].join(''),
-                         courseName: ['<span id="unenroll_course_name">', courseName, '</span>'].join(''),
-                         certNameLong: ['<span id="unenroll_cert_name">', certNameLong, '</span>'].join('')
-                     }, true));
+                     edx.HtmlUtils.setHtml(
+                         $('#track-info'),
+                         edx.HtmlUtils.interpolateHtml(dialogMessageAttr['data-track-info'], {
+                             courseNumber: edx.HtmlUtils.joinHtml(
+                                edx.HtmlUtils.HTML('<span id="unenroll_course_number">'),
+                                courseNumber,
+                                edx.HtmlUtils.HTML('</span>')
+                             ),
+                             courseName: edx.HtmlUtils.joinHtml(
+                                edx.HtmlUtils.HTML('<span id="unenroll_course_name">'),
+                                courseName,
+                                edx.HtmlUtils.HTML('</span>')
+                             ),
+                             certNameLong: edx.HtmlUtils.joinHtml(
+                                edx.HtmlUtils.HTML('<span id="unenroll_cert_name">'),
+                                certNameLong,
+                                edx.HtmlUtils.HTML('</span>')
+                             )
+                         }, true)
+                     );
 
 
                      if ('data-refund-info' in dialogMessageAttr) {

@@ -186,10 +186,13 @@ $ui-notification-height: ($baseline*10);
 
 // social platforms
 $twitter-blue: #55acee;
-$facebook-blue: #3b5998;
+$facebook-blue: #4267b2;
+$facebook-focus-blue: #29487d;
 $linkedin-blue: #0077b5;
-$google-red: #d73924;
-$microsoft-black: #000;
+$google-blue: #4285f4;
+$google-focus-blue: #287ae6;
+$microsoft-black: #2f2f2f;
+$microsoft-focus-black: #000;
 
 // shadows
 $shadow: rgba(0, 0, 0, 0.2) !default;
@@ -237,6 +240,9 @@ $xseries-color: #424242 !default;
 $zebra-stripe-color: rgb(249, 250, 252) !default;
 $divider-color: rgb(226, 231, 236) !default;
 $lms-preview-menu-color: #c8c8c8 !default;
+
+//Form control border color for account settings
+$gray58-border: tint($gray, 22%) !default;
 
 // old color variables
 // DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
@@ -475,7 +481,7 @@ $shadow-color: $blue !default;
 $modal-bg-color: rgb(245, 245, 245) !default;
 
 // courseware elements
-$courseware-header-image: linear-gradient(top, rgb(255, 255, 255), rgb(238, 238, 238)) !default;
+$courseware-header-image: linear-gradient(top, rgb(255, 255, 255), rgb(238, 238, 238)) !default; /* stylelint-disable-line */
 $courseware-header-bg: transparent !default;
 $courseware-footer-border: none !default;
 $courseware-footer-shadow: none !default;
@@ -535,7 +541,7 @@ $result-highlight-color-base: rgba($highlight-color, 0.25) !default;
 $sidebar-chapter-bg-top: rgba(255, 255, 255, 0.5) !default;
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0) !default;
 $sidebar-chapter-bg: rgb(246, 246, 246) !default;
-$sidebar-active-image: linear-gradient(top, rgb(230, 230, 230), rgb(214, 214, 214)) !default;
+$sidebar-active-image: linear-gradient(top, rgb(230, 230, 230), rgb(214, 214, 214)) !default; /* stylelint-disable-line */
 
 
 // student notes

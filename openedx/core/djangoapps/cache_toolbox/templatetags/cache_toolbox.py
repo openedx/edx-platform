@@ -2,6 +2,8 @@
 Implementation of custom django template tags for
 automatically caching template fragments.
 """
+
+
 from django import template
 from django.core.cache import cache
 from django.template import Node, TemplateSyntaxError, Variable

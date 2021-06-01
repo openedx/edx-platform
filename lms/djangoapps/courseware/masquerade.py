@@ -4,18 +4,26 @@ Allow course staff to see a student or staff view of courseware.
 Which kind of view has been selected is stored in the session state.
 '''
 
+
 import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
+from django.views import View
 from opaque_keys.edx.keys import CourseKey
+from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML
 from student.models import CourseEnrollment
+from student.role_helpers import has_staff_roles
 from util.json_request import JsonResponse, expect_json
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
@@ -55,46 +63,55 @@ class CourseMasquerade(object):
         self.__init__(**state)
 
 
-@require_POST
-@login_required
-@expect_json
-def handle_ajax(request, course_key_string):
+@method_decorator(login_required, name='dispatch')
+class MasqueradeView(View):
     """
-    Handle AJAX posts to update the current user's masquerade for the specified course.
-    The masquerade settings are stored in the Django session as a dict from course keys
-    to CourseMasquerade objects.
+    Create an HTTP endpoint to manage masquerade settings
     """
-    course_key = CourseKey.from_string(course_key_string)
-    masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
-    request_json = request.json
-    role = request_json.get('role', 'student')
-    group_id = request_json.get('group_id', None)
-    user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
-    user_name = request_json.get('user_name', None)
-    if user_name:
-        users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
-        try:
-            if '@' in user_name:
-                user_name = users_in_course.get(email=user_name).username
-            else:
-                users_in_course.get(username=user_name)
-        except User.DoesNotExist:
+
+    @method_decorator(expect_json)
+    def post(self, request, course_key_string):
+        """
+        Handle AJAX posts to update the current user's masquerade for the specified course.
+        The masquerade settings are stored in the Django session as a dict from course keys
+        to CourseMasquerade objects.
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        is_staff = has_staff_roles(request.user, course_key)
+        if not is_staff:
             return JsonResponse({
                 'success': False,
-                'error': _(
-                    'There is no user with the username or email address {user_name} '
-                    'enrolled in this course.'
-                ).format(user_name=user_name)
             })
-    masquerade_settings[course_key] = CourseMasquerade(
-        course_key,
-        role=role,
-        user_partition_id=user_partition_id,
-        group_id=group_id,
-        user_name=user_name,
-    )
-    request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
-    return JsonResponse({'success': True})
+        masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+        request_json = request.json
+        role = request_json.get('role', 'student')
+        group_id = request_json.get('group_id', None)
+        user_partition_id = request_json.get('user_partition_id', None) if group_id is not None else None
+        user_name = request_json.get('user_name', None)
+        found_user_name = None
+        if user_name:
+            users_in_course = CourseEnrollment.objects.users_enrolled_in(course_key)
+            try:
+                found_user_name = users_in_course.get(Q(email=user_name) | Q(username=user_name)).username
+            except User.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': _(
+                        u'There is no user with the username or email address u"{user_identifier}" '
+                        'enrolled in this course.'
+                    ).format(
+                        user_identifier=user_name,
+                    ),
+                })
+        masquerade_settings[course_key] = CourseMasquerade(
+            course_key,
+            role=role,
+            user_partition_id=user_partition_id,
+            group_id=group_id,
+            user_name=found_user_name,
+        )
+        request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
+        return JsonResponse({'success': True})
 
 
 def setup_masquerade(request, course_key, staff_access=False, reset_masquerade_data=False):
@@ -163,7 +180,7 @@ def is_masquerading_as_student(user, course_key):
     return get_masquerade_role(user, course_key) == 'student'
 
 
-def is_masquerading_as_specific_student(user, course_key):  # pylint: disable=invalid-name
+def is_masquerading_as_specific_student(user, course_key):
     """
     Returns whether the user is a staff member masquerading as a specific student.
     """
@@ -185,6 +202,30 @@ def get_masquerading_user_group(course_key, user, user_partition):
                 return None
     # The user is masquerading as a generic student or not masquerading as a group return None
     return None
+
+
+def check_content_start_date_for_masquerade_user(course_key, user, request, course_start,
+                                                 chapter_start=None, section_start=None):
+    """
+    Add a warning message if the masquerade user would not have access to this content
+    due to the content start date being in the future.
+    """
+    now = datetime.now(utc)
+    most_future_date = course_start
+    if chapter_start and section_start:
+        most_future_date = max(course_start, chapter_start, section_start)
+    is_masquerading = get_course_masquerade(user, course_key)
+    if now < most_future_date and is_masquerading:
+        group_masquerade = is_masquerading_as_student(user, course_key)
+        specific_student_masquerade = is_masquerading_as_specific_student(user, course_key)
+        is_staff = has_staff_roles(user, course_key)
+        if group_masquerade or (specific_student_masquerade and not is_staff):
+            PageLevelMessages.register_warning_message(
+                request,
+                HTML(_('This user does not have access to this content because \
+                        the content start date is in the future')),
+                once_only=True
+            )
 
 
 # Sentinel object to mark deleted objects in the session cache

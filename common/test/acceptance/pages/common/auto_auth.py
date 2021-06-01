@@ -1,10 +1,12 @@
 """
 Auto-auth page (used to automatically log in during testing).
 """
+
+
 import json
 import os
-import urllib
 
+from six.moves import urllib
 from bok_choy.page_object import PageObject, unguarded
 
 # The URL used for user auth in testing
@@ -24,8 +26,9 @@ class AutoAuthPage(PageObject):
     # Internal cache for parsed user info.
     _user_info = None
 
-    def __init__(self, browser, username=None, email=None, password=None, full_name=FULL_NAME, staff=False, superuser=None,
-                 course_id=None, enrollment_mode=None, roles=None, no_login=False, is_active=True, course_access_roles=None):
+    def __init__(self, browser, username=None, email=None, password=None, full_name=FULL_NAME, staff=False,
+                 superuser=None, course_id=None, enrollment_mode=None, roles=None, no_login=False, is_active=True,
+                 course_access_roles=None, should_manually_verify=False):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -37,6 +40,8 @@ class AutoAuthPage(PageObject):
         `superuser` is a boolean indicating whether the user is a super user.
         `course_id` is the ID of the course to enroll the student in.
         Currently, this has the form "org/number/run"
+        `should_manually_verify` is a boolean indicating whether the
+        created user should have their identification verified
 
         Note that "global staff" is NOT the same as course staff.
         """
@@ -80,13 +85,16 @@ class AutoAuthPage(PageObject):
         if no_login:
             self._params['no_login'] = True
 
+        if should_manually_verify:
+            self._params['should_manually_verify'] = True
+
     @property
     def url(self):
         """
         Construct the URL.
         """
         url = AUTH_BASE_URL + "/auto_auth"
-        query_str = urllib.urlencode(self._params)
+        query_str = urllib.parse.urlencode(self._params)
 
         if query_str:
             url += "?" + query_str

@@ -13,8 +13,7 @@
 .view-certificates {
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     float: left;
   }
 
@@ -115,8 +114,7 @@
         margin: ($baseline/4) 0 ($baseline/2) $baseline;
 
         li {
-          @include box-sizing(border-box);
-
+          box-sizing: border-box;
           display: table-cell;
           margin-right: 1%;
           padding: ($baseline/4) 0;
@@ -215,8 +213,7 @@
     }
 
     .collection-edit {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       border-radius: 2px;
       width: 100%;
       background: $white;

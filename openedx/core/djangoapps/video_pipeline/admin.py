@@ -1,6 +1,7 @@
 """
 Django admin for Video Pipeline models.
 """
+
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 

@@ -8,7 +8,9 @@ if and only if the service is deployed in the Open edX installation.
 To ensure maximum separation of concerns, and a minimum of interdependencies,
 this package should be kept small, thin, and stateless.
 """
-from openedx.core.djangoapps.waffle_utils import (WaffleSwitch, WaffleSwitchNamespace)
+
+
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch, WaffleSwitchNamespace
 
 PROGRAMS_WAFFLE_SWITCH_NAMESPACE = WaffleSwitchNamespace(name='programs')
 

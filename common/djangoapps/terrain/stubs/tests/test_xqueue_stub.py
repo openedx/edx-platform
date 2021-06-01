@@ -2,10 +2,14 @@
 Unit tests for stub XQueue implementation.
 """
 
-import mock
-import unittest
+
+import ast
 import json
+import unittest
+
+import mock
 import requests
+
 from ..xqueue import StubXQueueService
 
 
@@ -162,6 +166,10 @@ class StubXQueueServiceTest(unittest.TestCase):
             'xqueue_header': expected_header,
             'xqueue_body': expected_body,
         }
-
         # Check that the POST request was made with the correct params
-        self.post.assert_called_with(callback_url, data=expected_callback_dict)
+        self.assertEqual(self.post.call_args[1]['data']['xqueue_body'], expected_callback_dict['xqueue_body'])
+        self.assertEqual(
+            ast.literal_eval(self.post.call_args[1]['data']['xqueue_header']),
+            ast.literal_eval(expected_callback_dict['xqueue_header'])
+        )
+        self.assertEqual(self.post.call_args[0][0], callback_url)

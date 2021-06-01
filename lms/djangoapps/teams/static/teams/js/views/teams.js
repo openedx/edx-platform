@@ -18,15 +18,23 @@
             paginationLabel: gettext('Teams Pagination'),
 
             initialize: function(options) {
+                var view = this;
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({
                     router: options.router,
-                    maxTeamSize: this.context.maxTeamSize,
+                    courseMaxTeamSize: this.context.courseMaxTeamSize,
                     srInfo: this.srInfo,
                     countries: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.countries),
-                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages)
+                    languages: TeamUtils.selectorOptionsArrayToHashWithBlank(this.context.languages),
+                    getTopic: function(topicId) { return view.getTopic(topicId); }
                 });
                 PaginatedView.prototype.initialize.call(this);
+            },
+
+            // eslint-disable-next-line no-unused-vars
+            getTopic: function(topicId) {
+                // This must be overwritten in extending classes.
+                return null;
             }
         });
         return TeamsView;

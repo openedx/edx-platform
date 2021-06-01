@@ -1,0 +1,41 @@
+# This does not cover all the code in edx-platform but it's a good start.
+
+# Core
+common/djangoapps/student/                 @edx/platform-core
+common/djangoapps/third_party_auth/        @edx/platform-authn
+common/lib/xmodule/xmodule/                @edx/platform-core
+lms/djangoapps/course_api/blocks           @edx/platform-core
+lms/djangoapps/courseware/                 @edx/platform-core
+lms/djangoapps/grades/                     @edx/platform-grades
+lms/djangoapps/instructor/                 @edx/platform-core
+lms/djangoapps/instructor_task/            @edx/platform-core
+lms/djangoapps/mobile_api/                 @edx/platform-mobile
+openedx/core/djangoapps/contentserver/     @edx/platform-core
+openedx/core/djangoapps/heartbeat/         @edx/platform-core
+openedx/core/djangoapps/oauth_dispatch     @edx/platform-authn
+openedx/core/djangoapps/user_api/          @edx/platform-authn
+openedx/core/djangoapps/user_authn/        @edx/platform-authn
+openedx/features/course_experience/        @edx/platform-courseware
+
+# Core Extensions 
+common/lib/xmodule/xmodule/capa_module.py  @edx/platform-core-extensions
+common/lib/xmodule/xmodule/html_module.py  @edx/platform-core-extensions
+common/lib/xmodule/xmodule/video_module    @edx/platform-core-extensions
+lms/djangoapps/discussion/                 @edx/platform-core-extensions
+lms/djangoapps/edxnotes                    @edx/platform-core-extensions
+
+# Analytics
+common/djangoapps/track/                   @edx/edx-data-engineering
+
+# Credentials
+lms/djangoapps/certificates/               @edx/platform-credentials
+
+# Discovery
+common/djangoapps/course_modes/            @edx/platform-discovery
+common/djangoapps/enrollment/              @edx/platform-discovery
+lms/djangoapps/commerce/                   @edx/rev-team
+lms/djangoapps/experiments/                @edx/rev-team
+lms/djangoapps/learner_dashboard/          @edx/platform-discovery
+openedx/features/content_type_gating/      @edx/rev-team
+openedx/features/course_duration_limits/   @edx/rev-team
+openedx/features/discounts/                @edx/rev-team

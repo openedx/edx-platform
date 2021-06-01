@@ -9,9 +9,12 @@ CourseLocator or BlockUsageLocator will actually be used. And all objects
 returned from the modulestore will have their keys updated to be the CCX
 version that was passed in.
 """
+
+
 from contextlib import contextmanager
 from functools import partial
 
+import six
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
@@ -68,7 +71,7 @@ def restore_ccx_collection(field_value, ccx_id=None):
     if isinstance(field_value, list):
         field_value = [restore_ccx(fv, ccx_id) for fv in field_value]
     elif isinstance(field_value, dict):
-        for key, val in field_value.iteritems():
+        for key, val in six.iteritems(field_value):
             field_value[key] = restore_ccx(val, ccx_id)
     else:
         field_value = restore_ccx(field_value, ccx_id)

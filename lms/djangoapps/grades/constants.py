@@ -10,3 +10,9 @@ class ScoreDatabaseTableEnum(object):
     courseware_student_module = 'csm'
     submissions = 'submissions'
     overrides = 'overrides'
+
+
+class GradeOverrideFeatureEnum(object):
+    proctoring = u'PROCTORING'
+    gradebook = u'GRADEBOOK'
+    grade_import = 'grade-import'

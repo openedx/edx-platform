@@ -86,7 +86,7 @@ def patched_clear_site_cache(sender, **kwargs):
 
 
 class AlternativeDomain(models.Model):
-    site = models.OneToOneField(Site, related_name='alternative_domain')
+    site = models.OneToOneField(Site, related_name='alternative_domain', on_delete=models.CASCADE)
     domain = models.CharField(max_length=500)
 
     def __unicode__(self):

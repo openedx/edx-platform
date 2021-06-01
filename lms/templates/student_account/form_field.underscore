@@ -15,7 +15,7 @@
         </label>
         <% if (supplementalLink && supplementalText) { %>
             <div class="supplemental-link">
-                <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
             </div>
         <% } %>
     <% } %>
@@ -39,13 +39,13 @@
             <% }); %>
         </select>
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
         <% if (supplementalLink && supplementalText) { %>
             <div class="supplemental-link">
-                <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
             </div>
         <% } %>
     <% } else if ( type === 'textarea' ) { %>
@@ -65,13 +65,13 @@
             } %>
             <% if ( required ) { %> aria-required="true" required<% } %>></textarea>
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
         <% if (supplementalLink && supplementalText) { %>
             <div class="supplemental-link">
-                <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
+                <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
             </div>
         <% } %>
     <% } else if (type === 'plaintext' ) { %>
@@ -86,7 +86,7 @@
         <% if ( type === 'checkbox' ) { %>
             <% if (supplementalLink && supplementalText) { %>
                 <div class="supplemental-link">
-                    <a href="<%- supplementalLink %>" target="_blank"><%- supplementalText %></a>
+                    <a href="<%- supplementalLink %>" rel="noopener" target="_blank"><%- supplementalText %></a>
                 </div>
             <% } %>
         <% } %>
@@ -126,13 +126,13 @@
         <% } %>
 
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
     <% } %>
 
     <% if( form === 'login' && name === 'password' ) { %>
-        <button type="button" class="forgot-password field-link"><%- gettext("Forgot password?") %></button>
+        <button type="button" class="forgot-password field-link"><%- gettext("Need help logging in?") %></button>
     <% } %>
 </div>

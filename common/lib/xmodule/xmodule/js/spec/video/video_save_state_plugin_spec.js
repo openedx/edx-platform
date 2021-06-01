@@ -128,6 +128,7 @@ import * as Time from 'time.js';
             });
 
             function itSpec(value) {
+                state.config.saveStateEnabled = true;
                 var asyncVal = value.asyncVal,
                     speedVal = value.speedVal,
                     positionVal = value.positionVal,
@@ -163,6 +164,11 @@ import * as Time from 'time.js';
 
         it('can save state on speed change', function() {
             state.el.trigger('speedchange', ['2.0']);
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            });
+            state.config.saveStateEnabled = true;
+            state.el.trigger('speedchange', ['2.0']);
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
                 type: 'POST',
@@ -175,6 +181,12 @@ import * as Time from 'time.js';
         it('can save state on page unload', function() {
             $.ajax.calls.reset();
             state.videoSaveStatePlugin.onUnload();
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            })
+            state.config.saveStateEnabled = true;
+            $.ajax.calls.reset();
+            state.videoSaveStatePlugin.onUnload();
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
                 type: 'POST',
@@ -185,6 +197,11 @@ import * as Time from 'time.js';
         });
 
         it('can save state on pause', function() {
+            state.el.trigger('pause');
+            expect($.ajax).not.toHaveBeenCalledWith({
+                url: state.config.saveStateUrl
+            })
+            state.config.saveStateEnabled = true;
             state.el.trigger('pause');
             expect($.ajax).toHaveBeenCalledWith({
                 url: state.config.saveStateUrl,
@@ -213,6 +230,11 @@ import * as Time from 'time.js';
             expect($.ajax).not.toHaveBeenCalled();
 
             // Test that we can go from unavailable -> available
+            state.config.saveStateEnabled = false;
+            state.config.recordedYoutubeIsAvailable = false;
+            state.el.trigger('youtube_availability', [true]);
+            expect($.ajax).not.toHaveBeenCalled()
+            state.config.saveStateEnabled = true;
             state.config.recordedYoutubeIsAvailable = false;
             state.el.trigger('youtube_availability', [true]);
             expect($.ajax).toHaveBeenCalledWith({

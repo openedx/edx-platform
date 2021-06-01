@@ -2,18 +2,16 @@
 Helper methods for Studio views.
 """
 
-from __future__ import absolute_import
 
-import urllib
 from uuid import uuid4
 
+import six
 from django.conf import settings
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
-import dogstats_wrapper as dog_stats_api
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -112,7 +110,7 @@ def xblock_studio_url(xblock, parent_xblock=None):
     elif category in ('chapter', 'sequential'):
         return u'{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=urllib.quote(unicode(xblock.location))
+            usage_key=six.moves.urllib.parse.quote(six.text_type(xblock.location))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
@@ -145,7 +143,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Unit')
     component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
-        return _(component_class.display_name.default)    # pylint: disable=translation-of-non-string
+        return _(component_class.display_name.default)
     else:
         return default_display_name
 
@@ -223,7 +221,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
-        if isinstance(data, basestring):
+        if isinstance(data, six.string_types):
             data = {'data': data}
 
         created_block = store.create_child(
@@ -268,15 +266,6 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if category == 'static_tab':
-
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:create_xblock_static_tab",
-                    u"course:{}".format(unicode(dest_usage_key.course_key)),
-                )
-            )
-
             display_name = display_name or _("Empty")  # Prevent name being None
             course = store.get_course(dest_usage_key.course_key)
             course.tabs.append(

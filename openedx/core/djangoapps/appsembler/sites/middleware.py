@@ -4,6 +4,7 @@ import logging
 from django.conf import settings
 from django.core.cache import caches
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.appsembler.sites.models import AlternativeDomain
 from openedx.core.djangoapps.appsembler.sites.utils import get_current_organization
@@ -12,7 +13,7 @@ from openedx.core.djangoapps.appsembler.sites.utils import get_current_organizat
 log = logging.getLogger(__name__)
 
 
-class CustomDomainsRedirectMiddleware(object):
+class CustomDomainsRedirectMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         cache_general = caches['default']
@@ -37,7 +38,7 @@ class CustomDomainsRedirectMiddleware(object):
             return
 
 
-class RedirectMiddleware(object):
+class RedirectMiddleware(MiddlewareMixin):
     """
     Redirects requests for main site to Tahoe marketing page, except whitelisted.
     """
@@ -49,9 +50,7 @@ class RedirectMiddleware(object):
         site = request.site
         try:
             beeline.add_trace_field("site_id", site.id)
-            in_whitelist = any(map(
-                lambda p: p in request.path,
-                settings.MAIN_SITE_REDIRECT_WHITELIST))
+            in_whitelist = any([p in request.path for p in settings.MAIN_SITE_REDIRECT_WHITELIST])
             if (site.id == settings.SITE_ID) and not in_whitelist:
                 return redirect(settings.TAHOE_MAIN_SITE_REDIRECT_URL)
         except Exception:
@@ -61,7 +60,7 @@ class RedirectMiddleware(object):
             pass
 
 
-class LmsCurrentOrganizationMiddleware(object):
+class LmsCurrentOrganizationMiddleware(RedirectMiddleware):
     """
     Get the current middleware for the LMS.
 

@@ -1,4 +1,4 @@
-"""
+u"""
 Profile Distributions
 
 Aggregate sums for values of fields in students profiles.
@@ -20,6 +20,7 @@ The distribution in a course for gender might look like:
         'f': 'Female'
 }
 """
+
 
 from django.db.models import Count
 
@@ -95,7 +96,7 @@ def profile_distribution(course_id, feature):
 
     if feature not in AVAILABLE_PROFILE_FEATURES:
         raise ValueError(
-            "unsupported feature requested for distribution '{}'".format(
+            u"unsupported feature requested for distribution u'{}'".format(
                 feature)
         )
 

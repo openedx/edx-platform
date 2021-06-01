@@ -1,6 +1,7 @@
 """
 Helper functions for logging.
 """
+
 import logging
 
 log = logging.getLogger(__name__)

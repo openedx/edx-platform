@@ -2,6 +2,8 @@
 """
 Tests that the request came from a crawler or not.
 """
+
+
 import ddt
 from django.test import TestCase
 from django.http import HttpRequest

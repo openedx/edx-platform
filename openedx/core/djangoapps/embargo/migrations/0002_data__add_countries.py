@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 # Converted from the original South migration 0003_add_countries.py
 

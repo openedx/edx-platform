@@ -1,3 +1,8 @@
+"""
+i18n utility functions
+"""
+
+
 from django.utils.translation import ugettext as _, override
 from django.utils.formats import dateformat, get_format
 

@@ -2,15 +2,17 @@
 Tests for DOT Adapter
 """
 
+
 import unittest
 from datetime import timedelta
 
+import ddt
+import six
 from django.conf import settings
 from django.test import TestCase
 from django.utils.timezone import now
-
-import ddt
 from oauth2_provider import models
+
 from student.tests.factories import UserFactory
 
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -54,7 +56,7 @@ class DOTAdapterTestCase(TestCase):
         """
         Make sure unicode representation of RestrictedApplication is correct
         """
-        self.assertEqual(unicode(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
+        self.assertEqual(six.text_type(self.restricted_app), u"<RestrictedApplication '{name}'>".format(
             name=self.restricted_client.name
         ))
 
@@ -93,9 +95,9 @@ class DOTAdapterTestCase(TestCase):
         self.assertEqual(self.adapter.get_client_for_token(token), self.public_client)
 
     def test_get_access_token(self):
-        token = models.AccessToken.objects.create(
-            token='token-id',
-            application=self.public_client,
+        token = self.adapter.create_access_token_for_test(
+            'token-id',
+            client=self.public_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )
@@ -106,9 +108,9 @@ class DOTAdapterTestCase(TestCase):
         Make sure when generating an access_token for a restricted client
         that the token is immediately expired
         """
-        models.AccessToken.objects.create(
-            token='expired-token-id',
-            application=self.restricted_client,
+        self.adapter.create_access_token_for_test(
+            'expired-token-id',
+            client=self.restricted_client,
             user=self.user,
             expires=now() + timedelta(days=30),
         )

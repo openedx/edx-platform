@@ -1,14 +1,17 @@
 """
 Tests for course dates fragment.
 """
-from datetime import timedelta, datetime
+
+
+from datetime import datetime, timedelta
+
+import six
 from django.urls import reverse
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_PASSWORD = 'test'
 
@@ -32,13 +35,12 @@ class TestCourseDatesFragmentView(ModuleStoreTestCase):
         self.dates_fragment_url = reverse(
             'openedx.course_experience.mobile_dates_fragment_view',
             kwargs={
-                'course_id': unicode(self.course.id)
+                'course_id': six.text_type(self.course.id)
             }
         )
 
     def test_course_dates_fragment(self):
         response = self.client.get(self.dates_fragment_url)
-        self.assertContains(response, 'Today is')
         self.assertContains(response, 'Course End')
 
         self.client.logout()

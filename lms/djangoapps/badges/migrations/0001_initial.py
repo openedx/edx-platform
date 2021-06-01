@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import jsonfield.fields
-import badges.models
-from django.conf import settings
+
 import django.utils.timezone
+import jsonfield.fields
+from django.conf import settings
+from django.db import migrations, models
 from model_utils import fields
 from opaque_keys.edx.django.models import CourseKeyField
+
+import badges.models
 
 
 class Migration(migrations.Migration):
@@ -34,13 +35,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('slug', models.SlugField(max_length=255, validators=[badges.models.validate_lowercase])),
-                ('issuing_component', models.SlugField(default=b'', blank=True, validators=[badges.models.validate_lowercase])),
+                ('issuing_component', models.SlugField(default=u'', blank=True, validators=[badges.models.validate_lowercase])),
                 ('display_name', models.CharField(max_length=255)),
                 ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('description', models.TextField()),
                 ('criteria', models.TextField()),
-                ('mode', models.CharField(default=b'', max_length=100, blank=True)),
-                ('image', models.ImageField(upload_to=b'badge_classes', validators=[badges.models.validate_badge_image])),
+                ('mode', models.CharField(default=u'', max_length=100, blank=True)),
+                ('image', models.ImageField(upload_to=u'badge_classes', validators=[badges.models.validate_badge_image])),
             ],
         ),
         migrations.CreateModel(
@@ -48,7 +49,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('mode', models.CharField(help_text='The course mode for this badge image. For example, "verified" or "honor".', unique=True, max_length=125)),
-                ('icon', models.ImageField(help_text='Badge images must be square PNG files. The file size should be under 250KB.', upload_to=b'course_complete_badges', validators=[badges.models.validate_badge_image])),
+                ('icon', models.ImageField(help_text='Badge images must be square PNG files. The file size should be under 250KB.', upload_to=u'course_complete_badges', validators=[badges.models.validate_badge_image])),
                 ('default', models.BooleanField(default=False, help_text='Set this value to True if you want this image to be the default image for any course modes that do not have a specified badge image. You can have only one default image.')),
             ],
         ),

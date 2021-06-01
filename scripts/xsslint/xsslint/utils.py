@@ -1,6 +1,8 @@
 """
 Utility classes/functions for the XSS Linter.
 """
+
+
 import re
 
 

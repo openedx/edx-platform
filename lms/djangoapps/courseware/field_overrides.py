@@ -2,7 +2,7 @@
 This module provides a :class:`~xblock.field_data.FieldData` implementation
 which wraps an other `FieldData` object and provides overrides based on the
 user.  The use of providers allows for overrides that are arbitrarily
-extensible.  One provider is found in `courseware.student_field_overrides`
+extensible.  One provider is found in `lms.djangoapps.courseware.student_field_overrides`
 which allows for fields to be overridden for individual students.  One can
 envision other providers being written that allow for fields to be overridden
 base on membership of a student in a cohort, or similar.  The use of an
@@ -14,14 +14,17 @@ package and is used to wrap the `authored_data` when constructing an
 `LmsFieldData`.  This means overrides will be in effect for all scopes covered
 by `authored_data`, e.g. course content and settings stored in Mongo.
 """
+
+
 import threading
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
+import six
 from django.conf import settings
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from xblock.field_data import FieldData
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
@@ -77,8 +80,10 @@ def disable_overrides():
     """
     prev = _OVERRIDES_DISABLED.disabled
     _OVERRIDES_DISABLED.disabled += (True,)
-    yield
-    _OVERRIDES_DISABLED.disabled = prev
+    try:
+        yield
+    finally:
+        _OVERRIDES_DISABLED.disabled = prev
 
 
 def overrides_disabled():
@@ -89,7 +94,7 @@ def overrides_disabled():
     return bool(_OVERRIDES_DISABLED.disabled)
 
 
-class FieldOverrideProvider(object):
+class FieldOverrideProvider(six.with_metaclass(ABCMeta, object)):
     """
     Abstract class which defines the interface that a `FieldOverrideProvider`
     must provide.  In general, providers should derive from this class, but
@@ -100,10 +105,10 @@ class FieldOverrideProvider(object):
     field overrides. To set overrides, there will be a domain specific API for
     the concrete override implementation being used.
     """
-    __metaclass__ = ABCMeta
 
-    def __init__(self, user):
+    def __init__(self, user, fallback_field_data):
         self.user = user
+        self.fallback_field_data = fallback_field_data
 
     @abstractmethod
     def get(self, block, name, default):  # pragma no cover
@@ -180,11 +185,11 @@ class OverrideFieldData(FieldData):
         Arguments:
             course: The course XBlock
         """
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         if course is None:
             cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id='None')
         else:
-            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=unicode(course.id))
+            cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id=six.text_type(course.id))
         enabled_providers = request_cache.data.get(cache_key, NOTSET)
         if enabled_providers == NOTSET:
             enabled_providers = tuple(
@@ -196,7 +201,7 @@ class OverrideFieldData(FieldData):
 
     def __init__(self, user, fallback, providers):
         self.fallback = fallback
-        self.providers = tuple(provider(user) for provider in providers)
+        self.providers = tuple(provider(user, fallback) for provider in providers)
 
     def get_override(self, block, name):
         """
@@ -231,7 +236,7 @@ class OverrideFieldData(FieldData):
             # If this is an inheritable field and an override is set above,
             # then we want to return False here, so the field_data uses the
             # override and not the original value for this block.
-            inheritable = InheritanceMixin.fields.keys()
+            inheritable = list(InheritanceMixin.fields.keys())  # pylint: disable=no-member
             if name in inheritable:
                 for ancestor in _lineage(block):
                     if self.get_override(ancestor, name) is not NOTSET:
@@ -246,7 +251,7 @@ class OverrideFieldData(FieldData):
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
         if self.providers and not overrides_disabled():
-            inheritable = InheritanceMixin.fields.keys()
+            inheritable = list(InheritanceMixin.fields.keys())  # pylint: disable=no-member
             if name in inheritable:
                 for ancestor in _lineage(block):
                     value = self.get_override(ancestor, name)
@@ -291,10 +296,10 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         Arguments:
             block: An XBlock
         """
-        course_id = unicode(block.location.course_key)
+        course_id = six.text_type(block.location.course_key)
         cache_key = ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY.format(course_id=course_id)
 
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         enabled_providers = request_cache.data.get(cache_key)
 
         if enabled_providers is None:

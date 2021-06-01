@@ -2,6 +2,7 @@
 Survey Application Configuration
 """
 
+
 from django.apps import AppConfig
 
 
@@ -16,4 +17,4 @@ class SurveyConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        from . import signals  # pylint: disable=unused-variable
+        from . import signals  # pylint: disable=unused-import

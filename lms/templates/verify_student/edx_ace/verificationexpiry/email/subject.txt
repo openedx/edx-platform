@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans trimmed %}Your {{ platform_name }} Verification has Expired{% endblocktrans %}
+{% endautoescape %}

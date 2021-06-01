@@ -1,9 +1,9 @@
 """Integration tests for Azure Active Directory / Microsoft Account provider."""
 
+
 from third_party_auth.tests.specs import base
 
 
-# pylint: disable=test-inherits-tests
 class AzureADOauth2IntegrationTest(base.Oauth2IntegrationTest):
     """Integration tests for Azure Active Directory / Microsoft Account provider."""
 

@@ -3,6 +3,7 @@ Tests utils for multi-tenant emails.
 """
 
 import contextlib
+from unittest.mock import patch
 
 from django.conf import settings
 from unittest import skipUnless
@@ -41,15 +42,18 @@ def with_organization_context(site_color, configs=None):
                 short_name=site_color,
             )
             org.sites.add(site)
-        yield org
+
+        with patch('openedx.core.djangoapps.appsembler.sites.utils._get_current_organization', return_value=org):
+            # Avoids having `get_current_organization` freak out due to missing request.
+            yield org
 
 
-def create_org_user(organization, **kwargs):
+def create_org_user(organization, is_amc_admin=False, **kwargs):
     """
     Create one user and save it to the database.
     """
     user = UserFactory.create(**kwargs)
-    UserOrganizationMapping.objects.create(user=user, organization=organization)
+    UserOrganizationMapping.objects.create(user=user, organization=organization, is_amc_admin=is_amc_admin)
     return user
 
 

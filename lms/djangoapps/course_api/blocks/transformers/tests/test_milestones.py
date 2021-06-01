@@ -1,10 +1,12 @@
 """
 Tests for ProctoredExamTransformer.
 """
+
+
 import ddt
+import six
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -16,7 +18,6 @@ from student.tests.factories import CourseEnrollmentFactory
 from ..milestones import MilestonesAndSpecialExamsTransformer
 
 
-@attr(shard=3)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
@@ -48,7 +49,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             gated_block: The block that should be inaccessible until gating_block is completed
             gating_block: The block that must be completed before access is granted
         """
-        gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
+        gating_api.add_prerequisite(self.course.id, six.text_type(gating_block.location))
         gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100, 0)
 
     ALL_BLOCKS = (

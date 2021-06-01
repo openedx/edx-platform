@@ -11,7 +11,7 @@ by passing the --settings flag, you can specify what environment specific settin
 Any arguments not understood by this manage.py will be passed to django-admin.py
 """
 # pylint: disable=wrong-import-order, wrong-import-position
-from __future__ import absolute_import, print_function
+
 
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()
@@ -48,7 +48,7 @@ def parse_args():
         '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
         default='lms',
-        help='Which service variant to run, when using the aws environment')
+        help='Which service variant to run, when using the production environment')
     lms.add_argument(
         '--contracts',
         action='store_true',
@@ -97,11 +97,13 @@ def parse_args():
 if __name__ == "__main__":
     edx_args, django_args = parse_args()
 
+    edx_args_base = edx_args.settings_base.replace('/', '.') + '.'
     if edx_args.settings:
-        os.environ["DJANGO_SETTINGS_MODULE"] = edx_args.settings_base.replace('/', '.') + "." + edx_args.settings
-    else:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", edx_args.default_settings)
+        os.environ["DJANGO_SETTINGS_MODULE"] = edx_args_base + edx_args.settings
+    elif os.environ.get("EDX_PLATFORM_SETTINGS") and not os.environ.get("DJANGO_SETTINGS_MODULE"):
+        os.environ["DJANGO_SETTINGS_MODULE"] = edx_args_base + os.environ["EDX_PLATFORM_SETTINGS"]
 
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", edx_args.default_settings)
     os.environ.setdefault("SERVICE_VARIANT", edx_args.service_variant)
 
     enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)

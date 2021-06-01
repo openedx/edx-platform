@@ -2,36 +2,33 @@
 API for initiating and tracking requests for credit from a provider.
 """
 
+
 import datetime
 import logging
 import uuid
 
 import pytz
+import six
 from django.db import transaction
-
 from edx_proctoring.api import get_last_exam_completion_date
+
 from openedx.core.djangoapps.credit.exceptions import (
-    UserIsNotEligible,
     CreditProviderNotConfigured,
-    RequestAlreadyCompleted,
     CreditRequestNotFound,
     InvalidCreditStatus,
+    RequestAlreadyCompleted,
+    UserIsNotEligible
 )
 from openedx.core.djangoapps.credit.models import (
-    CreditProvider,
-    CreditRequirementStatus,
-    CreditRequest,
     CreditEligibility,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirementStatus
 )
-
-from student.models import (
-    User,
-    CourseEnrollment,
-)
-from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
+from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
+from student.models import CourseEnrollment, User
 from util.date_utils import to_timestamp
 from util.json_request import JsonResponse
-
 
 # TODO: Cleanup this mess! ECOM-2908
 
@@ -258,14 +255,14 @@ def create_credit_request(course_key, provider_id, username):
         ).reason["final_grade"]
 
         # NOTE (CCB): Limiting the grade to seven characters is a hack for ASU.
-        if len(unicode(final_grade)) > 7:
+        if len(six.text_type(final_grade)) > 7:
             final_grade = u'{:.5f}'.format(final_grade)
         else:
-            final_grade = unicode(final_grade)
+            final_grade = six.text_type(final_grade)
 
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
-        msg = 'Could not retrieve final grade from the credit eligibility table for ' \
-              'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
+        msg = u'Could not retrieve final grade from the credit eligibility table for ' \
+              u'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
         log.exception(msg)
         raise UserIsNotEligible(msg)
 

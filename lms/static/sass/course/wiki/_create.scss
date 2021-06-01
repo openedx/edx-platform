@@ -16,15 +16,13 @@ form#wiki_revision {
   .CodeMirror {
     @extend textarea;
 
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     font-family: monospace;
     margin-bottom: $baseline;
   }
 
   textarea {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     margin-bottom: $baseline;
     min-height: 450px;
     width: 100%;

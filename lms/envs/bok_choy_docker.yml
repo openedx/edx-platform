@@ -1,0 +1,168 @@
+# ingested edx-platform/lms/envs/bok_choy_docker.auth.json
+# ingested edx-platform/lms/envs/bok_choy_docker.env.json
+ACTIVATION_EMAIL_SUPPORT_LINK: https://support.example.com/activation-email-help.html
+ANALYTICS_DASHBOARD_URL: ''
+AWS_ACCESS_KEY_ID: ''
+AWS_SECRET_ACCESS_KEY: ''
+BUGS_EMAIL: bugs@example.com
+BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
+CACHES:
+  celery:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_FUNCTION: util.memcache.safe_key
+    KEY_PREFIX: integration_celery
+    LOCATION: ['edx.devstack.memcached:11211']
+  default:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_FUNCTION: util.memcache.safe_key
+    KEY_PREFIX: sandbox_default
+    LOCATION: ['edx.devstack.memcached:11211']
+  general:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_FUNCTION: util.memcache.safe_key
+    KEY_PREFIX: sandbox_general
+    LOCATION: ['edx.devstack.memcached:11211']
+  mongo_metadata_inheritance:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_FUNCTION: util.memcache.safe_key
+    KEY_PREFIX: integration_mongo_metadata_inheritance
+    LOCATION: ['edx.devstack.memcached:11211']
+  staticfiles:
+    BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    KEY_FUNCTION: util.memcache.safe_key
+    KEY_PREFIX: integration_static_files
+    LOCATION: ['edx.devstack.memcached:11211']
+CC_PROCESSOR:
+  CyberSource2: {ACCESS_KEY: abcd123, PROFILE_ID: edx, PURCHASE_ENDPOINT: /shoppingcart/payment_fake,
+    SECRET_KEY: abcd123}
+CC_PROCESSOR_NAME: CyberSource2
+CELERY_BROKER_HOSTNAME: localhost
+CELERY_BROKER_PASSWORD: celery
+CELERY_BROKER_TRANSPORT: amqp
+CELERY_BROKER_USER: celery
+CERT_QUEUE: certificates
+CMS_BASE: '** OVERRIDDEN **'
+CODE_JAIL:
+  limits: {REALTIME: 3, VMEM: 0}
+COMMENTS_SERVICE_KEY: password
+COMMENTS_SERVICE_URL: http://edx.devstack.lms:4567
+CONTACT_EMAIL: info@example.com
+CONTENTSTORE:
+  DOC_STORE_CONFIG:
+    collection: modulestore
+    db: test
+    host: [edx.devstack.mongo]
+    port: 27017
+  ENGINE: xmodule.contentstore.mongo.MongoContentStore
+  OPTIONS:
+    db: test
+    host: [edx.devstack.mongo]
+    port: 27017
+DATABASES:
+  default: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql, NAME: edxtest,
+    PASSWORD: '', PORT: '3306', USER: root}
+  student_module_history: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql,
+    NAME: student_module_history_test, PASSWORD: '', PORT: '3306', USER: root}
+DEFAULT_FEEDBACK_EMAIL: feedback@example.com
+DEFAULT_FROM_EMAIL: registration@example.com
+DJFS: {aws_access_key_id: test, aws_secret_access_key: test, bucket: test, prefix: test,
+  type: s3fs}
+DOC_STORE_CONFIG:
+  collection: modulestore
+  db: test
+  host: [edx.devstack.mongo]
+  port: 27017
+EMAIL_BACKEND: django.core.mail.backends.dummy.EmailBackend
+EVENT_TRACKING_BACKENDS:
+  mongo:
+    ENGINE: eventtracking.backends.mongodb.MongoBackend
+    OPTIONS:
+      collection: events
+      database: test
+      host: [edx.devstack.mongo]
+      port: 27017
+FEATURES: {ALLOW_AUTOMATED_SIGNUPS: true, AUTOMATIC_AUTH_FOR_TESTING: true,
+  AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING: true, CERTIFICATES_HTML_VIEW: true,
+  CERTIFICATES_INSTRUCTOR_GENERATION: true, CUSTOM_COURSES_EDX: true,
+  ENABLE_COURSE_DISCOVERY: true, ENABLE_DISCUSSION_SERVICE: true, ENABLE_GRADE_DOWNLOADS: true,
+  ENABLE_PAYMENT_FAKE: true, ENABLE_SPECIAL_EXAMS: true, ENABLE_THIRD_PARTY_AUTH: true,
+  ENABLE_VERIFIED_CERTIFICATES: true, EXPOSE_CACHE_PROGRAMS_ENDPOINT: true, MODE_CREATION_FOR_TESTING: true,
+  PREVIEW_LMS_BASE: 'preview.localhost:8003', RESTRICT_AUTOMATIC_AUTH: false, SHOW_HEADER_LANGUAGE_SELECTOR: true}
+GITHUB_REPO_ROOT: '** OVERRIDDEN **'
+JWT_AUTH: {JWT_PRIVATE_SIGNING_JWK: '{"e": "AQAB", "d": "HIiV7KNjcdhVbpn3KT-I9n3JPf5YbGXsCIedmPqDH1d4QhBofuAqZ9zebQuxkRUpmqtYMv0Zi6ECSUqH387GYQF_XvFUFcjQRPycISd8TH0DAKaDpGr-AYNshnKiEtQpINhcP44I1AYNPCwyoxXA1fGTtmkKChsuWea7o8kytwU5xSejvh5-jiqu2SF4GEl0BEXIAPZsgbzoPIWNxgO4_RzNnWs6nJZeszcaDD0CyezVSuH9QcI6g5QFzAC_YuykSsaaFJhZ05DocBsLczShJ9Omf6PnK9xlm26I84xrEh_7x4fVmNBg3xWTLh8qOnHqGko93A1diLRCrKHOvnpvgQ",
+    "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+    "q": "3T3DEtBUka7hLGdIsDlC96Uadx_q_E4Vb1cxx_4Ss_wGp1Loz3N3ZngGyInsKlmbBgLo1Ykd6T9TRvRNEWEtFSOcm2INIBoVoXk7W5RuPa8Cgq2tjQj9ziGQ08JMejrPlj3Q1wmALJr5VTfvSYBu0WkljhKNCy1KB6fCby0C9WE",
+    "p": "vUqzWPZnDG4IXyo-k5F0bHV0BNL_pVhQoLW7eyFHnw74IOEfSbdsMspNcPSFIrtgPsn7981qv3lN_staZ6JflKfHayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0",
+    "kid": "BTZ9HA6K", "kty": "RSA"}', JWT_PUBLIC_SIGNING_JWK_SET: '{"keys": [{"kid":
+    "BTZ9HA6K", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}',
+  JWT_SECRET_KEY: super-secret-key}
+LMS_BASE: http://edx.devstack.lms:18003
+LMS_ROOT_URL: http://edx.devstack.lms:18003
+LOCAL_LOGLEVEL: INFO
+LOGGING_ENV: sandbox
+LOG_DIR: '** OVERRIDDEN **'
+MEDIA_URL: /media/
+MKTG_URL_LINK_MAP: {ABOUT: about, BLOG: blog, CAREERS: careers, CONTACT: contact,
+  COURSES: courses, DONATE: donate, HELP_CENTER: help-center, HONOR: honor, NEWS: news,
+  PRESS: press, PRIVACY: privacy, ROOT: root, SITEMAP.XML: sitemap_xml, TOS: tos,
+  WHAT_IS_VERIFIED_CERT: verified-certificate}
+MODULESTORE:
+  default:
+    ENGINE: xmodule.modulestore.mixed.MixedModuleStore
+    OPTIONS:
+      mappings: {}
+      stores:
+      - DOC_STORE_CONFIG:
+          collection: modulestore
+          db: test
+          host: [edx.devstack.mongo]
+          port: 27017
+        ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
+        NAME: draft
+        OPTIONS:
+          collection: modulestore
+          db: test
+          default_class: xmodule.hidden_module.HiddenDescriptor
+          fs_root: '** OVERRIDDEN **'
+          host: [edx.devstack.mongo]
+          port: 27017
+          render_template: edxmako.shortcuts.render_to_string
+      - ENGINE: xmodule.modulestore.xml.XMLModuleStore
+        NAME: xml
+        OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
+PASSWORD_RESET_SUPPORT_LINK: https://support.example.com/password-reset-help.html
+REGISTRATION_EXTENSION_FORM: openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm
+REGISTRATION_EXTRA_FIELDS: {city: hidden, country: required, gender: optional, goals: optional,
+  honor_code: required, level_of_education: optional, mailing_address: optional, terms_of_service: hidden,
+  year_of_birth: optional}
+SECRET_KEY: ''
+SERVER_EMAIL: devops@example.com
+SESSION_COOKIE_DOMAIN: null
+SITE_NAME: localhost:8003
+SOCIAL_SHARING_SETTINGS: {CERTIFICATE_FACEBOOK: true, CERTIFICATE_FACEBOOK_TEXT: 'Testing
+    facebook feature:', CUSTOM_COURSE_URLS: true, DASHBOARD_FACEBOOK: true, DASHBOARD_TWITTER: true,
+  DASHBOARD_TWITTER_TEXT: 'Testing feature:'}
+STATIC_URL_BASE: /static/
+SUPPORT_SITE_LINK: https://support.example.com
+SYSLOG_SERVER: ''
+TECH_SUPPORT_EMAIL: technical@example.com
+THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_core.backends.linkedin.LinkedinOAuth2,
+  social_core.backends.facebook.FacebookOAuth2, third_party_auth.dummy.DummyBackend,
+  third_party_auth.saml.SAMLAuthBackend]
+TIME_ZONE: America/New_York
+TRACKING_BACKENDS:
+  mongo:
+    ENGINE: track.backends.mongodb.MongoBackend
+    OPTIONS:
+      collection: events
+      database: test
+      host: [edx.devstack.mongo]
+      port: 27017
+WIKI_ENABLED: true
+XQUEUE_INTERFACE:
+  basic_auth: [edx, edx]
+  django_auth: {password: password, username: lms}
+  url: '** OVERRIDDEN **'
+ZENDESK_API_KEY: ''
+ZENDESK_USER: ''
+

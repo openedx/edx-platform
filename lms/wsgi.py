@@ -7,10 +7,6 @@ It exposes a module-level variable named ``application``. Django's
 ``runserver`` and ``runfcgi`` commands discover this application via the
 ``WSGI_APPLICATION`` setting.
 """
-from __future__ import absolute_import
-
-from openedx.core.lib.logsettings import log_python_warnings
-log_python_warnings()
 
 # Patch the xml libs
 from safe_lxml import defuse_xml_libs
@@ -36,4 +32,4 @@ modulestore()
 # This application object is used by the development server
 # as well as any WSGI server configured to use this file.
 from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()  # pylint: disable=invalid-name
+application = get_wsgi_application()

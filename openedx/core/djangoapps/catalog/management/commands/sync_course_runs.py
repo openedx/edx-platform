@@ -1,6 +1,7 @@
 """
 Sync course runs from catalog service.
 """
+
 from collections import namedtuple
 import logging
 
@@ -9,6 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog.utils import get_course_runs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import six
 
 log = logging.getLogger(__name__)
 
@@ -42,8 +44,8 @@ class Command(BaseCommand):
                 num_runs_found_in_course_overview += 1
             except CourseOverview.DoesNotExist:
                 log.info(
-                    '[sync_course_runs] course overview record not found for course run: %s',
-                    unicode(course_key),
+                    u'[sync_course_runs] course overview record not found for course run: %s',
+                    six.text_type(course_key),
                 )
                 continue
 
@@ -60,10 +62,10 @@ class Command(BaseCommand):
 
         log.info(
             '[sync_course_runs] '
-            'course runs found in catalog: %d, '
-            'course runs found in course overview: %d, '
-            'course runs not found in course overview: %d, '
-            'course overviews updated: %d',
+            u'course runs found in catalog: %d, '
+            u'course runs found in course overview: %d, '
+            u'course runs not found in course overview: %d, '
+            u'course overviews updated: %d',
             num_runs_found_in_catalog,
             num_runs_found_in_course_overview,
             num_runs_found_in_catalog - num_runs_found_in_course_overview,

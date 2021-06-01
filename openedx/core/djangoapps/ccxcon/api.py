@@ -2,9 +2,11 @@
 Module containing API functions for the CCXCon
 """
 
-import logging
-import urlparse
 
+import logging
+
+import six
+import six.moves.urllib.parse  # pylint: disable=import-error
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.http import Http404
@@ -90,31 +92,31 @@ def course_info_to_ccxcon(course_key):
     try:
         course = get_course_by_id(course_key)
     except Http404:
-        log.error('Master Course with key "%s" not found', unicode(course_key))
+        log.error(u'Master Course with key "%s" not found', six.text_type(course_key))
         return
     if not course.enable_ccx:
-        log.debug('ccx not enabled for course key "%s"', unicode(course_key))
+        log.debug(u'ccx not enabled for course key "%s"', six.text_type(course_key))
         return
     if not course.ccx_connector:
-        log.debug('ccx connector not defined for course key "%s"', unicode(course_key))
+        log.debug(u'ccx connector not defined for course key "%s"', six.text_type(course_key))
         return
     if not is_valid_url(course.ccx_connector):
         log.error(
-            'ccx connector URL "%s" for course key "%s" is not a valid URL.',
-            course.ccx_connector, unicode(course_key)
+            u'ccx connector URL "%s" for course key "%s" is not a valid URL.',
+            course.ccx_connector, six.text_type(course_key)
         )
         return
     # get the oauth credential for this URL
     try:
         ccxcon = CCXCon.objects.get(url=course.ccx_connector)
     except CCXCon.DoesNotExist:
-        log.error('ccx connector Oauth credentials not configured for URL "%s".', course.ccx_connector)
+        log.error(u'ccx connector Oauth credentials not configured for URL "%s".', course.ccx_connector)
         return
 
     # get an oauth client with a valid token
 
     oauth_ccxcon = get_oauth_client(
-        server_token_url=urlparse.urljoin(course.ccx_connector, CCXCON_TOKEN_URL),
+        server_token_url=six.moves.urllib.parse.urljoin(course.ccx_connector, CCXCON_TOKEN_URL),
         client_id=ccxcon.oauth_client_id,
         client_secret=ccxcon.oauth_client_secret
     )
@@ -127,7 +129,7 @@ def course_info_to_ccxcon(course_key):
     course_details = CourseDetails.fetch(course_key)
 
     payload = {
-        'course_id': unicode(course_key),
+        'course_id': six.text_type(course_key),
         'title': course.display_name,
         'author_name': None,
         'overview': course_details.overview,
@@ -138,7 +140,7 @@ def course_info_to_ccxcon(course_key):
     headers = {'content-type': 'application/json'}
 
     # make the POST request
-    add_course_url = urlparse.urljoin(course.ccx_connector, CCXCON_COURSEXS_URL)
+    add_course_url = six.moves.urllib.parse.urljoin(course.ccx_connector, CCXCON_COURSEXS_URL)
     resp = oauth_ccxcon.post(
         url=add_course_url,
         json=payload,
@@ -147,11 +149,11 @@ def course_info_to_ccxcon(course_key):
     )
 
     if resp.status_code >= 500:
-        raise CCXConnServerError('Server returned error Status: %s, Content: %s', resp.status_code, resp.content)
+        raise CCXConnServerError(u'Server returned error Status: %s, Content: %s', resp.status_code, resp.content)
     if resp.status_code >= 400:
-        log.error("Error creating course on ccxcon. Status: %s, Content: %s", resp.status_code, resp.content)
+        log.error(u"Error creating course on ccxcon. Status: %s, Content: %s", resp.status_code, resp.content)
     # this API performs a POST request both for POST and PATCH, but the POST returns 201 and the PATCH returns 200
     elif resp.status_code != HTTP_200_OK and resp.status_code != HTTP_201_CREATED:
-        log.error('Server returned unexpected status code %s', resp.status_code)
+        log.error(u'Server returned unexpected status code %s', resp.status_code)
     else:
-        log.debug('Request successful. Status: %s, Content: %s', resp.status_code, resp.content)
+        log.debug(u'Request successful. Status: %s, Content: %s', resp.status_code, resp.content)

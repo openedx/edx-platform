@@ -1,4 +1,5 @@
 
+from unittest.mock import patch
 import pytest
 
 from django.test import TestCase
@@ -7,8 +8,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
+from student.tests.factories import UserFactory
+from openedx.core.djangoapps.user_authn.views.register import _skip_activation_email
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
-
 from openedx.core.djangoapps.appsembler.api.tests.factories import COURSE_ID_STR_TEMPLATE
 
 
@@ -45,3 +47,20 @@ class CourseKeyHelperTest(TestCase):
     def test_from_invalid_type(self):
         with pytest.raises(TypeError):
             as_course_key(dict(foo='bar'))
+
+
+class TestAPISendActivationEmail(TestCase):
+    """
+    Tests for _skip_activation_email for Tahoe Registration API and the related helpers.
+    """
+
+    @patch.dict('django.conf.settings.FEATURES', {'SKIP_EMAIL_VALIDATION': False})
+    def test_skip_for_api_callers_upon_request(self):
+        """
+        Email should not be sent if the API caller wants to skip it.
+        """
+        user = UserFactory.create()
+
+        helper_path = 'openedx.core.djangoapps.user_authn.views.register.skip_registration_email_for_registration_api'
+        with patch(helper_path, return_value=True):
+            assert _skip_activation_email(user, {}, None), 'API requested: email can be skipped by AMC admin'

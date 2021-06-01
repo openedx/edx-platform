@@ -13,8 +13,8 @@
 	<div class="user-info">
 		<h2><%- gettext('About You') %></h2>
 		<p><%- interpolate_text(
-			gettext('The following information is already a part of your {platform} profile. We\'ve included it here for your application.'),
-			{platform: platform_name} 
+			gettext("The following information is already a part of your {platform} profile. We've included it here for your application."),
+			{platform: platform_name}
 		) %></p>
 		<div class="info-column">
 			<div class="title"><%- gettext('Username') %></div>
@@ -34,7 +34,8 @@
 		</div>
 	</div>
 
-	<%= fields %>
+    <% // xss-lint: disable=underscore-not-escaped %>
+	<%= fields %> 
 
 	<div class="cta-wrapper clearfix">
 		<a href="<%- student_faq_url %>" class="nav-link"><%- interpolate_text(

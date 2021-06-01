@@ -11,8 +11,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 %>
 
 <%
-  courses_are_browsable = settings.FEATURES.get('COURSES_ARE_BROWSABLE')
-  show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing
+  show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE')
   show_sysadmin_dashboard = settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff
   self.real_user = getattr(user, 'real_user', user)
 %>
@@ -33,22 +32,27 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
       % endif
       % if show_dashboard_tabs:
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+          <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}"
+             aria-current="${'page' if reverse('dashboard') == request.path else 'false'}">
             ${_("Courses")}
           </a>
         </div>
         % if show_program_listing:
           <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-            <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+            <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}"
+               aria-current="${'page' if reverse('program_listing_view') == request.path else 'false'}">
               ${_("Programs")}
             </a>
           </div>
         % endif
-        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if '/u/' in request.path  else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
-            ${_("Profile")}
-          </a>
-        </div>
+        % if show_explore_courses:
+          <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+              <a class="tab-nav-link discover-new-link" href="${marketing_link('COURSES')}"
+                aria-current="${'page' if '/courses' in request.path else 'false'}">
+                ${_('Discover New')}
+              </a>
+          </div>
+        % endif
       % endif
     % endif
 
@@ -63,13 +67,11 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     % endif
     <div class="mobile-nav-item hidden-mobile nav-item">
       % if online_help_token == "instructor":
-        <a class="help-link" href="${get_online_help_info(online_help_token)['doc_url']}" target="_blank">${_("Help")}</a>
+        <a class="help-link" href="${get_online_help_info(online_help_token)['doc_url']}" rel="noopener" target="_blank">${_("Help")}</a>
       % else:
-        <a class="help-link" href="${configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)}" target="_blank">${_("Help")}</a>
+        <a class="help-link" href="${configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)}" rel="noopener" target="_blank">${_("Help")}</a>
       % endif
     </div>
     <%include file="user_dropdown.html"/>
   </div>
 </div>
-
-

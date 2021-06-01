@@ -17,7 +17,7 @@
   // basic layout
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -365,8 +365,7 @@
     // CASE: has status
     &.has-status {
       .course-status {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         display: inline-block;
         vertical-align: middle;
         width: flex-grid(3, 9);
@@ -444,8 +443,7 @@
 
   // UI: individual course listings
   .course-item {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     width: flex-grid(9, 9);
     position: relative;
     border-bottom: 1px solid $gray-l2;
@@ -458,8 +456,7 @@
 
     .course-link,
     .course-actions {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       display: inline-block;
       vertical-align: middle;
     }
@@ -535,8 +532,7 @@
 
       // view live button
       .view-button {
-        @include box-sizing(border-box);
-
+        box-sizing: border-box;
         padding: ($baseline/2);
       }
 

@@ -1,32 +1,33 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
+
 import datetime
-from pytz import UTC
-from mock import Mock, patch, PropertyMock
 import textwrap
-from lxml import etree
-from webob.request import Request
 from copy import copy
+
+import six
+from lxml import etree
+from mock import Mock, PropertyMock, patch
+from pytz import UTC
 from six import text_type
-import urllib
+from webob.request import Request
 
 from xmodule.fields import Timedelta
-from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 
 
 class LTIModuleTest(LogicTest):
     """Logic tests for LTI module."""
-    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):
         super(LTIModuleTest, self).setUp()
         self.environ = {'wsgi.url_scheme': 'http', 'REQUEST_METHOD': 'POST'}
-        self.request_body_xml_template = textwrap.dedent("""
+        self.request_body_xml_template = textwrap.dedent(u"""
             <?xml version = "1.0" encoding = "UTF-8"?>
                 <imsx_POXEnvelopeRequest xmlns = "{namespace}">
                   <imsx_POXHeader>
@@ -62,7 +63,7 @@ class LTIModuleTest(LogicTest):
             self.xmodule.runtime.hostname
         )
 
-        sourced_id = u':'.join(urllib.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
+        sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (self.lti_id, self.unquoted_resource_link_id, self.user_id))
 
         self.defaults = {
             'namespace': "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0",
@@ -83,7 +84,7 @@ class LTIModuleTest(LogicTest):
         data = copy(self.defaults)
 
         data.update(params)
-        return self.request_body_xml_template.format(**data)
+        return self.request_body_xml_template.format(**data).encode('utf-8')
 
     def get_response_values(self, response):
         """Gets the values from the given response"""
@@ -224,10 +225,14 @@ class LTIModuleTest(LogicTest):
         request.body = self.get_request_body(params={'grade': '0,5'})
         response = self.xmodule.grade_handler(request, '')
         real_response = self.get_response_values(response)
+        if six.PY2:
+            msg = u'invalid literal for float(): 0,5'
+        else:
+            msg = u"could not convert string to float: '0,5'"
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'Request body XML parsing error: invalid literal for float(): 0,5',
+            'description': u'Request body XML parsing error: {}'.format(msg),
             'messageIdentifier': 'unknown',
         }
         self.assertEqual(response.status_code, 200)
@@ -278,7 +283,7 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(self.xmodule.module_score, float(self.defaults['grade']))
 
     def test_user_id(self):
-        expected_user_id = text_type(urllib.quote(self.xmodule.runtime.anonymous_student_id))
+        expected_user_id = text_type(six.moves.urllib.parse.quote(self.xmodule.runtime.anonymous_student_id))
         real_user_id = self.xmodule.get_user_id()
         self.assertEqual(real_user_id, expected_user_id)
 
@@ -297,12 +302,12 @@ class LTIModuleTest(LogicTest):
     def test_resource_link_id(self):
         with patch('xmodule.lti_module.LTIModule.location', new_callable=PropertyMock):
             self.xmodule.location.html_id = lambda: 'i4x-2-3-lti-31de800015cf4afb973356dbe81496df'
-            expected_resource_link_id = text_type(urllib.quote(self.unquoted_resource_link_id))
+            expected_resource_link_id = text_type(six.moves.urllib.parse.quote(self.unquoted_resource_link_id))
             real_resource_link_id = self.xmodule.get_resource_link_id()
             self.assertEqual(real_resource_link_id, expected_resource_link_id)
 
     def test_lis_result_sourcedid(self):
-        expected_sourced_id = u':'.join(urllib.quote(i) for i in (
+        expected_sourced_id = u':'.join(six.moves.urllib.parse.quote(i) for i in (
             text_type(self.system.course_id),
             self.xmodule.get_resource_link_id(),
             self.user_id
@@ -392,13 +397,13 @@ class LTIModuleTest(LogicTest):
         """
         mock_request = Mock()
         mock_request.headers = {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': (
+            u'X-Requested-With': u'XMLHttpRequest',
+            u'Content-Type': u'application/x-www-form-urlencoded',
+            u'Authorization': (
                 u'OAuth realm="https://testurl/", oauth_body_hash="wwzA3s8gScKD1VpJ7jMt9b%2BMj9Q%3D",'
-                'oauth_nonce="18821463", oauth_timestamp="1409321145", '
-                'oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", '
-                'oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
+                u'oauth_nonce="18821463", oauth_timestamp="1409321145", '
+                u'oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", '
+                u'oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
             )
         }
         mock_request.url = u'https://testurl'
@@ -406,15 +411,16 @@ class LTIModuleTest(LogicTest):
         mock_request.method = mock_request.http_method
 
         mock_request.body = (
-            '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n'
-            '<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">'
-            '<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
-            '<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
-            '</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
-            '<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>'  # pylint: disable=line-too-long
-            '</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
-            '</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
-        )
+            u'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n'
+            u'<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">'
+            u'<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>'
+            u'<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>'
+            u'</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>'
+            u'<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2'
+            u':363979ef768ca171b50f9d1bfb322131</sourcedId>'
+            u'</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>'
+            u'</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
+        ).encode('utf-8')
 
         return mock_request
 

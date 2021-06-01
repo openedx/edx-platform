@@ -1,21 +1,25 @@
-from django.db.models import Q, F
-from django.utils import timezone
+from datetime import timedelta
 
 import beeline
 import json
-from itertools import izip
-from urlparse import urlparse
+
+from urllib.parse import urlparse
 
 import cssutils
 import os
 import sass
+
+from django.db.models import Q, F
+from django.utils import timezone
 from django.core.files.storage import get_storage_class
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.query import Q
-from provider.oauth2.models import AccessToken, RefreshToken, Client
+
+from oauth2_provider.models import AccessToken, RefreshToken, Application
+from oauth2_provider.generators import generate_client_id
+
 from django.utils.text import slugify
 
 from organizations import api as org_api
@@ -105,21 +109,26 @@ def get_active_sites(order_by='domain'):
     ).order_by(order_by)
 
 
-@beeline.traced(name="get_amc_oauth_client")
-def get_amc_oauth_client():
+@beeline.traced(name="get_amc_oauth_app")
+def get_amc_oauth_app():
     """
     Return the AMC OAuth2 Client model instance.
     """
-    return Client.objects.get(url=settings.AMC_APP_URL)
+    return Application.objects.get(client_id=settings.AMC_APP_OAUTH2_CLIENT_ID)
 
 
 @beeline.traced(name="get_amc_tokens")
 def get_amc_tokens(user):
     """
     Return the the access and refresh token with expiry date in a dict.
-    """
 
-    client = get_amc_oauth_client()
+    TODO: we need to fix this. Can't be returning empty string tokens
+    But then we need to rework the callers to handle errors. One is the
+    admin iterface, so we have to rewrite some of the form handling there
+    And there's a Django management command, so need to add error handling
+    there. There may be other places
+    """
+    app = get_amc_oauth_app()
     tokens = {
         'access_token': '',
         'access_expires': '',
@@ -127,7 +136,7 @@ def get_amc_tokens(user):
     }
 
     try:
-        access = AccessToken.objects.get(user=user, client=client)
+        access = AccessToken.objects.get(user=user, application=app)
         tokens.update({
             'access_token': access.token,
             'access_expires': access.expires,
@@ -136,7 +145,7 @@ def get_amc_tokens(user):
         return tokens
 
     try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
+        refresh = RefreshToken.objects.get(user=user, access_token=access, application=app)
         tokens['refresh_token'] = refresh.token
     except RefreshToken.DoesNotExist:
         pass
@@ -148,29 +157,37 @@ def get_amc_tokens(user):
 def reset_amc_tokens(user, access_token=None, refresh_token=None):
     """
     Create and return new tokens, or extend existing ones to one year in the future.
-    """
-    client = get_amc_oauth_client()
-    try:
-        access = AccessToken.objects.get(user=user, client=client)
-    except AccessToken.DoesNotExist:
-        access = AccessToken.objects.create(
-            user=user,
-            client=client,
-        )
 
-    access.expires = access.client.get_default_token_expiry()
+    The `generate_client_id` function generates a 40 char hash
+    This is longer than the implementaion in Hawthorn which generated 32 char hashes
+    This function is used because it's there in the toolkit code rather than
+    write a custom hash creation function to generates 32 chars
+    """
+    app = get_amc_oauth_app()
+    one_year_ahead = timezone.now() + timedelta(days=settings.OAUTH_EXPIRE_CONFIDENTIAL_CLIENT_DAYS)
+
+    access, _created = AccessToken.objects.get_or_create(
+        user=user,
+        application=app,
+        defaults={
+            'expires': one_year_ahead,
+            'token': generate_client_id(),
+        }
+    )
+
+    access.expires = one_year_ahead
     if access_token:
         access.token = access_token
     access.save()
 
-    try:
-        refresh = RefreshToken.objects.get(user=user, access_token=access, client=client)
-    except RefreshToken.DoesNotExist:
-        refresh = RefreshToken.objects.create(
-            user=user,
-            client=client,
-            access_token=access,
-        )
+    refresh, _created = RefreshToken.objects.get_or_create(
+        user=user,
+        access_token=access,
+        application=app,
+        defaults={
+            'token': generate_client_id(),
+        }
+    )
 
     if refresh_token:
         refresh.token = refresh_token
@@ -259,6 +276,15 @@ def is_request_for_amc_admin(request):
 def get_current_organization(failure_return_none=False):
     """
     Get current organization from request using multiple strategies.
+
+    The split is made to enable global patching of the function.
+    """
+    return _get_current_organization(failure_return_none)
+
+
+def _get_current_organization(failure_return_none=False):
+    """
+    Implements get_current_organization.
     """
     request = get_current_request()
     organization_name = None
@@ -351,7 +377,7 @@ def get_initial_sass_variables():
     """
     values = get_branding_values_from_file()
     labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    return [(val[0], (val[1], lab[1])) for val, lab in zip(values, labels)]
 
 
 @beeline.traced(name="get_branding_values_from_file")
@@ -361,7 +387,14 @@ def get_branding_values_from_file():
     if not settings.ENABLE_COMPREHENSIVE_THEMING:
         return {}
 
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty values dictionary if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return {}
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
@@ -400,7 +433,14 @@ def get_branding_labels_from_file(custom_branding=None):
 @beeline.traced(name="compile_sass")
 def compile_sass(sass_file, custom_branding=None):
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
-    site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
+    try:
+        default_site = Site.objects.get(id=settings.SITE_ID)
+    except Site.DoesNotExist:
+        # Empty CSS output if the database isn't initialized yet.
+        # This unblocks migrations and other cases before having a default site.
+        return ''
+
+    site_theme = SiteTheme(site=default_site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
         theme_dir_name=site_theme.theme_dir_name,
@@ -466,7 +506,7 @@ def bootstrap_site(site, org_data=None, username=None):
         })
         organization = org_models.Organization.objects.get(id=organization_data.get('id'))
         organization.sites.add(site)
-        site_config.values['course_org_filter'] = organization_slug
+        site_config.site_values['course_org_filter'] = organization_slug
         site_config.save()
     else:
         organization = {}
@@ -506,18 +546,18 @@ def migrate_page_element(element):
     Translate the `content` in the page element, apply the same for all children elements.
     """
     if not isinstance(element, dict):
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('An element should be a dict')
 
     if 'options' not in element:
-        print 'DEBUG:', element
+        print('DEBUG:', element)
         raise Exception('Unknown element type')
 
     options = element['options']
 
     if 'content' in options or 'text-content' in options:
         if 'content' in options and 'text-content' in options:
-            print 'DEBUG:', options
+            print('DEBUG:', options)
             raise Exception(
                 'Both `content` and `text-content` are there, but which one to translate?'
             )
@@ -532,7 +572,7 @@ def migrate_page_element(element):
                 'en': options['text-content']
             }
 
-    for _column_name, children in element.get('children', {}).iteritems():
+    for _column_name, children in element.get('children', {}).items():
         for child_element in children:
             migrate_page_element(child_element)
 
@@ -541,8 +581,8 @@ def to_new_page_elements(page_elements):
     """
     Migrate the page elements of a site.
     """
-    for page_id, page_obj in page_elements.iteritems():
-        if isinstance(page_obj, (unicode, str)):
+    for page_id, page_obj in page_elements.items():
+        if isinstance(page_obj, str):
             continue  # Skip pages like `"course-card": "course-tile-01"`
 
         for element in page_obj.get('content', []):
@@ -1150,7 +1190,7 @@ def _get_initial_page_elements():
                                     "margin-top": "marg-t-0",
                                     "margin-left": "marg-l-0",
                                     "text-content": {
-                                        "en": "We're here to support you"
+                                        "en": "We've got you covered."
                                     },
                                     "font-family": "font--primary--bold",
                                     "text-alignment": "text-align--left"
@@ -1178,7 +1218,7 @@ def _get_initial_page_elements():
                                 "element-path": "page-builder/elements/_content-block.html",
                                 "options": {
                                     "content": {
-                                        "en": "<p>We recommend you take a look at our <a title=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\" href=\"https://appsembler.com/blog/how-to-author-first-open-edx-course-webinar-recording/\">How to Author Your First Open edX Course in 30 Minutes</a> blog post and the <a title=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\" href=\"https://appsembler.wistia.com/medias/l5wyg0ua6l\">30 minute tutorial video from our Webinar</a>!</p>\n<p>For more, visit our <a title=\"http://help.appsembler.com/\" href=\"http://help.appsembler.com/\">Appsembler knowledge base</a>.</p>\n<p>If you run into any issues or have any questions about using our product, please feel free to contact our support team via <a title=\"mailto:support@appsembler.com\" href=\"mailto:support@appsembler.com\"><strong>support@appsembler.com</strong></a>!</p>"
+                                        "en": "<ul><li>The <a href='https://academy.appsembler.com/' target='_blank'>Appsembler Academy</a> is the home of Appsembler's own courses, including <a href='https://academy.appsembler.com/courses/course-v1:appsembleracademy+OX11+Perpetual/about' target='_blank'>Creating Your First Course</a></li><li>Our <a href='https://www.youtube.com/channel/UCINXF1QU7s1D4Tvp0AnWPKA' target='_blank'>YouTube channel</a> has plenty of videos and webinars for you to explore</li><li>Our <a href='https://help.appsembler.com/' target='_blank'>knowledge base</a> is where we keep all of our articles on how to accomplish specific tasks with your Tahoe site</li></ul><p>If you get stuck or have any questions, just contact us using the chat widget down in the bottom right. We're online from 5am to 5pm Eastern US Time, Monday to Friday, and we're happy to help!</p>"
                                     },
                                     "margin-top": "marg-t-5",
                                     "margin-left": "marg-l-0",

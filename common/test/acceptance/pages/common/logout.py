@@ -1,6 +1,8 @@
 """
 Logout Page.
 """
+
+
 from bok_choy.page_object import PageObject
 
 from common.test.acceptance.pages.common import BASE_URL

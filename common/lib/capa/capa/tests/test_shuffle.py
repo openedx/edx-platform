@@ -1,10 +1,11 @@
 """Tests the capa shuffle and name-masking."""
 
-import unittest
-import textwrap
 
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
+import textwrap
+import unittest
+
 from capa.responsetypes import LoncapaProblemError
+from capa.tests.helpers import new_loncapa_problem, test_capa_system
 
 
 class CapaShuffleTest(unittest.TestCase):
@@ -31,9 +32,9 @@ class CapaShuffleTest(unittest.TestCase):
         # shuffling 4 things with seed of 0 yields: B A C D
         # Check that the choices are shuffled
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>")
         # Check that choice name masking is enabled and that unmasking works
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertEqual(response.unmask_order(), ['choice_1', 'choice_0', 'choice_2', 'choice_3'])
         self.assertEqual(the_html, problem.get_html(), 'should be able to call get_html() twice')
@@ -54,7 +55,7 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)
         # B A C D
         # Check that the custom name= names come through
-        response = problem.responders.values()[0]
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(response.has_shuffle())
         self.assertEqual(response.unmask_order(), ['choice_0', 'choice_aaa', 'choice_1', 'choice_ddd'])
@@ -74,7 +75,7 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=341)  # yields D A B C
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Donut'.*'Apple'.*'Banana'.*'Chocolate'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Donut'.*'Apple'.*'Banana'.*'Chocolate'.*\].*</div>")
 
     def test_shuffle_1_choice(self):
         xml_str = textwrap.dedent("""
@@ -88,8 +89,8 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Apple'.*\].*</div>")
-        response = problem.responders.values()[0]
+        self.assertRegex(the_html, r"<div>.*\[.*'Apple'.*\].*</div>")
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertTrue(response.has_shuffle())
         self.assertEqual(response.unmask_order(), ['choice_0'])
@@ -112,7 +113,7 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)  # yields: C E A B D F
         # Donut -> Zonut to show that there is not some hidden alphabetic ordering going on
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Chocolate'.*'Eggplant'.*'Apple'.*'Banana'.*'Zonut'.*'Filet Mignon'.*\].*</div>")
 
     def test_shuffle_false(self):
         xml_str = textwrap.dedent("""
@@ -129,8 +130,8 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Apple'.*'Banana'.*'Chocolate'.*'Donut'.*\].*</div>")
-        response = problem.responders.values()[0]
+        self.assertRegex(the_html, r"<div>.*\[.*'Apple'.*'Banana'.*'Chocolate'.*'Donut'.*\].*</div>")
+        response = list(problem.responders.values())[0]
         self.assertFalse(response.has_mask())
         self.assertFalse(response.has_shuffle())
 
@@ -152,7 +153,7 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
         # Alpha Beta held back from shuffle (head end)
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*\].*</div>")
 
     def test_shuffle_fixed_tail_end(self):
         xml_str = textwrap.dedent("""
@@ -172,7 +173,7 @@ class CapaShuffleTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
         # Alpha Beta held back from shuffle (tail end)
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*'Alpha'.*'Beta'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'B'.*'A'.*'C'.*'D'.*'Alpha'.*'Beta'.*\].*</div>")
 
     def test_shuffle_fixed_both_ends(self):
         xml_str = textwrap.dedent("""
@@ -194,7 +195,7 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(
+        self.assertRegex(
             the_html,
             r"<div>.*\[.*'Alpha'.*'Beta'.*'B'.*'A'.*'C'.*'D'.*'Psi'.*'Omega'.*\].*</div>"
         )
@@ -213,7 +214,7 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'Alpha'.*'A'.*'Omega'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'Alpha'.*'A'.*'Omega'.*\].*</div>")
 
     def test_shuffle_fixed_all(self):
         xml_str = textwrap.dedent("""
@@ -229,7 +230,7 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'A'.*'B'.*'C'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'A'.*'B'.*'C'.*\].*</div>")
 
     def test_shuffle_island(self):
         """A fixed 'island' choice not at the head or tail end gets lumped into the tail end."""
@@ -248,7 +249,7 @@ class CapaShuffleTest(unittest.TestCase):
         """)
         problem = new_loncapa_problem(xml_str, seed=0)
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'A'.*'Mid'.*'Mid'.*'C'.*'D'.*\].*</div>")
+        self.assertRegex(the_html, r"<div>.*\[.*'A'.*'Mid'.*'Mid'.*'C'.*'D'.*\].*</div>")
 
     def test_multiple_shuffle_responses(self):
         xml_str = textwrap.dedent("""
@@ -276,11 +277,11 @@ class CapaShuffleTest(unittest.TestCase):
         orig_html = problem.get_html()
         self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
-        print html
-        self.assertRegexpMatches(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
-                                       r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
+        print(html)
+        self.assertRegex(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
+                         r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
         # Look at the responses in their authored order
-        responses = sorted(problem.responders.values(), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
+        responses = sorted(list(problem.responders.values()), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
         self.assertFalse(responses[0].has_mask())
         self.assertTrue(responses[0].has_shuffle())
         self.assertTrue(responses[1].has_shuffle())
@@ -303,5 +304,5 @@ class CapaShuffleTest(unittest.TestCase):
             </problem>
         """)
 
-        with self.assertRaisesRegexp(LoncapaProblemError, "shuffle and answer-pool"):
+        with self.assertRaisesRegex(LoncapaProblemError, "shuffle and answer-pool"):
             new_loncapa_problem(xml_str)

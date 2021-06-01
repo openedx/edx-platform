@@ -1,15 +1,14 @@
 """
 test utils
 """
+
+
 import uuid
 from smtplib import SMTPException
 
 import mock
 from ccx_keys.locator import CCXLocator
-from nose.plugins.attrib import attr
-from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.ccx import utils
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, ccx_course, remove_master_course_staff_from_ccx
@@ -22,7 +21,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=7)
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
     """Verify that get_ccx_from_ccx_locator functions properly"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE

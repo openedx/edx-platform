@@ -1,12 +1,13 @@
 """
 Script for fixing the item not found errors in a course
 """
+
+
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-
 
 # To run from command line: ./manage.py cms fix_not_found course-v1:org+course+run
 

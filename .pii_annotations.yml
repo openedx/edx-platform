@@ -1,0 +1,37 @@
+source_path: ./
+report_path: pii_report
+safelist_path: .annotation_safe_list.yml
+coverage_target: 94.5
+# See OEP-30 for more information on these values and what they mean:
+# https://open-edx-proposals.readthedocs.io/en/latest/oep-0030-arch-pii-markup-and-auditing.html#docstring-annotations
+annotations:
+    ".. no_pii:":
+    "pii_group":
+        - ".. pii:":
+        - ".. pii_types:":
+            choices:
+              - id
+              - name
+              - username
+              - password
+              - location
+              - phone_number
+              - email_address
+              - birth_date
+              - ip
+              - external_service
+              - biography
+              - gender
+              - sex
+              - image
+              - video
+              - other
+        - ".. pii_retirement:":
+            choices:
+              - retained
+              - local_api
+              - consumer_api
+              - third_party
+extensions:
+    python:
+        - py

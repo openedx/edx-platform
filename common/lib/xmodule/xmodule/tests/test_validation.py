@@ -2,19 +2,19 @@
 Test xblock/validation.py
 """
 
+
 import unittest
 
 import pytest
-
-from xmodule.validation import StudioValidationMessage, StudioValidation
 from xblock.validation import Validation, ValidationMessage
+
+from xmodule.validation import StudioValidation, StudioValidationMessage
 
 
 class StudioValidationMessageTest(unittest.TestCase):
     """
     Tests for `ValidationMessage`
     """
-    shard = 1
 
     def test_bad_parameters(self):
         """
@@ -30,7 +30,7 @@ class StudioValidationMessageTest(unittest.TestCase):
             StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_runtime_event=0)
 
         with pytest.raises(TypeError):
-            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_label="Non-unicode string")
+            StudioValidationMessage(StudioValidationMessage.WARNING, u"bad warning", action_label=b"Non-unicode string")
 
     def test_to_json(self):
         """
@@ -74,7 +74,6 @@ class StudioValidationTest(unittest.TestCase):
     """
     Tests for `StudioValidation` class.
     """
-    shard = 1
 
     def test_copy(self):
         validation = Validation("id")

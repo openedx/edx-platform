@@ -1,6 +1,8 @@
 """
 Django admin page for theming models
 """
+
+
 from django.contrib import admin
 
 from .models import SiteTheme

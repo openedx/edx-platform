@@ -1,6 +1,6 @@
 // Checks if a number is even
 @function is-even($int) {
-  @if $int%2 == 0   {
+  @if $int%2 == 0 {
     @return true;
   }
 
@@ -96,7 +96,7 @@
 // Layout direction
 @function get-direction($layout, $default) {
   $direction: nil;
-  
+
   @if $layout == LTR or $layout == RTL {
     $direction: direction-from-layout($layout);
   }

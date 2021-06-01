@@ -30,7 +30,8 @@
                         min: 0,
                         max: null,
                         slide: state.videoProgressSlider.onSlide,
-                        stop: state.videoProgressSlider.onStop
+                        stop: state.videoProgressSlider.onStop,
+                        step: 5
                     });
                 });
 

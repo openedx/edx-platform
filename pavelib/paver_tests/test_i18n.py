@@ -2,6 +2,7 @@
 Tests for pavelib/i18n.py.
 """
 
+
 import os
 import textwrap
 import unittest
@@ -12,7 +13,6 @@ from paver.easy import call_task, task
 import pavelib.i18n
 from pavelib.paver_tests.utils import PaverTestCase
 from pavelib.utils.envs import Env
-
 
 TX_CONFIG_SIMPLE = """\
 [main]
@@ -31,7 +31,7 @@ source_lang = en
 type = PO
 
 """
-
+# xss-lint: disable=python-concat-html
 TX_CONFIG_RELEASE = TX_CONFIG_SIMPLE + """\
 [edx-platform.release-zebrawood]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django.po
@@ -76,7 +76,7 @@ class FindReleaseResourcesTest(unittest.TestCase):
     @mocked_i18n_open(TX_CONFIG_SIMPLE)
     def test_no_resources(self):
         errmsg = r"You need two release-\* resources defined to use this command."
-        with self.assertRaisesRegexp(ValueError, errmsg):
+        with self.assertRaisesRegex(ValueError, errmsg):
             pavelib.i18n.find_release_resources()
 
     @mocked_i18n_open(TX_CONFIG_SIMPLE, """\
@@ -88,7 +88,7 @@ class FindReleaseResourcesTest(unittest.TestCase):
         """)
     def test_one_resource(self):
         errmsg = r"Strange Transifex config! Found these release-\* resources:\nedx-platform.release-zebrawood"
-        with self.assertRaisesRegexp(ValueError, errmsg):
+        with self.assertRaisesRegex(ValueError, errmsg):
             pavelib.i18n.find_release_resources()
 
     @mocked_i18n_open(TX_CONFIG_RELEASE)
@@ -156,13 +156,43 @@ class TestI18nDummy(PaverTestCase):
         """
         self.reset_task_messages()
         os.environ['NO_PREREQ_INSTALL'] = "true"
-        call_task('pavelib.i18n.i18n_dummy', options={"settings": Env.TEST_SETTINGS})
-        self.assertEquals(
+        call_task('pavelib.i18n.i18n_dummy')
+        self.assertEqual(
             self.task_messages,
             [
                 u'i18n_tool extract',
                 u'i18n_tool dummy',
                 u'i18n_tool generate',
+            ]
+        )
+
+
+class TestI18nCompileJS(PaverTestCase):
+    """
+    Test the Paver i18n_compilejs task.
+    """
+    def setUp(self):
+        super(TestI18nCompileJS, self).setUp()
+
+        # Mock the paver @needs decorator for i18n_extract
+        self._mock_paver_needs = patch.object(pavelib.i18n.i18n_extract, 'needs').start()
+        self._mock_paver_needs.return_value = 0
+
+        # Cleanup mocks
+        self.addCleanup(self._mock_paver_needs.stop)
+
+    def test_i18n_compilejs(self):
+        """
+        Test the "i18n_compilejs" task.
+        """
+        Env.TEST_SETTINGS = 'devstack_docker'
+
+        self.reset_task_messages()
+        os.environ['NO_PREREQ_INSTALL'] = "true"
+        call_task('pavelib.i18n.i18n_compilejs', options={"settings": Env.TEST_SETTINGS})
+        self.assertEqual(
+            self.task_messages,
+            [
                 u'python manage.py lms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
                 u'python manage.py cms --settings={} compilejsi18n'.format(Env.TEST_SETTINGS),
             ]

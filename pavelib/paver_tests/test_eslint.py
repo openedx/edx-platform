@@ -1,6 +1,8 @@
 """
 Tests for Paver's Stylelint tasks.
 """
+
+
 import unittest
 
 from mock import patch

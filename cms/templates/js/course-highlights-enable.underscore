@@ -8,5 +8,5 @@
 <% } else { %>
   <button class="status-highlights-enabled-value button" aria-labelledby="highlights-enabled-label"><%- gettext('Enable Now') %></button>
 <% } %>
-<a class="status-highlights-enabled-info" href="<%- highlights_doc_url %>" target="_blank">Learn more</a>
+<a class="status-highlights-enabled-info" href="<%- highlights_doc_url %>" rel="noopener" target="_blank">Learn more</a>
 </div>

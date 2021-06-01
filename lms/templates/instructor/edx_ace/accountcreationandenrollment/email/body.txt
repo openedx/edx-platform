@@ -1,0 +1,13 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Welcome to {{ course_name }}{% endblocktrans %}
+
+{% blocktrans %}To get started, please visit https://{{ site_name }}. The login information for your account follows.{% endblocktrans %}
+
+{% blocktrans %}email: {{ email_address }}{% endblocktrans %}
+{% blocktrans %}password: {{ password }}{% endblocktrans %}
+
+
+{% blocktrans %}It is recommended that you change your password.{% endblocktrans %}
+
+{% blocktrans %}You may access your course at: {{ course_url }}.{% endblocktrans %}
+
+{% blocktrans %}Sincerely yours, The {{ course_name }} Team{% endblocktrans %}{% endautoescape %}

@@ -36,12 +36,17 @@ describe('Currency factory', () => {
     it('when location is the default (US)', () => {
       $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"US"}', { path: '/' });
       currency = new Currency();
-      expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($100 USD)');
+      expect($('[name="verified_mode"].no-discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($100 USD)');
     });
     it('when cookie is set to a different country', () => {
       $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
       currency = new Currency();
-      expect($('input[name="verified_mode"]').filter(':visible')[0].value).toEqual('Pursue a Verified Certificate ($220 CAD)');
+      expect($('[name="verified_mode"].no-discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($220 CAD)');
+    });
+    it('when cookie is set to a different country with a discount', () => {
+      $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
+      currency = new Currency();
+      expect($('[name="verified_mode"].discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($198 CAD $220 CAD)');
     });
   });
 });

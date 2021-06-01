@@ -1,6 +1,8 @@
 """
 Creates Indexes on contentstore and modulestore databases.
 """
+
+
 from django.core.management.base import BaseCommand
 
 from xmodule.contentstore.django import contentstore
@@ -17,4 +19,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         contentstore().ensure_indexes()
         modulestore().ensure_indexes()
-        print 'contentstore and modulestore indexes created!'
+        print('contentstore and modulestore indexes created!')

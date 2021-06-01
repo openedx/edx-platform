@@ -1,20 +1,24 @@
 """
 Test for course API
 """
+
+from datetime import datetime, timedelta
 from hashlib import md5
 
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
+import mock
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 
-from ..api import course_detail, list_courses
+from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses
 from .mixins import CourseApiFactoryMixin
 
 
@@ -22,7 +26,6 @@ class CourseApiTestMixin(CourseApiFactoryMixin):
     """
     Establish basic functionality for Course API tests
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -58,7 +61,6 @@ class TestGetCourseDetail(CourseDetailTestMixin, SharedModuleStoreTestCase):
     """
     Test course_detail api function
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -94,7 +96,6 @@ class CourseListTestMixin(CourseApiTestMixin):
     """
     Common behavior for list_courses tests
     """
-    shard = 4
 
     def _make_api_call(self, requesting_user, specified_user, org=None, filter_=None):
         """
@@ -118,7 +119,6 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
     """
     Test the behavior of the `list_courses` api function.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -161,7 +161,6 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     Test the behavior of the `list_courses` api function (with tests that
     modify the courseware).
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -179,7 +178,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         """Verify that courses are filtered by the provided org key."""
         # Create a second course to be filtered out of queries.
         alternate_course = self.create_course(
-            org=md5(self.course.org).hexdigest()
+            org=md5(self.course.org.encode('utf-8')).hexdigest()
         )
 
         self.assertNotEqual(alternate_course.org, self.course.org)
@@ -208,10 +207,10 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         ]
         for filter_, expected_courses in test_cases:
             filtered_courses = self._make_api_call(self.staff_user, self.staff_user, filter_=filter_)
-            self.assertEquals(
+            self.assertEqual(
                 {course.id for course in filtered_courses},
                 {course.id for course in expected_courses},
-                "testing course_api.api.list_courses with filter_={}".format(filter_),
+                u"testing course_api.api.list_courses with filter_={}".format(filter_),
             )
 
 
@@ -220,7 +219,6 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
     Tests of course_list api function that require alternative configurations
     of created courses.
     """
-    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod
@@ -231,14 +229,85 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
 
     def test_no_courses(self):
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        self.assertEqual(len(courses), 0)
+        self.assertEqual(len(list(courses)), 0)
 
     def test_hidden_course_for_honor(self):
         self.create_course(visible_to_staff_only=True)
         courses = self._make_api_call(self.honor_user, self.honor_user)
-        self.assertEqual(len(courses), 0)
+        self.assertEqual(len(list(courses)), 0)
 
     def test_hidden_course_for_staff(self):
         self.create_course(visible_to_staff_only=True)
         courses = self._make_api_call(self.staff_user, self.staff_user)
         self.verify_courses(courses)
+
+
+class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
+    """
+    Test get_due_dates function
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = cls.create_course()
+        cls.staff_user = cls.create_user("staff", is_staff=True)
+        cls.today = datetime.utcnow()
+        cls.yesterday = cls.today - timedelta(days=1)
+        cls.tomorrow = cls.today + timedelta(days=1)
+
+        cls.section_1 = ItemFactory.create(
+            category='chapter',
+            start=cls.yesterday,
+            due=cls.tomorrow,
+            parent=cls.course,
+            display_name='section 1'
+        )
+
+        cls.subsection_1 = ItemFactory.create(
+            category='sequential',
+            parent=cls.section_1,
+            display_name='subsection 1'
+        )
+
+    def test_get_due_dates(self):
+        request = mock.Mock()
+
+        mock_path = 'lms.djangoapps.course_api.api.get_dates_for_course'
+        with mock.patch(mock_path) as mock_get_dates:
+            mock_get_dates.return_value = {
+                (self.section_1.location, 'due'): self.section_1.due.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                (self.section_1.location, 'start'): self.section_1.start.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            }
+
+            expected_due_dates = [
+                {
+                    'name': self.section_1.display_name,
+                    'url': request.build_absolute_uri.return_value,
+                    'date': self.tomorrow.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                },
+            ]
+            actual_due_dates = get_due_dates(request, self.course.id, self.staff_user)
+            assert expected_due_dates == actual_due_dates
+
+    def test_get_due_dates_error_fetching_block(self):
+        request = mock.Mock()
+
+        mock_path = 'lms.djangoapps.course_api.api.'
+        with mock.patch(mock_path + 'get_dates_for_course') as mock_get_dates:
+            with mock.patch(mock_path + 'modulestore') as mock_modulestore:
+                mock_modulestore.return_value.get_item.side_effect = ItemNotFoundError('whatever')
+                mock_get_dates.return_value = {
+                    (self.section_1.location, 'due'): self.section_1.due.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    (self.section_1.location, 'start'): self.section_1.start.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                }
+
+                expected_due_dates = [
+                    {
+                        'name': UNKNOWN_BLOCK_DISPLAY_NAME,
+                        'url': request.build_absolute_uri.return_value,
+                        'date': self.tomorrow.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                    },
+                ]
+                actual_due_dates = get_due_dates(request, self.course.id, self.staff_user)
+                assert expected_due_dates == actual_due_dates

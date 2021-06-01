@@ -1,3 +1,5 @@
+
+
 import unittest
 
 from django.conf import settings
@@ -28,7 +30,6 @@ class EntitlementsSerializerTests(ModuleStoreTestCase):
             'course_uuid': str(entitlement.course_uuid),
             'mode': entitlement.mode,
             'refund_locked': False,
-            'enrollment_course_run': None,
             'order_number': entitlement.order_number,
             'created': entitlement.created.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'modified': entitlement.modified.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),

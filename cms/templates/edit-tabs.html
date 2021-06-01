@@ -21,7 +21,7 @@
 
 <%block name="page_bundle">
     <%static:webpack entry="js/factories/edit_tabs">
-        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id})}");
+        EditTabsFactory("${context_course.location | n, js_escaped_string}", "${reverse('tabs_handler', kwargs={'course_key_string': context_course.id}) | n, js_escaped_string}");
     </%static:webpack>
 </%block>
 

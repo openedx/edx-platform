@@ -1,6 +1,7 @@
 """
 Django admin page for embargo models
 """
+
 import textwrap
 
 from config_models.admin import ConfigurationModelAdmin
@@ -37,6 +38,7 @@ class RestrictedCourseAdmin(admin.ModelAdmin):
     """Admin for configuring course restrictions. """
     inlines = [CountryAccessRuleInline]
     form = RestrictedCourseForm
+    search_fields = ('course_key',)
 
 
 admin.site.register(IPFilter, IPFilterAdmin)

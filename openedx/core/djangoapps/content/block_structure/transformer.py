@@ -2,6 +2,8 @@
 This module provides the abstract base class for all Block Structure
 Transformers.
 """
+
+
 from abc import abstractmethod
 
 

@@ -1,18 +1,20 @@
 """
 Signal handlers related to discussions.
 """
+
+
 import logging
 
+import six
 from django.conf import settings
 from django.dispatch import receiver
-
-from django_comment_common import signals
-from lms.djangoapps.discussion import tasks
 from opaque_keys.edx.locator import LibraryLocator
+
+from lms.djangoapps.discussion import tasks
+from openedx.core.djangoapps.django_comment_common import signals
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
 from xmodule.modulestore.django import SignalHandler
-
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +33,7 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
         return
 
     context = {
-        'course_id': unicode(course_key),
+        'course_id': six.text_type(course_key),
     }
     tasks.update_discussions_map.apply_async(
         args=[context],
@@ -43,16 +45,16 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
 def send_discussion_email_notification(sender, user, post, **kwargs):
     current_site = get_current_site()
     if current_site is None:
-        log.info('Discussion: No current site, not sending notification about post: %s.', post.id)
+        log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
         return
 
     try:
         if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
-            log_message = 'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
+            log_message = u'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
             log.info(log_message, current_site, post.id)
             return
     except SiteConfiguration.DoesNotExist:
-        log_message = 'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
+        log_message = u'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
         log.info(log_message, current_site, post.id)
         return
 
@@ -62,7 +64,7 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
 def send_message(comment, site):
     thread = comment.thread
     context = {
-        'course_id': unicode(thread.course_id),
+        'course_id': six.text_type(thread.course_id),
         'comment_id': comment.id,
         'comment_body': comment.body,
         'comment_author_id': comment.user_id,

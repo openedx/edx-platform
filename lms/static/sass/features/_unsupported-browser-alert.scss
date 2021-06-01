@@ -1,0 +1,54 @@
+
+@import 'lms/theme/variables-v1';
+
+// Unsupported browser alert
+$browser-update-background: #fff;
+$browser-update-ok-button: $button-color;
+$browser-update-ignore-button: $action-primary-disabled-bg;
+
+// Name of the style class used to customize browser-update alert
+.buorg {
+  background-color: $browser-update-background;
+  background-position: 8px 17px;
+  border-bottom: 1px solid #c5c6c7;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  left: 0;
+  position: absolute;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+
+  .buorg-buttons {
+    a {
+      color: #fff;
+
+      &:hover {
+        color: #fff !important;
+      }
+    }
+
+    #buorgul {
+      background-color: $browser-update-ok-button;
+    }
+
+    #buorgig {
+      background-color: $browser-update-ignore-button;
+    }
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .buorg div {
+    padding: 5px 12px 5px 9px;
+    text-indent: 22px;
+    line-height: 1.3em;
+  }
+
+  .buorg {
+    background-position: 9px 8px;
+  }
+}

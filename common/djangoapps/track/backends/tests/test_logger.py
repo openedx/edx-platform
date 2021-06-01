@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for Event tracker backend."""
-from __future__ import absolute_import
 
+
+import datetime
 import json
 import logging
-import datetime
 
 from track.backends.logger import LoggerBackend
 

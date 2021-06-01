@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import django.utils.timezone
+
 import django.db.models.deletion
-from django.conf import settings
+import django.utils.timezone
 import model_utils.fields
+from django.conf import settings
+from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
 
@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('qty', models.IntegerField(default=1, help_text='The number of items sold.')),
                 ('unit_price', models.DecimalField(default=0.0, help_text='The price per item sold, including discounts.', max_digits=30, decimal_places=2)),
-                ('currency', models.CharField(default=b'usd', help_text='Lower-case ISO currency codes', max_length=8)),
+                ('currency', models.CharField(default=u'usd', help_text='Lower-case ISO currency codes', max_length=8)),
             ],
         ),
         migrations.CreateModel(
@@ -126,9 +126,9 @@ class Migration(migrations.Migration):
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('amount', models.DecimalField(default=0.0, help_text='The amount of the transaction.  Use positive amounts for payments and negative amounts for refunds.', max_digits=30, decimal_places=2)),
-                ('currency', models.CharField(default=b'usd', help_text='Lower-case ISO currency codes', max_length=8)),
+                ('currency', models.CharField(default=u'usd', help_text='Lower-case ISO currency codes', max_length=8)),
                 ('comments', models.TextField(help_text='Optional: provide additional information for this transaction', null=True, blank=True)),
-                ('status', models.CharField(default=b'started', help_text="The status of the payment or refund. 'started' means that payment is expected, but money has not yet been transferred. 'completed' means that the payment or refund was received. 'cancelled' means that payment or refund was expected, but was cancelled before money was transferred. ", max_length=32, choices=[(b'started', b'started'), (b'completed', b'completed'), (b'cancelled', b'cancelled')])),
+                ('status', models.CharField(default=u'started', help_text="The status of the payment or refund. 'started' means that payment is expected, but money has not yet been transferred. 'completed' means that the payment or refund was received. 'cancelled' means that payment or refund was expected, but was cancelled before money was transferred. ", max_length=32, choices=[(u'started', u'started'), (u'completed', u'completed'), (u'cancelled', u'cancelled')])),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('invoice', models.ForeignKey(to='shoppingcart.Invoice', on_delete=models.CASCADE)),
                 ('last_modified_by', models.ForeignKey(related_name='last_modified_by_user', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
@@ -138,8 +138,8 @@ class Migration(migrations.Migration):
             name='Order',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('currency', models.CharField(default=b'usd', max_length=8)),
-                ('status', models.CharField(default=b'cart', max_length=32, choices=[(b'cart', b'cart'), (b'paying', b'paying'), (b'purchased', b'purchased'), (b'refunded', b'refunded'), (b'defunct-cart', b'defunct-cart'), (b'defunct-paying', b'defunct-paying')])),
+                ('currency', models.CharField(default=u'usd', max_length=8)),
+                ('status', models.CharField(default=u'cart', max_length=32, choices=[(u'cart', u'cart'), (u'paying', u'paying'), (u'purchased', u'purchased'), (u'refunded', u'refunded'), (u'defunct-cart', u'defunct-cart'), (u'defunct-paying', u'defunct-paying')])),
                 ('purchase_time', models.DateTimeField(null=True, blank=True)),
                 ('refunded_time', models.DateTimeField(null=True, blank=True)),
                 ('bill_to_first', models.CharField(max_length=64, blank=True)),
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
                 ('recipient_name', models.CharField(max_length=255, null=True, blank=True)),
                 ('recipient_email', models.CharField(max_length=255, null=True, blank=True)),
                 ('customer_reference_number', models.CharField(max_length=63, null=True, blank=True)),
-                ('order_type', models.CharField(default=b'personal', max_length=32, choices=[(b'personal', b'personal'), (b'business', b'business')])),
+                ('order_type', models.CharField(default=u'personal', max_length=32, choices=[(u'personal', u'personal'), (u'business', u'business')])),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
@@ -169,16 +169,16 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('status', models.CharField(default=b'cart', max_length=32, db_index=True, choices=[(b'cart', b'cart'), (b'paying', b'paying'), (b'purchased', b'purchased'), (b'refunded', b'refunded'), (b'defunct-cart', b'defunct-cart'), (b'defunct-paying', b'defunct-paying')])),
+                ('status', models.CharField(default=u'cart', max_length=32, db_index=True, choices=[(u'cart', u'cart'), (u'paying', u'paying'), (u'purchased', u'purchased'), (u'refunded', u'refunded'), (u'defunct-cart', u'defunct-cart'), (u'defunct-paying', u'defunct-paying')])),
                 ('qty', models.IntegerField(default=1)),
                 ('unit_cost', models.DecimalField(default=0.0, max_digits=30, decimal_places=2)),
                 ('list_price', models.DecimalField(null=True, max_digits=30, decimal_places=2)),
-                ('line_desc', models.CharField(default=b'Misc. Item', max_length=1024)),
-                ('currency', models.CharField(default=b'usd', max_length=8)),
+                ('line_desc', models.CharField(default=u'Misc. Item', max_length=1024)),
+                ('currency', models.CharField(default=u'usd', max_length=8)),
                 ('fulfilled_time', models.DateTimeField(null=True, db_index=True)),
                 ('refund_requested_time', models.DateTimeField(null=True, db_index=True)),
                 ('service_fee', models.DecimalField(default=0.0, max_digits=30, decimal_places=2)),
-                ('report_comments', models.TextField(default=b'')),
+                ('report_comments', models.TextField(default=u'')),
             ],
         ),
         migrations.CreateModel(
@@ -231,7 +231,7 @@ class Migration(migrations.Migration):
             name='Donation',
             fields=[
                 ('orderitem_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='shoppingcart.OrderItem', on_delete=models.CASCADE)),
-                ('donation_type', models.CharField(default=b'general', max_length=32, choices=[(b'general', b'A general donation'), (b'course', b'A donation to a particular course')])),
+                ('donation_type', models.CharField(default=u'general', max_length=32, choices=[(u'general', u'A general donation'), (u'course', u'A donation to a particular course')])),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
             ],
             bases=('shoppingcart.orderitem',),

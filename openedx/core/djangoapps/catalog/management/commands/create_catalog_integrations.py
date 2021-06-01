@@ -1,5 +1,6 @@
 '''CatalogIntegration management command'''
 
+
 from django.core.management import BaseCommand, CommandError
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 
@@ -65,10 +66,10 @@ class Command(BaseCommand):
                 page_size=page_size
             )
         except Exception as err:
-            raise CommandError('Error creating CatalogIntegration: {}'.format(err))
+            raise CommandError(u'Error creating CatalogIntegration: {}'.format(err))
 
         self.stdout.write(self.style.SUCCESS(
-            'Successfully created CatalogIntegration enabled={} url={} service_username={}').format(
+            u'Successfully created CatalogIntegration enabled={} url={} service_username={}').format(
                 catalog_integration.enabled,
                 catalog_integration.internal_api_url,
                 catalog_integration.service_username

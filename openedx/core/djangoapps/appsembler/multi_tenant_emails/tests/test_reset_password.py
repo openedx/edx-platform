@@ -1,46 +1,15 @@
 """
 Test the various password reset flows
 """
-import json
 import re
-import unittest
 
-from unittest import skipUnless
-
-import ddt
-from django.conf import settings
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.core.cache import cache
 from django.core import mail
-from django.urls import reverse
-from django.test.client import RequestFactory
-from django.test.utils import override_settings
-from django.utils.http import int_to_base36
-from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
-from mock import Mock, patch
-from oauth2_provider import models as dot_models
-from provider.oauth2 import models as dop_models
-
-from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api.models import UserRetirementRequest
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
-from student.tests.test_email import mock_render_to_string
-from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
-from util.testing import EventTestMixin
 from rest_framework.test import APITestCase
 
-#from .test_configuration_overrides import fake_get_value
-from .test_utils import with_organization_context, create_org_user
+from .test_utils import lms_multi_tenant_test, with_organization_context, create_org_user
 
 
-@skip_unless_lms
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
-@skipUnless(settings.FEATURES['APPSEMBLER_MULTI_TENANT_EMAILS'], 'This only tests multi-tenancy')
+@lms_multi_tenant_test
 class ResetPasswordMultiTenantTests(APITestCase):
     """
     Tests to ensure that password reset works with multi-tenant emails
@@ -92,13 +61,12 @@ class ResetPasswordMultiTenantTests(APITestCase):
             assert response.status_code == 200, response.content
             assert response.json()['success']
             assert mail.outbox[0]
-            assert len(mail.outbox) == 1
+            assert len(mail.outbox) == 1, 'Should not break multi-tenancy'
             sent_message = mail.outbox[0]
             assert "Password reset" in sent_message.subject
             assert len(sent_message.to) == 1
             assert sent_message.to[0] == self.AHMED_EMAIL
-            reset_pwr_url = r'{}/password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/'.format(org.sites.first().domain)
-            re.search(reset_pwr_url, sent_message.body).groupdict()
+            assert '/password_reset_confirm/' in sent_message.body
 
         with with_organization_context(site_color=self.BLUE) as org:
             response = self.client.post('/password_reset/', {'email': blue_ahmed.email})
@@ -110,8 +78,7 @@ class ResetPasswordMultiTenantTests(APITestCase):
             assert "Password reset" in sent_message.subject
             assert len(sent_message.to) == 1
             assert sent_message.to[0] == self.AHMED_EMAIL
-            reset_pwr_url = r'{}/password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/'.format(org.sites.first().domain)
-            re.search(reset_pwr_url, sent_message.body).groupdict()
+            assert '/password_reset_confirm/' in sent_message.body
 
     def test_user_in_another_site(self):
         """
@@ -120,10 +87,10 @@ class ResetPasswordMultiTenantTests(APITestCase):
         user with the same email exists in another site.
         """
         with with_organization_context(site_color=self.BLUE) as org:
-            blue_ahmed = create_org_user(org, email=self.AHMED_EMAIL, password=self.PASSWORD)
+            _blue_ahmed = create_org_user(org, email=self.AHMED_EMAIL, password=self.PASSWORD)
 
-        with with_organization_context(site_color=self.RED) as org:
+        with with_organization_context(site_color=self.RED):
             response = self.client.post('/password_reset/', {'email': self.AHMED_EMAIL})
             assert response.status_code == 200, response.content
             assert response.json()['success'], response.content
-            assert len(mail.outbox) == 0
+            assert len(mail.outbox) == 0, 'Should not break multi-tenancy'

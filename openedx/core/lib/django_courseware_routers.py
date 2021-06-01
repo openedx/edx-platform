@@ -10,20 +10,32 @@ class StudentModuleHistoryExtendedRouter(object):
 
     DATABASE_NAME = 'student_module_history'
 
-    def _is_csmh(self, model):
+    def _is_csm(self, model):
         """
-        Return True if ``model`` is courseware.StudentModuleHistoryExtended.
+        Return True if ``model`` is courseware.models.StudentModule.
         """
         return (
-            model._meta.app_label == 'coursewarehistoryextended' and  # pylint: disable=protected-access
-            model.__name__ == 'StudentModuleHistoryExtended'
+            model._meta.app_label == 'courseware' and
+            type(model).__name__ == 'StudentModule'
+        )
+
+    def _is_csm_h(self, model):
+        """
+        Return True if ``model`` is coursewarehistoryextended.models.StudentModuleHistoryExtended.
+        """
+        return (
+            model._meta.app_label == 'coursewarehistoryextended' and
+            (
+                type(model).__name__ == 'StudentModuleHistoryExtended' or
+                getattr(model, '__name__', '') == 'StudentModuleHistoryExtended'
+            )
         )
 
     def db_for_read(self, model, **hints):  # pylint: disable=unused-argument
         """
         Use the StudentModuleHistoryExtendedRouter.DATABASE_NAME if the model is StudentModuleHistoryExtended.
         """
-        if self._is_csmh(model):
+        if self._is_csm_h(model):
             return self.DATABASE_NAME
         else:
             return None
@@ -32,16 +44,24 @@ class StudentModuleHistoryExtendedRouter(object):
         """
         Use the StudentModuleHistoryExtendedRouter.DATABASE_NAME if the model is StudentModuleHistoryExtended.
         """
-        if self._is_csmh(model):
+        if self._is_csm_h(model):
             return self.DATABASE_NAME
         else:
             return None
 
     def allow_relation(self, obj1, obj2, **hints):  # pylint: disable=unused-argument
         """
-        Disable relations if the model is StudentModuleHistoryExtended.
+        Manage relations if the model is StudentModuleHistoryExtended.
         """
-        if self._is_csmh(obj1) or self._is_csmh(obj2):
+        # Allow relation between CSM and CSMH (this cross-database relationship is declared with db_constraint=False
+        # so while cross-model relationship is allowed via Django it is not stored as such within the database).
+        # Note: The order of obj1 and obj2 are based on the parent-child relationship as explained in
+        #   https://github.com/django/django/blob/stable/2.2.x/django/db/models/fields/related_descriptors.py
+        if self._is_csm(obj1) and self._is_csm_h(obj2):
+            return True
+
+        # Prevent any other relations with CSMH since CSMH is in its own different database.
+        elif self._is_csm_h(obj1) or self._is_csm_h(obj2):
             return False
         return None
 
@@ -51,7 +71,7 @@ class StudentModuleHistoryExtendedRouter(object):
         """
         if model_name is not None:
             model = hints.get('model')
-            if model is not None and self._is_csmh(model):
+            if model is not None and self._is_csm_h(model):
                 return db == self.DATABASE_NAME
         if db == self.DATABASE_NAME:
             return False

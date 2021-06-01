@@ -1,7 +1,9 @@
 """
 Tests for User deactivation API permissions
 """
-from django.test import TestCase, RequestFactory
+
+
+from django.test import RequestFactory, TestCase
 
 from openedx.core.djangoapps.user_api.accounts.permissions import CanDeactivateUser, CanRetireUser
 from student.tests.factories import ContentTypeFactory, PermissionFactory, SuperuserFactory, UserFactory
@@ -28,7 +30,7 @@ class CanDeactivateUserTest(TestCase):
                 app_label='student'
             )
         )
-        user.user_permissions.add(permission)  # pylint: disable=no-member
+        user.user_permissions.add(permission)
         self.request.user = user
 
         result = CanDeactivateUser().has_permission(self.request, None)

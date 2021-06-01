@@ -4,6 +4,7 @@ import * as xmoduleLoader from 'xmodule';
 import './base';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
+import 'xmodule/js/src/xmodule'; // Force the XBlockToXModuleShim to load for Static Tabs
 
 'use strict';
 export default function EditTabsFactory(courseLocation, explicitUrl) {

@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Hello {{full_name}}, {% endblocktrans %}
+{% blocktrans %}Your {{platform_name}} ID verification has expired. {% endblocktrans %}
+
+{% trans "You must have a valid ID verification to take proctored exams and qualify for certificates."%}
+{% trans "Follow the link below to submit your photos and renew your ID verification." %}
+{% trans "You can also do this from your dashboard." %}
+
+{% blocktrans %}Resubmit Verification : {{lms_verification_link}} {% endblocktrans %}
+{% blocktrans %}ID verification FAQ : {{help_center_link}} {% endblocktrans %}
+
+{% trans "Thank you," %}
+{% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+{% endautoescape %}

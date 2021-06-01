@@ -6,7 +6,7 @@ from organizations.models import UserOrganizationMapping
 
 
 def should_show_hubspot(user):
-    if not user or not user.is_authenticated():
+    if not user or not user.is_authenticated:
         return False
 
     if not user.is_active:

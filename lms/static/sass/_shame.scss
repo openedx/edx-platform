@@ -7,18 +7,16 @@
 
 // extends btn
 %m-btn {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
+
   @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
 
   display: inline-block;
   cursor: pointer;
   text-decoration: none;
 
-  &:hover, &:active {
-
-  }
-
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     cursor: default;
     pointer-events: none;
   }
@@ -42,16 +40,19 @@
   @extend %m-btn-edged;
 
   border: none;
-  padding:($baseline/2) ($baseline);
+  padding: ($baseline/2) ($baseline);
   text-align: center;
   text-shadow: none;
   font-weight: 500;
   letter-spacing: 0;
 
-  &.disabled, &[disabled], &.is-disabled {
+  &.disabled,
+  &[disabled],
+  &.is-disabled {
     background: $action-primary-disabled-bg;
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       background: $action-primary-disabled-bg !important; // needed for IE currently
     }
   }
@@ -65,7 +66,9 @@
   background: $action-primary-bg;
   color: $action-primary-fg;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $action-primary-focused-bg;
   }
 
@@ -73,18 +76,22 @@
     box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $action-primary-active-shadow;
     background: $action-primary-active-bg;
     color: $action-primary-active-fg;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $action-primary-active-focused-shadow;
       color: $action-primary-active-focused-fg;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
     background: $action-primary-disabled-bg; // needed for IE currently
   }
@@ -98,7 +105,9 @@
   background: $action-secondary-bg;
   color: $action-secondary-fg;
 
-  &:hover, &:active, &:focus {
+  &:hover,
+  &:active,
+  &:focus {
     background: $action-secondary-focused-bg;
   }
 
@@ -106,18 +115,22 @@
     box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
 
-  &.current, &.active {
+  &.current,
+  &.active {
     box-shadow: inset 0 2px 1px 1px $action-secondary-active-shadow;
     background: $action-secondary-active-bg;
     color: $action-secondary-active-fg;
 
-    &:hover, &:active, &:focus {
+    &:hover,
+    &:active,
+    &:focus {
       box-shadow: inset 0 2px 1px 1px $action-secondary-active-focused-shadow;
       color: $action-secondary-active-focused-fg;
     }
   }
 
-  &.disabled, &[disabled] {
+  &.disabled,
+  &[disabled] {
     box-shadow: none;
     background: $action-secondary-disabled-bg; // needed for IE currently
   }
@@ -127,7 +140,10 @@
 // ====================
 
 // edx.org marketing site - needed, but bad overrides with importants
-.view-register, .view-login, .view-passwordreset, .view-survey {
+.view-register,
+.view-login,
+.view-passwordreset,
+.view-survey {
   .form-actions button[type="submit"] {
     text-transform: none;
     vertical-align: middle;
@@ -145,13 +161,17 @@
 
   //overriding reset link style for nav/header
   .header-global {
-    .logo a:hover, .logo:active, .logo a:focus {
+    .logo a:hover,
+    .logo:active,
+    .logo a:focus {
       border: none;
       text-decoration: none;
       padding-bottom: 0;
     }
 
-    .nav-global a:hover, .nav-global a:active, .nav-global a:focus {
+    .nav-global a:hover,
+    .nav-global a:active,
+    .nav-global a:focus {
       border: none;
     }
   }
@@ -179,7 +199,8 @@ footer .references {
 // ====================
 
 // modal semantic button resetting - overriding the poorly scoped button mixin styling
-.close-modal, button.close-modal {
+.close-modal,
+button.close-modal {
   @extend %ui-reset-button;
 
   &:focus {

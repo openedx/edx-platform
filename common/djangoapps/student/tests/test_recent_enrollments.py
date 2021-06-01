@@ -1,6 +1,8 @@
 """
 Tests for the recently enrolled messaging within the Dashboard.
 """
+
+
 import datetime
 import unittest
 
@@ -8,10 +10,9 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from django.utils.timezone import now
-from django.test import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx import locator
 from pytz import UTC
+from six.moves import range, zip
 
 from common.test.utils import XssTestMixin
 from course_modes.tests.factories import CourseModeFactory
@@ -25,10 +26,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-@override_settings(DEFAULT_SITE_THEME='edx-theme-codebase')
 class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
@@ -104,7 +103,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         # Create a number of new enrollments and courses, and force their creation behind
         # the first enrollment
         courses = []
-        for idx, seconds_past in zip(range(2, 6), [5, 10, 15, 20]):
+        for idx, seconds_past in zip(list(range(2, 6)), [5, 10, 15, 20]):
             course_location = locator.CourseLocator(
                 'Org{num}'.format(num=idx),
                 'Course{num}'.format(num=idx),
@@ -272,7 +271,7 @@ class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
         (False, True,),
     )
     @ddt.unpack
-    @unittest.skip('Appsembler: Broken tests. Likely because of our theme changes. Skipping for now -- Omar')
+    @unittest.skipIf(settings.TAHOE_ALWAYS_SKIP_TEST, 'Broken tests. Likely because of our theme changes.')
     def test_donate_button_with_enabled_site_configuration(self, enable_donation_config, enable_donation_site_config):
         # Enable the enrollment success message and donations
         self._configure_message_timeout(10000)

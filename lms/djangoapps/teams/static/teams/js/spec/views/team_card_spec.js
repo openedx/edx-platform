@@ -2,13 +2,14 @@ define(['jquery',
     'underscore',
     'moment',
     'teams/js/views/team_card',
-    'teams/js/models/team'],
-    function($, _, moment, TeamCardView, Team) {
+    'teams/js/models/team',
+    'teams/js/models/topic'],
+    function($, _, moment, TeamCardView, Team, Topic) {
         'use strict';
 
         describe('TeamCardView', function() {
             var createTeamCardView, view;
-            createTeamCardView = function() {
+            createTeamCardView = function(topicOptions) {
                 var model = new Team({
                         id: 'test-team',
                         name: 'Test Team',
@@ -21,14 +22,17 @@ define(['jquery',
                         language: 'en',
                         membership: []
                     }),
+                    topic = new Topic(_.extend({id: 'test-topic'}, topicOptions)),
                     TeamCardClass = TeamCardView.extend({
-                        maxTeamSize: '100',
+                        courseMaxTeamSize: '100',
                         srInfo: {
                             id: 'test-sr-id',
                             text: 'Screenreader text'
                         },
                         countries: {us: 'United States of America'},
-                        languages: {en: 'English'}
+                        languages: {en: 'English'},
+                        // eslint-disable-next-line no-unused-vars
+                        getTopic: function(topicId) { return $.Deferred().resolve(topic); }
                     });
                 return new TeamCardClass({
                     model: model
@@ -88,7 +92,7 @@ define(['jquery',
                 expectThumbnailsOrder = function(members) {
                     var thumbnails = view.$('.item-member-thumb img');
                     expect(thumbnails.length).toBe(members.length);
-                    thumbnails.each(function(index, imgEl) {
+                    thumbnails.each(function(index) {
                         expect(thumbnails.eq(index).attr('alt')).toBe(members[index].username);
                         expect(thumbnails.eq(index).attr('src')).toBe(members[index].image_url);
                     });

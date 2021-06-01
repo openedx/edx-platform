@@ -10,4 +10,7 @@ echo "Running diff quality."
 mkdir -p test_root/log/
 LOG_PREFIX=test_root/log/run_quality
 
-paver run_quality -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log
+if [[ $TARGET_BRANCH != origin/* ]]; then
+    TARGET_BRANCH=origin/$TARGET_BRANCH
+fi
+paver run_quality -b $TARGET_BRANCH -p 100 -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD 2> $LOG_PREFIX.err.log > $LOG_PREFIX.out.log

@@ -1,0 +1,33 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% filter force_escape %}
+                {% blocktrans %}Email Change Confirmation for {{ platform_name }}{% endblocktrans %}
+                {% endfilter %}
+            </h1>
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}This is to confirm that you changed the e-mail associated with {{ platform_name }} from {{ old_email }} to {{ new_email }}. If you did not make this request, please contact us immediately. Contact information is listed at:{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+            <a href="{{ contact_link }}">{{ contact_link }}</a>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% filter force_escape %}
+                {% blocktrans %}We keep a log of old e-mails, so if this request was unintentional, we can investigate.{% endblocktrans %}
+                {% endfilter %}
+                <br />
+            </p>
+
+        </td>
+    </tr>
+</table>
+{% endblock %}

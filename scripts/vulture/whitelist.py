@@ -5,6 +5,7 @@
 # add them below. This file is consumed by
 # scripts/dead_code/find-dead-code.sh
 
+
 from vulture.whitelist_utils import Whitelist
 
 view_whitelilst = Whitelist()

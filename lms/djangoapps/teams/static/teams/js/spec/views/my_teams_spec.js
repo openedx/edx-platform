@@ -6,17 +6,23 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
+    var createMyTeamsView, mockGetTopic;
     describe('My Teams View', function() {
         beforeEach(function() {
             setFixtures('<div class="teams-container"></div>');
         });
 
-        var createMyTeamsView = function(myTeams) {
+        mockGetTopic = function(topicId) {
+            return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({id: topicId}));
+        };
+
+        createMyTeamsView = function(myTeams) {
             return new MyTeamsView({
                 el: '.teams-container',
                 collection: myTeams,
                 showActions: true,
-                context: TeamSpecHelpers.testContext
+                context: TeamSpecHelpers.testContext,
+                getTopic: mockGetTopic
             }).render();
         };
 
@@ -25,10 +31,6 @@ define([
                 teams = TeamSpecHelpers.createMockTeams({results: teamsData}),
                 myTeamsView = createMyTeamsView(teams);
             TeamSpecHelpers.verifyCards(myTeamsView, teamsData);
-
-            // Verify that there is no header or footer
-            expect(myTeamsView.$('.teams-paging-header').text().trim()).toBe('');
-            expect(myTeamsView.$('.teams-paging-footer').text().trim()).toBe('');
         });
 
         it('shows a message when the user is not a member of any teams', function() {
@@ -36,6 +38,16 @@ define([
                 myTeamsView = createMyTeamsView(teams);
             TeamSpecHelpers.verifyCards(myTeamsView, []);
             expect(myTeamsView.$el.text().trim()).toBe('You are not currently a member of any team.');
+        });
+
+        it('hides pagination when the user is not a member of any teams', function() {
+            var teams = TeamSpecHelpers.createMockTeams({results: []}),
+                myTeamsView = createMyTeamsView(teams);
+            TeamSpecHelpers.verifyCards(myTeamsView, []);
+
+            // Verify that there is no header or footer
+            expect(myTeamsView.$('.teams-paging-header').text().trim()).toBe('');
+            expect(myTeamsView.$('.teams-paging-footer').text().trim()).toBe('');
         });
 
         it('refreshes a stale membership collection when rendering', function() {

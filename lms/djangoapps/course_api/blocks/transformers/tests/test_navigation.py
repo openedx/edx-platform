@@ -2,9 +2,12 @@
 """
 Tests for BlockNavigationTransformer.
 """
+
+
 from unittest import TestCase
 
 import ddt
+import six
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
@@ -21,7 +24,6 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
     """
     Course-agnostic test class for testing the Navigation transformer.
     """
-    shard = 4
 
     @ddt.data(
         (0, 0, [], []),
@@ -55,7 +57,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
 
         for block_key, expected_nav in enumerate(expected_nav_map):
             self.assertSetEqual(
-                set(unicode(block) for block in expected_nav),
+                set(six.text_type(block) for block in expected_nav),
                 set(
                     block_structure.get_transformer_block_field(
                         block_key,
@@ -72,7 +74,6 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
     Uses SampleCourseFactory and Modulestore to test the Navigation transformer,
     specifically to test enforcement of the hide_from_toc field
     """
-    shard = 4
 
     def test_hide_from_toc(self):
         course_key = SampleCourseFactory.create().id
@@ -113,7 +114,7 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_y1a'),
                 course_key.make_usage_key('problem', 'problem_y1a_1'),
         ]:
-            self.assertIn(unicode(block_key), course_descendants)
+            self.assertIn(six.text_type(block_key), course_descendants)
 
         # chapter_x and its descendants should not be included
         for block_key in [
@@ -122,4 +123,4 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
                 course_key.make_usage_key('vertical', 'vertical_x1a'),
                 course_key.make_usage_key('problem', 'problem_x1a_1'),
         ]:
-            self.assertNotIn(unicode(block_key), course_descendants)
+            self.assertNotIn(six.text_type(block_key), course_descendants)

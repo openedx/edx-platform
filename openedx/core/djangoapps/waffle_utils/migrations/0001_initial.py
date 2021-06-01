@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
+
 
 import django.db.models.deletion
 from django.conf import settings
@@ -22,7 +23,7 @@ class Migration(migrations.Migration):
                 ('enabled', models.BooleanField(default=False, verbose_name='Enabled')),
                 ('waffle_flag', models.CharField(max_length=255, db_index=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
-                ('override_choice', models.CharField(default=b'on', max_length=3, choices=[(b'on', 'Force On'), (b'off', 'Force Off')])),
+                ('override_choice', models.CharField(default=u'on', max_length=3, choices=[(u'on', u'Force On'), (u'off', u'Force Off')])),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
             ],
             options={

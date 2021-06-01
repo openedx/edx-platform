@@ -3,7 +3,6 @@ Command to recalculate a user's grades for a course, for every user in
 a csv of (user, course) pairs.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 import csv
 

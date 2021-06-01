@@ -2,7 +2,9 @@
 Tests of the encryption and decryption utilities in the ssencrypt module.
 """
 
+
 import base64
+import binascii
 
 from lms.djangoapps.verify_student.ssencrypt import (
     aes_decrypt,
@@ -13,7 +15,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_encrypt
 )
 
-AES_KEY_BYTES = b'32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae'.decode('hex')
+AES_KEY_BYTES = binascii.unhexlify(b'32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae')
 
 # Make up some garbage keys for testing purposes.
 PUB_KEY_BYTES = b"""-----BEGIN PUBLIC KEY-----
@@ -76,7 +78,7 @@ def test_rsa():
 
 
 def test_rsa_unicode_data():
-    data = u'12345678901234567890123456789012'
+    data = b'12345678901234567890123456789012'
     _assert_rsa(data, PUB_KEY_BYTES, PRIV_KEY_BYTES)
 
 

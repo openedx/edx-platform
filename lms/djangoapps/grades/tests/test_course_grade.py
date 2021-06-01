@@ -1,4 +1,6 @@
 import ddt
+import six
+from crum import set_current_request
 from django.conf import settings
 from mock import patch
 
@@ -23,7 +25,6 @@ class ZeroGradeTest(GradeTestBase):
     Tests ZeroCourseGrade (and, implicitly, ZeroSubsectionGrade)
     functionality.
     """
-    shard = 4
 
     @ddt.data(True, False)
     def test_zero(self, assume_zero_enabled):
@@ -35,7 +36,7 @@ class ZeroGradeTest(GradeTestBase):
             chapter_grades = ZeroCourseGrade(self.request.user, course_data).chapter_grades
             for chapter in chapter_grades:
                 for section in chapter_grades[chapter]['sections']:
-                    for score in section.problem_scores.itervalues():
+                    for score in six.itervalues(section.problem_scores):
                         self.assertEqual(score.earned, 0)
                         self.assertEqual(score.first_attempted, None)
                     self.assertEqual(section.all_total.earned, 0)
@@ -70,7 +71,6 @@ class TestScoreForModule(SharedModuleStoreTestCase):
                    (2/5) (3/5) (0/1)   -   (1/3)   -   (3/10)
 
     """
-    shard = 4
 
     @classmethod
     def setUpClass(cls):
@@ -102,6 +102,11 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         answer_problem(cls.course, cls.request, cls.n, score=3, max_value=10)
 
         cls.course_grade = CourseGradeFactory().read(cls.request.user, cls.course)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestScoreForModule, cls).tearDownClass()
+        set_current_request(None)
 
     def test_score_chapter(self):
         earned, possible = self.course_grade.score_for_module(self.a.location)

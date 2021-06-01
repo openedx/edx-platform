@@ -1,5 +1,8 @@
-define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js/utils/date_utils'],
-    function(Backbone, _, gettext, ValidationHelpers, DateUtils) {
+define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js/utils/date_utils',
+    'edx-ui-toolkit/js/utils/string-utils'
+],
+    function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
+        'use strict';
         var CourseDetails = Backbone.Model.extend({
             defaults: {
                 org: '',
@@ -51,11 +54,17 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                 if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
                     errors.end_date = gettext('The course end date must be later than the course start date.');
                 }
-                if (newattrs.start_date && newattrs.enrollment_start && newattrs.start_date < newattrs.enrollment_start) {
-                    errors.enrollment_start = gettext('The course start date must be later than the enrollment start date.');
+                if (newattrs.start_date && newattrs.enrollment_start &&
+                  newattrs.start_date < newattrs.enrollment_start) {
+                    errors.enrollment_start = gettext(
+                      'The course start date must be later than the enrollment start date.'
+                    );
                 }
-                if (newattrs.enrollment_start && newattrs.enrollment_end && newattrs.enrollment_start >= newattrs.enrollment_end) {
-                    errors.enrollment_end = gettext('The enrollment start date cannot be after the enrollment end date.');
+                if (newattrs.enrollment_start && newattrs.enrollment_end &&
+                  newattrs.enrollment_start >= newattrs.enrollment_end) {
+                    errors.enrollment_end = gettext(
+                      'The enrollment start date cannot be after the enrollment end date.'
+                    );
                 }
                 if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                     errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
@@ -78,7 +87,9 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
                         max: 100
                     };
                     if (!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)) {
-                        errors.entrance_exam_minimum_score_pct = interpolate(gettext('Please enter an integer between %(min)s and %(max)s.'), range, true);
+                        errors.entrance_exam_minimum_score_pct = StringUtils.interpolate(gettext(
+                          'Please enter an integer between %(min)s and %(max)s.'
+                        ), range, true);
                     }
                 }
                 if (!_.isEmpty(errors)) return errors;
@@ -90,7 +101,8 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
             set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-                if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
+                if (_.isEmpty(newsource) &&
+                  !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
         // TODO remove all whitespace w/in string
                 else {
                     if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});

@@ -1,4 +1,6 @@
 """ Management command to update courses' search index """
+
+
 import logging
 from textwrap import dedent
 
@@ -8,6 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
+from six.moves import map
 
 from contentstore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.django import modulestore
@@ -44,7 +47,7 @@ class Command(BaseCommand):
         try:
             result = CourseKey.from_string(raw_value)
         except InvalidKeyError:
-            raise CommandError("Invalid course_key: '%s'." % raw_value)
+            raise CommandError(u"Invalid course_key: '%s'." % raw_value)
 
         if not isinstance(result, CourseLocator):
             raise CommandError(u"Argument {0} is not a course key".format(raw_value))
@@ -75,7 +78,7 @@ class Command(BaseCommand):
                     # try getting the ElasticSearch engine
                     searcher = SearchEngine.get_search_engine(index_name)
                 except exceptions.ElasticsearchException as exc:
-                    logging.exception('Search Engine error - %s', exc)
+                    logging.exception(u'Search Engine error - %s', exc)
                     return
 
                 index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
@@ -101,7 +104,7 @@ class Command(BaseCommand):
                 return
         else:
             # in case course keys are provided as arguments
-            course_keys = map(self._parse_course_key, course_ids)
+            course_keys = list(map(self._parse_course_key, course_ids))
 
         for course_key in course_keys:
             CoursewareSearchIndexer.do_course_reindex(store, course_key)

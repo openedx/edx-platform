@@ -1,6 +1,8 @@
 """
 Tools to create catalog-related data for use in bok choy tests.
 """
+
+
 import json
 
 import requests
@@ -38,6 +40,18 @@ class CatalogFixture(object):
         requests.put(
             '{}/set_config'.format(CATALOG_STUB_URL),
             data={key: json.dumps(uuids)},
+        )
+
+    def install_pathways(self, pathways):
+        """
+        Stub the discovery service's credit pathways API endpoint
+
+        Arguments:
+             pathways (list): A list of credit pathways. List endpoint will be stubbed using data from this list.
+        """
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={'catalog.pathways': json.dumps({'results': pathways, 'next': None})}
         )
 
     def install_program_types(self, program_types):
