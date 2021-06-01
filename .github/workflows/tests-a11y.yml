@@ -28,7 +28,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - uses: mirromutth/mysql-action@v1.1
+    - name: Shutdown Ubuntu MySQL
+      run: sudo service mysql stop
+
+    - name: Setup MySQL
+      uses: mirromutth/mysql-action@v1.1
       with:
         mysql version: '5.7'
         mysql database: 'edxapp'
@@ -42,9 +46,8 @@ jobs:
         sudo apt-get install -y libxmlsec1-dev memcached
         sudo apt-get install -y python3-mysqldb
         sudo systemctl start mongod
-        sudo systemctl start mysql
         sudo service memcached start
-#        sudo service mysql restart
+        sudo service mysql restart
 
     - name: Install pip
       run: |
