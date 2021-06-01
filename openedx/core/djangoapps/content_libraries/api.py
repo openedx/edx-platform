@@ -325,7 +325,6 @@ def require_permission_for_library_key(library_key, user, permission):
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    assert isinstance(library_key, LibraryLocatorV2)
     library_obj = ContentLibrary.objects.get_by_key(library_key)
     if not user.has_perm(permission, obj=library_obj):
         raise PermissionDenied
@@ -338,7 +337,6 @@ def get_library(library_key):
 
     Raises ContentLibraryNotFound if the library doesn't exist.
     """
-    assert isinstance(library_key, LibraryLocatorV2)
     ref = ContentLibrary.objects.get_by_key(library_key)
     bundle_metadata = get_bundle(ref.bundle_uuid)
     lib_bundle = LibraryBundle(library_key, ref.bundle_uuid, draft_name=DRAFT_NAME)
