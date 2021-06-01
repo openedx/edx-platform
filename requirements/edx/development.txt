@@ -30,6 +30,8 @@
     # via -r requirements/edx/testing.txt
 -e openedx/core/lib/xblock_builtin/xblock_discussion
     # via -r requirements/edx/testing.txt
+-e git+https://github.com/edx/xblock-free-text-response.git@cd7eb415f7623cb78215e47f050a8552a749ca6a#egg=xblock-free-text-response
+    # via -r requirements/edx/testing.txt
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@2d176468e33c0713c911b563f8f65f7cf232f5b6#egg=xblock-google-drive
     # via -r requirements/edx/testing.txt
 -e common/lib/xmodule
@@ -431,6 +433,7 @@ django==2.2.20
     #   ora2
     #   rest-condition
     #   super-csv
+    #   xblock-free-text-response
     #   xss-utils
 djangorestframework-xml==2.0.0
     # via
@@ -551,7 +554,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/testing.txt
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/testing.txt
-edx-proctoring==3.11.4
+edx-proctoring==3.11.5
     # via
     #   -r requirements/edx/testing.txt
     #   edx-proctoring-proctortrack
@@ -1271,6 +1274,7 @@ six==1.16.0
     #   tox
     #   transifex-client
     #   virtualenv
+    #   xblock-free-text-response
 slumber==0.7.1
     # via
     #   -r requirements/edx/testing.txt
@@ -1463,6 +1467,7 @@ xblock-utils==2.1.3
     #   lti-consumer-xblock
     #   staff-graded-xblock
     #   xblock-drag-and-drop-v2
+    #   xblock-free-text-response
     #   xblock-google-drive
 xblock==1.4.2
     # via
@@ -1480,6 +1485,7 @@ xblock==1.4.2
     #   staff-graded-xblock
     #   xblock-discussion
     #   xblock-drag-and-drop-v2
+    #   xblock-free-text-response
     #   xblock-google-drive
     #   xblock-poll
     #   xblock-utils
