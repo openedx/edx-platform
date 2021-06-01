@@ -30,6 +30,9 @@ class ApplicationHub(TimeStampedModel):
         User, related_name='application_hub', on_delete=models.CASCADE, verbose_name=_('User'),
     )
     is_prerequisite_courses_passed = models.BooleanField(default=False, verbose_name=_('Prerequisite Courses Passed'), )
+    is_bu_prerequisite_courses_passed = models.BooleanField(
+        default=False, verbose_name=_('Business Unit Prerequisite Courses Passed'),
+    )
     is_written_application_completed = models.BooleanField(
         default=False, verbose_name=_('Written Application Submitted'),
     )

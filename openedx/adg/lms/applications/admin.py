@@ -74,12 +74,12 @@ class ApplicationHubAdmin(admin.ModelAdmin):
     """
 
     fields = (
-        'user', 'is_prerequisite_courses_passed', 'is_written_application_completed', 'is_application_submitted',
-        'submission_date'
+        'user', 'is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed',
+        'is_written_application_completed', 'is_application_submitted', 'submission_date'
     )
     list_display = (
-        'id', 'user', 'is_prerequisite_courses_passed', 'is_written_application_completed', 'is_application_submitted',
-        'submission_date'
+        'id', 'user', 'is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed',
+        'is_written_application_completed', 'is_application_submitted', 'submission_date'
     )
     raw_id_fields = ('user',)
 
