@@ -2,8 +2,6 @@
 Courseware API Mixins.
 """
 
-import logging
-
 from babel.numbers import get_currency_symbol
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -12,8 +10,6 @@ from lms.djangoapps.courseware.utils import can_show_verified_upgrade, verified_
 from lms.djangoapps.experiments.utils import STREAK_DISCOUNT_EXPERIMENT_FLAG
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from openedx.features.discounts.applicability import can_show_streak_discount_experiment_coupon
-
-log = logging.getLogger(__name__)
 
 
 def get_celebrations_dict(user, enrollment, course, browser_timezone):
@@ -38,12 +34,10 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
 
     # We only want to bucket people into the AA-759 experiment if they are going to see the streak celebration
     if streak_length_to_celebrate:
-        log.info('AA759debug 0')
         # We only want to bucket people into the AA-759 experiment
         # if the course has not ended, is upgradeable and the user is not an enterprise learner
         if can_show_streak_discount_experiment_coupon(user, course):
             celebrations['streak_discount_experiment_enabled'] = STREAK_DISCOUNT_EXPERIMENT_FLAG.is_enabled()
-            log.info('AA759debug 8 %s %s', user.username, celebrations['streak_discount_experiment_enabled'])
     return celebrations
 
 

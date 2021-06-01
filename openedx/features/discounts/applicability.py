@@ -11,7 +11,6 @@ not other discounts like coupons or enterprise/program offers configured in ecom
 
 from datetime import datetime, timedelta
 
-import logging
 import pytz
 from crum import get_current_request, impersonate
 from django.utils import timezone
@@ -45,8 +44,6 @@ DISCOUNT_APPLICABILITY_FLAG = LegacyWaffleFlag(
 DISCOUNT_APPLICABILITY_HOLDBACK = 'first_purchase_discount_holdback'
 REV1008_EXPERIMENT_ID = 16
 
-log = logging.getLogger(__name__)
-
 
 def get_discount_expiration_date(user, course):
     """
@@ -54,19 +51,17 @@ def get_discount_expiration_date(user, course):
     Returns none if the user is not enrolled.
     """
     # anonymous users should never get the discount
-    log.info('AA759debug 1 %s', user.username)
     if user.is_anonymous:
         return None
-    log.info('AA759debug 2 %s', user.username)
+
     course_enrollment = CourseEnrollment.objects.filter(
         user=user,
         course=course.id,
         mode__in=CourseMode.UPSELL_TO_VERIFIED_MODES
     )
-    log.info('AA759debug 3 %s', user.username)
     if len(course_enrollment) != 1:
         return None
-    log.info('AA759debug 4 %s', user.username)
+
     time_limit_start = None
     try:
         saw_banner = ExperimentData.objects.get(user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course.id))
@@ -74,7 +69,6 @@ def get_discount_expiration_date(user, course):
     except ExperimentData.DoesNotExist:
         return None
 
-    log.info('AA759debug 5 %s', user.username)
     discount_expiration_date = time_limit_start + timedelta(weeks=1)
 
     # If the course has an upgrade deadline and discount time limit would put the discount expiration date
@@ -82,11 +76,10 @@ def get_discount_expiration_date(user, course):
     verified_mode = CourseMode.verified_mode_for_course(course=course, include_expired=True)
     if not verified_mode:
         return None
-    log.info('AA759debug 6 %s', user.username)
     upgrade_deadline = verified_mode.expiration_datetime
     if upgrade_deadline and discount_expiration_date > upgrade_deadline:
         discount_expiration_date = upgrade_deadline
-    log.info('AA759debug 7 %s', user.username)
+
     return discount_expiration_date
 
 
