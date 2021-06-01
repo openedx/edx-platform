@@ -17,10 +17,27 @@ log = logging.getLogger(__name__)
 
 def emit_certificate_event(event_name, user, course_id, course_overview=None, event_data=None):
     """
-    Emits certificate event.
+    Utility function responsible for emitting certificate events.
 
-    Documentation (that is not up to date) for these events can be found here:
-    https://github.com/edx/edx-documentation/blob/master/en_us/data/source/internal_data_formats/tracking_logs/student_event_types.rst # pylint: disable=line-too-long
+    We currently track the following events:
+    - `edx.certificate.created` - Emit when a course certificate with the `downloadable` status has been awarded to a
+                                  learner.
+    - `edx.certificate.revoked`- Emit when a course certificate with the `downloadable` status has been taken away from
+                                 a learner.
+    - `edx.certificate.shared` - Emit when a learner shares their course certificate to social media (LinkedIn,
+                                 Facebook, or Twitter).
+    - `edx.certificate.evidence_visisted` - Emit when a user (other than the learner who owns a certificate) views a
+                                            course certificate (e.g., someone views a course certificate shared on a
+                                            LinkedIn profile).
+
+    Args:
+        event_name (String) - Text describing the action/event that we are tracking. Examples include `revoked`,
+                              `created`, etc.
+        user (User) - The User object of the learner associated with this event.
+        course_id (CourseLocator) - The course-run key associated with this event.
+        course_overview (CourseOverview) - Optional. The CourseOverview of the course-run associated with this event.
+        event_data (dictionary) - Optional. Dictionary containing any additional data we want to be associated with an
+                                  event.
     """
     event_name = '.'.join(['edx', 'certificate', event_name])
 
