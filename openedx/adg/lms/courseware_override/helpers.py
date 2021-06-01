@@ -104,4 +104,3 @@ def get_extra_course_about_context(request, course):
     }
 
     return context
-

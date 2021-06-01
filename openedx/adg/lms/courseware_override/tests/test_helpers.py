@@ -105,4 +105,3 @@ def test_get_extra_course_about_context(
     }
 
     assert get_extra_course_about_context(request, course) == expected_context
-
