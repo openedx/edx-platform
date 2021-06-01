@@ -54,7 +54,7 @@ appdirs==1.4.4
     #   -r requirements/edx/base.txt
     #   fs
     #   virtualenv
-astroid==2.5.7
+astroid==2.5.6
     # via
     #   pylint
     #   pylint-celery
@@ -651,7 +651,7 @@ idna==2.10
     # via
     #   -r requirements/edx/base.txt
     #   requests
-importlib-metadata==4.3.1
+importlib-metadata==4.4.0
     # via
     #   -r requirements/edx/coverage.txt
     #   inflect
@@ -950,7 +950,7 @@ pylint-plugin-utils==0.6
     #   pylint-django
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
-pylint==2.8.2
+pylint==2.8.3
     # via
     #   edx-lint
     #   pylint-celery
@@ -1037,7 +1037,7 @@ python-slugify==4.0.1
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   transifex-client
-python-swiftclient==3.11.1
+python-swiftclient==3.12.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -1123,7 +1123,7 @@ ruamel.yaml.clib==0.2.2
     # via
     #   -r requirements/edx/base.txt
     #   ruamel.yaml
-ruamel.yaml==0.17.5
+ruamel.yaml==0.17.7
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
