@@ -2,7 +2,9 @@
 Test the Blockstore-based XBlock runtime and content libraries together.
 """
 import json
+import pytest
 from gettext import GNUTranslations
+from unittest.mock import Mock, patch
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections
@@ -10,6 +12,7 @@ from django.test import TestCase, override_settings
 from organizations.models import Organization
 from rest_framework.test import APIClient
 from xblock.core import XBlock
+from xblock.exceptions import XBlockParseException
 
 from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -126,6 +129,22 @@ class ContentLibraryRuntimeTest(ContentLibraryContentTestMixin, TestCase):
         # But it gets added by the runtime and defaults to False
         # And problems do have has_score True:
         assert problem_block.has_score is True
+
+    def test_xblock_parser_error(self):
+        """
+        Test XBlockParseException on xblock parsing error.
+        """
+        unit_block = library_api.create_library_block(self.library.key, "unit", "score-unit12")
+        problem_block = library_api.create_library_block(self.library.key, "problem", "score-prob12")
+        library_api.publish_changes(self.library.key)
+
+        with patch('xmodule.capa_module.ProblemBlock.parse_xml_new_runtime', Mock(side_effect=Exception)):
+            with pytest.raises(XBlockParseException):
+                xblock_api.load_block(problem_block.usage_key, self.student_a)
+
+        with patch('xmodule.unit_block.UnitBlock.parse_xml', Mock(side_effect=Exception)):
+            with pytest.raises(XBlockParseException):
+                xblock_api.load_block(unit_block.usage_key, self.student_a)
 
     @skip_unless_cms  # creating child blocks only works properly in Studio
     def test_xblock_metadata(self):

@@ -8,7 +8,7 @@ import os.path
 
 from lxml import etree
 from opaque_keys.edx.locator import BundleDefinitionLocator
-from xblock.exceptions import NoSuchDefinition, NoSuchUsage
+from xblock.exceptions import NoSuchDefinition, NoSuchUsage, XBlockParseException
 from xblock.fields import ScopeIds
 
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -67,9 +67,19 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
                 # When a former XModule no longer needs to support the old runtime, its parse_xml_new_runtime method
                 # should be removed and its parse_xml() method should be simplified to just call the super().parse_xml()
                 # plus some minor additional lines of code as needed.
-                block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
+                try:
+                    block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
+                except Exception as exc:
+                    message = 'parse_xml_new_runtime xblock error for usage_id {}'.format(usage_id)
+                    log.warning(message)
+                    raise XBlockParseException(message) from exc
             else:
-                block = block_class.parse_xml(xml_node, runtime=self, keys=keys, id_generator=None)
+                try:
+                    block = block_class.parse_xml(xml_node, runtime=self, keys=keys, id_generator=None)
+                except Exception as exc:
+                    message = 'parse_xml xblock error for usage_id {}'.format(usage_id)
+                    log.warning(message)
+                    raise XBlockParseException(message) from exc
             # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
             block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
             self.system.authored_data_store.cache_fields(block)
