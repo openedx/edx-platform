@@ -796,7 +796,7 @@ python-slugify==4.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   code-annotations
-python-swiftclient==3.11.1
+python-swiftclient==3.12.0
     # via ora2
 python3-openid==3.2.0 ; python_version >= "3"
     # via
@@ -877,7 +877,7 @@ rest-condition==1.0.3
     #   edx-drf-extensions
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml
-ruamel.yaml==0.17.5
+ruamel.yaml==0.17.7
     # via drf-yasg
 rules==3.0
     # via
