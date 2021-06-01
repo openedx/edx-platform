@@ -460,7 +460,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.11.4
+edx-proctoring==3.11.5
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
