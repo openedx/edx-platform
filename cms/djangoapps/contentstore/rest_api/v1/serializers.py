@@ -21,7 +21,7 @@ class LimitedProctoredExamSettingsSerializer(serializers.Serializer):
     enable_proctored_exams = serializers.BooleanField()
     proctoring_provider = serializers.CharField()
     proctoring_escalation_email = serializers.CharField(allow_blank=True)
-    create_zendesk_tickets = serializers.BooleanField(required=False)
+    create_zendesk_tickets = serializers.BooleanField()
 
 
 class ProctoredExamConfigurationSerializer(serializers.Serializer):
