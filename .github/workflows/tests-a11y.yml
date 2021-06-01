@@ -38,7 +38,7 @@ jobs:
         container port: 3307 # Optional, default value is 3306. The port of container
         mysql version: '5.7'
         mysql database: 'edxapp'
-        mysql user: 'edxapp001'
+        mysql user: 'root'
         mysql password: 'password'
         mysql root password: 'password'
 
