@@ -38,8 +38,10 @@ lxml==4.5.0
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py35.in
-markupsafe==2.0.1
-    # via chem
+markupsafe==1.1.1
+    # via
+    #   -c requirements/edx-sandbox/py35-constraints.txt
+    #   chem
 matplotlib==2.2.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt

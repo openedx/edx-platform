@@ -866,7 +866,7 @@ rest-condition==1.0.3
     #   edx-drf-extensions
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml
-ruamel.yaml==0.17.6
+ruamel.yaml==0.17.7
     # via drf-yasg
 rules==3.0
     # via
