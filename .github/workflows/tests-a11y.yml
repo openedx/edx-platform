@@ -34,6 +34,8 @@ jobs:
     - name: Setup MySQL
       uses: mirromutth/mysql-action@v1.1
       with:
+        host port: 3800 # Optional, default value is 3306. The port of host
+        container port: 3307 # Optional, default value is 3306. The port of container
         mysql version: '5.7'
         mysql database: 'edxapp'
         mysql user: 'edxapp001'
