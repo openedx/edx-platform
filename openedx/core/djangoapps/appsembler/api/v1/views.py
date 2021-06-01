@@ -4,6 +4,7 @@ Only include view classes here. See the tests/test_permissions.py:get_api_classe
 method.
 """
 from functools import partial
+import beeline
 import logging
 import random
 import string
@@ -92,6 +93,7 @@ def create_password():
         for _ in range(32))
 
 
+@beeline.traced(name="apis.v1.views.send_password_reset_email")
 def send_password_reset_email(request):
     """Copied/modified from appsembler_api.utils in enterprise Ginkgo
     Copied the template files from enterprise Ginkgo LMS templates
@@ -124,6 +126,7 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
     def dispatch(self, *args, **kwargs):
         return super(RegistrationViewSet, self).dispatch(*args, **kwargs)
 
+    @beeline.traced(name="apis.v1.views.RegistrationViewSet.create")
     def create(self, request):
         """Creates a new user account for the site that calls this view
 
@@ -189,9 +192,15 @@ class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
                 request=request,
                 params=data,
             )
-            # set the user as active if password is provided
-            # meaning we don't have to send a password reset email
-            user.is_active = password_provided
+            if password_provided:
+                # if send_activation_email is True, we want to keep the user
+                # inactive until the email is properly validated. If the param
+                # is False, we activate it.
+                user.is_active = not data['send_activation_email']
+            else:
+                # if the password is not provided, keep the user inactive until
+                # the password is set.
+                user.is_active = False
             user.save()
             user_id = user.id
             if not password_provided:
@@ -251,11 +260,13 @@ class CourseViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_class = CourseOverviewFilter
 
+    @beeline.traced(name="apis.v1.views.CourseViewSet.get_queryset")
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)
         queryset = get_courses_for_site(site)
         return queryset
 
+    @beeline.traced(name="apis.v1.views.CourseViewSet.retrieve")
     def retrieve(self, request, *args, **kwargs):
         course_id_str = kwargs.get('pk', '')
         course_key = as_course_key(course_id_str.replace(' ', '+'))
@@ -287,11 +298,13 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_class = CourseEnrollmentFilter
 
+    @beeline.traced(name="apis.v1.views.EnrollmentViewSet.get_queryset")
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)
         queryset = get_enrollments_for_site(site)
         return queryset
 
+    @beeline.traced(name="apis.v1.views.EnrollmentViewSet.retrieve")
     def retrieve(self, request, *args, **kwargs):
         course_id_str = kwargs.get('pk', '')
         course_key = as_course_key(course_id_str.replace(' ', '+'))
@@ -302,6 +315,7 @@ class EnrollmentViewSet(TahoeAuthMixin, viewsets.ModelViewSet):
         course_overview = get_object_or_404(CourseOverview, pk=course_key)
         return Response(CourseOverviewSerializer(course_overview).data)
 
+    @beeline.traced(name="apis.v1.views.EnrollmentViewSet.create")
     def create(self, request, *args, **kwargs):
         """
         Adapts interface from bulk enrollment
@@ -422,6 +436,7 @@ class UserIndexViewSet(TahoeAuthMixin, viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_class = UserIndexFilter
 
+    @beeline.traced(name="apis.v1.views.UserIndexViewSet.get_queryset")
     def get_queryset(self):
         site = django.contrib.sites.shortcuts.get_current_site(self.request)
         queryset = get_users_for_site(site)

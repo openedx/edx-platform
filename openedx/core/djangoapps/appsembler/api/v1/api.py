@@ -1,4 +1,4 @@
-
+import beeline
 import logging
 
 from django.contrib.auth.models import User
@@ -13,9 +13,6 @@ from student.models import (email_exists_or_retired,
                             username_exists_or_retired)
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 
-from openedx.core.djangoapps.appsembler.api.sites import (
-    get_site_for_course
-)
 from openedx.core.djangoapps.appsembler.api.v1.waffle import FIX_ENROLLMENT_RESULTS_BUG
 
 from student.models import (
@@ -58,6 +55,7 @@ def account_exists(email, username):
     return email_exists or username_exists
 
 
+@beeline.traced(name="apis.v1.api.enrollment_learners_context")
 def enrollment_learners_context(identifiers):
     """
     Get emails (and learner language) from a list of learner identifiers.
@@ -84,6 +82,7 @@ def enrollment_learners_context(identifiers):
         yield user, identifier, email, language
 
 
+@beeline.traced(name="apis.v1.views.enroll_learners_in_course")
 def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
     """
     This method assumes that the site has been verified to own this course
@@ -175,6 +174,7 @@ def enroll_learners_in_course(course_id, identifiers, enroll_func, **kwargs):
     return results
 
 
+@beeline.traced(name="apis.v1.views.unenroll_learners_in_course")
 def unenroll_learners_in_course(course_id, identifiers, unenroll_func, **kwargs):
     """
     Unenroll learners via email or username in a course.

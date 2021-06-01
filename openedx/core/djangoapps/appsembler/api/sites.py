@@ -1,3 +1,4 @@
+import beeline
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from organizations.models import (
@@ -13,6 +14,7 @@ from student.models import CourseEnrollment
 from openedx.core.djangoapps.appsembler.api.helpers import as_course_key
 
 
+@beeline.traced(name="api.sites.get_course_keys_for_site")
 def get_course_keys_for_site(site):
     orgs = Organization.objects.filter(sites__in=[site])
     org_courses = OrganizationCourse.objects.filter(
@@ -22,12 +24,14 @@ def get_course_keys_for_site(site):
     return [as_course_key(cid) for cid in course_ids]
 
 
+@beeline.traced(name="api.sites.get_courses_for_site")
 def get_courses_for_site(site):
     course_keys = get_course_keys_for_site(site)
     courses = CourseOverview.objects.filter(id__in=course_keys)
     return courses
 
 
+@beeline.traced(name="api.sites.get_site_for_course")
 def get_site_for_course(course_id):
     """
     Given a course, return the related site or None
@@ -62,23 +66,20 @@ def get_site_for_course(course_id):
     return site
 
 
+@beeline.traced(name="api.sites.course_belongs_to_site")
 def course_belongs_to_site(site, course_id):
     if not isinstance(site, Site):
         raise ValueError('invalid site object')
     return site == get_site_for_course(course_id)
 
 
+@beeline.traced(name="api.sites.get_enrollments_for_site")
 def get_enrollments_for_site(site):
     course_keys = get_course_keys_for_site(site)
     return CourseEnrollment.objects.filter(course_id__in=course_keys)
 
 
-def get_user_ids_for_site(site):
-    orgs = Organization.objects.filter(sites__in=[site])
-    mappings = UserOrganizationMapping.objects.filter(organization__in=orgs)
-    return mappings.values_list('user_id', flat=True)
-
-
+@beeline.traced(name="api.sites.get_users_for_site")
 def get_users_for_site(site):
-    user_ids = get_user_ids_for_site(site)
-    return get_user_model().objects.filter(id__in=user_ids)
+    org = Organization.objects.filter(sites__in=[site]).first()
+    return org.users.all()

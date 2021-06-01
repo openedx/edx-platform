@@ -110,13 +110,6 @@ class SitesModuleTests(TestCase):
                 aapi_sites.course_belongs_to_site(site=site,
                                                   course_id=self.my_course_overviews[0])
 
-    def test_get_users_ids_for_site(self):
-        my_users = create_org_users(org=self.my_site_org, new_user_count=3)
-        other_users = create_org_users(org=self.other_site_org, new_user_count=2)
-        retrieved_user_ids = aapi_sites.get_user_ids_for_site(self.my_site)
-        assert set(retrieved_user_ids) == set([obj.id for obj in my_users])
-        assert set(retrieved_user_ids).isdisjoint(set([obj.id for obj in other_users]))
-
     def test_get_users_for_site(self):
         my_users = create_org_users(org=self.my_site_org, new_user_count=3)
         other_users = create_org_users(org=self.other_site_org, new_user_count=2)
