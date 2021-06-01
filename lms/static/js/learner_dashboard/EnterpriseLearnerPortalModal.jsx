@@ -13,6 +13,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleEsc = this.handleEsc.bind(this);
   }
 
   componentDidMount() {
@@ -22,6 +23,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
       this.openModal();
       document.addEventListener('mousedown', this.handleClick, false);
       window.sessionStorage.setItem(storageKey, true);
+      document.addEventListener('keydown', this.handleEsc, false);
     }
   }
 
@@ -41,6 +43,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
     // remove the class to allow the dashboard content to scroll
     document.body.classList.remove('modal-open');
     document.removeEventListener('mousedown', this.handleClick, false);
+    document.removeEventListener('keydown', this.handleEsc, false);
   }
 
   handleClick(e) {
@@ -50,6 +53,13 @@ class EnterpriseLearnerPortalModal extends React.Component {
     }
 
     this.closeModal();
+  }
+
+  handleEsc(e) {
+    const { key } = e;
+    if (key === "Escape") {
+      this.closeModal();
+    }
   }
 
   closeModal() {
