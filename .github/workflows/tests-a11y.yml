@@ -44,10 +44,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libxmlsec1-dev memcached
-        sudo apt-get install -y python3-mysqldb
+        sudo apt-get install -y python3-mysqldb python3-mysqldb
         sudo systemctl start mongod
         sudo service memcached start
-        sudo service mysql restart
+#        sudo service mysql restart
 
     - name: Install pip
       run: |
