@@ -338,7 +338,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
-git+https://github.com/edx/django-user-tasks@d5fb5d8fa88597948b73533435b585459e7dafeb#egg=django-user-tasks==2.0.1
+git+https://github.com/edx/django-user-tasks@fb8d5f9582d2ddee8ef9bfe6743943f12d5f62ff#egg=django-user-tasks==2.0.2
     # via -r requirements/edx/base.txt
 django-waffle==2.2.0
     # via
