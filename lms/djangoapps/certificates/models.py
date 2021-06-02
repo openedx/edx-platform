@@ -135,7 +135,7 @@ class CertificateAllowlist(TimeStampedModel):
     @classmethod
     def get_certificate_allowlist(cls, course_id, student=None):
         """
-        Return the certificate allowlist for the given course as dict object
+        Return the certificate allowlist for the given course as a list of dict objects
         with the following key-value pairs:
 
         [{

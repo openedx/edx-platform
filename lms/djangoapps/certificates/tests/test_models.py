@@ -16,6 +16,7 @@ from path import Path as path
 
 from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from lms.djangoapps.certificates.models import (
+    CertificateAllowlist,
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -25,7 +26,11 @@ from lms.djangoapps.certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate
 )
-from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory,
+    TemporaryCertificateAllowlistFactory,
+)
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -47,7 +52,7 @@ class ExampleCertificateTest(TestCase):
 
     DESCRIPTION = 'test'
     TEMPLATE = 'test.pdf'
-    DOWNLOAD_URL = 'http://www.example.com'
+    DOWNLOAD_URL = 'https://www.example.com'
     ERROR_REASON = 'Kaboom!'
 
     def setUp(self):
@@ -105,11 +110,11 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         super().setUp()
         self.configuration_string = """{
             "default": {
-                "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png"
+                "url": "https://www.edx.org",
+                "logo_src": "https://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+                "logo_src": "https://www.edx.org/static/images/honor-logo.png"
             }
         }"""
         self.config = CertificateHtmlViewConfiguration(configuration=self.configuration_string)
@@ -136,11 +141,11 @@ class CertificateHtmlViewConfigurationTest(TestCase):
         self.config.save()
         expected_config = {
             "default": {
-                "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png"
+                "url": "https://www.edx.org",
+                "logo_src": "https://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+                "logo_src": "https://www.edx.org/static/images/honor-logo.png"
             }
         }
         assert self.config.get_config() == expected_config
@@ -450,3 +455,62 @@ class GeneratedCertificateTest(SharedModuleStoreTestCase):
         }
 
         self._assert_event_data(mock_emit_certificate_event, expected_event_data)
+
+
+class CertificateAllowlistTest(SharedModuleStoreTestCase):
+    """
+    Tests for the CertificateAllowlist model.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.username = 'fun_username'
+        self.user_email = 'a@b.com'
+        self.user = UserFactory(username=self.username, email=self.user_email)
+        self.second_user = UserFactory()
+
+        self.course_run = CourseFactory()
+        self.course_run_key = self.course_run.id  # pylint: disable=no-member
+
+    def test_get_allowlist_empty(self):
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=None, student=None)
+        assert len(ret) == 0
+
+    def test_get_allowlist_multiple_users(self):
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key)
+        assert len(ret) == 2
+
+    def test_get_allowlist_no_cert(self):
+        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.second_user)
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
+        assert len(ret) == 1
+
+        item = ret[0]
+        assert item['id'] == allowlist_item.id
+        assert item['user_id'] == self.user.id
+        assert item['user_name'] == self.username
+        assert item['user_email'] == self.user_email
+        assert item['course_id'] == str(self.course_run_key)
+        assert item['created'] == allowlist_item.created.strftime("%B %d, %Y")
+        assert item['certificate_generated'] == ''
+        assert item['notes'] == allowlist_item.notes
+
+    def test_get_allowlist_cert(self):
+        allowlist_item = TemporaryCertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
+        cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_run_key
+        )
+
+        ret = CertificateAllowlist.get_certificate_allowlist(course_id=self.course_run_key, student=self.user)
+        assert len(ret) == 1
+
+        item = ret[0]
+        assert item['id'] == allowlist_item.id
+        assert item['certificate_generated'] == cert.created_date.strftime("%B %d, %Y")
