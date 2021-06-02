@@ -115,6 +115,8 @@ class CertificateWhitelist(models.Model):
     in this table will always qualify for a certificate
     regardless of their grade.
 
+    This model is deprecated. CertificateAllowlist should be used in its place.
+
     .. no_pii:
     """
     class Meta:
@@ -161,6 +163,69 @@ class CertificateWhitelist(models.Model):
         }
 
         for item in white_list:
+            certificate_generated = generated_certificates.get(item.user.id, '')
+            result.append({
+                'id': item.id,
+                'user_id': item.user.id,
+                'user_name': str(item.user.username),
+                'user_email': str(item.user.email),
+                'course_id': str(item.course_id),
+                'created': item.created.strftime("%B %d, %Y"),
+                'certificate_generated': certificate_generated and certificate_generated.strftime("%B %d, %Y"),
+                'notes': str(item.notes or ''),
+            })
+        return result
+
+
+class CertificateAllowlist(TimeStampedModel):
+    """
+    Tracks students who are on the certificate allowlist for a given course run.
+
+    .. no_pii:
+    """
+    class Meta:
+        app_label = "certificates"
+        unique_together = [['course_id', 'user']]
+
+    objects = NoneToEmptyManager()
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    allowlist = models.BooleanField(default=0)
+    notes = models.TextField(default=None, null=True)
+
+    @classmethod
+    def get_certificate_allowlist(cls, course_id, student=None):
+        """
+        Return the certificate allowlist for the given course as dict object
+        with the following key-value pairs:
+
+        [{
+            id:         'id (pk) of CertificateAllowlist item'
+            user_id:    'User Id of the student'
+            user_name:  'name of the student'
+            user_email: 'email of the student'
+            course_id:  'Course key of the course to whom certificate exception belongs'
+            created:    'Creation date of the certificate exception'
+            notes:      'Additional notes for the certificate exception'
+        }, {...}, ...]
+
+        """
+        allowlist = cls.objects.filter(course_id=course_id, allowlist=True)
+        if student:
+            allowlist = allowlist.filter(user=student)
+        result = []
+        generated_certificates = GeneratedCertificate.eligible_certificates.filter(
+            course_id=course_id,
+            user__in=[allowlist_item.user for allowlist_item in allowlist],
+            status=CertificateStatuses.downloadable
+        )
+        generated_certificates = {
+            certificate['user']: certificate['created_date']
+            for certificate in generated_certificates.values('user', 'created_date')
+        }
+
+        for item in allowlist:
             certificate_generated = generated_certificates.get(item.user.id, '')
             result.append({
                 'id': item.id,
@@ -395,7 +460,7 @@ class GeneratedCertificate(models.Model):
     def _revoke_certificate(self, status, grade=None, source=None):
         """
         Revokes a course certificate from a learner, updating the certificate's status as specified by the value of the
-        `status` argument. This will prevent the learner from being able to access their certiticate in the associated
+        `status` argument. This will prevent the learner from being able to access their certificate in the associated
         course run.
 
         We remove the `download_uuid` and the `download_url` as well, but this is only important to PDF certificates.
@@ -503,7 +568,7 @@ class CertificateGenerationHistory(TimeStampedModel):
 
         1. "All learners" Certificate Generation task was initiated for all learners of the given course.
         2. Comma separated list of certificate statuses, This usually happens when instructor regenerates certificates.
-        3. "for exceptions", This is the case when instructor generates certificates for white-listed
+        3. "for exceptions", This is the case when instructor generates certificates for allowlisted
             students.
         """
         task_input = self.instructor_task.task_input
@@ -524,7 +589,7 @@ class CertificateGenerationHistory(TimeStampedModel):
             return ", ".join(readable_statuses)
 
         # If "student_set" is present in task_input, then this task only
-        # generates certificates for white listed students. Note that
+        # generates certificates for allowlisted students. Note that
         # this key used to be "students", so we include that in this conditional
         # for backwards compatibility.
         if 'student_set' in task_input_json or 'students' in task_input_json:
@@ -1092,11 +1157,11 @@ class CertificateHtmlViewConfiguration(ConfigurationModel):
     Example configuration :
         {
             "default": {
-                "url": "http://www.edx.org",
-                "logo_src": "http://www.edx.org/static/images/logo.png"
+                "url": "https://www.edx.org",
+                "logo_src": "https://www.edx.org/static/images/logo.png"
             },
             "honor": {
-                "logo_src": "http://www.edx.org/static/images/honor-logo.png"
+                "logo_src": "https://www.edx.org/static/images/honor-logo.png"
             }
         }
 
