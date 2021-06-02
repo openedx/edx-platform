@@ -458,17 +458,17 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     # By overriding following methods we are making this class non atomic since CourseStatusGET get is non atomic.
     @classmethod
     def setUpClass(cls):
-        super(TestCase, cls).setUpClass()
+        super(TestCase, cls).setUpClass()  # pylint: disable=bad-super-call
 
     @classmethod
     def tearDownClass(cls):
-        super(TestCase, cls).tearDownClass()
+        super(TestCase, cls).tearDownClass()  # pylint: disable=bad-super-call
 
     def _fixture_setup(self):
-        return super(TestCase, self)._fixture_setup()
+        return super(TestCase, self)._fixture_setup()  # pylint: disable=bad-super-call
 
     def _fixture_teardown(self):
-        return super(TestCase, self)._fixture_teardown()
+        return super(TestCase, self)._fixture_teardown()  # pylint: disable=bad-super-call
 
 
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,

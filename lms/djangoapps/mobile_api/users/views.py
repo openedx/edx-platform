@@ -128,9 +128,9 @@ class UserCourseStatus(views.APIView):
     def dispatch(self, request, *args, **kwargs):
         if request.method == 'PATCH':
             with transaction.atomic():
-                return super(UserCourseStatus, self).dispatch(request, *args, **kwargs)
+                return super().dispatch(request, *args, **kwargs)
         else:
-            return super(UserCourseStatus, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
 
     def _last_visited_module_path(self, request, course):
         """
