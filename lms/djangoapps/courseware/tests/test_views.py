@@ -2271,15 +2271,6 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             resp = self.client.post(self.url)
             assert resp.status_code == 200
 
-            # Verify Google Analytics event fired after generating certificate
-            mock_tracker.track.assert_called_once_with(
-                self.student.id,
-                'edx.bi.user.certificate.generate',
-                {
-                    'category': 'certificates',
-                    'label': str(self.course.id)
-                },
-            )
             mock_tracker.reset_mock()
 
     def test_user_with_passing_existing_generating_cert(self):

@@ -19,7 +19,6 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.signals import _fire_ungenerated_certificate_task
-from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
@@ -147,27 +146,6 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         )
         attempt.approve()
 
-    def test_cert_generation_on_passing_v1(self):
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                grade_factory = CourseGradeFactory()
-                # Not passing
-                grade_factory.update(self.user, self.ip_course)
-                mock_generate_certificate_apply_async.assert_not_called()
-                # Certs fired after passing
-                with mock_passing_grade():
-                    grade_factory.update(self.user, self.ip_course)
-                    mock_generate_certificate_apply_async.assert_called_with(
-                        countdown=CERTIFICATE_DELAY_SECONDS,
-                        kwargs={
-                            'student': str(self.user.id),
-                            'course_key': str(self.ip_course.id),
-                        }
-                    )
-
     def test_cert_already_generated(self):
         with mock.patch(
                 'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
@@ -199,7 +177,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
                     return_value=None
                 ) as mock_cert_task:
                     CourseGradeFactory().update(self.user, self.course)
-                    mock_cert_task.assert_not_called()
+                    mock_cert_task.assert_called_with(self.user, self.course.id)
 
             # User who is on the allowlist
             u = UserFactory.create()
@@ -397,26 +375,6 @@ class LearnerIdVerificationTest(ModuleStoreTestCase):
                 )
                 attempt.approve()
                 mock_cert_task.assert_called_with(self.user_two, self.course_two.id)
-
-    def test_cert_generation_on_photo_verification_v1(self):
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_cert_task:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                attempt = SoftwareSecurePhotoVerification.objects.create(
-                    user=self.user_two,
-                    status='submitted'
-                )
-                attempt.approve()
-                mock_cert_task.assert_called_with(
-                    countdown=CERTIFICATE_DELAY_SECONDS,
-                    kwargs={
-                        'student': str(self.user_two.id),
-                        'course_key': str(self.course_two.id),
-                        'expected_verification_status': 'approved'
-                    }
-                )
 
     def test_id_verification_allowlist(self):
         # User is not on the allowlist

@@ -5,7 +5,6 @@ Tests for certificate app views used by the support team.
 
 import json
 from unittest import mock
-from unittest.mock import patch
 from uuid import uuid4
 
 import ddt
@@ -17,10 +16,8 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.api import regenerate_user_certificates
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -285,38 +282,6 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         else:
             assert response.status_code == 403
 
-    def test_regenerate_certificate(self):
-        """Test web certificate regeneration."""
-        self.cert.download_url = ''
-        self.cert.save()
-
-        response = self._regenerate(
-            course_key=self.course_key,
-            username=self.STUDENT_USERNAME,
-        )
-        assert response.status_code == 200
-
-        # Check that the user's certificate was updated
-        # Since the student hasn't actually passed the course,
-        # we'd expect that the certificate status will be "notpassing"
-        cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
-        assert cert.status == CertificateStatuses.notpassing
-
-    @patch('lms.djangoapps.certificates.queue.XQueueCertInterface._generate_cert')
-    def test_regenerate_certificate_for_honor_mode(self, mock_generate_cert):
-        """Test web certificate regeneration for the users who have earned the
-           certificate in honor mode
-        """
-        self.cert.mode = 'honor'
-        self.cert.download_url = ''
-        self.cert.save()
-
-        with mock_passing_grade(percent=0.75):
-            with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
-                mock_mode_for_course.return_value = 'honor'
-                regenerate_user_certificates(self.student, self.course_key)
-                mock_generate_cert.assert_called()
-
     def test_regenerate_certificate_missing_params(self):
         # Missing username
         response = self._regenerate(course_key=self.CERT_COURSE_KEY)
@@ -366,33 +331,6 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         # A new certificate is created
         num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         assert num_certs == 1
-
-    @mock.patch(CAN_GENERATE_METHOD, mock.Mock(return_value=True))
-    def test_regenerate_cert_with_invalidated_record(self):
-        """ If the certificate is marked as invalid, regenerate the certificate. """
-
-        # mark certificate as invalid
-        self._invalidate_certificate(self.cert)
-        self.assertCertInvalidationExists()
-        # after invalidation certificate status become un-available.
-        self.assertGeneratedCertExists(
-            user=self.student, status=CertificateStatuses.unavailable
-        )
-
-        # Should be able to regenerate
-        response = self._regenerate(
-            course_key=self.CERT_COURSE_KEY,
-            username=self.STUDENT_USERNAME
-        )
-        assert response.status_code == 200
-        self.assertCertInvalidationExists()
-
-        # Check that the user's certificate was updated
-        # Since the student hasn't actually passed the course,
-        # we'd expect that the certificate status will be "notpassing"
-        self.assertGeneratedCertExists(
-            user=self.student, status=CertificateStatuses.notpassing
-        )
 
     def _regenerate(self, course_key=None, username=None):
         """Call the regeneration end-point and return the response. """
