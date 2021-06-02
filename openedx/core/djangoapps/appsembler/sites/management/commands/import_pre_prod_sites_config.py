@@ -3,6 +3,7 @@ Used for moving pre-prod candidate configs and theme updates to production after
 """
 
 import json
+import traceback
 
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
@@ -26,6 +27,8 @@ class Command(BaseCommand):
                 site_export_json = json.loads(site_json_line)
 
                 site = Site.objects.get(pk=site_export_json['site_id'])
+                self.stdout.write('START: Importing the site configs: `{domain}`'.format(domain=site.domain))
+
                 config = site.configuration
                 # Updates the values inline to keep SEGMENT_KEY and other values
                 config.site_values.update(site_export_json['site_values'])
@@ -33,4 +36,10 @@ class Command(BaseCommand):
                 # Override `sass_variables` and `page_elements` entirely because merge isn't conceivable
                 config.sass_variables = site_export_json['sass_variables']
                 config.page_elements = site_export_json['page_elements']
-                config.save()
+                try:
+                    config.save()
+                    self.stdout.write('SUCCESS: Imported site configs: `{domain}`'.format(domain=site.domain))
+                except Exception as e:
+                    self.stdout.write('FAILURE: Error in importing site configs: `{domain}`'.format(domain=site.domain))
+                    self.stdout.write(str(e))
+                    self.stdout.write(traceback.format_exc())
