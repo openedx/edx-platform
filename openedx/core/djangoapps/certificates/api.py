@@ -11,6 +11,7 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.certificates.config import waffle
 from common.djangoapps.student.models import CourseEnrollment
+from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +57,10 @@ def can_show_certificate_available_date_field(course):
 
 
 def _course_uses_available_date(course):
-    return can_show_certificate_available_date_field(course) and course.certificate_available_date
+    return (
+        can_show_certificate_available_date_field(course)
+        and course.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+    )
 
 
 def available_date_for_certificate(course, certificate, certificate_available_date=None):

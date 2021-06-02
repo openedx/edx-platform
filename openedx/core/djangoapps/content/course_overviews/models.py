@@ -32,10 +32,10 @@ from openedx.core.lib.cache_utils import request_cached, RequestCache
 from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import block_metadata_utils, course_metadata_utils
 from xmodule.course_module import DEFAULT_START_DATE, CourseBlock
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.error_module import ErrorBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
-
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +56,10 @@ class CourseOverview(TimeStampedModel):
         course catalog (courses to enroll in)
         course about (meta data about the course)
 
+    When you bump the VERSION you will invalidate all existing course overviews. This
+    will cause a slew of modulestore reads as each course needs to be re-cached into
+    the course overview.
+
     .. no_pii:
     """
 
@@ -63,7 +67,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 15
+    VERSION = 16
 
     # Cache entry versioning.
     version = IntegerField()
@@ -96,7 +100,11 @@ class CourseOverview(TimeStampedModel):
     end_of_course_survey_url = TextField(null=True)
 
     # Certification data
-    certificates_display_behavior = TextField(null=True)
+    certificates_display_behavior = TextField(
+        null=True,
+        choices=[(choice.value, choice.name) for choice in CertificatesDisplayBehaviors],
+        default=CertificatesDisplayBehaviors.END
+    )
     certificates_show_before_end = BooleanField(default=False)
     cert_html_view_enabled = BooleanField(default=False)
     has_any_active_web_certificate = BooleanField(default=False)
@@ -211,13 +219,15 @@ class CourseOverview(TimeStampedModel):
         course_overview.course_image_url = course_image_url(course)
         course_overview.social_sharing_url = course.social_sharing_url
 
-        course_overview.certificates_display_behavior = course.certificates_display_behavior
+        updated_display_behavior, updated_available_date = cls.validate_certificate_settings(course)
+
+        course_overview.certificates_display_behavior = updated_display_behavior
+        course_overview.certificate_available_date = updated_available_date
         course_overview.certificates_show_before_end = course.certificates_show_before_end
         course_overview.cert_html_view_enabled = course.cert_html_view_enabled
         course_overview.has_any_active_web_certificate = (get_active_web_certificate(course) is not None)
         course_overview.cert_name_short = course.cert_name_short
         course_overview.cert_name_long = course.cert_name_long
-        course_overview.certificate_available_date = course.certificate_available_date
         course_overview.lowest_passing_grade = lowest_passing_grade
         course_overview.end_of_course_survey_url = course.end_of_course_survey_url
 
@@ -895,6 +905,35 @@ class CourseOverview(TimeStampedModel):
         TODO: move this to the model.
         """
         return self._original_course.edxnotes_visibility
+
+    @staticmethod
+    def validate_certificate_settings(course):
+        """
+        Take a course and returns validated certificate display settings
+
+        Arguments:
+            course (CourseBlock): any course descriptor object
+
+        Returns:
+            tuple[str, str]: updated certificates_display_behavior, updated certificate_available_date
+            None
+        """
+        # Backwards compatibility for existing courses that set availability date, didn't set behavior,
+        # and expect availability date to be used
+        certificates_display_behavior = course.certificates_display_behavior
+        certificate_available_date = course.certificate_available_date
+
+        if certificates_display_behavior == "" and certificate_available_date:
+            certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+
+        if not CertificatesDisplayBehaviors.includes_value(certificates_display_behavior):
+            certificates_display_behavior = CertificatesDisplayBehaviors.END
+
+        # Null the date if it's not going to be used
+        if certificates_display_behavior != CertificatesDisplayBehaviors.END_WITH_DATE:
+            certificate_available_date = None
+
+        return (certificates_display_behavior, certificate_available_date)
 
     def __str__(self):
         """Represent ourselves with the course key."""

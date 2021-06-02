@@ -41,6 +41,7 @@ class CourseMetadata:
         'enrollment_start',
         'enrollment_end',
         'certificate_available_date',
+        'certificates_display_behavior',
         'tabs',
         'graceperiod',
         'show_timezone',

@@ -40,6 +40,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -227,6 +228,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=THREE_YEARS_AGO,
             certificate_available_date=TOMORROW,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
         CourseEnrollmentFactory(course_id=course.id, user=self.user)
@@ -242,6 +244,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=TOMORROW,
             certificate_available_date=TOMORROW,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
         CourseEnrollmentFactory(course_id=course.id, user=self.user)
@@ -257,6 +260,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             id=course_key,
             end_date=ONE_WEEK_AGO,
             certificate_available_date=now(),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             lowest_passing_grade=0.3
         )
         CourseEnrollmentFactory(course_id=course.id, user=self.user)

@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.data import CertificateStatuses
+from xmodule.data import CertificatesDisplayBehaviors
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -36,7 +37,12 @@ else:
     <div class="message message-status ${status_css_class} is-shown">
       <p class="message-copy">
         <%
-          certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+          if course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE:
+            certificate_available_date_string = course_overview.certificate_available_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+          elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
+            certificate_available_date_string = course_overview.end.strftime('%Y-%m-%dT%H:%M:%S%z')
+          else:
+            raise Exception(course_overview.certificate_available_date, course_overview.certificates_display_behavior)
           container_string = _("Your grade and certificate will be ready after {date}.")
           format = 'shortDate'
         %>
