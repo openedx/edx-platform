@@ -2,6 +2,7 @@
 Test app view logic
 """
 # pylint: disable=test-inherits-tests
+from datetime import datetime, timedelta, timezone
 import unittest
 
 import ddt
@@ -422,3 +423,54 @@ class DataTest(AuthorizedApiTest):
         assert data['provider_type'] == 'legacy'
         assert not data['plugin_configuration']['allow_anonymous']
         assert not data['lti_configuration']
+
+    @ddt.data(*[
+        user_type.name for user_type in CourseUserType
+        if user_type not in {  # pylint: disable=undefined-variable
+            CourseUserType.ANONYMOUS,
+            CourseUserType.GLOBAL_STAFF
+        }
+    ])
+    def test_unable_to_change_provider_for_running_course(self, user_type):
+        """
+        Ensure that certain users cannot change provider for a running course.
+        """
+        self.course.start = datetime.now(timezone.utc) - timedelta(days=5)
+        self.course = self.update_course(self.course, self.user.id)
+
+        # use the global staff user to do the initial config
+        # so we're sure to not get permissions errors
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'legacy',
+        })
+        assert response.status_code == status.HTTP_200_OK
+
+        self.create_user_for_course(self.course, CourseUserType[user_type])
+
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'piazza',
+        })
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_global_staff_can_change_provider_for_running_course(self):
+        """
+        Ensure that global staff can change provider for a running course.
+        """
+        self.course.start = datetime.now(timezone.utc) - timedelta(days=5)
+        self.course = self.update_course(self.course, self.user.id)
+
+        # use the global staff user to do the initial config
+        # so we're sure to not get permissions errors
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'legacy',
+        })
+        assert response.status_code == status.HTTP_200_OK
+
+        response = self._post({
+            'enabled': True,
+            'provider_type': 'piazza',
+        })
+        assert response.status_code == status.HTTP_200_OK
