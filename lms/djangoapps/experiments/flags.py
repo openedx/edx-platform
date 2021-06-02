@@ -275,7 +275,7 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
                         user_id=user.id,
                         event_name='edx.bi.experiment.AA759.bucketed',
                         properties={
-                            'course_id': course_key,
+                            'course_id': str(course_key),
                             'bucket': bucket,
                             'sku': verified_mode.sku,
                         }
