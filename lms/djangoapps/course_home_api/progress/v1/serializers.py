@@ -21,6 +21,7 @@ class SubsectionScoresSerializer(serializers.Serializer):
     """
     assignment_type = serializers.CharField(source='format')
     display_name = serializers.CharField()
+    block_key = serializers.SerializerMethodField()
     has_graded_assignment = serializers.BooleanField(source='graded')
     num_points_earned = serializers.IntegerField(source='graded_total.earned')
     num_points_possible = serializers.IntegerField(source='graded_total.possible')
@@ -28,6 +29,9 @@ class SubsectionScoresSerializer(serializers.Serializer):
     show_correctness = serializers.CharField()
     show_grades = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+
+    def get_block_key(self, subsection):
+        return str(subsection.location)
 
     def get_url(self, subsection):
         relative_path = reverse('jump_to', args=[self.context['course_key'], subsection.location])

@@ -83,7 +83,7 @@ class OutlineTabView(RetrieveAPIView):
             expiration_date: (str) When the access expires, in ISO 8601 notation
             masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
             upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
-            upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
+            upgrade_url: (str) Upgrade link (or None if can't upgrade anymore)
         course_blocks:
             blocks: List of serialized Course Block objects. Each serialization has the following fields:
                 id: (str) The usage ID of the block.
