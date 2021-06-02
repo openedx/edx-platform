@@ -12,7 +12,7 @@ import pytz
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.template import defaultfilters
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory, override_settings, TestCase
 from django.utils import timezone
 from django.utils.timezone import now
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -453,6 +453,22 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin,
         submit_completions_for_testing(self.user, [self.unit.location])
         response = self.api_response(api_version=API_V1)
         assert response.data['last_visited_block_id'] == str(self.unit.location)
+
+    # By inheriting from ModuleStoreTestCase and APITestCase this class is atomic by default
+    # By overriding following methods we are making this class non atomic since CourseStatusGET get is non atomic.
+    @classmethod
+    def setUpClass(cls):
+        super(TestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestCase, cls).tearDownClass()
+
+    def _fixture_setup(self):
+        return super(TestCase, self)._fixture_setup()
+
+    def _fixture_teardown(self):
+        return super(TestCase, self)._fixture_teardown()
 
 
 class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,

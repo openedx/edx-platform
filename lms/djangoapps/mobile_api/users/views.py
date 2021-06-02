@@ -78,8 +78,8 @@ class UserDetail(generics.RetrieveAPIView):
         return context
 
 
-@method_decorator(transaction.non_atomic_requests, name='dispatch')
 @mobile_view(is_user=True)
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class UserCourseStatus(views.APIView):
     """
     **Use Cases**
@@ -124,6 +124,13 @@ class UserCourseStatus(views.APIView):
     """
 
     http_method_names = ["get", "patch"]
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'PATCH':
+            with transaction.atomic():
+                return super(UserCourseStatus, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(UserCourseStatus, self).dispatch(request, *args, **kwargs)
 
     def _last_visited_module_path(self, request, course):
         """
