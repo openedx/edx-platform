@@ -175,6 +175,8 @@ class ExperimentWaffleFlag(CourseWaffleFlag):
 
         Arguments:
             course_key (Optional[CourseKey])
+                This argument should always be passed in a course-aware context even if
+                course aware bucketing is False.
             track (bool):
                 Whether an analytics event should be generated if the user is
                 bucketed for the first time.

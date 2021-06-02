@@ -37,7 +37,7 @@ def get_celebrations_dict(user, enrollment, course, browser_timezone):
         # We only want to bucket people into the AA-759 experiment
         # if the course has not ended, is upgradeable and the user is not an enterprise learner
         if can_show_streak_discount_experiment_coupon(user, course):
-            celebrations['streak_discount_experiment_enabled'] = STREAK_DISCOUNT_EXPERIMENT_FLAG.is_enabled()
+            celebrations['streak_discount_experiment_enabled'] = STREAK_DISCOUNT_EXPERIMENT_FLAG.is_enabled(course.id)
     return celebrations
 
 
