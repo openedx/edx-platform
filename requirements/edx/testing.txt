@@ -163,7 +163,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==5.5
+coverage==5.5
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -480,7 +480,7 @@ edx-django-release-util==1.0.0
     # via -r requirements/edx/base.txt
 edx-django-sites-extensions==3.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==4.0.0
+edx-django-utils==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -982,7 +982,7 @@ pysrt==1.1.2
     #   edxval
 pytest-attrib==0.1.3
     # via -r requirements/edx/testing.in
-pytest-cov==2.12.0
+pytest-cov==2.12.1
     # via -r requirements/edx/testing.in
 pytest-django==4.3.0
     # via -r requirements/edx/testing.in
@@ -1274,9 +1274,9 @@ tincan==1.0.0
     #   edx-event-routing-backends
 toml==0.10.2
     # via
-    #   coverage
     #   pylint
     #   pytest
+    #   pytest-cov
     #   tox
 tox-battery==0.6.1
     # via -r requirements/edx/testing.in
