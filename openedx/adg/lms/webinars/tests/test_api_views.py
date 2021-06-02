@@ -5,21 +5,10 @@ import pytest
 from django.urls import reverse
 from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 
-from common.djangoapps.student.tests.factories import UserFactory
-from openedx.adg.lms.webinars.models import Webinar, WebinarRegistration
+from openedx.adg.lms.webinars.models import WebinarRegistration
 from openedx.adg.lms.webinars.tests.factories import WebinarFactory, WebinarRegistrationFactory
 
 pytestmark = pytest.mark.django_db
-
-
-@pytest.fixture(name='user_client')
-def user_client_login(request, client):
-    """
-    User and client login fixture. User will be authenticated for all tests where we pass this fixture.
-    """
-    user = UserFactory()
-    client.login(username=user.username, password='test')
-    return user, client
 
 
 def test_webinar_registration_view_object_does_not_exist(user_client):

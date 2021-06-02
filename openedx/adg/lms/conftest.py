@@ -21,3 +21,13 @@ def user_with_user_profile(request):
     user = UserFactory()
     UserProfileFactory(user=user)
     return user
+
+
+@pytest.fixture(name='user_client')
+def user_client_login(request, client):
+    """
+    User and client login fixture. User will be authenticated for all tests where we pass this fixture.
+    """
+    user = UserFactory()
+    client.login(username=user.username, password='test')
+    return user, client

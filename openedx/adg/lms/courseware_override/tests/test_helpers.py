@@ -6,8 +6,14 @@ import pytest
 
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
-from openedx.adg.lms.applications.tests.factories import MultilingualCourseFactory
+from openedx.adg.lms.applications.tests.factories import (
+    ApplicationHubFactory,
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory,
+    UserApplicationFactory
+)
 from openedx.adg.lms.courseware_override.helpers import (
+    get_business_line_prereq_courses,
     get_course_instructors,
     get_extra_course_about_context,
     get_language_names_from_codes
@@ -99,3 +105,22 @@ def test_get_extra_course_about_context(mock_get_lang_names, mock_get_instructor
     }
 
     assert get_extra_course_about_context(None, course) == expected_context
+
+
+@pytest.mark.django_db
+def test_get_business_line_prereq_courses(user_client, courses):
+    """
+    Tests `get_business_line_prereq_courses` returns valid courses for a user.
+    """
+    user, _ = user_client
+
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user, is_application_submitted=True)
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=(MultilingualCourseGroupFactory(is_common_business_line_prerequisite=True))
+    )
+
+    courses_list = get_business_line_prereq_courses(user)
+
+    assert courses_list == [courses['test_course1']]

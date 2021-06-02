@@ -285,3 +285,25 @@ def has_admin_permissions(user):
 
     is_user_admin = user.is_superuser or is_adg_admin(user) or BusinessLine.is_user_business_line_admin(user)
     return user.is_staff and is_user_admin
+
+
+def get_courses_from_course_groups(course_groups, user):
+    """
+    Get courses from the given course groups for the user.
+
+    Args:
+        course_groups (list): List of course groups
+        user (User): User for which courses will be returned
+
+    Returns:
+        list: List of courses for the user
+    """
+    courses_list = []
+    for course_group in course_groups:
+        open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()
+        multilingual_course = open_multilingual_courses.multilingual_course(user)
+
+        if multilingual_course:
+            courses_list.append(multilingual_course.course)
+
+    return courses_list
