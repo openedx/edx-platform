@@ -42,12 +42,11 @@
         <div class="exam-settings-alert copy">
           <h2 class="title title-3">${_("This course has proctored exam settings that are incomplete or invalid.")}</h2>
           <p>
-            % if course_authoring_microfrontend_url:
+            % if mfe_proctored_exam_settings_url:
               <% url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='') %>
               ${Text(_("You will be unable to make changes until the errors are resolved. To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
-                link_start=HTML('<a href="{course_authoring_microfrontend_url}/proctored-exam-settings/{url_encoded_course_id}">').format(
-                  course_authoring_microfrontend_url=course_authoring_microfrontend_url,
-                  url_encoded_course_id=url_encoded_course_id,
+                link_start=HTML('<a href="{mfe_proctored_exam_settings_url}">').format(
+                        mfe_proctored_exam_settings_url=mfe_proctored_exam_settings_url
                 ),
                 link_end=HTML("</a>")
               )}
@@ -149,8 +148,8 @@
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-            % if course_authoring_microfrontend_url:
-              <li class="nav-item"><a href="${course_authoring_microfrontend_url}/proctored-exam-settings/${url_encoded_course_id}">${_("Proctored Exam Settings")}</a></li>
+            % if mfe_proctored_exam_settings_url:
+              <li class="nav-item"><a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a></li>
             % endif
           </ul>
         </nav>

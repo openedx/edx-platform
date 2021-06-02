@@ -71,7 +71,7 @@ def tabs_handler(request, course_key_string):
             'context_course': course_item,
             'tabs_to_render': tabs_to_render,
             'lms_link': get_lms_link_for_item(course_item.location),
-            'pages_and_resources_mfe_link': get_pages_and_resources_url(course_item),
+            'pages_and_resources_mfe_link': get_pages_and_resources_url(course_item.id),
         })
     else:
         return HttpResponseNotFound()
