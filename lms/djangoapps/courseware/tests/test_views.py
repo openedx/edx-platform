@@ -99,6 +99,7 @@ from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_uge
 from common.djangoapps.util.url import reload_django_url_config
 from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1288,6 +1289,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
             grade_cutoffs={'çü†øƒƒ': 0.75, 'Pass': 0.5},
             end=datetime.now(),
             certificate_available_date=datetime.now(UTC),
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE,
             **options
         )
 
