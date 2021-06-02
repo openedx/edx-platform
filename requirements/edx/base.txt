@@ -276,7 +276,7 @@ django-storages==1.8
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
-django-user-tasks==2.0.1
+django-user-tasks==2.0.2
     # via -r requirements/edx/base.in
 django-waffle==2.2.0
     # via
@@ -408,7 +408,7 @@ edx-django-release-util==1.0.0
     # via -r requirements/edx/base.in
 edx-django-sites-extensions==3.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==4.0.0
+edx-django-utils==4.1.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -458,7 +458,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.11.4
+edx-proctoring==3.11.5
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
