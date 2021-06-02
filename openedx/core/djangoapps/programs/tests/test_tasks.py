@@ -30,6 +30,7 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFa
 from openedx.core.djangoapps.programs import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from xmodule.data import CertificatesDisplayBehaviors
 
 log = logging.getLogger(__name__)
 
@@ -520,6 +521,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.course = CourseOverviewFactory.create(
             self_paced=True,  # Any option to allow the certificate to be viewable for the course
             certificate_available_date=self.available_date,
+            certificates_display_behavior=CertificatesDisplayBehaviors.END_WITH_DATE
         )
         self.student = UserFactory.create(username='test-student')
         # Instantiate the Certificate first so that the config doesn't execute issuance

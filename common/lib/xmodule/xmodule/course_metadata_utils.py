@@ -14,6 +14,8 @@ from math import exp
 import dateutil.parser
 from pytz import utc
 
+from xmodule.data import CertificatesDisplayBehaviors
+
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=utc)
 
 """

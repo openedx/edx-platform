@@ -22,6 +22,7 @@ from xmodule.course_metadata_utils import (
     has_course_started,
     number_for_course_location
 )
+from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.tests.utils import (
     MixedModulestoreBuilder,
     MongoModulestoreBuilder,
