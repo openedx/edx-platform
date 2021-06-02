@@ -8,6 +8,7 @@ from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.utils.translation import ugettext as _
+from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
@@ -17,37 +18,6 @@ from .tasks import update_outline_from_modulestore_task, update_all_outlines_fro
 
 
 log = logging.getLogger(__name__)
-
-
-class ReadOnlyAdminMixin(object):
-    """
-    Disables all editing capabilities for the admin's model.
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.list_display_links = None
-        self.readonly_fields = [f.name for f in self.model._meta.get_fields()]
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'delete_selected' in actions:
-            del actions["delete_selected"]
-        return actions
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):  # pylint: disable=unused-argument
-        return False
-
-    def save_model(self, request, obj, form, change):
-        pass
-
-    def delete_model(self, request, obj):
-        pass
-
-    def save_related(self, request, form, formsets, change):
-        pass
 
 
 def regenerate_course_outlines_subset(modeladmin, request, queryset):
