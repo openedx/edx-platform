@@ -3,8 +3,6 @@ Permission definitions for the contentstore djangoapp
 """
 
 from bridgekeeper import perms, rules
-from common.djangoapps.student.roles import CourseCreatorRole
-from lms.djangoapps.courseware.rules import HasRolesRule
 
 is_user_active = rules.is_authenticated & rules.is_active
 is_global_staff = is_user_active & rules.is_staff

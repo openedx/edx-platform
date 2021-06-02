@@ -32,7 +32,14 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 
-from cms.djangoapps.contentstore.permissions import ACCESS_COURSE, EDIT_COURSE, REINDEX_COURSE, RERUN_COURSE, OPTIMIZE_COURSE_LIST, RERUN_CREATOR_STATUS
+from cms.djangoapps.contentstore.permissions import (
+    ACCESS_COURSE,
+    EDIT_COURSE,
+    REINDEX_COURSE,
+    RERUN_COURSE,
+    OPTIMIZE_COURSE_LIST,
+    RERUN_CREATOR_STATUS
+)
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -47,7 +54,6 @@ from common.djangoapps.student.roles import (
     CourseCreatorRole,
     CourseInstructorRole,
     CourseStaffRole,
-    GlobalStaff,
     UserBasedRole
 )
 from common.djangoapps.util.course import get_link_for_about_page
