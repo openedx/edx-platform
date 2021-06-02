@@ -23,17 +23,25 @@ class MultilingualCourseGroupManager(Manager):
     Manager for MultilingualCourseGroup
     """
 
-    def prereq_course_groups(self):
+    def prereq_course_groups(self, business_line):
         """
         Get non-empty prerequisite course groups
         """
+        if business_line:
+            return self.get_queryset().filter(
+                is_common_business_line_prerequisite=True,
+                business_line_prerequisite=business_line,
+                multilingual_courses__isnull=False
+            ).distinct()
+
         return self.get_queryset().filter(is_program_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
-    def get_courses(self, user, is_prereq=False):
+    def get_courses(self, user, is_prereq=False, business_line=None):
         """
         Get courses from course groups.
 
         Args:
+            business_line(BusinessLine): BusinessLine object
             is_prereq (bool):  List of MultilingualCourseGroups
             user (User): user for which we need to find courses
 
@@ -41,7 +49,7 @@ class MultilingualCourseGroupManager(Manager):
             list: List of courses which contains a course from each group
         """
         courses_list = []
-        course_groups = self.prereq_course_groups() if is_prereq else self.get_queryset()
+        course_groups = self.prereq_course_groups(business_line) if is_prereq else self.get_queryset()
 
         for course_group in course_groups:
             open_multilingual_courses = course_group.multilingual_courses.open_multilingual_courses()

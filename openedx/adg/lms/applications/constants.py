@@ -75,3 +75,28 @@ COURSE_GROUP_PREREQ_VALIDATION_ERROR = _(
     'A Course Group can either be a prerequisite for the program, a specific business line or common for all business '
     'lines'
 )
+
+WRITTEN_APPLICATION_COMPLETION_CONGRATS = _('Congratulations! You have completed the written application.')
+WRITTEN_APPLICATION_COMPLETION_MSG = _(
+    'Get started on the Omnipreneurship Courses in order to move forward with your application.'
+)
+WRITTEN_APPLICATION_COMPLETION_INSTRUCTION = _(
+    'Finish up the Omnipreneurship Courses in order to complete your application.'
+)
+PREREQUISITE_COURSES_COMPLETION_CONGRATS = _('Congratulations! You have completed the Omnipreneurship Courses!')
+PREREQUISITE_COURSES_COMPLETION_MSG = _(
+    'Get started on the Business Line Courses in order to move forward with your application.'
+)
+PREREQUISITE_COURSES_COMPLETION_INSTRUCTION = _(
+    'Finish up the Business Line Courses in order to complete your application.'
+)
+APPLICATION_SUBMISSION_CONGRATS = _(
+    'Congratulations! You have completed all of the requirements and submitted your application. '
+)
+APPLICATION_SUBMISSION_INSTRUCTION = _(
+    'Your application is now under review by an admin. If you are selected for the program, they will be in contact '
+    'with you to begin the process of establishing your business. This will involve legal documentation and on-the-job '
+    'training. More details regarding this will be provided later. '
+)
+
+

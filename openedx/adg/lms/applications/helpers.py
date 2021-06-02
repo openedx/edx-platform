@@ -9,9 +9,16 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import ugettext as _
 
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
+from lms.djangoapps.courseware.models import StudentModule
+from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.grade_utils import round_away_from_zero
+from xmodule.modulestore.django import modulestore
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .constants import (
     COVER_LETTER_ONLY,
@@ -20,7 +27,15 @@ from .constants import (
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
-    SCORES
+    SCORES,
+    WRITTEN_APPLICATION_COMPLETION_CONGRATS,
+    WRITTEN_APPLICATION_COMPLETION_MSG,
+    WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
+    PREREQUISITE_COURSES_COMPLETION_CONGRATS,
+    PREREQUISITE_COURSES_COMPLETION_MSG,
+    PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
+    APPLICATION_SUBMISSION_INSTRUCTION,
+    APPLICATION_SUBMISSION_CONGRATS
 )
 from .rules import is_adg_admin
 
@@ -285,3 +300,95 @@ def has_admin_permissions(user):
 
     is_user_admin = user.is_superuser or is_adg_admin(user) or BusinessLine.is_user_business_line_admin(user)
     return user.is_staff and is_user_admin
+
+
+def get_course_card_information(user, courses):
+    course_cards_information = []
+    is_any_course_started = False
+    is_locked = False
+
+    for course in courses:
+        message = grade = status = ''
+        pre_requisite_courses = get_prerequisite_courses_display(course)
+
+        if pre_requisite_courses:
+            message = 'This course will unlock when you have completed and received a passing grade in '
+
+            for prereq in pre_requisite_courses:
+                course_grade = CourseGradeFactory().read(user, course_key=prereq['key'])
+
+                if not (course_grade and course_grade.passed):
+                    is_locked = True
+                    status = 'Locked'
+
+                    course_overview = CourseOverview.objects.get(id=prereq['key'])
+                    message = f'{message} {course_overview.display_name_with_default},'
+
+            message = f'{message[:-1]}.'
+
+        if status is not 'Locked':
+            message = ''
+            if CourseEnrollment.is_enrolled(user, course.id):
+                is_any_course_started = True
+                status = 'In Progress'
+                course_grade = CourseGradeFactory().read(user, course_key=course.id)
+
+                if course_grade:
+                    if course_grade.passed:
+                        status = 'Completed'
+                        grade = str(int(round_away_from_zero(course_grade.percent * 100)))
+                    elif has_attempted_all_modules(user, course):
+                        status = 'Re-Take Course'
+                        message = 'Please take the assessments in this course again in order to obtain a passing grade ' \
+                                  'and complete your application!'
+                        grade = str(int(round_away_from_zero(course_grade.percent * 100)))
+            else:
+                status = 'Not Started'
+
+        course_cards_information.append({
+            'course': course,
+            'status': status,
+            'grade': grade,
+            'message': message
+        })
+
+    return course_cards_information, is_any_course_started, is_locked
+
+
+def has_attempted_all_modules(user, course):
+    all_modules = modulestore().get_items(
+        course.id,
+        qualifiers={'category': 'course'}
+    )
+
+    for module in all_modules[0].children:
+        if not StudentModule.objects.filter(student=user, module_state_key=module).exists():
+            return False
+
+    return True
+
+
+def get_application_hub_instructions(user_application_hub, is_any_prerequisite_started, is_any_bl_course_started):
+    congrats = message = instruction = ''
+
+    if user_application_hub.are_application_pre_reqs_completed():
+        congrats = APPLICATION_SUBMISSION_CONGRATS
+        message = APPLICATION_SUBMISSION_INSTRUCTION
+    elif user_application_hub.is_prerequisite_courses_passed:
+        if is_any_bl_course_started:
+            instruction = PREREQUISITE_COURSES_COMPLETION_INSTRUCTION
+        else:
+            congrats = PREREQUISITE_COURSES_COMPLETION_CONGRATS
+            message = PREREQUISITE_COURSES_COMPLETION_MSG
+    elif user_application_hub.is_written_application_completed:
+        if is_any_prerequisite_started:
+            instruction = WRITTEN_APPLICATION_COMPLETION_INSTRUCTION
+        else:
+            congrats = WRITTEN_APPLICATION_COMPLETION_CONGRATS
+            message = WRITTEN_APPLICATION_COMPLETION_MSG
+
+    return {
+        'congrats': congrats,
+        'message': message,
+        'instruction': instruction
+    }
