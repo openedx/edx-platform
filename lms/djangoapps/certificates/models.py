@@ -748,7 +748,7 @@ def certificate_status(generated_certificate):
         return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor, 'uuid': None}
 
 
-def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_certificate):
+def certificate_info_for_user(user, course_id, grade, user_is_allowlisted, user_certificate):
     """
     Returns the certificate info for a user for grade report.
     """
@@ -763,7 +763,7 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     mode_is_verified = enrollment_mode in CourseMode.VERIFIED_MODES
     user_is_verified = grade is not None and mode_is_verified
 
-    eligible_for_certificate = 'Y' if (user_is_whitelisted or user_is_verified or certificate_generated) \
+    eligible_for_certificate = 'Y' if (user_is_allowlisted or user_is_verified or certificate_generated) \
         else 'N'
 
     if certificate_generated and can_have_certificate:

@@ -485,8 +485,8 @@ def generate_certificates_for_students(request, course_key, student_set=None, sp
         course_key  : Course Key
         student_set : Semantic for student collection for certificate generation.
                       Options are:
-                      'all_whitelisted': All Whitelisted students.
-                      'whitelisted_not_generated': Whitelisted students which does not got certificates yet.
+                      'all_allowlisted': All students on the certificate allowlist.
+                      'allowlisted_not_generated': Students on certificate allowlist who do not have certificates yet.
                       'specific_student': Single student for certificate generation.
         specific_student_id : Student ID when student_set is 'specific_student'
 

@@ -103,7 +103,7 @@ class XQueueCertInterface:
             settings.XQUEUE_INTERFACE['django_auth'],
             requests_auth,
         )
-        self.whitelist = CertificateWhitelist.objects.all()
+        self.allowlist = CertificateWhitelist.objects.all()
         self.use_https = True
 
     def regen_cert(self, student, course_id, forced_grade=None, template_file=None, generate_pdf=True):
@@ -194,7 +194,7 @@ class XQueueCertInterface:
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
 
-        If a student has a passing grade or is in the whitelist
+        If a student has a passing grade or is in the allowlist
         table for the course a request will be made for a new cert.
 
         If a student does not have a passing grade the status
@@ -259,7 +259,7 @@ class XQueueCertInterface:
         self.request.user = student
         self.request.session = {}
 
-        is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
+        is_allowlisted = self.allowlist.filter(user=student, course_id=course_id, whitelist=True).exists()
         course_grade = CourseGradeFactory().read(student, course_key=course_id)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
@@ -267,7 +267,7 @@ class XQueueCertInterface:
         cert_mode = enrollment_mode
 
         is_eligible_for_certificate = modes_api.is_eligible_for_certificate(enrollment_mode, cert_status)
-        if is_whitelisted and not is_eligible_for_certificate:
+        if is_allowlisted and not is_eligible_for_certificate:
             # check if audit certificates are enabled for audit mode
             is_eligible_for_certificate = enrollment_mode != CourseMode.AUDIT or \
                 not settings.FEATURES['DISABLE_AUDIT_CERTIFICATES']
@@ -337,10 +337,10 @@ class XQueueCertInterface:
                 str(exc)
             )
 
-        # Check if the student is whitelisted
-        if is_whitelisted:
+        # Check if the student is on the allowlist
+        if is_allowlisted:
             LOGGER.info(
-                "Student %s is whitelisted in '%s'",
+                "Student %s is on the certificate allowlist in '%s'",
                 student.id,
                 str(course_id)
             )

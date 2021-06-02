@@ -62,7 +62,7 @@ class AllowlistTests(ModuleStoreTestCase):
             mode="verified",
         )
 
-        # Whitelist user
+        # Add user to the allowlist
         CertificateAllowlistFactory.create(course_id=self.course_run_key, user=self.user)
 
     def test_is_on_allowlist(self):
@@ -186,9 +186,9 @@ class AllowlistTests(ModuleStoreTestCase):
         assert not _can_generate_allowlist_certificate(u, key)
         assert _set_allowlist_cert_status(u, key) is None
 
-    def test_can_generate_not_whitelisted(self):
+    def test_can_generate_not_allowlisted(self):
         """
-        Test handling when user is not whitelisted
+        Test handling when user is not on the certificate allowlist.
         """
         u = UserFactory()
         cr = CourseFactory()

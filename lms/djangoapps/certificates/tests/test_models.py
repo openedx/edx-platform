@@ -240,8 +240,8 @@ class TestCertificateGenerationHistory(TestCase):
     Test the CertificateGenerationHistory model's methods
     """
     @ddt.data(
-        ({"student_set": "whitelisted_not_generated"}, "For exceptions", True),
-        ({"student_set": "whitelisted_not_generated"}, "For exceptions", False),
+        ({"student_set": "allowlisted_not_generated"}, "For exceptions", True),
+        ({"student_set": "allowlisted_not_generated"}, "For exceptions", False),
         # check "students" key for backwards compatibility
         ({"students": [1, 2, 3]}, "For exceptions", True),
         ({"students": [1, 2, 3]}, "For exceptions", False),
