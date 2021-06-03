@@ -47,8 +47,7 @@ jobs:
 
     - name: Enable Mysql
       run:
-        sudo systemctl enable mysql.service
-        sudo systemctl start mysql.service
+        sudo service mysql start
 
 #    - name: Install Required Packages
 #      run: |
