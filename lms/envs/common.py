@@ -3998,6 +3998,17 @@ PROFILE_IMAGE_SIZES_MAP = {
 # If set to None, all courses will be listed on the homepage
 HOMEPAGE_COURSE_MAX = None
 
+# .. setting_name: COURSE_MEMBER_API_ENROLLMENT_LIMIT
+# .. setting_implementation: DjangoSetting
+# .. setting_default: 1000
+# .. setting_description: This limits the response size of the `get_course_members` API, throwing an exception
+#    if the number of Enrolled users is greater than this number. This is needed to limit the dataset size
+#    since the API does most of the calculation in Python to avoid expensive database queries.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2021-05-18
+# .. setting_tickets: https://openedx.atlassian.net/browse/TNL-7330
+COURSE_MEMBER_API_ENROLLMENT_LIMIT = 1000
+
 ################################ Settings for Credit Courses ################################
 # Initial delay used for retrying tasks.
 # Additional retries use longer delays.
