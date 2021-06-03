@@ -446,7 +446,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
   CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3052 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3060 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -577,10 +577,12 @@ CREATE TABLE `badges_badgeclass` (
   `criteria` longtext NOT NULL,
   `mode` varchar(100) NOT NULL,
   `image` varchar(100) NOT NULL,
+  `badgr_server_slug` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `badges_badgeclass_slug_issuing_component_course_id_92cd3912_uniq` (`slug`,`issuing_component`,`course_id`),
   KEY `badges_badgeclass_slug_5f420f6f` (`slug`),
-  KEY `badges_badgeclass_issuing_component_85b6d93d` (`issuing_component`)
+  KEY `badges_badgeclass_issuing_component_85b6d93d` (`issuing_component`),
+  KEY `badges_badgeclass_badgr_server_slug_701a8bf1` (`badgr_server_slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `badges_coursecompleteimageconfiguration`;
@@ -1194,6 +1196,23 @@ CREATE TABLE `celery_utils_failedtask` (
   KEY `celery_utils_failedtask_task_name_exc_efb8c9be_idx` (`task_name`,`exc`),
   KEY `celery_utils_failedtask_task_id_37af0933` (`task_id`),
   KEY `celery_utils_failedtask_datetime_resolved_8160e407` (`datetime_resolved`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `certificates_certificateallowlist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `certificates_certificateallowlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `course_id` varchar(255) NOT NULL,
+  `allowlist` tinyint(1) NOT NULL,
+  `notes` longtext,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `certificates_certificate_course_id_user_id_660abede_uniq` (`course_id`,`user_id`),
+  KEY `certificates_certifi_user_id_6c4d38f7_fk_auth_user` (`user_id`),
+  CONSTRAINT `certificates_certifi_user_id_6c4d38f7_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `certificates_certificategenerationcommandconfiguration`;
@@ -3048,7 +3067,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=864 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=866 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3059,7 +3078,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=871 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=874 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
