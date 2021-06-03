@@ -19,10 +19,7 @@ from openedx.adg.lms.applications.forms import (
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
-from .helpers import (
-    get_application_hub_instructions,
-    get_course_card_information,
-)
+from .helpers import get_application_hub_instructions, get_course_card_information
 from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
 
