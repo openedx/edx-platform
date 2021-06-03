@@ -31,11 +31,11 @@ jobs:
               FLUSH PRIVILEGES;
             EOF
 
-      name: a11y Test
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          python-version: [ '3.8' ]
+#      name: a11y Test
+#      runs-on: ubuntu-latest
+#      strategy:
+#        matrix:
+#          python-version: [ '3.8' ]
 
 #      steps:
 #        - uses: actions/checkout@v2
