@@ -4,69 +4,46 @@ on:
     - awais786/mysql-github-actions
 
 jobs:
-  test:
-    name: Test
+  run_tests:
+    name: a11y Test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: [ '3.8' ]
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: '5.7'
-          mysql database: 'edxtest'
-          mysql root password: 'password'
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
 
-      - name: Wait for MySQL
-        run: |
-          while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
-            sleep 1
-          done
-      - name: Reset mysql password
-        run: |
-            cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
-              UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-              FLUSH PRIVILEGES;
-            EOF
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: a11y Test
-       runs-on: ubuntu-latest
-       strategy:
-        matrix:
-          python-version: [ '3.8' ]
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      steps:
-        - uses: actions/checkout@v2
-        - uses: actions/setup-node@v2
-          with:
-            node-version: '12'
+    - name: Setup MySQL
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: '5.7'
+        mysql database: 'edxtest'
+        mysql root password: 'password'
 
-        - name: setup python
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{ matrix.python-version }}
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
+          sleep 1
+        done
+    - name: Reset mysql password
+      run: |
+          cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
+            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+            FLUSH PRIVILEGES;
+          EOF
 
-        - name: Install Required Packages
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y libxmlsec1-dev memcached
-            sudo systemctl start mongod
-            sudo service memcached start
-        - name: Install pip
-          run: |
-            pip install setuptools wheel
-            pip install -r requirements/edx/development.txt
-            - name: Install Python Dependencies
-              run: pip install -r requirements/edx/development.txt
-            - uses: browser-actions/setup-geckodriver@latest
 
-        - name: Run Tests
-          env:
-            TEST_SUITE: a11y
-            DB_DATABASE: edxtest
-            DB_USER: root
-            DB_PASSWORD: root
 
-        run: ./scripts/accessibility-tests.sh
