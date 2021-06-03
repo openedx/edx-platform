@@ -23,7 +23,9 @@ jobs:
           while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
             sleep 1
           done
-      - name: Ping for MySQL
+      - name: Reset mysql password
         run: |
-          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
+            cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+              UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+              FLUSH PRIVILEGES;
+            EOF
