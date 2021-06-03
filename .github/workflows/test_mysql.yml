@@ -25,7 +25,7 @@ jobs:
           done
       - name: Reset mysql password
         run: |
-            cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+            cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
               UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
               FLUSH PRIVILEGES;
             EOF
