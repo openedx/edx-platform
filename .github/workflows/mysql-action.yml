@@ -1,0 +1,33 @@
+name: MySql Action Test
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  run_mysql:
+    name: MySQL test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.8' ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Setup MySQL
+      env:
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: root
+      run: |
+        sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
