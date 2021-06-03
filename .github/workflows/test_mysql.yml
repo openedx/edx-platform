@@ -23,3 +23,5 @@ jobs:
           while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
             sleep 1
           done
+          options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
