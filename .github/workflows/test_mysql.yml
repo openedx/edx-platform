@@ -27,32 +27,28 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Setup MySQL
-      uses: mirromutth/mysql-action@v1.1
-      with:
-        host port: 3800 # Optional, default value is 3306. The port of host
-        container port: 3307 #
-        mysql version: '5.7'
-        mysql database: 'edxtest'
-        mysql root password: 'password'
-
-   - name: Shutdown Ubuntu MySQL (SUDO)
-      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-
-      #    - name: Wait for MySQL
-#      run: |
-#        while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
-#          sleep 1
-#        done
-#    - name: Reset mysql password
-#      run: |
-#          cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
-#            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-#            FLUSH PRIVILEGES;
-#          EOF
-
-    - name: Enable Mysql
-      run:
+      env:
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: root
+      run: |
         sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+    - name: Reset mysql password
+      run: |
+        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+          UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+          FLUSH PRIVILEGES;
+        EOF
+    - name: Run Tests
+      env:
+        TEST_SUITE: a11y
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: ''
+      run: |
+        sudo service mysql restart
+        ./scripts/reset-test-db.sh
 
 #    - name: Install Required Packages
 #      run: |
@@ -69,11 +65,4 @@ jobs:
 #      run: pip install -r requirements/edx/development.txt
 #    - uses: browser-actions/setup-geckodriver@latest
 
-    - name: Run Tests
-      env:
-        TEST_SUITE: a11y
-        DB_DATABASE: edxtest
-        DB_USER: root
-        DB_PASSWORD: ''
 
-      run: ./scripts/reset-test-db.sh
