@@ -1,12 +1,7 @@
 name: Platform a11y Tests
 
 on:
-  pull_request:
-    branches:
-      - master
   push:
-    branches:
-      - master
 
 jobs:
   run_tests:
