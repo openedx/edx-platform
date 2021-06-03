@@ -3,7 +3,7 @@ Managers for the models of applications app
 """
 from datetime import datetime
 
-from django.db.models import Manager, QuerySet
+from django.db.models import Manager, Q, QuerySet
 from django.utils.translation import get_language
 
 
@@ -29,10 +29,8 @@ class MultilingualCourseGroupManager(Manager):
         """
         if business_line:
             return self.get_queryset().filter(
-                is_common_business_line_prerequisite=True,
-                business_line_prerequisite=business_line,
-                multilingual_courses__isnull=False
-            ).distinct()
+                Q(is_common_business_line_prerequisite=True) | Q(business_line_prerequisite=business_line)
+            )
 
         return self.get_queryset().filter(is_program_prerequisite=True, multilingual_courses__isnull=False).distinct()
 
