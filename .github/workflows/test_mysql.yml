@@ -31,9 +31,9 @@ jobs:
               FLUSH PRIVILEGES;
             EOF
 
-     - name: a11y Test
-      runs-on: ubuntu-latest
-      strategy:
+      - name: a11y Test
+       runs-on: ubuntu-latest
+       strategy:
         matrix:
           python-version: [ '3.8' ]
 
