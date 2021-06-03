@@ -45,6 +45,11 @@ jobs:
             FLUSH PRIVILEGES;
           EOF
 
+    - name: Enable Mysql
+      run:
+        sudo systemctl enable mysql.service
+        sudo systemctl start mysql.service
+
 #    - name: Install Required Packages
 #      run: |
 #        sudo apt-get update
