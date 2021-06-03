@@ -16,8 +16,9 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: '5.7'
-          mysql database: 'test'
+          mysql database: 'edxtest'
           mysql root password: 'password'
+
       - name: Wait for MySQL
         run: |
           while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
@@ -29,3 +30,45 @@ jobs:
               UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
               FLUSH PRIVILEGES;
             EOF
+
+  run_tests:
+    name: a11y Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.8' ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Required Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxmlsec1-dev memcached
+          sudo systemctl start mongod
+          sudo service memcached start
+      - name: Install pip
+        run: |
+          pip install setuptools wheel
+          pip install -r requirements/edx/development.txt
+          - name: Install Python Dependencies
+            run: pip install -r requirements/edx/development.txt
+          - uses: browser-actions/setup-geckodriver@latest
+
+      - name: Run Tests
+        env:
+          TEST_SUITE: a11y
+          DB_DATABASE: edxtest
+          DB_USER: root
+          DB_PASSWORD: root
+
+      run: ./scripts/accessibility-tests.sh
