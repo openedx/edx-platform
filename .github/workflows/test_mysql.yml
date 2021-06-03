@@ -45,5 +45,10 @@ jobs:
             FLUSH PRIVILEGES;
           EOF
 
-
-
+    - name: Run Tests
+      env:
+        TEST_SUITE: a11y
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: ''
+      run: ./scripts/accessibility-tests.sh
