@@ -2,6 +2,8 @@ name: Platform a11y Tests
 
 on:
   push:
+    branches:
+    - iamsobanjaved/a11y-gha
 
 jobs:
   run_tests:
