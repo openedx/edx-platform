@@ -56,6 +56,7 @@ class BadgeClass(models.Model):
     .. no_pii:
     """
     slug = models.SlugField(max_length=255, validators=[validate_lowercase])
+    badgr_server_slug = models.SlugField(max_length=255, default='', blank=True)
     issuing_component = models.SlugField(max_length=50, default='', blank=True, validators=[validate_lowercase])
     display_name = models.CharField(max_length=255)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
