@@ -34,7 +34,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
             cls.sequence = ItemFactory.create(
                 parent=cls.chapter,
                 category='sequential',
-                display_name="Test Sequential X",
+                display_name="Test Sequential X with an & Ampersand",
                 graded=True,
                 format="Homework"
             )
