@@ -28,7 +28,6 @@ set -e
 DB_CACHE_DIR="common/test/db_cache"
 
 if [[ -z "$BOK_CHOY_HOSTNAME" ]]; then
-    MYSQL_HOST="127.0.0.1"
     SETTINGS="bok_choy"
 else
     MYSQL_HOST="--host=edx.devstack.mysql57"
