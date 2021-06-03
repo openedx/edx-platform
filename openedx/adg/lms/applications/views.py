@@ -20,7 +20,8 @@ from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
 from .helpers import (
-    get_application_hub_instructions, get_course_card_information, send_application_submission_confirmation_email
+    get_application_hub_instructions,
+    get_course_card_information,
 )
 from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
@@ -80,6 +81,9 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         Returns:
             Boolean, True if application exists otherwise False.
         """
+        if self.request.method == 'POST':
+            return False
+
         return ApplicationHub.objects.filter(user=self.request.user).exists()
 
     def handle_no_permission(self):
@@ -136,59 +140,6 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
                 'messages': messages
             }
         )
-
-    # def post(self, request):
-    #     """
-    #     Submit user application, send mandrill email according to the Application Confirmation Email format. In the
-    #     end, it redirects to the application success page.
-    #
-    #     Returns:
-    #         HttpResponse object.
-    #     """
-    #     if not request.user.application_hub.is_application_submitted:
-    #         request.user.application_hub.submit_application_for_current_date()
-    #         send_application_submission_confirmation_email(request.user.email)
-    #     return redirect('application_success')
-
-
-# class ApplicationSuccessView(RedirectToLoginOrRelevantPageMixin, TemplateView):
-#     """
-#     View entailing successfully submitted application status of a user.
-#     """
-#
-#     template_name = 'adg/lms/applications/success.html'
-#
-#     def is_precondition_satisfied(self):
-#         """
-#         Checks if a user's application is already submitted or not.
-#
-#         Returns:
-#             Boolean, True or False.
-#         """
-#         try:
-#             return self.request.user.application_hub.is_application_submitted
-#         except ApplicationHub.DoesNotExist:
-#             return False
-#
-#     def handle_no_permission(self):
-#         """
-#         Redirects on test failure, `test_func()` returns False.
-#
-#         Returns:
-#             HttpResponse object.
-#         """
-#         return HttpResponse(status=400)
-#
-#     def get_context_data(self, **kwargs):
-#         """
-#         Send the application submission date for the authenticated user in the context dictionary.
-#
-#         Returns:
-#             dict object.
-#         """
-#         context = super(ApplicationSuccessView, self).get_context_data(**kwargs)
-#         context['submission_date'] = self.request.user.application_hub.submission_date
-#         return context
 
 
 class ContactInformationView(RedirectToLoginOrRelevantPageMixin, View):

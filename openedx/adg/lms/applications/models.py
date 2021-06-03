@@ -36,7 +36,6 @@ class ApplicationHub(TimeStampedModel):
     is_written_application_completed = models.BooleanField(
         default=False, verbose_name=_('Written Application Submitted'),
     )
-    is_application_submitted = models.BooleanField(default=False, verbose_name=_('Application Submitted'), )
     submission_date = models.DateField(null=True, blank=True, verbose_name=_('Submission Date'), )
 
     class Meta:
@@ -65,7 +64,8 @@ class ApplicationHub(TimeStampedModel):
         Returns:
             bool: True if all objectives are done, otherwise False.
         """
-        return self.is_prerequisite_courses_passed and self.is_written_application_completed
+        return self.is_prerequisite_courses_passed and self.is_written_application_completed and \
+            self.is_bu_prerequisite_courses_passed
 
     @property
     def progress_of_objectives_completed_in_float(self):

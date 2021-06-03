@@ -1,8 +1,6 @@
 """
 Tests for all the views in applications app.
 """
-from datetime import date
-
 import mock
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -136,6 +134,32 @@ def test_application_introduction_view_for_logged_in_user(
     assert response.status_code == status_code
 
 
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'application_hub, status_code, expected_output',
+    [
+        (False, 302, reverse('application_hub')),
+        (True, 400, None)
+    ],
+    ids=['has_application_hub_object', 'no_application_hub_object']
+)
+def test_post_request_application_introduction_view(application_hub, status_code, expected_output, request_factory):
+    """
+    Test post request to application introduction view before and after starting the application
+    """
+    user = UserFactory()
+    request = request_factory.post(reverse('application_introduction'))
+    request.user = user
+
+    if application_hub:
+        ApplicationHubFactory(user=user)
+
+    response = ApplicationIntroductionView.as_view()(request)
+
+    assert response.get('Location') == expected_output
+    assert response.status_code == status_code
+
+
 # ------- Application Hub View tests below -------
 
 
@@ -162,7 +186,7 @@ def test_post_user_redirects_without_login_for_application_hub_view():
 @pytest.mark.django_db
 def test_application_hub_view_get_request(application_hub_view_get_request):
     """
-    Test the case where an authenticated user accesses Application Hub.
+    Test the case where a user sends get request to application hub with no saved ApplicationHub object.
     """
     response = ApplicationHubView.as_view()(application_hub_view_get_request)
 
@@ -170,199 +194,93 @@ def test_application_hub_view_get_request(application_hub_view_get_request):
     assert response.status_code == 302
 
 
-# @pytest.mark.django_db
-# @mock.patch('openedx.adg.lms.applications.views.render')
-# def test_get_initial_application_state_for_application_hub_view(mock_render, application_hub_view_get_request):
-#     """
-#     Test the case where the user has not completed even a single objective of the application.
-#     """
-#     ApplicationHubView.as_view()(application_hub_view_get_request)
-#
-#     expected_context = {
-#         'user_application_hub': application_hub_view_get_request.user.application_hub,
-#         'pre_req_courses': []
-#     }
-#     mock_render.assert_called_once_with(
-#         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
-#     )
-#
-#
-# @pytest.mark.django_db
-# @mock.patch('openedx.adg.lms.applications.views.render')
-# def test_get_written_application_completed_state_for_application_hub_view(
-#     mock_render, application_hub_view_get_request
-# ):
-#     """
-#     Test the case where the user has completed the written application but not the pre_req courses.
-#     """
-#     ApplicationHubView.as_view()(application_hub_view_get_request)
-#
-#     expected_context = {
-#         'user_application_hub': application_hub_view_get_request.user.application_hub,
-#         'pre_req_courses': []
-#     }
-#     mock_render.assert_called_once_with(
-#         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
-#     )
-#
-#
-# @pytest.mark.django_db
-# @mock.patch('openedx.adg.lms.applications.views.render')
-# def test_get_pre_req_courses_passed_state_for_application_hub_view(mock_render, application_hub_view_get_request):
-#     """
-#     Test the case where the user has completed the pre_req courses but not the written application.
-#     """
-#     ApplicationHubView.as_view()(application_hub_view_get_request)
-#
-#     user = application_hub_view_get_request.user
-#     user.application_hub.set_is_prerequisite_courses_passed()
-#     expected_context = {
-#         'user_application_hub': user.application_hub,
-#         'pre_req_courses': []
-#     }
-#     mock_render.assert_called_once_with(
-#         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
-#     )
-#
-#
-# @pytest.mark.django_db
-# @mock.patch('openedx.adg.lms.applications.views.render')
-# def test_get_complete_application_done_state_for_application_hub_view(mock_render, application_hub_view_get_request):
-#     """
-#     Test the case where the user has completed both objectives i.e the pre_req courses and the
-#     written application.
-#     """
-#     ApplicationHubView.as_view()(application_hub_view_get_request)
-#
-#     expected_context = {
-#         'user_application_hub': application_hub_view_get_request.user.application_hub,
-#         'pre_req_courses': []
-#     }
-#     mock_render.assert_called_once_with(
-#         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
-#     )
-#
-#
-# @pytest.mark.django_db
-# def test_get_already_submitted_application_state_for_application_hub_view(application_hub_view_get_request):
-#     """
-#     Test the case where the user does not even have a corresponding application.
-#     """
-#     application_hub_view_get_request.user.application_hub.submit_application_for_current_date()
-#
-#     response = ApplicationHubView.as_view()(application_hub_view_get_request)
-#     assert response.get('Location') == reverse('application_success')
-#     assert response.status_code == 302
-#
-#
-# @pytest.mark.django_db
-# def test_post_logged_in_user_without_required_objectives_completed_for_application_hub_view(logged_in_client):
-#     """
-#     Test the case where an authenticated user hits the url without having completed the required objectives i.e
-#     the pre_req courses and the written application.
-#     """
-#     response = logged_in_client.post(reverse('application_hub'))
-#     assert response.status_code == 400
-#
-#
-# @pytest.mark.django_db
-# @mock.patch('openedx.adg.lms.applications.views.send_application_submission_confirmation_email')
-# def test_post_logged_in_user_with_required_objectives_completed_to_application_hub_view(
-#     mock_send_mail, user, logged_in_client
-# ):
-#     """
-#     Test the case where an authenticated user, with all the required objectives completed, hits the url.
-#     """
-#     user.application_hub.set_is_prerequisite_courses_passed()
-#     user.application_hub.submit_written_application_for_current_date()
-#
-#     response = logged_in_client.post(reverse('application_hub'))
-#     assert mock_send_mail.called
-#     assert ApplicationHubFactory(user=user).is_application_submitted
-#     assert ApplicationHubFactory(user=user).submission_date == date.today()
-#     assert response.get('Location') == reverse('application_success')
-#     assert response.status_code == 302
-#
-#
-# @pytest.mark.django_db
-# def test_post_already_submitted_application_to_application_hub_view(user, logged_in_client):
-#     """
-#     Test the case where a user with already submitted application hits the url again.
-#     """
-#     user.application_hub.set_is_prerequisite_courses_passed()
-#     user.application_hub.submit_written_application_for_current_date()
-#     user.application_hub.submit_application_for_current_date()
-#
-#     response = logged_in_client.post(reverse('application_hub'))
-#     assert response.status_code == 302
-#     assert response.get('Location') == reverse('application_success')
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'has_application_hub_object',
+    [False, True],
+    ids=['no_application_hub_object', 'has_application_hub_object'])
+def test_application_hub_view_post_request(has_application_hub_object, request_factory, user_with_no_hub):
+    """
+    Test post request to application hub when a user has no saved ApplicationHub object and when a user has a saved
+    ApplicationHub object.
+    """
+    request = request_factory.post(reverse('application_hub'))
+    request.user = user_with_no_hub
+
+    if has_application_hub_object:
+        ApplicationHubFactory(user=user_with_no_hub)
+
+    response = ApplicationHubView.as_view()(request)
+
+    assert response.status_code == 400
 
 
-# ------- Application Success View tests below -------
+@pytest.mark.django_db
+def test_get_initial_application_state_for_application_hub_view(application_hub_view_get_request, mocker):
+    """
+    Test the case where the user has not completed even a single objective of the application.
+    """
+    mocker.patch('openedx.adg.lms.applications.views.get_application_hub_instructions', return_value={})
+    mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
+
+    ApplicationHubFactory(user=application_hub_view_get_request.user)
+    ApplicationHubView.as_view()(application_hub_view_get_request)
+
+    expected_context = {
+        'user_application_hub': application_hub_view_get_request.user.application_hub,
+        'pre_req_courses': [],
+        'business_line_courses': [],
+        'is_locked': False,
+        'messages': {},
+    }
+    mock_render.assert_called_once_with(
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
+    )
 
 
-# @pytest.fixture(name='get_request_for_application_success_view')
-# def get_request_for_application_success_view_fixture(request_factory, user):
-#     """
-#     Create a get request for the application_success url.
-#     """
-#     request = request_factory.get(reverse('application_success'))
-#     request.user = user
-#     return request
-#
-#
-# @pytest.mark.django_db
-# def test_get_environment_in_context_for_application_success_view(get_request_for_application_success_view):
-#     """
-#     Test if the context contains all the necessary pieces.
-#     """
-#     get_request_for_application_success_view.user.application_hub.submit_application_for_current_date()
-#
-#     response = ApplicationSuccessView.as_view()(get_request_for_application_success_view)
-#     assert 'submission_date' in response.context_data
-#
-#
-# @pytest.mark.django_db
-# def test_get_unauthenticated_user_redirects_for_application_success_view():
-#     """
-#     Test the case where an unauthenticated user is redirected to login page or not.
-#     """
-#     application_success_url = reverse('application_success')
-#     response = Client().get(application_success_url)
-#     assert f'/login?next={application_success_url}' in response.url
-#
-#
-# @pytest.mark.django_db
-# def test_get_submission_date_for_application_success_view(get_request_for_application_success_view):
-#     """
-#     Test if the right date is being fed to the context dictionary.
-#     """
-#     user_application_hub = get_request_for_application_success_view.user.application_hub
-#     user_application_hub.submit_application_for_current_date()
-#
-#     response = ApplicationSuccessView.as_view()(get_request_for_application_success_view)
-#     assert response.context_data.get('submission_date') == user_application_hub.submission_date
-#     assert response.status_code == 200
-#
-#
-# @pytest.mark.django_db
-# def test_get_user_without_submitted_application_for_application_success_view(logged_in_client):
-#     """
-#     Test the case where a user has not submitted their application.
-#     """
-#     response = logged_in_client.get(reverse('application_success'))
-#     assert response.status_code == 400
-#
-#
-# @pytest.mark.django_db
-# def test_get_no_user_application_exists_for_application_success_view(get_request_for_application_success_view):
-#     """
-#     Test the case where a user does not have an associated ApplicationHub object.
-#     """
-#     get_request_for_application_success_view.user.application_hub = None
-#
-#     response = ApplicationSuccessView.as_view()(get_request_for_application_success_view)
-#     assert response.status_code == 400
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'are_omni_courses_complete, are_bu_courses_complete',
+    [
+        (False, False),
+        (True, False),
+        (True, True)
+    ],
+    ids=['written_application_complete', 'omni_courses_complete', 'bu_courses_complete'])
+def test_each_step_for_application_completion_application_hub_view(
+    are_omni_courses_complete, are_bu_courses_complete, application_hub_view_get_request, mocker
+):
+    """
+    Test get request to application hub for each requirement completion till application submission.
+    """
+    mocker.patch('openedx.adg.lms.applications.views.get_application_hub_instructions', return_value={})
+    mocker.patch('openedx.adg.lms.applications.views.get_course_card_information', return_value=([], False, False))
+    mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
+
+    application_hub = ApplicationHubFactory(user=application_hub_view_get_request.user)
+    application_hub.submit_written_application_for_current_date()
+
+    application = UserApplicationFactory(user=application_hub_view_get_request.user)
+    application.business_line = None
+
+    if are_omni_courses_complete:
+        application_hub.set_is_prerequisite_courses_passed()
+
+    if are_bu_courses_complete:
+        application_hub.is_bu_prerequisite_courses_passed = True
+
+    ApplicationHubView.as_view()(application_hub_view_get_request)
+
+    expected_context = {
+        'user_application_hub': application_hub_view_get_request.user.application_hub,
+        'pre_req_courses': [],
+        'business_line_courses': [],
+        'is_locked': False,
+        'messages': {},
+    }
+    mock_render.assert_called_once_with(
+        application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
+    )
 
 
 # ------- Contact Information View tests below -------

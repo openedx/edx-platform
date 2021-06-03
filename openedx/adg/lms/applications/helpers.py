@@ -15,27 +15,29 @@ from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.common.lib.mandrill_client.client import MandrillClient
 from openedx.adg.common.lib.mandrill_client.tasks import task_send_mandrill_email
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule.modulestore.django import modulestore
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 from .constants import (
+    APPLICATION_SUBMISSION_CONGRATS,
+    APPLICATION_SUBMISSION_INSTRUCTION,
     COVER_LETTER_ONLY,
     HTML_FOR_EMBEDDED_FILE_VIEW,
+    LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
+    PREREQUISITE_COURSES_COMPLETION_CONGRATS,
+    PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
+    PREREQUISITE_COURSES_COMPLETION_MSG,
+    RETAKE_COURSE_MESSAGE,
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
-    WRITTEN_APPLICATION_COMPLETION_MSG,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    PREREQUISITE_COURSES_COMPLETION_CONGRATS,
-    PREREQUISITE_COURSES_COMPLETION_MSG,
-    PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
-    APPLICATION_SUBMISSION_INSTRUCTION,
-    APPLICATION_SUBMISSION_CONGRATS
+    WRITTEN_APPLICATION_COMPLETION_MSG
 )
 from .rules import is_adg_admin
 
@@ -303,6 +305,17 @@ def has_admin_permissions(user):
 
 
 def get_course_card_information(user, courses):
+    """
+    Decides status, grade and message for each course in the list and appends a dictionary containing status, grade,
+    message and course itself in a list
+
+    Arguments:
+        user: User object
+        courses: list containing Course objects
+
+    Returns:
+        list: A list containing dictionaries with status, grade, message and course
+    """
     course_cards_information = []
     is_any_course_started = False
     is_locked = False
@@ -312,7 +325,7 @@ def get_course_card_information(user, courses):
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
         if pre_requisite_courses:
-            message = 'This course will unlock when you have completed and received a passing grade in '
+            message = LOCKED_COURSE_MESSAGE
 
             for prereq in pre_requisite_courses:
                 course_grade = CourseGradeFactory().read(user, course_key=prereq['key'])
@@ -326,7 +339,7 @@ def get_course_card_information(user, courses):
 
             message = f'{message[:-1]}.'
 
-        if status is not 'Locked':
+        if status == 'Locked':
             message = ''
             if CourseEnrollment.is_enrolled(user, course.id):
                 is_any_course_started = True
@@ -339,8 +352,7 @@ def get_course_card_information(user, courses):
                         grade = str(int(round_away_from_zero(course_grade.percent * 100)))
                     elif has_attempted_all_modules(user, course):
                         status = 'Re-Take Course'
-                        message = 'Please take the assessments in this course again in order to obtain a passing grade ' \
-                                  'and complete your application!'
+                        message = RETAKE_COURSE_MESSAGE
                         grade = str(int(round_away_from_zero(course_grade.percent * 100)))
             else:
                 status = 'Not Started'
@@ -356,6 +368,16 @@ def get_course_card_information(user, courses):
 
 
 def has_attempted_all_modules(user, course):
+    """
+    Checks if all sections of a course have been attempted by the user or not
+
+    Arguments:
+        user: User object
+        course: Course object
+
+    Returns:
+        boolean: True if user attempted all sections, False otherwise
+    """
     all_modules = modulestore().get_items(
         course.id,
         qualifiers={'category': 'course'}
@@ -369,6 +391,18 @@ def has_attempted_all_modules(user, course):
 
 
 def get_application_hub_instructions(user_application_hub, is_any_prerequisite_started, is_any_bl_course_started):
+    """
+    Decides congratulation messages and instructions based on the requirements completed and if courses have been
+    started or not.
+
+    Arguments:
+        user_application_hub: ApplicationHub object
+        is_any_prerequisite_started: boolean
+        is_any_bl_course_started: boolean
+
+    Returns:
+        dictionary containing congratulations messages and instructions
+    """
     congrats = message = instruction = ''
 
     if user_application_hub.are_application_pre_reqs_completed():

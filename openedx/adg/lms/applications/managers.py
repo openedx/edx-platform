@@ -23,7 +23,7 @@ class MultilingualCourseGroupManager(Manager):
     Manager for MultilingualCourseGroup
     """
 
-    def prereq_course_groups(self, business_line):
+    def prereq_course_groups(self, business_line=None):
         """
         Get non-empty prerequisite course groups
         """

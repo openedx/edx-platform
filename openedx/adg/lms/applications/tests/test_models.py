@@ -1,8 +1,6 @@
 """
 Tests for all the models in applications app.
 """
-from datetime import date
-
 import factory
 import mock
 import pytest
@@ -89,7 +87,11 @@ def test_progress_of_objectives_completed_in_float_in_application_hub(
     ([], False),
     (['is_prerequisite_courses_passed'], False),
     (['is_written_application_completed'], False),
-    (['is_prerequisite_courses_passed', 'is_written_application_completed'], True)
+    (['is_bu_prerequisite_courses_passed'], False),
+    (['is_prerequisite_courses_passed', 'is_written_application_completed'], False),
+    (['is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'], False),
+    (['is_written_application_completed', 'is_bu_prerequisite_courses_passed'], False),
+    (['is_written_application_completed', 'is_prerequisite_courses_passed', 'is_bu_prerequisite_courses_passed'], True)
 ])
 def test_are_application_pre_reqs_completed_in_application_hub(
     objectives_completed, expected_return_value, application_hub
