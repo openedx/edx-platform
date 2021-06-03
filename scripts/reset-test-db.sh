@@ -35,6 +35,9 @@ else
     SETTINGS="bok_choy_docker"
 fi
 
+echo "MYSQL_HOST == $MYSQL_HOST"
+echo "SETTINGS == $SETTINGS"
+
 for i in "$@"; do
     case $i in
         -r|--rebuild_cache)
@@ -98,7 +101,8 @@ rebuild_cache_for_db() {
 
 for db in "${database_order[@]}"; do
     if ! [[ $USE_EXISTING_DB ]]; then
-        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root -p root
+        echo "Testing db ${databases[$db]}."
+        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root -p password
 
         # Clear out the test database
         #
