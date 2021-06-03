@@ -215,7 +215,7 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': 'Homework 1 - Test Sequential X - 50% (1/2)',
+                    'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50% (1/2)',
                     'label': 'HW 01',
                     'percent': 0.5
                 },

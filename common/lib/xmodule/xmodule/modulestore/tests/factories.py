@@ -300,7 +300,7 @@ class ItemFactory(XModuleFactory):
         if self.display_name is None:
             dest_name = uuid4().hex
         else:
-            dest_name = self.display_name.replace(" ", "_")  # lint-amnesty, pylint: disable=no-member
+            dest_name = BlockUsageLocator.clean(self.display_name)
 
         new_location = self.parent_location.course_key.make_usage_key(
             self.category,
