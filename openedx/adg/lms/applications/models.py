@@ -79,14 +79,6 @@ class ApplicationHub(TimeStampedModel):
                                               self.is_prerequisite_courses_passed])
         return number_of_objectives_completed / self.TOTAL_APPLICATION_OBJECTIVES
 
-    # def submit_application_for_current_date(self):
-    #     """
-    #     Set the is_application_submitted flag and add the submission_date of the current date.
-    #     """
-    #     self.is_application_submitted = True
-    #     self.submission_date = date.today()
-    #     self.save()
-
     @property
     def is_written_application_started(self):
         """
