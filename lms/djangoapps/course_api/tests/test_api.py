@@ -9,6 +9,7 @@ from unittest import mock
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
+from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
@@ -19,7 +20,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 
-from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses
+from ..api import UNKNOWN_BLOCK_DISPLAY_NAME, course_detail, get_due_dates, list_courses, get_course_members
+from ..exceptions import OverEnrollmentLimitException
 from .mixins import CourseApiFactoryMixin
 
 
@@ -305,3 +307,89 @@ class TestGetCourseDates(CourseDetailTestMixin, SharedModuleStoreTestCase):
                 ]
                 actual_due_dates = get_due_dates(request, self.course.id, self.staff_user)
                 assert expected_due_dates == actual_due_dates
+
+
+class TestGetCourseMembers(CourseApiTestMixin, SharedModuleStoreTestCase):
+    """
+    Test get_course_members function
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestGetCourseMembers, cls).setUpClass()
+        cls.course = cls.create_course()
+        cls.honor = cls.create_user('honor', is_staff=False)
+        cls.staff = cls.create_user('staff', is_staff=True)
+        cls.instructor = cls.create_user('instructor', is_staff=True)
+
+        # Attach honor to course with enrollment
+        cls.create_enrollment(user=cls.honor, course_id=cls.course.id)
+        # Attach instructor to course with both enrollment and course access role
+        cls.create_enrollment(user=cls.instructor, course_id=cls.course.id)
+        cls.create_courseaccessrole(user=cls.instructor, course_id=cls.course.id, role='instructor')
+        # Attach staff to course using only course access role
+        cls.create_courseaccessrole(user=cls.staff, course_id=cls.course.id, role='staff')
+
+    def test_get_course_members(self):
+        """
+        Test all different possible filtering
+        """
+        with self.assertNumQueries(3):
+            members = get_course_members(self.course.id)
+
+        self.assertEqual(len(members), 3)
+
+        # Check parameters for all users
+        expected_properties = ['id', 'username', 'email', 'name', 'enrollment_mode', 'roles']
+        for user_id in members:
+            self.assertCountEqual(members[user_id], expected_properties)
+
+        # Check that users have correct roles
+        # Honor should be only a student and have the enrollment mode set
+        self.assertEqual(members[self.honor.id]['roles'], ['student'])
+        self.assertEqual(members[self.honor.id]['enrollment_mode'], 'audit')
+        # Instructor should have both roles and enrollment_mode set
+        self.assertEqual(members[self.instructor.id]['roles'], ['student', 'instructor'])
+        self.assertEqual(members[self.instructor.id]['enrollment_mode'], 'audit')
+        # Staff should only have the staff role
+        self.assertEqual(members[self.staff.id]['roles'], ['staff'])
+        self.assertEqual(members[self.staff.id]['enrollment_mode'], None)
+
+    def test_same_result_with_csa_or_enrollment(self):
+        """
+        Checks that the API returns the same result regardless if a user
+        comes from CourseAccessRoles or CourseEnrollments table.
+        """
+        # Create new user
+        user = TestGetCourseMembers.create_user('test_use', is_staff=True)
+
+        # Attach with course enrollment
+        enrollment = TestGetCourseMembers.create_enrollment(
+            user=user,
+            course_id=self.course.id
+        )
+        members_enrollments = get_course_members(self.course.id)
+        enrollment.delete()
+
+        # Attach with course enrollment
+        enrollment = TestGetCourseMembers.create_courseaccessrole(
+            user=user,
+            course_id=self.course.id,
+            role='staff',
+        )
+        members_courseaccessroles = get_course_members(self.course.id)
+
+        # Check properties (except the ones that change depending on role)
+        for item in ['id', 'username', 'email', 'name']:
+            self.assertEqual(
+                members_courseaccessroles[user.id][item],
+                members_enrollments[user.id][item]
+            )
+
+    @override_settings(COURSE_MEMBER_API_ENROLLMENT_LIMIT=1)
+    def test_course_members_fails_overlimit(self):
+        """
+        Check if trying to retrieve more than settings.COURSE_MEMBER_API_ENROLLMENT_LIMIT
+        fails.
+        """
+        with self.assertRaises(OverEnrollmentLimitException):
+            get_course_members(self.course.id)
