@@ -35,17 +35,20 @@ jobs:
         mysql database: 'edxtest'
         mysql root password: 'password'
 
-    - name: Wait for MySQL
-      run: |
-        while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
-          sleep 1
-        done
-    - name: Reset mysql password
-      run: |
-          cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
-            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-            FLUSH PRIVILEGES;
-          EOF
+   - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+
+      #    - name: Wait for MySQL
+#      run: |
+#        while ! mysqladmin ping --host=127.0.0.1 --password=password --silent; do
+#          sleep 1
+#        done
+#    - name: Reset mysql password
+#      run: |
+#          cat <<EOF | mysql -h 127.0.0.1 -u root --password=password
+#            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+#            FLUSH PRIVILEGES;
+#          EOF
 
     - name: Enable Mysql
       run:
