@@ -528,6 +528,7 @@ edx-opaque-keys[django]==2.2.1
     #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
+    #   ora2
     #   xmodule
 edx-organizations==6.9.0
     # via -r requirements/edx/base.txt
@@ -573,7 +574,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.txt
-elasticsearch==7.13.0
+elasticsearch==7.13.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-search
@@ -593,7 +594,7 @@ execnet==1.8.1
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==8.4.0
+faker==8.5.0
     # via factory-boy
 filelock==3.0.12
     # via
@@ -841,7 +842,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.txt
-ora2==3.5.5
+ora2==3.6.1
     # via -r requirements/edx/base.txt
 packaging==20.9
     # via

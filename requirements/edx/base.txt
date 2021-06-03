@@ -453,6 +453,7 @@ edx-opaque-keys[django]==2.2.1
     #   edx-user-state-client
     #   edx-when
     #   lti-consumer-xblock
+    #   ora2
     #   xmodule
 edx-organizations==6.9.0
     # via -r requirements/edx/base.in
@@ -494,7 +495,7 @@ edx-when==2.0.0
     #   edx-proctoring
 edxval==2.0.3
     # via -r requirements/edx/base.in
-elasticsearch==7.13.0
+elasticsearch==7.13.1
     # via edx-search
 enmerkar-underscore==2.0.0
     # via -r requirements/edx/base.in
@@ -679,7 +680,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/base.in
-ora2==3.5.5
+ora2==3.6.1
     # via -r requirements/edx/base.in
 packaging==20.9
     # via
