@@ -8,10 +8,9 @@ from django.urls import reverse
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory
-
-from ..models import Education, WorkExperience
-from ..serializers import EducationSerializer, WorkExperienceSerializer
-from .factories import EducationFactory, UserApplicationFactory, WorkExperienceFactory
+from openedx.adg.lms.applications.api.serializers import EducationSerializer, WorkExperienceSerializer
+from openedx.adg.lms.applications.models import Education, WorkExperience
+from openedx.adg.lms.applications.tests.factories import EducationFactory, UserApplicationFactory, WorkExperienceFactory
 
 JSON_CONTENT_TYPE = 'application/json'
 

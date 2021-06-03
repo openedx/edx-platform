@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils.models import TimeStampedModel
 
+from common.djangoapps.student.models import UserProfile
 from lms.djangoapps.grades.api import CourseGradeFactory
 from openedx.adg.lms.utils.date_utils import month_choices
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -123,7 +124,7 @@ class BusinessLine(TimeStampedModel):
     @classmethod
     def is_user_business_line_admin(cls, user):
         """
-        Checks if the user is a business line admin i.e Belongs to atleast one business line group
+        Checks if the user is a business line admin i.e Belongs to at least one business line group
 
         Arguments:
              user (User): User object to check permissions for
@@ -397,3 +398,25 @@ class MultilingualCourse(models.Model):
 
     def __str__(self):
         return 'id={id} name={name}'.format(id=self.course.id, name=self.course.display_name)
+
+
+class Reference(models.Model):
+    """
+    Model for references provided by applicants
+    """
+
+    name = models.CharField(verbose_name=_('Name'), max_length=255)
+    position = models.CharField(verbose_name=_('Job Position / Title'), max_length=255)
+    relationship = models.CharField(verbose_name=_('Relationship to you'), max_length=255)
+    phone_number = models.CharField(validators=[UserProfile.phone_regex], max_length=50)
+    email = models.EmailField(verbose_name=_('Email'), blank=True)
+
+    user_application = models.ForeignKey(
+        UserApplication, related_name='references', related_query_name='reference', on_delete=models.CASCADE
+    )
+
+    class Meta:
+        app_label = 'applications'
+
+    def __str__(self):
+        return self.name
