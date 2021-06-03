@@ -51,4 +51,5 @@ jobs:
         DB_DATABASE: edxtest
         DB_USER: root
         DB_PASSWORD: ''
+
       run: ./scripts/accessibility-tests.sh
