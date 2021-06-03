@@ -28,7 +28,7 @@ set -e
 DB_CACHE_DIR="common/test/db_cache"
 
 if [[ -z "$BOK_CHOY_HOSTNAME" ]]; then
-    MYSQL_HOST=""
+    MYSQL_HOST="127.0.0.1"
     SETTINGS="bok_choy"
 else
     MYSQL_HOST="--host=edx.devstack.mysql57"
@@ -102,7 +102,7 @@ rebuild_cache_for_db() {
 for db in "${database_order[@]}"; do
     if ! [[ $USE_EXISTING_DB ]]; then
         echo "Testing db ${databases[$db]}."
-        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root -p password
+        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root
 
         # Clear out the test database
         #
