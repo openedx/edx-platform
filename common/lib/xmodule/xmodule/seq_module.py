@@ -543,6 +543,7 @@ class SequenceBlock(
             'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
             'is_proctored': self.is_proctored_enabled,
+            'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
             'position': self.position,
             'tag': self.location.block_type,
             'next_url': context.get('next_url'),
