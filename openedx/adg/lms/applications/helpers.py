@@ -339,7 +339,7 @@ def get_course_card_information(user, courses):
 
             message = f'{message[:-1]}.'
 
-        if status == 'Locked':
+        if status != 'Locked':
             message = ''
             if CourseEnrollment.is_enrolled(user, course.id):
                 is_any_course_started = True
