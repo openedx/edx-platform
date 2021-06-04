@@ -520,8 +520,9 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         user = create_user()
         CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
         block = CourseEndDate(course, user)
-        assert block.description == ('This course will be archived, which means you can review the course content '
-                                     'but can no longer participate in graded assignments or earn a certificate.')
+        assert block.description == ('After this date, the course will be archived, which means you can review the '
+                                     'course content but can no longer participate in graded assignments or work '
+                                     'towards earning a certificate.')
 
     def test_course_end_date_for_non_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
