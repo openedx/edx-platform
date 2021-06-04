@@ -33,7 +33,7 @@ jobs:
         DB_PASSWORD: root
       run: |
         sudo apt-get install memcached
-        sudo apt-get install python3-lxml
+        pip install -e common/lib/safe_lxml
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
