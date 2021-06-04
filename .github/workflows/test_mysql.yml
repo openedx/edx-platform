@@ -34,6 +34,7 @@ jobs:
       run: |
         sudo apt-get install memcached
         pip install -e common/lib/safe_lxml
+        pip install pycontracts==1.8.12
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
