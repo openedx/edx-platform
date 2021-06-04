@@ -54,7 +54,7 @@ class MultilingualCourseGroupManager(Manager):
             Q(is_common_business_line_prerequisite=True) | Q(business_line_prerequisite=user.application.business_line)
         )
 
-    def get_business_line_and_common_business_line_prereq_courses(self, user):
+    def get_user_business_line_and_common_business_line_prereq_courses(self, user):
         """
         Returns prerequisite courses for the selected business line and common prerequisite courses
         for all business lines for a user.
@@ -70,7 +70,7 @@ class MultilingualCourseGroupManager(Manager):
             self.business_line_and_common_business_line_prereq_course_groups_for_user(user), user
         )
 
-    def get_program_prereq_courses(self, user):
+    def get_user_program_prereq_courses(self, user):
         """
         Returns program prerequisite courses for a user.
 
@@ -84,7 +84,7 @@ class MultilingualCourseGroupManager(Manager):
             self.program_prereq_course_groups(), user
         )
 
-    def get_program_prereq_courses_and_all_non_prereq_courses(self, user):
+    def get_user_program_prereq_courses_and_all_non_prereq_courses(self, user):
         """
         Returns program prerequisite courses and non prerequisite courses for a user.
 

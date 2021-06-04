@@ -18,7 +18,7 @@ def get_courses(user):
     if is_testing_environment():
         return get_courses_core(user)
 
-    return MultilingualCourseGroup.objects.get_program_prereq_courses_and_all_non_prereq_courses(user)
+    return MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(user)
 
 
 def get_business_line_prereq_courses(user):
@@ -38,7 +38,7 @@ def get_business_line_prereq_courses(user):
     ):
         return
 
-    return MultilingualCourseGroup.objects.get_business_line_and_common_business_line_prereq_courses(user)
+    return MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(user)
 
 
 def get_course_instructors(course_key, request=None):

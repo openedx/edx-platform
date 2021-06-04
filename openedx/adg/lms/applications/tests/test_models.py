@@ -280,7 +280,7 @@ def test_get_catalog_courses_valid_user(courses, course_group, user_with_profile
         course=courses['test_course2'],
         multilingual_course_group=course_group
     )
-    courses_list = MultilingualCourseGroup.objects.get_program_prereq_courses_and_all_non_prereq_courses(
+    courses_list = MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(
         user_with_profile
     )
     assert len(courses_list) == 1
@@ -301,7 +301,7 @@ def test_get_catalog_courses_enrolled_user(courses, course_group, user_with_prof
         multilingual_course_group=course_group
     )
     CourseEnrollmentFactory(user=user_with_profile, course=enrolled_course)
-    courses_list = MultilingualCourseGroup.objects.get_program_prereq_courses_and_all_non_prereq_courses(
+    courses_list = MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(
         user_with_profile
     )
     assert len(courses_list) == 1
@@ -322,7 +322,7 @@ def test_get_catalog_courses_anonymous_user(courses, course_group):
         course=courses['test_course2'],
         multilingual_course_group=course_group
     )
-    assert len(MultilingualCourseGroup.objects.get_program_prereq_courses_and_all_non_prereq_courses(user)) == 1
+    assert len(MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(user)) == 1
 
 
 @pytest.mark.django_db
@@ -335,7 +335,7 @@ def test_get_catalog_courses_expired_course(expired_course, course_group, user_w
         multilingual_course_group=course_group
     )
 
-    courses_list = MultilingualCourseGroup.objects.get_program_prereq_courses_and_all_non_prereq_courses(
+    courses_list = MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(
         user_with_profile
     )
     assert len(courses_list) == 0
@@ -347,7 +347,7 @@ def test_get_prerequisites_for_user(courses, user_with_profile):
     Tests prerequisites for user
     """
     MultilingualCourseFactory(course=courses['test_course1'])
-    assert len(MultilingualCourseGroup.objects.get_program_prereq_courses(user_with_profile)) == 1
+    assert len(MultilingualCourseGroup.objects.get_user_program_prereq_courses(user_with_profile)) == 1
 
 
 @pytest.mark.django_db
@@ -355,7 +355,7 @@ def test_no_prerequisite_courses(user_with_profile):
     """
     Tests no prerequisites courses for user
     """
-    assert len(MultilingualCourseGroup.objects.get_program_prereq_courses(user_with_profile)) == 0
+    assert len(MultilingualCourseGroup.objects.get_user_program_prereq_courses(user_with_profile)) == 0
 
 
 @pytest.mark.django_db
@@ -365,7 +365,7 @@ def test_get_enrolled_prerequisites_for_user(user_with_profile, courses):
     """
     MultilingualCourseFactory(course=courses['test_course1'])
     CourseEnrollmentFactory(course=courses['test_course1'], user=user_with_profile, is_active=True)
-    assert len(MultilingualCourseGroup.objects.get_program_prereq_courses(user_with_profile)) == 1
+    assert len(MultilingualCourseGroup.objects.get_user_program_prereq_courses(user_with_profile)) == 1
 
 
 @pytest.mark.django_db
