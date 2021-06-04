@@ -2064,7 +2064,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 status=status,
             )
 
-        task_input = {'student_set': 'all_whitelisted'}
+        task_input = {'student_set': 'all_allowlisted'}
 
         # Only certificates for the 3 allowlisted students should have been run
         expected_results = {
@@ -2106,7 +2106,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 user=student, course_id=self.course.id
             )
 
-        task_input = {'student_set': 'whitelisted_not_generated'}
+        task_input = {'student_set': 'allowlisted_not_generated'}
 
         # Certificates should only be generated for the allowlisted students
         # who do not yet have passing certificates.
@@ -2419,7 +2419,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
 
         # Certificates should be regenerated for students having generated certificates with status
         # 'downloadable' or 'error' which are total of 5 students in this test case
-        task_input = {'student_set': "all_whitelisted"}
+        task_input = {'student_set': "all_allowlisted"}
 
         expected_results = {
             'action_name': 'certificates generated',

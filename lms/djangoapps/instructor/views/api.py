@@ -3123,10 +3123,10 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 
     if generate_for == 'all':
         # Generate Certificates for all allowlisted students
-        students = 'all_whitelisted'
+        students = 'all_allowlisted'
 
     elif generate_for == 'new':
-        students = 'whitelisted_not_generated'
+        students = 'allowlisted_not_generated'
 
     else:
         # Invalid data, generate_for must be present for all certificate exceptions
@@ -3141,7 +3141,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
     task_api.generate_certificates_for_students(request, course_key, student_set=students)
     response_payload = {
         'success': True,
-        'message': _('Certificate generation started for white listed students.'),
+        'message': _('Certificate generation started for students on the allowlist.'),
     }
 
     return JsonResponse(response_payload)
@@ -3273,7 +3273,7 @@ def certificate_invalidation_view(request, course_id):
         try:
             if certs_api.is_on_allowlist(student, course_key):
                 log.warning(f"Invalidating certificate for student {student.id} in course {course_key} failed. "
-                            "Student is currently on the allow list.")
+                            "Student is currently on the allowlist.")
                 raise ValueError(
                     _("The student {student} appears on the Certificate Exception list in course {course}. Please "
                       "remove them from the Certificate Exception list before attempting to invalidate their "

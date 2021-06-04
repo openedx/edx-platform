@@ -39,11 +39,11 @@ def generate_students_certificates(
     students_to_generate_certs_for = CourseEnrollment.objects.users_enrolled_in(course_id)
 
     student_set = task_input.get('student_set')
-    if student_set == 'all_whitelisted':
+    if student_set == 'all_allowlisted':
         # Generate Certificates for all allowlisted students.
         students_to_generate_certs_for = get_enrolled_allowlisted_users(course_id)
 
-    elif student_set == 'whitelisted_not_generated':
+    elif student_set == 'allowlisted_not_generated':
         # Allowlisted students who did not yet receive certificates
         students_to_generate_certs_for = get_enrolled_allowlisted_not_passing_users(course_id)
 

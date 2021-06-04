@@ -831,7 +831,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Request is successful
         assert res_json['success']
         # Assert Message
-        assert res_json['message'] == 'Certificate generation started for white listed students.'
+        assert res_json['message'] == 'Certificate generation started for students on the allowlist.'
 
     def test_generate_certificate_exceptions_allowlist_not_generated(self):
         """
@@ -856,7 +856,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Assert Request is successful
         assert res_json['success']
         # Assert Message
-        assert res_json['message'] == 'Certificate generation started for white listed students.'
+        assert res_json['message'] == 'Certificate generation started for students on the allowlist.'
 
     def test_generate_certificate_exceptions_generate_for_incorrect_value(self):
         """
