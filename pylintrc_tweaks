@@ -15,7 +15,6 @@ disable+ =
     useless-suppression,
     cyclic-import,
     logging-format-interpolation,
-    F0001,
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$

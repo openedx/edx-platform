@@ -394,7 +394,6 @@ disable =
 	useless-suppression,
 	cyclic-import,
 	logging-format-interpolation,
-	F0001,
 
 [REPORTS]
 output-format = text
@@ -494,4 +493,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 82a30995f9f57986e09f6f446fb5c3b3a163fd4f
+# c5312bad86f927500a51e6aba50677c3c19598d4
