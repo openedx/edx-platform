@@ -12,30 +12,40 @@ jobs:
         python-version: [ '3.8' ]
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '12'
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Setup Gecko Driver
-        uses: browser-actions/setup-geckodriver@latest
+    - name: Setup Gecko Driver
+      uses: browser-actions/setup-geckodriver@latest
 
-      - name: Install npm Dependencies
-        run: npm install -g rtlcss
+    - name: Install npm Dependencies
+      run: npm install -g rtlcss
 
-      - name: Install Required Packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libxmlsec1-dev memcached
-          pip install setuptools wheel
-          pip install -r requirements/edx/development.txt
+    - name: Install Required Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxmlsec1-dev memcached
+        pip install setuptools wheel
+        pip install -r requirements/edx/development.txt
+    - name: Initiate Services
+      env:
+        DB_DATABASE: edxtest
+        DB_USER: root
+        DB_PASSWORD: root
+      run: |
+        sudo systemctl start mongod
+        sudo service memcached start
+        sudo /etc/init.d/mysql start
+
 
     - name: Run Tests
       env:
