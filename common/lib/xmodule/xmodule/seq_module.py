@@ -33,6 +33,8 @@ from xmodule.x_module import (
     XModuleToXBlockMixin,
 )
 
+from openedx.core.djangoapps.agreements.toggles import is_integrity_signature_enabled
+
 from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoTemplateBlockBase
@@ -891,7 +893,8 @@ class SequenceBlock(
                 'is_practice_exam': self.is_practice_exam,
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
-                'grace_period': self.graceperiod  # lint-amnesty, pylint: disable=no-member
+                'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
+                'is_integrity_signature_enabled': is_integrity_signature_enabled(),
             }
 
             # inject the user's credit requirements and fulfillments
