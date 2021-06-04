@@ -37,24 +37,6 @@ jobs:
           pip install setuptools wheel
           pip install -r requirements/edx/development.txt
 
-
-    - name: Initiate Services
-      env:
-        DB_DATABASE: edxtest
-        DB_USER: root
-        DB_PASSWORD: root
-      run: |
-        sudo systemctl start mongod
-        sudo service memcached start
-        sudo /etc/init.d/mysql start
-
-    - name: Reset mysql password
-      run: |
-        cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
-          UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-          FLUSH PRIVILEGES;
-        EOF
-
     - name: Run Tests
       env:
         TEST_SUITE: a11y
@@ -64,20 +46,4 @@ jobs:
       run: |
         sudo service mysql restart
         ./scripts/reset-test-db.sh
-
-#    - name: Install Required Packages
-#      run: |
-#        sudo apt-get update
-#        sudo apt-get install -y libxmlsec1-dev memcached
-#        sudo systemctl start mongod
-#        sudo service memcached start
-#    - name: Install pip
-#      run: |
-#        pip install setuptools wheel
-#        pip install -r requirements/edx/development.txt
-#
-#    - name: Install Python Dependencies
-#      run: pip install -r requirements/edx/development.txt
-#    - uses: browser-actions/setup-geckodriver@latest
-
 
