@@ -27,7 +27,7 @@ class MultilingualCourseGroupManager(Manager):
 
     def program_prereq_and_all_non_prereq_course_groups(self):
         """
-        All course groups which are program prerequisites or which are not prerequisite of any kind.
+        All course groups which are not business line or common business line prerequisites course groups.
         """
         return self.get_queryset().filter(
             is_common_business_line_prerequisite=False, business_line_prerequisite__isnull=True
@@ -41,7 +41,8 @@ class MultilingualCourseGroupManager(Manager):
 
     def business_line_and_common_business_line_prereq_course_groups_for_user(self, user):
         """
-        Prerequisite course groups for a business line selected by user and common prerequisites for all business lines.
+        Returns prerequisite course groups for the selected business line and common prerequisite course groups
+        for all business lines.
 
         Args:
             user (User): User for which prerequisite course groups will be returned
@@ -55,7 +56,8 @@ class MultilingualCourseGroupManager(Manager):
 
     def get_business_line_and_common_business_line_prereq_courses(self, user):
         """
-        Returns prerequisite courses for a business line selected by user and common courses for all business lines.
+        Returns prerequisite courses for the selected business line and common prerequisite courses
+        for all business lines for a user.
 
         Args:
             user (User): User for which business line prerequisites will be returned
@@ -84,8 +86,7 @@ class MultilingualCourseGroupManager(Manager):
 
     def get_program_prereq_courses_and_all_non_prereq_courses(self, user):
         """
-        Returns program prerequisite courses and non prerequisite courses for the user. This excludes for the business
-        lines related prerequisite courses.
+        Returns program prerequisite courses and non prerequisite courses for a user.
 
         Args:
             user (User): User for which courses will be returned
