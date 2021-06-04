@@ -32,6 +32,7 @@ jobs:
         DB_USER: root
         DB_PASSWORD: root
       run: |
+        sudo apt-get install memcached
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
