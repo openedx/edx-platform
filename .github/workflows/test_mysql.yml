@@ -26,20 +26,23 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Setup MySQL
+    - name: Initiate Services
       env:
         DB_DATABASE: edxtest
         DB_USER: root
         DB_PASSWORD: root
       run: |
+        sudo systemctl start mongod
+        sudo service memcached start
         sudo /etc/init.d/mysql start
-        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+
     - name: Reset mysql password
       run: |
         cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
+
     - name: Run Tests
       env:
         TEST_SUITE: a11y
