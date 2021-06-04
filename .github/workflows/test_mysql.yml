@@ -41,6 +41,7 @@ jobs:
         pip install django==2.2.20
         pip install path==13.1.0
         pip install sortedcontainers==2.4.0
+        pip install xblock==1.4.2
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
