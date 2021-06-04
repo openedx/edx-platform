@@ -36,6 +36,7 @@ jobs:
         pip install -e common/lib/safe_lxml
         pip install pycontracts==1.8.12
         pip install kombu==4.6.11
+        pip install celery==4.4.7
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
