@@ -35,6 +35,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 log = logging.getLogger(__name__)
 
 BETA_TESTER_METHOD = 'lms.djangoapps.certificates.generation_handler._is_beta_tester'
+COURSE_OVERVIEW_METHOD = 'lms.djangoapps.certificates.generation_handler.get_course_overview_or_none'
 CCX_COURSE_METHOD = 'lms.djangoapps.certificates.generation_handler._is_ccx_course'
 ID_VERIFIED_METHOD = 'lms.djangoapps.verify_student.services.IDVerificationService.user_is_verified'
 PASSING_GRADE_METHOD = 'lms.djangoapps.certificates.generation_handler._has_passing_grade'
@@ -237,6 +238,14 @@ class AllowlistTests(ModuleStoreTestCase):
         Test handling when web certs are not enabled
         """
         with mock.patch(WEB_CERTS_METHOD, return_value=False):
+            assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
+            assert _set_allowlist_cert_status(self.user, self.course_run_key) is None
+
+    def test_can_generate_no_overview(self):
+        """
+        Test handling when the course overview is missing
+        """
+        with mock.patch(COURSE_OVERVIEW_METHOD, return_value=None):
             assert not _can_generate_allowlist_certificate(self.user, self.course_run_key)
             assert _set_allowlist_cert_status(self.user, self.course_run_key) is None
 
@@ -458,6 +467,14 @@ class CertificateTests(ModuleStoreTestCase):
         Test handling when web certs are not enabled
         """
         with mock.patch(WEB_CERTS_METHOD, return_value=False):
+            assert not _can_generate_v2_certificate(self.user, self.course_run_key)
+            assert _set_v2_cert_status(self.user, self.course_run_key) is None
+
+    def test_can_generate_no_overview(self):
+        """
+        Test handling when the course overview is missing
+        """
+        with mock.patch(COURSE_OVERVIEW_METHOD, return_value=None):
             assert not _can_generate_v2_certificate(self.user, self.course_run_key)
             assert _set_v2_cert_status(self.user, self.course_run_key) is None
 
