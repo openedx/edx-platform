@@ -37,6 +37,7 @@ jobs:
           pip install setuptools wheel
           pip install -r requirements/edx/development.txt
 
+
     - name: Initiate Services
       env:
         DB_DATABASE: edxtest
