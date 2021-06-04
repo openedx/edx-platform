@@ -956,10 +956,6 @@
         margin: 0;
       }
 
-      &.course-status-processing {
-        color: #0d7d4d;
-      }
-
       .credit-action {
         .credit-btn {
           @extend %btn-pl-yellow-base;
@@ -1069,6 +1065,11 @@
         .btn {
           margin-top: 2px;
         }
+      }
+
+      &.course-status-earned-not-available,
+      &.course-status-certavailable {
+        color: #0d7d4d;
       }
 
       &.course-status-certavailable {

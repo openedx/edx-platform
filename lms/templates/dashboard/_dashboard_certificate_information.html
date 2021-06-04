@@ -4,7 +4,7 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.util.course import should_display_grade
+from lms.djangoapps.certificates.data import CertificateStatuses
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -20,7 +20,7 @@ from common.djangoapps.util.course import should_display_grade
 
 <%
 if cert_status['status'] == 'certificate_earned_but_not_available':
-    status_css_class = 'course-status-processing'
+    status_css_class = 'course-status-earned-not-available'
 elif cert_status['status'] == 'generating':
     status_css_class = 'course-status-certrendering'
 elif cert_status['status'] == 'downloadable':
@@ -44,18 +44,11 @@ else:
       </p>
     </div>
   % else:
-    <div class="message message-status ${status_css_class} is-shown">
-      <p class="message-copy">
-        % if should_display_grade(course_overview):
-            ${_("Your final grade:")}
-            <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-        % elif course_overview.certificate_available_date and not course_overview.self_paced:
-          <%
-            cert_available_date = course_overview.certificate_available_date.strftime('%Y-%m-%d')
-          %>
-          ${_("Grades will be finalized on {cert_available_date}".format(cert_available_date=cert_available_date))}
-        % endif
-        % if cert_status['status'] == 'notpassing':
+    <div class="message message-status ${status_css_class} d-flex justify-content-between align-items-center">
+      <div class="message-copy">
+        % if cert_status['status'] == CertificateStatuses.downloadable:
+            ${_("Congratulations! Your certificate is ready.")}
+        % elif cert_status['status'] == 'notpassing':
           % if enrollment.mode != 'audit':
             ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)}
           % else:
@@ -76,8 +69,7 @@ else:
             <a href="${reverify_link}"> ${Text(_("Verify your identity now."))}</a>
           </p>
         % endif
-
-      </p>
+      </div>
 
       % if cert_status['status'] == 'generating' or cert_status['status'] == 'downloadable' or cert_status['show_survey_button']:
         <div class="wrapper-message-primary">
@@ -92,7 +84,7 @@ else:
               <li>
                 <a class="btn btn-primary" href="${cert_status['cert_web_view_url']}" rel="noopener" target="_blank"
                    title="${_('This link will open the certificate web view')}">
-                  ${_("View {cert_name_short}").format(cert_name_short=cert_name_short,)}
+                  ${_("View my {cert_name_short}").format(cert_name_short=cert_name_short,)}
                 </a>
               </li>
             % elif cert_status['status'] == 'downloadable' and enrollment.mode in CourseMode.NON_VERIFIED_MODES:
