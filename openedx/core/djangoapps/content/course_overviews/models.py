@@ -5,6 +5,7 @@ Declaration of CourseOverview model
 
 import json
 import logging
+from datetime import datetime
 from urllib.parse import urlparse, urlunparse
 
 from ccx_keys.locator import CCXLocator
@@ -579,13 +580,18 @@ class CourseOverview(TimeStampedModel):
         Returns whether it is acceptable to show the student a certificate
         download link.
         """
-        return course_metadata_utils.may_certify_for_course(
-            self.certificates_display_behavior,
-            self.certificates_show_before_end,
-            self.has_ended(),
-            self.certificate_available_date,
-            self.self_paced
+
+        show_early = (
+            self.certificates_display_behavior in ('early_with_info', 'early_no_info')
+            or self.certificates_show_before_end
         )
+        past_available_date = (
+            self.certificate_available_date
+            and self.certificate_available_date < datetime.now(utc)
+        )
+        ended_without_available_date = (self.certificate_available_date is None) and self.has_ended()
+
+        return any((self.self_paced, show_early, past_available_date, ended_without_available_date))
 
     @property
     def pre_requisite_courses(self):
