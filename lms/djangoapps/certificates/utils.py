@@ -10,7 +10,7 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
                                  a learner.
     - `edx.certificate.shared` - Emit when a learner shares their course certificate to social media (LinkedIn,
                                  Facebook, or Twitter).
-    - `edx.certificate.evidence_visisted` - Emit when a user (other than the learner who owns a certificate) views a
+    - `edx.certificate.evidence_visited` - Emit when a user (other than the learner who owns a certificate) views a
                                             course certificate (e.g., someone views a course certificate shared on a
                                             LinkedIn profile).
 
@@ -42,7 +42,11 @@ def emit_certificate_event(event_name, user, course_id, course_overview=None, ev
     event_name = '.'.join(['edx', 'certificate', event_name])
 
     if not course_overview:
-        course_overview = get_course_overview(course_id)
+        course_overview = get_course_overview_or_none(course_id)
+    if not course_overview:
+        log.warning(f'Skipping emitting event for {event_name} and {user.id} due to missing course overview for '
+                    f'{course_id}')
+        return
 
     context = {
         'org_id': course_overview.org,
@@ -123,7 +127,7 @@ def _course_from_key(course_key):
     """
     Returns the course overview
     """
-    return get_course_overview(_safe_course_key(course_key))
+    return get_course_overview_or_none(_safe_course_key(course_key))
 
 
 def _safe_course_key(course_key):

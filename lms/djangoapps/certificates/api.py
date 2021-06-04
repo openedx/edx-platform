@@ -48,6 +48,7 @@ from lms.djangoapps.certificates.utils import (
     has_html_certificates_enabled as _has_html_certificates_enabled
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 log = logging.getLogger("edx.certificate")
 User = get_user_model()
@@ -71,28 +72,30 @@ def _format_certificate_for_user(username, cert):
         username (unicode): The identifier of the user.
         cert (GeneratedCertificate): a user certificate
 
-    Returns: dict
+    Returns: dict or None if the course overview for the certificate's course id does not exist.
+
     """
-    try:
-        return {
-            "username": username,
-            "course_key": cert.course_id,
-            "type": cert.mode,
-            "status": cert.status,
-            "grade": cert.grade,
-            "created": cert.created_date,
-            "modified": cert.modified_date,
-            "is_passing": is_passing_status(cert.status),
-            "is_pdf_certificate": bool(cert.download_url),
-            "download_url": (
-                cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
-                                                         user_certificate=cert)
-                if cert.status == CertificateStatuses.downloadable
-                else None
-            ),
-        }
-    except CourseOverview.DoesNotExist:
+    course_overview = get_course_overview_or_none(cert.course_id)
+    if not course_overview:
         return None
+
+    return {
+        "username": username,
+        "course_key": cert.course_id,
+        "type": cert.mode,
+        "status": cert.status,
+        "grade": cert.grade,
+        "created": cert.created_date,
+        "modified": cert.modified_date,
+        "is_passing": is_passing_status(cert.status),
+        "is_pdf_certificate": bool(cert.download_url),
+        "download_url": (
+            cert.download_url or get_certificate_url(cert.user.id, cert.course_id, uuid=cert.verify_uuid,
+                                                     user_certificate=cert)
+            if cert.status == CertificateStatuses.downloadable
+            else None
+        ),
+    }
 
 
 def get_certificates_for_user(username):
@@ -139,7 +142,13 @@ def get_certificate_for_user(username, course_key, format_results=True):
     Returns:
         A dict containing information about the certificate or, optionally,
         the GeneratedCertificate object itself.
+
+        Returns None if the certificate itself does not exist, or if the course overview does not exist.
     """
+    course_overview = get_course_overview_or_none(course_key)
+    if not course_overview:
+        return None
+
     try:
         cert = GeneratedCertificate.eligible_certificates.get(
             user__username=username,

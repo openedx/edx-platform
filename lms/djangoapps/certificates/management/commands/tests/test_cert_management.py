@@ -133,7 +133,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         )
 
         with patch(
-            'lms.djangoapps.certificates.management.commands.resubmit_error_certificates.get_course_overview'
+            'lms.djangoapps.certificates.management.commands.resubmit_error_certificates.get_course_overview_or_none'
         ) as mock_get_course_overview:
             mock_get_course_overview.return_value = course_overview
 

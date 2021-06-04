@@ -3,7 +3,11 @@ course_overview api tests
 """
 from django.test import TestCase
 
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview, get_course_overviews
+from openedx.core.djangoapps.content.course_overviews.api import (
+    get_course_overview,
+    get_course_overview_or_none,
+    get_course_overviews
+)
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 from ..models import CourseOverview
@@ -25,6 +29,14 @@ class TestCourseOverviewsApi(TestCase):
         """
         course_overview = CourseOverviewFactory.create()
         retrieved_course_overview = get_course_overview(course_overview.id)
+        assert course_overview.id == retrieved_course_overview.id
+
+    def test_get_course_overview_or_none(self):
+        """
+        Test for `test_get_course_overview_or_none` function when the overview exists.
+        """
+        course_overview = CourseOverviewFactory.create()
+        retrieved_course_overview = get_course_overview_or_none(course_overview.id)
         assert course_overview.id == retrieved_course_overview.id
 
     def test_get_course_overviews(self):

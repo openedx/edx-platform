@@ -27,7 +27,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview
+from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
 LOGGER = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ class Command(BaseCommand):
         """Retrieve the course-overview for the given course-key and store it."""
         course_overview = (
             course_cache[course_key] if course_key in course_cache
-            else get_course_overview(course_key)
+            else get_course_overview_or_none(course_key)
         )
         course_cache[course_key] = course_overview
         return course_overview
