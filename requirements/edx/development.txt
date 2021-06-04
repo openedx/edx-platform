@@ -516,7 +516,7 @@ edx-drf-extensions==6.5.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==3.23.10
+edx-enterprise==3.23.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
