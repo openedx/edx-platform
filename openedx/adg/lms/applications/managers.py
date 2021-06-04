@@ -25,7 +25,8 @@ class MultilingualCourseGroupManager(Manager):
 
     def prereq_course_groups(self, business_line=None):
         """
-        Get non-empty prerequisite course groups
+        Get non-empty prerequisite course groups in case of no business line otherwise get common business line
+        prerequisite courses and specific courses to the business line passed as argument.
         """
         if business_line:
             return self.get_queryset().filter(
