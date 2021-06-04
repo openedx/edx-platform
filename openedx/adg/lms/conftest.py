@@ -37,7 +37,7 @@ def user_client_login(request, client):
 @pytest.fixture(name='courses')
 def course_overviews(current_time):
     """
-    Fixture which return multiple courses
+    Fixture which returns multiple courses
     """
     course_start_end_date = {
         'start_date': current_time - timedelta(days=1),

@@ -33,7 +33,7 @@ def get_business_line_prereq_courses(user):
     """
     if not (
         user.is_authenticated and
-        user.application_hub.is_prerequisite_courses_passed and
+        user.application_hub.is_written_application_completed and
         user.application.business_line
     ):
         return
