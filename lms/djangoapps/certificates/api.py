@@ -30,11 +30,11 @@ from lms.djangoapps.certificates.generation_handler import (
     is_using_v2_course_certificates as _is_using_v2_course_certificates,
     regenerate_user_certificates as _regenerate_user_certificates
 )
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
     CertificateInvalidation,
-    CertificateStatuses,
     CertificateTemplate,
     CertificateTemplateAsset,
     CertificateWhitelist,
@@ -263,7 +263,7 @@ def certificate_downloadable_status(student, course_key):
     course_overview = CourseOverview.get_from_id(course_key)
     if (
         not certificates_viewable_for_course(course_overview) and
-        (current_status['status'] in CertificateStatuses.PASSED_STATUSES) and
+        CertificateStatuses.is_passing_status(current_status['status']) and
         course_overview.certificate_available_date
     ):
         response_data['earned_but_not_available'] = True

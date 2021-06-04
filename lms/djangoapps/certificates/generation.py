@@ -13,7 +13,8 @@ import logging
 from uuid import uuid4
 
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from lms.djangoapps.certificates.utils import emit_certificate_event, has_html_certificates_enabled
 from lms.djangoapps.grades.api import CourseGradeFactory

@@ -28,6 +28,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 from lms.djangoapps.badges.events.course_complete import course_badge_check
 from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
@@ -35,69 +36,6 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 log = logging.getLogger(__name__)
 User = get_user_model()
-
-
-class CertificateStatuses:
-    """
-    Enum for certificate statuses.
-
-    Not all of these statuses are currently used. Some are kept for historical reasons and because existing course
-    certificates may have been granted that status.
-
-    audit_notpassing    - User is in the audit track and has not achieved a passing grade.
-    audit_passing       - User is in the audit track and has achieved a passing grade.
-    deleted             - The PDF certificate has been deleted.
-    deleting            - A request has been made to delete the PDF certificate.
-    downloadable        - The user has been granted this certificate and the certificate is ready and available.
-    error               - An error occurred during PDF certificate generation.
-    generating          - A request has been made to generate a PDF certificate, but it has not been generated yet.
-    honor_passing       - User is in the honor track and has achieved a passing grade.
-    invalidated         - Certificate is not valid.
-    notpassing          - The user has not achieved a passing grade.
-    requesting          - A request has been made to generate the PDF certificate.
-    restricted          - The user is restricted from receiving a certificate.
-    unavailable         - Certificate has been invalidated.
-    unverified          - The user does not have an approved, unexpired identity verification.
-
-    The following statuses are set by V2 of course certificates:
-      downloadable - See generation.py
-      notpassing - See GeneratedCertificate.mark_notpassing()
-      unavailable - See GeneratedCertificate.invalidate()
-      unverified - See GeneratedCertificate.mark_unverified()
-    """
-    deleted = 'deleted'
-    deleting = 'deleting'
-    downloadable = 'downloadable'
-    error = 'error'
-    generating = 'generating'
-    notpassing = 'notpassing'
-    restricted = 'restricted'
-    unavailable = 'unavailable'
-    auditing = 'auditing'
-    audit_passing = 'audit_passing'
-    audit_notpassing = 'audit_notpassing'
-    honor_passing = 'honor_passing'
-    unverified = 'unverified'
-    invalidated = 'invalidated'
-    requesting = 'requesting'
-
-    readable_statuses = {
-        downloadable: "already received",
-        notpassing: "didn't receive",
-        error: "error states",
-        audit_passing: "audit passing states",
-        audit_notpassing: "audit not passing states",
-    }
-
-    PASSED_STATUSES = (downloadable, generating)
-
-    @classmethod
-    def is_passing_status(cls, status):
-        """
-        Given the status of a certificate, return a boolean indicating whether
-        the student passed the course.
-        """
-        return status in cls.PASSED_STATUSES
 
 
 class CertificateSocialNetworks:

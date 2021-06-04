@@ -18,7 +18,7 @@ from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, UserProfile
-from lms.djangoapps.certificates.models import CertificateStatuses as status
+from lms.djangoapps.certificates.data import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
     ExampleCertificate,
