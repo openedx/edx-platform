@@ -169,6 +169,7 @@ urlpatterns = [
     url(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
         settings.COURSE_KEY_PATTERN
     ), contentstore_views.transcript_delete_handler, name='transcript_delete_handler'),
+    url(r'^transcript_upload_api/$', contentstore_views.transcript_upload_api, name='transcript_upload_api'),
     url(fr'^video_encodings_download/{settings.COURSE_KEY_PATTERN}$',
         contentstore_views.video_encodings_download, name='video_encodings_download'),
     url(fr'^group_configurations/{settings.COURSE_KEY_PATTERN}$',

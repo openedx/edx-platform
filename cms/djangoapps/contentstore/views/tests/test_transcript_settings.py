@@ -6,6 +6,7 @@ from io import StringIO
 from unittest.mock import ANY, Mock, patch
 
 import ddt
+from django.test.client import Client
 from django.test.testcases import TestCase
 from django.urls import reverse
 from edxval import api
@@ -14,6 +15,7 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.student.roles import CourseStaffRole
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 from ..transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 
@@ -550,3 +552,193 @@ class TranscriptDeleteTest(CourseTestCase):
         ))
         self.assertEqual(response.status_code, 200)
         self.assertFalse(api.get_video_transcript_data(video_id=video_id, language_code=language_code))
+
+
+@ddt.ddt
+class TranscriptUploadApiTest(CourseTestCase):
+    """
+    Tests for transcript upload handler.
+    """
+    def setUp(self):
+        super().setUp()
+        jwt_headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + create_jwt_for_user(self.user)
+        }
+        self.client = Client(**jwt_headers)
+
+    @property
+    def view_url(self):
+        """
+        Returns url for this view
+        """
+        return reverse('transcript_upload_api')
+
+    def test_401_without_authentication(self):
+        """
+        Verify that redirection happens in case of an unauthenticated request.
+        """
+        response = self.client.post(self.view_url, content_type='application/json', HTTP_AUTHORIZATION='')
+        self.assertEqual(response.status_code, 401)
+
+    def test_405_with_not_allowed_request_method(self):
+        """
+        Verify that 405 is returned in case of not-allowed request methods.
+        Allowed request methods include POST.
+        """
+        response = self.client.get(self.view_url, content_type='application/json')
+        self.assertEqual(response.status_code, 405)
+
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript')
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
+    def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
+        """
+        Tests that transcript upload handler works as expected.
+        """
+        transcript_file_stream = StringIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
+        # Make request to transcript upload handler
+        response = self.client.post(
+            self.view_url,
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+                'new_language_code': 'es',
+                'file': transcript_file_stream,
+            },
+            format='multipart'
+        )
+
+        self.assertEqual(response.status_code, 201)
+        mock_create_or_update_video_transcript.assert_called_with(
+            video_id='123',
+            language_code='en',
+            metadata={
+                'language_code': 'es',
+                'file_format': 'sjson',
+                'provider': 'Custom'
+            },
+            file_data=ANY,
+        )
+
+    @ddt.data(
+        (
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+                'new_language_code': 'en',
+            },
+            'A transcript file is required.'
+        ),
+        (
+            {
+                'language_code': 'en',
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
+            'The following parameters are required: edx_video_id, new_language_code.'
+        ),
+        (
+            {
+                'language_code': 'en',
+                'new_language_code': 'en',
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
+            'The following parameters are required: edx_video_id.'
+        ),
+        (
+            {
+                'file': '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
+            },
+            'The following parameters are required: edx_video_id, language_code, new_language_code.'
+        )
+    )
+    @ddt.unpack
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
+    def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
+        """
+        Tests the transcript upload handler when the required attributes are missing.
+        """
+        # Make request to transcript upload handler
+        response = self.client.post(self.view_url, request_payload, format='multipart')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
+
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en', 'es'])
+    )
+    def test_transcript_upload_handler_existing_transcript(self):
+        """
+        Tests that upload handler do not update transcript's language if a transcript
+        with the same language already present for an edx_video_id.
+        """
+        # Make request to transcript upload handler
+        request_payload = {
+            'edx_video_id': '1234',
+            'language_code': 'en',
+            'new_language_code': 'es'
+        }
+        response = self.client.post(self.view_url, request_payload, format='multipart')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8'))['error'],
+            'A transcript with the "es" language code already exists.'
+        )
+
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
+    def test_transcript_upload_handler_with_image(self):
+        """
+        Tests the transcript upload handler with an image file.
+        """
+        with make_image_file() as image_file:
+            # Make request to transcript upload handler
+            response = self.client.post(
+                self.view_url,
+                {
+                    'edx_video_id': '123',
+                    'language_code': 'en',
+                    'new_language_code': 'es',
+                    'file': image_file,
+                },
+                format='multipart'
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(
+                json.loads(response.content.decode('utf-8'))['error'],
+                'There is a problem with this transcript file. Try to upload a different file.'
+            )
+
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
+    def test_transcript_upload_handler_with_invalid_transcript(self):
+        """
+        Tests the transcript upload handler with an invalid transcript file.
+        """
+        transcript_file_stream = StringIO('An invalid transcript SubRip file content')
+        # Make request to transcript upload handler
+        response = self.client.post(
+            self.view_url,
+            {
+                'edx_video_id': '123',
+                'language_code': 'en',
+                'new_language_code': 'es',
+                'file': transcript_file_stream,
+            },
+            format='multipart'
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            json.loads(response.content.decode('utf-8'))['error'],
+            'There is a problem with this transcript file. Try to upload a different file.'
+        )
