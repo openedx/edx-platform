@@ -40,6 +40,7 @@ jobs:
         pip install celery==4.4.7
         pip install django==2.2.20
         pip install path==13.1.0
+        pip install sortedcontainers==2.4.0
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
