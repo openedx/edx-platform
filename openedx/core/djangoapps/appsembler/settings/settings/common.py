@@ -13,6 +13,7 @@ def plugin_settings(settings):
     settings.APPSEMBLER_FEATURES = {}
 
     settings.INSTALLED_APPS += [
+        'compat',
         'hijack',
         'hijack_admin',
 
