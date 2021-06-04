@@ -38,6 +38,7 @@ jobs:
         pip install kombu==4.6.11
         pip install celery==4.4.7
         pip install django==2.2.20
+        pip install path==13.1.0
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
