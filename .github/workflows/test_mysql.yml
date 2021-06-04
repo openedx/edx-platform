@@ -49,7 +49,7 @@ jobs:
     - name: Reset mysql password
       run: |
         cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
-          SET PASSWORD FOR 'root'@'localhost' = PASSWORD("root");
+          UPDATE mysql.user SET authentication_string = PASSWORD('root') WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
 
