@@ -12,19 +12,31 @@ jobs:
         python-version: [ '3.8' ]
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '12'
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
 
-    - name: setup python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Setup Gecko Driver
+        uses: browser-actions/setup-geckodriver@latest
+
+      - name: Install npm Dependencies
+        run: npm install -g rtlcss
+
+      - name: Install Required Packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxmlsec1-dev memcached
+          pip install setuptools wheel
+          pip install -r requirements/edx/development.txt
+
 
     - name: Initiate Services
       env:
@@ -32,18 +44,6 @@ jobs:
         DB_USER: root
         DB_PASSWORD: root
       run: |
-        sudo apt-get install memcached
-        pip install -e common/lib/safe_lxml
-        pip install -e common/lib/xmodule
-        pip install pycontracts==1.8.12
-        pip install kombu==4.6.11
-        pip install celery==4.4.7
-        pip install django==2.2.20
-        pip install path==13.1.0
-        pip install sortedcontainers==2.4.0
-        pip install xblock==1.4.2
-        pip install django-cors-headers
-        pip install edx_django_utils
         sudo systemctl start mongod
         sudo service memcached start
         sudo /etc/init.d/mysql start
