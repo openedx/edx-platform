@@ -6,6 +6,7 @@ from django.utils.translation import ngettext
 from rest_framework import serializers
 
 from lms.djangoapps.course_home_api.dates.v1.serializers import DateSummarySerializer
+from lms.djangoapps.course_home_api.progress.v1.serializers import CertificateDataSerializer
 from lms.djangoapps.course_home_api.mixins import DatesBannerSerializerMixin, VerifiedModeSerializerMixin
 
 
@@ -113,6 +114,7 @@ class OutlineTabSerializer(DatesBannerSerializerMixin, VerifiedModeSerializerMix
     Serializer for the Outline Tab
     """
     access_expiration = serializers.DictField()
+    cert_data = CertificateDataSerializer()
     course_blocks = CourseBlockSerializer()
     course_goals = CourseGoalsSerializer()
     course_tools = CourseToolSerializer(many=True)

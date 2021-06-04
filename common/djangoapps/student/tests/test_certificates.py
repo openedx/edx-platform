@@ -275,5 +275,5 @@ class CertificateDisplayTestLinkedHtmlView(CertificateDisplayTestBase):
 
         response = self.client.get(reverse('dashboard'))
 
-        self.assertContains(response, 'View Test_Certificate')
+        self.assertContains(response, 'View my Test_Certificate')
         self.assertContains(response, test_url)

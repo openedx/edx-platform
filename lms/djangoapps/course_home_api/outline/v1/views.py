@@ -37,6 +37,7 @@ from lms.djangoapps.courseware.context_processor import user_timezone_locale_pre
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
+from lms.djangoapps.courseware.views.views import get_cert_data
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -196,6 +197,7 @@ class OutlineTabView(RetrieveAPIView):
 
         # Set all of the defaults
         access_expiration = None
+        cert_data = None
         course_blocks = None
         course_goals = {
             'goal_options': [],
@@ -232,6 +234,7 @@ class OutlineTabView(RetrieveAPIView):
 
             offer_data = generate_offer_data(request.user, course_overview)
             access_expiration = get_access_expiration_data(request.user, course_overview)
+            cert_data = get_cert_data(request.user, course, enrollment.mode) if is_enrolled else None
 
             # Only show the set course goal message for enrolled, unverified
             # users in a course that allows for verified statuses.
@@ -277,6 +280,7 @@ class OutlineTabView(RetrieveAPIView):
 
         data = {
             'access_expiration': access_expiration,
+            'cert_data': cert_data,
             'course_blocks': course_blocks,
             'course_goals': course_goals,
             'course_tools': course_tools,

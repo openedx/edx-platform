@@ -33,6 +33,7 @@ from common.djangoapps.util.milestones_helpers import (
 )
 from common.djangoapps.util.testing import UrlResetMixin  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -44,6 +45,10 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 PASSWORD = 'test'
+TOMORROW = now() + timedelta(days=1)
+ONE_WEEK_AGO = now() - timedelta(weeks=1)
+THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
+THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
 
 @ddt.ddt
@@ -167,9 +172,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
     EMAIL_SETTINGS_ELEMENT_ID = "#actions-item-email-settings-0"
     ENABLED_SIGNALS = ['course_published']
-    TOMORROW = now() + timedelta(days=1)
-    THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
-    THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
     MOCK_SETTINGS = {
         'FEATURES': {
             'DISABLE_START_DATES': False,
@@ -219,38 +221,50 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(self.path)
         self.assertRedirects(response, reverse('account_settings'))
 
-    def test_grade_appears_before_course_end_date(self):
-        """
-        Verify that learners are not able to see their final grade before the end
-        of course in the learner dashboard
-        """
-        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.TOMORROW,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-                                                   certificate_available_date=self.THREE_YEARS_AGO,
-                                                   lowest_passing_grade=0.3)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
-
+    def test_course_cert_available_message_after_course_end(self):
+        course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        course = CourseOverviewFactory.create(
+            id=course_key,
+            end_date=THREE_YEARS_AGO,
+            certificate_available_date=TOMORROW,
+            lowest_passing_grade=0.3
+        )
+        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        GeneratedCertificateFactory(
+            status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
+        )
         response = self.client.get(reverse('dashboard'))
-        # The final grade does not appear before the course has ended
-        self.assertContains(response, 'Your final grade:')
-        self.assertContains(response, '<span class="grade-value">45%</span>')
+        self.assertContains(response, 'Your grade and certificate will be ready after')
 
-    def test_grade_not_appears_before_cert_available_date(self):
-        """
-        Verify that learners are able to see their final grade of the course in
-        the learner dashboard after the course had ended
-        """
-        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.course = CourseOverviewFactory.create(id=self.course_key, end_date=self.THREE_YEARS_AGO,  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-                                                   certificate_available_date=self.TOMORROW,
-                                                   lowest_passing_grade=0.3)
-        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        GeneratedCertificateFactory(status='notpassing', course_id=self.course.id, user=self.user, grade=0.45)
-
+    def test_course_cert_available_message_same_day_as_course_end(self):
+        course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        course = CourseOverviewFactory.create(
+            id=course_key,
+            end_date=TOMORROW,
+            certificate_available_date=TOMORROW,
+            lowest_passing_grade=0.3
+        )
+        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        GeneratedCertificateFactory(
+            status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
+        )
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, 'Your final grade:')
-        self.assertNotContains(response, '<span class="grade-value">45%</span>')
+        self.assertContains(response, 'Your grade and certificate will be ready after')
+
+    def test_cert_available_message_after_course_end(self):
+        course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        course = CourseOverviewFactory.create(
+            id=course_key,
+            end_date=ONE_WEEK_AGO,
+            certificate_available_date=now(),
+            lowest_passing_grade=0.3
+        )
+        CourseEnrollmentFactory(course_id=course.id, user=self.user)
+        GeneratedCertificateFactory(
+            status=CertificateStatuses.downloadable, course_id=course.id, user=self.user, grade=0.45
+        )
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'Congratulations! Your certificate is ready.')
 
     @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
     @ddt.data(
@@ -266,7 +280,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Verify that the course sharing icons show up if course is starting in future and
         any of marketing or social sharing urls are set.
         """
-        self.course = CourseFactory.create(start=self.TOMORROW, emit_signals=True, default_store=modulestore_type)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(start=TOMORROW, emit_signals=True, default_store=modulestore_type)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.set_course_sharing_urls(set_marketing, set_social_sharing)
 
@@ -316,11 +330,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         CourseEntitlementFactory.create(user=self.user, course_uuid=program['courses'][0]['uuid'])
         mock_get_programs.return_value = [program]
         course_key = CourseKey.from_string('course-v1:FAKE+FA1-MA1.X+3T2017')
-        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
+        mock_course_overview.return_value = CourseOverviewFactory.create(start=TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
                 'key': str(course_key),
-                'enrollment_end': str(self.TOMORROW),
+                'enrollment_end': str(TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
                 'status': 'published'
@@ -347,7 +361,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mock_course_runs.return_value = [
             {
                 'key': 'course-v1:edX+toy+2012_Fall',
-                'enrollment_end': str(self.TOMORROW),
+                'enrollment_end': str(TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
                 'status': 'published'
@@ -370,14 +384,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         CourseEntitlementFactory(
             user=self.user,
-            created=self.THREE_YEARS_AGO,
+            created=THREE_YEARS_AGO,
             expired_at=now()
         )
-        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_overview.return_value = CourseOverviewFactory(start=TOMORROW)
         mock_course_runs.return_value = [
             {
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
-                'enrollment_end': str(self.TOMORROW),
+                'enrollment_end': str(TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
                 'status': 'published'
@@ -401,7 +415,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         # Test an enrollment end in the past
         mocked_course_overview = CourseOverviewFactory.create(
-            start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
+            start=TOMORROW, end=THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id))
@@ -419,7 +433,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         # self.assertIn(noAvailableSessions, response.content)
 
         # Test an enrollment end in the future sets an availableSession
-        mocked_course_overview.enrollment_end = self.TOMORROW
+        mocked_course_overview.enrollment_end = TOMORROW
         mocked_course_overview.save()
 
         mock_course_overview.return_value = mocked_course_overview
@@ -465,7 +479,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start=TOMORROW, self_paced=True, enrollment_end=TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id))
@@ -500,10 +514,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             - a related programs message
         """
         mocked_course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start=TOMORROW, self_paced=True, enrollment_end=TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id), created=self.THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
+        course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=str(mocked_course_overview.id), created=THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -513,7 +527,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'status': 'published'
             }
         ]
-        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
+        entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=THREE_YEARS_AGO)  # lint-amnesty, pylint: disable=line-too-long
         program = ProgramFactory()
         program['courses'][0]['course_runs'] = [{'key': str(mocked_course_overview.id)}]
         program['courses'][0]['uuid'] = entitlement.course_uuid
@@ -531,7 +545,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         mock_email_feature.return_value = True
         course_overview = CourseOverviewFactory(
-            start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
+            start=TOMORROW, self_paced=True, enrollment_end=TOMORROW
         )
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=course_overview.id)
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -551,7 +565,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Assert that the Email Settings action is not shown when the entitlement is not fulfilled.
         """
         mock_email_feature.return_value = True
-        mock_course_overview.return_value = CourseOverviewFactory(start=self.TOMORROW)
+        mock_course_overview.return_value = CourseOverviewFactory(start=TOMORROW)
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
         assert pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length == 0
@@ -758,17 +772,17 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=self.THREE_YEARS_AGO - timedelta(days=30))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=THREE_YEARS_AGO - timedelta(days=30))
         self.override_waffle_switch(True)
 
-        course = CourseFactory.create(start=self.THREE_YEARS_AGO)
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
         add_course_mode(course, mode_slug=CourseMode.AUDIT)
         add_course_mode(course)
         enrollment = CourseEnrollmentFactory.create(
             user=self.user,
             course_id=course.id
         )
-        enrollment.created = self.THREE_YEARS_AGO + timedelta(days=1)
+        enrollment.created = THREE_YEARS_AGO + timedelta(days=1)
         enrollment.save()
 
         response = self.client.get(reverse('dashboard'))
