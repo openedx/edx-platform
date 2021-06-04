@@ -38,7 +38,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, U
 from common.djangoapps.student.views import complete_course_mode_info
 from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
 from common.djangoapps.util.testing import EventTestMixin
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory

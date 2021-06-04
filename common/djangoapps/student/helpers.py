@@ -40,7 +40,8 @@ from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
 )
-from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import certificate_status_for_student
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -511,7 +512,7 @@ def _cert_info(user, course_overview, cert_status):
 
     if (
         not certificates_viewable_for_course(course_overview) and
-        (status in CertificateStatuses.PASSED_STATUSES) and
+        CertificateStatuses.is_passing_status(status) and
         course_overview.certificate_available_date
     ):
         status = certificate_earned_but_not_available_status

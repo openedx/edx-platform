@@ -52,7 +52,7 @@ from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_respon
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_home_api.toggles import (
     course_home_mfe_dates_tab_is_active,

@@ -4,7 +4,7 @@
 <%def name="online_help_token()"><% return "progress" %></%def>
 <%!
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.grades.api import constants as grades_constants
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
@@ -259,4 +259,4 @@ username = get_enterprise_learner_generic_name(request) or student.username
       linkCategory: "FBE_banner"
   });
 
-</%static:require_module_async> 
+</%static:require_module_async>

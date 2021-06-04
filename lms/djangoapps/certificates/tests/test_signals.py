@@ -13,9 +13,9 @@ from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import cert_generation_enabled
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
-    CertificateStatuses,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.signals import _fire_ungenerated_certificate_task

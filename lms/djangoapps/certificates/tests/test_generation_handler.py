@@ -22,7 +22,8 @@ from lms.djangoapps.certificates.generation_handler import (
     _set_allowlist_cert_status,
     _set_v2_cert_status
 )
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import (
     CertificateAllowlistFactory,
     CertificateInvalidationFactory,
