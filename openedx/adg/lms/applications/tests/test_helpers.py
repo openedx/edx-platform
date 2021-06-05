@@ -15,27 +15,27 @@ from openedx.adg.lms.applications import helpers
 from openedx.adg.lms.applications.constants import (
     APPLICATION_SUBMISSION_CONGRATS,
     APPLICATION_SUBMISSION_INSTRUCTION,
+    COMPLETED,
     COVER_LETTER_ONLY,
     FILE_MAX_SIZE,
     HTML_FOR_EMBEDDED_FILE_VIEW,
+    IN_PROGRESS,
+    LOCKED,
     LOCKED_COURSE_MESSAGE,
     LOGO_IMAGE_MAX_SIZE,
     MAXIMUM_YEAR_OPTION,
     MINIMUM_YEAR_OPTION,
     MONTH_NAME_DAY_YEAR_FORMAT,
+    NOT_STARTED,
     PREREQUISITE_COURSES_COMPLETION_CONGRATS,
     PREREQUISITE_COURSES_COMPLETION_INSTRUCTION,
     PREREQUISITE_COURSES_COMPLETION_MSG,
+    RETAKE,
     RETAKE_COURSE_MESSAGE,
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    WRITTEN_APPLICATION_COMPLETION_MSG,
-    LOCKED,
-    NOT_STARTED,
-    IN_PROGRESS,
-    RETAKE,
-    COMPLETED
+    WRITTEN_APPLICATION_COMPLETION_MSG
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
@@ -64,7 +64,7 @@ from openedx.adg.lms.applications.tests.factories import (
     UserApplicationFactory
 )
 
-from .constants import EMAIL, PASSWORD, USERNAME
+from .constants import EMAIL
 from .factories import ApplicationHubFactory
 
 DATE_COMPLETED_MONTH = 5
