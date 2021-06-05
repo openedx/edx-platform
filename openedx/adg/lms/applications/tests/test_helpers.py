@@ -30,7 +30,12 @@ from openedx.adg.lms.applications.constants import (
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    WRITTEN_APPLICATION_COMPLETION_MSG
+    WRITTEN_APPLICATION_COMPLETION_MSG,
+    LOCKED,
+    NOT_STARTED,
+    IN_PROGRESS,
+    RETAKE,
+    COMPLETED
 )
 from openedx.adg.lms.applications.helpers import (
     _get_application_review_info,
@@ -392,20 +397,27 @@ def test_has_admin_permissions(mocker, is_business_line_admin, is_superuser, is_
     ]
 )
 def test_get_application_hub_instructions(
-    written_application, omni_courses, bu_courses, omni_courses_started, bu_courses_started, congrats, msg, inst
+    written_application,
+    omni_courses,
+    bu_courses,
+    omni_courses_started,
+    bu_courses_started,
+    congrats,
+    msg,
+    inst,
+    test_user
 ):
     """
     Test the congratulation messages and instructions for each requirement completion till application submission.
     """
-    user = UserFactory(username=USERNAME, password=PASSWORD)
-    application_hub = ApplicationHubFactory(user=user)
+    application_hub = ApplicationHubFactory(user=test_user)
 
     if written_application:
         application_hub.submit_written_application_for_current_date()
     if omni_courses:
         application_hub.set_is_prerequisite_courses_passed()
     if bu_courses:
-        application_hub.is_bu_prerequisite_courses_passed = True
+        application_hub.set_is_bu_prerequisite_courses_passed()
 
     actual_messages = get_application_hub_instructions(application_hub, omni_courses_started, bu_courses_started)
 
@@ -419,47 +431,35 @@ def test_get_application_hub_instructions(
 
 
 @pytest.mark.django_db
-def test_get_course_card_information_with_out_enrollment():
-    """
-    Test the course card information when the user has not yet enrolled in a course
-    """
-    user = UserFactory(username=USERNAME, password=PASSWORD)
-    course = CourseOverviewFactory()
-
-    course_cards, is_any_course_started, is_locked = get_course_card_information(user, [course])
-
-    assert course_cards == [{
-        'course': course,
-        'status': 'Not Started',
-        'grade': '',
-        'message': ''
-    }]
-    assert not is_any_course_started
-    assert not is_locked
-
-
-@pytest.mark.django_db
 @pytest.mark.parametrize(
-    'all_modules_attempted, status, grade, message',
+    'is_enrolled, is_completed, all_modules_attempted, status, grade, message',
     [
-        (False, 'In Progress', '', ''),
-        (True, 'Re-Take Course', '0', RETAKE_COURSE_MESSAGE)
+        (False, False, False, NOT_STARTED, '', ''),
+        (True, False, False, IN_PROGRESS, '', ''),
+        (True, False, True, RETAKE, '0', RETAKE_COURSE_MESSAGE),
+        (True, True, True, COMPLETED, '100', ''),
     ],
-    ids=['enrolled_in_course', 'failed_in_course']
+    ids=['not_enrolled', 'enrolled_in_course', 'failed_in_course', 'completed_course']
 )
 def test_get_course_card_information_after_enrolling_and_failing_course(
-    all_modules_attempted, status, grade, message, mocker
+    is_enrolled, is_completed, all_modules_attempted, status, grade, message, test_user, mocker
 ):
     """
     Test the course card information when the user has enrolled in a course and when the user has failed the course
     """
-    mocker.patch('openedx.adg.lms.applications.helpers.has_attempted_all_modules', return_value=all_modules_attempted)
+    if is_completed:
+        mocker.patch.object(helpers.CourseGradeFactory, 'read', return_value=Mock(passed=True, percent=1))
+    elif is_enrolled:
+        mocker.patch(
+            'openedx.adg.lms.applications.helpers.has_attempted_all_modules', return_value=all_modules_attempted
+        )
 
-    user = UserFactory(username=USERNAME, password=PASSWORD)
     course = CourseOverviewFactory()
-    CourseEnrollmentFactory(user=user, course=course)
 
-    course_cards, is_any_course_started, is_locked = get_course_card_information(user, [course])
+    if is_enrolled:
+        CourseEnrollmentFactory(user=test_user, course=course)
+
+    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
 
     assert course_cards == [{
         'course': course,
@@ -467,30 +467,8 @@ def test_get_course_card_information_after_enrolling_and_failing_course(
         'grade': grade,
         'message': message
     }]
-    assert is_any_course_started
-    assert not is_locked
 
-
-@pytest.mark.django_db
-def test_get_course_card_information_after_completing_course(mocker):
-    """
-    Test the course card information when the user has completed a course
-    """
-    mocker.patch.object(helpers.CourseGradeFactory, 'read', return_value=Mock(passed=True, percent=1))
-
-    user = UserFactory(username=USERNAME, password=PASSWORD)
-    course = CourseOverviewFactory()
-    CourseEnrollmentFactory(user=user, course=course)
-
-    course_cards, is_any_course_started, is_locked = get_course_card_information(user, [course])
-
-    assert course_cards == [{
-        'course': course,
-        'status': 'Completed',
-        'grade': '100',
-        'message': ''
-    }]
-    assert is_any_course_started
+    assert is_any_course_started if is_enrolled else not is_any_course_started
     assert not is_locked
 
 
@@ -498,19 +476,18 @@ def test_get_course_card_information_after_completing_course(mocker):
 @pytest.mark.parametrize(
     'is_passed, status, message, is_course_locked',
     [
-        (False, 'Locked', LOCKED_COURSE_MESSAGE, True),
-        (True, 'Not Started', '', False),
+        (False, LOCKED, LOCKED_COURSE_MESSAGE, True),
+        (True, NOT_STARTED, '', False),
     ],
     ids=['un_passed_prerequisite', 'passed_prerequisite']
 )
 def test_get_course_card_information_of_a_course_with_prerequisite(
-    is_passed, status, message, is_course_locked, mocker
+    is_passed, status, message, is_course_locked, test_user, mocker
 ):
     """
-    Test the course card information when a course has a prerequisite has not been passed yet and when a course has a
-    prerequisite has been passed
+    Test the course card information when a course has a prerequisite that has not been passed yet and when a course has
+    a prerequisite that has been passed
     """
-    user = UserFactory(username=USERNAME, password=PASSWORD)
     course = CourseOverviewFactory(display_name='course')
     prerequisite_course = CourseOverviewFactory(display_name='pre_course')
 
@@ -524,7 +501,7 @@ def test_get_course_card_information_of_a_course_with_prerequisite(
     if is_course_locked:
         message = f'{message} pre_course.'
 
-    course_cards, is_any_course_started, is_locked = get_course_card_information(user, [course])
+    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
 
     assert course_cards == [{
         'course': course,

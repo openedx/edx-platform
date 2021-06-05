@@ -37,7 +37,12 @@ from .constants import (
     SCORES,
     WRITTEN_APPLICATION_COMPLETION_CONGRATS,
     WRITTEN_APPLICATION_COMPLETION_INSTRUCTION,
-    WRITTEN_APPLICATION_COMPLETION_MSG
+    WRITTEN_APPLICATION_COMPLETION_MSG,
+    LOCKED,
+    NOT_STARTED,
+    IN_PROGRESS,
+    RETAKE,
+    COMPLETED
 )
 from .rules import is_adg_admin
 
@@ -310,11 +315,13 @@ def get_course_card_information(user, courses):
     message and course itself in a list
 
     Arguments:
-        user: User object
-        courses: list containing Course objects
+        user (User): User object
+        courses (list): List containing Course objects
 
     Returns:
-        list: A list containing dictionaries with status, grade, message and course
+        course_cards_information (list): A list containing dictionaries with status, grade, message and course
+        is_any_course_started (bool): Flag indicating if any course has been started yet
+        is_locked (bool): Flag indicating if any course is locked
     """
     course_cards_information = []
     is_any_course_started = False
@@ -325,37 +332,14 @@ def get_course_card_information(user, courses):
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
         if pre_requisite_courses:
-            message = LOCKED_COURSE_MESSAGE
+            is_locked, status, message = get_information_for_course_with_prerequisites(
+                user, pre_requisite_courses, is_locked, status
+            )
 
-            for prereq in pre_requisite_courses:
-                course_grade = CourseGradeFactory().read(user, course_key=prereq['key'])
-
-                if not (course_grade and course_grade.passed):
-                    is_locked = True
-                    status = 'Locked'
-
-                    course_overview = CourseOverview.objects.get(id=prereq['key'])
-                    message = f'{message} {course_overview.display_name_with_default},'
-
-            message = f'{message[:-1]}.'
-
-        if status != 'Locked':
-            message = ''
-            if CourseEnrollment.is_enrolled(user, course.id):
-                is_any_course_started = True
-                status = 'In Progress'
-                course_grade = CourseGradeFactory().read(user, course_key=course.id)
-
-                if course_grade:
-                    if course_grade.passed:
-                        status = 'Completed'
-                        grade = str(int(round_away_from_zero(course_grade.percent * 100)))
-                    elif has_attempted_all_modules(user, course):
-                        status = 'Re-Take Course'
-                        message = RETAKE_COURSE_MESSAGE
-                        grade = str(int(round_away_from_zero(course_grade.percent * 100)))
-            else:
-                status = 'Not Started'
+        if status != LOCKED:
+            is_any_course_started, status, grade, message = get_information_for_unlocked_course(
+                user, course, is_any_course_started, grade
+            )
 
         course_cards_information.append({
             'course': course,
@@ -367,13 +351,83 @@ def get_course_card_information(user, courses):
     return course_cards_information, is_any_course_started, is_locked
 
 
+def get_information_for_course_with_prerequisites(user, pre_requisite_courses, is_locked, status):
+    """
+    Checks if all prerequisite courses have been passed, if not then changes the status to Locked, sets the is_locked
+    flag to True and returns a message advising the user to pass the prerequisite courses.
+
+    Arguments:
+        user (User): User object
+        pre_requisite_courses (list): List containing prerequisite courses
+        is_locked (bool): Flag to indicate if any course is locked
+        status (str): Contains status of a course
+
+    Returns:
+        is_locked (bool): Flag to indicate if any course is locked
+        status (str): Contains status of a course
+        message (str): Message to indicate the user to pass the prerequisite courses
+    """
+    message = LOCKED_COURSE_MESSAGE
+
+    for prereq in pre_requisite_courses:
+        course_grade = CourseGradeFactory().read(user, course_key=prereq['key'])
+
+        if not (course_grade and course_grade.passed):
+            is_locked = True
+            status = LOCKED
+
+            course_overview = CourseOverview.objects.get(id=prereq['key'])
+            message = f'{message} {course_overview.display_name_with_default},'
+
+    message = _(f'{message[:-1]}.')
+
+    return is_locked, status, message
+
+
+def get_information_for_unlocked_course(user, course, is_any_course_started, grade):
+    """
+    Creates course card information based on whether the user has enrolled in the course, completed the course or failed
+    the course.
+
+    Arguments:
+        user (User): User object
+        course (Course):  Course for which card information is to be created
+        is_any_course_started (bool): Flag to indicate if any course has been started yet
+        grade (str): Grade attained in a course
+
+    Returns:
+        is_any_course_started (bool): Flag to indicate if any course has been started yet
+        status (str): Contains status of a course
+        grade (str): Grade attained in a course
+        message (str): Message to indicate the user to pass the prerequisite courses
+    """
+    message = ''
+    if CourseEnrollment.is_enrolled(user, course.id):
+        is_any_course_started = True
+        status = IN_PROGRESS
+        course_grade = CourseGradeFactory().read(user, course_key=course.id)
+
+        if course_grade:
+            if course_grade.passed:
+                status = COMPLETED
+                grade = _(str(int(round_away_from_zero(course_grade.percent * 100))))
+            elif has_attempted_all_modules(user, course):
+                status = RETAKE
+                message = RETAKE_COURSE_MESSAGE
+                grade = _(str(int(round_away_from_zero(course_grade.percent * 100))))
+    else:
+        status = NOT_STARTED
+
+    return is_any_course_started, status, grade, message
+
+
 def has_attempted_all_modules(user, course):
     """
     Checks if all sections of a course have been attempted by the user or not
 
     Arguments:
-        user: User object
-        course: Course object
+        user (User): User object
+        course (Course): Course object
 
     Returns:
         boolean: True if user attempted all sections, False otherwise
@@ -383,40 +437,49 @@ def has_attempted_all_modules(user, course):
         qualifiers={'category': 'course'}
     )
 
-    for module in all_modules[0].children:
-        if not StudentModule.objects.filter(student=user, module_state_key=module).exists():
-            return False
+    modules = all_modules[0].children
+    return StudentModule.objects.filter(student=user, module_state_key__in=modules).count() == len(modules)
 
-    return True
+    # for module in all_modules[0].children:
+    #     if not StudentModule.objects.filter(student=user, module_state_key=module).exists():
+    #         return False
+    #
+    # return True
 
 
-def get_application_hub_instructions(user_application_hub, is_any_prerequisite_started, is_any_bl_course_started):
+def get_application_hub_instructions(
+    user_application_hub, is_any_prerequisite_started, is_any_business_line_course_started
+):
     """
     Decides congratulation messages and instructions based on the requirements completed and if courses have been
     started or not.
 
     Arguments:
-        user_application_hub: ApplicationHub object
-        is_any_prerequisite_started: boolean
-        is_any_bl_course_started: boolean
+        user_application_hub (ApplicationHub): ApplicationHub object
+        is_any_prerequisite_started (bool): Flag to indicate if any prerequisite course has been started yet
+        is_any_business_line_course_started (bool): Flag to indicate if any business line course has been started yet
 
     Returns:
-        dictionary containing congratulations messages and instructions
+        dict: Dictionary containing congratulations messages and instructions
     """
     congrats = message = instruction = ''
 
     if user_application_hub.are_application_pre_reqs_completed():
         congrats = APPLICATION_SUBMISSION_CONGRATS
         message = APPLICATION_SUBMISSION_INSTRUCTION
+
     elif user_application_hub.is_prerequisite_courses_passed:
-        if is_any_bl_course_started:
+        if is_any_business_line_course_started:
             instruction = PREREQUISITE_COURSES_COMPLETION_INSTRUCTION
+
         else:
             congrats = PREREQUISITE_COURSES_COMPLETION_CONGRATS
             message = PREREQUISITE_COURSES_COMPLETION_MSG
+
     elif user_application_hub.is_written_application_completed:
         if is_any_prerequisite_started:
             instruction = WRITTEN_APPLICATION_COMPLETION_INSTRUCTION
+
         else:
             congrats = WRITTEN_APPLICATION_COMPLETION_CONGRATS
             message = WRITTEN_APPLICATION_COMPLETION_MSG

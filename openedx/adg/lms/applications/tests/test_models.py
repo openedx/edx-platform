@@ -48,6 +48,15 @@ def test_set_is_prerequisite_courses_passed_in_application_hub(application_hub):
     assert ApplicationHubFactory(user=application_hub.user).is_prerequisite_courses_passed
 
 
+@pytest.mark.django_db
+def test_set_is_bu_prerequisite_courses_passed_in_application_hub(application_hub):
+    """
+    Test if the is_bu_prerequisite_courses_passed is being set correctly by the model method.
+    """
+    application_hub.set_is_bu_prerequisite_courses_passed()
+    assert ApplicationHubFactory(user=application_hub.user).is_bu_prerequisite_courses_passed
+
+
 def mark_objectives_complete(application_hub, objectives_completed):
     """
     Mark the given objectives complete in the model object

@@ -48,6 +48,13 @@ class ApplicationHub(TimeStampedModel):
         self.is_prerequisite_courses_passed = True
         self.save()
 
+    def set_is_bu_prerequisite_courses_passed(self):
+        """
+        Mark business line courses objective as complete i.e set is_bu_prerequisite_courses_passed to True.
+        """
+        self.is_bu_prerequisite_courses_passed = True
+        self.save()
+
     def submit_written_application_for_current_date(self):
         """
         Mark written_application objective as complete i.e set is_written_application_completed to True and add current
@@ -64,8 +71,8 @@ class ApplicationHub(TimeStampedModel):
         Returns:
             bool: True if all objectives are done, otherwise False.
         """
-        return self.is_prerequisite_courses_passed and self.is_written_application_completed and \
-            self.is_bu_prerequisite_courses_passed
+        return (self.is_prerequisite_courses_passed and self.is_written_application_completed and
+                self.is_bu_prerequisite_courses_passed)
 
     @property
     def progress_of_objectives_completed_in_float(self):

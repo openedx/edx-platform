@@ -41,7 +41,7 @@ def user_fixture():
 @pytest.fixture(name='user_with_no_hub')
 def user_with_no_hub_fixture():
     """
-    Create a test user and their corresponding ApplicationHub object
+    Create a test user without corresponding ApplicationHub object
 
     Returns:
         User object
@@ -267,7 +267,7 @@ def test_each_step_for_application_completion_application_hub_view(
         application_hub.set_is_prerequisite_courses_passed()
 
     if are_bu_courses_complete:
-        application_hub.is_bu_prerequisite_courses_passed = True
+        application_hub.set_is_bu_prerequisite_courses_passed()
 
     ApplicationHubView.as_view()(application_hub_view_get_request)
 

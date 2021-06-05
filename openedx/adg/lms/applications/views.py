@@ -103,6 +103,8 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             HttpResponse object.
         """
         user_application_hub = ApplicationHub.objects.get(user=self.request.user)
+        pre_req_courses = business_line_courses = []
+        is_any_prerequisite_started = is_locked = is_any_bu_course_started = False
 
         if user_application_hub.is_written_application_completed:
             pre_req_courses, is_any_prerequisite_started, is_locked = get_course_card_information(
@@ -116,9 +118,6 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
                     request.user, is_prereq=True, business_line=request.user.application.business_line
                 )
             )
-        else:
-            pre_req_courses = business_line_courses = []
-            is_any_prerequisite_started = is_locked = is_any_bu_course_started = False
 
         messages = get_application_hub_instructions(
             user_application_hub,
@@ -126,16 +125,18 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             is_any_bu_course_started
         )
 
+        context = {
+            'user_application_hub': user_application_hub,
+            'pre_req_courses': pre_req_courses,
+            'business_line_courses': business_line_courses,
+            'is_locked': is_locked,
+            'messages': messages
+        }
+
         return render(
             request,
             self.template_name,
-            context={
-                'user_application_hub': user_application_hub,
-                'pre_req_courses': pre_req_courses,
-                'business_line_courses': business_line_courses,
-                'is_locked': is_locked,
-                'messages': messages
-            }
+            context=context
         )
 
 

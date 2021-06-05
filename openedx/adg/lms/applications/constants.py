@@ -99,6 +99,13 @@ APPLICATION_SUBMISSION_INSTRUCTION = _(
     'training. More details regarding this will be provided later. '
 )
 
-RETAKE_COURSE_MESSAGE = 'Please take the assessments in this course again in order to obtain a passing grade and ' \
-                        'complete your application!'
-LOCKED_COURSE_MESSAGE = 'This course will unlock when you have completed and received a passing grade in'
+RETAKE_COURSE_MESSAGE = _(
+    'Please take the assessments in this course again in order to obtain a passing grade and complete your application!'
+)
+LOCKED_COURSE_MESSAGE = _('This course will unlock when you have completed and received a passing grade in')
+
+LOCKED = _('Locked')
+NOT_STARTED = _('Not Started')
+IN_PROGRESS = _('In Progress')
+RETAKE = _('Re-Take Course')
+COMPLETED = _('Completed')
