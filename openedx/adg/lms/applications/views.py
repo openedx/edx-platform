@@ -109,13 +109,13 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         if user_application_hub.is_written_application_completed:
             pre_req_courses, is_any_prerequisite_started, is_locked = get_course_card_information(
                 request.user,
-                MultilingualCourseGroup.objects.get_courses(request.user, is_prereq=True)
+                MultilingualCourseGroup.objects.get_user_program_prereq_courses(request.user)
             )
 
             business_line_courses, is_any_bu_course_started, _ = get_course_card_information(
                 request.user,
-                MultilingualCourseGroup.objects.get_courses(
-                    request.user, is_prereq=True, business_line=request.user.application.business_line
+                MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(
+                    request.user
                 )
             )
 

@@ -43,6 +43,7 @@ from openedx.adg.lms.applications.helpers import (
     check_validations_for_past_record,
     get_application_hub_instructions,
     get_course_card_information,
+    get_courses_from_course_groups,
     get_duration,
     get_embedded_view_html,
     get_extra_context_for_application_review_page,
@@ -55,7 +56,13 @@ from openedx.adg.lms.applications.helpers import (
     validate_logo_size
 )
 from openedx.adg.lms.applications.models import UserApplication
-from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.adg.lms.applications.tests.factories import (
+    ApplicationHubFactory,
+    CourseOverviewFactory,
+    MultilingualCourseFactory,
+    MultilingualCourseGroupFactory,
+    UserApplicationFactory
+)
 
 from .constants import EMAIL, PASSWORD, USERNAME
 from .factories import ApplicationHubFactory
@@ -372,6 +379,27 @@ def test_has_admin_permissions(mocker, is_business_line_admin, is_superuser, is_
     test_user = UserFactory(is_superuser=is_superuser, is_staff=is_staff)
 
     assert has_admin_permissions(test_user) == expected_result
+
+
+@pytest.mark.django_db
+def test_get_courses_from_course_groups(user_client, courses):
+    """
+    Tests `get_courses_from_course_groups` returns a valid list of courses.
+    """
+    user, _ = user_client
+
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user)
+
+    course_group = MultilingualCourseGroupFactory(is_common_business_line_prerequisite=True)
+    MultilingualCourseFactory(
+        course=courses['test_course1'],
+        multilingual_course_group=course_group
+    )
+
+    catalog_courses = get_courses_from_course_groups([course_group], user)
+
+    assert catalog_courses == [courses['test_course1']]
 
 
 @pytest.mark.django_db

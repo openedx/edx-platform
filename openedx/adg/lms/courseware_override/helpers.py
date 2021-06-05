@@ -15,7 +15,30 @@ def get_courses(user):
     """
     Return courses using core method if environment is test environment else uses customized method for courses list.
     """
-    return get_courses_core(user) if is_testing_environment() else MultilingualCourseGroup.objects.get_courses(user)
+    if is_testing_environment():
+        return get_courses_core(user)
+
+    return MultilingualCourseGroup.objects.get_user_program_prereq_courses_and_all_non_prereq_courses(user)
+
+
+def get_business_line_prereq_courses(user):
+    """
+    Get business line courses for a user.
+
+    Args:
+        user (User): User for which courses will be retrieved
+
+    Returns:
+        list: List of business line courses for the user
+    """
+    if not (
+        user.is_authenticated and
+        user.application_hub.is_written_application_completed and
+        user.application.business_line
+    ):
+        return
+
+    return MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(user)
 
 
 def get_course_instructors(course_key, request=None):

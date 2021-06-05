@@ -86,21 +86,6 @@ def admin_user(admin_type):
         return UserFactory(is_staff=True, groups=[GroupFactory(name=ADG_ADMIN_GROUP_NAME)])
 
 
-@pytest.fixture(name='courses')
-def course_overviews(current_time):
-    """
-    Fixture which return multiple courses
-    """
-    course_start_end_date = {
-        'start_date': current_time - timedelta(days=1),
-        'end_date': current_time + timedelta(days=1),
-    }
-    return {
-        'test_course1': CourseOverviewFactory(language='en', **course_start_end_date),
-        'test_course2': CourseOverviewFactory(language='ar', **course_start_end_date),
-    }
-
-
 @pytest.fixture(name='expired_course')
 def expired_course_overview(current_time):
     return CourseOverviewFactory(
