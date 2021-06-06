@@ -323,7 +323,6 @@
     "No Content Group": "N\u0117ra turinio grup\u0117s",
     "No Flash Detected": "Flash nerastas",
     "No Webcam Detected": "Vaizdo kamera nerasta",
-    "No results found for \"%(query_string)s\". Please try searching again.": "Pagal u\u017eklaus\u0105 \"%(query_string)s\" rezultat\u0173 n\u0117ra. Bandykite dar kart\u0105.",
     "No tasks currently running.": "\u0160iuo metu nevykdoma n\u0117 viena u\u017eduotis.",
     "None": "N\u0117ra",
     "Noon": "Vidurdienis",
