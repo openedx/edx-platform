@@ -1,4 +1,4 @@
-name: Ensure Unit Tests Running
+name: CI
 
 on:
   pull_request:
@@ -7,11 +7,14 @@ on:
 
 jobs:
   run_tests:
-    name: Test
+    name: Ensure Unit Tests Running
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: ['3.8']
+        include:
+          - os: ubuntu-20.04
+            path: ~/.cache/pip
 
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +28,22 @@ jobs:
         sudo apt-get update && sudo apt-get install libxmlsec1-dev
         sudo systemctl start mongod
 
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/testing.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+
     - name: Install Python Dependencies
+      if: steps.cache-dependencies.output.cache-hit != 'true'
       run: |
         pip install setuptools wheel
         pip install -r requirements/edx/testing.txt
