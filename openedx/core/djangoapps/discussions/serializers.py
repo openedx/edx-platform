@@ -10,7 +10,7 @@ from openedx.core.djangoapps.django_comment_common.models import CourseDiscussio
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
-from .models import DEFAULT_PROVIDER_TYPE, PROVIDER_FEATURE_MAP, DiscussionsConfiguration, Features
+from .models import DEFAULT_PROVIDER_TYPE, AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -209,7 +209,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             'plugin_configuration': plugin_configuration,
             'providers': {
                 'active': provider_type or DEFAULT_PROVIDER_TYPE,
-                'available': PROVIDER_FEATURE_MAP,
+                'available': AVAILABLE_PROVIDER_MAP,
             },
         })
         return payload

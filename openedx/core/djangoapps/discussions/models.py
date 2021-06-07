@@ -16,6 +16,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import LearningContextKeyField
 from opaque_keys.edx.keys import CourseKey
 from simple_history.models import HistoricalRecords
+from collections import namedtuple
 
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -23,6 +24,9 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 log = logging.getLogger(__name__)
 
 DEFAULT_PROVIDER_TYPE = 'legacy'
+
+
+DocumentLinks = namedtuple('DocumentLinks', ['learn_more', 'configuration_documentation', 'documentation', 'accessibility_documentation', 'email_id'])
 
 
 class Features(Enum):
@@ -55,17 +59,7 @@ class Features(Enum):
     WCAG_2_1 = 'wcag-2.1'
     WCAG_2_0_SUPPORT = 'wcag-2.0-support'
 
-class LINKS(Enum):
-    """
-       Links to be used in discussion providers for documentation
-    """
-    PIAZZA_DOCUMENTATION: ''
-    PIAZZA_ACCESSIBILITY_DOCUMENTATION: ''
-    PIAZZA_EMAIL: ''
-    PIAZZA_CONFIGURATION_DOCUMENTATION: ''
-    PIAZZA_LEARN_MORE: ''
-
-PROVIDER_FEATURE_MAP = {
+AVAILABLE_PROVIDER_MAP = {
     'legacy': {
         'features': [
             Features.DISCUSSION_PAGE.value,
@@ -81,16 +75,16 @@ PROVIDER_FEATURE_MAP = {
             Features.COURSE_COHORT_SUPPORT.value,
             Features.RESEARCH_DATA_EVENTS.value,
         ],
-        'documentation_urls': {
-            'learnMore': '',
-            'configurationDocumentation': '',
-            'documentation': '',
-            'accessibilityDocumentation': '',
-            'emailId': '',
-        }
+        'documentation_urls': DocumentLinks(
+            '',
+            '',
+            '',
+            '',
+            '',
+        )._asdict(),
     },
     'piazza': {
-        'features':[
+        'features': [
             Features.DISCUSSION_PAGE.value,
             Features.LTI.value,
             Features.WCAG_2_0_SUPPORT.value,
@@ -104,13 +98,13 @@ PROVIDER_FEATURE_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
-        'documentation_urls': {
-            'learnMore': 'https://piazza.com/product/overview',
-            'configurationDocumentation': 'https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',
-            'documentation': 'https://support.piazza.com/',
-            'accessibilityDocumentation': 'https://piazza.com/product/accessibility',
-            'emailId': 'team@piazza.com',
-        }
+        'documentation_urls': DocumentLinks(
+            'https://piazza.com/product/overview',
+            'https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',
+            'https://support.piazza.com/',
+            'https://piazza.com/product/accessibility',
+            'team@piazza.com',
+        )._asdict()
     },
     'edx-next': {
         'features': [
@@ -130,13 +124,13 @@ PROVIDER_FEATURE_MAP = {
             Features.DISCUSSION_CONTENT_PROMPTS.value,
             Features.GRADED_DISCUSSIONS.value,
         ],
-        'documentation_urls': {
-            'learnMore': '',
-            'configurationDocumentation': '',
-            'documentation': '',
-            'accessibilityDocumentation': '',
-            'emailId': '',
-        }
+        'documentation_urls': DocumentLinks(
+            '',
+            '',
+            '',
+            '',
+            '',
+        )._asdict(),
     },
     'yellowdig': {
         'features': [
@@ -152,26 +146,26 @@ PROVIDER_FEATURE_MAP = {
             Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
             Features.USER_MENTIONS.value,
         ],
-        'documentation_urls': {
-            'learnMore': 'https://www.youtube.com/watch?v=ZACief-qMwY',
-            'configurationDocumentation': '',
-            'documentation': 'https://hubs.ly/H0J5Bn70',
-            'accessibilityDocumentation': 'https://drive.google.com/file/d/1FT6E2ajMabFQI3NqgInPgGsQnLH7e2Mb/view?usp=sharing',
-            'emailId': 'learnmore@yellowdig.com',
-        }
+        'documentation_urls': DocumentLinks(
+            'https://www.youtube.com/watch?v=ZACief-qMwY',
+            '',
+            'https://hubs.ly/H0J5Bn7',
+            'https://drive.google.com/file/d/1FT6E2ajMabFQI3NqgInPgGsQnLH7e2Mb/view?usp=sharing',
+            'learnmore@yellowdig.com',
+        )._asdict(),
     },
     'inscribe': {
         'features': [
             Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
             Features.LTI_BASIC_CONFIGURATION.value,
         ],
-        'documentation_urls': {
-            'learnMore': '',
-            'configurationDocumentation': '',
-            'documentation': 'https://www.inscribeapp.com/',
-            'accessibilityDocumentation': '',
-            'emailId': '',
-        }
+        'documentation_urls': DocumentLinks(
+            '',
+            '',
+            'https://www.inscribeapp.com/',
+            '',
+            '',
+        )._asdict(),
     },
     'discourse': {
         'features': [
@@ -179,13 +173,13 @@ PROVIDER_FEATURE_MAP = {
             Features.LTI_BASIC_CONFIGURATION.value,
             Features.LTI_ADVANCED_SHARING_MODE.value,
         ],
-        'documentation_urls': {
-            'learnMore': '',
-            'configurationDocumentation': '',
-            'documentation': 'http://discourse.org/',
-            'accessibilityDocumentation': '',
-            'emailId': '',
-        }
+        'documentation_urls': DocumentLinks(
+            '',
+            '',
+            'http://discourse.org/',
+            '',
+            '',
+        )._asdict(),
     },
     'ed-discuss': {
         'features': [
@@ -199,13 +193,13 @@ PROVIDER_FEATURE_MAP = {
             Features.COMMUNITY_TA_SUPPORT.value,
             Features.EMAIL_NOTIFICATIONS.value,
         ],
-        'documentation_urls': {
-            'learnMore': '',
-            'configurationDocumentation': '',
-            'documentation': 'https://edstem.org/us/',
-            'accessibilityDocumentation': '',
-            'emailId': '',
-        }
+        'documentation_urls': DocumentLinks(
+            '',
+            '',
+            'https://edstem.org/us/',
+            '',
+            '',
+        )._asdict(),
     }
 }
 
@@ -368,7 +362,7 @@ class DiscussionsConfiguration(TimeStampedModel):
         """
         Check if the provider supports some feature
         """
-        features = PROVIDER_FEATURE_MAP.get(self.provider_type) or []
+        features = AVAILABLE_PROVIDER_MAP.get(self.provider_type).get('features') or []
         has_support = bool(feature in features)
         return has_support
 
