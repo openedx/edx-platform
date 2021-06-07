@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from edx_ace import ace
 from edx_ace.recipient import Recipient
 from edx_ace.utils import date
+from edx_django_utils.monitoring import set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from six.moves.urllib.parse import urljoin
@@ -35,7 +36,6 @@ log = logging.getLogger(__name__)
 
 
 DEFAULT_LANGUAGE = 'en'
-ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
 @task(base=LoggedTask)
@@ -60,7 +60,8 @@ class ResponseNotification(BaseMessageType):
     pass
 
 
-@task(base=LoggedTask, routing_key=ROUTING_KEY)
+@task(base=LoggedTask)
+@set_code_owner_attribute
 def send_ace_message(context):
     context['course_id'] = CourseKey.from_string(context['course_id'])
 

@@ -16,7 +16,7 @@ from django.db.utils import DatabaseError
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
-from edx_django_utils.monitoring import set_custom_attribute
+from edx_django_utils.monitoring import set_custom_attribute, set_code_owner_attribute
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
@@ -143,7 +143,8 @@ class BinnedScheduleMessageBaseTask(ScheduleMessageBaseTask):
         raise NotImplementedError
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _recurring_nudge_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -153,7 +154,8 @@ def _recurring_nudge_schedule_send(site_id, msg_str):
     )
 
 
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _upgrade_reminder_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,
@@ -162,8 +164,8 @@ def _upgrade_reminder_schedule_send(site_id, msg_str):
         UPGRADE_REMINDER_LOG_PREFIX,
     )
 
-
-@task(base=LoggedTask, ignore_result=True, routing_key=ROUTING_KEY)
+@task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
 def _course_update_schedule_send(site_id, msg_str):
     _schedule_send(
         msg_str,

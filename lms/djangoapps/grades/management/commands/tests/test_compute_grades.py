@@ -92,19 +92,19 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         # Order doesn't matter, but can't use a set because dicts aren't hashable
         expected = [
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[0], 0)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[0], 2)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[3], 0)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[3], 2)
             },),
         ]

@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from edx_rest_api_client import exceptions
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -22,9 +23,6 @@ from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 LOGGER = get_task_logger(__name__)
-# Under cms the following setting is not defined, leading to errors during tests.
-ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
-PROGRAM_CERTIFICATES_ROUTING_KEY = getattr(settings, 'PROGRAM_CERTIFICATES_ROUTING_KEY', None)
 # Maximum number of retries before giving up on awarding credentials.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
@@ -123,7 +121,8 @@ def award_program_certificate(client, username, program_uuid, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@task(bind=True, ignore_result=True)
+@set_code_owner_attribute
 def award_program_certificates(self, username):
     """
     This task is designed to be called whenever a student's completion status
@@ -285,7 +284,8 @@ def post_course_certificate(client, username, certificate, visible_date):
     })
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(bind=True, ignore_result=True)
+@set_code_owner_attribute
 def award_course_certificate(self, username, course_run_key):
     """
     This task is designed to be called whenever a student GeneratedCertificate is updated.
@@ -399,7 +399,8 @@ def revoke_program_certificate(client, username, program_uuid):
     })
 
 
-@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@task(bind=True, ignore_result=True)
+@set_code_owner_attribute
 def revoke_program_certificates(self, username, course_key):
     """
     This task is designed to be called whenever a student's course certificate is
@@ -522,7 +523,8 @@ def revoke_program_certificates(self, username, course_key):
     LOGGER.info(u'Successfully completed the task revoke_program_certificates for username %s', username)
 
 
-@task(bind=True, ignore_result=True, routing_key=PROGRAM_CERTIFICATES_ROUTING_KEY)
+@task(bind=True, ignore_result=True)
+@set_code_owner_attribute
 def update_certificate_visible_date_on_course_update(self, course_key):
     """
     This task is designed to be called whenever a course is updated with
