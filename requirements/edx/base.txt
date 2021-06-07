@@ -837,7 +837,7 @@ pyyaml==5.4.1
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.in
-recommender-xblock==1.4.9
+recommender-xblock==2.0.1
     # via -r requirements/edx/base.in
 redis==3.5.3
     # via -r requirements/edx/base.in
