@@ -202,11 +202,13 @@ def upload_transcript(request):
         )
         response = JsonResponse(status=201)
     except (TranscriptsGenerationException, UnicodeDecodeError):
+        LOGGER.error("Unable to update transcript on edX video %s for language %s", edx_video_id, new_language_code)
         response = JsonResponse(
             {'error': _('There is a problem with this transcript file. Try to upload a different file.')},
             status=400
         )
     finally:
+        LOGGER.info("Updated transcript on edX video %s for language %s", edx_video_id, new_language_code)
         return response
 
 
