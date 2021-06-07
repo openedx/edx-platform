@@ -346,7 +346,7 @@ def is_using_v2_course_certificates(course_key):
     """
     Return True if the course run is using v2 course certificates
     """
-    return CERTIFICATES_USE_UPDATED.is_enabled(course_key)
+    return True
 
 
 def is_on_certificate_allowlist(user, course_key):
