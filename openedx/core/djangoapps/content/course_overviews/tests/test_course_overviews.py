@@ -574,6 +574,42 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         assert overviews_by_id[non_existent_course_key] is None
         assert mock_load_from_modulestore.call_count == 3
 
+    @ddt.data(
+        ('early_with_info', True, True, DATES[LAST_WEEK], False, True),
+        ('early_no_info', False, False, test_datetime, False, True),
+        ('end', True, False, test_datetime, False, True),
+        ('end', False, True, test_datetime, False, True),
+        ('end', False, False, DATES[NEXT_WEEK], False, False),
+        ('end', False, False, DATES[LAST_WEEK], False, True),
+        ('end', False, False, None, False, False),
+        ('early_with_info', False, False, None, False, True),
+        ('end', False, False, DATES[NEXT_WEEK], False, False),
+        ('end', False, False, DATES[NEXT_WEEK], True, True)
+    )
+    @ddt.unpack
+    def test_may_certify(
+        self,
+        certificate_display_behavior,
+        certificates_show_before_end,
+        has_ended,
+        certificate_available_date,
+        self_paced,
+        expected_return_value
+    ):
+        """Tests if it's acceptable to show the student a download link for the certificate"""
+        course = CourseFactory.create(language='en')
+        course_overview = CourseOverview.get_from_id(course.id)
+
+        course_overview.certificate_display_behavior = certificate_display_behavior
+        course_overview.certificates_show_before_end = certificates_show_before_end
+        course_overview.certificate_available_date = certificate_available_date
+        course_overview.self_paced = self_paced
+
+        if certificate_available_date is None:
+            course_overview.end = DATES[LAST_WEEK] if has_ended else DATE[NEXT_WEEK]
+
+        assert course_overview.may_certify() == expected_return_value
+
 
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
