@@ -114,6 +114,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 staffOnlyMessage: this.model.get('staff_only_message'),
                 course: course,
                 enableCopyPasteUnits: this.model.get("enable_copy_paste_units"), // ENABLE_COPY_PASTE_UNITS waffle flag
+                showDeleteButton: this.model.get('show_delete_button')
             };
         },
 

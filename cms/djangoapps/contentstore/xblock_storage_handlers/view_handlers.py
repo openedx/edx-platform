@@ -37,7 +37,8 @@ from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.config.waffle import PREVENT_STAFF_STRUCTURE_DELETION, SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.permissions import DELETE_COURSE_CONTENT
 from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
@@ -1403,6 +1404,12 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         xblock_info["user_partition_info"] = get_visibility_partition_info(
             xblock, course=course
         )
+
+        xblock_info['show_delete_button'] = True
+        if PREVENT_STAFF_STRUCTURE_DELETION.is_enabled():
+            xblock_info['show_delete_button'] = (
+                user.has_perm(DELETE_COURSE_CONTENT, xblock) if user is not None else False
+            )
 
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])

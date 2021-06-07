@@ -53,3 +53,13 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
 # .. toggle_warning: Flag course_experience.relative_dates should also be active for relative dates functionalities to work.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
 CUSTOM_RELATIVE_DATES = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.custom_relative_dates', __name__)
+
+# .. toggle_name: studio.prevent_staff_structure_deletion
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Prevents staff from deleting course structures
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-06-25
+PREVENT_STAFF_STRUCTURE_DELETION = WaffleFlag(
+    f'{WAFFLE_NAMESPACE}.prevent_staff_structure_deletion', __name__, LOG_PREFIX
+)

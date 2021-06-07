@@ -198,7 +198,7 @@ if (is_proctored_exam) {
                                             <a class="duplicate-button" href="#" role="button"><%- gettext('Duplicate') %></a>
                                         </li>
                                     <% } %>
-                                    <% if (xblockInfo.isDeletable()) { %>
+                                    <% if (xblockInfo.isDeletable() && showDeleteButton) { %>
                                         <li class="nav-item">
                                             <a class="delete-button" href="#" role="button"><%- gettext('Delete') %></a>
                                         </li>
@@ -224,7 +224,7 @@ if (is_proctored_exam) {
                             </a>
                         </li>
                     <% } %>
-                    <% if (xblockInfo.isDeletable()) { %>
+                    <% if (xblockInfo.isDeletable() && showDeleteButton) { %>
                         <li class="action-item action-delete">
                             <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">
                                 <span class="icon fa fa-trash-o" aria-hidden="true"></span>
