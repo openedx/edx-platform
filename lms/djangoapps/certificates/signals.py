@@ -28,6 +28,8 @@ from openedx.core.djangoapps.signals.signals import (
     LEARNER_NOW_VERIFIED
 )
 from common.djangoapps.student.models import CourseEnrollment
+from eventtracking import tracker
+from common.djangoapps.track import contexts, segment
 
 log = logging.getLogger(__name__)
 CERTIFICATE_DELAY_SECONDS = 2
@@ -68,6 +70,24 @@ def listen_for_passing_grade(sender, user, course_id, **kwargs):  # pylint: disa
     downstream signal from COURSE_GRADE_CHANGED
     """
     course = CourseOverview.get_from_id(course_id)
+    context = contexts.course_context_from_course_id(course_id)
+    data = {
+        'user_id': user.id,
+        'username': user.username,
+        'course_id': str(course_id),
+    }
+    segment_properties = {
+        'category': 'conversion',
+        'label': str(course_id),
+        'org': course_id.org,
+        'course': course_id.course,
+        'run': course_id.run,
+        'email': user.email
+    }
+    event_name = 'edx.course.completed'
+    with tracker.get_tracker().context(event_name, context):
+        tracker.emit(event_name, data)
+        segment.track(user.id, event_name, segment_properties)
     if not auto_certificate_generation_enabled():
         return
 
