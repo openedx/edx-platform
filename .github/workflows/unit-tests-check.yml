@@ -1,0 +1,36 @@
+name: Ensure Unit Tests Running
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  run_tests:
+    name: Test
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.8']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Required Packages
+      run: |
+        sudo apt-get update && sudo apt-get install libxmlsec1-dev
+        sudo systemctl start mongod
+
+    - name: Install Python Dependencies
+      run: |
+        pip install setuptools wheel
+        pip install -r requirements/edx/testing.txt
+
+    - name: Collect Tests
+      env:
+        STUDIO_CFG: lms/envs/bok_choy.yml
+      run: for dir in $(find . -name "pytest.ini" -exec dirname {} \;); do pytest --collect-only $dir; done
