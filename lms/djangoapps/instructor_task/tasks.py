@@ -26,6 +26,7 @@ from functools import partial
 from celery import task
 from django.conf import settings
 from django.utils.translation import ugettext_noop
+from edx_django_utils.monitoring import set_code_owner_attribute
 
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
@@ -162,7 +163,6 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
 @task(
     name='lms.djangoapps.instructor_task.tasks.calculate_problem_responses_csv.v2',
     base=BaseInstructorTask,
-    routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY,
 )
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
@@ -175,7 +175,8 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -191,7 +192,8 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
     Generate a CSV for a course containing all students' problem
@@ -256,7 +258,8 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask)
+@set_code_owner_attribute
 def generate_certificates(entry_id, xmodule_instance_args):
     """
     Grade students and generate certificates.
