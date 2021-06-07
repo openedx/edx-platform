@@ -118,7 +118,7 @@ COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS = CourseWaffleFlag(
 # .. toggle_description: Waffle flag to enable proctored exams experience without
 #   redirecting students to LMS.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-5-25
+# .. toggle_creation_date: 2021-5-24
 # .. toggle_target_removal_date: 2021-6-30
 # .. toggle_warnings: None
 COURSEWARE_MICROFRONTEND_PROCTORED_EXAMS = CourseWaffleFlag(
