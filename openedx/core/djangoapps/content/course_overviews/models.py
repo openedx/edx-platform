@@ -23,6 +23,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
+from pytz import utc
 from simple_history.models import HistoricalRecords
 
 from lms.djangoapps.discussion import django_comment_client
