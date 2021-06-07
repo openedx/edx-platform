@@ -412,6 +412,6 @@ class ApplicationIntroductionView(RedirectToLoginOrRelevantPageMixin, TemplateVi
         Returns:
             HttpResponse object.
         """
-        ApplicationHub.objects.create(user=self.request.user)
+        ApplicationHub.objects.get_or_create(user=self.request.user)
 
         return redirect('application_hub')
