@@ -13,6 +13,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -46,6 +47,8 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import item as item_module
+from cms.djangoapps.contentstore.config.waffle import PREVENT_STAFF_STRUCTURE_DELETION
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -3430,3 +3433,147 @@ class TestXBlockPublishingInfo(ItemTest):
         # Check that in self paced course content has live state now
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
+
+    def test_staff_show_delete_button(self):
+        """
+        Test delete button is *not visible* to user with CourseStaffRole
+        """
+        # Add user as course staff
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_staff_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *not visible* to user with CourseStaffRole and
+        PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course staff
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])
+
+    def test_no_user_show_delete_button(self):
+        """
+        Test delete button is *visible* when user attribute is not set on
+        xblock. This happens with ajax requests.
+        """
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=None
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_no_user_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* when user attribute is not set on
+        xblock (this happens with ajax requests) and PREVENT_STAFF_STRUCTURE_DELETION waffle set.
+        """
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=None
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])
+
+    def test_instructor_show_delete_button(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        """
+        # Add user as course instructor
+        CourseInstructorRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_instructor_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        and PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course instructor
+        CourseInstructorRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_creator_show_delete_button(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        """
+        # Add user as course creator
+        CourseCreatorRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_creator_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        and PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course creator
+        CourseCreatorRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])

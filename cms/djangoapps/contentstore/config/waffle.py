@@ -4,12 +4,13 @@ waffle switches for the contentstore app.
 """
 
 
-from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace
+from edx_toggles.toggles import LegacyWaffleFlag, LegacyWaffleFlagNamespace, LegacyWaffleSwitchNamespace, WaffleFlag
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # Namespace
 WAFFLE_NAMESPACE = 'studio'
+LOG_PREFIX = 'Studio: '
 
 # Switches
 # TODO: Replace with WaffleSwitch(). See waffle() docstring.
@@ -81,3 +82,13 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = LegacyWaffleFlag(
 # .. toggle_warnings: Flag course_experience.relative_dates should also be active for relative dates functionalities to work.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
 CUSTOM_RELATIVE_DATES = CourseWaffleFlag(WAFFLE_NAMESPACE, 'custom_relative_dates', module_name=__name__,)
+
+# .. toggle_name: studio.prevent_staff_structure_deletion
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Prevents staff from deleting course structures
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2021-06-25
+PREVENT_STAFF_STRUCTURE_DELETION = WaffleFlag(
+    f'{WAFFLE_NAMESPACE}.prevent_staff_structure_deletion', __name__, LOG_PREFIX
+)
