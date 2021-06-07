@@ -41,7 +41,7 @@ def user_fixture():
 @pytest.fixture(name='user_with_no_hub')
 def user_with_no_hub_fixture():
     """
-    Create a test user without corresponding ApplicationHub object
+    Create a test user with extended profile and without corresponding ApplicationHub object
 
     Returns:
         User object

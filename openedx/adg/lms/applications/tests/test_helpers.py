@@ -469,11 +469,12 @@ def test_get_application_hub_instructions(
     ],
     ids=['not_enrolled', 'enrolled_in_course', 'failed_in_course', 'completed_course']
 )
-def test_get_course_card_information_after_enrolling_and_failing_course(
+def test_get_course_card_information_with_and_without_enrollment(
     is_enrolled, is_completed, all_modules_attempted, status, grade, message, test_user, mocker
 ):
     """
-    Test the course card information when the user has enrolled in a course and when the user has failed the course
+    Test the course card information when the user has not enrolled in a course, when the user has enrolled in a course,
+    when the user has failed the course and when the user has completed the course
     """
     if is_completed:
         mocker.patch.object(helpers.CourseGradeFactory, 'read', return_value=Mock(passed=True, percent=1))
