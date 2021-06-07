@@ -4653,6 +4653,8 @@ PROCTORING_BACKENDS = {
     'null': {}
 }
 
+PROCTORED_EXAM_VIEWABLE_PAST_DUE = False
+
 ############### The SAML private/public key values ################
 SOCIAL_AUTH_SAML_SP_PRIVATE_KEY = ""
 SOCIAL_AUTH_SAML_SP_PUBLIC_CERT = ""
