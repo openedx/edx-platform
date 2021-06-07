@@ -55,85 +55,158 @@ class Features(Enum):
     WCAG_2_1 = 'wcag-2.1'
     WCAG_2_0_SUPPORT = 'wcag-2.0-support'
 
+class LINKS(Enum):
+    """
+       Links to be used in discussion providers for documentation
+    """
+    PIAZZA_DOCUMENTATION: ''
+    PIAZZA_ACCESSIBILITY_DOCUMENTATION: ''
+    PIAZZA_EMAIL: ''
+    PIAZZA_CONFIGURATION_DOCUMENTATION: ''
+    PIAZZA_LEARN_MORE: ''
+
 PROVIDER_FEATURE_MAP = {
-    'legacy': [
-        Features.DISCUSSION_PAGE.value,
-        Features.WCAG_2_1.value,
-        Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
-        Features.WCAG_2_0_SUPPORT.value,
-        Features.INTERNATIONALIZATION_SUPPORT.value,
-        Features.ANONYMOUS_POSTING.value,
-        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-        Features.QUESTION_DISCUSSION_SUPPORT.value,
-        Features.COMMUNITY_TA_SUPPORT.value,
-        Features.BLACKOUT_DISCUSSION_DATES.value,
-        Features.COURSE_COHORT_SUPPORT.value,
-        Features.RESEARCH_DATA_EVENTS.value,
-    ],
-    'piazza': [
-        Features.DISCUSSION_PAGE.value,
-        Features.LTI.value,
-        Features.WCAG_2_0_SUPPORT.value,
-        Features.ANONYMOUS_POSTING.value,
-        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-        Features.QUESTION_DISCUSSION_SUPPORT.value,
-        Features.COMMUNITY_TA_SUPPORT.value,
-        Features.EMAIL_NOTIFICATIONS.value,
-        Features.BLACKOUT_DISCUSSION_DATES.value,
-        Features.DISCUSSION_CONTENT_PROMPTS.value,
-        Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
-        Features.USER_MENTIONS.value,
-    ],
-    'edx-next': [
-        Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
-        Features.WCAG_2_0_SUPPORT.value,
-        Features.INTERNATIONALIZATION_SUPPORT.value,
-        Features.ANONYMOUS_POSTING.value,
-        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-        Features.QUESTION_DISCUSSION_SUPPORT.value,
-        Features.COMMUNITY_TA_SUPPORT.value,
-        Features.EMAIL_NOTIFICATIONS.value,
-        Features.BLACKOUT_DISCUSSION_DATES.value,
-        Features.SIMPLIFIED_IN_CONTEXT_DISCUSSION.value,
-        Features.ADVANCED_IN_CONTEXT_DISCUSSION.value,
-        Features.COURSE_COHORT_SUPPORT.value,
-        Features.RESEARCH_DATA_EVENTS.value,
-        Features.DISCUSSION_CONTENT_PROMPTS.value,
-        Features.GRADED_DISCUSSIONS.value,
-    ],
-    'yellowdig': [
-        Features.WCAG_2_0_SUPPORT.value,
-        Features.ANONYMOUS_POSTING.value,
-        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-        Features.QUESTION_DISCUSSION_SUPPORT.value,
-        Features.COMMUNITY_TA_SUPPORT.value,
-        Features.EMAIL_NOTIFICATIONS.value,
-        Features.RESEARCH_DATA_EVENTS.value,
-        Features.IN_PLATFORM_NOTIFICATIONS.value,
-        Features.GRADED_DISCUSSIONS.value,
-        Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
-        Features.USER_MENTIONS.value,
-    ],
-    'inscribe': [
-        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-        Features.LTI_BASIC_CONFIGURATION.value,
-    ],
-    'discourse': [
-        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-        Features.LTI_BASIC_CONFIGURATION.value,
-        Features.LTI_ADVANCED_SHARING_MODE.value,
-    ],
-    'ed-discuss': [
-        Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
-        Features.LTI_BASIC_CONFIGURATION.value,
-        Features.WCAG_2_0_SUPPORT.value,
-        Features.INTERNATIONALIZATION_SUPPORT.value,
-        Features.ANONYMOUS_POSTING.value,
-        Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
-        Features.QUESTION_DISCUSSION_SUPPORT.value,
-        Features.COMMUNITY_TA_SUPPORT.value,
-        Features.EMAIL_NOTIFICATIONS.value,
-    ]
+    'legacy': {
+        'features': [
+            Features.DISCUSSION_PAGE.value,
+            Features.WCAG_2_1.value,
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.COURSE_COHORT_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+        ],
+        'documentation_urls': {
+            'learnMore': '',
+            'configurationDocumentation': '',
+            'documentation': '',
+            'accessibilityDocumentation': '',
+            'emailId': '',
+        }
+    },
+    'piazza': {
+        'features':[
+            Features.DISCUSSION_PAGE.value,
+            Features.LTI.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.DISCUSSION_CONTENT_PROMPTS.value,
+            Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+            Features.USER_MENTIONS.value,
+        ],
+        'documentation_urls': {
+            'learnMore': 'https://piazza.com/product/overview',
+            'configurationDocumentation': 'https://support.piazza.com/support/solutions/articles/48001065447-configure-piazza-within-edx',
+            'documentation': 'https://support.piazza.com/',
+            'accessibilityDocumentation': 'https://piazza.com/product/accessibility',
+            'emailId': 'team@piazza.com',
+        }
+    },
+    'edx-next': {
+        'features': [
+            Features.AUTOMATIC_LEARNER_ENROLLMENT.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.BLACKOUT_DISCUSSION_DATES.value,
+            Features.SIMPLIFIED_IN_CONTEXT_DISCUSSION.value,
+            Features.ADVANCED_IN_CONTEXT_DISCUSSION.value,
+            Features.COURSE_COHORT_SUPPORT.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+            Features.DISCUSSION_CONTENT_PROMPTS.value,
+            Features.GRADED_DISCUSSIONS.value,
+        ],
+        'documentation_urls': {
+            'learnMore': '',
+            'configurationDocumentation': '',
+            'documentation': '',
+            'accessibilityDocumentation': '',
+            'emailId': '',
+        }
+    },
+    'yellowdig': {
+        'features': [
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+            Features.RESEARCH_DATA_EVENTS.value,
+            Features.IN_PLATFORM_NOTIFICATIONS.value,
+            Features.GRADED_DISCUSSIONS.value,
+            Features.DIRECT_MESSAGES_FROM_INSTRUCTORS.value,
+            Features.USER_MENTIONS.value,
+        ],
+        'documentation_urls': {
+            'learnMore': 'https://www.youtube.com/watch?v=ZACief-qMwY',
+            'configurationDocumentation': '',
+            'documentation': 'https://hubs.ly/H0J5Bn70',
+            'accessibilityDocumentation': 'https://drive.google.com/file/d/1FT6E2ajMabFQI3NqgInPgGsQnLH7e2Mb/view?usp=sharing',
+            'emailId': 'learnmore@yellowdig.com',
+        }
+    },
+    'inscribe': {
+        'features': [
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+        ],
+        'documentation_urls': {
+            'learnMore': '',
+            'configurationDocumentation': '',
+            'documentation': 'https://www.inscribeapp.com/',
+            'accessibilityDocumentation': '',
+            'emailId': '',
+        }
+    },
+    'discourse': {
+        'features': [
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.LTI_ADVANCED_SHARING_MODE.value,
+        ],
+        'documentation_urls': {
+            'learnMore': '',
+            'configurationDocumentation': '',
+            'documentation': 'http://discourse.org/',
+            'accessibilityDocumentation': '',
+            'emailId': '',
+        }
+    },
+    'ed-discuss': {
+        'features': [
+            Features.PRIMARY_DISCUSSION_APP_EXPERIENCE.value,
+            Features.LTI_BASIC_CONFIGURATION.value,
+            Features.WCAG_2_0_SUPPORT.value,
+            Features.INTERNATIONALIZATION_SUPPORT.value,
+            Features.ANONYMOUS_POSTING.value,
+            Features.REPORT_FLAG_CONTENT_TO_MODERATORS.value,
+            Features.QUESTION_DISCUSSION_SUPPORT.value,
+            Features.COMMUNITY_TA_SUPPORT.value,
+            Features.EMAIL_NOTIFICATIONS.value,
+        ],
+        'documentation_urls': {
+            'learnMore': '',
+            'configurationDocumentation': '',
+            'documentation': 'https://edstem.org/us/',
+            'accessibilityDocumentation': '',
+            'emailId': '',
+        }
+    }
 }
 
 
