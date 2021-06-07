@@ -55,8 +55,8 @@ from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_home_api.toggles import (
-    course_home_mfe_dates_tab_is_active,
-    course_home_mfe_progress_tab_is_active
+    course_home_mfe_progress_tab_is_active,
+    course_home_mfe_is_active
 )
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url, is_request_from_learning_mfe
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
@@ -1048,7 +1048,7 @@ def dates(request, course_id):
     from lms.urls import COURSE_DATES_NAME, RESET_COURSE_DEADLINES_NAME
 
     course_key = CourseKey.from_string(course_id)
-    if course_home_mfe_dates_tab_is_active(course_key) and not request.user.is_staff:
+    if course_home_mfe_is_active(course_key) and not request.user.is_staff:
         microfrontend_url = get_learning_mfe_home_url(course_key=course_key, view_name=COURSE_DATES_NAME)
         raise Redirect(microfrontend_url)
 
