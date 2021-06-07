@@ -10,7 +10,6 @@
 
 -c ../constraints.txt
 
--r ../edx-sandbox/shared.txt  # Dependencies which are also used by code sandboxes
 -r github.in              # Forks and other dependencies not yet on PyPI
 -r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
@@ -39,6 +38,7 @@ celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
 crowdsourcehinter-xblock
+cryptography                        # Implementations of assorted cryptography algorithms
 defusedxml
 Django                              # Web application framework
 django-appconf
@@ -108,6 +108,7 @@ icalendar                           # .ics generator, used by calendar_sync
 ipaddress                           # Ip network support for Embargo feature
 jsonfield2                          # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
+lxml                                # XML parser
 lti-consumer-xblock
 mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
@@ -115,6 +116,7 @@ Markdown                            # Convert text markup to HTML; used in capa 
 mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring
+nltk                                # Natural language processing; used by the chem package
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
@@ -163,4 +165,3 @@ XBlock                              # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
-

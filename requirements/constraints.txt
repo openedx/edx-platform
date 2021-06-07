@@ -15,17 +15,6 @@
 # latest version breaks the tests.
 django<2.2.21
 
-# celery 5.0 has dropped python3.5 support.
-celery<5.0
-
-# cryptography 3.3 has dropped python3.5 support.
-cryptography<3.3
-
-# PYJWT[crypto]==2.0.1 requires cryptography>=3.3.1
-PyJWT[crypto]<2.0.0
-# social-auth-core>=4.0.0 requires PYJWT>=2.0.0
-social-auth-core<4.0.0
-
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0
 
@@ -46,31 +35,9 @@ edx-enterprise==3.23.11
 # Newer versions need a more recent version of python-dateutil
 freezegun==0.3.12
 
-# 4.0.0 dropped support for Python 3.5
-inflect<4.0.0
-
-# 5.0.0 dropped support for Python 3.5
-isort<5.0.0
-
-# 0.15.0 dropped support for Python 3.5
-joblib<0.15.0
-
-
-# jsonfield2 3.1.0 drops support for python 3.5
-jsonfield2<3.1.0
-
-# kiwisolver 1.2.0 requires Python 3.6+
-kiwisolver<1.2.0
-
 # 4.5.1 introduced a bug when used together with xmlsec: https://bugs.launchpad.net/lxml/+bug/1880251
 # Tests passed, but hit a problem in stage
 lxml<4.5.1
-
-# Matplotlib 3.1 requires Python 3.6
-matplotlib<3.1
-
-# maxminddb 2.0.0 has dropped support for Python 3.5
-maxminddb<2.0.0
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -78,34 +45,22 @@ oauthlib==3.0.1
 # django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
 django-oauth-toolkit<=1.3.2
 
-# path 13.2.0 drops support for Python 3.5
-path<13.2.0
-
 # ARCHBOM-1141: pip-tools upgrade requires pip upgrade
 pip-tools<6.0
 
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
-
-# stevedore 2.0.0 requires python >= 3.6
-stevedore<2.0.0
+# matplotlib>=3.4.0 requires python-dateutil>=2.7
+matplotlib<3.4.0
 
 # Constraint from astroid 2.3.3
 wrapt==1.11.*
-
-# zipp 2.0.0 requires Python >= 3.6
-zipp==1.0.0
-
-# Matplotlib 3.1 requires Python 3.6
-matplotlib<3.1
-
-# geoip2 requires Python 3.6
-geoip2<4.0.1
 
 # tests failing for pymongo==3.11
 pymongo<3.11
 
 # sympy latest version causing test failures.
+# may be related to python35 version drop in 1.7.0. Needs to be tested before removing.
 sympy==1.6.2
 
 # python3-saml==1.10.0 version started breaking a11y tests
@@ -121,13 +76,26 @@ diff-cover==4.0.0
 # This can be removed once transifex-client drops support for Python 2.0 and removes the required constraint.
 python-slugify<5.0.0
 
-
-# Temporary package constraints to deal with some requirement upgrade issues.
-Sphinx<4.0
-jinja2<3.0
-MarkupSafe<2.0
-click<8.0
-
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
 
+# edx-proctoring==3.11.4 (latest) requires PyJWT<2.0.0
+PyJWT[crypto]<2.0.0
+social-auth-core<4.0.0  # social-auth-core>=4.0.0 requires PYJWT>=2.0.0
+
+# celery requires click<8.0.0 which would be fixed once https://github.com/celery/celery/issues/6753 is done.
+click<8.0.0
+
+# constraints present due to Python35 support. Need to be tested and removed independently.
+
+celery<5.0              # celery 5.0 has dropped python3.5 support.
+inflect<4.0.0           # 4.0.0 dropped support for Python 3.5
+isort<5.0.0             # 5.0.0 dropped support for Python 3.5
+joblib<0.15.0           # 0.15.0 dropped support for Python 3.5
+jsonfield2<3.1.0        # jsonfield2 3.1.0 drops support for python 3.5
+kiwisolver<1.2.0        # kiwisolver 1.2.0 requires Python 3.6+
+matplotlib<3.1          # Matplotlib 3.1 requires Python 3.6
+maxminddb<2.0.0         # maxminddb 2.0.0 has dropped support for Python 3.5
+path<13.2.0             # path 13.2.0 drops support for Python 3.5
+zipp==1.0.0             # zipp 2.0.0 requires Python >= 3.6
+geoip2<4.0.1            # geoip2 requires Python 3.6

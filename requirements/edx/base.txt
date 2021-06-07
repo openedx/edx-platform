@@ -102,9 +102,7 @@ certifi==2021.5.30
     #   elasticsearch
     #   requests
 cffi==1.14.5
-    # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
-    #   cryptography
+    # via cryptography
 chardet==4.0.0
     # via
     #   -r requirements/edx/paver.txt
@@ -115,7 +113,6 @@ chem==1.2.0
 click==7.1.2
     # via
     #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/../edx-sandbox/shared.txt
     #   code-annotations
     #   nltk
     #   user-util
@@ -133,10 +130,9 @@ coreschema==0.0.4
     #   drf-yasg
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
-cryptography==3.2.1
+cryptography==3.4.7
     # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/../edx-sandbox/shared.txt
+    #   -r requirements/edx/base.in
     #   django-fernet-fields
     #   edx-enterprise
     #   pyjwt
@@ -554,9 +550,8 @@ isodate==0.6.0
     #   python3-saml
 itypes==1.2.0
     # via coreapi
-jinja2==2.11.3
+jinja2==3.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   code-annotations
     #   coreschema
 jmespath==0.10.0
@@ -566,7 +561,6 @@ jmespath==0.10.0
 joblib==0.14.1
     # via
     #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/../edx-sandbox/shared.txt
     #   nltk
 jsondiff==1.3.0
     # via edx-enterprise
@@ -602,7 +596,7 @@ lti-consumer-xblock==2.9.1
 lxml==4.5.0
     # via
     #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/../edx-sandbox/shared.txt
+    #   -r requirements/edx/base.in
     #   capa
     #   edxval
     #   lti-consumer-xblock
@@ -628,9 +622,8 @@ markdown==3.3.4
     #   xblock-poll
 markey==0.8
     # via enmerkar-underscore
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/paver.txt
     #   chem
     #   jinja2
@@ -661,7 +654,7 @@ newrelic==6.4.0.157
     #   edx-django-utils
 nltk==3.6.2
     # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
+    #   -r requirements/edx/base.in
     #   chem
 nodeenv==1.6.0
     # via -r requirements/edx/base.in
@@ -724,9 +717,7 @@ pycontracts==1.8.12
 pycountry==20.7.3
     # via -r requirements/edx/base.in
 pycparser==2.20
-    # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
-    #   cffi
+    # via cffi
 pycryptodomex==3.10.1
     # via
     #   -r requirements/edx/base.in
@@ -842,9 +833,7 @@ recommender-xblock==2.0.1
 redis==3.5.3
     # via -r requirements/edx/base.in
 regex==2021.4.4
-    # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
-    #   nltk
+    # via nltk
 requests-oauthlib==1.3.0
     # via
     #   -r requirements/edx/base.in
@@ -903,7 +892,6 @@ simplejson==3.17.2
     #   xblock-utils
 six==1.16.0
     # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   analytics-python
@@ -911,7 +899,6 @@ six==1.16.0
     #   chem
     #   codejail
     #   crowdsourcehinter-xblock
-    #   cryptography
     #   django-countries
     #   edx-ace
     #   edx-bulk-grades
@@ -936,7 +923,6 @@ six==1.16.0
     #   python-swiftclient
     #   social-auth-app-django
     #   social-auth-core
-    #   stevedore
 slumber==0.7.1
     # via
     #   edx-bulk-grades
@@ -963,9 +949,8 @@ sqlparse==0.4.1
     #   django
 staff-graded-xblock==1.5.1
     # via -r requirements/edx/base.in
-stevedore==1.32.0
+stevedore==3.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt
     #   code-annotations
@@ -990,9 +975,7 @@ text-unidecode==1.3
 tincan==1.0.0
     # via edx-event-routing-backends
 tqdm==4.61.0
-    # via
-    #   -r requirements/edx/../edx-sandbox/shared.txt
-    #   nltk
+    # via nltk
 ua-parser==0.10.0
     # via django-cookies-samesite
 unicodecsv==0.14.1

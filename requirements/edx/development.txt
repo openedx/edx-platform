@@ -179,9 +179,8 @@ coverage==5.5
     #   pytest-cov
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/testing.txt
-cryptography==3.2.1
+cryptography==3.4.7
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-fernet-fields
     #   edx-enterprise
@@ -717,9 +716,8 @@ jinja2-pluralize==0.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
-jinja2==2.11.3
+jinja2==3.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
     #   coreschema
@@ -814,9 +812,8 @@ markey==0.8
     # via
     #   -r requirements/edx/testing.txt
     #   enmerkar-underscore
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   chem
     #   jinja2
@@ -1234,7 +1231,6 @@ six==1.16.0
     #   chem
     #   codejail
     #   crowdsourcehinter-xblock
-    #   cryptography
     #   django-countries
     #   edx-ace
     #   edx-bulk-grades
@@ -1266,7 +1262,6 @@ six==1.16.0
     #   social-auth-app-django
     #   social-auth-core
     #   sphinxcontrib-httpdomain
-    #   stevedore
     #   tox
     #   transifex-client
     #   virtualenv
@@ -1299,9 +1294,8 @@ soupsieve==2.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==3.5.4
+sphinx==4.0.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
 sphinxcontrib-applehelp==1.0.2
@@ -1327,9 +1321,8 @@ sqlparse==0.4.1
     #   django-debug-toolbar
 staff-graded-xblock==1.5.1
     # via -r requirements/edx/testing.txt
-stevedore==1.32.0
+stevedore==3.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   code-annotations
     #   edx-ace
