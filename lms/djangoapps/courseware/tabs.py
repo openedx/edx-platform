@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_noop
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active, course_home_mfe_progress_tab_is_active  # lint-amnesty, pylint: disable=line-too-long
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active, course_home_mfe_progress_tab_is_active
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import DISABLE_UNIFIED_COURSE_TAB_FLAG, default_course_url_name
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
