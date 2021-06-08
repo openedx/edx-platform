@@ -9,6 +9,7 @@ from factory.django import DjangoModelFactory
 
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from lms.djangoapps.certificates.models import (
+    CertificateAllowlist,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
@@ -45,6 +46,21 @@ class CertificateAllowlistFactory(DjangoModelFactory):
     notes = 'Test Notes'
 
 
+class TemporaryCertificateAllowlistFactory(DjangoModelFactory):
+    """
+    Temporary certificate allowlist factory.
+
+    This will be removed once the CertificateAllowlistFactory uses the CertificateAllowlist as its model.
+    """
+
+    class Meta:
+        model = CertificateAllowlist
+
+    course_id = None
+    allowlist = True
+    notes = 'Test Notes'
+
+
 class CertificateInvalidationFactory(DjangoModelFactory):
     """
     CertificateInvalidation factory
@@ -70,18 +86,18 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             "default": {
                 "accomplishment_class_append": "accomplishment-certificate",
                 "platform_name": "edX",
-                "company_about_url": "http://www.edx.org/about-us",
-                "company_privacy_url": "http://www.edx.org/edx-privacy-policy",
-                "company_tos_url": "http://www.edx.org/edx-terms-service",
-                "company_verified_certificate_url": "http://www.edx.org/verified-certificate",
+                "company_about_url": "https://www.edx.org/about-us",
+                "company_privacy_url": "https://www.edx.org/edx-privacy-policy",
+                "company_tos_url": "https://www.edx.org/edx-terms-service",
+                "company_verified_certificate_url": "https://www.edx.org/verified-certificate",
                 "document_stylesheet_url_application": "/static/certificates/sass/main-ltr.css",
                 "logo_src": "/static/certificates/images/logo-edx.png",
-                "logo_url": "http://www.edx.org"
+                "logo_url": "https://www.edx.org"
             },
             "honor": {
                 "certificate_type": "Honor Code",
                 "certificate_title": "Certificate of Achievement",
-                "logo_url": "http://www.edx.org/honor_logo.png"
+                "logo_url": "https://www.edx.org/honor_logo.png"
             },
             "verified": {
                 "certificate_type": "Verified",
