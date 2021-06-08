@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.dates.v1.serializers import DatesTabSerializer
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_dates_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
@@ -75,7 +75,7 @@ class DatesTabView(RetrieveAPIView):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
 
-        if not course_home_mfe_dates_tab_is_active(course_key):
+        if not course_home_mfe_is_active(course_key):
             raise Http404
 
         # Enable NR tracing for this view based on course
