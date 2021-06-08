@@ -15,10 +15,6 @@ isort:skip_file
 from safe_lxml import defuse_xml_libs
 defuse_xml_libs()
 
-# Disable PyContract contract checking when running as a webserver
-import contracts  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
-contracts.disable_all()
-
 import os  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cms.envs.aws")
 
