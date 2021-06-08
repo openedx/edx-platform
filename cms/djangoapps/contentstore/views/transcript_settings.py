@@ -21,7 +21,6 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from common.djangoapps.student.auth import has_studio_write_access
 from common.djangoapps.util.json_request import JsonResponse, expect_json
@@ -178,6 +177,14 @@ def transcript_download_handler(request):
 
 
 def upload_transcript(request):
+    """
+    Upload a transcript file
+
+    Arguments:
+        request: A WSGI request object
+
+        Transcript file in SRT format
+    """
     edx_video_id = request.POST['edx_video_id']
     language_code = request.POST['language_code']
     new_language_code = request.POST['new_language_code']
@@ -209,7 +216,7 @@ def upload_transcript(request):
         )
     finally:
         LOGGER.info("Updated transcript on edX video %s for language %s", edx_video_id, new_language_code)
-        return response
+    return response
 
 
 def validate_transcript_upload_data(data, files):
