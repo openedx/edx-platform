@@ -4,6 +4,7 @@ Helper methods for applications
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator, ValidationError
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -160,12 +161,12 @@ def validate_word_limit(text_area_input):
         )
 
 
-def send_application_submission_confirmation_email(recipient_email):
+def send_application_submission_confirmation_emails(recipient_emails):
     """
-    Send an email to the recipient_email according to the mandrill template
+    Send application submission confirmation email to the recipient emails
 
     Args:
-        recipient_email(str): target email address to send the email to
+        recipient_emails (list): target email addresses to send the email to
 
     Returns:
         None
@@ -179,7 +180,8 @@ def send_application_submission_confirmation_email(recipient_email):
     context = {
         'course_catalog_url': course_catalog_url
     }
-    task_send_mandrill_email.delay(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, [recipient_email], context)
+
+    task_send_mandrill_email.delay(MandrillClient.APPLICATION_SUBMISSION_CONFIRMATION, recipient_emails, context)
 
 
 def min_year_value_validator(value):
@@ -519,3 +521,49 @@ def get_application_hub_instructions(
         'message': message,
         'instruction': instruction
     }
+
+
+def get_users_with_active_enrollments_from_course_groups(user_ids, course_groups):
+    """
+    Given the ids and course groups, filter distinct users enrolled in the course group courses.
+
+    Args:
+        user_ids (list): List of user ids
+        course_groups (list): List of MultilingualCourseGroup objects
+
+    Returns:
+        users_with_active_enrollment (list): List of users who have active enrollment in at least one of
+        the open courses from at least one of the given course groups
+    """
+    users_with_active_enrollment = []
+
+    for course_group in course_groups:
+        course_keys = course_group.open_multilingual_course_keys()
+        users_with_active_enrollment += User.objects.filter(
+            id__in=user_ids,
+            courseenrollment__course__in=course_keys,
+            courseenrollment__is_active=True,
+        )
+
+    return list(set(users_with_active_enrollment))
+
+
+def has_user_passed_given_courses(user, courses):
+    """
+    Check if the user has passed the given list of courses
+
+    Args:
+        user (User): User object
+        courses (list): List of courses
+
+    Returns:
+        boolean: True if the user has passed all of the courses in the given list; False otherwise
+    """
+    for course in courses:
+        course_grade = CourseGradeFactory().read(user, course_key=course.id)
+        course_passed = course_grade and course_grade.passed
+
+        if not course_passed:
+            return False
+
+    return True

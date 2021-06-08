@@ -13,7 +13,7 @@ TITLE_BUSINESS_LINE_1 = 'test_business_line1'
 TITLE_BUSINESS_LINE_2 = 'test_business_line2'
 
 USERNAME = 'test'
-EMAIL = 'test@example.com'
+EMAILS = ['test1@example.com', 'test2@example.com']
 PASSWORD = 'edx'
 
 NOTE = 'Test note'
@@ -40,3 +40,6 @@ MOCK_FILE_PATH = 'dummy_file.pdf'
 TEST_MESSAGE_FOR_APPLICANT = 'Test message for the applicant'
 
 VALID_USER_BIRTH_DATE_FOR_APPLICATION = date.today() - relativedelta(years=30)
+
+PROGRAM_PRE_REQ = 'program_pre_req'
+BUSINESS_LINE_PRE_REQ = 'business_line_pre_req'
