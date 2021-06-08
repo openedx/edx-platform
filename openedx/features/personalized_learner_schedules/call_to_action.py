@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ngettext, gettext as _
 
-from common.lib.xmodule.xmodule.util.misc import is_xblock_an_assignment
+from xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_experience.url_helpers import is_request_from_learning_mfe
 from openedx.features.course_experience.utils import dates_banner_should_display

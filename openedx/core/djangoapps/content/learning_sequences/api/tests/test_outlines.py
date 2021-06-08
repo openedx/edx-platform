@@ -24,7 +24,7 @@ from common.djangoapps.course_modes.signals import update_masters_access_course
 from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.roles import CourseBetaTesterRole
 from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.lib.xmodule.xmodule.partitions.partitions import (
+from xmodule.partitions.partitions import (
     ENROLLMENT_TRACK_PARTITION_ID,
 )
 
