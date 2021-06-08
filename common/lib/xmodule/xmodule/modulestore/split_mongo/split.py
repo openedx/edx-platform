@@ -64,7 +64,6 @@ from importlib import import_module
 
 from bson.objectid import ObjectId
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
-from contracts import contract, new_contract
 from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
@@ -132,11 +131,6 @@ log = logging.getLogger(__name__)
 
 # When blacklists are this, all children should be excluded
 EXCLUDE_ALL = '*'
-
-
-new_contract('BlockUsageLocator', BlockUsageLocator)
-new_contract('BlockKey', BlockKey)
-new_contract('XBlock', XBlock)
 
 
 class SplitBulkWriteRecord(BulkOpsRecord):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -815,7 +809,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             system.module_data.update(new_module_data)
             return system.module_data
 
-    @contract(course_entry=CourseEnvelope, block_keys="list(BlockKey)", depth="int | None")
     def _load_items(self, course_entry, block_keys, depth=0, **kwargs):
         """
         Load & cache the given blocks from the course. May return the blocks in any order.
@@ -1224,7 +1217,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(usage_key)) is not None
 
-    @contract(returns='XBlock')
     def get_item(self, usage_key, depth=0, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         depth (int): An argument that some module stores may use to prefetch
@@ -1724,7 +1716,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 return potential_key
             serial += 1
 
-    @contract(returns='XBlock')
     def create_item(self, user_id, course_key, block_type, block_id=None, definition_locator=None, fields=None,  # lint-amnesty, pylint: disable=arguments-differ
                     asides=None, force=False, **kwargs):
         """
@@ -2491,7 +2482,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.update_structure(destination_course, destination_structure)
             self._update_head(destination_course, index_entry, destination_course.branch, destination_structure['_id'])
 
-    @contract(source_keys="list(BlockUsageLocator)", dest_usage=BlockUsageLocator)
     def copy_from_template(self, source_keys, dest_usage, user_id, head_validation=True):
         """
         Flexible mechanism for inheriting content from an external course/library/etc.
@@ -2723,7 +2713,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             return result
 
-    @contract(root_block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
     def _remove_subtree(self, root_block_key, blocks):
         """
         Remove the subtree rooted at root_block_key
@@ -2772,7 +2761,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self._emit_course_deleted_signal(course_key)
 
-    @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)
     def inherit_settings(
         self, block_map, block_key, inherited_settings_map, inheriting_settings=None, inherited_from=None
     ):
@@ -2927,7 +2915,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return self.save_asset_metadata_list([asset_metadata, ], user_id, import_only)
 
-    @contract(asset_key='AssetKey', attr_dict=dict)
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
@@ -2958,7 +2945,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self._update_course_assets(user_id, asset_key, _internal_method)
 
-    @contract(asset_key='AssetKey')
     def delete_asset_metadata(self, asset_key, user_id):
         """
         Internal; deletes a single asset's metadata.
@@ -2985,7 +2971,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         except ItemNotFoundError:
             return 0
 
-    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
         """
         Copy all the course assets from source_course_key to dest_course_key.
@@ -3037,7 +3022,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         and converting them.
         :param jsonfields: the serialized copy of the xblock's fields
         """
-        @contract(block_key="BlockUsageLocator | seq[2]")
         def robust_usage_key(block_key):
             """
             create a course_key relative usage key for the block_key. If the block_key is in blocks,
@@ -3220,7 +3204,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'schema_version': self.SCHEMA_VERSION,
         }
 
-    @contract(block_key=BlockKey)
     def _get_parents_from_structure(self, block_key, structure):
         """
         Given a structure, find block_key's parent in that structure. Note returns
@@ -3247,12 +3230,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         destination_parent.fields['children'] = destination_reordered
         return orphans
 
-    @contract(
-        block_key=BlockKey,
-        source_blocks="dict(BlockKey: *)",
-        destination_blocks="dict(BlockKey: *)",
-        blacklist="list(BlockKey) | str",
-    )
     def _copy_subdag(self, user_id, destination_version, block_key, source_blocks, destination_blocks, blacklist):
         """
         Update destination_blocks for the sub-dag rooted at block_key to be like the one in
@@ -3321,7 +3298,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         destination_blocks[block_key] = destination_block
         return orphans
 
-    @contract(blacklist='list(BlockKey) | str')
     def _filter_blacklist(self, fields, blacklist):
         """
         Filter out blacklist from the children field in fields. Will construct a new list for children;
@@ -3333,7 +3309,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             fields['children'] = [child for child in fields.get('children', []) if BlockKey(*child) not in blacklist]
         return fields
 
-    @contract(orphan=BlockKey)
     def _delete_if_true_orphan(self, orphan, structure):
         """
         Delete the orphan and any of its descendants which no longer have parents.
@@ -3343,7 +3318,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for child in orphan_data.fields.get('children', []):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
 
-    @contract(returns=BlockData)
     def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False,
                    asides=None, block_defaults=None):
         """
@@ -3375,7 +3349,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             document['defaults'] = block_defaults
         return BlockData(**document)
 
-    @contract(block_key=BlockKey, returns='BlockData | None')
     def _get_block_from_structure(self, structure, block_key):
         """
         Encodes the block key before retrieving it from the structure to ensure it can
@@ -3383,7 +3356,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return structure['blocks'].get(block_key)
 
-    @contract(block_key=BlockKey)
     def _get_asides_to_update_from_structure(self, structure, block_key, asides):
         """
         Get list of aside fields that should be updated/inserted
@@ -3415,7 +3387,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             return block.asides, False
 
-    @contract(block_key=BlockKey, content=BlockData)
     def _update_block_in_structure(self, structure, block_key, content):
         """
         Encodes the block key before accessing it in the structure to ensure it can

@@ -25,8 +25,6 @@ import os
 import sys
 from argparse import ArgumentParser
 
-import contracts
-
 
 def parse_args():
     """Parse edx specific arguments to manage.py"""
@@ -49,11 +47,6 @@ def parse_args():
         choices=['lms', 'lms-xml', 'lms-preview'],
         default='lms',
         help='Which service variant to run, when using the production environment')
-    lms.add_argument(
-        '--contracts',
-        action='store_true',
-        default=False,
-        help='Turn on pycontracts for local development')
     lms.set_defaults(
         help_string=lms.format_help(),
         settings_base='lms/envs',
@@ -72,11 +65,6 @@ def parse_args():
         help="Which django settings module to use under cms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
              "environment variable will be used if it is set, otherwise it will default to cms.envs.devstack_docker")
     cms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
-    cms.add_argument(
-        '--contracts',
-        action='store_true',
-        default=False,
-        help='Turn on pycontracts for local development')
     cms.set_defaults(
         help_string=cms.format_help(),
         settings_base='cms/envs',
@@ -105,11 +93,6 @@ if __name__ == "__main__":
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", edx_args.default_settings)
     os.environ.setdefault("SERVICE_VARIANT", edx_args.service_variant)
-
-    enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
-    # can override with '--contracts' argument
-    if not enable_contracts and not edx_args.contracts:
-        contracts.disable_all()
 
     if edx_args.help:
         print("Django:")
