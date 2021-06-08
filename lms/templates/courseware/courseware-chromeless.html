@@ -132,7 +132,6 @@ ${HTML(fragment.foot_html())}
         var newHeight = contentElement.offsetHeight;
         var newWidth = contentElement.offsetWidth;
 
-
         if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
             // Check to see if the page is fully loaded
             window.parent.postMessage("ready", document.referrer)
@@ -155,14 +154,14 @@ ${HTML(fragment.foot_html())}
         }
 
 
-        window.parent.postMessage(
-          {
+        window.parent.postMessage({
             type: 'plugin.resize',
             payload: {
               width: newWidth,
               height: newHeight,
             }
-          }, document.referrer);
+          }, document.referrer
+        );
 
         lastHeight = newHeight;
         lastWidth = newWidth;
