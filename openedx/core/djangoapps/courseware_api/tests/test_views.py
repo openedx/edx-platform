@@ -26,7 +26,6 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES,
     COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION,
-    REDIRECT_TO_COURSEWARE_MICROFRONTEND,
     COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS,
 )
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
@@ -95,7 +94,6 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@override_waffle_flag(REDIRECT_TO_COURSEWARE_MICROFRONTEND, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
 class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
