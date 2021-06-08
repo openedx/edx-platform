@@ -11,18 +11,19 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
 
-# .. toggle_name: courseware.courseware_mfe
+
+# .. toggle_name: courseware.use_legacy_frontend
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Waffle flag to redirect to another learner profile experience. Supports staged rollout to
-#   students for a new micro-frontend-based implementation of the courseware page.
+# .. toggle_description: Waffle flag to direct learners to the legacy courseware experience - the default behavior
+#   directs to the new MFE-based courseware in frontend-app-learning. Supports the ability to globally flip back to
+#   the legacy courseware experience.
 # .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2020-01-29
-# .. toggle_target_removal_date: 2020-12-31
-# .. toggle_warnings: Also set settings.LEARNING_MICROFRONTEND_URL.
+# .. toggle_creation_date: 2021-06-03
+# .. toggle_target_removal_date: 2021-10-09
 # .. toggle_tickets: DEPR-109
-REDIRECT_TO_COURSEWARE_MICROFRONTEND = CourseWaffleFlag(
-    WAFFLE_FLAG_NAMESPACE, 'courseware_mfe', __name__
+COURSEWARE_USE_LEGACY_FRONTEND = CourseWaffleFlag(
+    WAFFLE_FLAG_NAMESPACE, 'use_legacy_frontend', __name__
 )
 
 # .. toggle_name: courseware.microfrontend_course_team_preview
@@ -132,8 +133,12 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     #     regardless of configuration.
     if course_key.deprecated:
         return False
-    # OTHERWISE: Defer to value of waffle flag for this course run and user.
-    return REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
+    # NO: MFE courseware can be disabled for users/courses/globally via this
+    #     Waffle flag.
+    if COURSEWARE_USE_LEGACY_FRONTEND.is_enabled(course_key):
+        return False
+    # OTHERWISE: MFE courseware experience is active by default.
+    return True
 
 
 def courseware_mfe_is_visible(
