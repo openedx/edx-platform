@@ -65,15 +65,12 @@ class ProductionStorage(ProductionMixin, StaticFilesStorage):
 
 class ProductionS3Storage(ProductionMixin, S3Boto3Storage):  # pylint: disable=abstract-method
 
-    @beeline.traced('ProductionS3Storage.url')
     def url(self, name, force=False):
         """
         Return the non-hashed URL in DEBUG mode with cache support.
 
         Tahoe: RED-1961 This method is created for Tahoe to address mysteriously missing cache.
         """
-        beeline.add_context_field('ProductionS3Storage.file_name', name)
-        beeline.add_context_field('ProductionS3Storage.force', force)
 
         static_files_cache = caches['staticfiles']
         cache_entry_name = 'ProductionS3Storage.staticfiles_cache.{}'.format(name)
@@ -81,13 +78,8 @@ class ProductionS3Storage(ProductionMixin, S3Boto3Storage):  # pylint: disable=a
 
         url = static_files_cache.get(cache_entry_name)
         if not url:
-            beeline.add_context_field('ProductionS3Storage.cached', False)
             url = super().url(name, force)
             static_files_cache.set(cache_entry_name, url)
-        else:
-            beeline.add_context_field('ProductionS3Storage.cached', True)
-
-        beeline.add_context_field('ProductionS3Storage.hashed_url', url)
         return url
 
 
