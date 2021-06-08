@@ -416,7 +416,6 @@
     "Divided": "Podzielone",
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "Czy chcesz zwolni\u0107 studenta ('{student_id}') z egzaminu wst\u0119pnego?",
     "Do you want to replace the edX transcript with the YouTube transcript?": "Czy chcesz podmieni\u0107 bie\u017c\u0105c\u0105 transkrypcj\u0119 na nowsz\u0105 transkrypcj\u0119 z YouTube?",
-    "Do you want to upload your file before submitting?": "Czy chcesz wgra\u0107 sw\u00f3j plik przed wys\u0142aniem odpowiedzi?",
     "Does the name on your ID match your account name: %(fullName)s?": "Czy imi\u0119 i nazwisko na dokumencie zgadzaj\u0105 si\u0119 z danymi konta: %(fullName)s?",
     "Does the photo of you show your whole face?": "Czy na zdj\u0119ciu wida\u0107 ca\u0142\u0105 twoj\u0105 twarz?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "Nie widzisz swojego zdj\u0119cia? Upewnij si\u0119, \u017ce zezwalasz swojej przegl\u0105darce na u\u017cycie kamerki, gdy pojawia si\u0119 pro\u015bba o zgod\u0119.",

@@ -20,7 +20,6 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    "\n          Start my exam\n        ": "\n          Hasi azterketa\n        ",
     " ${price} {currency} )": " ${price} {currency} )",
     " and ": "eta",
     " and {num_of_minutes} minute": "eta {num_of_minutes} minutu",
@@ -1220,7 +1219,6 @@
     "Total": "Denerakoa",
     "Transcript Languages": "Transkripzio-hizkuntzak",
     "Transcripts": "Transkripzioak",
-    "Try this practice exam again": "Saiatu berriz praktika-azterketa hau egiten",
     "Try using a different browser, such as Google Chrome.": "Saiatu beste nabigatzaile bat erabilita, Google Chrome adibidez.",
     "Turn off transcripts": "Desgaitu transkripzioak",
     "Turn on closed captioning": "Gaitu itxitako azpitituluak",
@@ -1355,7 +1353,6 @@
     "You are currently sharing a limited profile.": "Une honetan profil mugatua partekatzen ari zara.",
     "You are not currently a member of any team.": "Une honetan ez zara inongo taldetako partaide.",
     "You are now enrolled as a verified student for:": "Orain egiaztatutkao ikasle gisa matrikulatu zara hemen:",
-    "You can also retry this practice exam": "Praktika-azterketa hau berriz egiten saia zaitezke",
     "You commented...": "Zuk komentatu zenuen...",
     "You could not be subscribed to this post. Refresh the page and try again.": "Ezin izan zara harpidetu mezu honetar. Freskatu orria eta saiatu berriz.",
     "You could not be unsubscribed from this post. Refresh the page and try again.": "Ezin izan duzu mezu honetarako harpidetza kendu. Freskatu orria eta saiatu berriz.",
@@ -1471,11 +1468,9 @@
     "or": "edo",
     "or create a new one here": "edo sortu beste bat hemen",
     "or sign in with": "edo hasi saioa ondokoarekin",
-    "pending": "zain",
     "post anonymously": "bidali anonimoki",
     "post anonymously to classmates": "bidali anonimoki ikaskideei",
     "posted %(time_ago)s by %(author)s": "%(author)s -k bidalia duela %(time_ago)s",
-    "practice": "praktika",
     "price": "prezioa",
     "question posted %(time_ago)s by %(author)s": "duela %(time_ago)s %(author)sk bidalitako galdera",
     "remove": "ezabatu",

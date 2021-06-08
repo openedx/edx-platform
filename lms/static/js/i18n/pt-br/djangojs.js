@@ -266,7 +266,6 @@
     "Display Name": "Exibir Nome",
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "Voc\u00ea deseja permitir que o estudante ('{student_id}') pule o teste de admiss\u00e3o?",
     "Do you want to replace the edX transcript with the YouTube transcript?": "Voc\u00ea quer substituir a transcri\u00e7\u00e3o do edX pela do YouTube?",
-    "Do you want to upload your file before submitting?": "Voc\u00ea deseja fazer upload de seu arquivo antes de enviar?",
     "Does the name on your ID match your account name: %(fullName)s?": "O nome de sua identifica\u00e7\u00e3o correspondo ao nome de sua conta: %(fullName)s?",
     "Does the photo of you show your whole face?": "A sua foto escolhida exibe todo o seu rosto?",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "N\u00e3o v\u00ea sua fotografia? Certifique-se de permitir que o seu navegador utilize a c\u00e2mera quando ele pedir permiss\u00e3o.",

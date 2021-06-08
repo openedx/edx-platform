@@ -159,7 +159,6 @@
     "Discard Changes": "Zahodi\u0165 zmeny",
     "Div": "Rozdelenie",
     "Do not show again": "Neukazuj znova",
-    "Do you want to upload your file before submitting?": "Chcete pred odoslan\u00edm odovzda\u0165 v\u00e1\u0161 s\u00fabor?",
     "Document properties": "Vlastnosti dokumentu",
     "Donate": "Darova\u0165",
     "Download": "Prevzia\u0165",

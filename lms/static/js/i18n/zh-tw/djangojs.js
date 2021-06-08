@@ -206,7 +206,6 @@
     "Deleted Content Group": "\u522a\u9664\u5167\u5bb9\u7fa4\u7d44",
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "\u522a\u9664\u9019%(item_display_name)s \u662f\u6c38\u4e45\u7684\u4ee5\u53ca\u7121\u6cd5\u518d\u8b8a\u66f4\u3002",
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "\u60a8\u8981\u5141\u8a31\u9019\u4f4d\u5b78\u751f ('{student_id}') \u4e0d\u53c3\u52a0\u8003\u8a66\uff1f",
-    "Do you want to upload your file before submitting?": "\u4f60\u60f3\u5728\u63d0\u4ea4\u524d\u4e0a\u50b3\u60a8\u7684\u6a94\u6848\uff1f",
     "Does the name on your ID match your account name: %(fullName)s?": "\u60a8\u7684ID\u540d\u7a31\u662f\u5426\u8207\u5e33\u865f\u540d\u7a31\u4e00\u6a23\uff1a %(fullName)s\uff1f",
     "Does the photo of you show your whole face?": "\u60a8\u7684\u7167\u7247\u662f\u5426\u6709\u5b8c\u5168\u986f\u793a\u60a8\u7684\u81c9\uff1f",
     "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.": "\u60a8\u6c92\u6709\u770b\u5230\u60a8\u7684\u7167\u7247\u55ce\uff1f\u8acb\u81f3\u60a8\u7684\u700f\u89bd\u5668\u4e2d\u78ba\u8a8d\u662f\u5426\u5141\u8a31\u4f7f\u7528\u7167\u76f8\u529f\u80fd\u3002",
