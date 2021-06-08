@@ -552,18 +552,6 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         """
         FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
 
-    def test_enrollment_track_partition_added(self):
-        """
-        Test that the dynamic enrollment track scheme is added if there is no conflict with the user partition ID.
-        """
-        all_partitions = get_all_partitions_for_course(self.course)
-        assert 2 == len(all_partitions)
-        assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
-        enrollment_track_partition = all_partitions[1]
-        assert self.ENROLLMENT_TRACK_SCHEME_NAME == enrollment_track_partition.scheme.name
-        assert str(self.course.id) == enrollment_track_partition.parameters['course_id']
-        assert ENROLLMENT_TRACK_PARTITION_ID == enrollment_track_partition.id
-
     def test_enrollment_track_partition_not_added_if_conflict(self):
         """
         Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
