@@ -726,6 +726,7 @@ def do_email_change_request(user, new_email, activation_key=None, secondary_emai
 
     try:
         ace.send(msg)
+        log.info("Email activation link sent to user [%s].", new_email)
     except Exception:
         from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         log.error('Unable to send email activation link to user from "%s"', from_address, exc_info=True)
