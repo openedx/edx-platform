@@ -14,7 +14,6 @@ from unittest.mock import patch
 import pytest
 import ddt
 from ccx_keys.locator import CCXBlockUsageLocator
-from contracts import contract
 from django.core.cache import InvalidCacheBackendError, caches
 from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId, VersionTree
 from path import Path as path
@@ -2125,7 +2124,6 @@ class TestPublish(SplitModuleTest):
         ]
         self._check_course(source_course, dest_course, expected, [BlockKey("chapter", "chapter2"), BlockKey("problem", "problem3_2")])  # lint-amnesty, pylint: disable=line-too-long
 
-    @contract(expected_blocks="list(BlockKey)", unexpected_blocks="list(BlockKey)")
     def _check_course(self, source_course_loc, dest_course_loc, expected_blocks, unexpected_blocks):
         """
         Check that the course has the expected blocks and does not have the unexpected blocks
@@ -2164,11 +2162,6 @@ class TestPublish(SplitModuleTest):
             actual = {key: BlockKey.from_usage_key(val) for (key, val) in actual}
         assert expected == actual
 
-    @contract(
-        source_children="list(BlockUsageLocator)",
-        dest_children="list(BlockUsageLocator)",
-        unexpected="list(BlockKey)"
-    )
     def _compare_children(self, source_children, dest_children, unexpected):
         """
         Ensure dest_children == source_children minus unexpected

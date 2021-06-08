@@ -14,7 +14,6 @@ from time import time
 
 import pymongo
 import pytz
-from contracts import check, new_contract
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
@@ -29,7 +28,6 @@ try:
 except ImportError:
     DJANGO_AVAILABLE = False
 
-new_contract('BlockData', BlockData)
 log = logging.getLogger(__name__)
 
 

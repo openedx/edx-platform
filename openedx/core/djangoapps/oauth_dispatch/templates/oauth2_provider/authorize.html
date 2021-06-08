@@ -1,0 +1,61 @@
+{% extends "main_django.html" %}
+{% load i18n configuration %}
+
+{% block title %}
+  {% trans "Authorize" as tmsg %}{{tmsg|force_escape}} | {% platform_name %}
+{% endblock %}
+
+{% block body %}
+    <main id="main" aria-label="Content" tabindex="-1">
+      <section class="container authorize {{ selected_tab }}" id="authorize-content">
+        <div class="wrapper-authorize">
+            <div class="block-center">
+                {% if not error %}
+                    <form id="authorizationForm" method="post">
+                        <h1 class="block-center-heading">{% trans "Authorize" as tmsg %}{{tmsg|force_escape}} {{ application.name }}?</h1>
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% endif %}
+                        {% endfor %}
+
+                        <p>{% trans "The above application requests the following permissions from your account:" as tmsg%}{{tmsg|force_escape}}</p>
+                        <ul>
+                            {% for scope in scopes_descriptions %}
+                                <li>{{ scope }}</li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if content_orgs %}
+                            <p>{% trans "These permissions will be granted for data from your courses associated with the following content providers:" as tmsg %}{{tmsg|force_escape}}</p>
+                            <ul>
+                                {% for org_name in content_orgs %}
+                                    <li>{{ org_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        <p>{% trans "Please click the 'Allow' button to grant these permissions to the above application. Otherwise, to withhold these permissions, please click the 'Cancel' button." as tmsg %}{{tmsg|force_escape}}
+                        </p>
+
+                        {{ form.errors }}
+                        {{ form.non_field_errors }}
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <button type="submit" class="btn btn-authorization-cancel" name="cancel"/>{% trans "Cancel" as tmsg%}{{tmsg|force_escape}}</button><button type="submit" class="btn btn-authorization-allow" name="allow" value="Authorize"/>{% trans "Allow" as tmsg%}{{tmsg|force_escape}}</button>
+                            </div>
+                        </div>
+                    </form>
+
+                {% else %}
+                    <h2>{% trans "Error" as tmsg%}{{tmsg|force_escape}}: {{ error.error }}</h2>
+                    <p>{{ error.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+      </section>
+    </main>
+{% endblock %}
