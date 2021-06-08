@@ -862,7 +862,7 @@ class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
         assert len(data['general_errors']) == 0
         assert len(data['row_errors']['data_format_error']) == 0
         assert len(data['row_errors']['user_not_exist']) == 0
-        assert len(data['row_errors']['user_already_white_listed']) == 0
+        assert len(data['row_errors']['user_already_allowlisted']) == 0
         assert len(data['row_errors']['user_not_enrolled']) == 0
         assert len(data['success']) == 2
 
@@ -937,7 +937,7 @@ class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
 
         csv_content = b"test_student1@example.com,dummy_notes"
         data = self.upload_file(csv_content=csv_content)
-        assert len(data['row_errors']['user_already_white_listed']) == 1
+        assert len(data['row_errors']['user_already_allowlisted']) == 1
         assert len(data['general_errors']) == 0
         assert len(data['success']) == 0
 
