@@ -24,7 +24,8 @@ from edx_django_utils.cache import TieredCache, get_cache_key
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAttribute, EnrollmentRefundConfiguration
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

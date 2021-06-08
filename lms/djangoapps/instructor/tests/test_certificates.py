@@ -24,10 +24,10 @@ from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateInvalidation,
-    CertificateStatuses,
     GeneratedCertificate
 )
 from lms.djangoapps.certificates.tests.factories import (

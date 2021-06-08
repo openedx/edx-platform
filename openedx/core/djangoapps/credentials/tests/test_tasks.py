@@ -14,7 +14,8 @@ from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.models import GeneratedCertificate, CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory

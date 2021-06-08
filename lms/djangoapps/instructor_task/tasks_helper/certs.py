@@ -20,7 +20,8 @@ from lms.djangoapps.certificates.api import (
     get_enrolled_allowlisted_not_passing_users,
     is_using_v2_course_certificates,
 )
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 
 from .runner import TaskProgress
 

@@ -1462,7 +1462,7 @@ XBLOCK_FS_STORAGE_PREFIX = None
 # .. setting_default: {}
 # .. setting_description: Dictionary containing server-wide configuration of XBlocks on a per-type basis.
 #     By default, keys should match the XBlock `block_settings_key` attribute/property. If the attribute/property
-#     is not defined, use the XBlock class name. Check `common.lib.xmodule.xmodule.services.SettingsService`
+#     is not defined, use the XBlock class name. Check `xmodule.services.SettingsService`
 #     for more reference.
 XBLOCK_SETTINGS = {}
 

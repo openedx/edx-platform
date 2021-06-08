@@ -18,7 +18,8 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_recently_modified_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.api import CourseGradeFactory, get_recently_modified_grades
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

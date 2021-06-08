@@ -31,7 +31,8 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.generation_handler import CERTIFICATES_USE_UPDATED
-from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.course_data import CourseData

@@ -60,7 +60,7 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory
 )

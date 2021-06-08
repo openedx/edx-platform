@@ -779,7 +779,7 @@ class CourseMode(models.Model):
         if settings.FEATURES['DISABLE_HONOR_CERTIFICATES']:
             # Adding check so that we can regenerate the certificate for learners who have
             # already earned the certificate using honor mode
-            from lms.djangoapps.certificates.models import CertificateStatuses
+            from lms.djangoapps.certificates.data import CertificateStatuses
             if mode_slug == cls.HONOR and status != CertificateStatuses.downloadable:
                 ineligible_modes.append(cls.HONOR)
 

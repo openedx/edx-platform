@@ -23,7 +23,7 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.grades.tests.utils import mock_passing_grade

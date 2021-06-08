@@ -13,7 +13,8 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from lms.djangoapps.certificates.api import generate_user_certificates
-from lms.djangoapps.certificates.models import CertificateStatuses, certificate_status_for_student
+from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.models import certificate_status_for_student
 
 LOGGER = logging.getLogger(__name__)
 User = get_user_model()

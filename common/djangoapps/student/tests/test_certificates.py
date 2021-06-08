@@ -14,7 +14,7 @@ from pytz import UTC
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import get_certificate_url
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory

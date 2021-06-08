@@ -12,8 +12,8 @@
 # This file contains all common constraints for edx-repos
 -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
 
-# latest version breaks the tests.
-django<2.2.21
+# edx-platform currently only supported for Django 2.2.x
+django<2.3
 
 # We do not support version django-config-models<1.0.0
 django-config-models>=1.0.0

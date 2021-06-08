@@ -30,7 +30,7 @@ from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, Optout
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.program_enrollments.constants import ProgramCourseOperationStatuses as CourseStatuses

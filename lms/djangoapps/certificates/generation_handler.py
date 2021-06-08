@@ -12,9 +12,9 @@ from edx_toggles.toggles import LegacyWaffleFlagNamespace
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateInvalidation,
-    CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
 )

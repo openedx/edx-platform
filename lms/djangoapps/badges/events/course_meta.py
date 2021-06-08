@@ -51,7 +51,7 @@ def completion_check(user):
     completed courses. This badge will not work if certificate generation isn't
     enabled and run.
     """
-    from lms.djangoapps.certificates.models import CertificateStatuses
+    from lms.djangoapps.certificates.data import CertificateStatuses
     config = CourseEventBadgesConfiguration.current().completed_settings
     certificates = user.generatedcertificate_set.filter(status__in=CertificateStatuses.PASSED_STATUSES).count()
     award_badge(config, certificates, user)
@@ -62,7 +62,7 @@ def course_group_check(user, course_key):
     """
     Awards a badge if a user has completed every course in a defined set.
     """
-    from lms.djangoapps.certificates.models import CertificateStatuses
+    from lms.djangoapps.certificates.data import CertificateStatuses
     config = CourseEventBadgesConfiguration.current().course_group_settings
     awards = []
     for slug, keys in config.items():

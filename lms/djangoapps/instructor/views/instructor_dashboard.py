@@ -39,11 +39,11 @@ from common.djangoapps.student.roles import (
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,
-    CertificateStatuses,
     GeneratedCertificate
 )
 from lms.djangoapps.courseware.access import has_access

@@ -287,7 +287,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-proctoring
-django==2.2.20
+django==2.2.24
     # via
     #   -c https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -455,7 +455,7 @@ edx-organizations==6.9.0
     # via -r requirements/edx/base.in
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
-edx-proctoring==3.12.0
+edx-proctoring==3.13.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring-proctortrack
@@ -648,7 +648,7 @@ mpmath==1.2.1
     # via sympy
 mysqlclient==2.0.3
     # via -r requirements/edx/base.in
-newrelic==6.4.0.157
+newrelic==6.4.1.158
     # via
     #   -r requirements/edx/base.in
     #   edx-django-utils
