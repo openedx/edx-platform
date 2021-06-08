@@ -17,9 +17,6 @@ jobs:
         os: [ ubuntu-20.04 ]
         node-version: [ 12 ]
         python-version: [ 3.8 ]
-        include:
-          - os: ubuntu-20.04
-            path: ~/.cache/pip
 
     steps:
 
