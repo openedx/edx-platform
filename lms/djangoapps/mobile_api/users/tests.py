@@ -22,11 +22,9 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
 from common.djangoapps.util.testing import UrlResetMixin
-from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
@@ -309,10 +307,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     )
     @ddt.unpack
     def test_enrollment_with_gating(self, api_version, expired, num_courses_returned):
-        '''
+        """
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
-        '''
+        """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2015, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
@@ -325,10 +323,10 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     )
     @ddt.unpack
     def test_enrollment_no_gating(self, api_version, expired, num_courses_returned):
-        '''
-        Test that expired and non-expired courses returned if waffle flag is disabled
-        regarless of version of API
-        '''
+        """
+        Test that expired and non-expired courses are returned if the waffle flag is disabled,
+        regardless of the API version
+        """
         CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
@@ -349,7 +347,7 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
         """
         self.login_and_enroll()
 
-        certificate_url = "http://test_certificate_url"
+        certificate_url = "https://test_certificate_url"
         GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course.id,
@@ -386,17 +384,13 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
 
     @patch.dict(settings.FEATURES, {'CERTIFICATES_HTML_VIEW': True, 'ENABLE_MKTG_SITE': True})
     def test_web_certificate(self):
-        CourseMode.objects.create(
-            course_id=self.course.id,
-            mode_display_name="Honor",
-            mode_slug=CourseMode.HONOR,
-        )
         self.login_and_enroll()
-        self.course.cert_html_view_enabled = True
-        self.store.update_item(self.course, self.user.id)
 
-        with mock_passing_grade():
-            generate_user_certificates(self.user, self.course.id)
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable
+        )
 
         response = self.api_response()
         certificate_data = response.data[0]['certificate']
@@ -559,9 +553,9 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         self.request.user = self.user
 
     def get_serialized_data(self, api_version):
-        '''
+        """
         Return data from CourseEnrollmentSerializer
-        '''
+        """
         if api_version == API_V05:
             serializer = CourseEnrollmentSerializerv05
         else:
@@ -573,10 +567,10 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         ).data
 
     def _expiration_in_response(self, response, api_version):
-        '''
+        """
         Assert that audit_access_expires field in present in response
         based on version of api being used
-        '''
+        """
         if api_version != API_V05:
             assert 'audit_access_expires' in response
         else:

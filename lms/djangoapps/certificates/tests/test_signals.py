@@ -23,7 +23,7 @@ from lms.djangoapps.certificates.tasks import CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -147,28 +147,7 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
         )
         attempt.approve()
 
-    def test_cert_generation_on_passing_self_paced(self):
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                grade_factory = CourseGradeFactory()
-                # Not passing
-                grade_factory.update(self.user, self.course)
-                mock_generate_certificate_apply_async.assert_not_called()
-                # Certs fired after passing
-                with mock_passing_grade():
-                    grade_factory.update(self.user, self.course)
-                    mock_generate_certificate_apply_async.assert_called_with(
-                        countdown=CERTIFICATE_DELAY_SECONDS,
-                        kwargs={
-                            'student': str(self.user.id),
-                            'course_key': str(self.course.id),
-                        }
-                    )
-
-    def test_cert_generation_on_passing_instructor_paced(self):
+    def test_cert_generation_on_passing_v1(self):
         with mock.patch(
             'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
             return_value=None
@@ -377,9 +356,9 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         assert cert.status == CertificateStatuses.downloadable
 
 
-class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
+class LearnerIdVerificationTest(ModuleStoreTestCase):
     """
-    Tests for certificate generation task firing on learner verification
+    Tests for certificate generation task firing on learner id verification
     """
 
     def setUp(self):
@@ -405,45 +384,37 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
             grade_factory.update(self.user_one, self.course_one)
             grade_factory.update(self.user_two, self.course_two)
 
-    def test_cert_generation_on_photo_verification_self_paced(self):
+    @override_waffle_flag(CERTIFICATES_USE_UPDATED, active=True)
+    def test_cert_generation_on_photo_verification(self):
         with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            'lms.djangoapps.certificates.signals.generate_certificate_task',
             return_value=None
-        ) as mock_generate_certificate_apply_async:
+        ) as mock_cert_task:
             with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                mock_generate_certificate_apply_async.assert_not_called()
-                attempt = SoftwareSecurePhotoVerification.objects.create(
-                    user=self.user_one,
-                    status='submitted'
-                )
-                attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(
-                    countdown=CERTIFICATE_DELAY_SECONDS,
-                    kwargs={
-                        'student': str(self.user_one.id),
-                        'course_key': str(self.course_one.id),
-                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
-                    }
-                )
-
-    def test_cert_generation_on_photo_verification_instructor_paced(self):
-        with mock.patch(
-            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
-            return_value=None
-        ) as mock_generate_certificate_apply_async:
-            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
-                mock_generate_certificate_apply_async.assert_not_called()
                 attempt = SoftwareSecurePhotoVerification.objects.create(
                     user=self.user_two,
                     status='submitted'
                 )
                 attempt.approve()
-                mock_generate_certificate_apply_async.assert_called_with(
+                mock_cert_task.assert_called_with(self.user_two, self.course_two.id)
+
+    def test_cert_generation_on_photo_verification_v1(self):
+        with mock.patch(
+            'lms.djangoapps.certificates.signals.generate_certificate.apply_async',
+            return_value=None
+        ) as mock_cert_task:
+            with override_waffle_switch(AUTO_CERTIFICATE_GENERATION_SWITCH, active=True):
+                attempt = SoftwareSecurePhotoVerification.objects.create(
+                    user=self.user_two,
+                    status='submitted'
+                )
+                attempt.approve()
+                mock_cert_task.assert_called_with(
                     countdown=CERTIFICATE_DELAY_SECONDS,
                     kwargs={
                         'student': str(self.user_two.id),
                         'course_key': str(self.course_two.id),
-                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
+                        'expected_verification_status': 'approved'
                     }
                 )
 

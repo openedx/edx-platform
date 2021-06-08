@@ -27,7 +27,6 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
-from testfixtures import LogCapture
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -59,7 +58,6 @@ from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import StaffFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
-from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory
@@ -1903,20 +1901,6 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         # from failed assertions in the event of a test failure.
         # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
-
-    def test_beta_tester_must_not_earn_cert(self):
-        """
-        Test to ensure that beta tester must not earn certificate in a course
-        in which he/she is a beta-tester.
-        """
-        with LogCapture() as capture:
-            message = (
-                f'Canceling Certificate Generation task for user {self.beta_tester.id} : {self.course.id}. User is a '
-                'Beta Tester.'
-            )
-
-            generate_user_certificates(self.beta_tester, self.course.id)
-            capture.check_present(('lms.djangoapps.certificates.generation_handler', 'INFO', message))
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
