@@ -65,7 +65,7 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     task_progress.update_task_state(extra_meta=current_step)
 
     # compute the student features table and format it
-    query_features = task_input
+    query_features = task_input.get('features')
     student_data = enrolled_students_features(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 
@@ -78,6 +78,8 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     task_progress.update_task_state(extra_meta=current_step)
 
     # Perform the upload
-    upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+    upload_parent_dir = task_input.get('upload_parent_dir', '')
+    upload_filename = task_input.get('filename', 'student_profile_info')
+    upload_csv_to_report_store(rows, upload_filename, course_id, start_date, parent_dir=upload_parent_dir)
 
     return task_progress.update_task_state(extra_meta=current_step)
