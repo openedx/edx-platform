@@ -593,7 +593,7 @@ execnet==1.8.1
     # via pytest-xdist
 factory-boy==3.2.0
     # via -r requirements/edx/testing.in
-faker==8.5.1
+faker==8.6.0
     # via factory-boy
 filelock==3.0.12
     # via
@@ -813,7 +813,7 @@ mpmath==1.2.1
     #   sympy
 mysqlclient==2.0.3
     # via -r requirements/edx/base.txt
-newrelic==6.4.0.157
+newrelic==6.4.1.158
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
