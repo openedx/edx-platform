@@ -133,8 +133,23 @@ ${HTML(fragment.foot_html())}
         var newWidth = contentElement.offsetWidth;
 
         if (eventType !== 'load' && newWidth === lastWidth && newHeight === lastHeight) {
+            // Monitor when any anchor tag is clicked, it is checked to make sure
+            // it is referencing an element's id (not an external website). If
+            // the href attribute is an id, the location of the selected focus
+            // element is sent through its offset attribute. The offset will
+            // allow the page to scroll to the location of the focus element so
+            // that it is at the top of the page.
+
+            $('a').on("click", function(event){
+              if ($(this).attr('href')[0] === "#") {
+                event.preventDefault()
+                var targetId = $(this).attr('href')
+                window.parent.postMessage({"offset": $(targetId).offset().top}, document.referrer)
+              }
+            })
           return;
         }
+
 
         window.parent.postMessage({
             type: 'plugin.resize',
