@@ -2572,6 +2572,9 @@ INSTALLED_APPS = [
 PAKX_INSTALLED_APPS = [
     # overrides app
     'openedx.features.pakx.lms.overrides',
+
+    # pakx admin app
+    'openedx.features.pakx.lms.pakx_admin_app',
 ]
 
 INSTALLED_APPS.extend(PAKX_INSTALLED_APPS)
