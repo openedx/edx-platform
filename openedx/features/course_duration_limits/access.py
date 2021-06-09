@@ -141,6 +141,40 @@ def get_access_expiration_data(user, course):
     }
 
 
+def generate_masquerading_expired_message(expiration_date):
+    """
+    Generate the message for course admins to see if /when a learner lost their access.
+    """
+    upgrade_message = _('This learner does not have access to this course. '
+                        'Their access expired on {expiration_date}.')
+    return HTML(upgrade_message).format(
+        expiration_date=strftime_localized_html(expiration_date, 'SHORT_DATE')
+    )
+
+
+def generate_course_expired_fragment_masquerade_only(user, course):
+    message = generate_course_expired_message_masquerade_only(user, course)
+    if message:
+        return generate_fragment_from_message(message)
+
+
+def generate_course_expired_message_masquerade_only(user, course):
+    """
+    Generate only the masquerade expired message for admins.
+
+    Skips all of the other output generated in generate_course_expired_message.
+    """
+    expiration_data = get_access_expiration_data(user, course)
+    if not expiration_data:
+        return
+
+    expiration_date = expiration_data['expiration_date']
+    masquerading_expired_course = expiration_data['masquerading_expired_course']
+
+    if masquerading_expired_course:
+        return generate_masquerading_expired_message(expiration_date)
+
+
 def generate_course_expired_message(user, course):
     """
     Generate the message for the user course expiration date if it exists.
@@ -155,11 +189,7 @@ def generate_course_expired_message(user, course):
     upgrade_url = expiration_data['upgrade_url']
 
     if masquerading_expired_course:
-        upgrade_message = _('This learner does not have access to this course. '
-                            'Their access expired on {expiration_date}.')
-        return HTML(upgrade_message).format(
-            expiration_date=strftime_localized_html(expiration_date, 'SHORT_DATE')
-        )
+        return generate_masquerading_expired_message(expiration_date)
     else:
         expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
                                '{line_break}You lose all access to this course, including your progress, on '
