@@ -2,10 +2,13 @@
 Toggles for the Agreements app
 """
 
-from edx_toggles.toggles import WaffleFlag
+from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+
 
 # .. toggle_name: agreements.enable_integrity_signature
-# .. toggle_implementation: WaffleFlag
+# .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Supports rollout of the integrity signature feature
 # .. toggle_use_cases: temporary, open_edx
@@ -14,8 +17,12 @@ from edx_toggles.toggles import WaffleFlag
 # .. toggle_warnings: None
 # .. toggle_tickets: MST-786
 
-ENABLE_INTEGRITY_SIGNATURE = WaffleFlag('agreements.enable_integrity_signature', __name__)
+ENABLE_INTEGRITY_SIGNATURE = CourseWaffleFlag(  # lint-amnesty, pylint: disable=toggle-missing-annotation
+    'agreements', 'enable_integrity_signature', __name__,
+)
 
 
-def is_integrity_signature_enabled():
-    return ENABLE_INTEGRITY_SIGNATURE.is_enabled()
+def is_integrity_signature_enabled(course_key):
+    if isinstance(course_key, str):
+        course_key = CourseKey.from_string(course_key)
+    return ENABLE_INTEGRITY_SIGNATURE.is_enabled(course_key)

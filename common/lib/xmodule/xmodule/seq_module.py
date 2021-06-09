@@ -894,7 +894,7 @@ class SequenceBlock(
                 'allow_proctoring_opt_out': self.allow_proctoring_opt_out,
                 'due_date': self.due,
                 'grace_period': self.graceperiod,  # lint-amnesty, pylint: disable=no-member
-                'is_integrity_signature_enabled': is_integrity_signature_enabled(),
+                'is_integrity_signature_enabled': is_integrity_signature_enabled(course_id),
             }
 
             # inject the user's credit requirements and fulfillments

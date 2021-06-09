@@ -300,10 +300,10 @@ class CoursewareMeta:
         Boolean describing whether the user needs to sign the integrity agreement for a course.
         """
         if (
-            not self.is_staff
+            is_integrity_signature_enabled(self.course_key)
+            and not self.is_staff
             and self.enrollment_object
             and self.enrollment_object.mode in CourseMode.CERTIFICATE_RELEVANT_MODES
-            and is_integrity_signature_enabled()
         ):
             signature = get_integrity_signature(self.effective_user.username, str(self.course_key))
             if not signature:
