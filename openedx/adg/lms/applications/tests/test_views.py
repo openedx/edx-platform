@@ -233,6 +233,7 @@ def test_get_initial_application_state_for_application_hub_view(application_hub_
     Test the case where the user has not completed even a single objective of the application.
     """
     mocker.patch('openedx.adg.lms.applications.views.get_application_hub_instructions', return_value={})
+    mocker.patch('openedx.adg.lms.applications.views.get_omnipreneurship_courses_instructions', return_value={})
     mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
 
     ApplicationHubFactory(user=application_hub_view_get_request.user)
@@ -242,8 +243,8 @@ def test_get_initial_application_state_for_application_hub_view(application_hub_
         'user_application_hub': application_hub_view_get_request.user.application_hub,
         'pre_req_courses': [],
         'business_line_courses': [],
-        'is_locked': False,
         'messages': {},
+        'instructions': {},
     }
     mock_render.assert_called_once_with(
         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context
@@ -266,7 +267,11 @@ def test_each_step_for_application_completion_application_hub_view(
     Test get request to application hub for each requirement completion till application submission.
     """
     mocker.patch('openedx.adg.lms.applications.views.get_application_hub_instructions', return_value={})
-    mocker.patch('openedx.adg.lms.applications.views.get_course_card_information', return_value=([], False, False))
+    mocker.patch('openedx.adg.lms.applications.views.get_omnipreneurship_courses_instructions', return_value={})
+    mocker.patch(
+        'openedx.adg.lms.applications.views.get_course_cards_and_gross_details',
+        return_value=([], False, False)
+    )
     mock_render = mocker.patch('openedx.adg.lms.applications.views.render')
 
     application_hub = ApplicationHubFactory(user=application_hub_view_get_request.user)
@@ -287,8 +292,8 @@ def test_each_step_for_application_completion_application_hub_view(
         'user_application_hub': application_hub_view_get_request.user.application_hub,
         'pre_req_courses': [],
         'business_line_courses': [],
-        'is_locked': False,
         'messages': {},
+        'instructions': {},
     }
     mock_render.assert_called_once_with(
         application_hub_view_get_request, 'adg/lms/applications/hub.html', context=expected_context

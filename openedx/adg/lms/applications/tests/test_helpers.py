@@ -43,16 +43,18 @@ from openedx.adg.lms.applications.constants import (
     CourseScore
 )
 from openedx.adg.lms.applications.helpers import (
+    CourseCard,
     _get_application_review_info,
     bulk_update_application_hub_flag,
     check_validations_for_current_record,
     check_validations_for_past_record,
     create_html_string_for_course_scores_in_admin_review,
     get_application_hub_instructions,
-    get_course_card_information,
+    get_course_cards_and_gross_details,
     get_courses_from_course_groups,
     get_duration,
     get_extra_context_for_application_review_page,
+    get_omnipreneurship_courses_instructions,
     get_user_scores_for_courses,
     get_users_with_active_enrollments_from_course_groups,
     has_admin_permissions,
@@ -480,17 +482,17 @@ def test_get_application_hub_instructions(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    'is_enrolled, is_completed, all_modules_attempted, status, grade, message',
+    'is_enrolled, is_completed, all_modules_attempted, status, grade, message, pre_req',
     [
-        (False, False, False, NOT_STARTED, '', ''),
-        (True, False, False, IN_PROGRESS, '', ''),
-        (True, False, True, RETAKE, '0', RETAKE_COURSE_MESSAGE),
-        (True, True, True, COMPLETED, '100', ''),
+        (False, False, False, NOT_STARTED, '', '', ''),
+        (True, False, False, IN_PROGRESS, '', '', ''),
+        (True, False, True, RETAKE, '0', RETAKE_COURSE_MESSAGE, ''),
+        (True, True, True, COMPLETED, '100', '', ''),
     ],
     ids=['not_enrolled', 'enrolled_in_course', 'failed_in_course', 'completed_course']
 )
-def test_get_course_card_information_with_and_without_enrollment(
-    is_enrolled, is_completed, all_modules_attempted, status, grade, message, test_user, mocker
+def test_get_course_cards_and_gross_details_with_and_without_enrollment(
+    is_enrolled, is_completed, all_modules_attempted, status, grade, message, pre_req, test_user, mocker
 ):
     """
     Test the course card information when the user has not enrolled in a course, when the user has enrolled in a course,
@@ -508,17 +510,16 @@ def test_get_course_card_information_with_and_without_enrollment(
     if is_enrolled:
         CourseEnrollmentFactory(user=test_user, course=course)
 
-    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
+    course_cards, is_any_course_started, are_courses_completed = get_course_cards_and_gross_details(test_user, [course])
 
-    assert course_cards == [{
-        'course': course,
-        'status': status,
-        'grade': grade,
-        'message': message
-    }]
+    assert course_cards[0].course == course
+    assert course_cards[0].status == status
+    assert course_cards[0].grade == grade
+    assert course_cards[0].message == message
+    assert course_cards[0].pre_req == pre_req
 
     assert is_any_course_started if is_enrolled else not is_any_course_started
-    assert not is_locked
+    assert are_courses_completed if is_completed else not are_courses_completed
 
 
 @pytest.mark.django_db
@@ -530,7 +531,7 @@ def test_get_course_card_information_with_and_without_enrollment(
     ],
     ids=['un_passed_prerequisite', 'passed_prerequisite']
 )
-def test_get_course_card_information_of_a_course_with_prerequisite(
+def test_get_course_cards_and_gross_details_of_a_course_with_prerequisite(
     is_passed, status, message, is_course_locked, test_user, mocker
 ):
     """
@@ -550,16 +551,76 @@ def test_get_course_card_information_of_a_course_with_prerequisite(
     if is_course_locked:
         message = f'{message} pre_course.'
 
-    course_cards, is_any_course_started, is_locked = get_course_card_information(test_user, [course])
+    course_cards, is_any_course_started, are_courses_completed = get_course_cards_and_gross_details(test_user, [course])
 
-    assert course_cards == [{
-        'course': course,
-        'status': status,
-        'grade': '',
-        'message': message
-    }]
+    assert course_cards[0].course == course
+    assert course_cards[0].status == status
+    assert course_cards[0].grade == ''
+    assert course_cards[0].message == message
+    assert course_cards[0].pre_req == 'pre_course'
+
     assert not is_any_course_started
-    assert is_locked == is_course_locked
+    assert not are_courses_completed
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'is_open_course, is_locked_course, is_unlocked_course',
+    [
+        (True, False, False),
+        (False, True, False),
+        (False, False, True),
+        (True, True, False),
+        (True, False, True),
+        (False, True, True),
+        (True, True, True),
+    ]
+)
+def test_get_omnipreneurship_courses_instructions(is_open_course, is_locked_course, is_unlocked_course):
+    """
+    Tests whether correct instructions are made for the courses depending on their statuses and whether they have
+    prerequisites courses or not
+    """
+    courses = []
+    open_courses = locked_courses = unlocked_courses = ''
+
+    if is_open_course:
+        courses.append(CourseCard(
+            course=CourseOverviewFactory(display_name='open_course'), status='', grade='', message='', pre_req=''
+        ))
+        open_courses = 'You will have to complete <em>all</em> of the Omnipreneurship courses. However, you will ' \
+                       'have to enroll in and <em>complete open_course first.</em>'
+
+    if is_locked_course:
+        courses.append(CourseCard(
+            course=CourseOverviewFactory(display_name='locked_course'),
+            status=LOCKED,
+            grade='',
+            message='',
+            pre_req='pre_req_course'
+        ))
+        locked_courses = 'Once you have completed pre_req_course and received a passing grade, the locked_course ' \
+                         'course will be unlocked. '
+
+    if is_unlocked_course:
+        courses.append(CourseCard(
+            course=CourseOverviewFactory(display_name='un_locked_course'),
+            status=NOT_STARTED,
+            grade='',
+            message='',
+            pre_req='pre_req_course'
+        ))
+        unlocked_courses = 'un_locked_course has been unlocked for you to enroll in and complete! '
+
+    expected_instructions = {
+        'open_courses': open_courses,
+        'locked_courses': locked_courses,
+        'unlocked_courses': unlocked_courses
+    }
+
+    actual_instructions = get_omnipreneurship_courses_instructions(courses)
+
+    assert actual_instructions == expected_instructions
 
 
 @pytest.mark.django_db

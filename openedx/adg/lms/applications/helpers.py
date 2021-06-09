@@ -53,6 +53,18 @@ from .rules import is_adg_admin
 logger = logging.getLogger(__name__)
 
 
+class CourseCard:
+    """
+    Class for course card to be displayed in Application Hub
+    """
+    def __init__(self, course, status, grade, message, pre_req):
+        self.course = course
+        self.status = status
+        self.grade = grade
+        self.message = message
+        self.pre_req = pre_req
+
+
 def validate_logo_size(file_):
     """
     Validate maximum allowed file upload size, raise validation error if file size exceeds.
@@ -353,82 +365,84 @@ def is_user_qualified_for_bu_prereq_courses(user):
     )
 
 
-def get_course_card_information(user, courses):
+def get_course_cards_and_gross_details(user, courses):
     """
-    Decides status, grade and message for each course in the list and appends a dictionary containing status, grade,
-    message and course itself in a list
+    Decides status, grade and message for each course in the list of courses and appends a CourseCard object containing
+    course, status, grade, message and prerequisite course name in a list. It also computes whether any course from the
+    list of courses has been started and whether all the courses have been completed.
 
     Arguments:
         user (User): User object
         courses (list): List containing Course objects
 
     Returns:
-        course_cards_information (list): A list containing dictionaries with status, grade, message and course
+        course_cards (list): A list containing dictionaries with status, grade, message and course
         is_any_course_started (bool): Flag indicating if any course has been started yet
-        is_locked (bool): Flag indicating if any course is locked
+        are_courses_completed (bool): Flag indicating if all courses have been passed
     """
-    course_cards_information = []
+    open_course_cards = []
+    locked_course_cards = []
+    unlocked_course_cards = []
     is_any_course_started = False
-    is_locked = False
+    are_courses_completed = bool(courses)
 
     for course in courses:
-        message = grade = status = ''
+        message = grade = status = pre_req = ''
         pre_requisite_courses = get_prerequisite_courses_display(course)
 
         if pre_requisite_courses:
-            is_locked, status, message = get_information_for_course_with_prerequisites(
-                user, pre_requisite_courses, is_locked, status
-            )
+            status, message, pre_req = get_information_for_course_with_prerequisite(user, pre_requisite_courses[0])
 
         if status != LOCKED:
             is_any_course_started, status, grade, message = get_information_for_unlocked_course(
-                user, course, is_any_course_started, grade
+                user, course, is_any_course_started
             )
 
-        course_cards_information.append({
-            'course': course,
-            'status': status,
-            'grade': grade,
-            'message': message
-        })
+        if status != COMPLETED:
+            are_courses_completed = False
 
-    return course_cards_information, is_any_course_started, is_locked
+        course_card = CourseCard(course=course, status=status, grade=grade, message=message, pre_req=pre_req)
+
+        if pre_requisite_courses:
+            if status == LOCKED:
+                locked_course_cards.append(course_card)
+            else:
+                unlocked_course_cards.append(course_card)
+        else:
+            open_course_cards.append(course_card)
+
+    course_cards = open_course_cards + unlocked_course_cards + locked_course_cards
+
+    return course_cards, is_any_course_started, are_courses_completed
 
 
-def get_information_for_course_with_prerequisites(user, pre_requisite_courses, is_locked, status):
+def get_information_for_course_with_prerequisite(user, pre_requisite_course):
     """
-    Checks if all prerequisite courses have been passed, if not then changes the status to Locked, sets the is_locked
-    flag to True and returns a message advising the user to pass the prerequisite courses.
+    Checks if prerequisite course is passed; if not then changes the status to Locked and returns a message advising
+    the user to pass the prerequisite course.
 
     Arguments:
         user (User): User object
-        pre_requisite_courses (list): List containing prerequisite courses
-        is_locked (bool): Flag to indicate if any course is locked
-        status (str): Contains status of a course
+        pre_requisite_course (dict): Dictionary containing course key and display name
 
     Returns:
-        is_locked (bool): Flag to indicate if any course is locked
         status (str): Contains status of a course
         message (str): Message to indicate the user to pass the prerequisite courses
+        prerequisite_name (str): Name of the prerequisite course
     """
-    message = LOCKED_COURSE_MESSAGE
+    message = status = ''
+    course_grade = CourseGradeFactory().read(user, course_key=pre_requisite_course['key'])
+    course_overview = CourseOverview.objects.get(id=pre_requisite_course['key'])
+    prerequisite_name = course_overview.display_name_with_default
 
-    for prereq in pre_requisite_courses:
-        course_grade = CourseGradeFactory().read(user, course_key=prereq['key'])
+    if not (course_grade and course_grade.passed):
+        status = LOCKED
+        message = f'{LOCKED_COURSE_MESSAGE} {prerequisite_name}.'
 
-        if not (course_grade and course_grade.passed):
-            is_locked = True
-            status = LOCKED
-
-            course_overview = CourseOverview.objects.get(id=prereq['key'])
-            message = f'{message} {course_overview.display_name_with_default},'
-
-    message = _(f'{message[:-1]}.')
-
-    return is_locked, status, message
+    return status, message, prerequisite_name
 
 
-def get_information_for_unlocked_course(user, course, is_any_course_started, grade):
+def get_information_for_unlocked_course(user, course, is_any_course_started):
     """
     Creates course card information based on whether the user has enrolled in the course, completed the course or failed
     the course.
@@ -437,7 +451,6 @@ def get_information_for_unlocked_course(user, course, is_any_course_started, gra
         user (User): User object
         course (Course):  Course for which card information is to be created
         is_any_course_started (bool): Flag to indicate if any course has been started yet
-        grade (str): Grade attained in a course
 
     Returns:
         is_any_course_started (bool): Flag to indicate if any course has been started yet
@@ -445,7 +458,7 @@ def get_information_for_unlocked_course(user, course, is_any_course_started, gra
         grade (str): Grade attained in a course
         message (str): Message to indicate the user to pass the prerequisite courses
     """
-    message = ''
+    message = grade = ''
     if CourseEnrollment.is_enrolled(user, course.id):
         is_any_course_started = True
         status = IN_PROGRESS
@@ -482,6 +495,7 @@ def has_attempted_all_modules(user, course):
     )
 
     modules = all_modules[0].children
+
     return StudentModule.objects.filter(student=user, module_state_key__in=modules).count() == len(modules)
 
 
@@ -527,6 +541,71 @@ def get_application_hub_instructions(
         'message': message,
         'instruction': instruction
     }
+
+
+def get_omnipreneurship_courses_instructions(course_cards):
+    """
+    Creates instructions for the Omnipreneurship courses depending on each course's status and whether that course has
+    a prerequisite or not
+
+    Arguments:
+        course_cards (list): List of course cards for which instructions need to be made
+
+    Returns:
+        dict: Dictionary containing instructions for open, locked and unlocked courses
+    """
+    open_courses = locked_courses = unlocked_courses = ''
+
+    for course_card in course_cards:
+        if course_card.pre_req:
+            if course_card.status == LOCKED:
+                locked_courses = f'{locked_courses}{_("Once you have completed")} {course_card.pre_req} ' \
+                                 f'{_("and received a passing grade, the")} ' \
+                                 f'{course_card.course.display_name_with_default} {_("course will be unlocked. ")}'
+            else:
+                unlocked_courses = f'{unlocked_courses}{course_card.course.display_name_with_default}, '
+
+        else:
+            open_courses = f'{open_courses}{course_card.course.display_name_with_default}, '
+
+    if open_courses:
+        open_courses = replace_last_comma_occurrences(open_courses)
+
+        open_courses = f'{_("You will have to complete")} <em>{_("all")}</em> ' \
+                       f'{_("of the Omnipreneurship courses. However, you will have to enroll in and")} ' \
+                       f'<em>{_("complete")} {open_courses} {_("first.")}</em>'
+
+    if unlocked_courses:
+        unlocked_courses = replace_last_comma_occurrences(unlocked_courses)
+
+        verb = 'have' if 'and' in unlocked_courses else 'has'
+
+        unlocked_courses = f'{unlocked_courses} {_(verb)} {_("been unlocked for you to enroll in and complete! ")}'
+
+    return {
+        'open_courses': open_courses,
+        'locked_courses': locked_courses,
+        'unlocked_courses': unlocked_courses
+    }
+
+
+def replace_last_comma_occurrences(string):
+    """
+    Removes the trailing comma and replaces the last remaining comma (if any) with 'and'
+
+    Arguments:
+        string (str): the string from which comma(s) are needed to be removed
+
+    Returns:
+        str: a string with removed comma(s)
+    """
+    # remove the trailing comma and space
+    string = string[:-2]
+
+    if ',' in string:
+        string = ' and'.join(string.rsplit(',', 1))
+
+    return string
 
 
 def get_users_with_active_enrollments_from_course_groups(user_ids, course_groups):

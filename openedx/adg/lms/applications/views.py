@@ -20,7 +20,11 @@ from openedx.adg.lms.applications.forms import (
 from openedx.adg.lms.registration_extension.models import ExtendedUserProfile
 from openedx.adg.lms.utils.date_utils import month_choices, year_choices
 
-from .helpers import get_application_hub_instructions, get_course_card_information
+from .helpers import (
+    get_application_hub_instructions,
+    get_course_cards_and_gross_details,
+    get_omnipreneurship_courses_instructions
+)
 from .models import ApplicationHub, BusinessLine, Education, MultilingualCourseGroup, UserApplication
 
 
@@ -105,20 +109,28 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
         """
         user_application_hub = ApplicationHub.objects.get(user=self.request.user)
         pre_req_courses = business_line_courses = []
-        is_any_prerequisite_started = is_locked = is_any_bu_course_started = False
+        is_any_prerequisite_started = is_any_bu_course_started = False
+        are_pre_req_courses_completed = are_bu_courses_completed = False
 
         if user_application_hub.is_written_application_completed:
-            pre_req_courses, is_any_prerequisite_started, is_locked = get_course_card_information(
-                request.user,
-                MultilingualCourseGroup.objects.get_user_program_prereq_courses(request.user)
-            )
-
-            business_line_courses, is_any_bu_course_started, _ = get_course_card_information(
-                request.user,
-                MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(
-                    request.user
+            pre_req_courses, is_any_prerequisite_started, are_pre_req_courses_completed = (
+                get_course_cards_and_gross_details(
+                    request.user,
+                    MultilingualCourseGroup.objects.get_user_program_prereq_courses(request.user)
                 )
             )
+
+            business_line_courses, is_any_bu_course_started, are_bu_courses_completed = (
+                get_course_cards_and_gross_details(
+                    request.user,
+                    MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(
+                        request.user
+                    )
+                )
+            )
+
+        user_application_hub.is_prerequisite_courses_passed = are_pre_req_courses_completed
+        user_application_hub.is_bu_prerequisite_courses_passed = are_bu_courses_completed
 
         messages = get_application_hub_instructions(
             user_application_hub,
@@ -126,12 +138,14 @@ class ApplicationHubView(RedirectToLoginOrRelevantPageMixin, View):
             is_any_bu_course_started
         )
 
+        instructions = get_omnipreneurship_courses_instructions(pre_req_courses)
+
         context = {
             'user_application_hub': user_application_hub,
             'pre_req_courses': pre_req_courses,
             'business_line_courses': business_line_courses,
-            'is_locked': is_locked,
-            'messages': messages
+            'messages': messages,
+            'instructions': instructions
         }
 
         return render(
