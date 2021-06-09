@@ -181,21 +181,29 @@ ${HTML(fragment.foot_html())}
                                 <span class="nav-item nav-item-course">
                                     <a href="${course_url}">${course_home_page_title(course)}</a>
                                 </span>
-                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % if chapter or section or sequence_title:
+                                    <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % endif
                             % endif
                             % if chapter:
                                 <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
                                     <a href="${course_url}#${six.text_type(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
-                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % if section or sequence_title:
+                                    <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % endif
                             % endif
                             % if section:
                                 <span class="nav-item nav-item-section">
                                     <a href="${course_url}#${six.text_type(section.location)}">${section.display_name_with_default}</a>
                                 </span>
-                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % if sequence_title:
+                                    <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                                % endif
                             % endif
-                            <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                            % if sequence_title:
+                                <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                            % endif
                         </div>
                     </div>
                 </nav>
