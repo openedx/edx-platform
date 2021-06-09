@@ -6,7 +6,7 @@ from edx_toggles.toggles import LegacyWaffleFlagNamespace, SettingToggle
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 # Namespace for courseware waffle flags.
 WAFFLE_FLAG_NAMESPACE = LegacyWaffleFlagNamespace(name='courseware')
@@ -117,8 +117,12 @@ def mfe_special_exams_is_active(course_key: CourseKey) -> bool:
     """
     Can we see a course special exams in the Learning MFE?
     """
+    hostname = get_current_request_hostname()
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname.startswith("preview"):
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return COURSEWARE_MICROFRONTEND_SPECIAL_EXAMS.is_enabled(course_key)
@@ -128,9 +132,13 @@ def courseware_mfe_is_active(course_key: CourseKey) -> bool:
     """
     Should we serve the Learning MFE as the canonical courseware experience?
     """
+    hostname = get_current_request_hostname()
     # NO: Old Mongo courses are always served in the Legacy frontend,
     #     regardless of configuration.
     if course_key.deprecated:
+        return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname.startswith("preview"):
         return False
     # OTHERWISE: Defer to value of waffle flag for this course run and user.
     return REDIRECT_TO_COURSEWARE_MICROFRONTEND.is_enabled(course_key)
@@ -144,8 +152,12 @@ def courseware_mfe_is_visible(
     """
     Can we see a course run's content in the Learning MFE?
     """
+    hostname = get_current_request_hostname()
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname.startswith("preview"):
         return False
     # ALLOW: Where techincally possible, global staff may always see the MFE.
     if is_global_staff:
@@ -171,8 +183,12 @@ def courseware_mfe_is_advertised(
     but we do not shove the New Experience in their face if the preview isn't
     enabled.
     """
+    hostname = get_current_request_hostname()
     # DENY: Old Mongo courses don't work in the MFE.
     if course_key.deprecated:
+        return False
+    # TEMP: DENY: Course preview doesn't work in the MFE
+    if hostname.startswith("preview"):
         return False
     # ALLOW: Both global and course staff can see the MFE link if the course team
     #        preview is enabled.
@@ -193,8 +209,12 @@ def courseware_legacy_is_visible(
     Note: This function will always return True for Old Mongo courses,
     since `courseware_mfe_is_active` will always return False for them.
     """
+    hostname = get_current_request_hostname()
     # ALLOW: Global staff may always see the Legacy experience.
     if is_global_staff:
+        return True
+    # TEMP: ALLOW: All course previews will be shown in Legacy experience
+    if hostname.startswith("preview"):
         return True
     # OTHERWISE: Legacy is only visible if it's the active (ie canonical) experience.
     #            Note that Old Mongo courses are never the active experience,
