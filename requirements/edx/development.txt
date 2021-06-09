@@ -853,7 +853,7 @@ mpmath==1.2.1
     #   sympy
 mypy-extensions==0.4.3
     # via mypy
-mypy==0.812
+mypy==0.901
     # via -r requirements/edx/development.in
 mysqlclient==2.0.3
     # via -r requirements/edx/testing.txt
@@ -883,7 +883,7 @@ oauthlib==3.0.1
     #   social-auth-core
 openedx-calc==2.0.1
     # via -r requirements/edx/testing.txt
-ora2==3.6.1
+ora2==3.6.2
     # via -r requirements/edx/testing.txt
 packaging==20.9
     # via
@@ -1358,6 +1358,7 @@ tincan==1.0.0
 toml==0.10.2
     # via
     #   -r requirements/edx/testing.txt
+    #   mypy
     #   pylint
     #   pytest
     #   pytest-cov
@@ -1375,8 +1376,6 @@ tqdm==4.61.0
     #   nltk
 transifex-client==0.14.2
     # via -r requirements/edx/testing.txt
-typed-ast==1.4.3
-    # via mypy
 typing-extensions==3.10.0.0
     # via mypy
 ua-parser==0.10.0
