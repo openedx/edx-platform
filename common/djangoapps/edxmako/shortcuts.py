@@ -15,7 +15,6 @@
 
 import logging
 
-import beeline
 import six
 from django.conf import settings
 from django.http import HttpResponse
@@ -150,7 +149,6 @@ def marketing_link_context_processor(request):
     )
 
 
-@beeline.traced(name='common.djangoapps.edxmako.shortcuts.render_to_string')
 def render_to_string(template_name, dictionary, namespace='main', request=None):
     """
     Render a Mako template to as a string.
@@ -171,8 +169,6 @@ def render_to_string(template_name, dictionary, namespace='main', request=None):
         request: The request to use to construct the RequestContext for rendering
             this template. If not supplied, the current request will be used.
     """
-    beeline.add_context_field('render_to_string.template_name', template_name)
-    beeline.add_context(dictionary)
     if namespace == 'lms.main':
         engine = engines[Engines.PREVIEW]
     else:

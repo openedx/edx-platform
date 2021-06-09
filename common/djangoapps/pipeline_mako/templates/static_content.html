@@ -2,7 +2,6 @@
 <%!
 import logging
 import json
-import beeline
 from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from pipeline_mako.helpers.studiofrontend import load_sfe_i18n_messages
@@ -32,15 +31,10 @@ logger = logging.getLogger(__name__)
 %></%def>
 
 <%def name='url(file, raw=False)'><%
-with beeline.tracer(name='static_content.html.url'):
-    beeline.add_context_field('url.file', file)
-    try:
-        url = staticfiles_storage.url(file)
-        beeline.add_context_field('url.error', False)
-    except:
-        beeline.add_context_field('url.error', True)
-        url = file
-    beeline.add_context_field('url.url', url)
+try:
+    url = staticfiles_storage.url(file)
+except:
+    url = file
 ## HTML-escaping must be handled by caller
 %>${url | n, decode.utf8}${"?raw" if raw else ""}</%def>
 
