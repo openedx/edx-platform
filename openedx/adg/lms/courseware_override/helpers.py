@@ -5,6 +5,7 @@ from django.utils.translation import get_language_info
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from lms.djangoapps.courseware.courses import get_courses as get_courses_core
 from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup
 from openedx.adg.lms.utils.env_utils import is_testing_environment
@@ -86,8 +87,16 @@ def get_extra_course_about_context(request, course):
     course_instructors = get_course_instructors(course.id, request=request)
     course_enrollment_count = CourseEnrollment.objects.enrollment_counts(course.id).get('total')
 
+    course_requirements = None
+    if request.user.is_authenticated:
+        course_requirements = get_pre_requisite_courses_not_completed(
+            request.user,
+            [course.id]
+        )
+
     context = {
         'course_languages': course_language_names,
+        'course_requirements': course_requirements,
         'instructors': course_instructors,
         'total_enrollments': course_enrollment_count,
         'self_paced': course.self_paced,

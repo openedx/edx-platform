@@ -72,12 +72,16 @@ def test_get_language_name_from_codes(language_codes, language_names):
 @pytest.mark.django_db
 @mock.patch('openedx.adg.lms.courseware_override.helpers.is_testing_environment')
 @mock.patch('openedx.adg.lms.courseware_override.helpers.get_course_instructors')
+@mock.patch('openedx.adg.lms.courseware_override.helpers.get_pre_requisite_courses_not_completed')
 @mock.patch('openedx.adg.lms.courseware_override.helpers.get_language_names_from_codes')
-def test_get_extra_course_about_context(mock_get_lang_names, mock_get_instructors, mock_testing_env):
+def test_get_extra_course_about_context(
+    mock_get_lang_names, mock_get_pre_requisite_courses_not_completed, mock_get_instructors, mock_testing_env, request
+):
     """
     Test if the context is being returned correctly by the get_extra_course_about_context function
     """
     user = UserFactory()
+    request.user = user
     course = CourseOverviewFactory(self_paced=True, effort=EFFORT, language='en')
     CourseInstructorRole(course.id).add_users(user)
     CourseEnrollmentFactory(user=user, course=course)
@@ -88,14 +92,16 @@ def test_get_extra_course_about_context(mock_get_lang_names, mock_get_instructor
 
     mock_get_lang_names.return_value = course_languages_with_ids
     mock_get_instructors.return_value = instructor_profiles_with_image_urls
+    mock_get_pre_requisite_courses_not_completed.return_value = None
     mock_testing_env.return_value = False
 
     expected_context = {
         'course_languages': course_languages_with_ids,
+        'course_requirements': None,
         'instructors': instructor_profiles_with_image_urls,
         'total_enrollments': 1,
         'self_paced': True,
         'effort': EFFORT,
     }
 
-    assert get_extra_course_about_context(None, course) == expected_context
+    assert get_extra_course_about_context(request, course) == expected_context
