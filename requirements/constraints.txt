@@ -48,9 +48,6 @@ oauthlib==3.0.1
 # django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
 django-oauth-toolkit<=1.3.2
 
-# ARCHBOM-1141: pip-tools upgrade requires pip upgrade
-pip-tools<6.0
-
 # Upgrading to 2.5.3 on 2020-01-03 triggered "'tzlocal' object has no attribute '_std_offset'" errors in production
 python-dateutil==2.4.0
 # matplotlib>=3.4.0 requires python-dateutil>=2.7
