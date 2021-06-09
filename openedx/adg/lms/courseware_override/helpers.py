@@ -6,6 +6,7 @@ from django.utils.translation import get_language_info
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from lms.djangoapps.courseware.courses import get_courses as get_courses_core
+from openedx.adg.lms.applications.helpers import is_user_qualified_for_bu_prereq_courses
 from openedx.adg.lms.applications.models import MultilingualCourse, MultilingualCourseGroup
 from openedx.adg.lms.utils.env_utils import is_testing_environment
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
@@ -31,11 +32,7 @@ def get_business_line_prereq_courses(user):
     Returns:
         list: List of business line courses for the user
     """
-    if not (
-        user.is_authenticated and
-        user.application_hub.is_written_application_completed and
-        user.application.business_line
-    ):
+    if not is_user_qualified_for_bu_prereq_courses(user):
         return
 
     return MultilingualCourseGroup.objects.get_user_business_line_and_common_business_line_prereq_courses(user)

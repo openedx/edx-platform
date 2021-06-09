@@ -31,6 +31,7 @@ from openedx.adg.lms.applications.helpers import (
     get_extra_context_for_application_review_page,
     has_admin_permissions,
     is_displayable_on_browser,
+    is_user_qualified_for_bu_prereq_courses,
     max_year_value_validator,
     min_year_value_validator,
     send_application_submission_confirmation_email,
@@ -380,3 +381,24 @@ def test_get_courses_from_course_groups(user_client, courses):
     catalog_courses = get_courses_from_course_groups([course_group], user)
 
     assert catalog_courses == [courses['test_course1']]
+
+
+@pytest.mark.django_db
+def test_user_is_not_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `False` for a user with no application and application_hub.
+    """
+    user, _ = user_client
+    assert not is_user_qualified_for_bu_prereq_courses(user)
+
+
+@pytest.mark.django_db
+def test_user_is_qualified_for_bu_prereq_courses(user_client):
+    """
+    Tests `is_user_qualified_for_bu_prereq_courses` returns `True` for user with application and application_hub and
+    has passed program prerequisites.
+    """
+    user, _ = user_client
+    UserApplicationFactory(user=user)
+    ApplicationHubFactory(user=user, is_prerequisite_courses_passed=True)
+    assert is_user_qualified_for_bu_prereq_courses(user)

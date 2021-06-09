@@ -307,3 +307,26 @@ def get_courses_from_course_groups(course_groups, user):
             courses_list.append(multilingual_course.course)
 
     return courses_list
+
+
+def is_user_qualified_for_bu_prereq_courses(user):
+    """
+    Checks whether a user satisfies all the conditions to attempt business line prerequisite courses.
+
+    Following are the conditions:
+    1. User has passed all the program prerequisites courses.
+    2. User has selected a business line in the written application.
+
+    Args:
+        user (User): User object
+
+    Returns:
+        bool: True if user is eligible to attempt business line prerequisite courses else False
+    """
+    return (
+        user.is_authenticated and
+        hasattr(user, 'application_hub') and
+        user.application_hub.is_prerequisite_courses_passed and
+        hasattr(user, 'application') and
+        user.application.business_line
+    )

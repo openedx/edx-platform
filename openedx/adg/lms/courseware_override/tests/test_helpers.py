@@ -115,7 +115,7 @@ def test_get_business_line_prereq_courses(user_client, courses):
     user, _ = user_client
 
     UserApplicationFactory(user=user)
-    ApplicationHubFactory(user=user, is_written_application_completed=True)
+    ApplicationHubFactory(user=user, is_prerequisite_courses_passed=True)
     MultilingualCourseFactory(
         course=courses['test_course1'],
         multilingual_course_group=(MultilingualCourseGroupFactory(is_common_business_line_prerequisite=True))
