@@ -15,6 +15,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from rest_framework import generics, views
 from rest_framework.decorators import api_view
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
@@ -126,11 +127,11 @@ class UserCourseStatus(views.APIView):
     http_method_names = ["get", "patch"]
 
     def dispatch(self, request, *args, **kwargs):
-        if request.method == 'PATCH':
+        if request.method in SAFE_METHODS:
+            return super().dispatch(request, *args, **kwargs)
+        else:
             with transaction.atomic():
                 return super().dispatch(request, *args, **kwargs)
-        else:
-            return super().dispatch(request, *args, **kwargs)
 
     def _last_visited_module_path(self, request, course):
         """
@@ -145,7 +146,7 @@ class UserCourseStatus(views.APIView):
             request.user, request, course, field_data_cache, course.id, course=course
         )
 
-        path = [course_module]
+        path = [course_module] if course_module else []
         chapter = get_current_child(course_module, min_depth=2)
         if chapter is not None:
             path.append(chapter)
@@ -161,7 +162,7 @@ class UserCourseStatus(views.APIView):
         Returns the course status
         """
         path = self._last_visited_module_path(request, course)
-        path_ids = [str(module.location) for module in path if module is not None]
+        path_ids = [str(module.location) for module in path]
         return Response({
             "last_visited_module_id": path_ids[0],
             "last_visited_module_path": path_ids,
