@@ -10,7 +10,6 @@ import tarfile  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime  # lint-amnesty, pylint: disable=wrong-import-order
 from tempfile import NamedTemporaryFile, mkdtemp  # lint-amnesty, pylint: disable=wrong-import-order
 
-import olxcleaner
 import pkg_resources
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
@@ -28,8 +27,7 @@ from edx_django_utils.monitoring import (
     set_custom_attribute,
     set_custom_attributes_for_course_key
 )
-from olxcleaner.exceptions import ErrorLevel
-from olxcleaner.reporting import report_error_summary, report_errors
+
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.api import add_organization_course, ensure_organization
@@ -39,6 +37,9 @@ from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
+import olxcleaner
+from olxcleaner.exceptions import ErrorLevel
+from olxcleaner.reporting import report_error_summary, report_errors
 import cms.djangoapps.contentstore.errors as UserErrors
 from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,

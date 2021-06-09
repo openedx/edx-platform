@@ -222,6 +222,9 @@ class Env:
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'
 
+    # Directory for keeping src folder that comes with pip installation
+    PIP_SRC_DIR = os.environ.get("PIP_SRC_DIR")
+
     # Service variant (lms, cms, etc.) configured with an environment variable
     # We use this to determine which envs.json file to load.
     SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)

@@ -13,11 +13,11 @@ import six
 from codejail import jail_code
 from codejail.django_integration import ConfigureCodeJailMiddleware
 from codejail.safe_exec import SafeExecException
-from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
-from django.test import override_settings
-from six import text_type, unichr
-from six.moves import range
+from django.conf import settings  # pylint: disable=wrong-import-order
+from django.core.exceptions import MiddlewareNotUsed  # pylint: disable=wrong-import-order
+from django.test import override_settings  # pylint: disable=wrong-import-order
+from six import text_type, unichr  # pylint: disable=wrong-import-order
+from six.moves import range  # pylint: disable=wrong-import-order
 
 from capa.safe_exec import safe_exec, update_hash
 

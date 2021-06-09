@@ -17,15 +17,15 @@ import ddt
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
-from django.utils.encoding import smart_text
-from edx_user_state_client.interface import XBlockUserState
-from lxml import etree
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
-from webob.multidict import MultiDict
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
-from xblock.scorable import Score
+from django.utils.encoding import smart_text  # pylint: disable=wrong-import-order
+from edx_user_state_client.interface import XBlockUserState  # pylint: disable=wrong-import-order
+from lxml import etree  # pylint: disable=wrong-import-order
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator  # pylint: disable=wrong-import-order
+from pytz import UTC  # pylint: disable=wrong-import-order
+from webob.multidict import MultiDict  # pylint: disable=wrong-import-order
+from xblock.field_data import DictFieldData  # pylint: disable=wrong-import-order
+from xblock.fields import ScopeIds  # pylint: disable=wrong-import-order
+from xblock.scorable import Score  # pylint: disable=wrong-import-order
 
 import xmodule
 from capa import responsetypes
