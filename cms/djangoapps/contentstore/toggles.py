@@ -74,6 +74,7 @@ ENABLE_EXAM_SETTINGS_HTML_VIEW = SettingDictToggle(
     "FEATURES", "ENABLE_EXAM_SETTINGS_HTML_VIEW", default=False, module_name=__name__
 )
 
+
 def exam_setting_view_enabled():
     """
     Returns a boolean if proctoring exam setting mfe view is enabled.
