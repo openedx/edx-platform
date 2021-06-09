@@ -239,11 +239,19 @@ class UserApplication(TimeStampedModel):
         return self.is_work_experience_not_applicable or self.has_work_experience
 
     @property
+    def is_reference_added(self):
+        """
+        Check if user has added any reference against their application
+        """
+        return self.references.exists()
+
+    @property
     def is_education_experience_completed(self):
         """
         Check user completed the education and experience step in user application
         """
-        return self.is_education_completed and self.is_work_experience_completed and bool(self.background_question)
+        return self.is_education_completed and self.is_work_experience_completed \
+            and bool(self.background_question) and self.is_reference_added
 
 
 class UserStartAndEndDates(TimeStampedModel):
