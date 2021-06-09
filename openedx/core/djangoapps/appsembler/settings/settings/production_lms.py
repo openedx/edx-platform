@@ -97,3 +97,5 @@ def plugin_settings(settings):
 
     settings.STATICFILES_DIRS = get_tahoe_theme_static_dirs(settings)
     settings.AUTHENTICATION_BACKENDS = get_tahoe_multitenant_auth_backends(settings)
+
+    settings.HIJACK_LOGIN_REDIRECT_URL = '/dashboard'
